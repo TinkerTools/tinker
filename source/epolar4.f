@@ -237,7 +237,7 @@ c
          d2plambdaexp = 0.0d0
       end if
       depdl = dplambdaexp * (ep1 - ep0)
-      depdl2 = d2plambdaexp * (ep1 - ep0)
+      d2epdl2 = d2plambdaexp * (ep1 - ep0)
       do i = 1, n
          do j = 1, 3
             dep(j,i) = plambdaexp * dep1(j,i)

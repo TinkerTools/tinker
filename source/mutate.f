@@ -45,6 +45,7 @@ c
       use iounit
       use katoms
       use keys
+      use math
       use mplpot
       use mpole
       use mutant
@@ -110,24 +111,61 @@ c     set default dual topology interpolation exponent
 c
       epdtexp = 2
 c
-c     set default ost energy update interval
+c     set default ost update intervals
 c
-      iost = 10
+      iost = 0
+      iosthist = 10
+      use_ostdyn = .false.
+      ostrestart = .false.
+      use_metadyn = .false.
+      metarestart = .false.
 c
 c     set default mapping from main lambda to sublambda
 c
       ostplmda1 = 1.0d0
-      ostplmda0 = 0.6d0
-      ostelmda1 = 0.7d0
+      ostplmda0 = 0.5d0
+      ostelmda1 = 0.8d0
       ostelmda0 = 0.3d0
-      ostvlmda1 = 0.4d0
+      ostvlmda1 = 0.5d0
       ostvlmda0 = 0.0d0
+      ostpmap = 'QNT'
+      ostemap = 'QNT'
+      ostvmap = 'QNT'
+      ostepexp = 1
+      ostemexp = 1
+      ostevexp = 1
+      ostinvepn = 4
+      ostinvemn = 4
+      ostinvevn = 4
+      ostinvepeps = 0.3d0
+      ostinvemeps = 0.3d0
+      ostinveveps = 0.3d0
       ostlambda = 1.0d0
+      ostlambdaavg = 0.0d0
+      ostdedlavg = 0.0d0
+      ostdedl = 0.0d0
+      deffdl = 0.0d0
+      osttheta = pi / 2.0d0
+      ostvtheta = 0.0d0
+      ostmass = 25.0d0
+      ostfriction = 0.01d0
+      ostdt = 0.001d0
 c
 c     set default flag to compute specific lambda deriv
 c
       use_pol4i = .false.
       use_pol4f = .false.
+c
+c     set default ost lambda bin values
+c
+      nlmda = 201
+      nflmda = 2001
+      wflmda = 1.0d0
+      fli0 = (nflmda + 1) / 2
+      hbias = 0.00001d0
+      oststdev = 4.0d0
+      eosttot = 0.0d0
+      nmetahist = 0
 c
 c     zero out number of hybrid atoms and mutated torsions
 c
@@ -234,9 +272,14 @@ c
             use_ost = .true.
             use_pol4i = .true.
             use_pol4f = .true.
-         else if (keyword(1:18) .eq. 'OST-COMP-INTERVAL ') then
+         else if (keyword(1:8) .eq. 'METADYN ') then
+            use_dlmda = .true.
+            use_meta = .true.
+            use_pol4i = .true.
+            use_pol4f = .true.
+         else if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
             string = record(next:240)
-            read (string,*,err=30)  iost
+            read (string,*,err=30)  iosthist
          else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
             string = record(next:240)
             read (string,*,err=30)  ostplmda0, ostplmda1
@@ -246,16 +289,194 @@ c
          else if (keyword(1:15) .eq. 'VDW-LMDA-RANGE ') then
             string = record(next:240)
             read (string,*,err=30)  ostvlmda0, ostvlmda1
-         else if (keyword(1:15) .eq. 'OST-LAMBDA ') then
+         else if (keyword(1:13) .eq. 'POL-LMDA-MAP ') then
+            call getword (record,ostpmap,next)
+            call upcase (ostpmap)
+         else if (keyword(1:13) .eq. 'ELE-LMDA-MAP ') then
+            call getword (record,ostemap,next)
+            call upcase (ostemap)
+         else if (keyword(1:13) .eq. 'VDW-LMDA-MAP ') then
+            call getword (record,ostvmap,next)
+            call upcase (ostvmap)
+         else if (keyword(1:13) .eq. 'POL-LMDA-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostepexp
+         else if (keyword(1:13) .eq. 'ELE-LMDA-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostemexp
+         else if (keyword(1:13) .eq. 'VDW-LMDA-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostevexp
+         else if (keyword(1:15) .eq. 'POL-LMDA-INV-N ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostinvepn
+         else if (keyword(1:15) .eq. 'ELE-LMDA-INV-N ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostinvemn
+         else if (keyword(1:15) .eq. 'VDW-LMDA-INV-N ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostinvevn
+         else if (keyword(1:17) .eq. 'POL-LMDA-INV-EPS ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostinvepeps
+         else if (keyword(1:17) .eq. 'ELE-LMDA-INV-EPS ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostinvemeps
+         else if (keyword(1:17) .eq. 'VDW-LMDA-INV-EPS ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostinveveps
+         else if (keyword(1:11) .eq. 'OST-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  ostlambda
+         else if (keyword(1:8) .eq. 'OST-DT ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostdt
+         else if (keyword(1:9) .eq. 'OST-MASS ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostmass
+         else if (keyword(1:13) .eq. 'OST-FRICTION ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostfriction
+         else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
+            string = record(next:240)
+            read (string,*,err=30)  nlmda
+         else if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
+            string = record(next:240)
+            read (string,*,err=30)  wflmda
+         else if (keyword(1:11) .eq. 'OST-STDDEV ') then
+            string = record(next:240)
+            read (string,*,err=30)  oststdev
+         else if (keyword(1:6) .eq. 'HBIAS ') then
+            string = record(next:240)
+            read (string,*,err=30)  hbias
          end if
    30    continue
       end do
 c
+c     only one adaptive lambda bias method can be active at a time
+c
+      if (use_ost .and. use_meta) then
+         write (iout,35)
+   35    format (/,' MUTATE  --  OST and METADYN cannot both be active')
+         call fatal
+      end if
+c
+c     validate mapping schemes from main lambda to sublambdas
+c
+      if (ostpmap.ne.'QNT' .and. ostpmap.ne.'EXP'
+     &       .and. ostpmap.ne.'INV') then
+         ostpmap = 'QNT'
+      end if
+      if (ostemap.ne.'QNT' .and. ostemap.ne.'EXP'
+     &       .and. ostemap.ne.'INV') then
+         ostemap = 'QNT'
+      end if
+      if (ostvmap.ne.'QNT' .and. ostvmap.ne.'EXP'
+     &       .and. ostvmap.ne.'INV') then
+         ostvmap = 'QNT'
+      end if
+      if (ostepexp .lt. 1) then
+         ostepexp = 1
+      end if
+      if (ostemexp .lt. 1) then
+         ostemexp = 1
+      end if
+      if (ostevexp .lt. 1) then
+         ostevexp = 1
+      end if
+      if (ostinvepn .lt. 1) then
+         ostinvepn = 1
+      end if
+      if (ostinvemn .lt. 1) then
+         ostinvemn = 1
+      end if
+      if (ostinvevn .lt. 1) then
+         ostinvevn = 1
+      end if
+      if (ostinvepeps .lt. 0.0d0) then
+         ostinvepeps = -ostinvepeps
+      end if
+      if (ostinvemeps .lt. 0.0d0) then
+         ostinvemeps = -ostinvemeps
+      end if
+      if (ostinveveps .lt. 0.0d0) then
+         ostinveveps = -ostinveveps
+      end if
+c
 c     set plambda to elambda if no values given
 c
       if (.not. setplambda)  plambda = elambda
+c
+c     define lambda width and flambda range
+c
+      if (mod(nlmda,2) .eq. 0)  nlmda = nlmda + 1
+      wlmda = 1.0d0 / dble(nlmda-1)
+      wlmda2 = 0.5d0 * wlmda
+      wflmda2 = 0.5d0 * wflmda
+c
+c     allocate ost histogram and kernels
+c
+      if (use_ost) then
+         if (allocated(osthhist))  deallocate (osthhist)
+         if (allocated(osthist))  deallocate (osthist)
+         if (allocated(osthead))  deallocate (osthead)
+         if (allocated(ostnext))  deallocate (ostnext)
+         if (allocated(ostlhist))  deallocate (ostlhist)
+         if (allocated(ostfhist))  deallocate (ostfhist)
+         if (allocated(ostwlhist))  deallocate (ostwlhist)
+         if (allocated(ostwfhist))  deallocate (ostwfhist)
+         if (allocated(fkernel))  deallocate (fkernel)
+         if (allocated(gkernel))  deallocate (gkernel)
+         sizeosthist = 10000
+         nosthist = 0
+         allocate (osthhist(sizeosthist))
+         allocate (osthist(sizeosthist))
+         allocate (osthead(nlmda,nflmda))
+         allocate (ostnext(sizeosthist))
+         allocate (ostlhist(sizeosthist))
+         allocate (ostfhist(sizeosthist))
+         allocate (ostwlhist(sizeosthist))
+         allocate (ostwfhist(sizeosthist))
+         allocate (fkernel(nlmda))
+         allocate (gkernel(nlmda,nflmda))
+c
+c     initialize ost histogram and kernels
+c
+         do i = 1, nlmda
+            fkernel(i) = 0.0d0
+            do k = 1, nflmda
+               gkernel(i,k) = 0.0d0
+               osthead(i,k) = 0
+            end do
+         end do
+         do i = 1, sizeosthist
+            osthist(i) = 0
+            ostnext(i) = 0
+            ostlhist(i) = 0.0d0
+            ostfhist(i) = 0.0d0
+            osthhist(i) = 0.0d0
+            ostwlhist(i) = 0.0d0
+            ostwfhist(i) = 0.0d0
+         end do
+      end if
+c
+c     allocate metadynamics gaussian history
+c
+      if (use_meta) then
+         if (allocated(metalhist))  deallocate (metalhist)
+         if (allocated(metahhist))  deallocate (metahhist)
+         if (allocated(metawhist))  deallocate (metawhist)
+         sizemetahist = 10000
+         nmetahist = 0
+         allocate (metalhist(sizemetahist))
+         allocate (metahhist(sizemetahist))
+         allocate (metawhist(sizemetahist))
+         do i = 1, sizemetahist
+            metalhist(i) = 0.0d0
+            metahhist(i) = 0.0d0
+            metawhist(i) = 0.0d0
+         end do
+      end if
 c
 c     check sublambda intervals are in [0,1] and ordered
 c
@@ -273,6 +494,8 @@ c
       if (ostvlmda0 .gt. 1.0d0)  ostvlmda0 = 1.0d0
       if (ostvlmda1 .gt. 1.0d0)  ostvlmda1 = 1.0d0
       if (ostlambda .gt. 1.0d0)  ostlambda = 1.0d0
+      if (.not. ostrestart .and. .not. metarestart)
+     &   osttheta = asin(sqrt(ostlambda))
       if (ostplmda1 .lt. ostplmda0) then
          temp = ostplmda0
          ostplmda0 = ostplmda1
@@ -291,7 +514,7 @@ c
 c
 c     get mapping from main lambda to sub-lambdas
 c
-      if (use_ost)  call mapsublmda
+      if (use_ost .or. use_meta)  call mapsublmda
 c
 c     perform dynamic allocation of some global arrays
 c

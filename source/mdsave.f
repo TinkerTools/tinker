@@ -30,6 +30,7 @@ c
       use mdstuf
       use mpole
       use output
+      use ost
       use polar
       use potent
       use rgddyn
@@ -102,24 +103,62 @@ c
   100    format (' Current Kinetic',5x,f15.4,' Kcal/mole')
       end if
 c
+c     print adaptive lambda bias information if present
+c
+      if (use_ostdyn) then
+         if (digits .ge. 8) then
+            write (iout,110)  ostlambda
+  110       format (' Current Lambda',6x,f19.8)
+            write (iout,120)  ostdedl
+  120       format (' Current dU/dLambda',2x,f19.8,' Kcal/mole')
+            write (iout,130)  eosttot
+  130       format (' Estimated Delta G',3x,f19.8,' Kcal/mole')
+         else if (digits .ge. 6) then
+            write (iout,140)  ostlambda
+  140       format (' Current Lambda',6x,f17.6)
+            write (iout,150)  ostdedl
+  150       format (' Current dU/dLambda',2x,f17.6,' Kcal/mole')
+            write (iout,160)  eosttot
+  160       format (' Estimated Delta G',3x,f17.6,' Kcal/mole')
+         else
+            write (iout,170)  ostlambda
+  170       format (' Current Lambda',6x,f15.4)
+            write (iout,180)  ostdedl
+  180       format (' Current dU/dLambda',2x,f15.4,' Kcal/mole')
+            write (iout,190)  eosttot
+  190       format (' Estimated Delta G',3x,f15.4,' Kcal/mole')
+         end if
+      else if (use_metadyn) then
+         if (digits .ge. 8) then
+            write (iout,110)  ostlambda
+            write (iout,130)  eosttot
+         else if (digits .ge. 6) then
+            write (iout,140)  ostlambda
+            write (iout,160)  eosttot
+         else
+            write (iout,170)  ostlambda
+            write (iout,190)  eosttot
+         end if
+      end if
+c
 c     print the values of the lattice lengths and angles
 c
       if (use_bounds) then
          if (digits .le. 6) then
-            write (iout,110)  xbox,ybox,zbox
-  110       format (' Lattice Lengths',6x,3f14.6)
-            write (iout,120)  alpha,beta,gamma
-  120       format (' Lattice Angles',7x,3f14.6)
+            write (iout,200)  xbox,ybox,zbox
+  200       format (' Lattice Lengths',6x,3f14.6)
+            write (iout,210)  alpha,beta,gamma
+  210       format (' Lattice Angles',7x,3f14.6)
          else if (digits .le. 8) then
-            write (iout,130)  xbox,ybox,zbox
-  130       format (' Lattice Lengths',6x,3f16.8)
-            write (iout,140)  alpha,beta,gamma
-  140       format (' Lattice Angles',7x,3f16.8)
+            write (iout,220)  xbox,ybox,zbox
+  220       format (' Lattice Lengths',6x,3f16.8)
+            write (iout,230)  alpha,beta,gamma
+  230       format (' Lattice Angles',7x,3f16.8)
          else
-            write (iout,150)  xbox,ybox,zbox
-  150       format (' Lattice Lengths',6x,3f18.10)
-            write (iout,160)  alpha,beta,gamma
-  160       format (' Lattice Angles',7x,3f18.10)
+            write (iout,240)  xbox,ybox,zbox
+  240       format (' Lattice Lengths',6x,3f18.10)
+            write (iout,250)  alpha,beta,gamma
+  250       format (' Lattice Angles',7x,3f18.10)
          end if
       end if
 c
@@ -161,14 +200,16 @@ c
          call prtxyz (ixyz)
       end if
       close (unit=ixyz)
-      write (iout,170)  isave
-  170 format (' Frame Number',13x,i10)
-      write (iout,180)  xyzfile(1:trimtext(xyzfile))
-  180 format (' Coordinate File',13x,a)
+      write (iout,260)  isave
+  260 format (' Frame Number',13x,i10)
+      write (iout,270)  xyzfile(1:trimtext(xyzfile))
+  270 format (' Coordinate File',13x,a)
 c
 c     update the information needed to restart the trajectory
 c
       call prtdyn
+      if (use_ost)  call saveost
+      if (use_meta)  call savemeta
 c
 c     save the velocity vector components at the current step
 c
@@ -202,13 +243,13 @@ c
             end if
          end if
          if (integrate .eq. 'RIGIDBODY') then
-            write (ivel,190)  ngrp,title(1:ltitle)
-  190       format (i6,2x,a)
+            write (ivel,280)  ngrp,title(1:ltitle)
+  280       format (i6,2x,a)
             do i = 1, ngrp
-               write (ivel,200)  i,(vcm(j,i),j=1,3)
-  200          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
-               write (ivel,210)  i,(wcm(j,i),j=1,3)
-  210          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,290)  i,(vcm(j,i),j=1,3)
+  290          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,300)  i,(wcm(j,i),j=1,3)
+  300          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
             end do
          else if (dcdsave) then
             call prtdcdv (ivel,first)
@@ -216,8 +257,8 @@ c
             call prtvel (ivel)
          end if
          close (unit=ivel)
-         write (iout,240)  velfile(1:trimtext(velfile))
-  240    format (' Velocity File',15x,a)
+         write (iout,310)  velfile(1:trimtext(velfile))
+  310    format (' Velocity File',15x,a)
       end if
 c
 c     save the force vector components for the current step; not
@@ -258,8 +299,8 @@ c
             call prtfrc (ifrc)
          end if
          close (unit=ifrc)
-         write (iout,270)  frcfile(1:trimtext(frcfile))
-  270    format (' Force Vector File',11x,a)
+         write (iout,320)  frcfile(1:trimtext(frcfile))
+  320    format (' Force Vector File',11x,a)
       end if
 c
 c     save the induced dipole components for the current step
@@ -296,8 +337,8 @@ c
             call prtuind (iind)
          end if
          close (unit=iind)
-         write (iout,300)  indfile(1:trimtext(indfile))
-  300    format (' Induced Dipole File',9x,a)
+         write (iout,330)  indfile(1:trimtext(indfile))
+  330    format (' Induced Dipole File',9x,a)
       end if
 c
 c     test for requested termination of the dynamics calculation
@@ -314,8 +355,8 @@ c
          end if
       end if
       if (exist) then
-         write (iout,310)
-  310    format (/,' MDSAVE  --  Dynamics Calculation Ending',
+         write (iout,340)
+  340    format (/,' MDSAVE  --  Dynamics Calculation Ending',
      &              ' due to User Request')
          call fatal
       end if
@@ -324,8 +365,8 @@ c     skip an extra line to keep the output formating neat
 c
       modsave = mod(istep,iprint)
       if (verbose .and. modsave.ne.0) then
-         write (iout,320)
-  320    format ()
+         write (iout,350)
+  350    format ()
       end if
       return
       end

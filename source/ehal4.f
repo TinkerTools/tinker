@@ -133,7 +133,7 @@ c     zero out the van der Waals energy and derivatives
 c
       ev = 0.0d0
       devdl = 0.0d0
-      devdl2 = 0.0d0
+      d2evdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dev(j,i) = 0.0d0
@@ -415,7 +415,7 @@ c
                   end if
                   if (mutik) then
                      devdl = devdl + dlambda
-                     devdl2 = devdl2 + dlambda2
+                     d2evdl2 = d2evdl2 + dlambda2
                   end if
 c
 c     increment the internal virial tensor components
@@ -729,7 +729,7 @@ c
                            dlambda2 = 0.5d0 * dlambda2
                         end if
                         devdl = devdl + dlambda
-                        devdl2 = devdl2 + dlambda2
+                        d2evdl2 = d2evdl2 + dlambda2
                      end if
 c
 c     increment the internal virial tensor components
@@ -876,7 +876,7 @@ c     zero out the van der Waals energy and derivatives
 c
       ev = 0.0d0
       devdl = 0.0d0
-      devdl2 = 0.0d0
+      d2evdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dev(j,i) = 0.0d0
@@ -1215,7 +1215,7 @@ c
                   end if
                   if (mutik) then
                      devdl = devdl + dlambda
-                     devdl2 = devdl2 + dlambda2
+                     d2evdl2 = d2evdl2 + dlambda2
                   end if
 c
 c     increment the internal virial tensor components
@@ -1363,7 +1363,7 @@ c     zero out the van der Waals energy and derivatives
 c
       ev = 0.0d0
       devdl = 0.0d0
-      devdl2 = 0.0d0
+      d2evdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dev(j,i) = 0.0d0
@@ -1414,9 +1414,9 @@ c
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
 !$OMP& dhal,cut2,vcouple,vlambda,mut,scexp,scalpha,
 !$OMP& c0,c1,c2,c3,c4,c5)
-!$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfvdl,devdl,devdl2,
+!$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfvdl,devdl,d2evdl2,
 !$OMP& evvir,devvirdl)
-!$OMP DO reduction(+:ev,dev,dfvdl,devdl,devdl2,evvir,devvirdl)
+!$OMP DO reduction(+:ev,dev,dfvdl,devdl,d2evdl2,evvir,devvirdl)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c
@@ -1657,7 +1657,7 @@ c
                   end if
                   if (mutik) then
                      devdl = devdl + dlambda
-                     devdl2 = devdl2 + dlambda2
+                     d2evdl2 = d2evdl2 + dlambda2
                   end if
 c
 c     increment the internal virial tensor components

@@ -770,7 +770,9 @@ c     for the fast-evolving local valence potential energy terms
 c
 c
       subroutine gradfast (energy,derivs)
+      use dlmda
       use limits
+      use ost
       use potent
       implicit none
       real*8 energy
@@ -781,6 +783,7 @@ c
       logical save_mpole,save_polar
       logical save_chgtrn,save_rxnfld
       logical save_solv,save_list
+      logical save_dlmda,save_ostdyn,save_metadyn
 c
 c
 c     save the original state of slow-evolving potentials
@@ -797,8 +800,11 @@ c
       save_rxnfld = use_rxnfld
       save_solv = use_solv
       save_list = use_list
+      save_dlmda = use_dlmda
+      save_ostdyn = use_ostdyn
+      save_metadyn = use_metadyn
 c
-c     turn off slow-evolving nonbonded potential energy terms
+c     turn off slow-evolving nonbonded potentials and adaptive biases
 c
       use_vdw = .false.
       use_repel = .false.
@@ -812,6 +818,9 @@ c
       use_rxnfld = .false.
       use_solv = .false.
       use_list = .false.
+      use_dlmda = .false.
+      use_ostdyn = .false.
+      use_metadyn = .false.
 c
 c     get energy and gradient for fast-evolving potential terms
 c
@@ -831,6 +840,9 @@ c
       use_rxnfld = save_rxnfld
       use_solv = save_solv
       use_list = save_list
+      use_dlmda = save_dlmda
+      use_ostdyn = save_ostdyn
+      use_metadyn = save_metadyn
       return
       end
 c

@@ -98,6 +98,7 @@ c
       use opbend
       use opdist
       use orbits
+      use ost
       use params
       use paths
       use pbstuf
@@ -914,6 +915,22 @@ c
       if (allocated(qorb))  deallocate (qorb)
       if (allocated(worb))  deallocate (worb)
       if (allocated(emorb))  deallocate (emorb)
+c
+c     deallocation of global arrays from module ost
+c
+      if (allocated(osthhist))  deallocate (osthhist)
+      if (allocated(osthist))  deallocate (osthist)
+      if (allocated(osthead))  deallocate (osthead)
+      if (allocated(ostnext))  deallocate (ostnext)
+      if (allocated(ostlhist))  deallocate (ostlhist)
+      if (allocated(ostfhist))  deallocate (ostfhist)
+      if (allocated(ostwlhist))  deallocate (ostwlhist)
+      if (allocated(ostwfhist))  deallocate (ostwfhist)
+      if (allocated(fkernel))  deallocate (fkernel)
+      if (allocated(gkernel))  deallocate (gkernel)
+      if (allocated(metalhist))  deallocate (metalhist)
+      if (allocated(metahhist))  deallocate (metahhist)
+      if (allocated(metawhist))  deallocate (metawhist)
 c
 c     deallocation of global arrays from module params
 c

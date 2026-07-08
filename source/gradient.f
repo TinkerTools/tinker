@@ -74,10 +74,10 @@ c
       devdl = 0.0d0
       demdl = 0.0d0
       depdl = 0.0d0
-      dedl2 = 0.0d0
-      devdl2 = 0.0d0
-      demdl2 = 0.0d0
-      depdl2 = 0.0d0
+      d2edl2 = 0.0d0
+      d2evdl2 = 0.0d0
+      d2emdl2 = 0.0d0
+      d2epdl2 = 0.0d0
       do i = 1, 3
          do j = 1, 3
             dvirdl(j,i) = 0.0d0
@@ -344,9 +344,9 @@ c
 c     sum up to get the total lambda derivative
 c
       if (use_dlmda) then
-         if (use_ost)  call lmdachain
+         if (use_ost .or. use_meta)  call lmdachain
          dedl = devdl + demdl + depdl
-         dedl2 = devdl2 + demdl2 + depdl2
+         d2edl2 = d2evdl2 + d2emdl2 + d2epdl2
          do i = 1, n
             do j = 1, 3
                dfsumdl(j,i) = dfvdl(j,i) + dfmdl(j,i) + dfpdl(j,i)
@@ -357,7 +357,19 @@ c
                dvirdl(j,i) = devvirdl(j,i)+demvirdl(j,i)+depvirdl(j,i)
             end do
          end do
-         if (use_ost)  call eost
+         if (use_ostdyn .or. use_metadyn) then
+            if (use_ostdyn) then
+               call eostdyn
+            else if (use_metadyn) then
+               call emetadyn
+            end if
+            energy = esum
+            do i = 1, n
+               do j = 1, 3
+                  derivs(j,i) = desum(j,i)
+               end do
+            end do
+         end if
       end if
 c
 c     distribute gradient on four-site water extra centers

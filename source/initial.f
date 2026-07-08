@@ -197,6 +197,11 @@ c     flag for use of lambda derivative
 c
       use_dlmda = .false.
       use_ost = .false.
+      use_ostdyn = .false.
+      ostrestart = .false.
+      use_meta = .false.
+      use_metadyn = .false.
+      metarestart = .false.
 c
 c     flag for use of rigid bodies
 c

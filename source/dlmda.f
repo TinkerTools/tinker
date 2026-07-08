@@ -17,17 +17,17 @@ c     dedl          total energy lambda derivative
 c     devdl         van der Waals lambda derivative
 c     demdl         multipole lambda derivative
 c     depdl         polarization lambda derivative
-c     dedl2         total energy second order lambda derivative
-c     devdl2        van der Waals second order lambda derivative
-c     demdl2        multipole second order lambda derivative
-c     depdl2        polarization second order lambda derivative
+c     d2edl2        total energy second order lambda derivative
+c     d2evdl2       van der Waals second order lambda derivative
+c     d2emdl2       multipole second order lambda derivative
+c     d2epdl2       polarization second order lambda derivative
 c     plambda       state weighting value for polarization potentials
 c     dpldlmda      derivative of plambda wrt main lambda
 c     deldlmda      derivative of elambda wrt main lambda
 c     dvldlmda      derivative of vlambda wrt main lambda
-c     d2pldlmda2    derivative of plambda wrt main lambda
-c     d2eldlmda2    derivative of elambda wrt main lambda
-c     d2vldlmda2    derivative of vlambda wrt main lambda
+c     d2pldlmda2    second derivative of plambda wrt main lambda
+c     d2eldlmda2    second derivative of elambda wrt main lambda
+c     d2vldlmda2    second derivative of vlambda wrt main lambda
 c     dvirdl        total virial lambda derivative
 c     devvirdl      van der Waals virial lambda derivative
 c     demvirdl      multipole virial lambda derivative
@@ -63,10 +63,10 @@ c
       real*8 devdl
       real*8 demdl
       real*8 depdl
-      real*8 dedl2
-      real*8 devdl2
-      real*8 demdl2
-      real*8 depdl2
+      real*8 d2edl2
+      real*8 d2evdl2
+      real*8 d2emdl2
+      real*8 d2epdl2
       real*8 plambda
       real*8 dpldlmda
       real*8 deldlmda

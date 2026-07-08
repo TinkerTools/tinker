@@ -176,7 +176,7 @@ c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
       demdl = 0.0d0
-      demdl2 = 0.0d0
+      d2emdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
@@ -563,7 +563,7 @@ c
                end if
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
-                  demdl2 = demdl2 + dlambda2
+                  d2emdl2 = d2emdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -1030,7 +1030,7 @@ c
                      dlambda2 = 0.5d0 * dlambda2
                   end if
                   demdl = demdl + dlambda
-                  demdl2 = demdl2 + dlambda2
+                  d2emdl2 = d2emdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -1358,7 +1358,7 @@ c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
       demdl = 0.0d0
-      demdl2 = 0.0d0
+      d2emdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
@@ -1416,9 +1416,9 @@ c
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
 !$OMP& use_group,use_intra,use_bounds,off2,f,mut,elambda)
 !$OMP& firstprivate(mscale) shared (em,dem,dfmdl,tem,dltem,pot,emvir,
-!$OMP& demvirdl,demdl,demdl2)
+!$OMP& demvirdl,demdl,d2emdl2)
 !$OMP DO reduction(+:em,dem,dfmdl,tem,dltem,pot,emvir,demvirdl,
-!$OMP& demdl,demdl2)
+!$OMP& demdl,d2emdl2)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1758,7 +1758,7 @@ c
                end if
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
-                  demdl2 = demdl2 + dlambda2
+                  d2emdl2 = d2emdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -2052,7 +2052,7 @@ c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
       demdl = 0.0d0
-      demdl2 = 0.0d0
+      d2emdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
@@ -2132,7 +2132,7 @@ c
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          if (muti) then
             demdl = demdl + 2.0d0 * elambda * e
-            demdl2 = demdl2 + 2.0d0 * e
+            d2emdl2 = d2emdl2 + 2.0d0 * e
             e = e * elambda * elambda
          end if
          em = em + e
@@ -2197,7 +2197,7 @@ c
       e = fterm * sum**2
       em = em + e
       demdl = demdl + fterm * 2.0d0 * sum * dlsum
-      demdl2 = demdl2 + fterm * 2.0d0 * dlsum**2
+      d2emdl2 = d2emdl2 + fterm * 2.0d0 * dlsum**2
 c
 c     compute the cell dipole boundary correction term
 c
@@ -2234,7 +2234,7 @@ c
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          em = em + term*(xd*xd+yd*yd+zd*zd)
          demdl = demdl + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
-         demdl2 = demdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
+         d2emdl2 = d2emdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
@@ -2832,7 +2832,7 @@ c
                end if
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
-                  demdl2 = demdl2 + dlambda2
+                  d2emdl2 = d2emdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -3286,7 +3286,7 @@ c
                end if
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
-                  demdl2 = demdl2 + dlambda2
+                  d2emdl2 = d2emdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -3566,7 +3566,7 @@ c     zero out the atomic multipole energy and derivatives
 c
       em = 0.0d0
       demdl = 0.0d0
-      demdl2 = 0.0d0
+      d2emdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
@@ -3646,7 +3646,7 @@ c
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
          if (muti) then
             demdl = demdl + 2.0d0 * elambda * e
-            demdl2 = demdl2 + 2.0d0 * e
+            d2emdl2 = d2emdl2 + 2.0d0 * e
             e = e * elambda * elambda
          end if
          em = em + e
@@ -3711,7 +3711,7 @@ c
       e = fterm * sum**2
       em = em + e
       demdl = demdl + fterm * 2.0d0 * sum * dlsum
-      demdl2 = demdl2 + fterm * 2.0d0 * dlsum**2
+      d2emdl2 = d2emdl2 + fterm * 2.0d0 * dlsum**2
 c
 c     compute the cell dipole boundary correction term
 c
@@ -3748,7 +3748,7 @@ c
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          em = em + term*(xd*xd+yd*yd+zd*zd)
          demdl = demdl + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
-         demdl2 = demdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
+         d2emdl2 = d2emdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
@@ -4029,8 +4029,8 @@ c
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
 !$OMP& yaxis,zaxis,elambda,mut)
 !$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir,demvirdl,
-!$OMP& demdl,demdl2,dfmdl,dltem)
-!$OMP DO reduction(+:em,dem,tem,pot,emvir,demvirdl,demdl,demdl2,
+!$OMP& demdl,d2emdl2,dfmdl,dltem)
+!$OMP DO reduction(+:em,dem,tem,pot,emvir,demvirdl,demdl,d2emdl2,
 !$OMP& dfmdl,dltem)
 c
 c     compute the real space portion of the Ewald summation
@@ -4359,7 +4359,7 @@ c
                end if
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
-                  demdl2 = demdl2 + dlambda2
+                  d2emdl2 = d2emdl2 + dlambda2
                end if
 c
 c     modify the energy, force, and torque by lambda
@@ -4968,7 +4968,7 @@ c
       e = 0.5d0 * e
       em = em + e
       demdl = demdl + dlambda
-      demdl2 = demdl2 + dlambda2
+      d2emdl2 = d2emdl2 + dlambda2
 c
 c     increment the permanent multipole virial contributions
 c

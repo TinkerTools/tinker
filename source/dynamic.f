@@ -26,6 +26,7 @@ c
       use iounit
       use keys
       use mdstuf
+      use ost
       use potent
       use stodyn
       use usage
@@ -64,6 +65,10 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
+         else if (keyword(1:4) .eq. 'OST ') then
+            use_ostdyn = .true.
+         else if (keyword(1:8) .eq. 'METADYN ') then
+            use_metadyn = .true.
          end if
       end do
 c
@@ -222,6 +227,12 @@ c
          end if
       end if
 c
+c     read adaptive-bias restart files
+c
+      if (use_ost)  call rdost
+      if (use_meta)  call rdmeta
+      if (use_ost .or. use_meta)  call mapsublmda
+c
 c     perform the setup functions needed to run dynamics
 c
       call mdinit (dt)
@@ -308,6 +319,11 @@ c
             call beeman (istep,dt)
          end if
       end do
+c
+c     save ost and metadynamics restart information
+c
+      if (use_ost)  call saveost
+      if (use_meta)  call savemeta
 c
 c     perform any final tasks before program exit
 c

@@ -20,6 +20,7 @@ c
       use atoms
       use ielscf
       use keys
+      use ost
       use uprior
       implicit none
       integer i,j,k
@@ -59,6 +60,17 @@ c
             use_ielscf = .true.
          end if
       end do
+c
+c     disable dipole prediction during adaptive lambda simulations
+c
+      if (use_ost .or. use_ostdyn .or.
+     &    use_meta .or. use_metadyn) then
+         use_pred = .false.
+         use_ielscf = .false.
+         polpred = '    '
+         maxualt = 0
+         nualt = 0
+      end if
 c
 c     set always stable predictor-corrector (ASPC) coefficients
 c

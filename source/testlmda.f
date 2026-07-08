@@ -39,12 +39,12 @@ c
       real*8 lmda,lmda0
       real*8 adedl,adevdl
       real*8 ademdl,adepdl
-      real*8 adedl2,adevdl2
-      real*8 ademdl2,adepdl2
+      real*8 ad2edl2,ad2evdl2
+      real*8 ad2emdl2,ad2epdl2
       real*8 ndedl,ndevdl
       real*8 ndemdl,ndepdl
-      real*8 ndedl2,ndevdl2
-      real*8 ndemdl2,ndepdl2
+      real*8 nd2edl2,nd2evdl2
+      real*8 nd2emdl2,nd2epdl2
       real*8 esum2,esum1,esum0
       real*8 em2,em1,em0
       real*8 ep2,ep1,ep0
@@ -183,10 +183,10 @@ c
             adevdl = devdl
             ademdl = demdl
             adepdl = depdl
-            adedl2 = dedl2
-            adevdl2 = devdl2
-            ademdl2 = demdl2
-            adepdl2 = depdl2
+            ad2edl2 = d2edl2
+            ad2evdl2 = d2evdl2
+            ad2emdl2 = d2emdl2
+            ad2epdl2 = d2epdl2
             do i = 1, n
                do j = 1, 3
                   adfsumdl(j,i) = dfsumdl(j,i)
@@ -236,10 +236,10 @@ c
             ndevdl = (ev2 - ev0) / (2.0d0 * eps)
             ndemdl = (em2 - em0) / (2.0d0 * eps)
             ndepdl = (ep2 - ep0) / (2.0d0 * eps)
-            ndedl2 = (esum2 - 2.0d0 * esum1 + esum0) / (eps*eps)
-            ndevdl2 = (ev2 - 2.0d0 * ev1 + ev0) / (eps*eps)
-            ndemdl2 = (em2 - 2.0d0 * em1 + em0) / (eps*eps)
-            ndepdl2 = (ep2 - 2.0d0 * ep1 + ep0) / (eps*eps)
+            nd2edl2 = (esum2 - 2.0d0 * esum1 + esum0) / (eps*eps)
+            nd2evdl2 = (ev2 - 2.0d0 * ev1 + ev0) / (eps*eps)
+            nd2emdl2 = (em2 - 2.0d0 * em1 + em0) / (eps*eps)
+            nd2epdl2 = (ep2 - 2.0d0 * ep1 + ep0) / (eps*eps)
             vlambda = oldvdl + eps
             elambda = oldeml + eps
             plambda = oldepl + eps
@@ -291,17 +291,17 @@ c
 c     apply chain rule if using global lambda in ost
 c
             if (use_ost) then
-               ndepdl2 = ndepdl2 * dpldlmda*dpldlmda
+               nd2epdl2 = nd2epdl2 * dpldlmda*dpldlmda
      &                           + ndepdl * d2pldlmda2
                ndepdl = ndepdl * dpldlmda
-               ndevdl2 = ndevdl2 * dvldlmda*dvldlmda
+               nd2evdl2 = nd2evdl2 * dvldlmda*dvldlmda
      &                           + ndevdl * d2vldlmda2
                ndevdl = ndevdl * dvldlmda
-               ndemdl2 = ndemdl2 * deldlmda*deldlmda
+               nd2emdl2 = nd2emdl2 * deldlmda*deldlmda
      &                           + ndemdl * d2eldlmda2
                ndemdl = ndemdl * deldlmda
                ndedl = ndepdl + ndevdl + ndemdl
-               ndedl2 = ndepdl2 + ndevdl2 + ndemdl2
+               nd2edl2 = nd2epdl2 + nd2evdl2 + nd2emdl2
                do i = 1, n
                   do j = 1, 3
                      ndfpdl(j,i) = ndfpdl(j,i) * dpldlmda
@@ -349,7 +349,7 @@ c
          if (doanalyt) then
             write (iout,110)  'd2E/dL2', 'd2EV/dL2', 'd2EM/dL2', 
      &                         'd2EP/dL2',
-     &                        adedl2,adevdl2,ademdl2,adepdl2
+     &                        ad2edl2,ad2evdl2,ad2emdl2,ad2epdl2
   110       format (/,' Analytical 2nd Lambda Derivatives :',
      &                 4a14, /, 36x, 4f14.6)
          end if
@@ -359,7 +359,7 @@ c
          if (donumer) then
             write (iout,120)  'd2E/dL2', 'd2EV/dL2', 'd2EM/dL2', 
      &                         'd2EP/dL2',
-     &                        ndedl2,ndevdl2,ndemdl2,ndepdl2
+     &                        nd2edl2,nd2evdl2,nd2emdl2,nd2epdl2
   120       format (/,' Numerical 2nd Lambda Derivatives : ',
      &                 4a14, /, 36x, 4f14.6)
          end if
@@ -442,15 +442,19 @@ c
 c
 c     print the components of the analytical internal virial
 c
-      write (iout,230)  (advirdl(1,i),advirdl(2,i),advirdl(3,i),i=1,3)
-  230 format (/,' Analytical dV/dL :',8x,3f13.3,
-     &           /,27x,3f13.3,/,27x,3f13.3)
+      if (doanalyt) then
+         write (iout,230) (advirdl(1,i),advirdl(2,i),advirdl(3,i),i=1,3)
+  230    format (/,' Analytical dV/dL :',8x,3f13.3,
+     &              /,27x,3f13.3,/,27x,3f13.3)
+      end if
 c
 c     print the components of the numerical internal virial
 c
-      write (iout,240)  (ndvirdl(1,i),ndvirdl(2,i),ndvirdl(3,i),i=1,3)
-  240 format (/,' Numerical dV/dL :',9x,3f13.3,
-     &           /,27x,3f13.3,/,27x,3f13.3)
+      if (donumer) then
+         write (iout,240) (ndvirdl(1,i),ndvirdl(2,i),ndvirdl(3,i),i=1,3)
+  240    format (/,' Numerical dV/dL :',9x,3f13.3,
+     &              /,27x,3f13.3,/,27x,3f13.3)
+      end if
 c
 c     attempt to read next structure from the coordinate file
 c
