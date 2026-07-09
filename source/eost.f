@@ -99,8 +99,12 @@ c
          ostwfhist(nosthist) = wfhist
          ostnext(nosthist) = osthead(ilmda,iflmda)
          osthead(ilmda,iflmda) = nosthist
-         call updategkernel
-         call buildfkernel
+         if (fastkernel) then
+            call updatekernels
+         else
+            call updategkernel
+            call buildfkernel
+         end if
          eosttot = etotfkernel()
 c
 c     zero out lambda and dE/dlambda averages and standard deviations
@@ -1163,6 +1167,44 @@ c
 c
 c     ###########################################################
 c     ##                                                       ##
+c     ##  subroutine buildkernels -- build the ost kernels     ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "buildkernels" builds both ost kernels by looping over saved
+c     histogram sources and updating the f kernel accumulators
+c
+c
+      subroutine buildkernels
+      use ost
+      implicit none
+      integer i,j
+      integer ihist
+c
+c
+c     zero out kernels and free energy accumulators
+c
+      do i = 1, nlmda
+         fkernel(i) = 0.0d0
+         fsumkernel(i) = 0.0d0
+         pfkernel(i) = 0.0d0
+         do j = 1, nflmda
+            gkernel(i,j) = 0.0d0
+         end do
+      end do
+c
+c     loop over saved histogram sources
+c
+      do ihist = 1, nosthist
+         call addkernelhist (ihist)
+      end do
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
 c     ##  subroutine updategkernel -- update the ost g kernel  ##
 c     ##                                                       ##
 c     ###########################################################
@@ -1180,6 +1222,29 @@ c
 c     add the most recently saved histogram source
 c
       if (nosthist .gt. 0)  call addgkernelhist (nosthist)
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine updatekernels -- update the ost kernels   ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "updatekernels" updates the ost kernels by spreading the most
+c     recently saved histogram source and updating f accumulators
+c
+c
+      subroutine updatekernels
+      use ost
+      implicit none
+c
+c
+c     add the most recently saved histogram source
+c
+      if (nosthist .gt. 0)  call addkernelhist (nosthist)
       return
       end
 c
@@ -1278,6 +1343,152 @@ c
             end do
          end if
       end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine addkernelhist -- add one histogram source     ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "addkernelhist" spreads one saved histogram source to the
+c     ost g kernel and updates the f kernel accumulators
+c
+c
+      subroutine addkernelhist (ihist)
+      use ost
+      use math
+      implicit none
+      integer ihist
+      integer k
+      integer lsrc,fsrc
+      integer ilmda,iflmda
+      integer img,llog
+      integer ilmda1,ilmda2
+      integer iflmda1,iflmda2
+      integer nlcut,nfcut
+      real*8 sigl,sigf
+      real*8 sigl2,sigf2
+      real*8 pref
+      real*8 sourcel,sourcefl
+      real*8 targetl,targetf
+      real*8 ldelta,ldelta2
+      real*8 fldelta,fldelta2
+      real*8 e,expl,expfl
+c
+c
+c     unpack saved source location and get gaussian parameters
+c
+      k = osthist(ihist)
+      call k_to_ij (k,nlmda,lsrc,fsrc)
+      sigl = ostwlhist(ihist)
+      sigf = ostwfhist(ihist)
+      sigl2 = sigl * sigl
+      sigf2 = sigf * sigf
+      pref = osthhist(ihist) / (2.0d0*pi*sigl*sigf)
+      sourcefl = ostfhist(ihist)
+c
+c     include target bins out to the requested gaussian cutoff
+c
+      nlcut = int(oststdev*sigl/wlmda)
+      if (dble(nlcut)*wlmda .lt. oststdev*sigl+wlmda2)
+     &   nlcut = nlcut + 1
+      nfcut = int(oststdev*sigf/wflmda)
+      if (dble(nfcut)*wflmda .lt. oststdev*sigf+wflmda2)
+     &   nfcut = nfcut + 1
+      iflmda1 = max(1,fsrc-nfcut)
+      iflmda2 = min(nflmda,fsrc+nfcut)
+c
+c     use the physical lambda source plus its two mirror images
+c
+      do img = 1, 3
+         if (img .eq. 1) then
+            llog = lsrc
+            sourcel = ostlhist(ihist)
+         else if (img .eq. 2) then
+            llog = 2 - lsrc
+            sourcel = -ostlhist(ihist)
+         else
+            llog = 2*nlmda - lsrc
+            sourcel = 2.0d0 - ostlhist(ihist)
+         end if
+c
+c     only target bins within the gaussian cutoff receive a contribution
+c
+         ilmda1 = max(1,llog-nlcut)
+         ilmda2 = min(nlmda,llog+nlcut)
+         if (ilmda1 .le. ilmda2) then
+            do ilmda = ilmda1, ilmda2
+               targetl = dble(ilmda-1) * wlmda
+               ldelta = targetl - sourcel
+               if (abs(ldelta) .gt. oststdev*sigl)  goto 10
+               ldelta2 = ldelta*ldelta
+               expl = exp(-ldelta2 / (2.0d0*sigl2))
+               do iflmda = iflmda1, iflmda2
+                  targetf = dble(iflmda-fli0) * wflmda
+                  fldelta = targetf - sourcefl
+                  if (abs(fldelta) .gt. oststdev*sigf)  goto 20
+                  fldelta2 = fldelta*fldelta
+                  expfl = exp(-fldelta2 / (2.0d0*sigf2))
+                  e = pref * expl * expfl
+                  call addkernelpoint (ilmda,iflmda,e)
+   20             continue
+               end do
+   10          continue
+            end do
+         end if
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine addkernelpoint -- add one grid contribution   ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "addkernelpoint" updates one g kernel cell and the associated
+c     f kernel numerator and partition-function accumulator
+c
+c
+      subroutine addkernelpoint (ilmda,iflmda,e)
+      use bath
+      use ost
+      use units
+      implicit none
+      integer ilmda,iflmda
+      real*8 e
+      real*8 flmda
+      real*8 oldg,newg
+      real*8 oldweight,newweight
+      real*8 delweight
+c
+c
+c     update the g kernel and adjust the f kernel accumulators
+c
+      oldg = gkernel(ilmda,iflmda)
+      if (oldg .eq. 0.0d0) then
+         oldweight = 0.0d0
+      else
+         oldweight = exp(oldg/(gasconst*kelvin))
+      end if
+      newg = oldg + e
+      newweight = exp(newg/(gasconst*kelvin))
+      delweight = newweight - oldweight
+      flmda = dble(iflmda-fli0) * wflmda
+      gkernel(ilmda,iflmda) = newg
+      fsumkernel(ilmda) = fsumkernel(ilmda) + flmda*delweight
+      pfkernel(ilmda) = pfkernel(ilmda) + delweight
+      if (pfkernel(ilmda) .eq. 0.0d0) then
+         fkernel(ilmda) = 0.0d0
+      else
+         fkernel(ilmda) = fsumkernel(ilmda) / pfkernel(ilmda)
+      end if
       return
       end
 c
@@ -1566,7 +1777,9 @@ c
       if (allocated(ostwlhist))  deallocate (ostwlhist)
       if (allocated(ostwfhist))  deallocate (ostwfhist)
       if (allocated(fkernel))  deallocate (fkernel)
+      if (allocated(fsumkernel))  deallocate (fsumkernel)
       if (allocated(gkernel))  deallocate (gkernel)
+      if (allocated(pfkernel))  deallocate (pfkernel)
       allocate (osthhist(sizeosthist0))
       allocate (osthist(sizeosthist0))
       allocate (osthead(nlmda0,nflmda0))
@@ -1578,7 +1791,9 @@ c
       allocate (ostwlhist(sizeosthist0))
       allocate (ostwfhist(sizeosthist0))
       allocate (fkernel(nlmda0))
+      allocate (fsumkernel(nlmda0))
       allocate (gkernel(nlmda0,nflmda0))
+      allocate (pfkernel(nlmda0))
 c
 c     set scalar ost state from the restart file
 c
@@ -1616,6 +1831,8 @@ c     initialize ost arrays
 c
       do i = 1, nlmda
          fkernel(i) = 0.0d0
+         fsumkernel(i) = 0.0d0
+         pfkernel(i) = 0.0d0
          do ihist = 1, nflmda
             gkernel(i,ihist) = 0.0d0
             osthead(i,ihist) = 0
@@ -1651,8 +1868,12 @@ c
 c     rebuild lookup table and kernels from the saved gaussians
 c
       call buildostindex
-      call buildgkernel
-      call buildfkernel
+      if (fastkernel) then
+         call buildkernels
+      else
+         call buildgkernel
+         call buildfkernel
+      end if
       eosttot = etotfkernel()
       ostrestart = .true.
       if (debug) then

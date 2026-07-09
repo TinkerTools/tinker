@@ -226,12 +226,18 @@ c     reallocate grid-dependent arrays for the new analysis grid
 c
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(fkernel))  deallocate (fkernel)
+      if (allocated(fsumkernel))  deallocate (fsumkernel)
       if (allocated(gkernel))  deallocate (gkernel)
+      if (allocated(pfkernel))  deallocate (pfkernel)
       allocate (osthead(nlmda,nflmda))
       allocate (fkernel(nlmda))
+      allocate (fsumkernel(nlmda))
       allocate (gkernel(nlmda,nflmda))
+      allocate (pfkernel(nlmda))
       do i = 1, nlmda
          fkernel(i) = 0.0d0
+         fsumkernel(i) = 0.0d0
+         pfkernel(i) = 0.0d0
          do j = 1, nflmda
             gkernel(i,j) = 0.0d0
             osthead(i,j) = 0
@@ -241,8 +247,12 @@ c
 c     rebuild lookup table and kernels from saved gaussian centers
 c
       call buildostindex
-      call buildgkernel
-      call buildfkernel
+      if (fastkernel) then
+         call buildkernels
+      else
+         call buildgkernel
+         call buildfkernel
+      end if
       eosttot = etotfkernel()
       return
       end
@@ -323,14 +333,21 @@ c
       freeeng = 0.0d0
       nosthist = 0
       do i = 1, nlmda
+         fkernel(i) = 0.0d0
+         fsumkernel(i) = 0.0d0
+         pfkernel(i) = 0.0d0
          do j = 1, nflmda
             gkernel(i,j) = 0.0d0
          end do
       end do
       do ihist = 1, nsave
          nosthist = ihist
-         call updategkernel
-         call buildfkernel
+         if (fastkernel) then
+            call updatekernels
+         else
+            call updategkernel
+            call buildfkernel
+         end if
          freeeng = etotfkernel()
          step = ihist * iosthist
          write (iout,20)  ihist,step,ostlhist(ihist),ostfhist(ihist),
@@ -366,8 +383,12 @@ c
 c
 c     recompute and print the total free energy estimate
 c
-      call buildgkernel
-      call buildfkernel
+      if (fastkernel) then
+         call buildkernels
+      else
+         call buildgkernel
+         call buildfkernel
+      end if
       eosttot = etotfkernel()
       write (iout,10)  nosthist,eosttot
    10 format (/,' OST Free Energy Estimate :',
@@ -403,7 +424,11 @@ c
 c
 c     rebuild the full g kernel before printing
 c
-      call buildgkernel
+      if (fastkernel) then
+         call buildkernels
+      else
+         call buildgkernel
+      end if
       flstart = dble(1-fli0) * wflmda
       write (iout,10)  nlmda,nflmda
       write (iout,20)  0.0d0,wlmda

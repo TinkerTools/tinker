@@ -471,7 +471,9 @@ c
          if (allocated(ostwlhist))  deallocate (ostwlhist)
          if (allocated(ostwfhist))  deallocate (ostwfhist)
          if (allocated(fkernel))  deallocate (fkernel)
+         if (allocated(fsumkernel))  deallocate (fsumkernel)
          if (allocated(gkernel))  deallocate (gkernel)
+         if (allocated(pfkernel))  deallocate (pfkernel)
          sizeosthist = 10000
          nosthist = 0
          allocate (osthhist(sizeosthist))
@@ -485,12 +487,16 @@ c
          allocate (ostwlhist(sizeosthist))
          allocate (ostwfhist(sizeosthist))
          allocate (fkernel(nlmda))
+         allocate (fsumkernel(nlmda))
          allocate (gkernel(nlmda,nflmda))
+         allocate (pfkernel(nlmda))
 c
 c     initialize ost histogram and kernels
 c
          do i = 1, nlmda
             fkernel(i) = 0.0d0
+            fsumkernel(i) = 0.0d0
+            pfkernel(i) = 0.0d0
             do k = 1, nflmda
                gkernel(i,k) = 0.0d0
                osthead(i,k) = 0

@@ -594,7 +594,9 @@ c
       real*8 height
       real*8 fmanual(9)
       real*8 fref(9)
+      real*8 fsumref(9)
       real*8 gref(9,9)
+      real*8 pfref(9)
 c
 c
 c     build a mixed history with overlapping gaussians, endpoint
@@ -651,12 +653,35 @@ c
          else
             fmanual(i) = fsum / partfunc
          end if
+         fsumref(i) = fsum
+         pfref(i) = partfunc
       end do
       call checkarray1 ('buildfkernel all-row weighted mean',
      &                  fkernel,fmanual,nlmda,1.0d-12,nfail)
 c
-c     incrementally updating gkernel one history at a time must match
-c     a full buildgkernel rebuild exactly enough for fkernel rebuild
+c     buildkernels must produce the same gkernel, fkernel and
+c     free energy accumulators as the old full rebuild path
+c
+      do i = 1, nlmda
+         fkernel(i) = -123.0d0
+         fsumkernel(i) = -123.0d0
+         pfkernel(i) = -123.0d0
+         do j = 1, nflmda
+            gkernel(i,j) = -123.0d0
+         end do
+      end do
+      call buildkernels
+      call checkarray2 ('buildkernels gkernel reference',
+     &                  gkernel,gref,nlmda,nflmda,1.0d-12,nfail)
+      call checkarray1 ('buildkernels fkernel reference',
+     &                  fkernel,fref,nlmda,1.0d-12,nfail)
+      call checkarray1 ('buildkernels fsum reference',
+     &                  fsumkernel,fsumref,nlmda,1.0d-12,nfail)
+      call checkarray1 ('buildkernels partfunc reference',
+     &                  pfkernel,pfref,nlmda,1.0d-12,nfail)
+c
+c     incrementally updating kernels one history at a time must match
+c     a full buildkernels rebuild
 c
       call resetost (9,9,8)
       height = 2.0d0 * pi * wlmda * wflmda
@@ -684,13 +709,16 @@ c
      &                    0.9d0*height,wlmda,wflmda)
          end if
          call buildostindex
-         call updategkernel
+         call updatekernels
       end do
-      call checkarray2 ('updategkernel equals buildgkernel',
+      call checkarray2 ('updatekernels gkernel reference',
      &                  gkernel,gref,nlmda,nflmda,1.0d-12,nfail)
-      call buildfkernel
-      call checkarray1 ('buildfkernel after updategkernel',
+      call checkarray1 ('updatekernels fkernel reference',
      &                  fkernel,fref,nlmda,1.0d-12,nfail)
+      call checkarray1 ('updatekernels fsum reference',
+     &                  fsumkernel,fsumref,nlmda,1.0d-12,nfail)
+      call checkarray1 ('updatekernels partfunc reference',
+     &                  pfkernel,pfref,nlmda,1.0d-12,nfail)
       return
       end
 c
@@ -939,7 +967,9 @@ c
       if (allocated(ostwlhist))  deallocate (ostwlhist)
       if (allocated(ostwfhist))  deallocate (ostwfhist)
       if (allocated(fkernel))  deallocate (fkernel)
+      if (allocated(fsumkernel))  deallocate (fsumkernel)
       if (allocated(gkernel))  deallocate (gkernel)
+      if (allocated(pfkernel))  deallocate (pfkernel)
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
@@ -999,7 +1029,9 @@ c
       allocate (ostwlhist(sizeosthist))
       allocate (ostwfhist(sizeosthist))
       allocate (fkernel(nlmda))
+      allocate (fsumkernel(nlmda))
       allocate (gkernel(nlmda,nflmda))
+      allocate (pfkernel(nlmda))
 c
 c     initialize arrays
 c
@@ -1018,6 +1050,8 @@ c
       end do
       do i = 1, nlmda
          fkernel(i) = 0.0d0
+         fsumkernel(i) = 0.0d0
+         pfkernel(i) = 0.0d0
          do j = 1, nflmda
             osthead(i,j) = 0
             gkernel(i,j) = 0.0d0

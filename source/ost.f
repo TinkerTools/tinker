@@ -68,6 +68,7 @@ c     wlhist        lambda width of new histogram gaussians
 c     wlmda         width of lambda bins
 c     wlmda2        half width of lambda bins
 c     fkernel       free energy mean force at each lambda bin
+c     fsumkernel    numerator of free energy mean force kernel
 c     metahhist     height of metadynamics gaussians
 c     metalhist     lambda center of metadynamics gaussians
 c     metawhist     lambda width of metadynamics gaussians
@@ -79,6 +80,8 @@ c     ostllist      lambda values saved between hist updates
 c     ostwfhist     flambda width of gaussians saved in histogram
 c     ostwlhist     lambda width of gaussians saved in histogram
 c     gkernel       ost bias potential on the lambda/flambda grid
+c     pfkernel      partition function for free energy mean force
+c     fastkernel    flag to use fused g and f kernel updates
 c     metarestart   flag to indicate metadynamics restart data was read
 c     ostrestart    flag to indicate ost restart data was read
 c     use_meta      flag to use metadynamics
@@ -150,6 +153,7 @@ c
       real*8 wlmda
       real*8 wlmda2
       real*8, allocatable :: fkernel(:)
+      real*8, allocatable :: fsumkernel(:)
       real*8, allocatable :: metahhist(:)
       real*8, allocatable :: metalhist(:)
       real*8, allocatable :: metawhist(:)
@@ -161,6 +165,8 @@ c
       real*8, allocatable :: ostwfhist(:)
       real*8, allocatable :: ostwlhist(:)
       real*8, allocatable :: gkernel(:,:)
+      real*8, allocatable :: pfkernel(:)
+      logical fastkernel
       logical metarestart
       logical ostrestart
       logical use_meta
@@ -172,5 +178,6 @@ c
       character*3 ostemap
       character*3 ostpmap
       character*3 ostvmap
+      data fastkernel  / .true. /
       save
       end
