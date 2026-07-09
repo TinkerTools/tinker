@@ -38,9 +38,11 @@ c     eosttot       total ost free energy
 c     hbias         height of biasing gaussian
 c     maxwfhist     maximum flambda width of histogram gaussians
 c     maxwlhist     maximum lambda width of histogram gaussians
+c     ostddgdl      current dDeltaG/dlambda value
 c     ostdedl       current unbiased dU/dlambda value
 c     ostdedlavg    average dE/dlambda value between hist updates
 c     ostdedlstd    standard deviation of dE/dlambda between updates
+c     ostdgdl       current dg/dlambda value
 c     ostdt         time step for theta lambda propagation
 c     ostelmda0     sublambda lower bound for electrostatics
 c     ostelmda1     sublambda upper bound for electrostatics
@@ -117,9 +119,11 @@ c
       real*8 hbias
       real*8 maxwfhist
       real*8 maxwlhist
+      real*8 ostddgdl
       real*8 ostdedl
       real*8 ostdedlavg
       real*8 ostdedlstd
+      real*8 ostdgdl
       real*8 ostdt
       real*8 ostelmda0
       real*8 ostelmda1

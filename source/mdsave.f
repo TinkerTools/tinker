@@ -47,7 +47,6 @@ c
       integer modsave
       real*8 dt,pico
       real*8 epot,eksum
-      real*8 ostdbias
       logical exist,first
       character*7 ext
       character*240 endfile
@@ -107,45 +106,50 @@ c
 c     print adaptive lambda bias information if present
 c
       if (use_ostdyn) then
-         ostdbias = deffdl - ostdedl
          if (digits .ge. 8) then
             write (iout,110)  ostlambda
   110       format (' Current Lambda',6x,f19.8)
             write (iout,120)  ostdedl
   120       format (' Current dU/dLambda',2x,f19.8,' Kcal/mole')
-            write (iout,130)  ostdbias
-  130       format (' Current dV/dLambda',2x,f19.8,' Kcal/mole')
-            write (iout,140)  eosttot
-  140       format (' Estimated Delta G',3x,f19.8,' Kcal/mole')
+            write (iout,130)  ostdgdl
+  130       format (' Current dg/dLambda',2x,f19.8,' Kcal/mole')
+            write (iout,140)  -ostddgdl
+  140       format (' Current -ddG/dLambda',f19.8,' Kcal/mole')
+            write (iout,150)  eosttot
+  150       format (' Estimated Delta G',3x,f19.8,' Kcal/mole')
          else if (digits .ge. 6) then
-            write (iout,150)  ostlambda
-  150       format (' Current Lambda',6x,f17.6)
-            write (iout,160)  ostdedl
-  160       format (' Current dU/dLambda',2x,f17.6,' Kcal/mole')
-            write (iout,170)  ostdbias
-  170       format (' Current dV/dLambda',2x,f17.6,' Kcal/mole')
-            write (iout,180)  eosttot
-  180       format (' Estimated Delta G',3x,f17.6,' Kcal/mole')
+            write (iout,160)  ostlambda
+  160       format (' Current Lambda',6x,f17.6)
+            write (iout,170)  ostdedl
+  170       format (' Current dU/dLambda',2x,f17.6,' Kcal/mole')
+            write (iout,180)  ostdgdl
+  180       format (' Current dg/dLambda',2x,f17.6,' Kcal/mole')
+            write (iout,190)  -ostddgdl
+  190       format (' Current -ddG/dLambda',f17.6,' Kcal/mole')
+            write (iout,200)  eosttot
+  200       format (' Estimated Delta G',3x,f17.6,' Kcal/mole')
          else
-            write (iout,190)  ostlambda
-  190       format (' Current Lambda',6x,f15.4)
-            write (iout,200)  ostdedl
-  200       format (' Current dU/dLambda',2x,f15.4,' Kcal/mole')
-            write (iout,210)  ostdbias
-  210       format (' Current dV/dLambda',2x,f15.4,' Kcal/mole')
-            write (iout,220)  eosttot
-  220       format (' Estimated Delta G',3x,f15.4,' Kcal/mole')
+            write (iout,210)  ostlambda
+  210       format (' Current Lambda',6x,f15.4)
+            write (iout,220)  ostdedl
+  220       format (' Current dU/dLambda',2x,f15.4,' Kcal/mole')
+            write (iout,230)  ostdgdl
+  230       format (' Current dg/dLambda',2x,f15.4,' Kcal/mole')
+            write (iout,240)  -ostddgdl
+  240       format (' Current -ddG/dLambda',f15.4,' Kcal/mole')
+            write (iout,250)  eosttot
+  250       format (' Estimated Delta G',3x,f15.4,' Kcal/mole')
          end if
       else if (use_metadyn) then
          if (digits .ge. 8) then
             write (iout,110)  ostlambda
-            write (iout,140)  eosttot
+            write (iout,150)  eosttot
          else if (digits .ge. 6) then
-            write (iout,150)  ostlambda
-            write (iout,180)  eosttot
+            write (iout,160)  ostlambda
+            write (iout,200)  eosttot
          else
-            write (iout,190)  ostlambda
-            write (iout,220)  eosttot
+            write (iout,210)  ostlambda
+            write (iout,250)  eosttot
          end if
       end if
 c
@@ -153,20 +157,20 @@ c     print the values of the lattice lengths and angles
 c
       if (use_bounds) then
          if (digits .le. 6) then
-            write (iout,230)  xbox,ybox,zbox
-  230       format (' Lattice Lengths',6x,3f14.6)
-            write (iout,240)  alpha,beta,gamma
-  240       format (' Lattice Angles',7x,3f14.6)
+            write (iout,260)  xbox,ybox,zbox
+  260       format (' Lattice Lengths',6x,3f14.6)
+            write (iout,270)  alpha,beta,gamma
+  270       format (' Lattice Angles',7x,3f14.6)
          else if (digits .le. 8) then
-            write (iout,250)  xbox,ybox,zbox
-  250       format (' Lattice Lengths',6x,3f16.8)
-            write (iout,260)  alpha,beta,gamma
-  260       format (' Lattice Angles',7x,3f16.8)
+            write (iout,280)  xbox,ybox,zbox
+  280       format (' Lattice Lengths',6x,3f16.8)
+            write (iout,290)  alpha,beta,gamma
+  290       format (' Lattice Angles',7x,3f16.8)
          else
-            write (iout,270)  xbox,ybox,zbox
-  270       format (' Lattice Lengths',6x,3f18.10)
-            write (iout,280)  alpha,beta,gamma
-  280       format (' Lattice Angles',7x,3f18.10)
+            write (iout,300)  xbox,ybox,zbox
+  300       format (' Lattice Lengths',6x,3f18.10)
+            write (iout,310)  alpha,beta,gamma
+  310       format (' Lattice Angles',7x,3f18.10)
          end if
       end if
 c
@@ -208,10 +212,10 @@ c
          call prtxyz (ixyz)
       end if
       close (unit=ixyz)
-      write (iout,290)  isave
-  290 format (' Frame Number',13x,i10)
-      write (iout,300)  xyzfile(1:trimtext(xyzfile))
-  300 format (' Coordinate File',13x,a)
+      write (iout,320)  isave
+  320 format (' Frame Number',13x,i10)
+      write (iout,330)  xyzfile(1:trimtext(xyzfile))
+  330 format (' Coordinate File',13x,a)
 c
 c     update the information needed to restart the trajectory
 c
@@ -251,13 +255,13 @@ c
             end if
          end if
          if (integrate .eq. 'RIGIDBODY') then
-            write (ivel,310)  ngrp,title(1:ltitle)
-  310       format (i6,2x,a)
+            write (ivel,340)  ngrp,title(1:ltitle)
+  340       format (i6,2x,a)
             do i = 1, ngrp
-               write (ivel,320)  i,(vcm(j,i),j=1,3)
-  320          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
-               write (ivel,330)  i,(wcm(j,i),j=1,3)
-  330          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,350)  i,(vcm(j,i),j=1,3)
+  350          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
+               write (ivel,360)  i,(wcm(j,i),j=1,3)
+  360          format (i6,3x,d13.6,3x,d13.6,3x,d13.6)
             end do
          else if (dcdsave) then
             call prtdcdv (ivel,first)
@@ -265,8 +269,8 @@ c
             call prtvel (ivel)
          end if
          close (unit=ivel)
-         write (iout,340)  velfile(1:trimtext(velfile))
-  340    format (' Velocity File',15x,a)
+         write (iout,370)  velfile(1:trimtext(velfile))
+  370    format (' Velocity File',15x,a)
       end if
 c
 c     save the force vector components for the current step; not
@@ -307,8 +311,8 @@ c
             call prtfrc (ifrc)
          end if
          close (unit=ifrc)
-         write (iout,350)  frcfile(1:trimtext(frcfile))
-  350    format (' Force Vector File',11x,a)
+         write (iout,380)  frcfile(1:trimtext(frcfile))
+  380    format (' Force Vector File',11x,a)
       end if
 c
 c     save the induced dipole components for the current step
@@ -345,8 +349,8 @@ c
             call prtuind (iind)
          end if
          close (unit=iind)
-         write (iout,360)  indfile(1:trimtext(indfile))
-  360    format (' Induced Dipole File',9x,a)
+         write (iout,390)  indfile(1:trimtext(indfile))
+  390    format (' Induced Dipole File',9x,a)
       end if
 c
 c     test for requested termination of the dynamics calculation
@@ -363,8 +367,8 @@ c
          end if
       end if
       if (exist) then
-         write (iout,370)
-  370    format (/,' MDSAVE  --  Dynamics Calculation Ending',
+         write (iout,400)
+  400    format (/,' MDSAVE  --  Dynamics Calculation Ending',
      &              ' due to User Request')
          call fatal
       end if
@@ -373,8 +377,8 @@ c     skip an extra line to keep the output formating neat
 c
       modsave = mod(istep,iprint)
       if (verbose .and. modsave.ne.0) then
-         write (iout,380)
-  380    format ()
+         write (iout,410)
+  410    format ()
       end if
       return
       end

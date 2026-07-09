@@ -44,7 +44,9 @@ c
       call efkernel (eostlmda,dfdl)
       esum = esum + egbias - eostlmda
       ostdedl = dedl
-      deffdl = ostdedl + dgdl + dgdfl*d2edl2 - dfdl
+      ostdgdl = dgdl + dgdfl*d2edl2
+      ostddgdl = dfdl
+      deffdl = ostdedl + ostdgdl - ostddgdl
       do i = 1, n
          do j = 1, 3
             desum(j,i) = desum(j,i) + dgdfl*dfsumdl(j,i)

@@ -299,6 +299,7 @@ c
       use iounit
       use ost
       implicit none
+      integer i,j
       integer ihist
       integer nsave
       integer step
@@ -319,9 +320,16 @@ c
 c
 c     rebuild the kernels cumulatively over the saved history
 c
+      freeeng = 0.0d0
+      nosthist = 0
+      do i = 1, nlmda
+         do j = 1, nflmda
+            gkernel(i,j) = 0.0d0
+         end do
+      end do
       do ihist = 1, nsave
          nosthist = ihist
-         call buildgkernel
+         call updategkernel
          call buildfkernel
          freeeng = etotfkernel()
          step = ihist * iosthist
@@ -330,12 +338,9 @@ c
    20    format (i7,i12,6d20.10)
       end do
 c
-c     restore the full saved history and kernels
+c     restore the full saved history free energy
 c
-      nosthist = nsave
-      call buildgkernel
-      call buildfkernel
-      eosttot = etotfkernel()
+      eosttot = freeeng
       return
       end
 c

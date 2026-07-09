@@ -117,6 +117,8 @@ c
       iosthist = 10
       ostnequil = 5
       ostnavg = 5
+      ostddgdl = 0.0d0
+      ostdgdl = 0.0d0
       osteqratio = 0.5d0
       use_ostdyn = .false.
       ostrestart = .false.
