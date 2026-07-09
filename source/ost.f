@@ -186,6 +186,5 @@ c
       character*3 ostemap
       character*3 ostpmap
       character*3 ostvmap
-      data fastkernel  / .true. /
       save
       end

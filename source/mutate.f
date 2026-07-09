@@ -368,6 +368,7 @@ c
             read (string,*,err=30)  oststdev
          else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
             ostinterpol = .true.
+            fastkernel = .true.
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
             read (string,*,err=30)  hbias
