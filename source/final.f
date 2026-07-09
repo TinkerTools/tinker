@@ -922,6 +922,8 @@ c
       if (allocated(osthist))  deallocate (osthist)
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(ostnext))  deallocate (ostnext)
+      if (allocated(ostllist))  deallocate (ostllist)
+      if (allocated(ostflist))  deallocate (ostflist)
       if (allocated(ostlhist))  deallocate (ostlhist)
       if (allocated(ostfhist))  deallocate (ostfhist)
       if (allocated(ostwlhist))  deallocate (ostwlhist)

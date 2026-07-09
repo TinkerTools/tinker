@@ -26,6 +26,7 @@ c
       implicit none
       integer i,j
       integer k
+      integer isamp,istep
       integer ilmda,iflmda
       integer lambdabin,flambdabin
       real*8 egbias,dgdl,dgdfl
@@ -55,14 +56,22 @@ c
          end do
       end do
 c
-c     update lambda and dE/dlambda averages between hist updates
+c     save all values in the hist interval, but average only after
+c     the requested equilibration fraction
 c
-      ostlambdaavg = ostlambdaavg + ostlambda/dble(iosthist)
-      ostdedlavg = ostdedlavg + ostdedl/dble(iosthist)
+      istep = mod(iost,iosthist)
+      if (istep .eq. 0) then
+         isamp = iosthist
+      else
+         isamp = istep
+      end if
+      ostllist(isamp) = ostlambda
+      ostflist(isamp) = ostdedl
 c
 c     add a new histogram count every iosthist steps
 c
-      if ((mod(iost,iosthist) .eq. 0)) then
+      if (istep .eq. 0) then
+         call ostavgstd
          ilmda = lambdabin(ostlambdaavg)
 c
 c     ensure histogram contains the unbiased dU/dlambda value
@@ -92,16 +101,63 @@ c
          call buildfkernel
          eosttot = etotfkernel()
 c
-c     zero out lambda and dE/dlambda averages
+c     zero out lambda and dE/dlambda averages and standard deviations
 c
          ostlambdaavg = 0.0d0
          ostdedlavg = 0.0d0
+         ostlambdastd = 0.0d0
+         ostdedlstd = 0.0d0
       end if
 c
 c     propagate the lambda particle for the next dynamics step
 c
       call ostlangevin
       return 
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ostavgstd -- ost average and std deviation    ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ostavgstd" computes average and standard deviation values
+c     from lambda and dE/dlambda samples saved between hist updates
+c
+c
+      subroutine ostavgstd
+      use ost
+      implicit none
+      integer i
+      real*8 dlmda,dfdl
+c
+c
+c     compute averages from collected samples
+c
+      ostlambdaavg = 0.0d0
+      ostdedlavg = 0.0d0
+      do i = ostnequil+1, iosthist
+         ostlambdaavg = ostlambdaavg + ostllist(i)
+         ostdedlavg = ostdedlavg + ostflist(i)
+      end do
+      ostlambdaavg = ostlambdaavg / dble(ostnavg)
+      ostdedlavg = ostdedlavg / dble(ostnavg)
+c
+c     compute population standard deviations from collected samples
+c
+      ostlambdastd = 0.0d0
+      ostdedlstd = 0.0d0
+      do i = ostnequil+1, iosthist
+         dlmda = ostllist(i) - ostlambdaavg
+         dfdl = ostflist(i) - ostdedlavg
+         ostlambdastd = ostlambdastd + dlmda*dlmda
+         ostdedlstd = ostdedlstd + dfdl*dfdl
+      end do
+      ostlambdastd = sqrt(ostlambdastd/dble(ostnavg))
+      ostdedlstd = sqrt(ostdedlstd/dble(ostnavg))
+      return
       end
 c
 c
@@ -121,6 +177,7 @@ c
       use energi
       use ost
       implicit none
+      integer istep,navg
       real*8 vbias,dvdl
       real*8 metadeltag
 c
@@ -136,13 +193,17 @@ c
       ostdedl = dedl
       deffdl = ostdedl + dvdl
 c
-c     update average lambda between gaussian depositions
+c     update average lambda only in the second half of each interval
 c
-      ostlambdaavg = ostlambdaavg + ostlambda/dble(iosthist)
+      istep = mod(iost,iosthist)
+      navg = iosthist / 2
+      if ((istep .eq. 0) .or. (istep .gt. navg)) then
+         ostlambdaavg = ostlambdaavg + ostlambda/dble(navg)
+      end if
 c
 c     add a new metadynamics gaussian every iosthist steps
 c
-      if ((mod(iost,iosthist) .eq. 0)) then
+      if (istep .eq. 0) then
          nmetahist = nmetahist + 1
          if (nmetahist .gt. sizemetahist)  call resizemeta
          metalhist(nmetahist) = ostlambdaavg
@@ -1485,6 +1546,7 @@ c
       if (nlmda0 .lt. 2)  goto 90
       if (nflmda0 .lt. 1)  goto 90
       if (fli00 .lt. 1 .or. fli00 .gt. nflmda0)  goto 90
+      if (iosthist0 .lt. 1)  goto 90
       if (nosthist0 .lt. 0)  goto 90
       if (sizeosthist0 .lt. nosthist0)  sizeosthist0 = nosthist0
       if (sizeosthist0 .lt. 1)  sizeosthist0 = 1
@@ -1495,6 +1557,8 @@ c
       if (allocated(osthist))  deallocate (osthist)
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(ostnext))  deallocate (ostnext)
+      if (allocated(ostllist))  deallocate (ostllist)
+      if (allocated(ostflist))  deallocate (ostflist)
       if (allocated(ostlhist))  deallocate (ostlhist)
       if (allocated(ostfhist))  deallocate (ostfhist)
       if (allocated(ostwlhist))  deallocate (ostwlhist)
@@ -1505,6 +1569,8 @@ c
       allocate (osthist(sizeosthist0))
       allocate (osthead(nlmda0,nflmda0))
       allocate (ostnext(sizeosthist0))
+      allocate (ostllist(iosthist0))
+      allocate (ostflist(iosthist0))
       allocate (ostlhist(sizeosthist0))
       allocate (ostfhist(sizeosthist0))
       allocate (ostwlhist(sizeosthist0))
@@ -1516,6 +1582,9 @@ c     set scalar ost state from the restart file
 c
       iost = iost0
       iosthist = iosthist0
+      ostnequil = int(osteqratio*dble(iosthist))
+      ostnequil = max(0,min(ostnequil,iosthist-1))
+      ostnavg = iosthist - ostnequil
       nlmda = nlmda0
       nflmda = nflmda0
       fli0 = fli00
@@ -1529,7 +1598,9 @@ c
       maxwfhist = wfhist
       ostlambda = ostlambda0
       ostlambdaavg = ostlambdaavg0
+      ostlambdastd = 0.0d0
       ostdedlavg = ostdedlavg0
+      ostdedlstd = 0.0d0
       osttheta = osttheta0
       ostvtheta = ostvtheta0
       ostmass = ostmass0
@@ -1547,6 +1618,10 @@ c
             gkernel(i,ihist) = 0.0d0
             osthead(i,ihist) = 0
          end do
+      end do
+      do i = 1, iosthist
+         ostllist(i) = 0.0d0
+         ostflist(i) = 0.0d0
       end do
       do i = 1, sizeosthist
          osthist(i) = 0

@@ -37,6 +37,8 @@ c
       call testensure (nfail)
       call testgkernels (nfail)
       call testfkernel (nfail)
+      call testkernelbuilds (nfail)
+      call testavgstd (nfail)
       call testefkernel (nfail)
       call testmapsub (nfail)
       call testmeta (nfail)
@@ -569,6 +571,171 @@ c
 c
 c     ###############################################################
 c     ##                                                           ##
+c     ##  subroutine testkernelbuilds -- test full kernel builds   ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine testkernelbuilds (nfail)
+      use bath
+      use math
+      use ost
+      use units
+      implicit none
+      integer i,j
+      integer ihist
+      integer nfail
+      integer nhist
+      real*8 rt
+      real*8 flmda
+      real*8 partfunc
+      real*8 fsum
+      real*8 weight
+      real*8 height
+      real*8 fmanual(9)
+      real*8 fref(9)
+      real*8 gref(9,9)
+c
+c
+c     build a mixed history with overlapping gaussians, endpoint
+c     mirror images, and multiple gaussian widths
+c
+      call resetost (9,9,8)
+      rt = gasconst * kelvin
+      nhist = 6
+      nosthist = nhist
+      height = 2.0d0 * pi * wlmda * wflmda
+      call sethist (1,0.00d0, 0.0d0,0.7d0*height,wlmda,wflmda)
+      call sethist (2,0.25d0,-1.0d0,1.1d0*height,wlmda,wflmda)
+      call sethist (3,0.50d0, 0.0d0,1.6d0*height,wlmda,wflmda)
+      call sethist (4,0.50d0, 0.0d0,0.4d0*height,wlmda,wflmda)
+      call sethist (5,0.75d0, 1.0d0,2.3d0*height,wlmda,wflmda)
+      call sethist (6,1.00d0, 0.0d0,0.9d0*height,wlmda,wflmda)
+      ostwlhist(5) = 2.0d0 * wlmda
+      ostwfhist(5) = 2.0d0 * wflmda
+      call buildostindex
+c
+c     buildgkernel must clear stale values before rebuilding
+c
+      do i = 1, nlmda
+         do j = 1, nflmda
+            gkernel(i,j) = -123.0d0
+         end do
+      end do
+      call buildgkernel
+      call buildfkernel
+      do i = 1, nlmda
+         fref(i) = fkernel(i)
+         do j = 1, nflmda
+            gref(i,j) = gkernel(i,j)
+         end do
+      end do
+      call checkreal ('buildgkernel clears outside support',
+     &                gkernel(1,1),0.0d0,1.0d-12,nfail)
+c
+c     compute the buildfkernel result independently from gkernel
+c
+      do i = 1, nlmda
+         partfunc = 0.0d0
+         fsum = 0.0d0
+         do j = 1, nflmda
+            if (gref(i,j) .ne. 0.0d0) then
+               flmda = dble(j-fli0) * wflmda
+               weight = exp(gref(i,j)/rt)
+               fsum = fsum + flmda*weight
+               partfunc = partfunc + weight
+            end if
+         end do
+         if (partfunc .eq. 0.0d0) then
+            fmanual(i) = 0.0d0
+         else
+            fmanual(i) = fsum / partfunc
+         end if
+      end do
+      call checkarray1 ('buildfkernel all-row weighted mean',
+     &                  fkernel,fmanual,nlmda,1.0d-12,nfail)
+c
+c     incrementally updating gkernel one history at a time must match
+c     a full buildgkernel rebuild exactly enough for fkernel rebuild
+c
+      call resetost (9,9,8)
+      height = 2.0d0 * pi * wlmda * wflmda
+      do ihist = 1, nhist
+         nosthist = ihist
+         if (ihist .eq. 1) then
+            call sethist (ihist,0.00d0,0.0d0,
+     &                    0.7d0*height,wlmda,wflmda)
+         else if (ihist .eq. 2) then
+            call sethist (ihist,0.25d0,-1.0d0,
+     &                    1.1d0*height,wlmda,wflmda)
+         else if (ihist .eq. 3) then
+            call sethist (ihist,0.50d0,0.0d0,
+     &                    1.6d0*height,wlmda,wflmda)
+         else if (ihist .eq. 4) then
+            call sethist (ihist,0.50d0,0.0d0,
+     &                    0.4d0*height,wlmda,wflmda)
+         else if (ihist .eq. 5) then
+            call sethist (ihist,0.75d0,1.0d0,
+     &                    2.3d0*height,wlmda,wflmda)
+            ostwlhist(ihist) = 2.0d0 * wlmda
+            ostwfhist(ihist) = 2.0d0 * wflmda
+         else
+            call sethist (ihist,1.00d0,0.0d0,
+     &                    0.9d0*height,wlmda,wflmda)
+         end if
+         call buildostindex
+         call updategkernel
+      end do
+      call checkarray2 ('updategkernel equals buildgkernel',
+     &                  gkernel,gref,nlmda,nflmda,1.0d-12,nfail)
+      call buildfkernel
+      call checkarray1 ('buildfkernel after updategkernel',
+     &                  fkernel,fref,nlmda,1.0d-12,nfail)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine testavgstd -- test OST interval averaging     ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine testavgstd (nfail)
+      use ost
+      implicit none
+      integer i
+      integer nfail
+      real*8 stdref
+c
+c
+c     average all saved interval samples after equilibration prefix
+c
+      call resetost (5,5,1)
+      iosthist = 6
+      ostnequil = 2
+      ostnavg = 4
+      do i = 1, iosthist
+         ostllist(i) = dble(i)
+         ostflist(i) = 2.0d0*dble(i)
+      end do
+      call ostavgstd
+      stdref = sqrt(1.25d0)
+      call checkreal ('ostavgstd configurable lambda average',
+     &                ostlambdaavg,4.5d0,1.0d-12,nfail)
+      call checkreal ('ostavgstd configurable dE/dl average',
+     &                ostdedlavg,9.0d0,1.0d-12,nfail)
+      call checkreal ('ostavgstd configurable lambda std',
+     &                ostlambdastd,stdref,1.0d-12,nfail)
+      call checkreal ('ostavgstd configurable dE/dl std',
+     &                ostdedlstd,2.0d0*stdref,1.0d-12,nfail)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
 c     ##  subroutine testefkernel -- test DeltaG interpolation     ##
 c     ##                                                           ##
 c     ###############################################################
@@ -765,6 +932,8 @@ c
       if (allocated(osthist))  deallocate (osthist)
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(ostnext))  deallocate (ostnext)
+      if (allocated(ostllist))  deallocate (ostllist)
+      if (allocated(ostflist))  deallocate (ostflist)
       if (allocated(ostlhist))  deallocate (ostlhist)
       if (allocated(ostfhist))  deallocate (ostfhist)
       if (allocated(ostwlhist))  deallocate (ostwlhist)
@@ -790,10 +959,15 @@ c
       maxwfhist = wfhist
       nosthist = 0
       sizeosthist = nhist
+      iosthist = 10
+      ostnequil = 5
+      ostnavg = 5
       ostlambda = 0.0d0
       ostlambdaavg = 0.0d0
+      ostlambdastd = 0.0d0
       ostdedl = 0.0d0
       ostdedlavg = 0.0d0
+      ostdedlstd = 0.0d0
       deffdl = 0.0d0
       ostpmap = 'QNT'
       ostemap = 'QNT'
@@ -807,6 +981,7 @@ c
       ostinvepeps = 0.0d0
       ostinvemeps = 0.0d0
       ostinveveps = 0.0d0
+      osteqratio = 0.5d0
       hbias = 0.0d0
       eosttot = 0.0d0
       oststdev = 1.0d0
@@ -816,6 +991,8 @@ c
       allocate (osthist(sizeosthist))
       allocate (osthead(nlmda,nflmda))
       allocate (ostnext(sizeosthist))
+      allocate (ostllist(iosthist))
+      allocate (ostflist(iosthist))
       allocate (ostlhist(sizeosthist))
       allocate (ostfhist(sizeosthist))
       allocate (osthhist(sizeosthist))
@@ -834,6 +1011,10 @@ c
          osthhist(i) = 0.0d0
          ostwlhist(i) = 0.0d0
          ostwfhist(i) = 0.0d0
+      end do
+      do i = 1, iosthist
+         ostllist(i) = 0.0d0
+         ostflist(i) = 0.0d0
       end do
       do i = 1, nlmda
          fkernel(i) = 0.0d0
@@ -910,6 +1091,92 @@ c
       maxwlhist = max(maxwlhist,sigl)
       maxwfhist = max(maxwfhist,sigf)
       ostnext(ihist) = 0
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine checkarray1 -- check 1D real array output     ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine checkarray1 (name,actual,expected,n,tol,nfail)
+      implicit none
+      integer i
+      integer imax
+      integer n,nfail
+      real*8 actual(n),expected(n)
+      real*8 tol
+      real*8 diff,maxdiff
+      character*(*) name
+c
+c
+      imax = 1
+      maxdiff = 0.0d0
+      do i = 1, n
+         diff = abs(actual(i)-expected(i))
+         if (diff .gt. maxdiff) then
+            maxdiff = diff
+            imax = i
+         end if
+      end do
+      if (maxdiff .le. tol) then
+         write (*,10)  name,maxdiff
+   10    format (' PASS ',a,': max diff ',g12.5)
+      else
+         nfail = nfail + 1
+         write (*,20)  name,imax,expected(imax),actual(imax),
+     &                 maxdiff
+   20    format (' FAIL ',a,': index ',i8,' expected ',g24.15,
+     &           ' actual ',g24.15,' diff ',g12.5)
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine checkarray2 -- check 2D real array output     ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine checkarray2 (name,actual,expected,n,m,tol,nfail)
+      implicit none
+      integer i,j
+      integer imax,jmax
+      integer n,m,nfail
+      real*8 actual(n,m),expected(n,m)
+      real*8 tol
+      real*8 diff,maxdiff
+      character*(*) name
+c
+c
+      imax = 1
+      jmax = 1
+      maxdiff = 0.0d0
+      do i = 1, n
+         do j = 1, m
+            diff = abs(actual(i,j)-expected(i,j))
+            if (diff .gt. maxdiff) then
+               maxdiff = diff
+               imax = i
+               jmax = j
+            end if
+         end do
+      end do
+      if (maxdiff .le. tol) then
+         write (*,10)  name,maxdiff
+   10    format (' PASS ',a,': max diff ',g12.5)
+      else
+         nfail = nfail + 1
+         write (*,20)  name,imax,jmax,expected(imax,jmax),
+     &                 actual(imax,jmax),maxdiff
+   20    format (' FAIL ',a,': index ',i8,1x,i8,' expected ',
+     &           g24.15,' actual ',g24.15,' diff ',g12.5)
+      end if
       return
       end
 c

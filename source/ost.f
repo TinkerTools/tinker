@@ -19,6 +19,9 @@ c     nflmda        number of flambda bins
 c     nlmda         number of lambda bins
 c     nmetahist     total number of metadynamics gaussians
 c     nosthist      total number of histograms
+c     osteqratio    fraction of hist interval to equilibrate
+c     ostnavg       samples averaged between hist updates
+c     ostnequil     samples skipped before hist averaging
 c     ostemexp      exponent for electrostatic exponential mapping
 c     ostepexp      exponent for polarization exponential mapping
 c     ostevexp      exponent for van der Waals exponential mapping
@@ -37,6 +40,7 @@ c     maxwfhist     maximum flambda width of histogram gaussians
 c     maxwlhist     maximum lambda width of histogram gaussians
 c     ostdedl       current unbiased dU/dlambda value
 c     ostdedlavg    average dE/dlambda value between hist updates
+c     ostdedlstd    standard deviation of dE/dlambda between updates
 c     ostdt         time step for theta lambda propagation
 c     ostelmda0     sublambda lower bound for electrostatics
 c     ostelmda1     sublambda upper bound for electrostatics
@@ -46,6 +50,7 @@ c     ostinvepeps   shift for polarization inverse-power mapping
 c     ostinveveps   shift for van der Waals inverse-power mapping
 c     ostlambda     main lambda value in orthogonal space sampling
 c     ostlambdaavg  average main lambda value between hist updates
+c     ostlambdastd  standard deviation of lambda between hist updates
 c     ostmass       fictitious mass of theta lambda coordinate
 c     ostplmda0     sublambda lower bound for polarization
 c     ostplmda1     sublambda upper bound for polarization
@@ -66,7 +71,9 @@ c     metalhist     lambda center of metadynamics gaussians
 c     metawhist     lambda width of metadynamics gaussians
 c     ostfhist      flambda center of gaussians saved in histogram
 c     osthhist      height of gaussians saved in histogram
+c     ostflist      dE/dlambda values saved between hist updates
 c     ostlhist      lambda center of gaussians saved in histogram
+c     ostllist      lambda values saved between hist updates
 c     ostwfhist     flambda width of gaussians saved in histogram
 c     ostwlhist     lambda width of gaussians saved in histogram
 c     gkernel       ost bias potential on the lambda/flambda grid
@@ -92,6 +99,8 @@ c
       integer nlmda
       integer nmetahist
       integer nosthist
+      integer ostnavg
+      integer ostnequil
       integer ostemexp
       integer ostepexp
       integer ostevexp
@@ -110,15 +119,18 @@ c
       real*8 maxwlhist
       real*8 ostdedl
       real*8 ostdedlavg
+      real*8 ostdedlstd
       real*8 ostdt
       real*8 ostelmda0
       real*8 ostelmda1
+      real*8 osteqratio
       real*8 ostfriction
       real*8 ostinvemeps
       real*8 ostinvepeps
       real*8 ostinveveps
       real*8 ostlambda
       real*8 ostlambdaavg
+      real*8 ostlambdastd
       real*8 ostmass
       real*8 ostplmda0
       real*8 ostplmda1
@@ -137,8 +149,10 @@ c
       real*8, allocatable :: metahhist(:)
       real*8, allocatable :: metalhist(:)
       real*8, allocatable :: metawhist(:)
+      real*8, allocatable :: ostflist(:)
       real*8, allocatable :: ostfhist(:)
       real*8, allocatable :: osthhist(:)
+      real*8, allocatable :: ostllist(:)
       real*8, allocatable :: ostlhist(:)
       real*8, allocatable :: ostwfhist(:)
       real*8, allocatable :: ostwlhist(:)

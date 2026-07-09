@@ -115,6 +115,9 @@ c     set default ost update intervals
 c
       iost = 0
       iosthist = 10
+      ostnequil = 5
+      ostnavg = 5
+      osteqratio = 0.5d0
       use_ostdyn = .false.
       ostrestart = .false.
       use_metadyn = .false.
@@ -142,7 +145,9 @@ c
       ostinveveps = 0.3d0
       ostlambda = 1.0d0
       ostlambdaavg = 0.0d0
+      ostlambdastd = 0.0d0
       ostdedlavg = 0.0d0
+      ostdedlstd = 0.0d0
       ostdedl = 0.0d0
       deffdl = 0.0d0
       osttheta = pi / 2.0d0
@@ -282,6 +287,9 @@ c
          else if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
             string = record(next:240)
             read (string,*,err=30)  iosthist
+         else if (keyword(1:15) .eq. 'OSTEQUIL-RATIO ') then
+            string = record(next:240)
+            read (string,*,err=30)  osteqratio
          else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
             string = record(next:240)
             read (string,*,err=30)  ostplmda0, ostplmda1
@@ -435,6 +443,18 @@ c
       maxwlhist = wlhist
       maxwfhist = wfhist
 c
+c     bound ost equilibration ratio to leave at least one sample
+c
+      if (iosthist .lt. 1)  iosthist = 1
+      if (osteqratio .lt. 0.0d0) then
+         osteqratio = 0.0d0
+      else if (osteqratio .ge. 1.0d0) then
+         osteqratio = 1.0d0 - 1.0d0/dble(iosthist)
+      end if
+      ostnequil = int(osteqratio*dble(iosthist))
+      ostnequil = max(0,min(ostnequil,iosthist-1))
+      ostnavg = iosthist - ostnequil
+c
 c     allocate ost histogram and kernels
 c
       if (use_ost) then
@@ -442,6 +462,8 @@ c
          if (allocated(osthist))  deallocate (osthist)
          if (allocated(osthead))  deallocate (osthead)
          if (allocated(ostnext))  deallocate (ostnext)
+         if (allocated(ostllist))  deallocate (ostllist)
+         if (allocated(ostflist))  deallocate (ostflist)
          if (allocated(ostlhist))  deallocate (ostlhist)
          if (allocated(ostfhist))  deallocate (ostfhist)
          if (allocated(ostwlhist))  deallocate (ostwlhist)
@@ -454,6 +476,8 @@ c
          allocate (osthist(sizeosthist))
          allocate (osthead(nlmda,nflmda))
          allocate (ostnext(sizeosthist))
+         allocate (ostllist(iosthist))
+         allocate (ostflist(iosthist))
          allocate (ostlhist(sizeosthist))
          allocate (ostfhist(sizeosthist))
          allocate (ostwlhist(sizeosthist))
@@ -469,6 +493,10 @@ c
                gkernel(i,k) = 0.0d0
                osthead(i,k) = 0
             end do
+         end do
+         do i = 1, iosthist
+            ostllist(i) = 0.0d0
+            ostflist(i) = 0.0d0
          end do
          do i = 1, sizeosthist
             osthist(i) = 0

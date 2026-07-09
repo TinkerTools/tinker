@@ -20,6 +20,7 @@ c
       use bath
       use files
       use iounit
+      use keys
       use ost
       implicit none
       integer next
@@ -44,6 +45,7 @@ c
 c     set the base filename used by the OST restart reader
 c
       call ostbasename (ostfile)
+      call getkey
 c
 c     use room temperature if no simulation temperature is available
 c
@@ -72,6 +74,7 @@ c
    40    format (/,' ANALYZEOST  --  Unable to Read OST File :  ',a)
          call fatal
       end if
+      call ostgridkey
 c
 c     perform the requested analysis
 c
@@ -90,6 +93,158 @@ c
 c     perform any final tasks before program exit
 c
       call final
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ostgridkey  --  override ost analysis grid    ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ostgridkey" checks the keyfile for requested analysis grid
+c     settings and rebuilds the ost kernels on the requested grid
+c
+c
+      subroutine ostgridkey
+      use keys
+      use ost
+      implicit none
+      integer i,next
+      integer nlmda1
+      real*8 wflmda1
+      logical setnlmda,setwflmda
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     get requested analysis grid settings from the keyfile
+c
+      setnlmda = .false.
+      setwflmda = .false.
+      nlmda1 = nlmda
+      wflmda1 = wflmda
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
+            read (string,*,err=10,end=10)  nlmda1
+            setnlmda = .true.
+         else if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
+            read (string,*,err=10,end=10)  wflmda1
+            setwflmda = .true.
+         end if
+   10    continue
+      end do
+c
+c     normalize the requested lambda grid to the standard convention
+c
+      if (setnlmda) then
+         if (nlmda1 .lt. 2)  nlmda1 = nlmda
+         if (mod(nlmda1,2) .eq. 0)  nlmda1 = nlmda1 + 1
+      end if
+      if (setwflmda) then
+         if (wflmda1 .le. 0.0d0)  wflmda1 = wflmda
+      end if
+c
+c     rebuild kernels if the requested grid differs from restart grid
+c
+      if ((setnlmda .and. nlmda1.ne.nlmda) .or.
+     &    (setwflmda .and. wflmda1.ne.wflmda)) then
+         call remeshost (nlmda1,wflmda1)
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine remeshost  --  rebuild ost on a new grid      ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "remeshost" changes the analysis grid while preserving the
+c     saved gaussian centers, widths and heights from the restart
+c
+c
+      subroutine remeshost (nlmda1,wflmda1)
+      use ost
+      implicit none
+      integer i,j
+      integer lowbin,highbin
+      integer nlmda1
+      integer nflmda0,fli00
+      real*8 wflmda1
+      real*8 wflmda0
+      real*8 flmin,flmax
+      real*8 flow,fhigh
+      real*8 etotfkernel
+c
+c
+c     save old flambda grid range before changing the grid spacing
+c
+      nflmda0 = nflmda
+      fli00 = fli0
+      wflmda0 = wflmda
+      flmin = dble(1-fli00) * wflmda0
+      flmax = dble(nflmda0-fli00) * wflmda0
+c
+c     set the requested lambda and flambda grid spacings
+c
+      nlmda = nlmda1
+      wlmda = 1.0d0 / dble(nlmda-1)
+      wlmda2 = 0.5d0 * wlmda
+      wflmda = wflmda1
+      wflmda2 = 0.5d0 * wflmda
+c
+c     preserve old flambda range and all saved gaussian cutoffs
+c
+      do i = 1, nosthist
+         flow = ostfhist(i) - oststdev*ostwfhist(i) - wflmda2
+         fhigh = ostfhist(i) + oststdev*ostwfhist(i) + wflmda2
+         flmin = min(flmin,flow)
+         flmax = max(flmax,fhigh)
+      end do
+c
+c     derive flambda bin limits that cover the requested range
+c
+      lowbin = int(flmin/wflmda)
+      if (dble(lowbin)*wflmda .gt. flmin)  lowbin = lowbin - 1
+      highbin = int(flmax/wflmda)
+      if (dble(highbin)*wflmda .lt. flmax)  highbin = highbin + 1
+      fli0 = 1 - lowbin
+      nflmda = highbin - lowbin + 1
+      if (nflmda .lt. 1)  nflmda = 1
+c
+c     reallocate grid-dependent arrays for the new analysis grid
+c
+      if (allocated(osthead))  deallocate (osthead)
+      if (allocated(fkernel))  deallocate (fkernel)
+      if (allocated(gkernel))  deallocate (gkernel)
+      allocate (osthead(nlmda,nflmda))
+      allocate (fkernel(nlmda))
+      allocate (gkernel(nlmda,nflmda))
+      do i = 1, nlmda
+         fkernel(i) = 0.0d0
+         do j = 1, nflmda
+            gkernel(i,j) = 0.0d0
+            osthead(i,j) = 0
+         end do
+      end do
+c
+c     rebuild lookup table and kernels from saved gaussian centers
+c
+      call buildostindex
+      call buildgkernel
+      call buildfkernel
+      eosttot = etotfkernel()
+      return
       end
 c
 c
