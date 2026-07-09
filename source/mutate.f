@@ -175,6 +175,8 @@ c
       oststdev = 4.0d0
       eosttot = 0.0d0
       nmetahist = 0
+      fastkernel = .true.
+      ostinterpol = .false.
 c
 c     zero out number of hybrid atoms and mutated torsions
 c
@@ -364,6 +366,8 @@ c
          else if (keyword(1:11) .eq. 'OST-STDDEV ') then
             string = record(next:240)
             read (string,*,err=30)  oststdev
+         else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
+            ostinterpol = .true.
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
             read (string,*,err=30)  hbias
@@ -427,6 +431,7 @@ c
 c
 c     define lambda width and flambda range
 c
+      if (nlmda .lt. 3)  nlmda = 3
       if (mod(nlmda,2) .eq. 0)  nlmda = nlmda + 1
       wlmda = 1.0d0 / dble(nlmda-1)
       wlmda2 = 0.5d0 * wlmda
@@ -472,7 +477,10 @@ c
          if (allocated(ostwfhist))  deallocate (ostwfhist)
          if (allocated(fkernel))  deallocate (fkernel)
          if (allocated(fsumkernel))  deallocate (fsumkernel)
+         if (allocated(gfkernel))  deallocate (gfkernel)
          if (allocated(gkernel))  deallocate (gkernel)
+         if (allocated(glfkernel))  deallocate (glfkernel)
+         if (allocated(glkernel))  deallocate (glkernel)
          if (allocated(pfkernel))  deallocate (pfkernel)
          sizeosthist = 10000
          nosthist = 0
@@ -488,7 +496,10 @@ c
          allocate (ostwfhist(sizeosthist))
          allocate (fkernel(nlmda))
          allocate (fsumkernel(nlmda))
+         allocate (gfkernel(nlmda,nflmda))
          allocate (gkernel(nlmda,nflmda))
+         allocate (glfkernel(nlmda,nflmda))
+         allocate (glkernel(nlmda,nflmda))
          allocate (pfkernel(nlmda))
 c
 c     initialize ost histogram and kernels
@@ -498,7 +509,10 @@ c
             fsumkernel(i) = 0.0d0
             pfkernel(i) = 0.0d0
             do k = 1, nflmda
+               gfkernel(i,k) = 0.0d0
                gkernel(i,k) = 0.0d0
+               glfkernel(i,k) = 0.0d0
+               glkernel(i,k) = 0.0d0
                osthead(i,k) = 0
             end do
          end do

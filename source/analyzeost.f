@@ -227,19 +227,28 @@ c
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(fkernel))  deallocate (fkernel)
       if (allocated(fsumkernel))  deallocate (fsumkernel)
+      if (allocated(gfkernel))  deallocate (gfkernel)
       if (allocated(gkernel))  deallocate (gkernel)
+      if (allocated(glfkernel))  deallocate (glfkernel)
+      if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(pfkernel))  deallocate (pfkernel)
       allocate (osthead(nlmda,nflmda))
       allocate (fkernel(nlmda))
       allocate (fsumkernel(nlmda))
+      allocate (gfkernel(nlmda,nflmda))
       allocate (gkernel(nlmda,nflmda))
+      allocate (glfkernel(nlmda,nflmda))
+      allocate (glkernel(nlmda,nflmda))
       allocate (pfkernel(nlmda))
       do i = 1, nlmda
          fkernel(i) = 0.0d0
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
          do j = 1, nflmda
+            gfkernel(i,j) = 0.0d0
             gkernel(i,j) = 0.0d0
+            glfkernel(i,j) = 0.0d0
+            glkernel(i,j) = 0.0d0
             osthead(i,j) = 0
          end do
       end do
@@ -337,7 +346,10 @@ c
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
          do j = 1, nflmda
+            gfkernel(i,j) = 0.0d0
             gkernel(i,j) = 0.0d0
+            glfkernel(i,j) = 0.0d0
+            glkernel(i,j) = 0.0d0
          end do
       end do
       do ihist = 1, nsave

@@ -40,7 +40,11 @@ c
 c
 c     compute current continuous g kernel bias and derivatives
 c
-      call egkernel (egbias,dgdl,dgdfl)
+      if (ostinterpol) then
+         call egkernelinterpolate (egbias,dgdl,dgdfl)
+      else
+         call egkernel (egbias,dgdl,dgdfl)
+      end if
       call efkernel (eostlmda,dfdl)
       esum = esum + egbias - eostlmda
       ostdedl = dedl
@@ -499,7 +503,10 @@ c
       integer offset
       integer jflmda
       real*8 dudl
+      real*8, allocatable :: gfkernel0(:,:)
       real*8, allocatable :: gkernel0(:,:)
+      real*8, allocatable :: glfkernel0(:,:)
+      real*8, allocatable :: glkernel0(:,:)
 c
 c
 c     get the raw flambda bin before any endpoint clamping
@@ -545,25 +552,46 @@ c
 c
 c     resize the flambda-dependent kernels while preserving old data
 c
+      allocate (gfkernel0(nlmda,oldnflmda))
       allocate (gkernel0(nlmda,oldnflmda))
+      allocate (glfkernel0(nlmda,oldnflmda))
+      allocate (glkernel0(nlmda,oldnflmda))
       do i = 1, nlmda
          do jflmda = 1, oldnflmda
+            gfkernel0(i,jflmda) = gfkernel(i,jflmda)
             gkernel0(i,jflmda) = gkernel(i,jflmda)
+            glfkernel0(i,jflmda) = glfkernel(i,jflmda)
+            glkernel0(i,jflmda) = glkernel(i,jflmda)
          end do
       end do
+      deallocate (gfkernel)
       deallocate (gkernel)
+      deallocate (glfkernel)
+      deallocate (glkernel)
+      allocate (gfkernel(nlmda,nflmda))
       allocate (gkernel(nlmda,nflmda))
+      allocate (glfkernel(nlmda,nflmda))
+      allocate (glkernel(nlmda,nflmda))
       do i = 1, nlmda
          do jflmda = 1, nflmda
+            gfkernel(i,jflmda) = 0.0d0
             gkernel(i,jflmda) = 0.0d0
+            glfkernel(i,jflmda) = 0.0d0
+            glkernel(i,jflmda) = 0.0d0
          end do
       end do
       do i = 1, nlmda
          do jflmda = 1, oldnflmda
+            gfkernel(i,jflmda+offset) = gfkernel0(i,jflmda)
             gkernel(i,jflmda+offset) = gkernel0(i,jflmda)
+            glfkernel(i,jflmda+offset) = glfkernel0(i,jflmda)
+            glkernel(i,jflmda+offset) = glkernel0(i,jflmda)
          end do
       end do
+      deallocate (gfkernel0)
       deallocate (gkernel0)
+      deallocate (glfkernel0)
+      deallocate (glkernel0)
       return
       end
 c
@@ -935,6 +963,119 @@ c
       end
 c
 c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine egkernelinterpolate -- interpolate g kernel   ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "egkernelinterpolate" evaluates the ost g kernel and its first
+c     derivatives using bicubic Hermite interpolation on the grid
+c
+c
+      subroutine egkernelinterpolate (egbias,dgdl,dgdfl)
+      use ost
+      implicit none
+      integer i,j
+      integer ia,ja
+      integer il0,if0
+      real*8 egbias,dgdl,dgdfl
+      real*8 flstart,flend
+      real*8 l0,f0
+      real*8 x,y
+      real*8 x2,x3,y2,y3
+      real*8 hxv(2),hxd(2),dhxv(2),dhxd(2)
+      real*8 hyv(2),hyd(2),dhyv(2),dhyd(2)
+      real*8 val,gl,gf,glf
+c
+c
+c     require a complete interpolation cell in both dimensions
+c
+      egbias = 0.0d0
+      dgdl = 0.0d0
+      dgdfl = 0.0d0
+      flstart = dble(1-fli0) * wflmda
+      flend = dble(nflmda-fli0) * wflmda
+      if (ostlambda .lt. 0.0d0 .or. ostlambda .gt. 1.0d0)
+     &   return
+      if (ostdedl .lt. flstart .or. ostdedl .gt. flend)  return
+c
+c     locate the lower-left grid point of the interpolation cell
+c
+      if (ostlambda .ge. 1.0d0) then
+         il0 = nlmda - 1
+      else
+         il0 = int(ostlambda/wlmda) + 1
+         il0 = max(1,min(il0,nlmda-1))
+      end if
+      if (ostdedl .ge. flend) then
+         if0 = nflmda - 1
+      else
+         if0 = int((ostdedl-flstart)/wflmda) + 1
+         if0 = max(1,min(if0,nflmda-1))
+      end if
+      l0 = dble(il0-1) * wlmda
+      f0 = dble(if0-fli0) * wflmda
+      x = (ostlambda-l0) / wlmda
+      y = (ostdedl-f0) / wflmda
+c
+c     cubic Hermite basis functions and normalized derivatives
+c
+      x2 = x * x
+      x3 = x2 * x
+      y2 = y * y
+      y3 = y2 * y
+      hxv(1) = 2.0d0*x3 - 3.0d0*x2 + 1.0d0
+      hxv(2) = -2.0d0*x3 + 3.0d0*x2
+      hxd(1) = x3 - 2.0d0*x2 + x
+      hxd(2) = x3 - x2
+      dhxv(1) = 6.0d0*x2 - 6.0d0*x
+      dhxv(2) = -6.0d0*x2 + 6.0d0*x
+      dhxd(1) = 3.0d0*x2 - 4.0d0*x + 1.0d0
+      dhxd(2) = 3.0d0*x2 - 2.0d0*x
+      hyv(1) = 2.0d0*y3 - 3.0d0*y2 + 1.0d0
+      hyv(2) = -2.0d0*y3 + 3.0d0*y2
+      hyd(1) = y3 - 2.0d0*y2 + y
+      hyd(2) = y3 - y2
+      dhyv(1) = 6.0d0*y2 - 6.0d0*y
+      dhyv(2) = -6.0d0*y2 + 6.0d0*y
+      dhyd(1) = 3.0d0*y2 - 4.0d0*y + 1.0d0
+      dhyd(2) = 3.0d0*y2 - 2.0d0*y
+c
+c     evaluate the bicubic Hermite patch and its derivatives
+c
+      do ia = 1, 2
+         i = il0 + ia - 1
+         do ja = 1, 2
+            j = if0 + ja - 1
+            val = gkernel(i,j)
+            gl = wlmda * glkernel(i,j)
+            gf = wflmda * gfkernel(i,j)
+            glf = wlmda * wflmda * glfkernel(i,j)
+            egbias = egbias
+     &         + hxv(ia)*hyv(ja)*val
+     &         + hxd(ia)*hyv(ja)*gl
+     &         + hxv(ia)*hyd(ja)*gf
+     &         + hxd(ia)*hyd(ja)*glf
+            dgdl = dgdl
+     &         + dhxv(ia)*hyv(ja)*val
+     &         + dhxd(ia)*hyv(ja)*gl
+     &         + dhxv(ia)*hyd(ja)*gf
+     &         + dhxd(ia)*hyd(ja)*glf
+            dgdfl = dgdfl
+     &         + hxv(ia)*dhyv(ja)*val
+     &         + hxd(ia)*dhyv(ja)*gl
+     &         + hxv(ia)*dhyd(ja)*gf
+     &         + hxd(ia)*dhyd(ja)*glf
+         end do
+      end do
+      dgdl = dgdl / wlmda
+      dgdfl = dgdfl / wflmda
+      return
+      end
+c
+c
 c     ######################################################
 c     ##                                                  ##
 c     ##  function lambdabin -- get bin index for lambda  ##
@@ -1190,7 +1331,10 @@ c
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
          do j = 1, nflmda
+            gfkernel(i,j) = 0.0d0
             gkernel(i,j) = 0.0d0
+            glfkernel(i,j) = 0.0d0
+            glkernel(i,j) = 0.0d0
          end do
       end do
 c
@@ -1434,7 +1578,8 @@ c
                   fldelta2 = fldelta*fldelta
                   expfl = exp(-fldelta2 / (2.0d0*sigf2))
                   e = pref * expl * expfl
-                  call addkernelpoint (ilmda,iflmda,e)
+                  call addkernelpoint (ilmda,iflmda,e,ldelta,
+     &                                 fldelta,sigl2,sigf2)
    20             continue
                end do
    10          continue
@@ -1456,17 +1601,21 @@ c     "addkernelpoint" updates one g kernel cell and the associated
 c     f kernel numerator and partition-function accumulator
 c
 c
-      subroutine addkernelpoint (ilmda,iflmda,e)
+      subroutine addkernelpoint (ilmda,iflmda,e,ldelta,
+     &                           fldelta,sigl2,sigf2)
       use bath
       use ost
       use units
       implicit none
       integer ilmda,iflmda
       real*8 e
+      real*8 ldelta,fldelta
+      real*8 sigl2,sigf2
       real*8 flmda
       real*8 oldg,newg
       real*8 oldweight,newweight
       real*8 delweight
+      real*8 dgdl,dgdfl,d2gdlfl
 c
 c
 c     update the g kernel and adjust the f kernel accumulators
@@ -1481,7 +1630,13 @@ c
       newweight = exp(newg/(gasconst*kelvin))
       delweight = newweight - oldweight
       flmda = dble(iflmda-fli0) * wflmda
+      dgdl = -ldelta * e / sigl2
+      dgdfl = -fldelta * e / sigf2
+      d2gdlfl = ldelta * fldelta * e / (sigl2*sigf2)
+      gfkernel(ilmda,iflmda) = gfkernel(ilmda,iflmda) + dgdfl
       gkernel(ilmda,iflmda) = newg
+      glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda) + d2gdlfl
+      glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
       fsumkernel(ilmda) = fsumkernel(ilmda) + flmda*delweight
       pfkernel(ilmda) = pfkernel(ilmda) + delweight
       if (pfkernel(ilmda) .eq. 0.0d0) then
@@ -1778,7 +1933,10 @@ c
       if (allocated(ostwfhist))  deallocate (ostwfhist)
       if (allocated(fkernel))  deallocate (fkernel)
       if (allocated(fsumkernel))  deallocate (fsumkernel)
+      if (allocated(gfkernel))  deallocate (gfkernel)
       if (allocated(gkernel))  deallocate (gkernel)
+      if (allocated(glfkernel))  deallocate (glfkernel)
+      if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(pfkernel))  deallocate (pfkernel)
       allocate (osthhist(sizeosthist0))
       allocate (osthist(sizeosthist0))
@@ -1792,7 +1950,10 @@ c
       allocate (ostwfhist(sizeosthist0))
       allocate (fkernel(nlmda0))
       allocate (fsumkernel(nlmda0))
+      allocate (gfkernel(nlmda0,nflmda0))
       allocate (gkernel(nlmda0,nflmda0))
+      allocate (glfkernel(nlmda0,nflmda0))
+      allocate (glkernel(nlmda0,nflmda0))
       allocate (pfkernel(nlmda0))
 c
 c     set scalar ost state from the restart file
@@ -1834,7 +1995,10 @@ c
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
          do ihist = 1, nflmda
+            gfkernel(i,ihist) = 0.0d0
             gkernel(i,ihist) = 0.0d0
+            glfkernel(i,ihist) = 0.0d0
+            glkernel(i,ihist) = 0.0d0
             osthead(i,ihist) = 0
          end do
       end do

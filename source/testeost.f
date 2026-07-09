@@ -38,6 +38,7 @@ c
       call testgkernels (nfail)
       call testfkernel (nfail)
       call testkernelbuilds (nfail)
+      call testeginterpolate (nfail)
       call testavgstd (nfail)
       call testefkernel (nfail)
       call testmapsub (nfail)
@@ -764,6 +765,79 @@ c
 c
 c     ###############################################################
 c     ##                                                           ##
+c     ##  subroutine testeginterpolate -- test g interpolation     ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine testeginterpolate (nfail)
+      use math
+      use ost
+      implicit none
+      integer nfail
+      real*8 egbias0,dgdl0,dgdfl0
+      real*8 egbias1,dgdl1,dgdfl1
+      real*8 height
+      real*8 sigl,sigf
+c
+c
+c     grid-point interpolation should reproduce the analytic gaussian
+c     sum and derivatives from egkernel exactly to roundoff
+c
+      call resetost (9,9,4)
+      sigl = 2.0d0 * wlmda
+      sigf = 2.0d0 * wflmda
+      height = 2.0d0 * pi * sigl * sigf
+      oststdev = 4.0d0
+      nosthist = 3
+      call sethist (1,0.25d0,-1.0d0,1.1d0*height,sigl,sigf)
+      call sethist (2,0.50d0, 0.0d0,1.6d0*height,sigl,sigf)
+      call sethist (3,0.75d0, 1.0d0,2.3d0*height,sigl,sigf)
+      call buildostindex
+      call buildkernels
+      ostlambda = 0.50d0
+      ostdedl = 0.0d0
+      ostinterpol = .false.
+      call egkernel (egbias0,dgdl0,dgdfl0)
+      call egkernelinterpolate (egbias1,dgdl1,dgdfl1)
+      call checkreal ('egkernel interpolate grid bias',
+     &                egbias1,egbias0,1.0d-12,nfail)
+      call checkreal ('egkernel interpolate grid dgdl',
+     &                dgdl1,dgdl0,1.0d-12,nfail)
+      call checkreal ('egkernel interpolate grid dgdfl',
+     &                dgdfl1,dgdfl0,1.0d-12,nfail)
+c
+c     off-grid interpolation is approximate; wide gaussians should
+c     keep the value and derivative errors small
+c
+      call resetost (17,17,4)
+      sigl = 4.0d0 * wlmda
+      sigf = 4.0d0 * wflmda
+      height = 2.0d0 * pi * sigl * sigf
+      oststdev = 4.0d0
+      nosthist = 3
+      call sethist (1,0.25d0,-2.0d0,0.8d0*height,sigl,sigf)
+      call sethist (2,0.50d0, 0.0d0,1.2d0*height,sigl,sigf)
+      call sethist (3,0.75d0, 2.0d0,1.6d0*height,sigl,sigf)
+      call buildostindex
+      call buildkernels
+      ostlambda = 0.53125d0
+      ostdedl = 0.25d0
+      ostinterpol = .false.
+      call egkernel (egbias0,dgdl0,dgdfl0)
+      call egkernelinterpolate (egbias1,dgdl1,dgdfl1)
+      call checkreal ('egkernel interpolate offgrid bias',
+     &                egbias1,egbias0,1.0d-3,nfail)
+      call checkreal ('egkernel interpolate offgrid dgdl',
+     &                dgdl1,dgdl0,2.0d-2,nfail)
+      call checkreal ('egkernel interpolate offgrid dgdfl',
+     &                dgdfl1,dgdfl0,2.0d-2,nfail)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
 c     ##  subroutine testefkernel -- test DeltaG interpolation     ##
 c     ##                                                           ##
 c     ###############################################################
@@ -968,7 +1042,10 @@ c
       if (allocated(ostwfhist))  deallocate (ostwfhist)
       if (allocated(fkernel))  deallocate (fkernel)
       if (allocated(fsumkernel))  deallocate (fsumkernel)
+      if (allocated(gfkernel))  deallocate (gfkernel)
       if (allocated(gkernel))  deallocate (gkernel)
+      if (allocated(glfkernel))  deallocate (glfkernel)
+      if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(pfkernel))  deallocate (pfkernel)
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
@@ -1015,6 +1092,7 @@ c
       hbias = 0.0d0
       eosttot = 0.0d0
       oststdev = 1.0d0
+      ostinterpol = .false.
 c
 c     allocate arrays
 c
@@ -1030,7 +1108,10 @@ c
       allocate (ostwfhist(sizeosthist))
       allocate (fkernel(nlmda))
       allocate (fsumkernel(nlmda))
+      allocate (gfkernel(nlmda,nflmda))
       allocate (gkernel(nlmda,nflmda))
+      allocate (glfkernel(nlmda,nflmda))
+      allocate (glkernel(nlmda,nflmda))
       allocate (pfkernel(nlmda))
 c
 c     initialize arrays
@@ -1054,7 +1135,10 @@ c
          pfkernel(i) = 0.0d0
          do j = 1, nflmda
             osthead(i,j) = 0
+            gfkernel(i,j) = 0.0d0
             gkernel(i,j) = 0.0d0
+            glfkernel(i,j) = 0.0d0
+            glkernel(i,j) = 0.0d0
          end do
       end do
       return

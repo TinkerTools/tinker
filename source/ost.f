@@ -69,6 +69,7 @@ c     wlmda         width of lambda bins
 c     wlmda2        half width of lambda bins
 c     fkernel       free energy mean force at each lambda bin
 c     fsumkernel    numerator of free energy mean force kernel
+c     gfkernel      d(gkernel)/dflambda values on grid
 c     metahhist     height of metadynamics gaussians
 c     metalhist     lambda center of metadynamics gaussians
 c     metawhist     lambda width of metadynamics gaussians
@@ -80,9 +81,12 @@ c     ostllist      lambda values saved between hist updates
 c     ostwfhist     flambda width of gaussians saved in histogram
 c     ostwlhist     lambda width of gaussians saved in histogram
 c     gkernel       ost bias potential on the lambda/flambda grid
+c     glfkernel     mixed derivative of gkernel on grid
+c     glkernel      d(gkernel)/dlambda values on grid
 c     pfkernel      partition function for free energy mean force
 c     fastkernel    flag to use fused g and f kernel updates
 c     metarestart   flag to indicate metadynamics restart data was read
+c     ostinterpol   flag to interpolate ost g kernel from grid
 c     ostrestart    flag to indicate ost restart data was read
 c     use_meta      flag to use metadynamics
 c     use_metadyn   flag to propagate metadynamics lambda particle
@@ -154,6 +158,7 @@ c
       real*8 wlmda2
       real*8, allocatable :: fkernel(:)
       real*8, allocatable :: fsumkernel(:)
+      real*8, allocatable :: gfkernel(:,:)
       real*8, allocatable :: metahhist(:)
       real*8, allocatable :: metalhist(:)
       real*8, allocatable :: metawhist(:)
@@ -165,9 +170,12 @@ c
       real*8, allocatable :: ostwfhist(:)
       real*8, allocatable :: ostwlhist(:)
       real*8, allocatable :: gkernel(:,:)
+      real*8, allocatable :: glfkernel(:,:)
+      real*8, allocatable :: glkernel(:,:)
       real*8, allocatable :: pfkernel(:)
       logical fastkernel
       logical metarestart
+      logical ostinterpol
       logical ostrestart
       logical use_meta
       logical use_metadyn
