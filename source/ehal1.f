@@ -17,6 +17,7 @@ c     its first derivatives with respect to Cartesian coordinates
 c
 c
       subroutine ehal1
+      use dlmda
       use energi
       use limits
       use vdwpot
@@ -29,23 +30,27 @@ c
 c
 c     choose the method for summing over pairwise interactions
 c
-      if (use_lights) then
-         call ehal1b
-      else if (use_vlist) then
-         call ehal1c
+      if (use_evdt) then
+         call ehal1d
       else
-         call ehal1a
-      end if
+         if (use_lights) then
+            call ehal1b
+         else if (use_vlist) then
+            call ehal1c
+         else
+            call ehal1a
+         end if
 c
 c     apply the long range van der Waals correction if used
 c
-      if (use_vcorr) then
-         mode = 'VDW'
-         call evcorr1 (mode,elrc,vlrc)
-         ev = ev + elrc
-         evvir(1,1) = evvir(1,1) + vlrc
-         evvir(2,2) = evvir(2,2) + vlrc
-         evvir(3,3) = evvir(3,3) + vlrc
+         if (use_vcorr) then
+            mode = 'VDW'
+            call evcorr1 (mode,elrc,vlrc)
+            ev = ev + elrc
+            evvir(1,1) = evvir(1,1) + vlrc
+            evvir(2,2) = evvir(2,2) + vlrc
+            evvir(3,3) = evvir(3,3) + vlrc
+         end if
       end if
 c
 c     add the van der Waals virial to main virial
@@ -1269,5 +1274,137 @@ c     perform deallocation of some local arrays
 c
       deallocate (iv14)
       deallocate (vscale)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ehal1d  --  dual topology buffered 14-7 derivs  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "ehal1d" calculates the buffered 14-7 van der Waals energy and
+c     its first derivatives with respect to Cartesian coordinates with
+c     the dual topology method, in which the fully coupled (vlambda=1)
+c     and fully decoupled (vlambda=0) states are each evaluated in full
+c     and combined by a power law interpolation in vlambda
+c
+c     note the long range correction depends on vlambda, so it must be
+c     evaluated separately for each end state and interpolated along
+c     with the pairwise energy and virial
+c
+c
+      subroutine ehal1d
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use limits
+      use mutant
+      use vdwpot
+      use virial
+      implicit none
+      integer i,j
+      real*8 ev1,ev0
+      real*8 elrc,vlrc
+      real*8 vlambdaorig
+      real*8 weight1,weight0
+      real*8 evvir1(3,3),evvir0(3,3)
+      real*8, allocatable :: dev1(:,:)
+      real*8, allocatable :: dev0(:,:)
+      character*6 mode
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dev1(3,n))
+      allocate (dev0(3,n))
+      mode = 'VDW'
+c
+c     compute energy and derivatives of the vlambda = 1 state
+c
+      vlambdaorig = vlambda
+      vlambda = 1.0d0
+      if (use_lights) then
+         call ehal1b
+      else if (use_vlist) then
+         call ehal1c
+      else
+         call ehal1a
+      end if
+      if (use_vcorr) then
+         call evcorr1 (mode,elrc,vlrc)
+         ev = ev + elrc
+         evvir(1,1) = evvir(1,1) + vlrc
+         evvir(2,2) = evvir(2,2) + vlrc
+         evvir(3,3) = evvir(3,3) + vlrc
+      end if
+      ev1 = ev
+      do i = 1, n
+         do j = 1, 3
+            dev1(j,i) = dev(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvir1(j,i) = evvir(j,i)
+         end do
+      end do
+c
+c     compute energy and derivatives of the vlambda = 0 state
+c
+      vlambda = 0.0d0
+      if (use_lights) then
+         call ehal1b
+      else if (use_vlist) then
+         call ehal1c
+      else
+         call ehal1a
+      end if
+      if (use_vcorr) then
+         call evcorr1 (mode,elrc,vlrc)
+         ev = ev + elrc
+         evvir(1,1) = evvir(1,1) + vlrc
+         evvir(2,2) = evvir(2,2) + vlrc
+         evvir(3,3) = evvir(3,3) + vlrc
+      end if
+      ev0 = ev
+      do i = 1, n
+         do j = 1, 3
+            dev0(j,i) = dev(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvir0(j,i) = evvir(j,i)
+         end do
+      end do
+c
+c     restore the original vlambda value
+c
+      vlambda = vlambdaorig
+c
+c     interpolate the dual topology energy, derivatives and virial
+c
+      weight1 = vlambda**vdtexp
+      weight0 = 1.0d0 - weight1
+      ev = weight1*ev1 + weight0*ev0
+      do i = 1, n
+         do j = 1, 3
+            dev(j,i) = weight1*dev1(j,i) + weight0*dev0(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvir(j,i) = weight1*evvir1(j,i) + weight0*evvir0(j,i)
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dev1)
+      deallocate (dev0)
       return
       end

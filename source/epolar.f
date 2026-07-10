@@ -1962,9 +1962,13 @@ c
       if (aewald .lt. 1.0d-6)  return
       f = 0.5d0 * electric / dielec
 c
-c     perform dynamic allocation of some global arrays
+c     perform dynamic allocation of some global arrays; the multipole
+c     PME grid cannot be reused with multipole dual topology, since it
+c     belongs to a decoupled end state rather than to the interpolated
+c     multipoles at the current lambda value
 c
-      if (.not.use_mpole .or. aewald.ne.aeewald .or. use_dlmda) then
+      if (.not.use_mpole .or. aewald.ne.aeewald .or. use_dlmda
+     &       .or. use_emdt) then
          if (allocated(cmp)) then
             if (size(cmp) .lt. 10*n)  deallocate (cmp)
          end if

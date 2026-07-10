@@ -196,6 +196,8 @@ c
 c     flag for use of lambda derivative
 c
       use_dlmda = .false.
+      use_emdt = .false.
+      use_evdt = .false.
       use_ost = .false.
       use_ostdyn = .false.
       ostrestart = .false.

@@ -8668,9 +8668,13 @@ c
       nff = nfft1 * nfft2
       ntot = nff * nfft3
 c
-c     remove scalar sum virial from prior multipole FFT
+c     remove scalar sum virial from prior multipole FFT; the saved
+c     values cannot be reused with multipole dual topology, since the
+c     prior FFT belongs to a decoupled end state rather than to the
+c     interpolated multipoles at the current lambda value
 c
-      if (use_mpole .and. aewald.eq.aeewald .and. .not.use_dlmda) then
+      if (use_mpole .and. aewald.eq.aeewald .and. .not.use_dlmda
+     &       .and. .not.use_emdt) then
          vxx = -vmxx
          vxy = -vmxy
          vxz = -vmxz

@@ -17,6 +17,7 @@ c     multipole interactions, and partitions the energy among atoms
 c
 c
       subroutine empole3
+      use dlmda
       use energi
       use extfld
       use inform
@@ -29,7 +30,9 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_ewald) then
+      if (use_emdt) then
+         call empole3e
+      else if (use_ewald) then
          if (use_mlist) then
             call empole3d
          else
@@ -2336,5 +2339,121 @@ c
          end do
       end do
       em = em + e
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine empole3e  --  dual topology multipole analysis  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "empole3e" calculates the electrostatic energy due to atomic
+c     multipole interactions, and partitions the energy among atoms,
+c     using the dual topology method, in which the fully coupled
+c     (elambda=1) and fully decoupled (elambda=0) states are each
+c     evaluated in full and combined by a power law interpolation
+c     in elambda
+c
+c
+      subroutine empole3e
+      use action
+      use analyz
+      use atoms
+      use dlmda
+      use energi
+      use inter
+      use limits
+      use mutant
+      implicit none
+      integer i
+      integer nem1
+      real*8 em1,em0
+      real*8 elambdaorig
+      real*8 weight1,weight0
+      real*8 einterorig
+      real*8 einter1,einter0
+      real*8, allocatable :: aem1(:)
+      real*8, allocatable :: aem0(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aem1(n))
+      allocate (aem0(n))
+c
+c     compute energy and analysis of the elambda = 1 state
+c
+      elambdaorig = elambda
+      einterorig = einter
+      call altemdt (1.0d0)
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole3d
+         else
+            call empole3c
+         end if
+      else
+         if (use_mlist) then
+            call empole3b
+         else
+            call empole3a
+         end if
+      end if
+      em1 = em
+      nem1 = nem
+      do i = 1, n
+         aem1(i) = aem(i)
+      end do
+c
+c     the intermolecular energy accumulates across energy terms, so
+c     save and remove the contribution from the elambda = 1 state
+c
+      einter1 = einter - einterorig
+      einter = einterorig
+c
+c     compute energy and analysis of the elambda = 0 state
+c
+      call altemdt (0.0d0)
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole3d
+         else
+            call empole3c
+         end if
+      else
+         if (use_mlist) then
+            call empole3b
+         else
+            call empole3a
+         end if
+      end if
+      em0 = em
+      do i = 1, n
+         aem0(i) = aem(i)
+      end do
+      einter0 = einter - einterorig
+c
+c     restore original elambda and dependent parameters
+c
+      call altemdt (elambdaorig)
+c
+c     interpolate the dual topology energy and analysis
+c
+      weight1 = elambda**emdtexp
+      weight0 = 1.0d0 - weight1
+      em = weight1*em1 + weight0*em0
+      nem = nem1
+      einter = einterorig + weight1*einter1 + weight0*einter0
+      do i = 1, n
+         aem(i) = weight1*aem1(i) + weight0*aem0(i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aem1)
+      deallocate (aem0)
       return
       end

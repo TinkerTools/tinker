@@ -17,6 +17,7 @@ c     multipole interactions
 c
 c
       subroutine empole
+      use dlmda
       use energi
       use extfld
       use limits
@@ -27,7 +28,9 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_ewald) then
+      if (use_emdt) then
+         call empole0e
+      else if (use_ewald) then
          if (use_mlist) then
             call empole0d
          else
@@ -1950,5 +1953,79 @@ c
          end do
       end do
       em = em + e
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine empole0e  --  dual topology multipole energy  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "empole0e" calculates the electrostatic energy due to atomic
+c     multipole interactions with the dual topology method, in which
+c     the fully coupled (elambda=1) and fully decoupled (elambda=0)
+c     states are each evaluated in full and combined by a power law
+c     interpolation in elambda
+c
+c
+      subroutine empole0e
+      use dlmda
+      use energi
+      use limits
+      use mutant
+      implicit none
+      real*8 em1,em0
+      real*8 elambdaorig
+      real*8 weight1
+c
+c
+c     compute energy of the fully coupled elambda = 1 state
+c
+      elambdaorig = elambda
+      call altemdt (1.0d0)
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole0d
+         else
+            call empole0c
+         end if
+      else
+         if (use_mlist) then
+            call empole0b
+         else
+            call empole0a
+         end if
+      end if
+      em1 = em
+c
+c     compute energy of the fully decoupled elambda = 0 state
+c
+      call altemdt (0.0d0)
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole0d
+         else
+            call empole0c
+         end if
+      else
+         if (use_mlist) then
+            call empole0b
+         else
+            call empole0a
+         end if
+      end if
+      em0 = em
+c
+c     restore original elambda and dependent parameters
+c
+      call altemdt (elambdaorig)
+c
+c     interpolate the dual topology energy
+c
+      weight1 = elambda**emdtexp
+      em = weight1*em1 + (1.0d0-weight1)*em0
       return
       end

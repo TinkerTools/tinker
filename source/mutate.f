@@ -107,6 +107,16 @@ c
       scexp = 5.0d0
       scalpha = 0.7d0
 c
+c     set defaults for use of multipole dual topology
+c
+      use_emdt = .false.
+      emdtexp = 2
+c
+c     set defaults for use of van der Waals dual topology
+c
+      use_evdt = .false.
+      vdtexp = 2
+c
 c     set default dual topology interpolation exponent
 c
       epdtexp = 2
@@ -215,6 +225,16 @@ c
             read (string,*,err=30)  tlambda
          else if (keyword(1:15) .eq. 'VDW-ANNIHILATE ') then
             vcouple = 1
+         else if (keyword(1:13) .eq. 'MTP-DUALTOPO ') then
+            use_emdt = .true.
+         else if (keyword(1:17) .eq. 'MTP-DUALTOPO-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  emdtexp
+         else if (keyword(1:13) .eq. 'VDW-DUALTOPO ') then
+            use_evdt = .true.
+         else if (keyword(1:17) .eq. 'VDW-DUALTOPO-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  vdtexp
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:240)
             read (string,*,err=30)  ihyb,it0,it1
@@ -397,6 +417,12 @@ c
       if (ostvmap.ne.'QNT' .and. ostvmap.ne.'EXP'
      &       .and. ostvmap.ne.'INV') then
          ostvmap = 'QNT'
+      end if
+      if (emdtexp .lt. 1) then
+         emdtexp = 1
+      end if
+      if (vdtexp .lt. 1) then
+         vdtexp = 1
       end if
       if (ostepexp .lt. 1) then
          ostepexp = 1
@@ -827,6 +853,44 @@ c
             end if
          end do
       end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine altemdt  --  dual topology end state reset    ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "altemdt" switches the electrostatic parameters to the state
+c     given by the lambda value "elmda", as needed by the multipole
+c     dual topology energy routines
+c
+c     the charge flux monopoles are recomputed, and the multipoles
+c     are checked for chirality inversion and rotated into the global
+c     frame, so that the global frame multipoles are left consistent
+c     with the requested state for any later energy term
+c
+c
+      subroutine altemdt (elmda)
+      use mutant
+      use potent
+      implicit none
+      real*8 elmda
+c
+c
+c     set electrostatic parameters for the requested lambda state
+c
+      elambda = elmda
+      call altelec
+      if (use_chgflx)  call alterchg
+c
+c     get global frame multipoles for the requested lambda state
+c
+      call chkpole
+      call rotpole ('MPOLE')
       return
       end
 c

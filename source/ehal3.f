@@ -19,6 +19,7 @@ c
       subroutine ehal3
       use analyz
       use atoms
+      use dlmda
       use energi
       use inform
       use iounit
@@ -32,6 +33,10 @@ c
 c
 c     choose the method for summing over pairwise interactions
 c
+      if (use_evdt) then
+         call ehal3d
+         return
+      end if
       if (use_lights) then
          call ehal3b
       else if (use_vlist) then
@@ -1133,5 +1138,132 @@ c     perform deallocation of some local arrays
 c
       deallocate (iv14)
       deallocate (vscale)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine ehal3d  --  dual topology buffered 14-7 analysis ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "ehal3d" calculates the buffered 14-7 van der Waals energy, and
+c     partitions the energy among the atoms, with the dual topology
+c     method, in which the fully coupled (vlambda=1) and the fully
+c     decoupled (vlambda=0) states are each evaluated in full and
+c     combined by a power law interpolation in vlambda
+c
+c     note the long range correction depends on vlambda, so it must be
+c     evaluated separately for each end state and interpolated along
+c     with the pairwise energy
+c
+c
+      subroutine ehal3d
+      use action
+      use analyz
+      use atoms
+      use dlmda
+      use energi
+      use inter
+      use limits
+      use mutant
+      use vdwpot
+      implicit none
+      integer i
+      integer nev1
+      real*8 ev1,ev0
+      real*8 elrc,aelrc
+      real*8 vlambdaorig
+      real*8 weight1,weight0
+      real*8 einterorig
+      real*8 einter1,einter0
+      real*8, allocatable :: aev1(:)
+      real*8, allocatable :: aev0(:)
+      character*6 mode
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aev1(n))
+      allocate (aev0(n))
+      mode = 'VDW'
+c
+c     compute energy and analysis of the vlambda = 1 state
+c
+      vlambdaorig = vlambda
+      einterorig = einter
+      vlambda = 1.0d0
+      if (use_lights) then
+         call ehal3b
+      else if (use_vlist) then
+         call ehal3c
+      else
+         call ehal3a
+      end if
+      if (use_vcorr) then
+         call evcorr (mode,elrc)
+         ev = ev + elrc
+         aelrc = elrc / dble(n)
+         do i = 1, n
+            aev(i) = aev(i) + aelrc
+         end do
+      end if
+      ev1 = ev
+      nev1 = nev
+      do i = 1, n
+         aev1(i) = aev(i)
+      end do
+c
+c     the intermolecular energy accumulates across energy terms, so
+c     save and remove the contribution from the vlambda = 1 state
+c
+      einter1 = einter - einterorig
+      einter = einterorig
+c
+c     compute energy and analysis of the vlambda = 0 state
+c
+      vlambda = 0.0d0
+      if (use_lights) then
+         call ehal3b
+      else if (use_vlist) then
+         call ehal3c
+      else
+         call ehal3a
+      end if
+      if (use_vcorr) then
+         call evcorr (mode,elrc)
+         ev = ev + elrc
+         aelrc = elrc / dble(n)
+         do i = 1, n
+            aev(i) = aev(i) + aelrc
+         end do
+      end if
+      ev0 = ev
+      do i = 1, n
+         aev0(i) = aev(i)
+      end do
+      einter0 = einter - einterorig
+c
+c     restore the original vlambda value
+c
+      vlambda = vlambdaorig
+c
+c     interpolate the dual topology energy and analysis
+c
+      weight1 = vlambda**vdtexp
+      weight0 = 1.0d0 - weight1
+      ev = weight1*ev1 + weight0*ev0
+      nev = nev1
+      einter = einterorig + weight1*einter1 + weight0*einter0
+      do i = 1, n
+         aev(i) = weight1*aev1(i) + weight0*aev0(i)
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aev1)
+      deallocate (aev0)
       return
       end

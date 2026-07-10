@@ -16,6 +16,7 @@ c     "ehal" calculates the buffered 14-7 van der Waals energy
 c
 c
       subroutine ehal
+      use dlmda
       use energi
       use limits
       use vdwpot
@@ -26,20 +27,24 @@ c
 c
 c     choose the method for summing over pairwise interactions
 c
-      if (use_lights) then
-         call ehal0b
-      else if (use_vlist) then
-         call ehal0c
+      if (use_evdt) then
+         call ehal0d
       else
-         call ehal0a
-      end if
+         if (use_lights) then
+            call ehal0b
+         else if (use_vlist) then
+            call ehal0c
+         else
+            call ehal0a
+         end if
 c
 c     apply the long range van der Waals correction if used
 c
-      if (use_vcorr) then
-         mode = 'VDW'
-         call evcorr (mode,elrc)
-         ev = ev + elrc
+         if (use_vcorr) then
+            mode = 'VDW'
+            call evcorr (mode,elrc)
+            ev = ev + elrc
+         end if
       end if
       return
       end
@@ -904,5 +909,83 @@ c     perform deallocation of some local arrays
 c
       deallocate (iv14)
       deallocate (vscale)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine ehal0d  --  dual topology buffered 14-7 energy   ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "ehal0d" calculates the buffered 14-7 van der Waals energy with
+c     the dual topology method, in which the fully coupled (vlambda=1)
+c     and fully decoupled (vlambda=0) states are each evaluated in full
+c     and combined by a power law interpolation in vlambda
+c
+c     note the long range correction depends on vlambda, so it must be
+c     evaluated separately for each end state and interpolated along
+c     with the pairwise energy
+c
+c
+      subroutine ehal0d
+      use dlmda
+      use energi
+      use limits
+      use mutant
+      use vdwpot
+      implicit none
+      real*8 ev1,ev0
+      real*8 elrc
+      real*8 vlambdaorig
+      real*8 weight1
+      character*6 mode
+c
+c
+c     compute energy of the fully coupled vlambda = 1 state
+c
+      vlambdaorig = vlambda
+      vlambda = 1.0d0
+      if (use_lights) then
+         call ehal0b
+      else if (use_vlist) then
+         call ehal0c
+      else
+         call ehal0a
+      end if
+      if (use_vcorr) then
+         mode = 'VDW'
+         call evcorr (mode,elrc)
+         ev = ev + elrc
+      end if
+      ev1 = ev
+c
+c     compute energy of the fully decoupled vlambda = 0 state
+c
+      vlambda = 0.0d0
+      if (use_lights) then
+         call ehal0b
+      else if (use_vlist) then
+         call ehal0c
+      else
+         call ehal0a
+      end if
+      if (use_vcorr) then
+         mode = 'VDW'
+         call evcorr (mode,elrc)
+         ev = ev + elrc
+      end if
+      ev0 = ev
+c
+c     restore the original vlambda value
+c
+      vlambda = vlambdaorig
+c
+c     interpolate the dual topology energy
+c
+      weight1 = vlambda**vdtexp
+      ev = weight1*ev1 + (1.0d0-weight1)*ev0
       return
       end

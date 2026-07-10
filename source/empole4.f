@@ -18,6 +18,7 @@ c     and lambda derivatives
 c
 c
       subroutine empole4
+      use dlmda
       use energi
       use extfld
       use limits
@@ -30,7 +31,9 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_ewald) then
+      if (use_emdt) then
+         call empole4e
+      else if (use_ewald) then
          if (use_mlist) then
             call empole4d
          else
@@ -5181,5 +5184,161 @@ c
       demvirdl(1,3) = demvirdl(1,3) + dldvxz
       demvirdl(2,3) = demvirdl(2,3) + dldvyz
       demvirdl(3,3) = demvirdl(3,3) + dldvzz
+      return
+      end
+c
+c
+c     ####################################################################
+c     ##                                                                ##
+c     ##  subroutine empole4e  --  dual topology multipole lambda deriv ##
+c     ##                                                                ##
+c     ####################################################################
+c
+c
+c     "empole4e" calculates the electrostatic energy, first
+c     derivatives with respect to Cartesian coordinates, and lambda
+c     derivatives due to atomic multipole interactions with the dual
+c     topology method, in which the fully coupled (elambda=1) and
+c     fully decoupled (elambda=0) states are each evaluated in full
+c     via the non-lambda-aware "empole1" routines, then combined by
+c     a power law interpolation in elambda; since the two end state
+c     energies do not themselves depend on elambda, the lambda
+c     derivatives follow directly from the interpolation weight
+c
+c
+      subroutine empole4e
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use limits
+      use mutant
+      use virial
+      implicit none
+      integer i,j
+      real*8 em1,em0
+      real*8 elambdaorig
+      real*8 weight1,weight0
+      real*8 dweight1,d2weight1
+      real*8 emvir1(3,3),emvir0(3,3)
+      real*8, allocatable :: dem1(:,:)
+      real*8, allocatable :: dem0(:,:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dem1(3,n))
+      allocate (dem0(3,n))
+c
+c     compute energy and derivatives of the elambda = 1 state
+c
+      elambdaorig = elambda
+      call altemdt (1.0d0)
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole1d
+         else
+            call empole1c
+         end if
+      else
+         if (use_mlist) then
+            call empole1b
+         else
+            call empole1a
+         end if
+      end if
+      em1 = em
+      do i = 1, n
+         do j = 1, 3
+            dem1(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir1(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     compute energy and derivatives of the elambda = 0 state
+c
+      call altemdt (0.0d0)
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole1d
+         else
+            call empole1c
+         end if
+      else
+         if (use_mlist) then
+            call empole1b
+         else
+            call empole1a
+         end if
+      end if
+      em0 = em
+      do i = 1, n
+         do j = 1, 3
+            dem0(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir0(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     restore original elambda and dependent parameters
+c
+      call altemdt (elambdaorig)
+c
+c     interpolate the dual topology energy, derivatives and virial
+c
+      weight1 = elambda**emdtexp
+      weight0 = 1.0d0 - weight1
+      em = weight1*em1 + weight0*em0
+      do i = 1, n
+         do j = 1, 3
+            dem(j,i) = weight1*dem1(j,i) + weight0*dem0(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir(j,i) = weight1*emvir1(j,i) + weight0*emvir0(j,i)
+         end do
+      end do
+c
+c     analytic first and second derivatives of the interpolation
+c     weight with respect to elambda; guard against a negative power
+c     of zero when emdtexp equals one
+c
+      dweight1 = 0.0d0
+      d2weight1 = 0.0d0
+      if (emdtexp .ge. 2) then
+         dweight1 = dble(emdtexp) * elambda**(emdtexp-1)
+         d2weight1 = dble(emdtexp) * dble(emdtexp-1)
+     &                  * elambda**(emdtexp-2)
+      else if (emdtexp .eq. 1) then
+         dweight1 = 1.0d0
+      end if
+c
+c     set the lambda derivatives of energy and virial
+c
+      demdl = dweight1 * (em1-em0)
+      d2emdl2 = d2weight1 * (em1-em0)
+      do i = 1, 3
+         do j = 1, 3
+            demvirdl(j,i) = dweight1 * (emvir1(j,i)-emvir0(j,i))
+         end do
+      end do
+      do i = 1, n
+         do j = 1, 3
+            dfmdl(j,i) = dweight1 * (dem1(j,i)-dem0(j,i))
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dem1)
+      deallocate (dem0)
       return
       end

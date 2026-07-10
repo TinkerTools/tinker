@@ -17,6 +17,7 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine empole1
+      use dlmda
       use energi
       use extfld
       use limits
@@ -29,7 +30,9 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_ewald) then
+      if (use_emdt) then
+         call empole1e
+      else if (use_ewald) then
          if (use_mlist) then
             call empole1d
          else
@@ -4051,5 +4054,128 @@ c
       emvir(1,3) = emvir(1,3) + vxz
       emvir(2,3) = emvir(2,3) + vyz
       emvir(3,3) = emvir(3,3) + vzz
+      return
+      end
+c
+c
+c     #####################################################################
+c     ##                                                                 ##
+c     ##  subroutine empole1e  --  dual topology multipole derivatives  ##
+c     ##                                                                 ##
+c     #####################################################################
+c
+c
+c     "empole1e" calculates the electrostatic energy and first
+c     derivatives with respect to Cartesian coordinates due to
+c     atomic multipole interactions with the dual topology method,
+c     in which the fully coupled (elambda=1) and fully decoupled
+c     (elambda=0) states are each evaluated in full and combined by
+c     a power law interpolation in elambda
+c
+c
+      subroutine empole1e
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use limits
+      use mutant
+      use virial
+      implicit none
+      integer i,j
+      real*8 em1,em0
+      real*8 elambdaorig
+      real*8 weight1,weight0
+      real*8 emvir1(3,3),emvir0(3,3)
+      real*8, allocatable :: dem1(:,:)
+      real*8, allocatable :: dem0(:,:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dem1(3,n))
+      allocate (dem0(3,n))
+c
+c     compute energy and derivatives of the elambda = 1 state
+c
+      elambdaorig = elambda
+      call altemdt (1.0d0)
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole1d
+         else
+            call empole1c
+         end if
+      else
+         if (use_mlist) then
+            call empole1b
+         else
+            call empole1a
+         end if
+      end if
+      em1 = em
+      do i = 1, n
+         do j = 1, 3
+            dem1(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir1(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     compute energy and derivatives of the elambda = 0 state
+c
+      call altemdt (0.0d0)
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole1d
+         else
+            call empole1c
+         end if
+      else
+         if (use_mlist) then
+            call empole1b
+         else
+            call empole1a
+         end if
+      end if
+      em0 = em
+      do i = 1, n
+         do j = 1, 3
+            dem0(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir0(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     restore original elambda and dependent parameters
+c
+      call altemdt (elambdaorig)
+c
+c     interpolate the dual topology energy, derivatives and virial
+c
+      weight1 = elambda**emdtexp
+      weight0 = 1.0d0 - weight1
+      em = weight1*em1 + weight0*em0
+      do i = 1, n
+         do j = 1, 3
+            dem(j,i) = weight1*dem1(j,i) + weight0*dem0(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir(j,i) = weight1*emvir1(j,i) + weight0*emvir0(j,i)
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dem1)
+      deallocate (dem0)
       return
       end
