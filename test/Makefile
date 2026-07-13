@@ -103,7 +103,7 @@ TINKERLIB := $(TINKERSRC)/libtinker.a
 ##  Should not be Necessary to Change Things Below this Point  ##
 #################################################################
 
-COMMON := assert.o test_amoeba.o test_pdbxyz.o test_potential.o \
+COMMON := assert.o test_amoeba.o test_angle.o test_pdbxyz.o test_potential.o \
  test_xyzpdb.o
 
 EXEFILES := tinkertest.x

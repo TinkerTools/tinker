@@ -56,6 +56,9 @@ c
 c     run unit tests
 c
       call test_amoeba
+      call test_angle
+      call test_angtor
+      call test_bond
 c
 c     run program tests
 c
