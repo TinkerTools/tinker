@@ -1,0 +1,25 @@
+
+                     #####################################
+                     TEST Directory for the Tinker Package
+                     #####################################
+
+      This directory contains the source code and reference files for the
+      Tinker unit test suite. The tests are built separately from the main
+      Tinker executables, and require that the Tinker library has already
+      been built in the ../source directory.
+
+      The provided Makefile can be rebuilt after adding, removing or
+      changing test source files by running the local "buildmake.py" script
+      from within this directory:
+
+          ./buildmake.py *.f > Makefile
+
+      After the Makefile is present, run "make" from this directory to
+      compile the unit test executables. Run "make test" to execute the
+      full test suite.
+
+      A subset of tests can be selected by passing a name or tag with the
+      FILTER variable, for example "make test FILTER=amoeba". Per-check
+      detail lines can be printed by setting DETAIL to "-v", for example
+      "make test FILTER=amoeba DETAIL=-v".
+

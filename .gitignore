@@ -27,4 +27,8 @@ source/*.o
 source/*.x
 source/*.make
 source/*-*
+test/build
+test/*.o
+test/*.mod
+test/*.x
 usage
