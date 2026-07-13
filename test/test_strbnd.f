@@ -5,41 +5,22 @@ c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung and Jay W. Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
-c     #######################################################
-c     ##                                                   ##
-c     ##  subroutine test_bond  --  bond stretching tests  ##
-c     ##                                                   ##
-c     #######################################################
+c     ######################################################
+c     ##                                                  ##
+c     ##  subroutine test_strbnd  --  stretch-bend tests  ##
+c     ##                                                  ##
+c     ######################################################
 c
 c
-c     "test_bond" checks the bond stretching case exercised by the
-c     tinker-gpu bond.cpp test
+c     "test_strbnd" checks the stretch-bend case exercised by the
+c     tinker-gpu strbnd.cpp test
 c
 c
-      subroutine test_bond
-      implicit none
-c
-c
-      call test_bond_trpcage
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine test_bond_trpcage  --  AMOEBA protein bonds  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "test_bond_trpcage" checks harmonic AMOEBA bond stretching for
-c     trpcage against the upstream tinker-gpu bond reference
-c
-c
-      subroutine test_bond_trpcage
+      subroutine test_strbnd
       use action
       use atoms
-      use bndstr
       use energi
+      use strbnd
       use virial
       implicit none
       integer nat,refcnt
@@ -52,31 +33,28 @@ c
       character*240 rpath
       character*(*) tname
       character*(*) tpre
-      parameter (tname='bond_trpcage')
+      parameter (tname='strbnd_trpcage')
       parameter (tpre='test_')
 c
 c
       if (skiptest(tpre//tname,'amoeba'))  return
-c
-c     load the bond-only fixture and reference values
-c
-      call pushdir ('file/bond')
+      call pushdir ('file/strbnd')
       call loadfix ('trpcage','trpcage.key')
       allocate (derivs(3,n))
       allocate (refg(3,n))
-      call refpath ('bond','bond.txt',rpath)
+      call refpath ('strbnd','strbnd.txt',rpath)
       call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
-      call load_engcnt (rpath,'Bond Stretching',refeng,refcnt)
+      call load_engcnt (rpath,'Stretch-Bend',refeng,refcnt)
       eps_e = 1.0d-4
-      eps_g = 4.0d-3
-      eps_v = 6.0d-3
+      eps_g = 3.0d-4
+      eps_v = 1.0d-3
 c
-c     setup and level 0  --  total bond stretching energy
+c     setup and level 0  --  total stretch-bend energy
 c
-      call assert_int (nbond,refcnt,tpre//tname//' count')
+      call assert_int (nstrbnd,refcnt,tpre//tname//' count')
       e = energy ()
       call assert_real (esum,ref_e,eps_e,tpre//tname//' energy (v0)')
-      call assert_real (eb,refeng,eps_e,tpre//tname//' bond (v0)')
+      call assert_real (eba,refeng,eps_e,tpre//tname//' strbnd (v0)')
 c
 c     level 1  --  energy, Cartesian gradient and internal virial
 c
@@ -90,11 +68,8 @@ c
       call analysis (e)
       call assert_real (esum,ref_e,eps_e,
      &                  tpre//tname//' analysis (v3)')
-      call check_engcnt (rpath,'Bond Stretching',eb,neb,eps_e,
-     &                   tpre//tname//' bond (v3)')
-c
-c     clean up
-c
+      call check_engcnt (rpath,'Stretch-Bend',eba,neba,eps_e,
+     &                   tpre//tname//' strbnd (v3)')
       deallocate (derivs)
       deallocate (refg)
       call popdir

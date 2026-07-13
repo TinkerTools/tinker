@@ -147,21 +147,41 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "loadfix" performs the same work as "getxyz" for a caller-supplied
-c     base name, reading the coordinates and key file and building the
-c     force field, so a single binary can set up many structures
+c     "loadfix" performs the same work as "getxyz" for caller-supplied
+c     coordinate and key files, reading the coordinates and key file
+c     and building the force field, so a single binary can set up many
+c     structures
 c
 c
-      subroutine loadfix (base)
+      subroutine loadfix (base,key)
+      use argue
       implicit none
-      character*(*) base
+      character*(*) base,key
       character*240 xyzfile
-      integer ixyz,freeunit
+      character*240 save_arg(0:maxarg)
+      logical save_list(0:maxarg)
+      integer i,ixyz,freeunit
+      integer save_narg
 c
 c
       call initial
+      save_narg = narg
+      do i = 0, maxarg
+         save_arg(i) = arg(i)
+         save_list(i) = listarg(i)
+      end do
+      narg = 2
+      arg(1) = '-k'
+      arg(2) = key
+      listarg(1) = .false.
+      listarg(2) = .false.
       xyzfile = base
       call basefile (xyzfile)
+      narg = save_narg
+      do i = 0, maxarg
+         arg(i) = save_arg(i)
+         listarg(i) = save_list(i)
+      end do
       call suffix (xyzfile,'xyz','old')
       ixyz = freeunit ()
       open (unit=ixyz,file=xyzfile,status='old')

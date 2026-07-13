@@ -59,6 +59,16 @@ c
       call test_angle
       call test_angtor
       call test_bond
+      call test_geom
+      call test_improp
+      call test_imptor
+      call test_opbend
+      call test_pitors
+      call test_strbnd
+      call test_strtor
+      call test_torsion
+      call test_tortor
+      call test_urey
 c
 c     run program tests
 c

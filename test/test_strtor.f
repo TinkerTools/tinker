@@ -5,41 +5,22 @@ c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung and Jay W. Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
-c     ##########################################################
-c     ##                                                      ##
-c     ##  subroutine test_angtor  --  angle-torsion FF tests  ##
-c     ##                                                      ##
-c     ##########################################################
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine test_strtor  --  stretch-torsion tests  ##
+c     ##                                                     ##
+c     #########################################################
 c
 c
-c     "test_angtor" checks the angle-torsion case exercised by the
-c     tinker-gpu angtor.cpp test
+c     "test_strtor" checks the stretch-torsion case exercised by
+c     the tinker-gpu strtor.cpp test
 c
 c
-      subroutine test_angtor
-      implicit none
-c
-c
-      call test_angtor_a4
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine test_angtor_a4  --  A4 angle-torsion test  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "test_angtor_a4" checks the AMOEBA nucleic acid angle-torsion
-c     interaction for A4 against the upstream tinker-gpu reference
-c
-c
-      subroutine test_angtor_a4
+      subroutine test_strtor
       use action
-      use angtor
       use atoms
       use energi
+      use strtor
       use virial
       implicit none
       integer nat,refcnt
@@ -52,31 +33,28 @@ c
       character*240 rpath
       character*(*) tname
       character*(*) tpre
-      parameter (tname='angtor_a4')
+      parameter (tname='strtor_a4')
       parameter (tpre='test_')
 c
 c
       if (skiptest(tpre//tname,'amoeba'))  return
-c
-c     load the angle-torsion-only fixture and reference values
-c
-      call pushdir ('file/angtor')
+      call pushdir ('file/strtor')
       call loadfix ('a4','a4.key')
       allocate (derivs(3,n))
       allocate (refg(3,n))
-      call refpath ('angtor','angtor.txt',rpath)
+      call refpath ('strtor','strtor.txt',rpath)
       call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
-      call load_engcnt (rpath,'Angle-Torsion',refeng,refcnt)
+      call load_engcnt (rpath,'Stretch-Torsion',refeng,refcnt)
       eps_e = 1.0d-4
       eps_g = 1.0d-4
       eps_v = 1.0d-3
 c
-c     setup and level 0  --  total angle-torsion energy
+c     setup and level 0  --  total stretch-torsion energy
 c
-      call assert_int (nangtor,refcnt,tpre//tname//' count')
+      call assert_int (nstrtor,refcnt,tpre//tname//' count')
       e = energy ()
       call assert_real (esum,ref_e,eps_e,tpre//tname//' energy (v0)')
-      call assert_real (eat,refeng,eps_e,tpre//tname//' angtor (v0)')
+      call assert_real (ebt,refeng,eps_e,tpre//tname//' strtor (v0)')
 c
 c     level 1  --  energy, Cartesian gradient and internal virial
 c
@@ -90,11 +68,8 @@ c
       call analysis (e)
       call assert_real (esum,ref_e,eps_e,
      &                  tpre//tname//' analysis (v3)')
-      call check_engcnt (rpath,'Angle-Torsion',eat,neat,eps_e,
-     &                   tpre//tname//' angtor (v3)')
-c
-c     clean up
-c
+      call check_engcnt (rpath,'Stretch-Torsion',ebt,nebt,eps_e,
+     &                   tpre//tname//' strtor (v3)')
       deallocate (derivs)
       deallocate (refg)
       call popdir

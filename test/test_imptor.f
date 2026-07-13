@@ -7,39 +7,20 @@ c     ##################################################################
 c
 c     ##########################################################
 c     ##                                                      ##
-c     ##  subroutine test_angtor  --  angle-torsion FF tests  ##
+c     ##  subroutine test_imptor  --  improper torsion tests  ##
 c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "test_angtor" checks the angle-torsion case exercised by the
-c     tinker-gpu angtor.cpp test
+c     "test_imptor" checks the improper torsion case exercised by
+c     the tinker-gpu imptor.cpp test
 c
 c
-      subroutine test_angtor
-      implicit none
-c
-c
-      call test_angtor_a4
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine test_angtor_a4  --  A4 angle-torsion test  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "test_angtor_a4" checks the AMOEBA nucleic acid angle-torsion
-c     interaction for A4 against the upstream tinker-gpu reference
-c
-c
-      subroutine test_angtor_a4
+      subroutine test_imptor
       use action
-      use angtor
       use atoms
       use energi
+      use imptor
       use virial
       implicit none
       integer nat,refcnt
@@ -52,31 +33,28 @@ c
       character*240 rpath
       character*(*) tname
       character*(*) tpre
-      parameter (tname='angtor_a4')
+      parameter (tname='imptor_ala')
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoeba'))  return
-c
-c     load the angle-torsion-only fixture and reference values
-c
-      call pushdir ('file/angtor')
-      call loadfix ('a4','a4.key')
+      if (skiptest(tpre//tname,'amber'))  return
+      call pushdir ('file/imptor')
+      call loadfix ('ala','ala.key')
       allocate (derivs(3,n))
       allocate (refg(3,n))
-      call refpath ('angtor','angtor.txt',rpath)
+      call refpath ('imptor','imptor.txt',rpath)
       call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
-      call load_engcnt (rpath,'Angle-Torsion',refeng,refcnt)
-      eps_e = 1.0d-4
+      call load_engcnt (rpath,'Improper Torsion',refeng,refcnt)
+      eps_e = 2.0d-4
       eps_g = 1.0d-4
       eps_v = 1.0d-3
 c
-c     setup and level 0  --  total angle-torsion energy
+c     setup and level 0  --  total improper torsion energy
 c
-      call assert_int (nangtor,refcnt,tpre//tname//' count')
+      call assert_int (nitors,refcnt,tpre//tname//' count')
       e = energy ()
       call assert_real (esum,ref_e,eps_e,tpre//tname//' energy (v0)')
-      call assert_real (eat,refeng,eps_e,tpre//tname//' angtor (v0)')
+      call assert_real (eit,refeng,eps_e,tpre//tname//' imptor (v0)')
 c
 c     level 1  --  energy, Cartesian gradient and internal virial
 c
@@ -90,11 +68,8 @@ c
       call analysis (e)
       call assert_real (esum,ref_e,eps_e,
      &                  tpre//tname//' analysis (v3)')
-      call check_engcnt (rpath,'Angle-Torsion',eat,neat,eps_e,
-     &                   tpre//tname//' angtor (v3)')
-c
-c     clean up
-c
+      call check_engcnt (rpath,'Improper Torsion',eit,neit,eps_e,
+     &                   tpre//tname//' imptor (v3)')
       deallocate (derivs)
       deallocate (refg)
       call popdir

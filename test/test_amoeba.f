@@ -63,7 +63,7 @@ c
 c     load the structure and force field, and the reference values
 c
       call pushdir ('file/'//tname)
-      call loadfix (tname)
+      call loadfix (tname,tname//'.key')
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath (tname,tname//'.txt',rpath)

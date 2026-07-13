@@ -106,7 +106,7 @@ c
 c     load the angle-only fixture and the reference values
 c
       call pushdir ('file/angle')
-      call loadfix (base)
+      call loadfix (base,base//'.key')
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath ('angle',reffile,rpath)
