@@ -1,0 +1,3 @@
+ Total Potential Energy :                206.5670 Kcal/mole
+
+ EngCnt  Van der Waals                           206.5670             129

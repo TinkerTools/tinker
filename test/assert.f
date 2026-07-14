@@ -478,6 +478,65 @@ c
       end
 c
 c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine read_gradient  --  read gradient records  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "read_gradient" reads "Anlyt" rows of the form
+c     "Anlyt <atom> dx dy dz norm" into a 3-by-N vector array
+c
+c
+      subroutine read_gradient (fname,mxn,refg,nat)
+      use assert
+      implicit none
+      integer mxn,nat,i,j,atom,ios,ip,next
+      real*8 refg(3,mxn)
+      character*(*) fname
+      character*256 line
+c
+c
+      nat = 0
+      do i = 1, mxn
+         do j = 1, 3
+            refg(j,i) = 0.0d0
+         end do
+      end do
+      open (unit=15,file=fname,status='old',iostat=ios)
+      if (ios .ne. 0) then
+         nfail = nfail + 1
+         write (*,*) 'read_gradient: cannot open ',trim(fname)
+         call assert_summary ()
+      end if
+  100 continue
+      read (15,'(a)',iostat=ios) line
+      if (ios .ne. 0)  go to 190
+      ip = index(line,'Anlyt')
+      if (ip .gt. 0) then
+         next = ip + 5
+         call getnumb (line,atom,next)
+         if (atom.ge.1 .and. atom.le.mxn) then
+            call getfloat (line,refg(1,atom),next)
+            call getfloat (line,refg(2,atom),next)
+            call getfloat (line,refg(3,atom),next)
+            if (atom .gt. nat)  nat = atom
+         end if
+      end if
+      go to 100
+  190 continue
+      close (unit=15)
+      if (nat .eq. 0) then
+         nfail = nfail + 1
+         write (*,*) 'read_gradient: missing gradient in ',
+     &              trim(fname)
+         call assert_summary ()
+      end if
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine load_engcnt  --  read named energy and count  ##

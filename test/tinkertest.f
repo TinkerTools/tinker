@@ -61,6 +61,8 @@ c
       call test_aplusgas
       call test_aplusliquid
       call test_bond
+      call test_bounds
+      call test_box
       call test_chglj
       call test_chgtrn
       call test_disp
@@ -71,6 +73,10 @@ c
       call test_geom
       call test_improp
       call test_imptor
+      call test_kinetic
+      call test_localframe
+      call test_localframe2
+      call test_localframe3
       call test_nacl
       call test_opbend
       call test_partialcharge

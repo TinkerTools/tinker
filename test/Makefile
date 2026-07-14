@@ -104,12 +104,14 @@ TINKERLIB := $(TINKERSRC)/libtinker.a
 #################################################################
 
 COMMON := assert.o test_amoeba.o test_angle.o test_angtor.o test_aplusgas.o \
- test_aplusliquid.o test_bond.o test_chglj.o test_chgtrn.o test_disp.o \
- test_emhippo.o test_ephippo.o test_expol.o test_extfield.o test_geom.o \
- test_improp.o test_imptor.o test_nacl.o test_opbend.o test_partialcharge.o \
- test_pdbxyz.o test_pitors.o test_polpair.o test_potential.o test_rephippo.o \
- test_strbnd.o test_strtor.o test_torsion.o test_tortor.o test_urey.o \
- test_vdw14.o test_xyzpdb.o
+ test_aplusliquid.o test_bond.o test_bounds.o test_box.o test_chglj.o \
+ test_chgtrn.o test_disp.o test_emhippo.o test_ephippo.o test_expol.o \
+ test_extfield.o test_geom.o test_improp.o test_imptor.o test_kinetic.o \
+ test_localframe.o test_localframe2.o test_localframe3.o test_nacl.o \
+ test_opbend.o test_partialcharge.o test_pdbxyz.o test_pitors.o \
+ test_polpair.o test_potential.o test_rephippo.o test_strbnd.o \
+ test_strtor.o test_torsion.o test_tortor.o test_urey.o test_vdw14.o \
+ test_xyzpdb.o
 
 EXEFILES := tinkertest.x
 
