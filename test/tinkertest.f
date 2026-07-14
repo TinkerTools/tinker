@@ -94,6 +94,7 @@ c     run program tests
 c
       call test_potential
       call test_pdbxyz
+      call test_tinkernist
       call test_xyzpdb
 c
 c     report the tally and set the process exit status
