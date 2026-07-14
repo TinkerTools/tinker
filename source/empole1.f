@@ -1805,8 +1805,10 @@ c
          i = ipole(ii)
          sum = sum + rpole(1,i)
       end do
-      e = fterm * sum**2
-      em = em + e
+      if (abs(sum) .gt. 1.0d-10) then
+         e = fterm * sum**2
+         em = em + e
+      end if
 c
 c     compute the cell dipole boundary correction term
 c
@@ -2981,8 +2983,10 @@ c
          i = ipole(ii)
          sum = sum + rpole(1,i)
       end do
-      e = fterm * sum**2
-      em = em + e
+      if (abs(sum) .gt. 1.0d-10) then
+         e = fterm * sum**2
+         em = em + e
+      end if
 c
 c     compute the cell dipole boundary correction term
 c

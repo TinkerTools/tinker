@@ -2,11 +2,6 @@
 
  EngCnt  Pi-Orbital Torsion                       5.0769               37
 
- pitors.cpp
-
- Energy Component Breakdown :           Kcal/mole        Interactions
- Pi-Orbital Torsion                        5.0769               37
-
  Internal Virial Tensor :                  -3.014       -1.132        2.354
                                            -1.132        1.167       -0.679
                                             2.354       -0.679        1.847

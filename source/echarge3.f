@@ -1105,7 +1105,7 @@ c
          i = iion(ii)
          sum = sum + pchg(i)
       end do
-      if (sum .ne. 0.0d0) then
+      if (abs(sum) .gt. 1.0d-10) then
          e = fs * sum**2
          ec = ec + e
          nec = nec + 1
@@ -1500,7 +1500,7 @@ c
          i = iion(ii)
          sum = sum + pchg(i)
       end do
-      if (sum .ne. 0.0d0) then
+      if (abs(sum) .gt. 1.0d-10) then
          e = fs * sum**2
          ec = ec + e
          nec = nec + 1
@@ -1847,7 +1847,7 @@ c
          i = iion(ii)
          sum = sum + pchg(i)
       end do
-      if (sum .ne. 0.0d0) then
+      if (abs(sum) .gt. 1.0d-10) then
          e = fs * sum**2
          ec = ec + e
          nec = nec + 1

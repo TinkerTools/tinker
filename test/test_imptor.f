@@ -45,7 +45,7 @@ c
       call refpath ('imptor','imptor.txt',rpath)
       call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
       call load_engcnt (rpath,'Improper Torsion',refeng,refcnt)
-      eps_e = 2.0d-4
+      eps_e = 1.0d-4
       eps_g = 1.0d-4
       eps_v = 1.0d-3
 c

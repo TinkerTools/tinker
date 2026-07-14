@@ -68,8 +68,8 @@ c
       call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
       call load_engcnt (rpath,'Bond Stretching',refeng,refcnt)
       eps_e = 1.0d-4
-      eps_g = 4.0d-3
-      eps_v = 6.0d-3
+      eps_g = 1.0d-4
+      eps_v = 1.0d-3
 c
 c     setup and level 0  --  total bond stretching energy
 c

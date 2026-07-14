@@ -868,8 +868,10 @@ c
          i = iion(ii)
          sum = sum + pchg(i)
       end do
-      e = fs * sum**2
-      ec = ec + e
+      if (abs(sum) .gt. 1.0d-10) then
+         e = fs * sum**2
+         ec = ec + e
+      end if
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1169,8 +1171,10 @@ c
          i = iion(ii)
          sum = sum + pchg(i)
       end do
-      e = fs * sum**2
-      ec = ec + e
+      if (abs(sum) .gt. 1.0d-10) then
+         e = fs * sum**2
+         ec = ec + e
+      end if
 c
 c     compute the cell dipole boundary correction term
 c
@@ -1438,8 +1442,10 @@ c
          i = iion(ii)
          sum = sum + pchg(i)
       end do
-      e = fs * sum**2
-      ec = ec + e
+      if (abs(sum) .gt. 1.0d-10) then
+         e = fs * sum**2
+         ec = ec + e
+      end if
 c
 c     compute the cell dipole boundary correction term
 c

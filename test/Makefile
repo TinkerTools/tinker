@@ -103,10 +103,13 @@ TINKERLIB := $(TINKERSRC)/libtinker.a
 ##  Should not be Necessary to Change Things Below this Point  ##
 #################################################################
 
-COMMON := assert.o test_amoeba.o test_angle.o test_angtor.o test_bond.o \
- test_geom.o test_improp.o test_imptor.o test_opbend.o test_pdbxyz.o \
- test_pitors.o test_potential.o test_strbnd.o test_strtor.o test_torsion.o \
- test_tortor.o test_urey.o test_xyzpdb.o
+COMMON := assert.o test_amoeba.o test_angle.o test_angtor.o test_aplusgas.o \
+ test_aplusliquid.o test_bond.o test_chgtrn.o test_disp.o test_emhippo.o \
+ test_ephippo.o test_expol.o test_extfield.o test_geom.o test_improp.o \
+ test_imptor.o test_nacl.o test_opbend.o test_pdbxyz.o test_pitors.o \
+ test_polpair.o test_potential.o test_rephippo.o test_strbnd.o \
+ test_strtor.o test_torsion.o test_tortor.o test_urey.o test_vdw14.o \
+ test_xyzpdb.o
 
 EXEFILES := tinkertest.x
 

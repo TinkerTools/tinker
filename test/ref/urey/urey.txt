@@ -2,11 +2,6 @@
 
  EngCnt  Urey-Bradley                            -0.1964               10
 
- urey.cpp
-
- Energy Component Breakdown :           Kcal/mole        Interactions
- Urey-Bradley                             -0.1964               10
-
  Internal Virial Tensor :                   2.318       -0.827       -1.078
                                            -0.827        3.061        0.062
                                            -1.078        0.062        4.915

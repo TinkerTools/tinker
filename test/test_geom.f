@@ -91,7 +91,7 @@ c
 c
 c
       call test_geom_case ('torsion','geom.4.txt','torsion',
-     &                     'geom_torsion',5.0d-4,1.0d-1,1.5d-3)
+     &                     'geom_torsion',1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c
@@ -108,7 +108,7 @@ c
 c
 c
       call test_geom_case ('position','geom.5.txt','position',
-     &                     'geom_position',5.0d-4,1.0d-1,1.5d-3)
+     &                     'geom_position',1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c

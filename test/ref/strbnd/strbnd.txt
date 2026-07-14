@@ -2,11 +2,6 @@
 
  EngCnt  Stretch-Bend                            -0.6930              504
 
- strbnd.cpp
-
- Energy Component Breakdown :           Kcal/mole        Interactions
- Stretch-Bend                             -0.6930              504
-
  Internal Virial Tensor :                 -55.818       18.525       25.157
                                            18.525      -26.515       -9.871
                                            25.157       -9.871      -15.485

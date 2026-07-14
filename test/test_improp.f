@@ -37,7 +37,7 @@ c
 c
 c
       call test_improp_case ('trp_charmm','improp.1.txt',
-     &                       'improp_trpcage',1.0d-4,3.0d-4,1.0d-3)
+     &                       'improp_trpcage',1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c
@@ -54,7 +54,7 @@ c
 c
 c
       call test_improp_case ('bdna3','improp.2.txt',
-     &                       'improp_bdna3',1.0d-4,1.0d-3,1.0d-3)
+     &                       'improp_bdna3',1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c

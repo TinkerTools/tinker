@@ -2,11 +2,6 @@
 
  EngCnt  Torsion-Torsion                         -9.5128                3
 
- tortor.cpp
-
- Energy Component Breakdown :           Kcal/mole        Interactions
- Torsion-Torsion                          -9.5128                3
-
  Internal Virial Tensor :                   0.384       -0.444        0.347
                                            -0.444        1.642        0.528
                                             0.347        0.528       -2.027

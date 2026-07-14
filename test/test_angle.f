@@ -42,7 +42,7 @@ c
 c
 c
       call test_angle_case ('trpcage','angle.1.txt','amoeba',
-     &                      'angle_trpcage',1.0d-4,1.0d-3,3.0d-3)
+     &                      'angle_trpcage',1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c

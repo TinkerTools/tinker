@@ -2,11 +2,6 @@
 
  EngCnt  Torsional Angle                         12.4527              843
 
- torsion.cpp
-
- Energy Component Breakdown :           Kcal/mole        Interactions
- Torsional Angle                          12.4527              843
-
  Internal Virial Tensor :                  -0.522        2.350       -4.405
                                             2.350       -0.934       -2.815
                                            -4.405       -2.815        1.456

@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung and Jay W. Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  module assert  --  unit-test assertions and refs            ##
-c     ##                                                              ##
-c     ##################################################################
+c     ########################################################
+c     ##                                                    ##
+c     ##  module assert  --  unit-test assertions and refs  ##
+c     ##                                                    ##
+c     ########################################################
 c
 c
 c     "assert" provides the lightweight assertion primitives,
@@ -41,11 +41,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine ta_init  --  set test root and filter            ##
-c     ##                                                              ##
-c     ##################################################################
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine ta_init  --  set test root and filter  ##
+c     ##                                                    ##
+c     ########################################################
 c
 c
 c     "ta_init" records the test directory root and the optional test
@@ -66,11 +66,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  function skiptest  --  filter tests by name or tag          ##
-c     ##                                                              ##
-c     ##################################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  function skiptest  --  filter tests by name or tag  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
 c     "skiptest" returns true when the active filter, if any, matches
@@ -95,11 +95,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine pushdir  --  enter a fixture directory           ##
-c     ##                                                              ##
-c     ##################################################################
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine pushdir  --  enter a fixture directory  ##
+c     ##                                                     ##
+c     #########################################################
 c
 c
 c     "pushdir" saves the current working directory and changes into a
@@ -119,11 +119,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine popdir  --  return to prior directory            ##
-c     ##                                                              ##
-c     ##################################################################
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine popdir  --  return to prior directory  ##
+c     ##                                                    ##
+c     ########################################################
 c
 c
 c     "popdir" restores the working directory saved by the matching
@@ -140,11 +140,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine loadfix  --  read a fixture and set up FF        ##
-c     ##                                                              ##
-c     ##################################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine loadfix  --  read a fixture and set up FF  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "loadfix" performs the same work as "getxyz" for caller-supplied
@@ -192,11 +192,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine refpath  --  build a reference file path         ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine refpath  --  build a reference file path  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
 c     "refpath" returns the path to a reference file, given its case
@@ -214,11 +214,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine assert_real  --  compare scalar to reference     ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine assert_real  --  compare scalar to reference  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "assert_real" checks that a computed scalar agrees with a stored
@@ -249,11 +249,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine assert_int  --  compare integer to reference     ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine assert_int  --  compare integer to reference  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "assert_int" checks that a computed integer exactly agrees with a
@@ -283,11 +283,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine assert_grad  --  compare gradient to reference   ##
-c     ##                                                              ##
-c     ##################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine assert_grad  --  compare gradient to reference  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "assert_grad" checks that every Cartesian gradient component of an
@@ -334,11 +334,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine load_ref  --  read energy/gradient reference     ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine load_ref  --  read energy/gradient reference  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "load_ref" reads a Tinker reference output file and extracts the
@@ -436,11 +436,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine load_engcnt  --  read named energy and count     ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine load_engcnt  --  read named energy and count  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
 c     "load_engcnt" reads a Tinker reference output file and extracts
@@ -485,11 +485,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine run_prog  --  run a built Tinker program         ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine run_prog  --  run a built Tinker program  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
 c     "run_prog" runs a built Tinker program as a subprocess, capturing
@@ -532,11 +532,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine assert_files  --  tolerant file comparison       ##
-c     ##                                                              ##
-c     ##################################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine assert_files  --  tolerant file comparison  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "assert_files" checks that two Tinker output files agree: banner
@@ -633,11 +633,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine next_content  --  next non-banner data line      ##
-c     ##                                                              ##
-c     ##################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine next_content  --  next non-banner data line  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "next_content" returns the next line of a file that is neither
@@ -672,11 +672,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine assert_summary  --  report totals and exit       ##
-c     ##                                                              ##
-c     ##################################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine assert_summary  --  report totals and exit  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "assert_summary" prints the pass/fail totals and terminates with a

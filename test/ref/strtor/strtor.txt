@@ -2,11 +2,6 @@
 
  EngCnt  Stretch-Torsion                         -2.2930               10
 
- strtor.cpp
-
- Energy Component Breakdown :           Kcal/mole        Interactions
- Stretch-Torsion                          -2.2930               10
-
  Internal Virial Tensor :                -140.355     -161.665      -83.899
                                          -161.665     -199.006       14.182
                                           -83.899       14.182       92.711

@@ -58,17 +58,29 @@ c
       call test_amoeba
       call test_angle
       call test_angtor
+      call test_aplusgas
+      call test_aplusliquid
       call test_bond
+      call test_chgtrn
+      call test_disp
+      call test_emhippo
+      call test_ephippo
+      call test_expol
+      call test_extfield
       call test_geom
       call test_improp
       call test_imptor
+      call test_nacl
       call test_opbend
       call test_pitors
+      call test_polpair
+      call test_rephippo
       call test_strbnd
       call test_strtor
       call test_torsion
       call test_tortor
       call test_urey
+      call test_vdw14
 c
 c     run program tests
 c
