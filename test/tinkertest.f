@@ -61,6 +61,7 @@ c
       call test_aplusgas
       call test_aplusliquid
       call test_bond
+      call test_chglj
       call test_chgtrn
       call test_disp
       call test_emhippo
@@ -72,6 +73,7 @@ c
       call test_imptor
       call test_nacl
       call test_opbend
+      call test_partialcharge
       call test_pitors
       call test_polpair
       call test_rephippo
