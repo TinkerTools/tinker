@@ -192,6 +192,48 @@ c
       end
 c
 c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine loadfix_keyadd  --  read key plus keyword  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "loadfix_keyadd" writes a temporary keyfile containing the
+c     contents of an existing keyfile plus one appended keyword line,
+c     then reads the coordinates and temporary key via "loadfix"
+c
+c
+      subroutine loadfix_keyadd (base,key,addkey)
+      implicit none
+      integer ikey,itmp,freeunit
+      character*(*) base,key,addkey
+      character*240 record,tmpkey
+c
+c
+      tmpkey = 'tinkertest-keyadd.key'
+      ikey = freeunit ()
+      open (unit=ikey,file=key,status='old')
+      itmp = freeunit ()
+      open (unit=itmp,file=tmpkey,status='replace')
+      do while (.true.)
+         read (ikey,10,end=30)  record
+   10    format (a240)
+         write (itmp,20)  trim(record)
+      end do
+   20 format (a)
+   30 continue
+      write (itmp,20)  trim(addkey)
+      close (unit=ikey)
+      close (unit=itmp)
+      call loadfix (base,tmpkey)
+      itmp = freeunit ()
+      open (unit=itmp,file=tmpkey,status='old')
+      close (unit=itmp,status='delete')
+      return
+      end
+c
+c
 c     ###########################################################
 c     ##                                                       ##
 c     ##  subroutine refpath  --  build a reference file path  ##

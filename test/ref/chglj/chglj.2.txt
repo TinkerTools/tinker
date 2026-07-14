@@ -1,4 +1,4 @@
- Total Potential Energy :               -863.8791 Kcal/mole
+ Total Potential Energy :               -864.0762 Kcal/mole
 
  Internal Virial Tensor :                -316.927     -129.430       55.116
                                          -129.430     -199.709       51.162

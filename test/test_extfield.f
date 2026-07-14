@@ -42,7 +42,10 @@ c
 c
       call test_extfield_case ('water4_Na_shifted',
      &   'water4_Na_shifted_mpole.key','extfield.1.txt',
-     &   'extfield_mpole','Atomic Multipoles','amoeba')
+     &   'extfield_mpole','Atomic Multipoles','amoeba',.true.)
+      call test_extfield_case ('water4_Na_shifted',
+     &   'water4_Na_shifted_mpole.key','extfield.1.txt',
+     &   'extfield_mpole','Atomic Multipoles','amoeba',.false.)
       return
       end
 c
@@ -60,7 +63,10 @@ c
 c
       call test_extfield_case ('water4_Na_shifted',
      &   'water4_Na_shifted_polar.key','extfield.2.txt',
-     &   'extfield_polar','Polarization','amoeba')
+     &   'extfield_polar','Polarization','amoeba',.true.)
+      call test_extfield_case ('water4_Na_shifted',
+     &   'water4_Na_shifted_polar.key','extfield.2.txt',
+     &   'extfield_polar','Polarization','amoeba',.false.)
       return
       end
 c
@@ -78,7 +84,10 @@ c
 c
       call test_extfield_case ('water4_Na_shifted',
      &   'water4_Na_shifted_mpolar.key','extfield.3.txt',
-     &   'extfield_mpolar',' ','amoeba')
+     &   'extfield_mpolar',' ','amoeba',.true.)
+      call test_extfield_case ('water4_Na_shifted',
+     &   'water4_Na_shifted_mpolar.key','extfield.3.txt',
+     &   'extfield_mpolar',' ','amoeba',.false.)
       return
       end
 c
@@ -95,7 +104,9 @@ c
 c
 c
       call test_extfield_case ('amber','amber.key','extfield.4.txt',
-     &   'extfield_vdwpchg',' ','amber')
+     &   'extfield_vdwpchg',' ','amber',.true.)
+      call test_extfield_case ('amber','amber.key','extfield.4.txt',
+     &   'extfield_vdwpchg',' ','amber',.false.)
       return
       end
 c
@@ -107,7 +118,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-      subroutine test_extfield_case (base,key,reffile,tname,term,fftag)
+      subroutine test_extfield_case (base,key,reffile,tname,term,fftag,
+     &                               uselist)
       use action
       use atoms
       use energi
@@ -121,23 +133,26 @@ c
       real*8, allocatable :: derivs(:,:)
       real*8 refv(3,3)
       real*8, allocatable :: refg(:,:)
-      logical skiptest,hasterm
+      logical skiptest,hasterm,uselist
       character*(*) base,key,reffile,tname,term,fftag
+      character*48 cname
       character*240 rpath
       character*(*) tpre
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,fftag))  return
+      if (uselist) then
+         cname = tpre//trim(tname)//'_list'
+      else
+         cname = tpre//trim(tname)//'_nolist'
+      end if
+      if (skiptest(cname,fftag))  return
       call pushdir ('file/extfield')
-      call loadfix (base,key)
-      use_exfld = .true.
-      exfld(1) = 150.0d0 / elefield
-      exfld(2) = -300.0d0 / elefield
-      exfld(3) = 450.0d0 / elefield
-      do i = 1, 3
-         texfld(i) = exfld(i)
-      end do
+      if (uselist) then
+         call loadfix_keyadd (base,key,'neighbor-list')
+      else
+         call loadfix (base,key)
+      end if
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath ('extfield',reffile,rpath)
@@ -154,31 +169,31 @@ c
 c     level 0  --  external field energy
 c
       e = energy ()
-      call assert_real (esum,ref_e,eps_e,tpre//tname//' energy (v0)')
+      call assert_real (esum,ref_e,eps_e,trim(cname)//' energy (v0)')
       if (trim(term) .eq. 'Atomic Multipoles')
      &   call assert_real (em,refeng,eps_e,
-     &                     tpre//tname//' mpole (v0)')
+     &                     trim(cname)//' mpole (v0)')
       if (trim(term) .eq. 'Polarization')
      &   call assert_real (ep,refeng,eps_e,
-     &                     tpre//tname//' polar (v0)')
+     &                     trim(cname)//' polar (v0)')
 c
 c     level 1  --  energy, Cartesian gradient and internal virial
 c
       call gradient (e,derivs)
-      call assert_real (esum,ref_e,eps_e,tpre//tname//' grad-e (v1)')
-      call assert_grad (derivs,refg,n,eps_g,tpre//tname//' grad (v1)')
-      call assert_grad (vir,refv,3,eps_v,tpre//tname//' virial (v1)')
+      call assert_real (esum,ref_e,eps_e,trim(cname)//' grad-e (v1)')
+      call assert_grad (derivs,refg,n,eps_g,trim(cname)//' grad (v1)')
+      call assert_grad (vir,refv,3,eps_v,trim(cname)//' virial (v1)')
 c
 c     level 3  --  total energy and optional per-term analysis
 c
       call analysis (e)
-      call assert_real (esum,ref_e,eps_e,tpre//tname//' analysis (v3)')
+      call assert_real (esum,ref_e,eps_e,trim(cname)//' analysis (v3)')
       if (trim(term) .eq. 'Atomic Multipoles')
      &   call check_engcnt (rpath,'Atomic Multipoles',em,nem,
-     &                      eps_e,tpre//tname//' mpole (v3)')
+     &                      eps_e,trim(cname)//' mpole (v3)')
       if (trim(term) .eq. 'Polarization')
      &   call check_engcnt (rpath,'Polarization',ep,nep,
-     &                      eps_e,tpre//tname//' polar (v3)')
+     &                      eps_e,trim(cname)//' polar (v3)')
       deallocate (derivs)
       deallocate (refg)
       call popdir

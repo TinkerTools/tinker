@@ -44,7 +44,10 @@ c
 c
       call test_nacl_vdw_case ('nacl1','nacl_vdw.key',
      &   'nacl_ehal_noswitch',51.4242d0,1,184.4899d0,
-     &   -405.878d0,0.0d0,0.0d0)
+     &   -405.878d0,0.0d0,0.0d0,.true.)
+      call test_nacl_vdw_case ('nacl1','nacl_vdw.key',
+     &   'nacl_ehal_noswitch',51.4242d0,1,184.4899d0,
+     &   -405.878d0,0.0d0,0.0d0,.false.)
       return
       end
 c
@@ -62,7 +65,10 @@ c
 c
       call test_nacl_vdw_case ('nacl2','nacl_vdw.key',
      &   'nacl_ehal_switch_near_cut',25.8420d0,1,149.0904d0,
-     &   -354.835d0,0.0d0,0.0d0)
+     &   -354.835d0,0.0d0,0.0d0,.true.)
+      call test_nacl_vdw_case ('nacl2','nacl_vdw.key',
+     &   'nacl_ehal_switch_near_cut',25.8420d0,1,149.0904d0,
+     &   -354.835d0,0.0d0,0.0d0,.false.)
       return
       end
 c
@@ -80,7 +86,10 @@ c
 c
       call test_nacl_vdw_case ('nacl3','nacl_vdw.key',
      &   'nacl_ehal_switch_near_off',4.8849d0,1,127.6639d0,
-     &   -319.160d0,0.0d0,0.0d0)
+     &   -319.160d0,0.0d0,0.0d0,.true.)
+      call test_nacl_vdw_case ('nacl3','nacl_vdw.key',
+     &   'nacl_ehal_switch_near_off',4.8849d0,1,127.6639d0,
+     &   -319.160d0,0.0d0,0.0d0,.false.)
       return
       end
 c
@@ -98,7 +107,10 @@ c
 c
       call test_nacl_vdw_case ('nacl1','nacl_vdw_corr.key',
      &   'nacl_ehal_evcorr_full',52.0802d0,1,184.4899d0,
-     &   -408.398d0,-2.521d0,-2.521d0)
+     &   -408.398d0,-2.521d0,-2.521d0,.true.)
+      call test_nacl_vdw_case ('nacl1','nacl_vdw_corr.key',
+     &   'nacl_ehal_evcorr_full',52.0802d0,1,184.4899d0,
+     &   -408.398d0,-2.521d0,-2.521d0,.false.)
       return
       end
 c
@@ -116,7 +128,10 @@ c
 c
       call test_nacl_vdw_case ('nacl1','nacl_vdw_lambda.key',
      &   'nacl_ehal_evcorr_lambda',25.8947d0,1,81.9570d0,
-     &   -182.721d0,-2.415d0,-2.415d0)
+     &   -182.721d0,-2.415d0,-2.415d0,.true.)
+      call test_nacl_vdw_case ('nacl1','nacl_vdw_lambda.key',
+     &   'nacl_ehal_evcorr_lambda',25.8947d0,1,81.9570d0,
+     &   -182.721d0,-2.415d0,-2.415d0,.false.)
       return
       end
 c
@@ -133,7 +148,9 @@ c
 c
 c
       call test_nacl_mpole_case ('nacl1','nacl_mpole.key',
-     &   'nacl_empole_nonewald',-150.9381d0,1,1.0d-4)
+     &   'nacl_empole_nonewald',-150.9381d0,1,1.0d-4,.true.)
+      call test_nacl_mpole_case ('nacl1','nacl_mpole.key',
+     &   'nacl_empole_nonewald',-150.9381d0,1,1.0d-4,.false.)
       return
       end
 c
@@ -150,7 +167,9 @@ c
 c
 c
       call test_nacl_mpole_case ('nacl4','nacl_mpole_ewald.key',
-     &   'nacl_empole_ewald',-0.3146d0,2,5.0d-4)
+     &   'nacl_empole_ewald',-0.3146d0,2,5.0d-4,.true.)
+      call test_nacl_mpole_case ('nacl4','nacl_mpole_ewald.key',
+     &   'nacl_empole_ewald',-0.3146d0,2,5.0d-4,.false.)
       return
       end
 c
@@ -163,7 +182,7 @@ c     #######################################################
 c
 c
       subroutine test_nacl_vdw_case (base,key,tname,refeng,refcnt,
-     &                               gx,vxx,vyy,vzz)
+     &                               gx,vxx,vyy,vzz,uselist)
       use action
       use atoms
       use energi
@@ -173,16 +192,26 @@ c
       real*8 energy,e,refeng,gx,vxx,vyy,vzz
       real*8 eps,refv(3,3)
       real*8, allocatable :: derivs(:,:),refg(:,:)
-      logical skiptest
+      logical skiptest,uselist
       character*(*) base,key,tname
+      character*48 cname
       character*(*) tpre
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoeba'))
+      if (uselist) then
+         cname = tpre//trim(tname)//'_list'
+      else
+         cname = tpre//trim(tname)//'_nolist'
+      end if
+      if (skiptest(cname,'amoeba'))
      &   return
       call pushdir ('file/nacl')
-      call loadfix (base,key)
+      if (uselist) then
+         call loadfix_keyadd (base,key,'neighbor-list')
+      else
+         call loadfix (base,key)
+      end if
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call zero_ref2 (refg,refv,n)
@@ -196,20 +225,20 @@ c
 c     level 0  --  buffered 14-7 van der Waals energy
 c
       e = energy ()
-      call assert_real (ev,refeng,eps,tpre//tname//' vdw (v0)')
+      call assert_real (ev,refeng,eps,trim(cname)//' vdw (v0)')
 c
 c     level 1  --  energy, Cartesian gradient and internal virial
 c
       call gradient (e,derivs)
-      call assert_real (ev,refeng,eps,tpre//tname//' vdw (v1)')
-      call assert_grad (derivs,refg,n,eps,tpre//tname//' grad (v1)')
-      call assert_grad (vir,refv,3,eps,tpre//tname//' virial (v1)')
+      call assert_real (ev,refeng,eps,trim(cname)//' vdw (v1)')
+      call assert_grad (derivs,refg,n,eps,trim(cname)//' grad (v1)')
+      call assert_grad (vir,refv,3,eps,trim(cname)//' virial (v1)')
 c
 c     level 3  --  energy and per-term analysis
 c
       call analysis (e)
-      call assert_real (ev,refeng,eps,tpre//tname//' vdw (v3)')
-      call assert_int (nev,refcnt,tpre//tname//' vdw count (v3)')
+      call assert_real (ev,refeng,eps,trim(cname)//' vdw (v3)')
+      call assert_int (nev,refcnt,trim(cname)//' vdw count (v3)')
       deallocate (derivs)
       deallocate (refg)
       call popdir
@@ -226,7 +255,7 @@ c     ###########################################################
 c
 c
       subroutine test_nacl_mpole_case (base,key,tname,refeng,refcnt,
-     &                                 eps)
+     &                                 eps,uselist)
       use action
       use atoms
       use energi
@@ -235,21 +264,31 @@ c
       integer refcnt
       real*8 energy,e,refeng,eps,refv(3,3)
       real*8, allocatable :: derivs(:,:),refg(:,:)
-      logical skiptest,ewald
+      logical skiptest,ewald,uselist
       character*(*) base,key,tname
+      character*48 cname
       character*(*) tpre
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoeba'))
+      if (uselist) then
+         cname = tpre//trim(tname)//'_list'
+      else
+         cname = tpre//trim(tname)//'_nolist'
+      end if
+      if (skiptest(cname,'amoeba'))
      &   return
       call pushdir ('file/nacl')
-      call loadfix (base,key)
+      if (uselist) then
+         call loadfix_keyadd (base,key,'neighbor-list')
+      else
+         call loadfix (base,key)
+      end if
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call zero_ref2 (refg,refv,n)
-      ewald = index(tname,'ewald') .gt. 0
-     &        .and. index(tname,'nonewald') .eq. 0
+      ewald = index(cname,'ewald') .gt. 0
+     &        .and. index(cname,'nonewald') .eq. 0
       if (ewald) then
          refg(1,1) = 0.1731d0
          refg(2,1) = 0.1921d0
@@ -275,20 +314,20 @@ c
 c     level 0  --  atomic multipole energy
 c
       e = energy ()
-      call assert_real (em,refeng,eps,tpre//tname//' mpole (v0)')
+      call assert_real (em,refeng,eps,trim(cname)//' mpole (v0)')
 c
 c     level 1  --  energy, Cartesian gradient and internal virial
 c
       call gradient (e,derivs)
-      call assert_real (em,refeng,eps,tpre//tname//' mpole (v1)')
-      call assert_grad (derivs,refg,n,eps,tpre//tname//' grad (v1)')
-      call assert_grad (vir,refv,3,eps,tpre//tname//' virial (v1)')
+      call assert_real (em,refeng,eps,trim(cname)//' mpole (v1)')
+      call assert_grad (derivs,refg,n,eps,trim(cname)//' grad (v1)')
+      call assert_grad (vir,refv,3,eps,trim(cname)//' virial (v1)')
 c
 c     level 3  --  energy and per-term analysis
 c
       call analysis (e)
-      call assert_real (em,refeng,eps,tpre//tname//' mpole (v3)')
-      call assert_int (nem,refcnt,tpre//tname//' mpole count (v3)')
+      call assert_real (em,refeng,eps,trim(cname)//' mpole (v3)')
+      call assert_int (nem,refcnt,trim(cname)//' mpole count (v3)')
       deallocate (derivs)
       deallocate (refg)
       call popdir

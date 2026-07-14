@@ -38,7 +38,7 @@ c
 c
 c
       call test_vdw14_case ('vdw14.1','vdw14.1.txt',
-     &                      'vdw14_nopbc')
+     &                      'vdw14_nopbc',.false.)
       return
       end
 c
@@ -55,7 +55,9 @@ c
 c
 c
       call test_vdw14_case ('vdw14.2','vdw14.2.txt',
-     &                      'vdw14_cutoff')
+     &                      'vdw14_cutoff_list',.true.)
+      call test_vdw14_case ('vdw14.2','vdw14.2.txt',
+     &                      'vdw14_cutoff_nolist',.false.)
       return
       end
 c
@@ -67,7 +69,7 @@ c     ##                                               ##
 c     ###################################################
 c
 c
-      subroutine test_vdw14_case (key,reffile,tname)
+      subroutine test_vdw14_case (key,reffile,tname,uselist)
       use action
       use atoms
       use energi
@@ -79,7 +81,7 @@ c
       real*8, allocatable :: derivs(:,:)
       real*8 refv(3,3)
       real*8, allocatable :: refg(:,:)
-      logical skiptest
+      logical skiptest,uselist
       character*(*) key,reffile,tname
       character*240 rpath
       character*(*) tpre
@@ -88,7 +90,12 @@ c
 c
       if (skiptest(tpre//tname,'charmm'))  return
       call pushdir ('file/vdw14')
-      call loadfix ('trp_charmm',key//'.key')
+      if (uselist) then
+         call loadfix_keyadd ('trp_charmm',key//'.key',
+     &                        'neighbor-list')
+      else
+         call loadfix ('trp_charmm',key//'.key')
+      end if
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath ('vdw14',reffile,rpath)

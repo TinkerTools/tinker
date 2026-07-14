@@ -706,7 +706,7 @@ c
 c     compute the self-energy portion of the Ewald summation
 c
       do ii = 1, ndisp
-         i = idisp(i)
+         i = idisp(ii)
          e = csix(i)**2 * aewald**6 / 12.0d0
          edsp = edsp + e
       end do

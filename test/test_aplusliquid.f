@@ -38,8 +38,11 @@ c
 c
 c
       call test_aplusliquid_case ('liquid_ewald','aplusliquid.1.txt',
-     &                           'aplusliquid_ewald',1.0d-4,
-     &                           1.0d-4,1.0d-3)
+     &                           'aplusliquid_ewald_list',.true.,
+     &                           1.0d-4,1.0d-4,1.0d-3)
+      call test_aplusliquid_case ('liquid_ewald','aplusliquid.1.txt',
+     &                           'aplusliquid_ewald_nolist',.false.,
+     &                           1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c
@@ -56,8 +59,11 @@ c
 c
 c
       call test_aplusliquid_case ('liquid','aplusliquid.2.txt',
-     &                           'aplusliquid_nonewald',1.0d-4,
-     &                           1.0d-4,1.0d-3)
+     &                           'aplusliquid_nonewald_list',.true.,
+     &                           1.0d-4,1.0d-4,1.0d-3)
+      call test_aplusliquid_case ('liquid','aplusliquid.2.txt',
+     &                           'aplusliquid_nonewald_nolist',
+     &                           .false.,1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c
@@ -69,7 +75,7 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-      subroutine test_aplusliquid_case (key,reffile,tname,
+      subroutine test_aplusliquid_case (key,reffile,tname,uselist,
      &                                  eps_e,eps_g,eps_v)
       use action
       use atoms
@@ -82,7 +88,7 @@ c
       real*8, allocatable :: derivs(:,:)
       real*8 refv(3,3)
       real*8, allocatable :: refg(:,:)
-      logical skiptest
+      logical skiptest,uselist
       character*(*) key,reffile,tname
       character*240 rpath
       character*(*) tpre
@@ -91,7 +97,11 @@ c
 c
       if (skiptest(tpre//tname,'amoebaplus'))  return
       call pushdir ('file/aplusliquid')
-      call loadfix ('tetramer',key//'.key')
+      if (uselist) then
+         call loadfix_keyadd ('tetramer',key//'.key','neighbor-list')
+      else
+         call loadfix ('tetramer',key//'.key')
+      end if
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath ('aplusliquid',reffile,rpath)

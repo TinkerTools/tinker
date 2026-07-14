@@ -39,7 +39,7 @@ c
 c
       call test_partialcharge_case ('partialcharge.1',
      &                              'partialcharge.1.txt',
-     &                              'partialcharge_nonewald')
+     &                              'partialcharge_nonewald',.false.)
       return
       end
 c
@@ -57,7 +57,11 @@ c
 c
       call test_partialcharge_case ('partialcharge.2',
      &                              'partialcharge.2.txt',
-     &                              'partialcharge_ewald')
+     &                              'partialcharge_ewald_list',.true.)
+      call test_partialcharge_case ('partialcharge.2',
+     &                              'partialcharge.2.txt',
+     &                              'partialcharge_ewald_nolist',
+     &                              .false.)
       return
       end
 c
@@ -69,7 +73,7 @@ c     ##                                                       ##
 c     ###########################################################
 c
 c
-      subroutine test_partialcharge_case (key,reffile,tname)
+      subroutine test_partialcharge_case (key,reffile,tname,uselist)
       use action
       use atoms
       use energi
@@ -81,7 +85,7 @@ c
       real*8, allocatable :: derivs(:,:)
       real*8 refv(3,3)
       real*8, allocatable :: refg(:,:)
-      logical skiptest
+      logical skiptest,uselist
       character*(*) key,reffile,tname
       character*240 rpath
       character*(*) tpre
@@ -90,7 +94,12 @@ c
 c
       if (skiptest(tpre//tname,'charmm'))  return
       call pushdir ('file/partialcharge')
-      call loadfix ('trp_charmm',key//'.key')
+      if (uselist) then
+         call loadfix_keyadd ('trp_charmm',key//'.key',
+     &                        'neighbor-list')
+      else
+         call loadfix ('trp_charmm',key//'.key')
+      end if
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath ('partialcharge',reffile,rpath)

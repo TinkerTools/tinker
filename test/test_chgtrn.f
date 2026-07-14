@@ -36,9 +36,45 @@ c
       parameter (tpre='test_')
 c
 c
+      call test_chgtrn_case (tname//'_list',.true.)
+      call test_chgtrn_case (tname//'_nolist',.false.)
+      return
+      end
+c
+c
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine test_chgtrn_case  --  run chgtrn case  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+      subroutine test_chgtrn_case (tname,uselist)
+      use action
+      use atoms
+      use energi
+      use virial
+      implicit none
+      integer nat,refcnt
+      real*8 energy,e,ref_e,ref_ei,refeng
+      real*8 eps_e,eps_g,eps_v
+      real*8, allocatable :: derivs(:,:)
+      real*8 refv(3,3)
+      real*8, allocatable :: refg(:,:)
+      logical skiptest,uselist
+      character*(*) tname
+      character*240 rpath
+      character*(*) tpre
+      parameter (tpre='test_')
+c
+c
       if (skiptest(tpre//tname,'hippo'))  return
       call pushdir ('file/chgtrn')
-      call loadfix ('dmso','chgtrn.key')
+      if (uselist) then
+         call loadfix_keyadd ('dmso','chgtrn.key','neighbor-list')
+      else
+         call loadfix ('dmso','chgtrn.key')
+      end if
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath ('chgtrn','chgtrn.1.txt',rpath)

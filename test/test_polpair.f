@@ -38,7 +38,9 @@ c
 c
 c
       call test_polpair_case ('nacl_ewald','polpair.1.txt',
-     &                        'polpair_ewald')
+     &                        'polpair_ewald',.true.)
+      call test_polpair_case ('nacl_ewald','polpair.1.txt',
+     &                        'polpair_ewald',.false.)
       return
       end
 c
@@ -55,7 +57,9 @@ c
 c
 c
       call test_polpair_case ('nacl','polpair.2.txt',
-     &                        'polpair_nonewald')
+     &                        'polpair_nonewald',.true.)
+      call test_polpair_case ('nacl','polpair.2.txt',
+     &                        'polpair_nonewald',.false.)
       return
       end
 c
@@ -67,7 +71,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-      subroutine test_polpair_case (key,reffile,tname)
+      subroutine test_polpair_case (key,reffile,tname,uselist)
       use action
       use atoms
       use energi
@@ -79,16 +83,26 @@ c
       real*8, allocatable :: derivs(:,:)
       real*8 refv(3,3)
       real*8, allocatable :: refg(:,:)
-      logical skiptest
+      logical skiptest,uselist
       character*(*) key,reffile,tname
+      character*48 cname
       character*240 rpath
       character*(*) tpre
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoeba'))  return
+      if (uselist) then
+         cname = tpre//trim(tname)//'_list'
+      else
+         cname = tpre//trim(tname)//'_nolist'
+      end if
+      if (skiptest(cname,'amoeba'))  return
       call pushdir ('file/polpair')
-      call loadfix ('nacl',key//'.key')
+      if (uselist) then
+         call loadfix_keyadd ('nacl',key//'.key','neighbor-list')
+      else
+         call loadfix ('nacl',key//'.key')
+      end if
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath ('polpair',reffile,rpath)
@@ -100,20 +114,20 @@ c
 c     level 0  --  total polarization pair energy
 c
       e = energy ()
-      call assert_real (esum,ref_e,eps_e,tpre//tname//' energy (v0)')
+      call assert_real (esum,ref_e,eps_e,trim(cname)//' energy (v0)')
 c
 c     level 1  --  energy, Cartesian gradient and internal virial
 c
       call gradient (e,derivs)
-      call assert_real (esum,ref_e,eps_e,tpre//tname//' grad-e (v1)')
-      call assert_grad (derivs,refg,n,eps_g,tpre//tname//' grad (v1)')
-      call assert_grad (vir,refv,3,eps_v,tpre//tname//' virial (v1)')
+      call assert_real (esum,ref_e,eps_e,trim(cname)//' grad-e (v1)')
+      call assert_grad (derivs,refg,n,eps_g,trim(cname)//' grad (v1)')
+      call assert_grad (vir,refv,3,eps_v,trim(cname)//' virial (v1)')
 c
 c     level 3  --  total energy via analysis path
 c
       call analysis (e)
       call assert_real (esum,ref_e,eps_e,
-     &                  tpre//tname//' analysis (v3)')
+     &                  trim(cname)//' analysis (v3)')
       deallocate (derivs)
       deallocate (refg)
       call popdir
