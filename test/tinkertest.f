@@ -77,6 +77,7 @@ c
       call test_localframe
       call test_localframe2
       call test_localframe3
+      call test_mutate
       call test_nacl
       call test_opbend
       call test_partialcharge
