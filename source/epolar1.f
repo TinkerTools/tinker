@@ -18,6 +18,7 @@ c
 c
       subroutine epolar1
       use dlmda
+      use mutant
       use iounit
       use limits
       use mplpot
@@ -38,8 +39,12 @@ c
 c
 c     choose the method to sum over polarization interactions
 c
-      if (use_dlmda) then
-         call epolar1f
+      if (use_epdt) then
+         if (use_rel) then
+            call epolar1fr
+         else
+            call epolar1f
+         end if
       else
          if (use_ewald) then
             if (use_mlist) then
@@ -214,7 +219,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2661,7 +2666,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -3992,7 +3997,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -6853,7 +6858,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -8673,7 +8678,7 @@ c     values cannot be reused with multipole dual topology, since the
 c     prior FFT belongs to a decoupled end state rather than to the
 c     interpolated multipoles at the current lambda value
 c
-      if (use_mpole .and. aewald.eq.aeewald .and. .not.use_dlmda
+      if (use_mpole .and. aewald.eq.aeewald .and. .not.use_epdt
      &       .and. .not.use_emdt) then
          vxx = -vmxx
          vxy = -vmxy
@@ -9669,13 +9674,16 @@ c
       use deriv
       use dlmda
       use limits
+      use mutant
       use ost
       use polpot
+      use potent
       use virial
       implicit none
       integer i,j
       real*8 ep1,ep0
       real*8 plambdaorig
+      real*8 elambdaorig
       real*8 plambdaexp
       real*8 epvir1(3,3)
       real*8 epvir0(3,3)
@@ -9687,6 +9695,7 @@ c
 c     copy original plambda
 c
       plambdaorig = plambda
+      elambdaorig = elambda
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -9698,22 +9707,7 @@ c
       if (use_pol4i) then
          plambda = 0.0d0
          call altpolr
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
-         else
-            if (use_mlist) then
-               call epolar1b
-            else
-               call epolar1a
-            end if
-         end if
-         if (use_expol) then
-            call dexpol
-         end if
+         call epolar1sub
 c
 c     copy energy, force, and virial of the lambda = 0 state
 c
@@ -9735,22 +9729,7 @@ c
       if (use_pol4f) then
          plambda = 1.0d0
          call altpolr
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
-         else
-            if (use_mlist) then
-               call epolar1b
-            else
-               call epolar1a
-            end if
-         end if
-         if (use_expol) then
-            call dexpol
-         end if
+         call epolar1sub
 c
 c     copy energy, force, and virial of the lambda = 1 state
 c
@@ -9798,7 +9777,13 @@ c
 c     set original plambda
 c
       plambda = plambdaorig
-      call altelec
+      if (use_mpole) then
+         call altemdt (elambdaorig)
+      else
+         call altpolr
+         call chkpole
+         call rotpole ('MPOLE')
+      end if
 c
 c     interpolate energy, force, and virial
 c
@@ -9821,5 +9806,181 @@ c     perform deallocation of some local arrays
 c
       deallocate (dep0)
       deallocate (dep1)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine epolar1sub  --  subsystem polarization derivs    ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "epolar1sub" evaluates the polarization energy and Cartesian
+c     derivatives for the atom subsystem installed by "altpolrsub",
+c     using the same standard routine selection as "epolar1f"
+c
+c
+      subroutine epolar1sub
+      use limits
+      use polpot
+      implicit none
+c
+c
+      if (use_ewald) then
+         if (use_mlist) then
+            call epolar1d
+         else
+            call epolar1c
+         end if
+      else
+         if (use_mlist) then
+            call epolar1b
+         else
+            call epolar1a
+         end if
+      end if
+      if (use_expol)  call dexpol
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine epolar1fr  --  relative dual topo pol derivs  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "epolar1fr" calculates the polarization energy and first
+c     derivatives for a two-ligand relative dual topology calculation
+c     by combining four self-consistent subsystem states, E1 =
+c     E(A+env) + E(B) and E0 = E(B+env) + E(A); each subsystem is a
+c     complete induced dipole solve, so the environment never responds
+c     to both ligands at once and the two endpoints are well defined
+c
+c
+      subroutine epolar1fr
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use mutant
+      use virial
+      implicit none
+      integer i,j
+      real*8 epae,epbe
+      real*8 epa,epb
+      real*8 ep1,ep0
+      real*8 plambdaexp,plambdaex0
+      real*8 epvirae(3,3),epvirbe(3,3)
+      real*8 epvira(3,3),epvirb(3,3)
+      real*8, allocatable :: depae(:,:)
+      real*8, allocatable :: depbe(:,:)
+      real*8, allocatable :: depa(:,:)
+      real*8, allocatable :: depb(:,:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (depae(3,n))
+      allocate (depbe(3,n))
+      allocate (depa(3,n))
+      allocate (depb(3,n))
+c
+c     ligand A coupled to environment, group B fully decoupled
+c
+      call altpolrsub (.true.,.false.,.true.)
+      call epolar1sub
+      epae = ep
+      do i = 1, n
+         do j = 1, 3
+            depae(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvirae(j,i) = epvir(j,i)
+         end do
+      end do
+c
+c     ligand B coupled to environment, group A fully decoupled
+c
+      call altpolrsub (.false.,.true.,.true.)
+      call epolar1sub
+      epbe = ep
+      do i = 1, n
+         do j = 1, 3
+            depbe(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvirbe(j,i) = epvir(j,i)
+         end do
+      end do
+c
+c     ligand A alone, giving its intramolecular polarization energy
+c
+      call altpolrsub (.true.,.false.,.false.)
+      call epolar1sub
+      epa = ep
+      do i = 1, n
+         do j = 1, 3
+            depa(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvira(j,i) = epvir(j,i)
+         end do
+      end do
+c
+c     ligand B alone, giving its intramolecular polarization energy
+c
+      call altpolrsub (.false.,.true.,.false.)
+      call epolar1sub
+      epb = ep
+      do i = 1, n
+         do j = 1, 3
+            depb(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvirb(j,i) = epvir(j,i)
+         end do
+      end do
+c
+c     restore full system and interpolate the dual topology result
+c
+      call altpolrsub (.true.,.true.,.true.)
+      call chkpole
+      call rotpole ('MPOLE')
+      plambdaexp = plambda**epdtexp
+      plambdaex0 = 1.0d0 - plambdaexp
+      ep1 = epae + epb
+      ep0 = epbe + epa
+      ep = plambdaexp*ep1 + plambdaex0*ep0
+      do i = 1, n
+         do j = 1, 3
+            dep(j,i) = plambdaexp*(depae(j,i)+depb(j,i))
+     &               + plambdaex0*(depbe(j,i)+depa(j,i))
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvir(j,i) = plambdaexp*(epvirae(j,i)+epvirb(j,i))
+     &                 + plambdaex0*(epvirbe(j,i)+epvira(j,i))
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (depae)
+      deallocate (depbe)
+      deallocate (depa)
+      deallocate (depb)
       return
       end

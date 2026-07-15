@@ -18,6 +18,7 @@ c
 c
       subroutine empole1
       use dlmda
+      use mutant
       use energi
       use extfld
       use limits
@@ -31,7 +32,11 @@ c
 c     choose the method to sum over multipole interactions
 c
       if (use_emdt) then
-         call empole1e
+         if (use_rel) then
+            call empole1er
+         else
+            call empole1e
+         end if
       else if (use_ewald) then
          if (use_mlist) then
             call empole1d
@@ -4100,19 +4105,7 @@ c     compute energy and derivatives of the elambda = 1 state
 c
       elambdaorig = elambda
       call altemdt (1.0d0)
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole1d
-         else
-            call empole1c
-         end if
-      else
-         if (use_mlist) then
-            call empole1b
-         else
-            call empole1a
-         end if
-      end if
+      call empole1sub
       em1 = em
       do i = 1, n
          do j = 1, 3
@@ -4128,19 +4121,7 @@ c
 c     compute energy and derivatives of the elambda = 0 state
 c
       call altemdt (0.0d0)
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole1d
-         else
-            call empole1c
-         end if
-      else
-         if (use_mlist) then
-            call empole1b
-         else
-            call empole1a
-         end if
-      end if
+      call empole1sub
       em0 = em
       do i = 1, n
          do j = 1, 3
@@ -4177,5 +4158,185 @@ c     perform deallocation of some local arrays
 c
       deallocate (dem1)
       deallocate (dem0)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine empole1sub  --  subsystem multipole derivatives  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "empole1sub" evaluates the multipole energy and derivatives for
+c     the atom subsystem currently installed by "altemdtsub", using the
+c     same standard non-lambda-aware routine selection as "empole1e"
+c
+c
+      subroutine empole1sub
+      use limits
+      implicit none
+c
+c
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole1d
+         else
+            call empole1c
+         end if
+      else
+         if (use_mlist) then
+            call empole1b
+         else
+            call empole1a
+         end if
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine empole1er  --  relative dual topo mpole grad  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "empole1er" calculates the multipole energy and Cartesian first
+c     derivatives for a two-ligand relative dual topology calculation
+c     by combining four parameter-zeroed subsystem energies,
+c
+c        E1 = E(A+env) + E(B) ,   E0 = E(B+env) + E(A)
+c        E  = weight1*E1 + (1-weight1)*E0 ,   weight1 = elambda**emdtexp
+c
+c     so that all intramolecular interactions of each ligand are kept at
+c     full strength while only the ligand-environment coupling is scaled
+c     and the two ligands never interact with one another
+c
+c
+      subroutine empole1er
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use limits
+      use mutant
+      use virial
+      implicit none
+      integer i,j
+      real*8 emae,embe
+      real*8 ema,emb
+      real*8 em1,em0
+      real*8 weight1,weight0
+      real*8 emvirae(3,3),emvirbe(3,3)
+      real*8 emvira(3,3),emvirb(3,3)
+      real*8, allocatable :: demae(:,:)
+      real*8, allocatable :: dembe(:,:)
+      real*8, allocatable :: dema(:,:)
+      real*8, allocatable :: demb(:,:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (demae(3,n))
+      allocate (dembe(3,n))
+      allocate (dema(3,n))
+      allocate (demb(3,n))
+c
+c     ligand A coupled to environment, group B fully decoupled
+c
+      call altemdtsub (.true.,.false.,.true.)
+      call empole1sub
+      emae = em
+      do i = 1, n
+         do j = 1, 3
+            demae(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvirae(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     ligand B coupled to environment, group A fully decoupled
+c
+      call altemdtsub (.false.,.true.,.true.)
+      call empole1sub
+      embe = em
+      do i = 1, n
+         do j = 1, 3
+            dembe(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvirbe(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     ligand A alone, giving its intramolecular multipole energy
+c
+      call altemdtsub (.true.,.false.,.false.)
+      call empole1sub
+      ema = em
+      do i = 1, n
+         do j = 1, 3
+            dema(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvira(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     ligand B alone, giving its intramolecular multipole energy
+c
+      call altemdtsub (.false.,.true.,.false.)
+      call empole1sub
+      emb = em
+      do i = 1, n
+         do j = 1, 3
+            demb(j,i) = dem(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvirb(j,i) = emvir(j,i)
+         end do
+      end do
+c
+c     restore the original full system parameters
+c
+      call altemdtsub (.true.,.true.,.true.)
+c
+c     assemble the two dual topology endpoints and interpolate
+c
+      weight1 = elambda**emdtexp
+      weight0 = 1.0d0 - weight1
+      em1 = emae + emb
+      em0 = embe + ema
+      em = weight1*em1 + weight0*em0
+      do i = 1, n
+         do j = 1, 3
+            dem(j,i) = weight1*(demae(j,i)+demb(j,i))
+     &               + weight0*(dembe(j,i)+dema(j,i))
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir(j,i) = weight1*(emvirae(j,i)+emvirb(j,i))
+     &                 + weight0*(emvirbe(j,i)+emvira(j,i))
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (demae)
+      deallocate (dembe)
+      deallocate (dema)
+      deallocate (demb)
       return
       end

@@ -39,7 +39,11 @@ c
 c
 c     compute polarization interactions
 c
-      call epolar4f
+      if (use_rel) then
+         call epolar4fr
+      else
+         call epolar4f
+      end if
 c
 c     modify the gradient and virial for exchange polarization
 c
@@ -80,11 +84,13 @@ c
       use ost
       use polar
       use polpot
+      use potent
       use virial
       implicit none
       integer i,j
       real*8 ep1,ep0
       real*8 plambdaorig
+      real*8 elambdaorig
       real*8 plambdaexp
       real*8 dplambdaexp
       real*8 d2plambdaexp
@@ -98,6 +104,7 @@ c
 c     copy original plambda
 c
       plambdaorig = plambda
+      elambdaorig = elambda
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -109,22 +116,7 @@ c
       if (use_pol4i) then
          plambda = 0.0d0
          call altpolr
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
-         else
-            if (use_mlist) then
-               call epolar1b
-            else
-               call epolar1a
-            end if
-         end if
-         if (use_expol) then
-            call dexpol
-         end if
+         call epolar1sub
 c
 c     copy energy, force, and virial of the lambda = 0 state
 c
@@ -146,22 +138,7 @@ c
       if (use_pol4f) then
          plambda = 1.0d0
          call altpolr
-         if (use_ewald) then
-            if (use_mlist) then
-               call epolar1d
-            else
-               call epolar1c
-            end if
-         else
-            if (use_mlist) then
-               call epolar1b
-            else
-               call epolar1a
-            end if
-         end if
-         if (use_expol) then
-            call dexpol
-         end if
+         call epolar1sub
 c
 c     copy energy, force, and virial of the lambda = 1 state
 c
@@ -209,7 +186,13 @@ c
 c     set original plambda
 c
       plambda = plambdaorig
-      call altelec
+      if (use_mpole) then
+         call altemdt (elambdaorig)
+      else
+         call altpolr
+         call chkpole
+         call rotpole ('MPOLE')
+      end if
 c
 c     interpolate energy, force, and virial
 c
@@ -255,5 +238,168 @@ c     perform deallocation of some local arrays
 c
       deallocate (dep0)
       deallocate (dep1)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epolar4fr  --  relative dual topology pol deriv  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "epolar4fr" calculates the polarization energy, Cartesian gradient
+c     and lambda derivatives for a two-ligand relative dual topology
+c     calculation by combining four self-consistent subsystem states,
+c     E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A), which are
+c     independent of plambda so the lambda derivatives follow directly
+c     from the interpolation weight as in "epolar4f"
+c
+c
+      subroutine epolar4fr
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use mutant
+      use virial
+      implicit none
+      integer i,j
+      real*8 epae,epbe
+      real*8 epa,epb
+      real*8 ep1,ep0
+      real*8 plambdaexp
+      real*8 dplambdaexp,d2plambdaexp
+      real*8 epvirae(3,3),epvirbe(3,3)
+      real*8 epvira(3,3),epvirb(3,3)
+      real*8, allocatable :: depae(:,:)
+      real*8, allocatable :: depbe(:,:)
+      real*8, allocatable :: depa(:,:)
+      real*8, allocatable :: depb(:,:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (depae(3,n))
+      allocate (depbe(3,n))
+      allocate (depa(3,n))
+      allocate (depb(3,n))
+c
+c     ligand A coupled to environment, group B fully decoupled
+c
+      call altpolrsub (.true.,.false.,.true.)
+      call epolar1sub
+      epae = ep
+      do i = 1, n
+         do j = 1, 3
+            depae(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvirae(j,i) = epvir(j,i)
+         end do
+      end do
+c
+c     ligand B coupled to environment, group A fully decoupled
+c
+      call altpolrsub (.false.,.true.,.true.)
+      call epolar1sub
+      epbe = ep
+      do i = 1, n
+         do j = 1, 3
+            depbe(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvirbe(j,i) = epvir(j,i)
+         end do
+      end do
+c
+c     ligand A alone, giving its intramolecular polarization energy
+c
+      call altpolrsub (.true.,.false.,.false.)
+      call epolar1sub
+      epa = ep
+      do i = 1, n
+         do j = 1, 3
+            depa(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvira(j,i) = epvir(j,i)
+         end do
+      end do
+c
+c     ligand B alone, giving its intramolecular polarization energy
+c
+      call altpolrsub (.false.,.true.,.false.)
+      call epolar1sub
+      epb = ep
+      do i = 1, n
+         do j = 1, 3
+            depb(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvirb(j,i) = epvir(j,i)
+         end do
+      end do
+c
+c     restore full system and interpolate the dual topology result
+c
+      call altpolrsub (.true.,.true.,.true.)
+      call chkpole
+      call rotpole ('MPOLE')
+      plambdaexp = plambda**epdtexp
+      ep1 = epae + epb
+      ep0 = epbe + epa
+      ep = plambdaexp*ep1 + (1.0d0-plambdaexp)*ep0
+      do i = 1, n
+         do j = 1, 3
+            dep(j,i) = plambdaexp*(depae(j,i)+depb(j,i))
+     &               + (1.0d0-plambdaexp)*(depbe(j,i)+depa(j,i))
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvir(j,i) = plambdaexp*(epvirae(j,i)+epvirb(j,i))
+     &                 + (1.0d0-plambdaexp)*(epvirbe(j,i)+epvira(j,i))
+         end do
+      end do
+c
+c     lambda derivatives of energy, gradient and virial
+c
+      dplambdaexp = epdtexp * plambda**(epdtexp-1)
+      if (epdtexp .gt. 1) then
+         d2plambdaexp = dble(epdtexp*(epdtexp-1))*plambda**(epdtexp-2)
+      else
+         d2plambdaexp = 0.0d0
+      end if
+      depdl = dplambdaexp * (ep1 - ep0)
+      d2epdl2 = d2plambdaexp * (ep1 - ep0)
+      do i = 1, n
+         do j = 1, 3
+            dfpdl(j,i) = dplambdaexp
+     &         * ((depae(j,i)+depb(j,i))-(depbe(j,i)+depa(j,i)))
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            depvirdl(j,i) = dplambdaexp
+     &         * ((epvirae(j,i)+epvirb(j,i))-(epvirbe(j,i)+epvira(j,i)))
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (depae)
+      deallocate (depbe)
+      deallocate (depa)
+      deallocate (depb)
       return
       end

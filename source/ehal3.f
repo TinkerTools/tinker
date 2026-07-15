@@ -20,6 +20,7 @@ c
       use analyz
       use atoms
       use dlmda
+      use mutant
       use energi
       use inform
       use iounit
@@ -34,7 +35,11 @@ c
 c     choose the method for summing over pairwise interactions
 c
       if (use_evdt) then
-         call ehal3d
+         if (use_rel) then
+            call ehal3dr
+         else
+            call ehal3d
+         end if
          return
       end if
       if (use_lights) then
@@ -209,6 +214,9 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+            if (use_subsys .and. proceed) then
+               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
+            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -234,7 +242,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if (muti .or. mutk) then
+                  if ((muti .or. mutk) .and. .not.use_subsys) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -373,6 +381,9 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+            if (use_subsys .and. proceed) then
+               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
+            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -403,7 +414,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                      mutik = .false.
-                     if (muti .or. mutk) then
+                     if ((muti .or. mutk) .and. .not.use_subsys) then
                         if (vcouple .eq. 1) then
                            mutik = .true.
                         else if (.not.muti .or. .not.mutk) then
@@ -700,6 +711,9 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+            if (use_subsys .and. proceed) then
+               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
+            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -739,7 +753,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if (muti .or. mutk) then
+                  if ((muti .or. mutk) .and. .not.use_subsys) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -963,6 +977,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,
+!$OMP& subon,use_subsys,
 !$OMP& ired,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
@@ -1009,6 +1024,9 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+            if (use_subsys .and. proceed) then
+               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
+            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -1034,7 +1052,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if (muti .or. mutk) then
+                  if ((muti .or. mutk) .and. .not.use_subsys) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -1167,49 +1185,30 @@ c
       use dlmda
       use energi
       use inter
-      use limits
       use mutant
-      use vdwpot
       implicit none
       integer i
       integer nev1
       real*8 ev1,ev0
-      real*8 elrc,aelrc
       real*8 vlambdaorig
       real*8 weight1,weight0
       real*8 einterorig
       real*8 einter1,einter0
       real*8, allocatable :: aev1(:)
       real*8, allocatable :: aev0(:)
-      character*6 mode
 c
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aev1(n))
       allocate (aev0(n))
-      mode = 'VDW'
 c
 c     compute energy and analysis of the vlambda = 1 state
 c
       vlambdaorig = vlambda
       einterorig = einter
       vlambda = 1.0d0
-      if (use_lights) then
-         call ehal3b
-      else if (use_vlist) then
-         call ehal3c
-      else
-         call ehal3a
-      end if
-      if (use_vcorr) then
-         call evcorr (mode,elrc)
-         ev = ev + elrc
-         aelrc = elrc / dble(n)
-         do i = 1, n
-            aev(i) = aev(i) + aelrc
-         end do
-      end if
+      call ehal3sub
       ev1 = ev
       nev1 = nev
       do i = 1, n
@@ -1225,21 +1224,7 @@ c
 c     compute energy and analysis of the vlambda = 0 state
 c
       vlambda = 0.0d0
-      if (use_lights) then
-         call ehal3b
-      else if (use_vlist) then
-         call ehal3c
-      else
-         call ehal3a
-      end if
-      if (use_vcorr) then
-         call evcorr (mode,elrc)
-         ev = ev + elrc
-         aelrc = elrc / dble(n)
-         do i = 1, n
-            aev(i) = aev(i) + aelrc
-         end do
-      end if
+      call ehal3sub
       ev0 = ev
       do i = 1, n
          aev0(i) = aev(i)
@@ -1252,7 +1237,7 @@ c
 c
 c     interpolate the dual topology energy and analysis
 c
-      weight1 = vlambda**vdtexp
+      weight1 = vlambda**evdtexp
       weight0 = 1.0d0 - weight1
       ev = weight1*ev1 + weight0*ev0
       nev = nev1
@@ -1265,5 +1250,179 @@ c     perform deallocation of some local arrays
 c
       deallocate (aev1)
       deallocate (aev0)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ehal3sub  --  subsystem buffered 14-7 analysis  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "ehal3sub" evaluates the buffered 14-7 van der Waals energy and
+c     analysis for the atom subsystem flagged by "subon", using the same
+c     standard routine selection as "ehal3d"; the long range correction
+c     follows the active subsystem when enabled
+c
+c
+      subroutine ehal3sub
+      use analyz
+      use atoms
+      use energi
+      use limits
+      use mutant
+      use vdwpot
+      implicit none
+      integer i,nsub
+      real*8 elrc,aelrc
+      character*6 mode
+c
+c
+      if (use_lights) then
+         call ehal3b
+      else if (use_vlist) then
+         call ehal3c
+      else
+         call ehal3a
+      end if
+      if (use_vcorr) then
+         mode = 'VDW'
+         call evcorr (mode,elrc)
+         ev = ev + elrc
+         if (use_subsys) then
+            nsub = 0
+            do i = 1, n
+               if (subon(i))  nsub = nsub + 1
+            end do
+         else
+            nsub = n
+         end if
+         if (nsub .ne. 0) then
+            aelrc = elrc / dble(nsub)
+            do i = 1, n
+               if (.not.use_subsys .or. subon(i)) then
+                  aev(i) = aev(i) + aelrc
+               end if
+            end do
+         end if
+      end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ehal3dr  --  relative dual topology 14-7 anlys  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "ehal3dr" calculates the buffered 14-7 van der Waals energy and
+c     analysis for a two-ligand relative dual topology calculation by
+c     combining four subsystem states, E1 = E(A+env) + E(B) and
+c     E0 = E(B+env) + E(A)
+c
+c
+      subroutine ehal3dr
+      use action
+      use analyz
+      use atoms
+      use dlmda
+      use energi
+      use inter
+      use mutant
+      implicit none
+      integer i
+      integer nevae
+      real*8 evae,evbe
+      real*8 eva,evb
+      real*8 ev1,ev0
+      real*8 weight1,weight0
+      real*8 einterorig
+      real*8 einterae,einterbe
+      real*8 eintera,einterb
+      real*8, allocatable :: aevae(:)
+      real*8, allocatable :: aevbe(:)
+      real*8, allocatable :: aeva(:)
+      real*8, allocatable :: aevb(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aevae(n))
+      allocate (aevbe(n))
+      allocate (aeva(n))
+      allocate (aevb(n))
+      einterorig = einter
+c
+c     ligand A coupled to environment, group B fully decoupled
+c
+      call submask (.true.,.false.,.true.)
+      call ehal3sub
+      evae = ev
+      nevae = nev
+      do i = 1, n
+         aevae(i) = aev(i)
+      end do
+      einterae = einter - einterorig
+      einter = einterorig
+c
+c     ligand B coupled to environment, group A fully decoupled
+c
+      call submask (.false.,.true.,.true.)
+      call ehal3sub
+      evbe = ev
+      do i = 1, n
+         aevbe(i) = aev(i)
+      end do
+      einterbe = einter - einterorig
+      einter = einterorig
+c
+c     ligand A alone, giving its intramolecular van der Waals energy
+c
+      call submask (.true.,.false.,.false.)
+      call ehal3sub
+      eva = ev
+      do i = 1, n
+         aeva(i) = aev(i)
+      end do
+      eintera = einter - einterorig
+      einter = einterorig
+c
+c     ligand B alone, giving its intramolecular van der Waals energy
+c
+      call submask (.false.,.true.,.false.)
+      call ehal3sub
+      evb = ev
+      do i = 1, n
+         aevb(i) = aev(i)
+      end do
+      einterb = einter - einterorig
+      einter = einterorig
+c
+c     restore full system and interpolate the dual topology result
+c
+      call submask (.true.,.true.,.true.)
+      weight1 = vlambda**evdtexp
+      weight0 = 1.0d0 - weight1
+      ev1 = evae + evb
+      ev0 = evbe + eva
+      ev = weight1*ev1 + weight0*ev0
+      nev = nevae
+      einter = einterorig + weight1*(einterae+einterb)
+     &                    + weight0*(einterbe+eintera)
+      do i = 1, n
+         aev(i) = weight1*(aevae(i)+aevb(i))
+     &          + weight0*(aevbe(i)+aeva(i))
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aevae)
+      deallocate (aevbe)
+      deallocate (aeva)
+      deallocate (aevb)
       return
       end

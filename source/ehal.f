@@ -17,6 +17,7 @@ c
 c
       subroutine ehal
       use dlmda
+      use mutant
       use energi
       use limits
       use vdwpot
@@ -28,7 +29,11 @@ c
 c     choose the method for summing over pairwise interactions
 c
       if (use_evdt) then
-         call ehal0d
+         if (use_rel) then
+            call ehal0dr
+         else
+            call ehal0d
+         end if
       else
          if (use_lights) then
             call ehal0b
@@ -164,6 +169,9 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+            if (use_subsys .and. proceed) then
+               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
+            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -189,7 +197,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if (muti .or. mutk) then
+                  if ((muti .or. mutk) .and. .not.use_subsys) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -296,6 +304,9 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+            if (use_subsys .and. proceed) then
+               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
+            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -326,7 +337,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                      mutik = .false.
-                     if (muti .or. mutk) then
+                     if ((muti .or. mutk) .and. .not.use_subsys) then
                         if (vcouple .eq. 1) then
                            mutik = .true.
                         else if (.not.muti .or. .not.mutk) then
@@ -566,6 +577,9 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+            if (use_subsys .and. proceed) then
+               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
+            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -605,7 +619,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if (muti .or. mutk) then
+                  if ((muti .or. mutk) .and. .not.use_subsys) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -766,6 +780,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
+!$OMP& subon,use_subsys,
 !$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,i13,
 !$OMP& i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
 !$OMP& off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,vcouple,
@@ -811,6 +826,9 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
+            if (use_subsys .and. proceed) then
+               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
+            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -836,7 +854,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if (muti .or. mutk) then
+                  if ((muti .or. mutk) .and. .not.use_subsys) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -933,50 +951,24 @@ c
       subroutine ehal0d
       use dlmda
       use energi
-      use limits
       use mutant
-      use vdwpot
       implicit none
       real*8 ev1,ev0
-      real*8 elrc
       real*8 vlambdaorig
       real*8 weight1
-      character*6 mode
 c
 c
 c     compute energy of the fully coupled vlambda = 1 state
 c
       vlambdaorig = vlambda
       vlambda = 1.0d0
-      if (use_lights) then
-         call ehal0b
-      else if (use_vlist) then
-         call ehal0c
-      else
-         call ehal0a
-      end if
-      if (use_vcorr) then
-         mode = 'VDW'
-         call evcorr (mode,elrc)
-         ev = ev + elrc
-      end if
+      call ehal0sub
       ev1 = ev
 c
 c     compute energy of the fully decoupled vlambda = 0 state
 c
       vlambda = 0.0d0
-      if (use_lights) then
-         call ehal0b
-      else if (use_vlist) then
-         call ehal0c
-      else
-         call ehal0a
-      end if
-      if (use_vcorr) then
-         mode = 'VDW'
-         call evcorr (mode,elrc)
-         ev = ev + elrc
-      end if
+      call ehal0sub
       ev0 = ev
 c
 c     restore the original vlambda value
@@ -985,7 +977,92 @@ c
 c
 c     interpolate the dual topology energy
 c
-      weight1 = vlambda**vdtexp
+      weight1 = vlambda**evdtexp
       ev = weight1*ev1 + (1.0d0-weight1)*ev0
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ehal0sub  --  subsystem buffered 14-7 energy  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ehal0sub" evaluates the buffered 14-7 van der Waals energy for
+c     the atom subsystem currently flagged by "subon", using the same
+c     standard routine selection as "ehal0d"; the long range correction
+c     follows the active subsystem when enabled
+c
+c
+      subroutine ehal0sub
+      use energi
+      use limits
+      use vdwpot
+      implicit none
+      real*8 elrc
+      character*6 mode
+c
+c
+      if (use_lights) then
+         call ehal0b
+      else if (use_vlist) then
+         call ehal0c
+      else
+         call ehal0a
+      end if
+      if (use_vcorr) then
+         mode = 'VDW'
+         call evcorr (mode,elrc)
+         ev = ev + elrc
+      end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine ehal0dr  --  relative dual topology 14-7 energy  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "ehal0dr" calculates the buffered 14-7 van der Waals energy for a
+c     two-ligand relative dual topology calculation by combining four
+c     subsystem energies, E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A),
+c     so that intramolecular van der Waals is preserved, only the ligand
+c     environment coupling is scaled, and the two ligands never interact
+c
+c
+      subroutine ehal0dr
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      real*8 evae,evbe
+      real*8 eva,evb
+      real*8 ev1,ev0
+      real*8 weight1,weight0
+c
+c
+      call submask (.true.,.false.,.true.)
+      call ehal0sub
+      evae = ev
+      call submask (.false.,.true.,.true.)
+      call ehal0sub
+      evbe = ev
+      call submask (.true.,.false.,.false.)
+      call ehal0sub
+      eva = ev
+      call submask (.false.,.true.,.false.)
+      call ehal0sub
+      evb = ev
+      call submask (.true.,.true.,.true.)
+      weight1 = vlambda**evdtexp
+      weight0 = 1.0d0 - weight1
+      ev1 = evae + evb
+      ev0 = evbe + eva
+      ev = weight1*ev1 + weight0*ev0
       return
       end

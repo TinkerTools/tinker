@@ -18,6 +18,7 @@ c
 c
       subroutine empole3
       use dlmda
+      use mutant
       use energi
       use extfld
       use inform
@@ -31,7 +32,11 @@ c
 c     choose the method to sum over multipole interactions
 c
       if (use_emdt) then
-         call empole3e
+         if (use_rel) then
+            call empole3er
+         else
+            call empole3e
+         end if
       else if (use_ewald) then
          if (use_mlist) then
             call empole3d
@@ -2389,19 +2394,7 @@ c
       elambdaorig = elambda
       einterorig = einter
       call altemdt (1.0d0)
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole3d
-         else
-            call empole3c
-         end if
-      else
-         if (use_mlist) then
-            call empole3b
-         else
-            call empole3a
-         end if
-      end if
+      call empole3sub
       em1 = em
       nem1 = nem
       do i = 1, n
@@ -2417,19 +2410,7 @@ c
 c     compute energy and analysis of the elambda = 0 state
 c
       call altemdt (0.0d0)
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole3d
-         else
-            call empole3c
-         end if
-      else
-         if (use_mlist) then
-            call empole3b
-         else
-            call empole3a
-         end if
-      end if
+      call empole3sub
       em0 = em
       do i = 1, n
          aem0(i) = aem(i)
@@ -2455,5 +2436,159 @@ c     perform deallocation of some local arrays
 c
       deallocate (aem1)
       deallocate (aem0)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine empole3sub  --  subsystem multipole analysis  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "empole3sub" evaluates the multipole energy and analysis for the
+c     atom subsystem currently installed by "altemdtsub", using the same
+c     standard routine selection as "empole3e"
+c
+c
+      subroutine empole3sub
+      use limits
+      implicit none
+c
+c
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole3d
+         else
+            call empole3c
+         end if
+      else
+         if (use_mlist) then
+            call empole3b
+         else
+            call empole3a
+         end if
+      end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine empole3er  --  relative dual topo mpole analys  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "empole3er" calculates the multipole energy and analysis for a
+c     two-ligand relative dual topology calculation by combining four
+c     parameter-zeroed subsystem states, E1 = E(A+env) + E(B) and
+c     E0 = E(B+env) + E(A)
+c
+c
+      subroutine empole3er
+      use action
+      use analyz
+      use atoms
+      use dlmda
+      use energi
+      use inter
+      use limits
+      use mutant
+      implicit none
+      integer i
+      integer nemae
+      real*8 emae,embe
+      real*8 ema,emb
+      real*8 em1,em0
+      real*8 weight1,weight0
+      real*8 einterorig
+      real*8 einterae,einterbe
+      real*8 eintera,einterb
+      real*8, allocatable :: aemae(:)
+      real*8, allocatable :: aembe(:)
+      real*8, allocatable :: aema(:)
+      real*8, allocatable :: aemb(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aemae(n))
+      allocate (aembe(n))
+      allocate (aema(n))
+      allocate (aemb(n))
+      einterorig = einter
+c
+c     ligand A coupled to environment, group B fully decoupled
+c
+      call altemdtsub (.true.,.false.,.true.)
+      call empole3sub
+      emae = em
+      nemae = nem
+      do i = 1, n
+         aemae(i) = aem(i)
+      end do
+      einterae = einter - einterorig
+      einter = einterorig
+c
+c     ligand B coupled to environment, group A fully decoupled
+c
+      call altemdtsub (.false.,.true.,.true.)
+      call empole3sub
+      embe = em
+      do i = 1, n
+         aembe(i) = aem(i)
+      end do
+      einterbe = einter - einterorig
+      einter = einterorig
+c
+c     ligand A alone, giving its intramolecular multipole energy
+c
+      call altemdtsub (.true.,.false.,.false.)
+      call empole3sub
+      ema = em
+      do i = 1, n
+         aema(i) = aem(i)
+      end do
+      eintera = einter - einterorig
+      einter = einterorig
+c
+c     ligand B alone, giving its intramolecular multipole energy
+c
+      call altemdtsub (.false.,.true.,.false.)
+      call empole3sub
+      emb = em
+      do i = 1, n
+         aemb(i) = aem(i)
+      end do
+      einterb = einter - einterorig
+      einter = einterorig
+c
+c     restore the original full system parameters
+c
+      call altemdtsub (.true.,.true.,.true.)
+c
+c     assemble the two dual topology endpoints and interpolate
+c
+      weight1 = elambda**emdtexp
+      weight0 = 1.0d0 - weight1
+      em1 = emae + emb
+      em0 = embe + ema
+      em = weight1*em1 + weight0*em0
+      nem = nemae
+      einter = einterorig + weight1*(einterae+einterb)
+     &                    + weight0*(einterbe+eintera)
+      do i = 1, n
+         aem(i) = weight1*(aemae(i)+aemb(i))
+     &          + weight0*(aembe(i)+aema(i))
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aemae)
+      deallocate (aembe)
+      deallocate (aema)
+      deallocate (aemb)
       return
       end

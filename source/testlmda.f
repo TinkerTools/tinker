@@ -84,6 +84,7 @@ c
 c     set flag to use lambda derivative
 c
       use_dlmda = .true.
+      use_epdt = .true.
       use_pol4i = .true.
       use_pol4f = .true.
 c

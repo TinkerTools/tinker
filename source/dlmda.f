@@ -14,7 +14,7 @@ c
 c
 c     emdtexp       multipole exponent for dual topology interpolation
 c     epdtexp       polarization lambda exponent for dual topology
-c     vdtexp        van der Waals exponent for dual topology interpolation
+c     evdtexp       van der Waals exponent for dual topology interpolation
 c     d2edl2        total energy second order lambda derivative
 c     d2eldlmda2    second derivative of elambda wrt main lambda
 c     d2emdl2       multipole second order lambda derivative
@@ -55,8 +55,9 @@ c     poleorig      original pole
 c     pval0orig     original pval0
 c     pvalorig      original pval
 c     use_dlmda     logical flag governing use of lambda derivative
-c     use_emdt      logical flag governing use of multipole dual topology
-c     use_evdt      logical flag governing use of van der Waals dual topology
+c     use_emdt      flag governing use of multipole dual topology
+c     use_evdt      flag governing use of van der Waals dual topology
+c     use_epdt      flag governing use of polarization dual topology
 c     douindorig    original douind
 c
 c
@@ -64,7 +65,7 @@ c
       implicit none
       integer emdtexp
       integer epdtexp
-      integer vdtexp
+      integer evdtexp
       real*8 d2edl2
       real*8 d2eldlmda2
       real*8 d2emdl2
@@ -106,6 +107,7 @@ c
       real*8, allocatable :: pvalorig(:)
       logical use_dlmda
       logical use_emdt
+      logical use_epdt
       logical use_evdt
       logical, allocatable :: douindorig(:)
       save

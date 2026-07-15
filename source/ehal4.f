@@ -19,6 +19,7 @@ c
 c
       subroutine ehal4
       use dlmda
+      use mutant
       use energi
       use limits
       use vdwpot
@@ -32,7 +33,11 @@ c
 c     choose the method for summing over pairwise interactions
 c
       if (use_evdt) then
-         call ehal4d
+         if (use_rel) then
+            call ehal4dr
+         else
+            call ehal4d
+         end if
       else
          if (use_lights) then
             call ehal4b
@@ -1756,47 +1761,29 @@ c
       use deriv
       use dlmda
       use energi
-      use limits
       use mutant
-      use vdwpot
       use virial
       implicit none
       integer i,j
       real*8 ev1,ev0
-      real*8 elrc,vlrc
       real*8 vlambdaorig
       real*8 weight1,weight0
       real*8 dweight1,d2weight1
       real*8 evvir1(3,3),evvir0(3,3)
       real*8, allocatable :: dev1(:,:)
       real*8, allocatable :: dev0(:,:)
-      character*6 mode
 c
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (dev1(3,n))
       allocate (dev0(3,n))
-      mode = 'VDW'
 c
 c     compute energy and derivatives of the vlambda = 1 state
 c
       vlambdaorig = vlambda
       vlambda = 1.0d0
-      if (use_lights) then
-         call ehal1b
-      else if (use_vlist) then
-         call ehal1c
-      else
-         call ehal1a
-      end if
-      if (use_vcorr) then
-         call evcorr1 (mode,elrc,vlrc)
-         ev = ev + elrc
-         evvir(1,1) = evvir(1,1) + vlrc
-         evvir(2,2) = evvir(2,2) + vlrc
-         evvir(3,3) = evvir(3,3) + vlrc
-      end if
+      call ehal1sub
       ev1 = ev
       do i = 1, n
          do j = 1, 3
@@ -1812,20 +1799,7 @@ c
 c     compute energy and derivatives of the vlambda = 0 state
 c
       vlambda = 0.0d0
-      if (use_lights) then
-         call ehal1b
-      else if (use_vlist) then
-         call ehal1c
-      else
-         call ehal1a
-      end if
-      if (use_vcorr) then
-         call evcorr1 (mode,elrc,vlrc)
-         ev = ev + elrc
-         evvir(1,1) = evvir(1,1) + vlrc
-         evvir(2,2) = evvir(2,2) + vlrc
-         evvir(3,3) = evvir(3,3) + vlrc
-      end if
+      call ehal1sub
       ev0 = ev
       do i = 1, n
          do j = 1, 3
@@ -1844,7 +1818,7 @@ c
 c
 c     interpolate the dual topology energy, derivatives and virial
 c
-      weight1 = vlambda**vdtexp
+      weight1 = vlambda**evdtexp
       weight0 = 1.0d0 - weight1
       ev = weight1*ev1 + weight0*ev0
       do i = 1, n
@@ -1860,15 +1834,15 @@ c
 c
 c     analytic first and second derivatives of the interpolation
 c     weight with respect to vlambda; guard against a negative power
-c     of zero when vdtexp equals one
+c     of zero when evdtexp equals one
 c
       dweight1 = 0.0d0
       d2weight1 = 0.0d0
-      if (vdtexp .ge. 2) then
-         dweight1 = dble(vdtexp) * vlambda**(vdtexp-1)
-         d2weight1 = dble(vdtexp) * dble(vdtexp-1)
-     &                  * vlambda**(vdtexp-2)
-      else if (vdtexp .eq. 1) then
+      if (evdtexp .ge. 2) then
+         dweight1 = dble(evdtexp) * vlambda**(evdtexp-1)
+         d2weight1 = dble(evdtexp) * dble(evdtexp-1)
+     &                  * vlambda**(evdtexp-2)
+      else if (evdtexp .eq. 1) then
          dweight1 = 1.0d0
       end if
 c
@@ -1891,5 +1865,174 @@ c     perform deallocation of some local arrays
 c
       deallocate (dev1)
       deallocate (dev0)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine ehal4dr  --  relative dual topology 14-7 lambda  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "ehal4dr" calculates the buffered 14-7 van der Waals energy,
+c     Cartesian gradient and lambda derivatives for a two-ligand
+c     relative dual topology calculation, combining four subsystem
+c     states, E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A), which are
+c     independent of vlambda so the lambda derivatives follow directly
+c     from the interpolation weight as in "ehal4d"
+c
+c
+      subroutine ehal4dr
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use mutant
+      use virial
+      implicit none
+      integer i,j
+      real*8 evae,evbe
+      real*8 eva,evb
+      real*8 ev1,ev0
+      real*8 weight1,weight0
+      real*8 dweight1,d2weight1
+      real*8 evvirae(3,3),evvirbe(3,3)
+      real*8 evvira(3,3),evvirb(3,3)
+      real*8, allocatable :: devae(:,:)
+      real*8, allocatable :: devbe(:,:)
+      real*8, allocatable :: deva(:,:)
+      real*8, allocatable :: devb(:,:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (devae(3,n))
+      allocate (devbe(3,n))
+      allocate (deva(3,n))
+      allocate (devb(3,n))
+c
+c     ligand A coupled to environment, group B fully decoupled
+c
+      call submask (.true.,.false.,.true.)
+      call ehal1sub
+      evae = ev
+      do i = 1, n
+         do j = 1, 3
+            devae(j,i) = dev(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvirae(j,i) = evvir(j,i)
+         end do
+      end do
+c
+c     ligand B coupled to environment, group A fully decoupled
+c
+      call submask (.false.,.true.,.true.)
+      call ehal1sub
+      evbe = ev
+      do i = 1, n
+         do j = 1, 3
+            devbe(j,i) = dev(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvirbe(j,i) = evvir(j,i)
+         end do
+      end do
+c
+c     ligand A alone, giving its intramolecular van der Waals energy
+c
+      call submask (.true.,.false.,.false.)
+      call ehal1sub
+      eva = ev
+      do i = 1, n
+         do j = 1, 3
+            deva(j,i) = dev(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvira(j,i) = evvir(j,i)
+         end do
+      end do
+c
+c     ligand B alone, giving its intramolecular van der Waals energy
+c
+      call submask (.false.,.true.,.false.)
+      call ehal1sub
+      evb = ev
+      do i = 1, n
+         do j = 1, 3
+            devb(j,i) = dev(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvirb(j,i) = evvir(j,i)
+         end do
+      end do
+c
+c     restore full system and interpolate the dual topology result
+c
+      call submask (.true.,.true.,.true.)
+      weight1 = vlambda**evdtexp
+      weight0 = 1.0d0 - weight1
+      ev1 = evae + evb
+      ev0 = evbe + eva
+      ev = weight1*ev1 + weight0*ev0
+      do i = 1, n
+         do j = 1, 3
+            dev(j,i) = weight1*(devae(j,i)+devb(j,i))
+     &               + weight0*(devbe(j,i)+deva(j,i))
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvir(j,i) = weight1*(evvirae(j,i)+evvirb(j,i))
+     &                 + weight0*(evvirbe(j,i)+evvira(j,i))
+         end do
+      end do
+c
+c     analytic first and second derivatives of the interpolation
+c     weight with respect to vlambda, as in "ehal4d"
+c
+      dweight1 = 0.0d0
+      d2weight1 = 0.0d0
+      if (evdtexp .ge. 2) then
+         dweight1 = dble(evdtexp) * vlambda**(evdtexp-1)
+         d2weight1 = dble(evdtexp) * dble(evdtexp-1)
+     &                  * vlambda**(evdtexp-2)
+      else if (evdtexp .eq. 1) then
+         dweight1 = 1.0d0
+      end if
+c
+c     set the lambda derivatives of energy, force and virial
+c
+      devdl = dweight1 * (ev1-ev0)
+      d2evdl2 = d2weight1 * (ev1-ev0)
+      do i = 1, n
+         do j = 1, 3
+            dfvdl(j,i) = dweight1
+     &         * ((devae(j,i)+devb(j,i))-(devbe(j,i)+deva(j,i)))
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            devvirdl(j,i) = dweight1
+     &         * ((evvirae(j,i)+evvirb(j,i))-(evvirbe(j,i)+evvira(j,i)))
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (devae)
+      deallocate (devbe)
+      deallocate (deva)
+      deallocate (devb)
       return
       end

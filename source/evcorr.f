@@ -85,21 +85,23 @@ c     count the number of types and their frequencies
 c
       nvt = 0
       do i = 1, n
-         if (use_vdw)  it = jvdw(i)
-         if (use_disp)  it = class(i)
-         do k = 1, nvt
-            if (ivt(k) .eq. it) then
-               jvt(k) = jvt(k) + 1
-               if (mut(i))  mvt(k) = mvt(k) + 1
-               goto 10
-            end if
-         end do
-         nvt = nvt + 1
-         ivt(nvt) = it
-         jvt(nvt) = 1
-         mvt(nvt) = 0
-         if (mut(i))  mvt(nvt) = 1
-   10    continue
+         if (.not.use_subsys .or. subon(i)) then
+            if (use_vdw)  it = jvdw(i)
+            if (use_disp)  it = class(i)
+            do k = 1, nvt
+               if (ivt(k) .eq. it) then
+                  jvt(k) = jvt(k) + 1
+                  if (mut(i))  mvt(k) = mvt(k) + 1
+                  goto 10
+               end if
+            end do
+            nvt = nvt + 1
+            ivt(nvt) = it
+            jvt(nvt) = 1
+            mvt(nvt) = 0
+            if (mut(i))  mvt(nvt) = 1
+   10       continue
+         end if
       end do
 c
 c     find the correction energy via double loop search
@@ -115,7 +117,9 @@ c
 c
 c     set decoupling or annihilation for intraligand interactions
 c
-            if (vcouple .eq. 0) then
+            if (use_subsys) then
+               fik = fi * fk
+            else if (vcouple .eq. 0) then
                fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
             else
                fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
@@ -263,21 +267,23 @@ c     count the number of vdw types and their frequencies
 c
       nvt = 0
       do i = 1, n
-         if (use_vdw)  it = jvdw(i)
-         if (use_disp)  it = class(i)
-         do k = 1, nvt
-            if (ivt(k) .eq. it) then
-               jvt(k) = jvt(k) + 1
-               if (mut(i))  mvt(k) = mvt(k) + 1
-               goto 10
-            end if
-         end do
-         nvt = nvt + 1
-         ivt(nvt) = it
-         jvt(nvt) = 1
-         mvt(nvt) = 0
-         if (mut(i))  mvt(nvt) = 1
-   10    continue
+         if (.not.use_subsys .or. subon(i)) then
+            if (use_vdw)  it = jvdw(i)
+            if (use_disp)  it = class(i)
+            do k = 1, nvt
+               if (ivt(k) .eq. it) then
+                  jvt(k) = jvt(k) + 1
+                  if (mut(i))  mvt(k) = mvt(k) + 1
+                  goto 10
+               end if
+            end do
+            nvt = nvt + 1
+            ivt(nvt) = it
+            jvt(nvt) = 1
+            mvt(nvt) = 0
+            if (mut(i))  mvt(nvt) = 1
+   10       continue
+         end if
       end do
 c
 c     find the van der Waals energy via double loop search
@@ -293,7 +299,9 @@ c
 c
 c     set decoupling or annihilation for intraligand interactions
 c
-            if (vcouple .eq. 0) then
+            if (use_subsys) then
+               fik = fi * fk
+            else if (vcouple .eq. 0) then
                fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
             else
                fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)

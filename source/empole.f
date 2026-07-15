@@ -18,6 +18,7 @@ c
 c
       subroutine empole
       use dlmda
+      use mutant
       use energi
       use extfld
       use limits
@@ -29,7 +30,11 @@ c
 c     choose the method to sum over multipole interactions
 c
       if (use_emdt) then
-         call empole0e
+         if (use_rel) then
+            call empole0er
+         else
+            call empole0e
+         end if
       else if (use_ewald) then
          if (use_mlist) then
             call empole0d
@@ -1986,37 +1991,13 @@ c     compute energy of the fully coupled elambda = 1 state
 c
       elambdaorig = elambda
       call altemdt (1.0d0)
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole0d
-         else
-            call empole0c
-         end if
-      else
-         if (use_mlist) then
-            call empole0b
-         else
-            call empole0a
-         end if
-      end if
+      call empole0sub
       em1 = em
 c
 c     compute energy of the fully decoupled elambda = 0 state
 c
       call altemdt (0.0d0)
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole0d
-         else
-            call empole0c
-         end if
-      else
-         if (use_mlist) then
-            call empole0b
-         else
-            call empole0a
-         end if
-      end if
+      call empole0sub
       em0 = em
 c
 c     restore original elambda and dependent parameters
@@ -2027,5 +2008,86 @@ c     interpolate the dual topology energy
 c
       weight1 = elambda**emdtexp
       em = weight1*em1 + (1.0d0-weight1)*em0
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine empole0sub  --  subsystem multipole energy  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "empole0sub" evaluates the multipole energy for the atom
+c     subsystem currently installed by "altemdtsub", using the same
+c     standard routine selection as "empole0e"
+c
+c
+      subroutine empole0sub
+      use limits
+      implicit none
+c
+c
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole0d
+         else
+            call empole0c
+         end if
+      else
+         if (use_mlist) then
+            call empole0b
+         else
+            call empole0a
+         end if
+      end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine empole0er  --  relative dual topology mpole eng  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "empole0er" calculates the multipole energy for a two-ligand
+c     relative dual topology calculation by combining four parameter
+c     zeroed subsystem energies, E1 = E(A+env) + E(B) and E0 =
+c     E(B+env) + E(A), so all intramolecular interactions are kept at
+c     full strength while only ligand-environment coupling is scaled
+c
+c
+      subroutine empole0er
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      real*8 emae,embe
+      real*8 ema,emb
+      real*8 em1,em0
+      real*8 weight1,weight0
+c
+c
+      call altemdtsub (.true.,.false.,.true.)
+      call empole0sub
+      emae = em
+      call altemdtsub (.false.,.true.,.true.)
+      call empole0sub
+      embe = em
+      call altemdtsub (.true.,.false.,.false.)
+      call empole0sub
+      ema = em
+      call altemdtsub (.false.,.true.,.false.)
+      call empole0sub
+      emb = em
+      call altemdtsub (.true.,.true.,.true.)
+      weight1 = elambda**emdtexp
+      weight0 = 1.0d0 - weight1
+      em1 = emae + emb
+      em0 = embe + ema
+      em = weight1*em1 + weight0*em0
       return
       end

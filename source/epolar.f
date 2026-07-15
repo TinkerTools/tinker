@@ -18,6 +18,7 @@ c
 c
       subroutine epolar
       use dlmda
+      use mutant
       use limits
       implicit none
       logical pairwise
@@ -25,8 +26,12 @@ c
 c
 c     choose the method to sum over polarization interactions
 c
-      if (use_dlmda) then
-         call epolar0f
+      if (use_epdt) then
+         if (use_rel) then
+            call epolar0fr
+         else
+            call epolar0f
+         end if
       else
          pairwise = .false.
          if (pairwise) then
@@ -122,7 +127,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -572,7 +577,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -856,7 +861,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1438,7 +1443,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1836,7 +1841,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1967,7 +1972,7 @@ c     PME grid cannot be reused with multipole dual topology, since it
 c     belongs to a decoupled end state rather than to the interpolated
 c     multipoles at the current lambda value
 c
-      if (.not.use_mpole .or. aewald.ne.aeewald .or. use_dlmda
+      if (.not.use_mpole .or. aewald.ne.aeewald .or. use_epdt
      &       .or. use_emdt) then
          if (allocated(cmp)) then
             if (size(cmp) .lt. 10*n)  deallocate (cmp)
@@ -2125,44 +2130,26 @@ c
       use limits
       use mutant
       use ost
+      use potent
       implicit none
       real*8 ep1,ep0
       real*8 plambdaorig
+      real*8 elambdaorig
       real*8 plambdaexp
-      logical pairwise
       character*6 mode
 c
 c
 c     copy original plambda
 c
       plambdaorig = plambda
-c
-c     set pairwise logical value
-c
-      pairwise = .false.
+      elambdaorig = elambda
 c
 c     compute energy of the lambda = 0 state
 c
       if (use_pol4i) then
          plambda = 0.0d0
          call altpolr
-         if (pairwise) then
-            if (use_ewald) then
-               if (use_mlist) then
-                  call epolar0d
-               else
-                  call epolar0c
-               end if
-            else
-               if (use_mlist) then
-                  call epolar0b
-               else
-                  call epolar0a
-               end if
-            end if
-         else
-            call epolar0e
-         end if
+         call epolar0sub
 c
 c     copy energy of the lambda = 0 state
 c
@@ -2174,23 +2161,7 @@ c
       if (use_pol4f) then
          plambda = 1.0d0
          call altpolr
-         if (pairwise) then
-            if (use_ewald) then
-               if (use_mlist) then
-                  call epolar0d
-               else
-                  call epolar0c
-               end if
-            else
-               if (use_mlist) then
-                  call epolar0b
-               else
-                  call epolar0a
-               end if
-            end if
-         else
-            call epolar0e
-         end if
+         call epolar0sub
 c
 c     copy energy of the lambda = 1 state
 c
@@ -2208,11 +2179,84 @@ c
 c     set original plambda
 c
       plambda = plambdaorig
-      call altelec
+      if (use_mpole) then
+         call altemdt (elambdaorig)
+      else
+         call altpolr
+         call chkpole
+         call rotpole ('MPOLE')
+      end if
 c
 c     interpolate energy
 c
       plambdaexp = plambda**epdtexp
       ep = plambdaexp * ep1 + (1.0d0 - plambdaexp) * ep0
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine epolar0sub  --  subsystem polarization energy  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "epolar0sub" evaluates the polarization energy for the atom
+c     subsystem installed by "altpolrsub", using the same non-pairwise
+c     induced dipole routine selection as "epolar0f"
+c
+c
+      subroutine epolar0sub
+      implicit none
+c
+c
+      call epolar0e
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine epolar0fr  --  relative dual topo pol energy  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "epolar0fr" calculates the polarization energy for a two-ligand
+c     relative dual topology calculation by combining four subsystem
+c     energies, E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A)
+c
+c
+      subroutine epolar0fr
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      real*8 epae,epbe
+      real*8 epa,epb
+      real*8 ep1,ep0
+      real*8 plambdaexp
+c
+c
+      call altpolrsub (.true.,.false.,.true.)
+      call epolar0sub
+      epae = ep
+      call altpolrsub (.false.,.true.,.true.)
+      call epolar0sub
+      epbe = ep
+      call altpolrsub (.true.,.false.,.false.)
+      call epolar0sub
+      epa = ep
+      call altpolrsub (.false.,.true.,.false.)
+      call epolar0sub
+      epb = ep
+      call altpolrsub (.true.,.true.,.true.)
+      call chkpole
+      call rotpole ('MPOLE')
+      plambdaexp = plambda**epdtexp
+      ep1 = epae + epb
+      ep0 = epbe + epa
+      ep = plambdaexp*ep1 + (1.0d0-plambdaexp)*ep0
       return
       end

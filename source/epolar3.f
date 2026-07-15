@@ -18,6 +18,7 @@ c
 c
       subroutine epolar3
       use dlmda
+      use mutant
       use limits
       implicit none
       logical pairwise
@@ -26,8 +27,12 @@ c
 c     choose the method to sum over polarization interactions
 c
       pairwise = .true.
-      if (use_dlmda) then
-         call epolar3f
+      if (use_epdt) then
+         if (use_rel) then
+            call epolar3fr
+         else
+            call epolar3f
+         end if
       else if (pairwise) then
          if (use_ewald) then
             if (use_mlist) then
@@ -131,7 +136,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -657,7 +662,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -986,7 +991,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1673,7 +1678,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2144,7 +2149,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_dlmda)  call rotpole ('MPOLE')
+      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2310,7 +2315,7 @@ c     PME grid cannot be reused with multipole dual topology, since it
 c     belongs to a decoupled end state rather than to the interpolated
 c     multipoles at the current lambda value
 c
-      if (.not.use_mpole .or. aewald.ne.aeewald .or. use_dlmda
+      if (.not.use_mpole .or. aewald.ne.aeewald .or. use_epdt
      &       .or. use_emdt) then
          if (allocated(cmp)) then
             if (size(cmp) .lt. 10*n)  deallocate (cmp)
@@ -2471,54 +2476,37 @@ c
       use dlmda
       use energi
       use limits
+      use mutant
       use ost
+      use potent
       implicit none
       integer i
       integer nep1,nep0
       real*8 ep1,ep0
       real*8 plambdaorig
+      real*8 elambdaorig
       real*8 plambdaexp
       real*8, allocatable :: aep1(:)
       real*8, allocatable :: aep0(:)
-      logical pairwise
       character*6 mode
 c
 c
 c     copy original plambda
 c
       plambdaorig = plambda
+      elambdaorig = elambda
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aep0(n))
       allocate (aep1(n))
 c
-c     set pairwise logical value
-c
-      pairwise = .true.
-c
 c     compute energy of the lambda = 0 state
 c
       if (use_pol4i) then
          plambda = 0.0d0
          call altpolr
-         if (pairwise) then
-            if (use_ewald) then
-               if (use_mlist) then
-                  call epolar3d
-               else
-                  call epolar3c
-               end if
-            else
-               if (use_mlist) then
-                  call epolar3b
-               else
-                  call epolar3a
-               end if
-            end if
-         else
-            call epolar3e
-         end if
+         call epolar3sub
 c
 c     copy energy of the lambda = 0 state
 c
@@ -2534,23 +2522,7 @@ c
       if (use_pol4f) then
          plambda = 1.0d0
          call altpolr
-         if (pairwise) then
-            if (use_ewald) then
-               if (use_mlist) then
-                  call epolar3d
-               else
-                  call epolar3c
-               end if
-            else
-               if (use_mlist) then
-                  call epolar3b
-               else
-                  call epolar3a
-               end if
-            end if
-         else
-            call epolar3e
-         end if
+         call epolar3sub
 c
 c     copy energy of the lambda = 1 state
 c
@@ -2580,7 +2552,13 @@ c
 c     set original plambda
 c
       plambda = plambdaorig
-      call altelec
+      if (use_mpole) then
+         call altemdt (elambdaorig)
+      else
+         call altpolr
+         call chkpole
+         call rotpole ('MPOLE')
+      end if
 c
 c     interpolate energy
 c
@@ -2595,5 +2573,140 @@ c     perform deallocation of some local arrays
 c
       deallocate (aep0)
       deallocate (aep1)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epolar3sub  --  subsystem polarization analysis  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "epolar3sub" evaluates the polarization energy and analysis for
+c     the atom subsystem installed by "altpolrsub", using the same
+c     pairwise routine selection as "epolar3f"
+c
+c
+      subroutine epolar3sub
+      use limits
+      implicit none
+c
+c
+      if (use_ewald) then
+         if (use_mlist) then
+            call epolar3d
+         else
+            call epolar3c
+         end if
+      else
+         if (use_mlist) then
+            call epolar3b
+         else
+            call epolar3a
+         end if
+      end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine epolar3fr  --  relative dual topo pol analysis  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "epolar3fr" calculates the polarization energy and analysis for a
+c     two-ligand relative dual topology calculation by combining four
+c     subsystem states, E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A)
+c
+c
+      subroutine epolar3fr
+      use action
+      use analyz
+      use atoms
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      integer i
+      integer nepae
+      real*8 epae,epbe
+      real*8 epa,epb
+      real*8 ep1,ep0
+      real*8 plambdaexp
+      real*8, allocatable :: aepae(:)
+      real*8, allocatable :: aepbe(:)
+      real*8, allocatable :: aepa(:)
+      real*8, allocatable :: aepb(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aepae(n))
+      allocate (aepbe(n))
+      allocate (aepa(n))
+      allocate (aepb(n))
+c
+c     ligand A coupled to environment, group B fully decoupled
+c
+      call altpolrsub (.true.,.false.,.true.)
+      call epolar3sub
+      epae = ep
+      nepae = nep
+      do i = 1, n
+         aepae(i) = aep(i)
+      end do
+c
+c     ligand B coupled to environment, group A fully decoupled
+c
+      call altpolrsub (.false.,.true.,.true.)
+      call epolar3sub
+      epbe = ep
+      do i = 1, n
+         aepbe(i) = aep(i)
+      end do
+c
+c     ligand A alone, giving its intramolecular polarization energy
+c
+      call altpolrsub (.true.,.false.,.false.)
+      call epolar3sub
+      epa = ep
+      do i = 1, n
+         aepa(i) = aep(i)
+      end do
+c
+c     ligand B alone, giving its intramolecular polarization energy
+c
+      call altpolrsub (.false.,.true.,.false.)
+      call epolar3sub
+      epb = ep
+      do i = 1, n
+         aepb(i) = aep(i)
+      end do
+c
+c     restore full system and interpolate the dual topology result
+c
+      call altpolrsub (.true.,.true.,.true.)
+      call chkpole
+      call rotpole ('MPOLE')
+      plambdaexp = plambda**epdtexp
+      ep1 = epae + epb
+      ep0 = epbe + epa
+      ep = plambdaexp*ep1 + (1.0d0-plambdaexp)*ep0
+      nep = nepae
+      do i = 1, n
+         aep(i) = plambdaexp*(aepae(i)+aepb(i))
+     &          + (1.0d0-plambdaexp)*(aepbe(i)+aepa(i))
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aepae)
+      deallocate (aepbe)
+      deallocate (aepa)
+      deallocate (aepb)
       return
       end

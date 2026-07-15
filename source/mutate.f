@@ -56,6 +56,7 @@ c
       integer i,j,k,ihyb
       integer it0,it1
       integer k1,k2
+      integer igrp
       integer next,size
       integer ntbnd
       integer, allocatable :: list(:)
@@ -76,12 +77,16 @@ c
       if (allocated(type1))  deallocate (type1)
       if (allocated(class1))  deallocate (class1)
       if (allocated(mut))  deallocate (mut)
+      if (allocated(mutg))  deallocate (mutg)
+      if (allocated(subon))  deallocate (subon)
       allocate (imut(n))
       allocate (type0(n))
       allocate (class0(n))
       allocate (type1(n))
       allocate (class1(n))
       allocate (mut(n))
+      allocate (mutg(n))
+      allocate (subon(n))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -115,10 +120,11 @@ c
 c     set defaults for use of van der Waals dual topology
 c
       use_evdt = .false.
-      vdtexp = 2
+      evdtexp = 2
 c
-c     set default dual topology interpolation exponent
+c     set defaults for use of polarization dual topology
 c
+      use_epdt = .false.
       epdtexp = 2
 c
 c     set default ost update intervals
@@ -191,8 +197,13 @@ c
 c     zero out number of hybrid atoms and mutated torsions
 c
       nmut = 0
+      nmutb = 0
+      use_rel = .false.
+      use_subsys = .false.
       do i = 1, n
          mut(i) = .false.
+         mutg(i) = 0
+         subon(i) = .true.
       end do
       ntbnd = 0
       do i = 1, nbond
@@ -230,11 +241,16 @@ c
          else if (keyword(1:17) .eq. 'MTP-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=30)  emdtexp
+         else if (keyword(1:13) .eq. 'POL-DUALTOPO ') then
+            use_epdt = .true.
+         else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  epdtexp
          else if (keyword(1:13) .eq. 'VDW-DUALTOPO ') then
             use_evdt = .true.
          else if (keyword(1:17) .eq. 'VDW-DUALTOPO-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  vdtexp
+            read (string,*,err=30)  evdtexp
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:240)
             read (string,*,err=30)  ihyb,it0,it1
@@ -245,7 +261,14 @@ c
             type1(nmut) = it1
             class0(nmut) = atmcls(it0)
             class1(nmut) = atmcls(it1)
-         else if (keyword(1:7) .eq. 'LIGAND ') then
+         else if (keyword(1:7).eq.'LIGAND ' .or.
+     &            keyword(1:8).eq.'LIGAND1 ' .or.
+     &            keyword(1:8).eq.'LIGAND2 ') then
+            if (keyword(1:8) .eq. 'LIGAND2 ') then
+               igrp = 2
+            else
+               igrp = 1
+            end if
             do k = 1, size
                list(k) = 0
             end do
@@ -256,23 +279,11 @@ c
             do while (list(k) .ne. 0)
                if (list(k).gt.0 .and. list(k).le.n) then
                   j = list(k)
-                  nmut = nmut + 1
-                  imut(nmut) = j
-                  mut(j) = .true.
-                  type0(nmut) = 0
-                  type1(nmut) = type(j)
-                  class0(nmut) = 0
-                  class1(nmut) = class(j)
+                  call setligand (j,igrp)
                   k = k + 1
                else
                   do j = max(1,abs(list(k))), min(n,abs(list(k+1)))
-                     nmut = nmut + 1
-                     imut(nmut) = j
-                     mut(j) = .true.
-                     type0(nmut) = 0
-                     type1(nmut) = type(i)
-                     class0(nmut) = 0
-                     class1(nmut) = class(i)
+                     call setligand (j,igrp)
                   end do
                   k = k + 2
                end if
@@ -291,23 +302,14 @@ c
                itbnd(2,ntbnd) = list(k+1)
                k = k + 2
             end do
-         else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
-            string = record(next:240)
-            read (string,*,err=30)  epdtexp
          else if (keyword(1:13) .eq. 'LAMBDA-DERIV ') then
             use_dlmda = .true.
-            use_pol4i = .true.
-            use_pol4f = .true.
          else if (keyword(1:4) .eq. 'OST ') then
             use_dlmda = .true.
             use_ost = .true.
-            use_pol4i = .true.
-            use_pol4f = .true.
          else if (keyword(1:8) .eq. 'METADYN ') then
             use_dlmda = .true.
             use_meta = .true.
-            use_pol4i = .true.
-            use_pol4f = .true.
          else if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
             string = record(next:240)
             read (string,*,err=30)  iosthist
@@ -404,6 +406,14 @@ c
          call fatal
       end if
 c
+c     lambda derivatives of polarization require dual topology
+c
+      if (use_dlmda)  use_epdt = .true.
+      if (use_epdt) then
+         use_pol4i = .true.
+         use_pol4f = .true.
+      end if
+c
 c     validate mapping schemes from main lambda to sublambdas
 c
       if (ostpmap.ne.'QNT' .and. ostpmap.ne.'EXP'
@@ -421,8 +431,8 @@ c
       if (emdtexp .lt. 1) then
          emdtexp = 1
       end if
-      if (vdtexp .lt. 1) then
-         vdtexp = 1
+      if (evdtexp .lt. 1) then
+         evdtexp = 1
       end if
       if (ostepexp .lt. 1) then
          ostepexp = 1
@@ -693,19 +703,27 @@ c
 c
 c     scale electrostatic parameter values based on lambda
 c
-      if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
+c     enable two-ligand relative dual topo if a second ligand exists;
+c     in that mode the resting parameters are left at their unscaled
+c     values and each subsystem state is built on demand by the combiner
+c
+      use_rel = (nmutb .gt. 0)
+      if (.not.use_rel .and.
+     &    elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
          call altelec
       end if
 c
 c     scale torsional parameter values based on lambda
 c
-      if (tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0) then
+      if (.not.use_rel .and.
+     &    tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0) then
          if (ntbnd .ne. 0)  call alttors (ntbnd,itbnd)
       end if
 c
 c     scale implicit solvation parameter values based on lambda
 c
-      if (elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
+      if (.not.use_rel .and.
+     &    elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
          call altsolv
       end if
 c
@@ -725,12 +743,58 @@ c
      &           /,' Electrostatics Lambda Value',8x,f8.3,
      &           /,' Polarization Lambda Value',10x,f8.3,
      &           /,' Torsion Angle Lambda Value',9x,f8.3)
+         if (use_rel) then
+            write (iout,55)  nmut-nmutb,nmutb
+   55       format (/,' Relative Dual Topology Active :',
+     &              /,' Number of Ligand1 Atoms',12x,i8,
+     &              /,' Number of Ligand2 Atoms',12x,i8)
+         end if
       end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (list)
       deallocate (itbnd)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine setligand  --  register a ligand hybrid atom  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "setligand" appends atom "j" to the list of mutated hybrid atoms
+c     as a member of alchemical group "igrp" (1 for the first ligand,
+c     2 for the second ligand of a relative dual topology calculation)
+c
+c
+      subroutine setligand (j,igrp)
+      use atomid
+      use atoms
+      use mutant
+      implicit none
+      integer j,igrp
+c
+c
+      nmut = nmut + 1
+      imut(nmut) = j
+      mut(j) = .true.
+      mutg(j) = igrp
+      if (igrp .eq. 2) then
+         type0(nmut) = type(j)
+         type1(nmut) = 0
+         class0(nmut) = class(j)
+         class1(nmut) = 0
+         nmutb = nmutb + 1
+      else
+         type0(nmut) = 0
+         type1(nmut) = type(j)
+         class0(nmut) = 0
+         class1(nmut) = class(j)
+      end if
       return
       end
 c
@@ -857,11 +921,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine altemdt  --  dual topology end state reset    ##
-c     ##                                                           ##
-c     ###############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine altemdt  --  dual topology end state reset  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "altemdt" switches the electrostatic parameters to the state
@@ -907,6 +971,9 @@ c     on the lambda mutation parameter "plambda"
 c
 c
       subroutine altpolr
+      use angbnd
+      use bndstr
+      use cflux
       use chgpen
       use dlmda
       use mplpot
@@ -951,6 +1018,38 @@ c
             end if
          end do
       end if
+c
+c     set scaled parameters for bond stretch charge flux
+c
+      if (use_chgflx) then
+         do i = 1, nbond
+            ia = ibnd(1,i)
+            ib = ibnd(2,i)
+            if (mut(ia) .and. mut(ib)) then
+               bflx(i) = bflxorig(i) * plambda
+            end if
+         end do
+      end if
+c
+c     set scaled parameters for angle bend charge flux
+c
+      if (use_chgflx) then
+         do i = 1, nangle
+            ia = iang(1,i)
+            ib = iang(2,i)
+            ic = iang(3,i)
+            if (mut(ia) .and. mut(ib) .and. mut(ic)) then
+               aflx(1,i) = aflxorig(1,i) * plambda
+               aflx(2,i) = aflxorig(2,i) * plambda
+               abflx(1,i) = abflxorig(1,i) * plambda
+               abflx(2,i) = abflxorig(2,i) * plambda
+            end if
+         end do
+      end if
+c
+c     update monopoles for charge flux at the requested lambda state
+c
+      if (use_chgflx)  call alterchg
       return
       end
 c
@@ -1041,5 +1140,304 @@ c
             end if
          end do
       end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine submask  --  select relative subsystem atoms  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "submask" flags which atoms are active in the subsystem currently
+c     being built for a relative dual topology energy term; group A is
+c     included when "la", group B when "lb", and the environment when
+c     "le", with all other alchemical atoms zeroed out
+c
+c
+      subroutine submask (la,lb,le)
+      use atoms
+      use mutant
+      implicit none
+      integer i
+      logical la,lb,le
+c
+c
+      do i = 1, n
+         if (mutg(i) .eq. 1) then
+            subon(i) = la
+         else if (mutg(i) .eq. 2) then
+            subon(i) = lb
+         else
+            subon(i) = le
+         end if
+      end do
+      use_subsys = .not. (la .and. lb .and. le)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine setsubelec  --  subsystem electrostatic state  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "setsubelec" installs the electrostatic parameters for the atom
+c     subsystem flagged by "subon", using full original values for the
+c     active atoms and zero for the inactive atoms, then refreshes the
+c     charge flux monopoles and global frame multipoles so any later
+c     energy term is consistent with the requested subsystem
+c
+c
+      subroutine setsubelec
+      use angbnd
+      use atoms
+      use bndstr
+      use cflux
+      use charge
+      use chgpen
+      use dipole
+      use dlmda
+      use mplpot
+      use mpole
+      use mutant
+      use polar
+      use potent
+      implicit none
+      integer i,j,k
+      integer k1,k2
+      integer ia,ib,ic
+c
+c
+c     partial charge models
+c
+      if (use_charge) then
+         do i = 1, nion
+            k = iion(i)
+            if (subon(k)) then
+               pchg(k) = pchgorig(k)
+            else
+               pchg(k) = 0.0d0
+            end if
+            pchg0(k) = pchg(k)
+         end do
+      end if
+c
+c     bond dipole models
+c
+      if (use_dipole) then
+         do i = 1, ndipole
+            k1 = idpl(1,i)
+            k2 = idpl(2,i)
+            if (subon(k1) .and. subon(k2)) then
+               bdpl(i) = bdplorig(i)
+            else
+               bdpl(i) = 0.0d0
+            end if
+         end do
+      end if
+c
+c     atomic multipole models
+c
+      if (use_mpole) then
+         do i = 1, npole
+            k = ipole(i)
+            if (subon(k)) then
+               do j = 1, 13
+                  pole(j,k) = poleorig(j,k)
+               end do
+               if (use_chgpen) then
+                  pcore(k) = pcoreorig(k)
+                  pval(k) = pvalorig(k)
+                  pval0(k) = pval(k)
+               end if
+            else
+               do j = 1, 13
+                  pole(j,k) = 0.0d0
+               end do
+               if (use_chgpen) then
+                  pcore(k) = 0.0d0
+                  pval(k) = 0.0d0
+                  pval0(k) = 0.0d0
+               end if
+            end if
+            mono0(k) = pole(1,k)
+         end do
+      end if
+c
+c     atomic polarizability models
+c
+      if (use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            if (subon(k)) then
+               polarity(k) = polarityorig(k)
+               douind(k) = douindorig(k)
+            else
+               polarity(k) = 0.0d0
+               douind(k) = .false.
+            end if
+         end do
+      end if
+c
+c     bond stretch charge flux
+c
+      if (use_chgflx) then
+         do i = 1, nbond
+            ia = ibnd(1,i)
+            ib = ibnd(2,i)
+            if (subon(ia) .and. subon(ib)) then
+               bflx(i) = bflxorig(i)
+            else
+               bflx(i) = 0.0d0
+            end if
+         end do
+         do i = 1, nangle
+            ia = iang(1,i)
+            ib = iang(2,i)
+            ic = iang(3,i)
+            if (subon(ia) .and. subon(ib) .and. subon(ic)) then
+               aflx(1,i) = aflxorig(1,i)
+               aflx(2,i) = aflxorig(2,i)
+               abflx(1,i) = abflxorig(1,i)
+               abflx(2,i) = abflxorig(2,i)
+            else
+               aflx(1,i) = 0.0d0
+               aflx(2,i) = 0.0d0
+               abflx(1,i) = 0.0d0
+               abflx(2,i) = 0.0d0
+            end if
+         end do
+      end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine altemdtsub  --  subsystem multipole end state  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "altemdtsub" switches the electrostatic parameters to the atom
+c     subsystem containing group A when "la", group B when "lb", and
+c     the environment when "le"; the charge flux monopoles are updated
+c     and the global frame multipoles are rebuilt as in "altemdt"
+c
+c
+      subroutine altemdtsub (la,lb,le)
+      use potent
+      implicit none
+      logical la,lb,le
+c
+c
+      call submask (la,lb,le)
+      call setsubelec
+      if (use_chgflx)  call alterchg
+      call chkpole
+      call rotpole ('MPOLE')
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine altpolrsub  --  subsystem polarization state  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "altpolrsub" installs the polarizability and multipole values for
+c     the atom subsystem flagged by "subon", using full original values
+c     for active atoms and zero for inactive atoms, for the polarization
+c     dual topology subsystem energies
+c
+c
+      subroutine altpolrsub (la,lb,le)
+      use angbnd
+      use bndstr
+      use cflux
+      use chgpen
+      use dlmda
+      use mplpot
+      use mpole
+      use mutant
+      use polar
+      use potent
+      implicit none
+      integer i,j,k
+      integer ia,ib,ic
+      logical la,lb,le
+c
+c
+      call submask (la,lb,le)
+      if (use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            if (subon(k)) then
+               do j = 1, 13
+                  pole(j,k) = poleorig(j,k)
+               end do
+               if (use_chgpen) then
+                  pcore(k) = pcoreorig(k)
+                  pval(k) = pvalorig(k)
+                  pval0(k) = pval(k)
+               end if
+               polarity(k) = polarityorig(k)
+               douind(k) = douindorig(k)
+            else
+               do j = 1, 13
+                  pole(j,k) = 0.0d0
+               end do
+               if (use_chgpen) then
+                  pcore(k) = 0.0d0
+                  pval(k) = 0.0d0
+                  pval0(k) = 0.0d0
+               end if
+               polarity(k) = 0.0d0
+               douind(k) = .false.
+            end if
+            mono0(k) = pole(1,k)
+         end do
+      end if
+c
+c     set subsystem parameters for charge flux
+c
+      if (use_chgflx) then
+         do i = 1, nbond
+            ia = ibnd(1,i)
+            ib = ibnd(2,i)
+            if (subon(ia) .and. subon(ib)) then
+               bflx(i) = bflxorig(i)
+            else
+               bflx(i) = 0.0d0
+            end if
+         end do
+         do i = 1, nangle
+            ia = iang(1,i)
+            ib = iang(2,i)
+            ic = iang(3,i)
+            if (subon(ia) .and. subon(ib) .and. subon(ic)) then
+               aflx(1,i) = aflxorig(1,i)
+               aflx(2,i) = aflxorig(2,i)
+               abflx(1,i) = abflxorig(1,i)
+               abflx(2,i) = abflxorig(2,i)
+            else
+               aflx(1,i) = 0.0d0
+               aflx(2,i) = 0.0d0
+               abflx(1,i) = 0.0d0
+               abflx(2,i) = 0.0d0
+            end if
+         end do
+      end if
+c
+c     update monopoles for charge flux in the requested subsystem
+c
+      if (use_chgflx)  call alterchg
       return
       end
