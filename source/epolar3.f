@@ -565,7 +565,7 @@ c
          do i = 1, npole
             e = 0.0d0
             do j = 1, 3
-               e = e - f*uind(j,i)*exfld(j)
+               e = e - f*uind(j,i)*texfld(j)
             end do
             ep = ep + e
             nep = nep + 1
@@ -702,7 +702,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,off2,f,
-!$OMP& exfld,use_exfld,molcule,name,verbose,debug,header,iout)
+!$OMP& texfld,molcule,name,verbose,debug,header,iout,use_exfld)
 !$OMP& firstprivate(pscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter)
 c
@@ -907,7 +907,7 @@ c
          do i = 1, npole
             e = 0.0d0
             do j = 1, 3
-               e = e - f*uind(j,i)*exfld(j)
+               e = e - f*uind(j,i)*texfld(j)
             end do
             ep = ep + e
             nep = nep + 1
@@ -1599,7 +1599,7 @@ c
          do i = 1, npole
             e = 0.0d0
             do j = 1, 3
-               e = e - f*uind(j,i)*exfld(j)
+               e = e - f*uind(j,i)*texfld(j)
             end do
             ep = ep + e
             nep = nep + 1
@@ -1844,7 +1844,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,nelst,elst,use_thole,use_chgpen,use_bounds,off2,f,
-!$OMP& exfld,use_exfld,molcule,name,verbose,debug,header,iout)
+!$OMP& texfld,molcule,name,verbose,debug,header,iout,use_exfld)
 !$OMP& firstprivate(pscale) shared (ep,nep,aep,einter)
 !$OMP DO reduction(+:ep,nep,aep,einter)
 c
@@ -2074,7 +2074,7 @@ c
          do i = 1, npole
             e = 0.0d0
             do j = 1, 3
-               e = e - f*uind(j,i)*exfld(j)
+               e = e - f*uind(j,i)*texfld(j)
             end do
             ep = ep + e
             nep = nep + 1

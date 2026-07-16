@@ -1,0 +1,19 @@
+ Total Potential Energy :                  2.5040 Kcal/mole
+
+ EngCnt  Angle Bending                             2.5040               15
+
+ Internal Virial Tensor :                 -16.151      -18.626        5.123
+                                          -18.626        8.897       -2.176
+                                            5.123       -2.176        7.254
+
+ Cartesian Gradient Breakdown over Individual Atoms :
+
+  Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
+
+ Anlyt         1            17.0793    -27.7323     -7.7567       33.4806
+ Anlyt         2             2.8974      1.1176      3.0201        4.3319
+ Anlyt         3            -4.8330      8.3731     -0.1717        9.6694
+ Anlyt         4           -11.1938      2.7921      0.6558       11.5554
+ Anlyt         5             0.6160      0.4907      0.9961        1.2698
+ Anlyt         6           -11.3931      3.0899      4.4134       12.6027
+ Anlyt         7             6.8272     11.8690     -1.1570       13.7413

@@ -89,6 +89,7 @@ c
       use merck
       use molcul
       use moldyn
+      use moment
       use mpole
       use mrecip
       use mutant
@@ -99,6 +100,7 @@ c
       use opdist
       use orbits
       use ost
+      use output
       use params
       use paths
       use pbstuf
@@ -840,6 +842,10 @@ c
       if (allocated(aslow))  deallocate (aslow)
       if (allocated(afast))  deallocate (afast)
 c
+c     deallocation of global arrays from module moment
+c
+      if (allocated(momuse))  deallocate (momuse)
+c
 c     deallocation of global arrays from module mpole
 c
       if (allocated(ipole))  deallocate (ipole)
@@ -938,6 +944,12 @@ c
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
+c
+c     deallocation of global arrays from module output
+c
+      if (allocated(ionly))  deallocate (ionly)
+      if (allocated(ionlyinv))  deallocate (ionlyinv)
+      if (allocated(print3n))  deallocate (print3n)
 c
 c     deallocation of global arrays from module params
 c

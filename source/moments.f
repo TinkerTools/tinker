@@ -131,7 +131,7 @@ c     set the multipole moment components due to partial charges
 c
       do i = 1, nion
          k = iion(i)
-         if (use(k)) then
+         if (use(k) .and. momuse(k)) then
             netchg = netchg + pchg(k)
             xdpl = xdpl + xcm(k)*pchg(k)
             ydpl = ydpl + ycm(k)*pchg(k)
@@ -153,7 +153,7 @@ c
       do i = 1, ndipole
          j = idpl(1,i)
          k = idpl(2,i)
-         if (use(j) .or. use(k)) then
+         if ((use(j).and.momuse(j)) .or. (use(k).and.momuse(k))) then
             xi = x(j) - x(k)
             yi = y(j) - y(k)
             zi = z(j) - z(k)
@@ -205,7 +205,7 @@ c     set the moment components due to atomic monopoles and dipoles
 c
       do i = 1, npole
          k = ipole(i)
-         if (use(k)) then
+         if (use(k) .and. momuse(k)) then
             netchg = netchg + rpole(1,k)
             xdpl = xdpl + xcm(k)*rpole(1,k) + rpole(2,k)
             ydpl = ydpl + ycm(k)*rpole(1,k) + rpole(3,k)
@@ -254,7 +254,7 @@ c     add the traceless atomic quadrupoles to total quadrupole
 c
       do i = 1, npole
          k = ipole(i)
-         if (use(k)) then
+         if (use(k) .and. momuse(k)) then
             xxqpl = xxqpl + 3.0d0*rpole(5,k)
             xyqpl = xyqpl + 3.0d0*rpole(6,k)
             xzqpl = xzqpl + 3.0d0*rpole(7,k)
@@ -307,5 +307,222 @@ c
       a(3,2) = zyqpl
       a(3,3) = zzqpl
       call jacobi (3,a,netqpl,b)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine dmoments  --  total electric dipole moments  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "dmoments" computes the total dipole moments over all atoms and
+c     the unique atom type dipole moments;
+c     called in mdsave, it is assumed bound is called
+c
+c
+      subroutine dmoments (xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind,
+     &                              xuchg,yuchg,zuchg)
+      use atoms
+      use dipole
+      use charge
+      use moment
+      use mpole
+      use polar
+      use potent
+      use solpot
+      use uatom
+      use units
+      implicit none
+      integer i,j,k
+      integer ii
+      integer ut
+      real*8 xi,yi,zi,ri
+      real*8 xm,ym,zm
+      real*8 xu,yu,zu
+      real*8 xc,yc,zc
+      real*8 xustc,yustc,zustc
+      real*8 xuind,yuind,zuind
+      real*8 xuchg,yuchg,zuchg
+      real*8 xbnd,ybnd,zbnd
+c
+c
+c     zero out dipole moments
+c
+      xustc = 0.0d0
+      yustc = 0.0d0
+      zustc = 0.0d0
+      xuind = 0.0d0
+      yuind = 0.0d0
+      zuind = 0.0d0
+      xuchg = 0.0d0
+      yuchg = 0.0d0
+      zuchg = 0.0d0
+      do i = 1, nunique
+         do j = 1, 3
+            utv1(j,i) = 0.0d0
+            utv2(j,i) = 0.0d0
+            utv3(j,i) = 0.0d0
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(nion,iion,x,y,z,pchg,momuse,xuchg,yuchg,zuchg,utv3,type,
+!$OMP& utypeinv)
+!$OMP DO reduction(+:xuchg,yuchg,zuchg,utv3)
+c
+c     compute the static dipole moment due to partial charges
+c
+      do ii = 1, nion
+         i = iion(ii)
+         if (momuse(i)) then
+            xc = (x(i)-xm)*pchg(i)
+            yc = (y(i)-ym)*pchg(i)
+            zc = (z(i)-zm)*pchg(i)
+            xuchg = xuchg + xc
+            yuchg = yuchg + yc
+            zuchg = zuchg + zc
+            ut = utypeinv(type(i))
+            utv3(1,ut) = utv3(1,ut) + xc
+            utv3(2,ut) = utv3(2,ut) + yc
+            utv3(3,ut) = utv3(3,ut) + zc
+         end if
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(ndipole,x,y,z,idpl,bdpl,momuse,xustc,yustc,zustc,
+!$OMP& utv1,type,utypeinv)
+!$OMP DO reduction(+:xustc,yustc,zustc,utv1)
+c
+c     compute the static dipole moment due to bond dipoles
+c
+      do i = 1, ndipole
+         j = idpl(1,i)
+         k = idpl(2,i)
+         if (momuse(j) .or. momuse(k)) then
+            xi = x(j) - x(k)
+            yi = y(j) - y(k)
+            zi = z(j) - z(k)
+            ri = sqrt(xi*xi + yi*yi + zi*zi)
+            xbnd = bdpl(i) * (xi/ri) / debye
+            ybnd = bdpl(i) * (yi/ri) / debye
+            zbnd = bdpl(i) * (zi/ri) / debye
+            xustc = xustc + xbnd
+            yustc = yustc + ybnd
+            zustc = zustc + zbnd
+            ut = utypeinv(type(j))
+            utv1(1,ut) = utv1(1,ut) + xbnd
+            utv1(2,ut) = utv1(2,ut) + ybnd
+            utv1(3,ut) = utv1(3,ut) + zbnd
+         end if
+      end do
+!$OMP END DO
+!$OMP END PARALLEL
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private)
+!$OMP& shared(npole,x,y,z,ipole,rpole,uind,uinds,use_polar,solvtyp,
+!$OMP& momuse,xm,ym,zm,xustc,yustc,zustc,xuind,yuind,zuind,
+!$OMP& xuchg,yuchg,zuchg,utv1,utv2,utv3,type,utypeinv)
+!$OMP DO reduction(+:xustc,yustc,zustc,xuchg,yuchg,zuchg,utv1,utv3)
+c
+c     compute the static dipole moment due to atomic multipoles
+c
+      do ii = 1, npole
+         i = ipole(ii)
+         if (momuse(i)) then
+            xu = rpole(2,i)
+            yu = rpole(3,i)
+            zu = rpole(4,i)
+            xc = (x(i)-xm)*rpole(1,i)
+            yc = (y(i)-ym)*rpole(1,i)
+            zc = (z(i)-zm)*rpole(1,i)
+            xustc = xustc + xu
+            yustc = yustc + yu
+            zustc = zustc + zu
+            xuchg = xuchg + xc
+            yuchg = yuchg + yc
+            zuchg = zuchg + zc
+            ut = utypeinv(type(i))
+            utv1(1,ut) = utv1(1,ut) + xu
+            utv1(2,ut) = utv1(2,ut) + yu
+            utv1(3,ut) = utv1(3,ut) + zu
+            utv3(1,ut) = utv3(1,ut) + xc
+            utv3(2,ut) = utv3(2,ut) + yc
+            utv3(3,ut) = utv3(3,ut) + zc
+         end if
+      end do
+!$OMP END DO
+c
+c     compute the induced dipole moment
+c
+      if (use_polar) then
+         if (solvtyp.eq.'GK' .or. solvtyp.eq.'PB') then
+!$OMP DO reduction(+:xuind,yuind,zuind,utv2)
+            do ii = 1, npole
+               i = ipole(ii)
+               if (momuse(i)) then
+                  xu = uinds(1,i)
+                  yu = uinds(2,i)
+                  zu = uinds(3,i)
+                  xuind = xuind + xu
+                  yuind = yuind + yu
+                  zuind = zuind + zu
+                  ut = utypeinv(type(i))
+                  utv2(1,ut) = utv2(1,ut) + xu
+                  utv2(2,ut) = utv2(2,ut) + yu
+                  utv2(3,ut) = utv2(3,ut) + zu
+               end if
+            end do
+!$OMP END DO
+         else
+!$OMP DO reduction(+:xuind,yuind,zuind,utv2)
+            do ii = 1, npole
+               i = ipole(ii)
+               if (momuse(i)) then
+                  xu = uind(1,i)
+                  yu = uind(2,i)
+                  zu = uind(3,i)
+                  xuind = xuind + xu
+                  yuind = yuind + yu
+                  zuind = zuind + zu
+                  ut = utypeinv(type(i))
+                  utv2(1,ut) = utv2(1,ut) + xu
+                  utv2(2,ut) = utv2(2,ut) + yu
+                  utv2(3,ut) = utv2(3,ut) + zu
+               end if
+            end do
+!$OMP END DO
+         end if
+      end if
+!$OMP END PARALLEL
+c
+c     convert dipole to Debye
+c
+      xustc = xustc * debye
+      yustc = yustc * debye
+      zustc = zustc * debye
+      xuind = xuind * debye
+      yuind = yuind * debye
+      zuind = zuind * debye
+      xuchg = xuchg * debye
+      yuchg = yuchg * debye
+      zuchg = zuchg * debye
+      do i = 1, nunique
+         do j = 1, 3
+            utv1(j,i) = utv1(j,i) * debye
+            utv2(j,i) = utv2(j,i) * debye
+            utv3(j,i) = utv3(j,i) * debye
+         end do
+      end do
       return
       end

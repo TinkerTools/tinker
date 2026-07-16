@@ -1,0 +1,3 @@
+parameters      ../commit_6bd0b6fd/water21
+fix-monopole
+resp-weight     1.0

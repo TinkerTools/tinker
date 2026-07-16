@@ -528,14 +528,11 @@ ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtarc.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtcif.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtdyn.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prterr.f
-ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtfrc.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtint.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtmol2.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtpdb.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtprm.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtseq.f
-ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtuind.f
-ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtvel.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp prtxyz.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp pss.f
 ifort -c -O3 -no-ipo -no-prec-div -qopenmp pssrigid.f

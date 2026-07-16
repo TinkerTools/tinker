@@ -1,0 +1,12 @@
+ Total Potential Energy :               -131.2801 Kcal/mole
+
+ Internal Virial Tensor :                  18.064       36.125       27.109
+                                           36.125       73.250       54.212
+                                           27.109       54.212       41.217
+
+ Cartesian Gradient Breakdown over Individual Atoms :
+
+  Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
+
+ Anlyt         1           -18.1463    -36.2484    -27.2392       48.8386
+ Anlyt         2            18.1721     36.3837     27.1456       48.8967

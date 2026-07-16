@@ -528,14 +528,11 @@ gfortran -c -Og -g -Wall prtarc.f
 gfortran -c -Og -g -Wall prtcif.f
 gfortran -c -Og -g -Wall prtdyn.f
 gfortran -c -Og -g -Wall prterr.f
-gfortran -c -Og -g -Wall prtfrc.f
 gfortran -c -Og -g -Wall prtint.f
 gfortran -c -Og -g -Wall prtmol2.f
 gfortran -c -Og -g -Wall prtpdb.f
 gfortran -c -Og -g -Wall prtprm.f
 gfortran -c -Og -g -Wall prtseq.f
-gfortran -c -Og -g -Wall prtuind.f
-gfortran -c -Og -g -Wall prtvel.f
 gfortran -c -Og -g -Wall prtxyz.f
 gfortran -c -Og -g -Wall pss.f
 gfortran -c -Og -g -Wall pssrigid.f

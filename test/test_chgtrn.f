@@ -1,0 +1,112 @@
+c
+c
+c     ##################################################################
+c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung and Jay W. Ponder  ##
+c     ##                     All Rights Reserved                      ##
+c     ##################################################################
+c
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine test_chgtrn  --  charge transfer tests  ##
+c     ##                                                     ##
+c     #########################################################
+c
+c
+c     "test_chgtrn" checks the charge transfer case exercised by
+c     the tinker-gpu chgtrn.cpp test
+c
+c
+      subroutine test_chgtrn
+      use action
+      use atoms
+      use energi
+      use virial
+      implicit none
+      integer nat,refcnt
+      real*8 energy,e,ref_e,ref_ei,refeng
+      real*8 eps_e,eps_g,eps_v
+      real*8, allocatable :: derivs(:,:)
+      real*8 refv(3,3)
+      real*8, allocatable :: refg(:,:)
+      logical skiptest
+      character*240 rpath
+      character*(*) tname
+      character*(*) tpre
+      parameter (tname='chgtrn_dmso')
+      parameter (tpre='test_')
+c
+c
+      call test_chgtrn_case (tname//'_list',.true.)
+      call test_chgtrn_case (tname//'_nolist',.false.)
+      return
+      end
+c
+c
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine test_chgtrn_case  --  run chgtrn case  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+      subroutine test_chgtrn_case (tname,uselist)
+      use action
+      use atoms
+      use energi
+      use virial
+      implicit none
+      integer nat,refcnt
+      real*8 energy,e,ref_e,ref_ei,refeng
+      real*8 eps_e,eps_g,eps_v
+      real*8, allocatable :: derivs(:,:)
+      real*8 refv(3,3)
+      real*8, allocatable :: refg(:,:)
+      logical skiptest,uselist
+      character*(*) tname
+      character*240 rpath
+      character*(*) tpre
+      parameter (tpre='test_')
+c
+c
+      if (skiptest(tpre//tname,'hippo'))  return
+      call pushdir ('file/chgtrn')
+      if (uselist) then
+         call loadfix_keyadd ('dmso','chgtrn.key','neighbor-list')
+      else
+         call loadfix ('dmso','chgtrn.key')
+      end if
+      allocate (derivs(3,n))
+      allocate (refg(3,n))
+      call refpath ('chgtrn','chgtrn.1.txt',rpath)
+      call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
+      call load_engcnt (rpath,'Charge Transfer',refeng,refcnt)
+      eps_e = 1.0d-4
+      eps_g = 1.0d-4
+      eps_v = 1.0d-3
+c
+c     level 0  --  total charge transfer energy
+c
+      e = energy ()
+      call assert_real (esum,ref_e,eps_e,tpre//tname//' energy (v0)')
+      call assert_real (ect,refeng,eps_e,tpre//tname//' chgtrn (v0)')
+c
+c     level 1  --  energy, Cartesian gradient and internal virial
+c
+      call gradient (e,derivs)
+      call assert_real (esum,ref_e,eps_e,tpre//tname//' grad-e (v1)')
+      call assert_grad (derivs,refg,n,eps_g,tpre//tname//' grad (v1)')
+      call assert_grad (vir,refv,3,eps_v,tpre//tname//' virial (v1)')
+c
+c     level 3  --  energy and per-term analysis
+c
+      call analysis (e)
+      call assert_real (esum,ref_e,eps_e,
+     &                  tpre//tname//' analysis (v3)')
+      call check_engcnt (rpath,'Charge Transfer',ect,nect,eps_e,
+     &                   tpre//tname//' chgtrn (v3)')
+      deallocate (derivs)
+      deallocate (refg)
+      call popdir
+      call final
+      return
+      end

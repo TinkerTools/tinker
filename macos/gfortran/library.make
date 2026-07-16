@@ -439,14 +439,11 @@ prtarc.o \
 prtcif.o \
 prtdyn.o \
 prterr.o \
-prtfrc.o \
 prtint.o \
 prtmol2.o \
 prtpdb.o \
 prtprm.o \
 prtseq.o \
-prtuind.o \
-prtvel.o \
 prtxyz.o \
 ptable.o \
 qmstuf.o \

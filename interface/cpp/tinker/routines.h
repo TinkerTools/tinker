@@ -20,6 +20,10 @@ void tinkerFortranRuntimeEnd();
 // active.f
 void active_();
 #define tinker_f_active active_
+void saveonly_();
+#define tinker_f_saveonly saveonly_
+void msystem_();
+#define tinker_f_msystem msystem_
 
 // alterchg.f
 void alterchg_();
@@ -108,6 +112,8 @@ void calendar_(int* year, int* month, int* day, int* hour, int* minute, int* sec
 // center.f
 void center_(int* n1, double* x1, double* y1, double* z1, int* n2, double* x2, double* y2, double* z2, double* xmid, double* ymid, double* zmid);
 #define tinker_f_center center_
+void compcent_(double* xcm, double* ycm, double* zcm);
+#define tinker_f_compcent compcent_
 
 // chkpole.f
 void chkpole_();
@@ -1970,6 +1976,8 @@ void moments_(char* mode, tinker_fchar_len_t mode_cap);
 inline void tinker_f_moments(tinker_fchars mode) {
     return moments_(mode.string, mode.capacity);
 }
+void dmoments_(double* xm, double* ym, double* zm, double* xustc, double* yustc, double* zustc, double* xuind, double* yuind, double* zuind, double* xuchg, double* yuchg, double* zuchg);
+#define tinker_f_dmoments dmoments_
 
 // mutate.f
 void mutate_();
@@ -2247,12 +2255,6 @@ void prtdyn_();
 void prterr_();
 #define tinker_f_prterr prterr_
 
-// prtfrc.f
-void prtfrc_(int* ifrc);
-#define tinker_f_prtfrc prtfrc_
-void prtdcdf_(int* idcd, int* first);
-#define tinker_f_prtdcdf prtdcdf_
-
 // prtint.f
 void prtint_(int* izmt);
 #define tinker_f_prtint prtint_
@@ -2277,23 +2279,23 @@ void prtprm_(int* itxt);
 void prtseq_(int* iseq);
 #define tinker_f_prtseq prtseq_
 
-// prtuind.f
-void prtuind_(int* iind);
-#define tinker_f_prtuind prtuind_
-void prtdcdu_(int* idcd, int* first);
-#define tinker_f_prtdcdu prtdcdu_
-
-// prtvel.f
-void prtvel_(int* ivel);
-#define tinker_f_prtvel prtvel_
-void prtdcdv_(int* idcd, int* first);
-#define tinker_f_prtdcdv prtdcdv_
-
 // prtxyz.f
 void prtxyz_(int* ixyz);
 #define tinker_f_prtxyz prtxyz_
+void prtvec3_(int* iunit, char* mode, tinker_fchar_len_t mode_cap);
+inline void tinker_f_prtvec3(int* iunit, tinker_fchars mode) {
+    return prtvec3_(iunit, mode.string, mode.capacity);
+}
+void copyvec3_(double* print3n, char* mode, tinker_fchar_len_t mode_cap);
+inline void tinker_f_copyvec3(double* print3n, tinker_fchars mode) {
+    return copyvec3_(print3n, mode.string, mode.capacity);
+}
 void prtdcd_(int* idcd, int* first);
 #define tinker_f_prtdcd prtdcd_
+void prtdcdv3_(int* idcd, int* first, char* mode, tinker_fchar_len_t mode_cap);
+inline void tinker_f_prtdcdv3(int* idcd, int* first, tinker_fchars mode) {
+    return prtdcdv3_(idcd, first, mode.string, mode.capacity);
+}
 
 // qrsolve.f
 void qrfact_(int* n, int* m, double* a, int* pivot, int* ipvt, double* rdiag);
@@ -2912,6 +2914,12 @@ void addbogus_(double* bcoord, double* brad);
 #define tinker_f_addbogus addbogus_
 void tetra_volume_(double* r12sq, double* r13sq, double* r14sq, double* r23sq, double* r24sq, double* r34sq, double* vol);
 #define tinker_f_tetra_volume tetra_volume_
+
+// uniquetyp.f
+void uniquetyp_();
+#define tinker_f_uniquetyp uniquetyp_
+void velunique_();
+#define tinker_f_velunique velunique_
 
 // unitcell.f
 void unitcell_();

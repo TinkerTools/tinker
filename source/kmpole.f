@@ -705,6 +705,10 @@ c
       if (use_mpole .and. .not.use_polar .and. .not.use_chgtrn)
      &   call chkpole
 c
+c     set exclusion in computing moment of system
+c
+      call msystem
+c
 c     turn off atomic multipole potentials if not used
 c
       if (npole .eq. 0)  use_mpole = .false.

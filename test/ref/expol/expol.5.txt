@@ -1,0 +1,16 @@
+ Total Potential Energy :            -88.59818254 Kcal/mole
+
+ EngCnt  Polarization                        -88.59818254                6
+
+ Internal Virial Tensor :                  76.339       50.971      -14.081
+                                           50.971      125.437      -61.029
+                                          -14.081      -61.029       69.980
+
+ Cartesian Gradient Breakdown over Individual Atoms :
+
+  Type    Atom          dE/dX           dE/dY           dE/dZ           Norm
+
+ Anlyt       1     -13.78553573     11.67733212    -25.81538711     31.50928899
+ Anlyt       2      -6.78341068     -4.70227541     14.85762924     16.99632905
+ Anlyt       3     -38.50314991    -86.75934147     50.59101447    107.55987463
+ Anlyt       4      59.07209632     79.78428476    -39.63325661    106.89171945

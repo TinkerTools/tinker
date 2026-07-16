@@ -1059,7 +1059,7 @@ c
          i = ipole(ii)
          sum = sum + rpole(1,i)
       end do
-      if (sum .ne. 0.0d0) then
+      if (abs(sum) .gt. 1.0d-10) then
          e = fterm * sum**2
          em = em + e
          nem = nem + 1
@@ -1775,7 +1775,7 @@ c
          i = ipole(ii)
          sum = sum + rpole(1,i)
       end do
-      if (sum .ne. 0.0d0) then
+      if (abs(sum) .gt. 1.0d-10) then
          e = fterm * sum**2
          em = em + e
          nem = nem + 1

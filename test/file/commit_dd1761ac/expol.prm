@@ -1,0 +1,312 @@
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              HIPPO-WATER-2021
+
+bond-cubic              -2.55
+bond-quartic            3.793125
+angle-cubic             -0.014
+angle-quartic           0.000056
+angle-pentic            -0.0000007
+angle-sextic            0.000000022
+opbendtype              ALLINGER
+opbend-cubic            -0.014
+opbend-quartic          0.000056
+opbend-pentic           -0.0000007
+opbend-sextic           0.000000022
+torsionunit             0.5
+dielectric              1.0
+polarization            MUTUAL
+d-equals-p
+rep-12-scale            0.0
+rep-13-scale            0.0
+rep-14-scale            1.0
+rep-15-scale            1.0
+disp-12-scale           0.0
+disp-13-scale           0.0
+disp-14-scale           0.4
+disp-15-scale           0.8
+mpole-12-scale          0.0
+mpole-13-scale          0.0
+mpole-14-scale          0.4
+mpole-15-scale          0.8
+polar-12-scale          0.0
+polar-13-scale          0.5
+polar-14-scale          1.0
+polar-15-scale          1.0
+polar-12-intra          0.0
+polar-13-intra          0.0
+polar-14-intra          0.0
+polar-15-intra          0.5
+direct-11-scale         0.0
+direct-12-scale         1.0
+direct-13-scale         1.0
+direct-14-scale         1.0
+mutual-11-scale         1.0
+mutual-12-scale         1.0
+mutual-13-scale         1.0
+mutual-14-scale         1.0
+induce-12-scale         0.2
+induce-13-scale         1.0
+induce-14-scale         1.0
+induce-15-scale         1.0
+
+      #############################
+      ##                         ##
+      ##  Literature References  ##
+      ##                         ##
+      #############################
+
+
+Preliminary parameter for water in the HIPPO (Hydrogen-like Intermolecular
+Polarizable Potential) force field. It accounts for charge penetration,
+damped dispersion, and anisotropic repulsion as per the papers below. The
+parameters are from Roseane dos Reis Silva and Josh Rackers in the Ponder
+lab at Washington University. These parameters are under development and
+subject to change.
+
+J. A. Rackers, R. R. Silva and J. W. Ponder, A Polarizable Water Model
+Derived from a Model Electron Density, manuscript in preparation (2021)
+
+J. A. Rackers and J. W. Ponder, Classical Pauli Repulsion: An Anisotropic,
+Atomic Multipole Model, Journal of Chemical Physics, 150, 084104 (2019)
+
+J. A. Rackers, C. Liu, P. Ren and J. W. Ponder, A Physically Grounded
+Damped Dispersion Model with Particle Mesh Ewald Summation, Journal
+of Chemical Physics, 149, 084115 (2018)
+
+J. A. Rackers, Q. Wang, C. Liu, J.-P. Piquemal, P. Ren and J. W. Ponder,
+An Optimized Charge Penetration Model for Use with the AMOEBA Force Field,
+Physical Chemistry Chemical Physics, 19, 276-291 (2017)
+
+
+      #############################
+      ##                         ##
+      ##  Atom Type Definitions  ##
+      ##                         ##
+      #############################
+
+
+atom          1    1    O     "HIPPO Water O"                8    15.999    2
+atom          2    2    H     "HIPPO Water H"                1     1.008    1
+atom          6    6    Li+   "Lithium Ion Li+"              3     6.941    0
+atom          7    7    Na+   "Sodium Ion Na+"              11    22.990    0
+atom          8    8    K+    "Potassium Ion K+"            19    39.098    0
+atom          9    9    Rb+   "Rubidium Ion Rb+"            37    85.468    0
+atom         10   10    Cs+   "Cesium Ion Cs+"              55   132.905    0
+atom         14   14    F-    "Fluoride Ion F-"              9    18.998    0
+atom         15   15    Cl-   "Chloride Ion Cl-"            17    35.453    0
+atom         16   16    Br-   "Bromide Ion Br-"             35    79.904    0
+atom         17   17    I-    "Iodide Ion I-"               53   126.904    0
+atom         20   20    Mg+   "Magnesium Ion Mg+"           12    24.305    0
+atom         21   21    Ca+   "Calcium Ion Ca+"             20    40.078    0
+atom         22   22    Zn+   "Zinc Ion Zn+"                30    65.380    0
+
+      ##################################
+      ##                              ##
+      ##  Bond Stretching Parameters  ##
+      ##                              ##
+      ##################################
+
+
+bond          1    2         551.108     0.9572
+
+
+      ################################
+      ##                            ##
+      ##  Angle Bending Parameters  ##
+      ##                            ##
+      ################################
+
+
+angle         2    1    2    47.8253    104.520
+
+
+      ##################################
+      ##                              ##
+      ##  Pauli Repulsion Parameters  ##
+      ##                              ##
+      ##################################
+
+
+#repulsion          1         23.0592    4.41372     3.37829
+#repulsion          2         16.0230    4.92152     0.63308
+repulsion          1         18.2226    4.05560     2.44443
+repulsion          2         18.2226    4.95569     0.83016
+
+      #############################
+      ##                         ##
+      ##  Dispersion Parameters  ##
+      ##                         ##
+      #############################
+
+
+dispersion         1        16.11930    4.28982
+dispersion         2         3.68130    5.21764
+
+
+      ###################################
+      ##                               ##
+      ##  Atomic Multipole Parameters  ##
+      ##                               ##
+      ###################################
+
+
+#multipole     1   -2   -2             -0.374842
+#                                       0.000000   0.000000   0.054116
+#                                       0.680265
+#                                       0.000000  -0.611121
+#                                       0.000000   0.000000  -0.069144
+#multipole     2    1    2              0.187421
+#                                       0.008106   0.000000  -0.200116
+#                                       0.066936
+#                                       0.000000   0.043814
+#                                       0.007338   0.000000  -0.110750
+#multipole     1   -2   -2             -0.382400
+#                                       0.000000   0.000000   0.267989
+#                                       0.461712
+#                                       0.000000  -0.666364
+#                                       0.000000   0.000000   0.204651
+#multipole     2    1    2              0.191200
+#                                      -0.064996   0.000000  -0.113085
+#                                       0.001791
+#                                       0.000000  -0.106774
+#                                      -0.040304   0.000000   0.104983
+multipole     1   -2   -2             -0.374720
+                                       0.000000   0.000000   0.257635
+                                       0.475224
+                                       0.000000  -0.653215
+                                       0.000000   0.000000   0.177991
+multipole     2    1    2              0.187360
+                                      -0.057202   0.000000  -0.118625
+                                       0.011027
+                                       0.000000  -0.118574
+                                      -0.015659   0.000000   0.107547
+multipole     6    0    0              1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole     7    0    0              1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole     8    0    0              1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole     9    0    0              1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole    10    0    0              1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole    14    0    0             -1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole    15    0    0             -1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole    16    0    0             -1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole    17    0    0             -1.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole    20    0    0              2.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole    21    0    0              2.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+multipole    22    0    0              2.000000
+                                       0.000000   0.000000   0.000000
+                                       0.000000
+                                       0.000000   0.000000
+                                       0.000000   0.000000   0.000000
+
+
+      #####################################
+      ##                                 ##
+      ##  Charge Penetration Parameters  ##
+      ##                                 ##
+      #####################################
+
+
+#chgpen             1          6.0000    4.28982
+#chgpen             2          1.0000    5.21764
+#chgpen             1          6.0000    4.66724
+#chgpen             2          1.0000    4.70018
+chgpen             1          6.0000    4.60946
+chgpen             2          1.0000    4.63694
+
+
+      ########################################
+      ##                                    ##
+      ##  Dipole Polarizability Parameters  ##
+      ##                                    ##
+      ########################################
+
+
+#polarize           1        0.725918            2
+#polarize           2        0.359954            1
+polarize           1        1.21889959  2
+polarize           2        0.14304110  1
+polarize           6        0.032
+polarize           7        0.157
+polarize           8        0.830
+polarize           9        1.370
+polarize          10        2.360
+polarize          14        2.467
+polarize          15        5.482
+polarize          16        7.268
+polarize          17        10.275
+polarize          20        0.075
+polarize          21        0.490
+polarize          22        0.420
+
+
+      ##################################
+      ##                              ##
+      ##  Charge Transfer Parameters  ##
+      ##                              ##
+      ##################################
+
+
+#chgtrn             1         3.63984    0.00000
+#chgtrn             2         0.00000    3.27760
+
+
+      ##############################
+      ##                          ##
+      ##  Charge Flux Parameters  ##
+      ##                          ##
+      ##############################
+
+
+bndcflux      1    2           -0.027265
+angcflux      2    1    2       0.102621   0.102621  -0.039303  -0.039303
+
