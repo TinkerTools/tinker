@@ -478,6 +478,125 @@ c
       end
 c
 c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine load_lmdaref  --  read lambda reference values  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "load_lmdaref" reads a Tinker reference output file and extracts
+c     only the lambda-associated quantities: the analytical lambda
+c     derivatives, the analytical 2nd lambda derivatives, the per-atom
+c     lambda gradient rows that begin with "Lambda", and the analytical
+c     dV/dL tensor; the four derivative columns are stored as written,
+c     the gradient is kept by atom index (its norm column is ignored),
+c     and the dV/dL tensor is read as one labeled row plus two
+c     continuation rows, mirroring "load_ref"
+c
+c
+      subroutine load_lmdaref (fname,mxn,dedl,d2edl2,lgrad,dvdl,nat)
+      use assert
+      implicit none
+      integer mxn,nat,i,j,atom,ios,ip,next
+      real*8 dedl(4),d2edl2(4),lgrad(3,mxn),dvdl(3,3)
+      character*(*) fname
+      character*256 line
+c
+c
+      do i = 1, 4
+         dedl(i) = 0.0d0
+         d2edl2(i) = 0.0d0
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            dvdl(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, mxn
+         do j = 1, 3
+            lgrad(j,i) = 0.0d0
+         end do
+      end do
+      nat = 0
+      open (unit=15,file=fname,status='old',iostat=ios)
+      if (ios .ne. 0) then
+         nfail = nfail + 1
+         write (*,*) 'load_lmdaref: cannot open ',trim(fname)
+         call assert_summary ()
+      end if
+  100 continue
+      read (15,'(a)',iostat=ios) line
+      if (ios .ne. 0)  go to 190
+c
+c     the analytical lambda derivatives (four columns) sit on the line
+c     following their column-header label
+c
+      if (index(line,'Analytical Lambda Derivatives') .gt. 0) then
+         read (15,'(a)',iostat=ios) line
+         if (ios .ne. 0)  go to 190
+         next = 1
+         call getfloat (line,dedl(1),next)
+         call getfloat (line,dedl(2),next)
+         call getfloat (line,dedl(3),next)
+         call getfloat (line,dedl(4),next)
+         go to 100
+      end if
+c
+c     the analytical 2nd lambda derivatives likewise follow their label
+c
+      if (index(line,'Analytical 2nd Lambda Derivatives') .gt. 0) then
+         read (15,'(a)',iostat=ios) line
+         if (ios .ne. 0)  go to 190
+         next = 1
+         call getfloat (line,d2edl2(1),next)
+         call getfloat (line,d2edl2(2),next)
+         call getfloat (line,d2edl2(3),next)
+         call getfloat (line,d2edl2(4),next)
+         go to 100
+      end if
+c
+c     the analytical dV/dL is written as one labeled row and two
+c     continuation rows, each containing three tensor components
+c
+      if (index(line,'Analytical dV/dL') .gt. 0) then
+         next = index(line,':') + 1
+         call getfloat (line,dvdl(1,1),next)
+         call getfloat (line,dvdl(2,1),next)
+         call getfloat (line,dvdl(3,1),next)
+         do i = 2, 3
+            read (15,'(a)',iostat=ios) line
+            if (ios .ne. 0)  go to 190
+            next = 1
+            call getfloat (line,dvdl(1,i),next)
+            call getfloat (line,dvdl(2,i),next)
+            call getfloat (line,dvdl(3,i),next)
+         end do
+         go to 100
+      end if
+c
+c     per-atom lambda gradient rows read as "Lambda <atom> gx gy gz
+c     norm"; the header lines above are excluded by their labels
+c
+      ip = index(line,'Lambda')
+      if (ip.gt.0 .and. index(line,'Analytical').eq.0
+     &        .and. index(line,'Derivatives').eq.0) then
+         next = ip + 6
+         call getnumb (line,atom,next)
+         if (atom.ge.1 .and. atom.le.mxn) then
+            call getfloat (line,lgrad(1,atom),next)
+            call getfloat (line,lgrad(2,atom),next)
+            call getfloat (line,lgrad(3,atom),next)
+            if (atom .gt. nat)  nat = atom
+         end if
+      end if
+      go to 100
+  190 continue
+      close (unit=15)
+      return
+      end
+c
+c
 c     ############################################################
 c     ##                                                        ##
 c     ##  subroutine read_gradient  --  read gradient records  ##

@@ -237,9 +237,9 @@ c
             read (string,*,err=30)  tlambda
          else if (keyword(1:15) .eq. 'VDW-ANNIHILATE ') then
             vcouple = 1
-         else if (keyword(1:13) .eq. 'MTP-DUALTOPO ') then
+         else if (keyword(1:13) .eq. 'ELE-DUALTOPO ') then
             use_emdt = .true.
-         else if (keyword(1:17) .eq. 'MTP-DUALTOPO-EXP ') then
+         else if (keyword(1:17) .eq. 'ELE-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=30)  emdtexp
          else if (keyword(1:13) .eq. 'POL-DUALTOPO ') then

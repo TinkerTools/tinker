@@ -22,6 +22,7 @@ c
 c
       call test_mutate_mv
       call test_mutate_mp
+      call test_mutate_ast
       return
       end
 c
@@ -157,39 +158,132 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine test_mutate_fixed  --  one mutation case   ##
-c     ##                                                        ##
-c     ############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_ast  --  single topology lambda  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_ast" runs the eleven absolute single topology water
+c     fixtures 030-040, each carrying the "lambda-deriv" keyword, and
+c     drives them through "test_mutate_calc" with the level 4 lambda
+c     derivative checks enabled; cases 030-035 keep only the multipole
+c     term at three ele-lambda values with Ewald on and off, cases
+c     036-038 keep only the van der Waals term at three vdw-lambda
+c     values, and cases 039-040 leave the multipole and polarization
+c     terms active with Ewald on and off; the no-Ewald cases cannot use
+c     a pairwise neighbor list
+c
+c
+      subroutine test_mutate_ast
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','030_water_ast_ye_m10.key',
+     &   '030_water_ast_ye_m10.txt','030_water_ast_ye_m10',
+     &   .true.,  .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2','031_water_ast_ne_m10.key',
+     &   '031_water_ast_ne_m10.txt','031_water_ast_ne_m10',
+     &   .true.,  .false., .false., .false., .true.)
+      call test_mutate_calc ('water2','032_water_ast_ye_m05.key',
+     &   '032_water_ast_ye_m05.txt','032_water_ast_ye_m05',
+     &   .true.,  .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2','033_water_ast_ne_m05.key',
+     &   '033_water_ast_ne_m05.txt','033_water_ast_ne_m05',
+     &   .true.,  .false., .false., .false., .true.)
+      call test_mutate_calc ('water2','034_water_ast_ye_m00.key',
+     &   '034_water_ast_ye_m00.txt','034_water_ast_ye_m00',
+     &   .true.,  .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2','035_water_ast_ne_m00.key',
+     &   '035_water_ast_ne_m00.txt','035_water_ast_ne_m00',
+     &   .true.,  .false., .false., .false., .true.)
+      call test_mutate_calc ('water2','036_water_ast_v10.key',
+     &   '036_water_ast_v10.txt','036_water_ast_v10',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','037_water_ast_v05.key',
+     &   '037_water_ast_v05.txt','037_water_ast_v05',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','038_water_ast_v00.key',
+     &   '038_water_ast_v00.txt','038_water_ast_v00',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','039_water_ast_ye_m05p10.key',
+     &   '039_water_ast_ye_m05p10.txt','039_water_ast_ye_m05p10',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','040_water_ast_ne_m05p10.key',
+     &   '040_water_ast_ne_m05p10.txt','040_water_ast_ne_m05p10',
+     &   .true.,  .true.,  .false., .false., .true.)
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine test_mutate_fixed  --  one mutation case  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
 c     "test_mutate_fixed" runs a single mutation fixture with and
-c     without the neighbor-list keyword; for each neighbor-list
-c     variant the force field is built once, then the level 0/1/3
-c     checks are repeated twice before teardown, giving four passes
-c     per fixture; the "checkm", "checkp" and "checkv" flags select
-c     which level 3 energy components are verified (Atomic Multipoles,
-c     Polarization and Van der Waals); the "canlist" flag records
-c     whether the neighbor-list variant is compatible with this
-c     fixture (false for the no-Ewald cases); it backs both the
-c     "test_mutate_mv" and "test_mutate_mp" case lists
+c     without the neighbor-list keyword, checking the level 0/1/3
+c     energy, gradient, virial and named component regressions; it is
+c     a thin wrapper around "test_mutate_calc" with the level 4 lambda
+c     derivative checks disabled, and backs the "test_mutate_mv" and
+c     "test_mutate_mp" case lists
 c
 c
       subroutine test_mutate_fixed
      &   (key,ref,cname,checkm,checkp,checkv,canlist)
+      implicit none
+      logical checkm,checkp,checkv,canlist
+      character*(*) key,ref,cname
+c
+c
+      call test_mutate_calc ('water',key,ref,cname,checkm,checkp,
+     &                       checkv,canlist,.false.)
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine test_mutate_calc  --  one mutation case  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "test_mutate_calc" runs a single mutation fixture with and
+c     without the neighbor-list keyword; for each neighbor-list
+c     variant the force field is built once, then the checks are
+c     repeated twice before teardown, giving four passes per fixture;
+c     the "checkm", "checkp" and "checkv" flags select which level 3
+c     energy components are verified (Atomic Multipoles, Polarization
+c     and Van der Waals); the "canlist" flag records whether the
+c     neighbor-list variant is compatible with this fixture (false for
+c     the no-Ewald cases); when "dolmda" is set, the level 4 checks
+c     also verify the analytical lambda derivatives, second lambda
+c     derivatives, per-atom lambda gradient and dV/dL tensor against
+c     the reference read by "load_lmdaref", reusing the values already
+c     produced by the level 1 gradient call
+c
+c
+      subroutine test_mutate_calc
+     &   (base,key,ref,cname,checkm,checkp,checkv,canlist,dolmda)
       use action
       use atoms
+      use dlmda
       use energi
       use virial
       implicit none
-      integer nat,irun,ilist,nlist
+      integer nat,natl,irun,ilist,nlist
       real*8 energy,e,ref_e,ref_ei
-      real*8 eps_e,eps_g,eps_v,refv(3,3)
+      real*8 eps_e,eps_g,eps_v,eps_l,refv(3,3)
+      real*8 ref_dedl(4),ref_d2edl2(4),ref_dvdl(3,3)
       real*8, allocatable :: derivs(:,:)
       real*8, allocatable :: refg(:,:)
-      logical skiptest,checkm,checkp,checkv,canlist,uselist
-      character*(*) key,ref,cname
+      real*8, allocatable :: ref_lg(:,:)
+      logical skiptest,checkm,checkp,checkv,canlist,uselist,dolmda
+      character*(*) base,key,ref,cname
       character*240 rpath,pre
       character*8 rtag
 c
@@ -208,10 +302,10 @@ c     set up the force field once for this neighbor-list variant
 c
          call pushdir ('file/mutate')
          if (uselist) then
-            call loadfix_keyadd ('water',key,'neighbor-list')
+            call loadfix_keyadd (base,key,'neighbor-list')
             pre = 'test_'//trim(cname)//' list'
          else
-            call loadfix ('water',key)
+            call loadfix (base,key)
             pre = 'test_'//trim(cname)//' nolist'
          end if
          allocate (derivs(3,n))
@@ -222,7 +316,16 @@ c
          eps_g = 1.0d-4
          eps_v = 1.0d-3
 c
-c     repeat the level 0/1/3 checks twice against the built system
+c     read the reference lambda derivatives for the level 4 checks
+c
+         if (dolmda) then
+            allocate (ref_lg(3,n))
+            call load_lmdaref (rpath,n,ref_dedl,ref_d2edl2,ref_lg,
+     &                         ref_dvdl,natl)
+            eps_l = 1.0d-4
+         end if
+c
+c     repeat the checks twice against the built system
 c
          do irun = 1, 2
             if (irun .eq. 1) then
@@ -247,6 +350,31 @@ c
             call assert_grad (vir,refv,3,eps_v,
      &                        trim(pre)//' virial (v1)'//trim(rtag))
 c
+c     level 4  --  lambda derivatives from the level 1 gradient call
+c
+            if (dolmda) then
+               call assert_real (dedl,ref_dedl(1),eps_l,
+     &                        trim(pre)//' dE/dL (v4)'//trim(rtag))
+               call assert_real (devdl,ref_dedl(2),eps_l,
+     &                        trim(pre)//' dEV/dL (v4)'//trim(rtag))
+               call assert_real (demdl,ref_dedl(3),eps_l,
+     &                        trim(pre)//' dEM/dL (v4)'//trim(rtag))
+               call assert_real (depdl,ref_dedl(4),eps_l,
+     &                        trim(pre)//' dEP/dL (v4)'//trim(rtag))
+               call assert_real (d2edl2,ref_d2edl2(1),eps_l,
+     &                        trim(pre)//' d2E/dL2 (v4)'//trim(rtag))
+               call assert_real (d2evdl2,ref_d2edl2(2),eps_l,
+     &                        trim(pre)//' d2EV/dL2 (v4)'//trim(rtag))
+               call assert_real (d2emdl2,ref_d2edl2(3),eps_l,
+     &                        trim(pre)//' d2EM/dL2 (v4)'//trim(rtag))
+               call assert_real (d2epdl2,ref_d2edl2(4),eps_l,
+     &                        trim(pre)//' d2EP/dL2 (v4)'//trim(rtag))
+               call assert_grad (dfsumdl,ref_lg,n,eps_g,
+     &                        trim(pre)//' lgrad (v4)'//trim(rtag))
+               call assert_grad (dvirdl,ref_dvdl,3,eps_v,
+     &                        trim(pre)//' dV/dL (v4)'//trim(rtag))
+            end if
+c
 c     level 3  --  total and named AMOEBA energy components
 c
             call analysis (e)
@@ -270,6 +398,7 @@ c     clean up this neighbor-list variant
 c
          deallocate (derivs)
          deallocate (refg)
+         if (dolmda)  deallocate (ref_lg)
          call popdir
          call final
       end do
