@@ -207,6 +207,13 @@ c
          keys1(i) = keyline(i)
       end do
 c
+c     make sure the keyword array can hold either state, since
+c     "getkey" sized it to trajectory B alone and the saved
+c     keyword sets are restored into it below
+c
+      if (allocated(keyline))  deallocate (keyline)
+      allocate (keyline(max(nkey0,nkey1)))
+c
 c     find the original temperature value for trajectory B
 c
       tempb = -1.0d0

@@ -93,6 +93,7 @@ c
 c
 c     run program tests
 c
+      call test_bar
       call test_potential
       call test_pdbxyz
       call test_tinkernist
