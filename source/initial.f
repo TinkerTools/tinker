@@ -199,6 +199,7 @@ c
       use_emdt = .false.
       use_evdt = .false.
       use_epdt = .false.
+      use_plmda = .false.
       use_ost = .false.
       use_ostdyn = .false.
       ostrestart = .false.

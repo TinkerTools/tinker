@@ -45,6 +45,8 @@ c
          else
             call epolar1f
          end if
+      else if (use_plmda) then
+         call epolar1p
       else
          if (use_ewald) then
             if (use_mlist) then
@@ -98,7 +100,6 @@ c
       use chgpot
       use couple
       use deriv
-      use dlmda
       use energi
       use molcul
       use mplpot
@@ -219,7 +220,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2544,7 +2545,6 @@ c
       use chgpot
       use couple
       use deriv
-      use dlmda
       use energi
       use molcul
       use mplpot
@@ -2666,7 +2666,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -3931,7 +3931,6 @@ c
       use boxes
       use chgpot
       use deriv
-      use dlmda
       use energi
       use ewald
       use math
@@ -3997,7 +3996,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -6792,7 +6791,6 @@ c
       use boxes
       use chgpot
       use deriv
-      use dlmda
       use energi
       use ewald
       use math
@@ -6858,7 +6856,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -8674,12 +8672,12 @@ c
       ntot = nff * nfft3
 c
 c     remove scalar sum virial from prior multipole FFT; the saved
-c     values cannot be reused with multipole dual topology, since the
-c     prior FFT belongs to a decoupled end state rather than to the
-c     interpolated multipoles at the current lambda value
+c     values cannot be reused with decoupled polarization lambda or
+c     multipole dual topology, since the prior FFT belongs to a
+c     different set of multipoles than the current polarization state
 c
       if (use_mpole .and. aewald.eq.aeewald .and. .not.use_epdt
-     &       .and. .not.use_emdt) then
+     &       .and. .not.use_plmda .and. .not.use_emdt) then
          vxx = -vmxx
          vxy = -vmxy
          vxz = -vmxz
@@ -9705,8 +9703,7 @@ c
 c     compute energy, force, and virial of the lambda = 0 state
 c
       if (use_pol4i) then
-         plambda = 0.0d0
-         call altpolr
+         call altepdt (0.0d0)
          call epolar1sub
 c
 c     copy energy, force, and virial of the lambda = 0 state
@@ -9727,8 +9724,7 @@ c
 c     compute energy of the lambda = 1 state
 c
       if (use_pol4f) then
-         plambda = 1.0d0
-         call altpolr
+         call altepdt (1.0d0)
          call epolar1sub
 c
 c     copy energy, force, and virial of the lambda = 1 state
@@ -9780,9 +9776,7 @@ c
       if (use_mpole) then
          call altemdt (elambdaorig)
       else
-         call altpolr
-         call chkpole
-         call rotpole ('MPOLE')
+         call altepdt (plambdaorig)
       end if
 c
 c     interpolate energy, force, and virial
@@ -9842,6 +9836,41 @@ c
          end if
       end if
       if (use_expol)  call dexpol
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine epolar1p  --  decoupled lambda pol derivs  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "epolar1p" calculates the polarization energy and first
+c     derivatives with the electrostatic parameters scaled by the
+c     polarization lambda, then restores the parameters to the
+c     electrostatics lambda state left by "altelec"
+c
+c
+      subroutine epolar1p
+      use dlmda
+      implicit none
+      real*8 plmdaorig
+c
+c
+c     scale the parameters to the polarization lambda state
+c
+      plmdaorig = plambda
+      call altepdt (plmdaorig)
+c
+c     compute the polarization energy and first derivatives
+c
+      call epolar1sub
+c
+c     restore the electrostatics lambda state
+c
+      call alteprst
       return
       end
 c
@@ -9956,8 +9985,6 @@ c
 c     restore full system and interpolate the dual topology result
 c
       call altpolrsub (.true.,.true.,.true.)
-      call chkpole
-      call rotpole ('MPOLE')
       plambdaexp = plambda**epdtexp
       plambdaex0 = 1.0d0 - plambdaexp
       ep1 = epae + epb

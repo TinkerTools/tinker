@@ -45,7 +45,7 @@ c
          if (allocated(replist)) then
             if (replist(i) .ne. 0)  dorep = .true.
          end if
-         if (dopol .and. (use_epdt .or. use_emdt)) then
+         if (dopol .and. (use_epdt .or. use_emdt .or. use_plmda)) then
             dopolorig = .true.
          end if
          if (dopol .or. dorep .or. dopolorig) then

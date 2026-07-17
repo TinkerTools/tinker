@@ -33,6 +33,8 @@ c
          else
             call epolar3f
          end if
+      else if (use_plmda) then
+         call epolar3p
       else if (pairwise) then
          if (use_ewald) then
             if (use_mlist) then
@@ -75,7 +77,6 @@ c
       use chgpen
       use chgpot
       use couple
-      use dlmda
       use energi
       use extfld
       use inform
@@ -136,7 +137,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -600,7 +601,6 @@ c
       use chgpen
       use chgpot
       use couple
-      use dlmda
       use energi
       use extfld
       use inform
@@ -662,7 +662,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -945,7 +945,6 @@ c
       use atoms
       use boxes
       use chgpot
-      use dlmda
       use energi
       use ewald
       use math
@@ -991,7 +990,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -1632,7 +1631,6 @@ c
       use atoms
       use boxes
       use chgpot
-      use dlmda
       use energi
       use ewald
       use math
@@ -1678,7 +1676,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2112,7 +2110,6 @@ c
       use atomid
       use boxes
       use chgpot
-      use dlmda
       use energi
       use ewald
       use inform
@@ -2149,7 +2146,7 @@ c
 c
 c     rotate the multipole components into the global frame
 c
-      if (.not.use_mpole .or. use_epdt)  call rotpole ('MPOLE')
+      if (.not. use_mpole)  call rotpole ('MPOLE')
 c
 c     compute the induced dipoles at each polarizable atom
 c
@@ -2311,12 +2308,12 @@ c
       f = 0.5d0 * electric / dielec
 c
 c     perform dynamic allocation of some global arrays; the multipole
-c     PME grid cannot be reused with multipole dual topology, since it
-c     belongs to a decoupled end state rather than to the interpolated
-c     multipoles at the current lambda value
+c     PME grid cannot be reused with decoupled polarization lambda or
+c     multipole dual topology, since it belongs to a different set of
+c     multipoles than the current polarization state
 c
       if (.not.use_mpole .or. aewald.ne.aeewald .or. use_epdt
-     &       .or. use_emdt) then
+     &       .or. use_plmda .or. use_emdt) then
          if (allocated(cmp)) then
             if (size(cmp) .lt. 10*n)  deallocate (cmp)
          end if
@@ -2504,8 +2501,7 @@ c
 c     compute energy of the lambda = 0 state
 c
       if (use_pol4i) then
-         plambda = 0.0d0
-         call altpolr
+         call altepdt (0.0d0)
          call epolar3sub
 c
 c     copy energy of the lambda = 0 state
@@ -2520,8 +2516,7 @@ c
 c     compute energy of the lambda = 1 state
 c
       if (use_pol4f) then
-         plambda = 1.0d0
-         call altpolr
+         call altepdt (1.0d0)
          call epolar3sub
 c
 c     copy energy of the lambda = 1 state
@@ -2555,9 +2550,7 @@ c
       if (use_mpole) then
          call altemdt (elambdaorig)
       else
-         call altpolr
-         call chkpole
-         call rotpole ('MPOLE')
+         call altepdt (plambdaorig)
       end if
 c
 c     interpolate energy
@@ -2607,6 +2600,41 @@ c
             call epolar3a
          end if
       end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine epolar3p  --  decoupled lambda pol analysis     ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "epolar3p" calculates the polarization energy and partitions
+c     the energy among the atoms with the electrostatic parameters
+c     scaled by the polarization lambda, then restores the parameters
+c     to the electrostatics lambda state left by "altelec"
+c
+c
+      subroutine epolar3p
+      use dlmda
+      implicit none
+      real*8 plmdaorig
+c
+c
+c     scale the parameters to the polarization lambda state
+c
+      plmdaorig = plambda
+      call altepdt (plmdaorig)
+c
+c     compute and partition the polarization energy
+c
+      call epolar3sub
+c
+c     restore the electrostatics lambda state
+c
+      call alteprst
       return
       end
 c
@@ -2690,8 +2718,6 @@ c
 c     restore full system and interpolate the dual topology result
 c
       call altpolrsub (.true.,.true.,.true.)
-      call chkpole
-      call rotpole ('MPOLE')
       plambdaexp = plambda**epdtexp
       ep1 = epae + epb
       ep0 = epbe + epa

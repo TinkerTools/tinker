@@ -56,6 +56,11 @@ c
       isothermal = .false.
       isobaric = .false.
 c
+c     propagate the lambda particle if set in mutate.f
+c
+      use_ostdyn = use_ost
+      use_metadyn = use_meta
+c
 c     check for keywords containing any altered parameters
 c
       integrate = 'BEEMAN'
@@ -68,10 +73,6 @@ c
          if (keyword(1:11) .eq. 'INTEGRATOR ') then
             call getword (record,integrate,next)
             call upcase (integrate)
-         else if (keyword(1:4) .eq. 'OST ') then
-            use_ostdyn = .true.
-         else if (keyword(1:8) .eq. 'METADYN ') then
-            use_metadyn = .true.
          end if
       end do
 c
@@ -343,8 +344,8 @@ c
 c
 c     save ost and metadynamics restart information
 c
-      if (use_ost)  call saveost
-      if (use_meta)  call savemeta
+      if (use_ostdyn)  call saveost
+      if (use_metadyn)  call savemeta
 c
 c     save dynamic at the end if it was not saved during simulation
 c

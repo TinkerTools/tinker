@@ -58,6 +58,7 @@ c     use_dlmda     logical flag governing use of lambda derivative
 c     use_emdt      flag governing use of multipole dual topology
 c     use_evdt      flag governing use of van der Waals dual topology
 c     use_epdt      flag governing use of polarization dual topology
+c     use_plmda     flag governing rescale to a decoupled plambda
 c     douindorig    original douind
 c
 c
@@ -109,6 +110,7 @@ c
       logical use_emdt
       logical use_epdt
       logical use_evdt
+      logical use_plmda
       logical, allocatable :: douindorig(:)
       save
       end

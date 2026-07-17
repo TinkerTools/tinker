@@ -114,8 +114,7 @@ c
 c     compute energy, force, and virial of the lambda = 0 state
 c
       if (use_pol4i) then
-         plambda = 0.0d0
-         call altpolr
+         call altepdt (0.0d0)
          call epolar1sub
 c
 c     copy energy, force, and virial of the lambda = 0 state
@@ -136,8 +135,7 @@ c
 c     compute energy of the lambda = 1 state
 c
       if (use_pol4f) then
-         plambda = 1.0d0
-         call altpolr
+         call altepdt (1.0d0)
          call epolar1sub
 c
 c     copy energy, force, and virial of the lambda = 1 state
@@ -189,9 +187,7 @@ c
       if (use_mpole) then
          call altemdt (elambdaorig)
       else
-         call altpolr
-         call chkpole
-         call rotpole ('MPOLE')
+         call altepdt (plambdaorig)
       end if
 c
 c     interpolate energy, force, and virial
@@ -353,8 +349,6 @@ c
 c     restore full system and interpolate the dual topology result
 c
       call altpolrsub (.true.,.true.,.true.)
-      call chkpole
-      call rotpole ('MPOLE')
       plambdaexp = plambda**epdtexp
       ep1 = epae + epb
       ep0 = epbe + epa

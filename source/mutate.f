@@ -112,19 +112,24 @@ c
       scexp = 5.0d0
       scalpha = 0.7d0
 c
-c     set defaults for use of multipole dual topology
+c     flag for use of lambda derivative
 c
+      use_dlmda = .false.
       use_emdt = .false.
-      emdtexp = 2
-c
-c     set defaults for use of van der Waals dual topology
-c
       use_evdt = .false.
-      evdtexp = 2
-c
-c     set defaults for use of polarization dual topology
-c
       use_epdt = .false.
+      use_plmda = .false.
+      use_ost = .false.
+      use_ostdyn = .false.
+      ostrestart = .false.
+      use_meta = .false.
+      use_metadyn = .false.
+      metarestart = .false.
+c
+c     set defaults for dual topology
+c
+      emdtexp = 2
+      evdtexp = 2
       epdtexp = 2
 c
 c     set default ost update intervals
@@ -136,10 +141,6 @@ c
       ostddgdl = 0.0d0
       ostdgdl = 0.0d0
       osteqratio = 0.5d0
-      use_ostdyn = .false.
-      ostrestart = .false.
-      use_metadyn = .false.
-      metarestart = .false.
 c
 c     set default mapping from main lambda to sublambda
 c
@@ -401,8 +402,8 @@ c
 c     only one adaptive lambda bias method can be active at a time
 c
       if (use_ost .and. use_meta) then
-         write (iout,35)
-   35    format (/,' MUTATE  --  OST and METADYN cannot both be active')
+         write (iout,40)
+   40    format (/,' MUTATE  --  OST and METADYN cannot both be active')
          call fatal
       end if
 c
@@ -732,20 +733,42 @@ c
       use_mutate = .true.
       if (nmut .eq. 0)  use_mutate = .false.
 c
+c     enable rescale of the electrostatic parameters inside the
+c     polarization routines when the polarization lambda has been
+c     decoupled from the electrostatics lambda; when the two are
+c     equal, "altelec" has already installed the correct values
+c
+      if (use_mutate .and. .not.use_rel .and. .not.use_epdt
+     &       .and. use_polar) then
+         if (plambda .ne. elambda)  use_plmda = .true.
+      end if
+c
 c     write status of current hybrid potential lambda values
 c
       if (use_mutate .and. .not.silent) then
-         write (iout,40)
-   40    format (/,' Free Energy Perturbation Parameters :')
-         write (iout,50)  nmut,vlambda,elambda,plambda,tlambda
-   50    format (/,' Number of FEP Hybrid Atoms',9x,i8,
+         write (iout,50)
+   50    format (/,' Free Energy Perturbation Parameters :')
+         write (iout,60)  nmut,vlambda,elambda,plambda,tlambda
+   60    format (/,' Number of FEP Hybrid Atoms',9x,i8,
      &           /,' van der Waals Lambda Value',9x,f8.3,
      &           /,' Electrostatics Lambda Value',8x,f8.3,
      &           /,' Polarization Lambda Value',10x,f8.3,
      &           /,' Torsion Angle Lambda Value',9x,f8.3)
+         if (use_dlmda) then
+            write (iout,70)
+   70       format (/,' Lambda Sampling Mode',8x,'Lambda Dynamics')
+         else
+            write (iout,80)
+   80       format (/,' Lambda Sampling Mode',11x,'Fixed Lambda')
+         end if
+         if (use_plmda) then
+            write (iout,90)
+   90       format (' Polarization Lambda Decoupled from',
+     &              ' Electrostatics Lambda')
+         end if
          if (use_rel) then
-            write (iout,55)  nmut-nmutb,nmutb
-   55       format (/,' Relative Dual Topology Active :',
+            write (iout,100)  nmut-nmutb,nmutb
+  100       format (/,' Relative Dual Topology Active :',
      &              /,' Number of Ligand1 Atoms',12x,i8,
      &              /,' Number of Ligand2 Atoms',12x,i8)
          end if
@@ -1050,6 +1073,145 @@ c
 c     update monopoles for charge flux at the requested lambda state
 c
       if (use_chgflx)  call alterchg
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine altepdt  --  polarization lambda state reset  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "altepdt" switches the electrostatic parameters to the state
+c     given by the polarization lambda value "plmda", as needed by
+c     the dual topology polarization energy routines
+c
+c     the multipoles are checked for chirality inversion and rotated
+c     into the global frame, since the polarization routines do not
+c     rotate when the multipole term is in use
+c
+c
+      subroutine altepdt (plmda)
+      use dlmda
+      implicit none
+      real*8 plmda
+c
+c     set polarization parameters for the requested lambda state
+c
+      plambda = plmda
+      call altpolr
+c
+c     get global frame multipoles for the requested lambda state
+c
+      call chkpole
+      call rotpole ('MPOLE')
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine alteprst  --  restore electrostatic lambda  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "alteprst" restores the electrostatic parameters to the state
+c     installed by "altelec" for the current value of "elambda", so
+c     that a rescale performed by "altepdt" leaves no trace for any
+c     later energy term
+c
+c     note "altelec" scales the permanent multipoles under "use_mpole"
+c     while "altpolr" scales them under "use_polar"; with the multipole
+c     term not in use they were never scaled by "altelec" and must be
+c     returned to their unscaled values here
+c
+c
+      subroutine alteprst
+      use angbnd
+      use bndstr
+      use cflux
+      use chgpen
+      use dlmda
+      use mplpot
+      use mpole
+      use mutant
+      use polar
+      use potent
+      implicit none
+      integer i,j,k
+      integer ia,ib,ic
+      real*8 elmdaorig
+c
+c
+c     multipole term in use, so the multipole reset restores every
+c     parameter that "altpolr" scaled
+c
+      if (use_mpole) then
+         elmdaorig = elambda
+         call altemdt (elmdaorig)
+         return
+      end if
+c
+c     return the permanent multipoles to their unscaled values, and
+c     the polarizabilities to the electrostatics lambda state
+c
+      if (use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            if (mut(k)) then
+               do j = 1, 13
+                  pole(j,k) = poleorig(j,k)
+               end do
+               mono0(k) = pole(1,k)
+               if (use_chgpen) then
+                  pcore(k) = pcoreorig(k)
+                  pval(k) = pvalorig(k)
+                  pval0(k) = pval(k)
+               end if
+               polarity(k) = polarityorig(k) * elambda
+               douind(k) = douindorig(k)
+               if (elambda .eq. 0.0d0)  douind(k) = .false.
+            end if
+         end do
+      end if
+c
+c     restore scaled parameters for bond stretch charge flux
+c
+      if (use_chgflx) then
+         do i = 1, nbond
+            ia = ibnd(1,i)
+            ib = ibnd(2,i)
+            if (mut(ia) .and. mut(ib)) then
+               bflx(i) = bflxorig(i) * elambda
+            end if
+         end do
+      end if
+c
+c     restore scaled parameters for angle bend charge flux
+c
+      if (use_chgflx) then
+         do i = 1, nangle
+            ia = iang(1,i)
+            ib = iang(2,i)
+            ic = iang(3,i)
+            if (mut(ia) .and. mut(ib) .and. mut(ic)) then
+               aflx(1,i) = aflxorig(1,i) * elambda
+               aflx(2,i) = aflxorig(2,i) * elambda
+               abflx(1,i) = abflxorig(1,i) * elambda
+               abflx(2,i) = abflxorig(2,i) * elambda
+            end if
+         end do
+      end if
+c
+c     update monopoles for charge flux, then get global frame
+c     multipoles for the restored state
+c
+      if (use_chgflx)  call alterchg
+      call chkpole
+      call rotpole ('MPOLE')
       return
       end
 c
@@ -1439,5 +1601,10 @@ c
 c     update monopoles for charge flux in the requested subsystem
 c
       if (use_chgflx)  call alterchg
+c
+c     get global frame multipoles for the requested subsystem
+c
+      call chkpole
+      call rotpole ('MPOLE')
       return
       end

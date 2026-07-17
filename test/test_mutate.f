@@ -21,6 +21,7 @@ c
 c
 c
       call test_mutate_mv
+      call test_mutate_mp
       return
       end
 c
@@ -42,57 +43,128 @@ c
       implicit none
 c
 c
-c
-c     the checkm/checkp/checkv flags select which level 3 energy
-c     components are verified (Atomic Multipoles, Polarization, and
-c     Van der Waals); cases 001-006 check multipole and polarization,
-c     cases 007-009 check van der Waals.  the final canlist flag
-c     enables the neighbor-list variant.  it is off for the no-Ewald
-c     (ne) cases 002/004/006, whose full-cutoff electrostatics require
-c     periodic replicas that Tinker forbids combining with a pairwise
-c     neighbor list; every other fixture keeps its cutoffs plus the
-c     list buffer under half the box and so runs both variants
-c
-c                                              checkm  checkp  checkv  canlist
-      call test_mutate_mv_case ('001_water_ye_m10.key',
+      call test_mutate_fixed ('001_water_ye_m10.key',
      &   '001_water_ye_m10.txt','001_water_ye_m10',
      &   .true.,  .true.,  .false., .true.)
-      call test_mutate_mv_case ('002_water_ne_m10.key',
+      call test_mutate_fixed ('002_water_ne_m10.key',
      &   '002_water_ne_m10.txt','002_water_ne_m10',
      &   .true.,  .true.,  .false., .false.)
-      call test_mutate_mv_case ('003_water_ye_m05.key',
+      call test_mutate_fixed ('003_water_ye_m05.key',
      &   '003_water_ye_m05.txt','003_water_ye_m05',
      &   .true.,  .true.,  .false., .true.)
-      call test_mutate_mv_case ('004_water_ne_m05.key',
+      call test_mutate_fixed ('004_water_ne_m05.key',
      &   '004_water_ne_m05.txt','004_water_ne_m05',
      &   .true.,  .true.,  .false., .false.)
-      call test_mutate_mv_case ('005_water_ye_m00.key',
+      call test_mutate_fixed ('005_water_ye_m00.key',
      &   '005_water_ye_m00.txt','005_water_ye_m00',
      &   .true.,  .true.,  .false., .true.)
-      call test_mutate_mv_case ('006_water_ne_m00.key',
+      call test_mutate_fixed ('006_water_ne_m00.key',
      &   '006_water_ne_m00.txt','006_water_ne_m00',
      &   .true.,  .true.,  .false., .false.)
-      call test_mutate_mv_case ('007_water_v10.key',
+      call test_mutate_fixed ('007_water_v10.key',
      &   '007_water_v10.txt','007_water_v10',
      &   .false., .false., .true.,  .true.)
-      call test_mutate_mv_case ('008_water_v05.key',
+      call test_mutate_fixed ('008_water_v05.key',
      &   '008_water_v05.txt','008_water_v05',
      &   .false., .false., .true.,  .true.)
-      call test_mutate_mv_case ('009_water_v00.key',
+      call test_mutate_fixed ('009_water_v00.key',
      &   '009_water_v00.txt','009_water_v00',
      &   .false., .false., .true.,  .true.)
       return
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine test_mutate_mv_case  --  one mutation case  ##
-c     ##                                                         ##
-c     #############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_mp  --  electrostatic lambda cases  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "test_mutate_mv_case" runs a single mutation fixture with and
+c     "test_mutate_mp" runs the twenty water mutation fixtures that
+c     scan the electrostatic lambda values; cases 010-015 keep only the
+c     multipole term at three ele-lambda values with Ewald on and off,
+c     cases 016-021 keep only the polarization term at three pol-lambda
+c     values, and cases 022-029 leave both terms active while varying
+c     ele-lambda and pol-lambda together
+c
+c
+      subroutine test_mutate_mp
+      implicit none
+c
+c
+      call test_mutate_fixed ('010_water_ye_m10.key',
+     &   '010_water_ye_m10.txt','010_water_ye_m10',
+     &   .true.,  .false., .false., .true.)
+      call test_mutate_fixed ('011_water_ne_m10.key',
+     &   '011_water_ne_m10.txt','011_water_ne_m10',
+     &   .true.,  .false., .false., .false.)
+      call test_mutate_fixed ('012_water_ye_m05.key',
+     &   '012_water_ye_m05.txt','012_water_ye_m05',
+     &   .true.,  .false., .false., .true.)
+      call test_mutate_fixed ('013_water_ne_m05.key',
+     &   '013_water_ne_m05.txt','013_water_ne_m05',
+     &   .true.,  .false., .false., .false.)
+      call test_mutate_fixed ('014_water_ye_m00.key',
+     &   '014_water_ye_m00.txt','014_water_ye_m00',
+     &   .true.,  .false., .false., .true.)
+      call test_mutate_fixed ('015_water_ne_m00.key',
+     &   '015_water_ne_m00.txt','015_water_ne_m00',
+     &   .true.,  .false., .false., .false.)
+      call test_mutate_fixed ('016_water_ye_p10.key',
+     &   '016_water_ye_p10.txt','016_water_ye_p10',
+     &   .false., .true.,  .false., .true.)
+      call test_mutate_fixed ('017_water_ne_p10.key',
+     &   '017_water_ne_p10.txt','017_water_ne_p10',
+     &   .false., .true.,  .false., .false.)
+      call test_mutate_fixed ('018_water_ye_p05.key',
+     &   '018_water_ye_p05.txt','018_water_ye_p05',
+     &   .false., .true.,  .false., .true.)
+      call test_mutate_fixed ('019_water_ne_p05.key',
+     &   '019_water_ne_p05.txt','019_water_ne_p05',
+     &   .false., .true.,  .false., .false.)
+      call test_mutate_fixed ('020_water_ye_p00.key',
+     &   '020_water_ye_p00.txt','020_water_ye_p00',
+     &   .false., .true.,  .false., .true.)
+      call test_mutate_fixed ('021_water_ne_p00.key',
+     &   '021_water_ne_p00.txt','021_water_ne_p00',
+     &   .false., .true.,  .false., .false.)
+      call test_mutate_fixed ('022_water_ye_m10p05.key',
+     &   '022_water_ye_m10p05.txt','022_water_ye_m10p05',
+     &   .true.,  .true.,  .false., .true.)
+      call test_mutate_fixed ('023_water_ne_m10p05.key',
+     &   '023_water_ne_m10p05.txt','023_water_ne_m10p05',
+     &   .true.,  .true.,  .false., .false.)
+      call test_mutate_fixed ('024_water_ye_m05p10.key',
+     &   '024_water_ye_m05p10.txt','024_water_ye_m05p10',
+     &   .true.,  .true.,  .false., .true.)
+      call test_mutate_fixed ('025_water_ne_m05p10.key',
+     &   '025_water_ne_m05p10.txt','025_water_ne_m05p10',
+     &   .true.,  .true.,  .false., .false.)
+      call test_mutate_fixed ('026_water_ye_m05p00.key',
+     &   '026_water_ye_m05p00.txt','026_water_ye_m05p00',
+     &   .true.,  .true.,  .false., .true.)
+      call test_mutate_fixed ('027_water_ne_m05p00.key',
+     &   '027_water_ne_m05p00.txt','027_water_ne_m05p00',
+     &   .true.,  .true.,  .false., .false.)
+      call test_mutate_fixed ('028_water_ye_m00p05.key',
+     &   '028_water_ye_m00p05.txt','028_water_ye_m00p05',
+     &   .true.,  .true.,  .false., .true.)
+      call test_mutate_fixed ('029_water_ne_m00p05.key',
+     &   '029_water_ne_m00p05.txt','029_water_ne_m00p05',
+     &   .true.,  .true.,  .false., .false.)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_mutate_fixed  --  one mutation case   ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_mutate_fixed" runs a single mutation fixture with and
 c     without the neighbor-list keyword; for each neighbor-list
 c     variant the force field is built once, then the level 0/1/3
 c     checks are repeated twice before teardown, giving four passes
@@ -100,10 +172,11 @@ c     per fixture; the "checkm", "checkp" and "checkv" flags select
 c     which level 3 energy components are verified (Atomic Multipoles,
 c     Polarization and Van der Waals); the "canlist" flag records
 c     whether the neighbor-list variant is compatible with this
-c     fixture (false for the no-Ewald cases)
+c     fixture (false for the no-Ewald cases); it backs both the
+c     "test_mutate_mv" and "test_mutate_mp" case lists
 c
 c
-      subroutine test_mutate_mv_case
+      subroutine test_mutate_fixed
      &   (key,ref,cname,checkm,checkp,checkv,canlist)
       use action
       use atoms

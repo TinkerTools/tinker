@@ -63,8 +63,7 @@ c
 c
 c     disable dipole prediction during adaptive lambda simulations
 c
-      if (use_ost .or. use_ostdyn .or.
-     &    use_meta .or. use_metadyn) then
+      if (use_ost .or. use_meta) then
          use_pred = .false.
          use_ielscf = .false.
          polpred = '    '
