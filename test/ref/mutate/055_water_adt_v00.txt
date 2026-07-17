@@ -1,6 +1,6 @@
  Total Potential Energy :                  2.3388 Kcal/mole
 
- EngCnt  Van der Waals                             2.3388              225
+ EngCnt  Van der Waals                             2.3388              358
 
  Internal Virial Tensor :                 -15.478        8.536       -9.292
                                             8.536      -21.208       -0.114
@@ -45,7 +45,7 @@
                                           0.000000      0.000000      0.000000      0.000000
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                          0.000000      0.000000      0.000000      0.000000
+                                         15.442792     15.442792      0.000000      0.000000
 
  Lambda Gradient Breakdown over Individual Atoms :
 
@@ -85,4 +85,3 @@
  Analytical dV/dL :                0.000        0.000        0.000
                                    0.000        0.000        0.000
                                    0.000        0.000        0.000
-

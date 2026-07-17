@@ -41,8 +41,8 @@
  Anlyt        29            -0.0282     -0.0043     -0.0424        0.0511
  Anlyt        30            -0.0395      0.0008     -0.0246        0.0465
 
- Analytical Lambda Derivatives :         dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                      0.020716      0.020716      0.000000      0.000000
+ Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                          0.020716      0.020716      0.000000      0.000000
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
                                           4.307202      4.307202      0.000000      0.000000

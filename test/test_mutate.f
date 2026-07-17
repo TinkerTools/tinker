@@ -23,6 +23,7 @@ c
       call test_mutate_mv
       call test_mutate_mp
       call test_mutate_ast
+      call test_mutate_adt
       return
       end
 c
@@ -212,6 +213,84 @@ c
      &   .true.,  .true.,  .false., .true.,  .true.)
       call test_mutate_calc ('water2','040_water_ast_ne_m05p10.key',
      &   '040_water_ast_ne_m05p10.txt','040_water_ast_ne_m05p10',
+     &   .true.,  .true.,  .false., .false., .true.)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_mutate_adt  --  abs dual topo lambda  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_mutate_adt" runs the seventeen absolute dual topology water
+c     fixtures 041-057, each carrying the "lambda-deriv" keyword and a
+c     dual topology keyword, and drives them through "test_mutate_calc"
+c     with the level 4 lambda derivative checks enabled; cases 041-046
+c     keep only the multipole term at three ele-lambda values with Ewald
+c     on and off, cases 047-052 keep only the polarization term at three
+c     pol-lambda values, cases 053-055 keep only the van der Waals term
+c     at three vdw-lambda values, and cases 056-057 leave the multipole
+c     and polarization terms active with Ewald on and off; the no-Ewald
+c     cases cannot use a pairwise neighbor list
+c
+c
+      subroutine test_mutate_adt
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','041_water_adt_ye_m10.key',
+     &   '041_water_adt_ye_m10.txt','041_water_adt_ye_m10',
+     &   .true.,  .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2','042_water_adt_ne_m10.key',
+     &   '042_water_adt_ne_m10.txt','042_water_adt_ne_m10',
+     &   .true.,  .false., .false., .false., .true.)
+      call test_mutate_calc ('water2','043_water_adt_ye_m05.key',
+     &   '043_water_adt_ye_m05.txt','043_water_adt_ye_m05',
+     &   .true.,  .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2','044_water_adt_ne_m05.key',
+     &   '044_water_adt_ne_m05.txt','044_water_adt_ne_m05',
+     &   .true.,  .false., .false., .false., .true.)
+      call test_mutate_calc ('water2','045_water_adt_ye_m00.key',
+     &   '045_water_adt_ye_m00.txt','045_water_adt_ye_m00',
+     &   .true.,  .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2','046_water_adt_ne_m00.key',
+     &   '046_water_adt_ne_m00.txt','046_water_adt_ne_m00',
+     &   .true.,  .false., .false., .false., .true.)
+      call test_mutate_calc ('water2','047_water_adt_ye_p10.key',
+     &   '047_water_adt_ye_p10.txt','047_water_adt_ye_p10',
+     &   .false., .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','048_water_adt_ne_p10.key',
+     &   '048_water_adt_ne_p10.txt','048_water_adt_ne_p10',
+     &   .false., .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2','049_water_adt_ye_p05.key',
+     &   '049_water_adt_ye_p05.txt','049_water_adt_ye_p05',
+     &   .false., .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','050_water_adt_ne_p05.key',
+     &   '050_water_adt_ne_p05.txt','050_water_adt_ne_p05',
+     &   .false., .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2','051_water_adt_ye_p00.key',
+     &   '051_water_adt_ye_p00.txt','051_water_adt_ye_p00',
+     &   .false., .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','052_water_adt_ne_p00.key',
+     &   '052_water_adt_ne_p00.txt','052_water_adt_ne_p00',
+     &   .false., .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2','053_water_adt_v10.key',
+     &   '053_water_adt_v10.txt','053_water_adt_v10',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','054_water_adt_v05.key',
+     &   '054_water_adt_v05.txt','054_water_adt_v05',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','055_water_adt_v00.key',
+     &   '055_water_adt_v00.txt','055_water_adt_v00',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','056_water_adt_ye_m05p10.key',
+     &   '056_water_adt_ye_m05p10.txt','056_water_adt_ye_m05p10',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','057_water_adt_ne_m05p10.key',
+     &   '057_water_adt_ne_m05p10.txt','057_water_adt_ne_m05p10',
      &   .true.,  .true.,  .false., .false., .true.)
       return
       end

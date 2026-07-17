@@ -332,7 +332,7 @@ c
          if (doanalyt) then
             write (iout,90)  'dE/dL', 'dEV/dL', 'dEM/dL', 'dEP/dL',
      &                         adedl,adevdl,ademdl,adepdl
-  90       format (/,' Analytical Lambda Derivatives :', 4a14, /, 32x,
+  90       format (/,' Analytical Lambda Derivatives :',4x,4a14,/,36x,
      &                 4f14.6)
          end if
 c
@@ -341,7 +341,7 @@ c
          if (donumer) then
             write (iout,100)  'dE/dL', 'dEV/dL', 'dEM/dL', 'dEP/dL',
      &                         ndedl,ndevdl,ndemdl,ndepdl
-  100       format (/,' Numerical Lambda Derivatives : ', 4a14, /, 32x,
+  100       format (/,' Numerical Lambda Derivatives : ',4x,4a14,/,36x,
      &                 4f14.6)
          end if
 c
