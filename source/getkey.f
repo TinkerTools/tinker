@@ -82,8 +82,8 @@ c
          open (unit=ikey,file=keyfile,status='old')
          rewind (unit=ikey)
          do while (.true.)
-            read (ikey,20,err=30,end=30)
-   20       format ()
+            read (ikey,20,err=30,end=30)  record
+   20       format (a240)
             nkey = nkey + 1
          end do
    30    continue
