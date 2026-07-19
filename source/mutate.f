@@ -128,9 +128,9 @@ c
 c
 c     set defaults for dual topology
 c
-      emdtexp = 2
-      evdtexp = 2
-      epdtexp = 2
+      emdtexp = 1
+      evdtexp = 1
+      epdtexp = 1
 c
 c     set default ost update intervals
 c
@@ -709,6 +709,11 @@ c     in that mode the resting parameters are left at their unscaled
 c     values and each subsystem state is built on demand by the combiner
 c
       use_rel = (nmutb .gt. 0)
+      if (use_rel) then
+         use_epdt = .true.
+         use_emdt = .true.
+         use_evdt = .true.
+      end if
       if (.not.use_rel .and.
      &    elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
          call altelec
@@ -883,7 +888,7 @@ c
 c
 c     set scaled parameters for atomic multipole models
 c
-      if (use_mpole) then
+      if (use_mpole .or. use_polar) then
          do i = 1, npole
             k = ipole(i)
             if (mut(k)) then
