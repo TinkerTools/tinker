@@ -97,8 +97,8 @@ c
 c     set defaults for lambda perturbation scaling values
 c
       lambda = 1.0d0
-      vlambda = 1.0d0
       elambda = 1.0d0
+      vlambda = 1.0d0
       tlambda = 1.0d0
 c
 c     set defaults for lambda scaling for lambda derivatives
@@ -116,8 +116,8 @@ c     flag for use of lambda derivative
 c
       use_dlmda = .false.
       use_emdt = .false.
-      use_evdt = .false.
       use_epdt = .false.
+      use_evdt = .false.
       use_plmda = .false.
       use_ost = .false.
       use_ostdyn = .false.
@@ -129,8 +129,8 @@ c
 c     set defaults for dual topology
 c
       emdtexp = 1
-      evdtexp = 1
       epdtexp = 1
+      evdtexp = 1
 c
 c     set default ost update intervals
 c
@@ -144,23 +144,23 @@ c
 c
 c     set default mapping from main lambda to sublambda
 c
-      ostplmda1 = 1.0d0
-      ostplmda0 = 0.5d0
       ostelmda1 = 0.8d0
       ostelmda0 = 0.3d0
+      ostplmda1 = 1.0d0
+      ostplmda0 = 0.5d0
       ostvlmda1 = 0.5d0
       ostvlmda0 = 0.0d0
-      ostpmap = 'QNT'
       ostemap = 'QNT'
+      ostpmap = 'QNT'
       ostvmap = 'QNT'
-      ostepexp = 1
       ostemexp = 1
+      ostepexp = 1
       ostevexp = 1
-      ostinvepn = 4
       ostinvemn = 4
+      ostinvepn = 4
       ostinvevn = 4
-      ostinvepeps = 0.3d0
       ostinvemeps = 0.3d0
+      ostinvepeps = 0.3d0
       ostinveveps = 0.3d0
       ostlambda = 1.0d0
       ostlambdaavg = 0.0d0
@@ -222,9 +222,6 @@ c
          if (keyword(1:7) .eq. 'LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  lambda
-         else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
-            string = record(next:240)
-            read (string,*,err=30)  vlambda
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  elambda
@@ -232,6 +229,9 @@ c
             string = record(next:240)
             read (string,*,err=30)  plambda
             setplambda = .true.
+         else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
+            string = record(next:240)
+            read (string,*,err=30)  vlambda
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  tlambda
@@ -317,48 +317,48 @@ c
          else if (keyword(1:15) .eq. 'OSTEQUIL-RATIO ') then
             string = record(next:240)
             read (string,*,err=30)  osteqratio
-         else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostplmda0, ostplmda1
          else if (keyword(1:15) .eq. 'ELE-LMDA-RANGE ') then
             string = record(next:240)
             read (string,*,err=30)  ostelmda0, ostelmda1
+         else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostplmda0, ostplmda1
          else if (keyword(1:15) .eq. 'VDW-LMDA-RANGE ') then
             string = record(next:240)
             read (string,*,err=30)  ostvlmda0, ostvlmda1
-         else if (keyword(1:13) .eq. 'POL-LMDA-MAP ') then
-            call getword (record,ostpmap,next)
-            call upcase (ostpmap)
          else if (keyword(1:13) .eq. 'ELE-LMDA-MAP ') then
             call getword (record,ostemap,next)
             call upcase (ostemap)
+         else if (keyword(1:13) .eq. 'POL-LMDA-MAP ') then
+            call getword (record,ostpmap,next)
+            call upcase (ostpmap)
          else if (keyword(1:13) .eq. 'VDW-LMDA-MAP ') then
             call getword (record,ostvmap,next)
             call upcase (ostvmap)
-         else if (keyword(1:13) .eq. 'POL-LMDA-EXP ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostepexp
          else if (keyword(1:13) .eq. 'ELE-LMDA-EXP ') then
             string = record(next:240)
             read (string,*,err=30)  ostemexp
+         else if (keyword(1:13) .eq. 'POL-LMDA-EXP ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostepexp
          else if (keyword(1:13) .eq. 'VDW-LMDA-EXP ') then
             string = record(next:240)
             read (string,*,err=30)  ostevexp
-         else if (keyword(1:15) .eq. 'POL-LMDA-INV-N ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostinvepn
          else if (keyword(1:15) .eq. 'ELE-LMDA-INV-N ') then
             string = record(next:240)
             read (string,*,err=30)  ostinvemn
+         else if (keyword(1:15) .eq. 'POL-LMDA-INV-N ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostinvepn
          else if (keyword(1:15) .eq. 'VDW-LMDA-INV-N ') then
             string = record(next:240)
             read (string,*,err=30)  ostinvevn
-         else if (keyword(1:17) .eq. 'POL-LMDA-INV-EPS ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostinvepeps
          else if (keyword(1:17) .eq. 'ELE-LMDA-INV-EPS ') then
             string = record(next:240)
             read (string,*,err=30)  ostinvemeps
+         else if (keyword(1:17) .eq. 'POL-LMDA-INV-EPS ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostinvepeps
          else if (keyword(1:17) .eq. 'VDW-LMDA-INV-EPS ') then
             string = record(next:240)
             read (string,*,err=30)  ostinveveps
