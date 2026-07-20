@@ -37,6 +37,7 @@ add_library (tinkerObjF OBJECT
 ../source/dipole.f
 ../source/disgeo.f
 ../source/disp.f
+../source/dlmda.f
 ../source/dma.f
 ../source/domega.f
 ../source/dsppot.f
@@ -115,6 +116,7 @@ add_library (tinkerObjF OBJECT
 ../source/opdist.f
 ../source/openmp.f
 ../source/orbits.f
+../source/ost.f
 ../source/output.f
 ../source/params.f
 ../source/paths.f
@@ -270,6 +272,7 @@ add_library (tinkerObjF OBJECT
 ../source/ehal1.f
 ../source/ehal2.f
 ../source/ehal3.f
+../source/ehal4.f
 ../source/eimprop.f
 ../source/eimprop1.f
 ../source/eimprop2.f
@@ -295,6 +298,7 @@ add_library (tinkerObjF OBJECT
 ../source/empole1.f
 ../source/empole2.f
 ../source/empole3.f
+../source/empole4.f
 ../source/energy.f
 ../source/eopbend.f
 ../source/eopbend1.f
@@ -304,6 +308,7 @@ add_library (tinkerObjF OBJECT
 ../source/eopdist1.f
 ../source/eopdist2.f
 ../source/eopdist3.f
+../source/eost.f
 ../source/epitors.f
 ../source/epitors1.f
 ../source/epitors2.f
@@ -312,6 +317,7 @@ add_library (tinkerObjF OBJECT
 ../source/epolar1.f
 ../source/epolar2.f
 ../source/epolar3.f
+../source/epolar4.f
 ../source/erepel.f
 ../source/erepel1.f
 ../source/erepel2.f

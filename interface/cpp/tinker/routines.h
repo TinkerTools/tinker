@@ -684,6 +684,12 @@ void ehal0b_();
 #define tinker_f_ehal0b ehal0b_
 void ehal0c_();
 #define tinker_f_ehal0c ehal0c_
+void ehal0d_();
+#define tinker_f_ehal0d ehal0d_
+void ehal0sub_();
+#define tinker_f_ehal0sub ehal0sub_
+void ehal0dr_();
+#define tinker_f_ehal0dr ehal0dr_
 
 // ehal1.f
 void ehal1_();
@@ -694,6 +700,12 @@ void ehal1b_();
 #define tinker_f_ehal1b ehal1b_
 void ehal1c_();
 #define tinker_f_ehal1c ehal1c_
+void ehal1d_();
+#define tinker_f_ehal1d ehal1d_
+void ehal1sub_();
+#define tinker_f_ehal1sub ehal1sub_
+void ehal1dr_();
+#define tinker_f_ehal1dr ehal1dr_
 
 // ehal2.f
 void ehal2_(int* iatom);
@@ -708,6 +720,26 @@ void ehal3b_();
 #define tinker_f_ehal3b ehal3b_
 void ehal3c_();
 #define tinker_f_ehal3c ehal3c_
+void ehal3d_();
+#define tinker_f_ehal3d ehal3d_
+void ehal3sub_();
+#define tinker_f_ehal3sub ehal3sub_
+void ehal3dr_();
+#define tinker_f_ehal3dr ehal3dr_
+
+// ehal4.f
+void ehal4_();
+#define tinker_f_ehal4 ehal4_
+void ehal4a_();
+#define tinker_f_ehal4a ehal4a_
+void ehal4b_();
+#define tinker_f_ehal4b ehal4b_
+void ehal4c_();
+#define tinker_f_ehal4c ehal4c_
+void ehal4d_();
+#define tinker_f_ehal4d ehal4d_
+void ehal4dr_();
+#define tinker_f_ehal4dr ehal4dr_
 
 // eimprop.f
 void eimprop_();
@@ -924,6 +956,12 @@ void emreal0d_();
 #define tinker_f_emreal0d emreal0d_
 void emrecip_();
 #define tinker_f_emrecip emrecip_
+void empole0e_();
+#define tinker_f_empole0e empole0e_
+void empole0sub_();
+#define tinker_f_empole0sub empole0sub_
+void empole0er_();
+#define tinker_f_empole0er empole0er_
 
 // empole1.f
 void empole1_();
@@ -942,6 +980,12 @@ void emreal1d_();
 #define tinker_f_emreal1d emreal1d_
 void emrecip1_();
 #define tinker_f_emrecip1 emrecip1_
+void empole1e_();
+#define tinker_f_empole1e empole1e_
+void empole1sub_();
+#define tinker_f_empole1sub empole1sub_
+void empole1er_();
+#define tinker_f_empole1er empole1er_
 
 // empole2.f
 void empole2_(int* i);
@@ -966,6 +1010,34 @@ void emreal3d_();
 #define tinker_f_emreal3d emreal3d_
 void emrecip3_();
 #define tinker_f_emrecip3 emrecip3_
+void empole3e_();
+#define tinker_f_empole3e empole3e_
+void empole3sub_();
+#define tinker_f_empole3sub empole3sub_
+void empole3er_();
+#define tinker_f_empole3er empole3er_
+
+// empole4.f
+void empole4_();
+#define tinker_f_empole4 empole4_
+void empole4a_();
+#define tinker_f_empole4a empole4a_
+void empole4b_();
+#define tinker_f_empole4b empole4b_
+void empole4c_();
+#define tinker_f_empole4c empole4c_
+void emreal4c_();
+#define tinker_f_emreal4c emreal4c_
+void empole4d_();
+#define tinker_f_empole4d empole4d_
+void emreal4d_();
+#define tinker_f_emreal4d emreal4d_
+void emrecip4_();
+#define tinker_f_emrecip4 emrecip4_
+void empole4e_();
+#define tinker_f_empole4e empole4e_
+void empole4er_();
+#define tinker_f_empole4er empole4er_
 
 // energy.f
 double energy_();
@@ -1005,6 +1077,84 @@ void eopdist2_(int* i);
 void eopdist3_();
 #define tinker_f_eopdist3 eopdist3_
 
+// eost.f
+void eostdyn_();
+#define tinker_f_eostdyn eostdyn_
+void ostavgstd_();
+#define tinker_f_ostavgstd ostavgstd_
+void emetadyn_();
+#define tinker_f_emetadyn emetadyn_
+void emetabias_(double* lambda, double* vbias, double* dvdl);
+#define tinker_f_emetabias emetabias_
+double metadeltag_();
+#define tinker_f_metadeltag metadeltag_
+void resizemeta_();
+#define tinker_f_resizemeta resizemeta_
+void ostlangevin_();
+#define tinker_f_ostlangevin ostlangevin_
+void lmdachain_();
+#define tinker_f_lmdachain lmdachain_
+void ensureflambda_(double* dudl);
+#define tinker_f_ensureflambda ensureflambda_
+void mapsublmda_();
+#define tinker_f_mapsublmda mapsublmda_
+void sublmdaexp_(double* x, int* exponent, double* lmda, double* dlmda, double* d2lmda);
+#define tinker_f_sublmdaexp sublmdaexp_
+void sublmdainvpower_(double* x, int* n, double* eps, double* lmda, double* dlmda, double* d2lmda);
+#define tinker_f_sublmdainvpower sublmdainvpower_
+void sublmdataper_(char* mode, double* x, double* taper, double* dtaper, double* d2taper, tinker_fchar_len_t mode_cap);
+inline void tinker_f_sublmdataper(tinker_fchars mode, double* x, double* taper, double* dtaper, double* d2taper) {
+    return sublmdataper_(mode.string, x, taper, dtaper, d2taper, mode.capacity);
+}
+void egkernel_(double* egbias, double* dgdl, double* dgdfl);
+#define tinker_f_egkernel egkernel_
+void egkernelinterpolate_(double* egbias, double* dgdl, double* dgdfl);
+#define tinker_f_egkernelinterpolate egkernelinterpolate_
+int lambdabin_(double* lambda);
+#define tinker_f_lambdabin lambdabin_
+int flambdabin_(double* dudl);
+#define tinker_f_flambdabin flambdabin_
+void resizeosthist_();
+#define tinker_f_resizeosthist resizeosthist_
+void buildostindex_();
+#define tinker_f_buildostindex buildostindex_
+void buildgkernel_();
+#define tinker_f_buildgkernel buildgkernel_
+void buildkernels_();
+#define tinker_f_buildkernels buildkernels_
+void updategkernel_();
+#define tinker_f_updategkernel updategkernel_
+void updatekernels_();
+#define tinker_f_updatekernels updatekernels_
+void addgkernelhist_(int* ihist);
+#define tinker_f_addgkernelhist addgkernelhist_
+void addkernelhist_(int* ihist);
+#define tinker_f_addkernelhist addkernelhist_
+void addkernelpoint_(int* ilmda, int* iflmda, double* e, double* ldelta, double* fldelta, double* sigl2, double* sigf2);
+#define tinker_f_addkernelpoint addkernelpoint_
+void buildfkernel_();
+#define tinker_f_buildfkernel buildfkernel_
+double etotfkernel_();
+#define tinker_f_etotfkernel etotfkernel_
+void efkernel_(double* eostlmda, double* dfdl);
+#define tinker_f_efkernel efkernel_
+void saveost_();
+#define tinker_f_saveost saveost_
+void rdost_();
+#define tinker_f_rdost rdost_
+void prtost_(int* ihis);
+#define tinker_f_prtost prtost_
+void savemeta_();
+#define tinker_f_savemeta savemeta_
+void rdmeta_();
+#define tinker_f_rdmeta rdmeta_
+void prtmeta_(int* ihis);
+#define tinker_f_prtmeta prtmeta_
+void ij_to_k_(int* i, int* j, int* nrow, int* k);
+#define tinker_f_ij_to_k ij_to_k_
+void k_to_ij_(int* k, int* nrow, int* i, int* j);
+#define tinker_f_k_to_ij k_to_ij_
+
 // epitors.f
 void epitors_();
 #define tinker_f_epitors epitors_
@@ -1042,6 +1192,14 @@ void epolar0e_();
 #define tinker_f_epolar0e epolar0e_
 void eprecip_();
 #define tinker_f_eprecip eprecip_
+void epolar0f_();
+#define tinker_f_epolar0f epolar0f_
+void epolar0sub_();
+#define tinker_f_epolar0sub epolar0sub_
+void epolar0p_();
+#define tinker_f_epolar0p epolar0p_
+void epolar0fr_();
+#define tinker_f_epolar0fr epolar0fr_
 
 // epolar1.f
 void epolar1_();
@@ -1062,6 +1220,14 @@ void epolar1e_();
 #define tinker_f_epolar1e epolar1e_
 void eprecip1_();
 #define tinker_f_eprecip1 eprecip1_
+void epolar1f_();
+#define tinker_f_epolar1f epolar1f_
+void epolar1sub_();
+#define tinker_f_epolar1sub epolar1sub_
+void epolar1p_();
+#define tinker_f_epolar1p epolar1p_
+void epolar1fr_();
+#define tinker_f_epolar1fr epolar1fr_
 
 // epolar2.f
 void epolar2_(int* i);
@@ -1088,6 +1254,22 @@ void epolar3e_();
 #define tinker_f_epolar3e epolar3e_
 void eprecip3_();
 #define tinker_f_eprecip3 eprecip3_
+void epolar3f_();
+#define tinker_f_epolar3f epolar3f_
+void epolar3sub_();
+#define tinker_f_epolar3sub epolar3sub_
+void epolar3p_();
+#define tinker_f_epolar3p epolar3p_
+void epolar3fr_();
+#define tinker_f_epolar3fr epolar3fr_
+
+// epolar4.f
+void epolar4_();
+#define tinker_f_epolar4 epolar4_
+void epolar4f_();
+#define tinker_f_epolar4f epolar4f_
+void epolar4fr_();
+#define tinker_f_epolar4fr epolar4fr_
 
 // erepel.f
 void erepel_();
@@ -1392,9 +1574,9 @@ void fatal_();
 // fft3d.f
 void fftsetup_();
 #define tinker_f_fftsetup fftsetup_
-void fftfront_();
+void fftfront_(double* qg);
 #define tinker_f_fftfront fftfront_
-void fftback_();
+void fftback_(double* qg);
 #define tinker_f_fftback fftback_
 void fftclose_();
 #define tinker_f_fftclose fftclose_
@@ -1982,12 +2164,30 @@ void dmoments_(double* xm, double* ym, double* zm, double* xustc, double* yustc,
 // mutate.f
 void mutate_();
 #define tinker_f_mutate mutate_
+void setligand_(int* j, int* igrp);
+#define tinker_f_setligand setligand_
 void altelec_();
 #define tinker_f_altelec altelec_
+void altemdt_(double* elmda);
+#define tinker_f_altemdt altemdt_
+void altpolr_();
+#define tinker_f_altpolr altpolr_
+void altepdt_(double* plmda);
+#define tinker_f_altepdt altepdt_
+void alteprst_();
+#define tinker_f_alteprst alteprst_
 void alttors_(int* ntbnd, int* itbnd);
 #define tinker_f_alttors alttors_
 void altsolv_();
 #define tinker_f_altsolv altsolv_
+void submask_(int* la, int* lb, int* le);
+#define tinker_f_submask submask_
+void setsubelec_();
+#define tinker_f_setsubelec setsubelec_
+void altemdtsub_(int* la, int* lb, int* le);
+#define tinker_f_altemdtsub altemdtsub_
+void altpolrsub_(int* la, int* lb, int* le);
+#define tinker_f_altpolrsub altpolrsub_
 
 // nblist.f
 void nblist_();
@@ -2158,7 +2358,7 @@ void setchunk_(int* i, int* cid, int* off1, int* off2, int* off3);
 #define tinker_f_setchunk setchunk_
 void grid_pchg_();
 #define tinker_f_grid_pchg grid_pchg_
-void grid_mpole_(double* fmp);
+void grid_mpole_(double* fmp, double* qg);
 #define tinker_f_grid_mpole grid_mpole_
 void grid_uind_(double* fuind, double* fuinp);
 #define tinker_f_grid_uind grid_uind_
@@ -2168,7 +2368,7 @@ void adjust_(int* offset, int* nfft, int* nchk, int* amin, int* amax, int* cmin,
 #define tinker_f_adjust adjust_
 void fphi_pchg_(double* fphi);
 #define tinker_f_fphi_pchg fphi_pchg_
-void fphi_mpole_(double* fphi);
+void fphi_mpole_(double* fphi, double* qg);
 #define tinker_f_fphi_mpole fphi_mpole_
 void fphi_uind_(double* fdip_phi1, double* fdip_phi2, double* fdip_sum_phi);
 #define tinker_f_fphi_uind fphi_uind_
