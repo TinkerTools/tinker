@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung and Jay W. Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  program tinkertest  --  Tinker unit test dispatcher         ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  program tinkertest  --  Tinker unit test dispatcher  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
 c     "tinkertest" is the single Tinker unit test binary; it links
@@ -66,6 +66,8 @@ c
       call test_chglj
       call test_chgtrn
       call test_disp
+      call test_eost
+      call test_eostmap
       call test_emhippo
       call test_ephippo
       call test_expol

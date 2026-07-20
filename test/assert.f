@@ -325,6 +325,138 @@ c
       end
 c
 c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine assert_logical  --  compare logical to ref  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "assert_logical" checks that a computed logical agrees exactly
+c     with a stored reference logical, recording the outcome and
+c     printing one summary line
+c
+c
+      subroutine assert_logical (got,ref,label)
+      use assert
+      implicit none
+      logical got,ref
+      character*(*) label
+c
+c
+      if (got .eqv. ref) then
+         npass = npass + 1
+         write (*,10)  'pass ',trim(label)
+      else
+         nfail = nfail + 1
+         write (*,10)  'FAIL ',trim(label)
+      end if
+      if (ta_detail .or. got .neqv. ref)  write (*,20)  got,ref
+      if (got .neqv. ref)  call assert_summary ()
+   10 format (1x,a5,1x,a)
+   20 format (7x,'calc=',l1,' ref=',l1)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine assert_array1  --  compare 1D array to ref  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "assert_array1" checks that every element of a one-dimensional
+c     real array agrees with a stored reference to within an absolute
+c     tolerance, reporting the largest deviation found
+c
+c
+      subroutine assert_array1 (got,ref,n,eps,label)
+      use assert
+      implicit none
+      integer n,i,iw
+      real*8 got(*),ref(*),eps,diff,worst
+      character*(*) label
+c
+c
+      worst = 0.0d0
+      iw = 1
+      do i = 1, n
+         diff = abs(got(i)-ref(i))
+         if (diff .gt. worst) then
+            worst = diff
+            iw = i
+         end if
+      end do
+      if (worst .le. eps) then
+         npass = npass + 1
+         write (*,10)  'pass ',trim(label)
+         if (ta_detail)  write (*,20)  worst
+      else
+         nfail = nfail + 1
+         write (*,10)  'FAIL ',trim(label)
+         write (*,30)  iw,got(iw),iw,ref(iw),worst
+         call assert_summary ()
+      end if
+   10 format (1x,a5,1x,a)
+   20 format (7x,'maxdiff=',g12.4)
+   30 format (7x,'calc[',i0,']=',g16.8,'  ref[',i0,']=',g16.8,
+     &        '  d=',g11.3)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine assert_array2  --  compare 2D array to ref  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "assert_array2" checks that every element of a two-dimensional
+c     real array agrees with a stored reference to within an absolute
+c     tolerance, reporting the largest deviation found
+c
+c
+      subroutine assert_array2 (got,ref,n,m,eps,label)
+      use assert
+      implicit none
+      integer n,m,i,j,iw,jw
+      real*8 got(n,*),ref(n,*),eps,diff,worst
+      character*(*) label
+c
+c
+      worst = 0.0d0
+      iw = 1
+      jw = 1
+      do j = 1, m
+         do i = 1, n
+            diff = abs(got(i,j)-ref(i,j))
+            if (diff .gt. worst) then
+               worst = diff
+               iw = i
+               jw = j
+            end if
+         end do
+      end do
+      if (worst .le. eps) then
+         npass = npass + 1
+         write (*,10)  'pass ',trim(label)
+         if (ta_detail)  write (*,20)  worst
+      else
+         nfail = nfail + 1
+         write (*,10)  'FAIL ',trim(label)
+         write (*,30)  iw,jw,got(iw,jw),iw,jw,ref(iw,jw),worst
+         call assert_summary ()
+      end if
+   10 format (1x,a5,1x,a)
+   20 format (7x,'maxdiff=',g12.4)
+   30 format (7x,'calc[',i0,',',i0,']=',g16.8,'  ref[',i0,',',i0,
+     &        ']=',g16.8,'  d=',g11.3)
+      return
+      end
+c
+c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine assert_grad  --  compare gradient to reference  ##

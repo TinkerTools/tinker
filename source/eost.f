@@ -662,8 +662,8 @@ c
 c     set flags to compute polarization lambda derivative
 c
       if (ostpmap .eq. 'QNT') then
-         use_pol4i = (plambda .le. ostplmda1)
-         use_pol4f = (plambda .ge. ostplmda0)
+         use_pol4i = (ostlambda .le. ostplmda1)
+         use_pol4f = (ostlambda .ge. ostplmda0)
       end if
       return
       end

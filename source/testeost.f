@@ -42,6 +42,9 @@ c
       call testavgstd (nfail)
       call testefkernel (nfail)
       call testmapsub (nfail)
+      call testsublmda (nfail)
+      call testtaper (nfail)
+      call testlmdachain (nfail)
       call testmeta (nfail)
 c
 c     print final result
@@ -209,6 +212,8 @@ c
       implicit none
       integer nfail
       integer k
+      integer nold
+      integer oldfli0
       integer ilmda,iflmda
 c
 c
@@ -261,6 +266,25 @@ c
      &               ostnext(2),1,nfail)
       call checkint ('ensureflambda rebuild ostnext tail',
      &               ostnext(1),0,nfail)
+c
+c     the resize copies four separate kernels, so seed all of them
+c     with values that identify both the array and the bin, then
+c     require every entry of every array to land where it belongs
+c
+      call resetost (3,5,1)
+      nold = nflmda
+      oldfli0 = fli0
+      call seedkernels
+      call ensureflambda (2000.0d0)
+      call checkkernels ('ensureflambda high',nold,
+     &                   fli0-oldfli0,nfail)
+      call resetost (3,5,1)
+      nold = nflmda
+      oldfli0 = fli0
+      call seedkernels
+      call ensureflambda (-2000.0d0)
+      call checkkernels ('ensureflambda low',nold,
+     &                   fli0-oldfli0,nfail)
       return
       end
 c
@@ -850,6 +874,7 @@ c
       integer i
       real*8 eostlmda,dfdl
       real*8 expected
+      real*8 etotfkernel
 c
 c
 c     use fkernel(lambda)=lambda and integrate to lambda=0.375
@@ -865,6 +890,68 @@ c
      &                eostlmda,expected,1.0d-12,nfail)
       call checkreal ('efkernel dDeltaG/dlambda',
      &                dfdl,ostlambda,1.0d-12,nfail)
+c
+c     use fkernel(lambda)=1+lambda so the endpoint mean forces are
+c     nonzero and distinct from each other
+c
+      call resetost (5,5,1)
+      do i = 1, nlmda
+         fkernel(i) = 1.0d0 + dble(i-1)*wlmda
+      end do
+c
+c     at and below lambda = 0 the free energy is zero and the
+c     derivative comes from the first lambda bin
+c
+      ostlambda = 0.0d0
+      call efkernel (eostlmda,dfdl)
+      call checkreal ('efkernel DeltaG lambda=0',
+     &                eostlmda,0.0d0,1.0d-12,nfail)
+      call checkreal ('efkernel dDeltaG/dlambda lambda=0',
+     &                dfdl,1.0d0,1.0d-12,nfail)
+      ostlambda = -0.25d0
+      call efkernel (eostlmda,dfdl)
+      call checkreal ('efkernel DeltaG lambda below 0',
+     &                eostlmda,0.0d0,1.0d-12,nfail)
+      call checkreal ('efkernel dDeltaG/dlambda below 0',
+     &                dfdl,1.0d0,1.0d-12,nfail)
+c
+c     at lambda = 1 the last interval is integrated in full, and
+c     beyond lambda = 1 the loop falls through to the same result
+c
+      ostlambda = 1.0d0
+      call efkernel (eostlmda,dfdl)
+      call checkreal ('efkernel DeltaG lambda=1',
+     &                eostlmda,1.5d0,1.0d-12,nfail)
+      call checkreal ('efkernel dDeltaG/dlambda lambda=1',
+     &                dfdl,2.0d0,1.0d-12,nfail)
+      ostlambda = 1.25d0
+      call efkernel (eostlmda,dfdl)
+      call checkreal ('efkernel DeltaG lambda above 1',
+     &                eostlmda,1.5d0,1.0d-12,nfail)
+      call checkreal ('efkernel dDeltaG/dlambda above 1',
+     &                dfdl,2.0d0,1.0d-12,nfail)
+c
+c     the trapezoid rule is exact for a linear mean force, so the
+c     total must match the efkernel value at lambda = 1
+c
+      call checkreal ('etotfkernel linear fkernel',
+     &                etotfkernel(),1.5d0,1.0d-12,nfail)
+c
+c     a constant mean force integrates to itself over unit lambda
+c
+      do i = 1, nlmda
+         fkernel(i) = 2.5d0
+      end do
+      call checkreal ('etotfkernel constant fkernel',
+     &                etotfkernel(),2.5d0,1.0d-12,nfail)
+c
+c     an all-zero mean force gives no free energy change
+c
+      do i = 1, nlmda
+         fkernel(i) = 0.0d0
+      end do
+      call checkreal ('etotfkernel zero fkernel',
+     &                etotfkernel(),0.0d0,1.0d-12,nfail)
       return
       end
 c
@@ -877,11 +964,13 @@ c     ###############################################################
 c
 c
       subroutine testmapsub (nfail)
+      use bound
       use dlmda
       use mutant
       use ost
       implicit none
       integer nfail
+      real*8 tref,dtref,d2tref
 c
 c
 c     test exponential sublambda maps and chain rule derivatives
@@ -949,6 +1038,537 @@ c
       call checkreal ('mapsublmda invpower d2vldlmda2',
      &                d2vldlmda2,-2.94247262960432d0,1.0d-12,
      &                nfail)
+c
+c     any map other than EXP or INV falls back to the quintic taper,
+c     where the sublambda is the complement of the taper
+c
+      use_bounds = .false.
+      call resetost (5,5,1)
+      ostplmda0 = 0.2d0
+      ostplmda1 = 0.8d0
+      ostelmda0 = 0.3d0
+      ostelmda1 = 0.7d0
+      ostvlmda0 = 0.1d0
+      ostvlmda1 = 0.9d0
+      ostpmap = 'QNT'
+      ostemap = 'QNT'
+      ostvmap = 'QNT'
+      ostlambda = 0.5d0
+c
+c     each sublambda uses its own window, so the midpoint value is
+c     one half for all three but the slopes differ
+c
+      call mapsublmda
+      call checkreal ('mapsublmda taper plambda',
+     &                plambda,0.5d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper elambda',
+     &                elambda,0.5d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper vlambda',
+     &                vlambda,0.5d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper dpldlmda',
+     &                dpldlmda,3.125d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper deldlmda',
+     &                deldlmda,4.6875d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper dvldlmda',
+     &                dvldlmda,2.34375d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper d2pldlmda2',
+     &                d2pldlmda2,0.0d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper d2eldlmda2',
+     &                d2eldlmda2,0.0d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper d2vldlmda2',
+     &                d2vldlmda2,0.0d0,1.0d-12,nfail)
+c
+c     the taper branch must negate the taper derivatives, checked
+c     off center where the second derivative is nonzero
+c
+      ostlambda = 0.35d0
+      call refquintic (0.35d0,0.2d0,0.8d0,tref,dtref,d2tref)
+      call mapsublmda
+      call checkreal ('mapsublmda taper offcenter plambda',
+     &                plambda,1.0d0-tref,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper offcenter dpldlmda',
+     &                dpldlmda,-dtref,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper offcenter d2pldlmda2',
+     &                d2pldlmda2,-d2tref,1.0d-12,nfail)
+c
+c     below the polarization window the sublambda is fully off and
+c     above it the sublambda is fully on
+c
+      ostlambda = 0.1d0
+      call mapsublmda
+      call checkreal ('mapsublmda taper below window plambda',
+     &                plambda,0.0d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper below window dpldlmda',
+     &                dpldlmda,0.0d0,1.0d-12,nfail)
+      ostlambda = 0.9d0
+      call mapsublmda
+      call checkreal ('mapsublmda taper above window plambda',
+     &                plambda,1.0d0,1.0d-12,nfail)
+      call checkreal ('mapsublmda taper above window dpldlmda',
+     &                dpldlmda,0.0d0,1.0d-12,nfail)
+c
+c     a QNT polarization map sets the initial and final polarization
+c     flags by comparing lambda against the polarization window
+c
+      ostpmap = 'QNT'
+      ostlambda = 0.1d0
+      call mapsublmda
+      call checklogical ('mapsublmda qnt pol4i below window',
+     &                   use_pol4i,.true.,nfail)
+      call checklogical ('mapsublmda qnt pol4f below window',
+     &                   use_pol4f,.false.,nfail)
+      ostlambda = 0.5d0
+      call mapsublmda
+      call checklogical ('mapsublmda qnt pol4i mid window',
+     &                   use_pol4i,.true.,nfail)
+      call checklogical ('mapsublmda qnt pol4f mid window',
+     &                   use_pol4f,.true.,nfail)
+      ostlambda = 0.9d0
+      call mapsublmda
+      call checklogical ('mapsublmda qnt pol4i above window',
+     &                   use_pol4i,.false.,nfail)
+      call checklogical ('mapsublmda qnt pol4f above window',
+     &                   use_pol4f,.true.,nfail)
+c
+c     anywhere inside the window both endpoint states still
+c     contribute, since plambda has not yet pinned to zero or one
+c
+      ostlambda = 0.65d0
+      call mapsublmda
+      call checklogical ('mapsublmda qnt pol4i upper ramp',
+     &                   use_pol4i,.true.,nfail)
+      call checklogical ('mapsublmda qnt pol4f upper ramp',
+     &                   use_pol4f,.true.,nfail)
+      ostlambda = 0.30d0
+      call mapsublmda
+      call checklogical ('mapsublmda qnt pol4i lower ramp',
+     &                   use_pol4i,.true.,nfail)
+      call checklogical ('mapsublmda qnt pol4f lower ramp',
+     &                   use_pol4f,.true.,nfail)
+c
+c     the window bounds are inclusive, so a lambda sitting exactly
+c     on either edge must keep both endpoint states
+c
+      ostlambda = ostplmda1
+      call mapsublmda
+      call checklogical ('mapsublmda qnt pol4i at upper bound',
+     &                   use_pol4i,.true.,nfail)
+      call checklogical ('mapsublmda qnt pol4f at upper bound',
+     &                   use_pol4f,.true.,nfail)
+      ostlambda = ostplmda0
+      call mapsublmda
+      call checklogical ('mapsublmda qnt pol4i at lower bound',
+     &                   use_pol4i,.true.,nfail)
+      call checklogical ('mapsublmda qnt pol4f at lower bound',
+     &                   use_pol4f,.true.,nfail)
+c
+c     a non QNT polarization map must leave the flags untouched
+c
+      ostpmap = 'EXP'
+      ostepexp = 2
+      use_pol4i = .false.
+      use_pol4f = .false.
+      ostlambda = 0.5d0
+      call mapsublmda
+      call checklogical ('mapsublmda exp leaves pol4i',
+     &                   use_pol4i,.false.,nfail)
+      call checklogical ('mapsublmda exp leaves pol4f',
+     &                   use_pol4f,.false.,nfail)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine testsublmda -- test sublambda map endpoints   ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine testsublmda (nfail)
+      implicit none
+      integer nfail
+      real*8 lmda,dlmda,d2lmda
+      real*8 lmda0,dlmda0,d2lmda0
+c
+c
+c     at and below x=0 the exponential map is zero, but the first
+c     and second derivatives survive for exponents of one and two
+c
+      call sublmdaexp (0.0d0,1,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdaexp x=0 n=1 lmda',
+     &                lmda,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x=0 n=1 dlmda',
+     &                dlmda,1.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x=0 n=1 d2lmda',
+     &                d2lmda,0.0d0,1.0d-12,nfail)
+      call sublmdaexp (0.0d0,2,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdaexp x=0 n=2 lmda',
+     &                lmda,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x=0 n=2 dlmda',
+     &                dlmda,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x=0 n=2 d2lmda',
+     &                d2lmda,2.0d0,1.0d-12,nfail)
+      call sublmdaexp (0.0d0,3,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdaexp x=0 n=3 lmda',
+     &                lmda,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x=0 n=3 dlmda',
+     &                dlmda,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x=0 n=3 d2lmda',
+     &                d2lmda,0.0d0,1.0d-12,nfail)
+      call sublmdaexp (-0.5d0,2,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdaexp x below 0 lmda',
+     &                lmda,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x below 0 d2lmda',
+     &                d2lmda,2.0d0,1.0d-12,nfail)
+c
+c     at and above x=1 the exponential map saturates with the
+c     analytic power law derivatives
+c
+      call sublmdaexp (1.0d0,3,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdaexp x=1 n=3 lmda',
+     &                lmda,1.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x=1 n=3 dlmda',
+     &                dlmda,3.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x=1 n=3 d2lmda',
+     &                d2lmda,6.0d0,1.0d-12,nfail)
+      call sublmdaexp (1.5d0,1,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdaexp x above 1 n=1 lmda',
+     &                lmda,1.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x above 1 n=1 dlmda',
+     &                dlmda,1.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp x above 1 n=1 d2lmda',
+     &                d2lmda,0.0d0,1.0d-12,nfail)
+c
+c     the interior exponential map is continuous with the x=1
+c     endpoint for an exponent of one
+c
+      call sublmdaexp (0.5d0,1,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdaexp interior n=1 lmda',
+     &                lmda,0.5d0,1.0d-12,nfail)
+      call checkreal ('sublmdaexp interior n=1 d2lmda',
+     &                d2lmda,0.0d0,1.0d-12,nfail)
+c
+c     an inverse power of one or less is the identity map
+c
+      call sublmdainvpower (0.4d0,1,0.1d0,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdainvpower n=1 lmda',
+     &                lmda,0.4d0,1.0d-12,nfail)
+      call checkreal ('sublmdainvpower n=1 dlmda',
+     &                dlmda,1.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdainvpower n=1 d2lmda',
+     &                d2lmda,0.0d0,1.0d-12,nfail)
+      call sublmdainvpower (0.4d0,0,0.1d0,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdainvpower n=0 lmda',
+     &                lmda,0.4d0,1.0d-12,nfail)
+c
+c     the identity map still clamps out of range coordinates
+c
+      call sublmdainvpower (1.5d0,1,0.1d0,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdainvpower n=1 clamp high',
+     &                lmda,1.0d0,1.0d-12,nfail)
+      call sublmdainvpower (-0.5d0,1,0.1d0,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdainvpower n=1 clamp low',
+     &                lmda,0.0d0,1.0d-12,nfail)
+c
+c     out of range coordinates clamp to the endpoint values of the
+c     shifted inverse power map, which is normalized to zero and one
+c
+      call sublmdainvpower (1.5d0,3,0.02d0,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdainvpower clamp high',
+     &                lmda,1.0d0,1.0d-12,nfail)
+      call sublmdainvpower (-0.5d0,3,0.02d0,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdainvpower clamp low',
+     &                lmda,0.0d0,1.0d-12,nfail)
+c
+c     a nonpositive shift falls back to a default shift of 0.1
+c
+      call sublmdainvpower (0.25d0,2,0.1d0,lmda0,dlmda0,d2lmda0)
+      call sublmdainvpower (0.25d0,2,0.0d0,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdainvpower zero eps lmda',
+     &                lmda,lmda0,1.0d-12,nfail)
+      call checkreal ('sublmdainvpower zero eps dlmda',
+     &                dlmda,dlmda0,1.0d-12,nfail)
+      call checkreal ('sublmdainvpower zero eps d2lmda',
+     &                d2lmda,d2lmda0,1.0d-12,nfail)
+      call sublmdainvpower (0.25d0,2,-1.0d0,lmda,dlmda,d2lmda)
+      call checkreal ('sublmdainvpower negative eps lmda',
+     &                lmda,lmda0,1.0d-12,nfail)
+      call checkreal ('sublmdainvpower negative eps dlmda',
+     &                dlmda,dlmda0,1.0d-12,nfail)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine testtaper -- test quintic sublambda tapering  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine testtaper (nfail)
+      use bound
+      use ost
+      implicit none
+      integer nfail
+      real*8 taper,dtaper,d2taper
+      real*8 tref,dtref,d2tref
+      character*6 mode
+c
+c
+c     avoid the periodic image search inside the switch routine
+c
+      use_bounds = .false.
+c
+c     use a distinct taper window for each sublambda so a mode
+c     that reads the wrong window cannot pass
+c
+      ostplmda0 = 0.2d0
+      ostplmda1 = 0.8d0
+      ostelmda0 = 0.3d0
+      ostelmda1 = 0.7d0
+      ostvlmda0 = 0.1d0
+      ostvlmda1 = 0.9d0
+      mode = 'OSTPOL'
+c
+c     below and at the lower bound the taper is fully on and flat
+c
+      call sublmdataper (mode,0.05d0,taper,dtaper,d2taper)
+      call checkreal ('sublmdataper below cut taper',
+     &                taper,1.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdataper below cut dtaper',
+     &                dtaper,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdataper below cut d2taper',
+     &                d2taper,0.0d0,1.0d-12,nfail)
+      call sublmdataper (mode,0.2d0,taper,dtaper,d2taper)
+      call checkreal ('sublmdataper at cut taper',
+     &                taper,1.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdataper at cut dtaper',
+     &                dtaper,0.0d0,1.0d-12,nfail)
+c
+c     above and at the upper bound the taper is fully off and flat
+c
+      call sublmdataper (mode,0.95d0,taper,dtaper,d2taper)
+      call checkreal ('sublmdataper above off taper',
+     &                taper,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdataper above off dtaper',
+     &                dtaper,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdataper above off d2taper',
+     &                d2taper,0.0d0,1.0d-12,nfail)
+      call sublmdataper (mode,0.8d0,taper,dtaper,d2taper)
+      call checkreal ('sublmdataper at off taper',
+     &                taper,0.0d0,1.0d-12,nfail)
+      call checkreal ('sublmdataper at off dtaper',
+     &                dtaper,0.0d0,1.0d-12,nfail)
+c
+c     the quintic is the unique polynomial that is one at cut and
+c     zero at off with vanishing first and second derivatives at
+c     both ends, so it must equal the analytic smoothstep form
+c
+      call sublmdataper (mode,0.5d0,taper,dtaper,d2taper)
+      call refquintic (0.5d0,0.2d0,0.8d0,tref,dtref,d2tref)
+      call checkreal ('sublmdataper midpoint taper',
+     &                taper,0.5d0,1.0d-12,nfail)
+      call checkreal ('sublmdataper midpoint reference',
+     &                taper,tref,1.0d-12,nfail)
+      call checkreal ('sublmdataper midpoint dtaper',
+     &                dtaper,dtref,1.0d-12,nfail)
+      call checkreal ('sublmdataper midpoint d2taper',
+     &                d2taper,0.0d0,1.0d-12,nfail)
+      call sublmdataper (mode,0.35d0,taper,dtaper,d2taper)
+      call refquintic (0.35d0,0.2d0,0.8d0,tref,dtref,d2tref)
+      call checkreal ('sublmdataper offcenter taper',
+     &                taper,tref,1.0d-12,nfail)
+      call checkreal ('sublmdataper offcenter dtaper',
+     &                dtaper,dtref,1.0d-12,nfail)
+      call checkreal ('sublmdataper offcenter d2taper',
+     &                d2taper,d2tref,1.0d-12,nfail)
+      call sublmdataper (mode,0.70d0,taper,dtaper,d2taper)
+      call refquintic (0.70d0,0.2d0,0.8d0,tref,dtref,d2tref)
+      call checkreal ('sublmdataper upper half taper',
+     &                taper,tref,1.0d-12,nfail)
+      call checkreal ('sublmdataper upper half dtaper',
+     &                dtaper,dtref,1.0d-12,nfail)
+      call checkreal ('sublmdataper upper half d2taper',
+     &                d2taper,d2tref,1.0d-12,nfail)
+c
+c     the same lambda gives different results per mode because each
+c     mode selects its own taper window
+c
+      mode = 'OSTELE'
+      call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
+      call checkreal ('sublmdataper ostele below own cut',
+     &                taper,1.0d0,1.0d-12,nfail)
+      mode = 'OSTVDW'
+      call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
+      call refquintic (0.25d0,0.1d0,0.9d0,tref,dtref,d2tref)
+      call checkreal ('sublmdataper ostvdw own window taper',
+     &                taper,tref,1.0d-12,nfail)
+      call checkreal ('sublmdataper ostvdw own window dtaper',
+     &                dtaper,dtref,1.0d-12,nfail)
+      mode = 'OSTPOL'
+      call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
+      call refquintic (0.25d0,0.2d0,0.8d0,tref,dtref,d2tref)
+      call checkreal ('sublmdataper ostpol own window taper',
+     &                taper,tref,1.0d-12,nfail)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine refquintic -- analytic quintic taper values   ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "refquintic" evaluates the quintic taper and its derivatives
+c     independently of the switch coefficients, using the smoothstep
+c     form 1 - (6t^5-15t^4+10t^3) on the scaled coordinate t
+c
+c
+      subroutine refquintic (x,cutval,offval,taper,dtaper,d2taper)
+      implicit none
+      real*8 x,cutval,offval
+      real*8 taper,dtaper,d2taper
+      real*8 t,t2,t3,t4,t5
+      real*8 w
+c
+c
+      w = offval - cutval
+      t = (x-cutval) / w
+      t2 = t * t
+      t3 = t2 * t
+      t4 = t2 * t2
+      t5 = t2 * t3
+      taper = 1.0d0 - (6.0d0*t5-15.0d0*t4+10.0d0*t3)
+      dtaper = -(30.0d0*t4-60.0d0*t3+30.0d0*t2) / w
+      d2taper = -(120.0d0*t3-180.0d0*t2+60.0d0*t) / (w*w)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine testlmdachain -- test sublambda chain rule    ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine testlmdachain (nfail)
+      use atoms
+      use dlmda
+      implicit none
+      integer i,j
+      integer nfail
+      real*8 fpref(3,2)
+      real*8 fmref(3,2)
+      real*8 fvref(3,2)
+      real*8 vpref(3,3)
+      real*8 vmref(3,3)
+      real*8 vvref(3,3)
+c
+c
+c     use distinct sublambda derivatives so a swapped polarization,
+c     multipole or van der Waals factor cannot pass
+c
+      n = 2
+      if (allocated(dfpdl))  deallocate (dfpdl)
+      if (allocated(dfmdl))  deallocate (dfmdl)
+      if (allocated(dfvdl))  deallocate (dfvdl)
+      allocate (dfpdl(3,n))
+      allocate (dfmdl(3,n))
+      allocate (dfvdl(3,n))
+      dpldlmda = 2.0d0
+      d2pldlmda2 = 3.0d0
+      deldlmda = 11.0d0
+      d2eldlmda2 = 13.0d0
+      dvldlmda = 5.0d0
+      d2vldlmda2 = 7.0d0
+c
+c     set the sublambda energy derivatives and expected results
+c
+      depdl = 1.5d0
+      d2epdl2 = 0.5d0
+      demdl = 0.25d0
+      d2emdl2 = 4.0d0
+      devdl = 2.5d0
+      d2evdl2 = 1.5d0
+c
+c     set force and virial derivatives that vary by component
+c
+      do i = 1, n
+         do j = 1, 3
+            dfpdl(j,i) = dble(j+3*(i-1))
+            dfmdl(j,i) = dble(j+3*(i-1)) + 0.5d0
+            dfvdl(j,i) = dble(j+3*(i-1)) - 0.5d0
+            fpref(j,i) = dfpdl(j,i) * dpldlmda
+            fmref(j,i) = dfmdl(j,i) * deldlmda
+            fvref(j,i) = dfvdl(j,i) * dvldlmda
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            depvirdl(j,i) = dble(j+3*(i-1))
+            demvirdl(j,i) = dble(j+3*(i-1)) + 0.5d0
+            devvirdl(j,i) = dble(j+3*(i-1)) - 0.5d0
+            vpref(j,i) = depvirdl(j,i) * dpldlmda
+            vmref(j,i) = demvirdl(j,i) * deldlmda
+            vvref(j,i) = devvirdl(j,i) * dvldlmda
+         end do
+      end do
+      call lmdachain
+c
+c     the second derivatives must use the old first derivatives,
+c     so d2epdl2 = 0.5*2^2 + 1.5*3 and depdl = 1.5*2
+c
+      call checkreal ('lmdachain depdl',
+     &                depdl,3.0d0,1.0d-12,nfail)
+      call checkreal ('lmdachain d2epdl2',
+     &                d2epdl2,6.5d0,1.0d-12,nfail)
+      call checkreal ('lmdachain demdl',
+     &                demdl,2.75d0,1.0d-12,nfail)
+      call checkreal ('lmdachain d2emdl2',
+     &                d2emdl2,487.25d0,1.0d-12,nfail)
+      call checkreal ('lmdachain devdl',
+     &                devdl,12.5d0,1.0d-12,nfail)
+      call checkreal ('lmdachain d2evdl2',
+     &                d2evdl2,55.0d0,1.0d-12,nfail)
+c
+c     forces and virials scale by the first derivative only
+c
+      call checkarray2 ('lmdachain dfpdl',dfpdl,fpref,3,n,
+     &                  1.0d-12,nfail)
+      call checkarray2 ('lmdachain dfmdl',dfmdl,fmref,3,n,
+     &                  1.0d-12,nfail)
+      call checkarray2 ('lmdachain dfvdl',dfvdl,fvref,3,n,
+     &                  1.0d-12,nfail)
+      call checkarray2 ('lmdachain depvirdl',depvirdl,vpref,3,3,
+     &                  1.0d-12,nfail)
+      call checkarray2 ('lmdachain demvirdl',demvirdl,vmref,3,3,
+     &                  1.0d-12,nfail)
+      call checkarray2 ('lmdachain devvirdl',devvirdl,vvref,3,3,
+     &                  1.0d-12,nfail)
+c
+c     an identity sublambda map must leave everything unchanged
+c
+      dpldlmda = 1.0d0
+      d2pldlmda2 = 0.0d0
+      deldlmda = 1.0d0
+      d2eldlmda2 = 0.0d0
+      dvldlmda = 1.0d0
+      d2vldlmda2 = 0.0d0
+      depdl = 1.5d0
+      d2epdl2 = 0.5d0
+      call lmdachain
+      call checkreal ('lmdachain identity depdl',
+     &                depdl,1.5d0,1.0d-12,nfail)
+      call checkreal ('lmdachain identity d2epdl2',
+     &                d2epdl2,0.5d0,1.0d-12,nfail)
+      deallocate (dfpdl)
+      deallocate (dfmdl)
+      deallocate (dfvdl)
       return
       end
 c
@@ -1180,6 +1800,122 @@ c
 c
 c     ###############################################################
 c     ##                                                           ##
+c     ##  subroutine seedkernels -- tag every flambda kernel bin   ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "seedkernels" fills the four flambda-dependent kernels with
+c     values encoding the array, the lambda bin and the flambda bin,
+c     so a resize that crosses arrays or transposes indices shows up
+c
+c
+      subroutine seedkernels
+      use ost
+      implicit none
+      integer i,j
+      real*8 kerneltag
+c
+c
+      do i = 1, nlmda
+         do j = 1, nflmda
+            gkernel(i,j) = kerneltag (1,i,j)
+            gfkernel(i,j) = kerneltag (2,i,j)
+            glkernel(i,j) = kerneltag (3,i,j)
+            glfkernel(i,j) = kerneltag (4,i,j)
+         end do
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  function kerneltag -- unique value per kernel and bin    ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      function kerneltag (ikern,i,j)
+      implicit none
+      integer ikern,i,j
+      real*8 kerneltag
+c
+c
+      kerneltag = 1000.0d0*dble(ikern) + 10.0d0*dble(i) + dble(j)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine checkkernels -- verify a flambda grid resize  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "checkkernels" compares all four flambda-dependent kernels
+c     against a reference in which the seeded block has moved by
+c     offset bins and every other bin is zero
+c
+c
+      subroutine checkkernels (label,nold,offset,nfail)
+      use ost
+      implicit none
+      integer i,j
+      integer nold,offset
+      integer nfail
+      real*8 kerneltag
+      real*8, allocatable :: gref(:,:)
+      real*8, allocatable :: gfref(:,:)
+      real*8, allocatable :: glref(:,:)
+      real*8, allocatable :: glfref(:,:)
+      character*(*) label
+c
+c
+c     bins outside the copied block must be zero after the resize
+c
+      allocate (gref(nlmda,nflmda))
+      allocate (gfref(nlmda,nflmda))
+      allocate (glref(nlmda,nflmda))
+      allocate (glfref(nlmda,nflmda))
+      do i = 1, nlmda
+         do j = 1, nflmda
+            gref(i,j) = 0.0d0
+            gfref(i,j) = 0.0d0
+            glref(i,j) = 0.0d0
+            glfref(i,j) = 0.0d0
+         end do
+      end do
+c
+c     the seeded block keeps its values but shifts by offset bins
+c
+      do i = 1, nlmda
+         do j = 1, nold
+            gref(i,j+offset) = kerneltag (1,i,j)
+            gfref(i,j+offset) = kerneltag (2,i,j)
+            glref(i,j+offset) = kerneltag (3,i,j)
+            glfref(i,j+offset) = kerneltag (4,i,j)
+         end do
+      end do
+      call checkarray2 (label//' gkernel',gkernel,gref,
+     &                  nlmda,nflmda,1.0d-12,nfail)
+      call checkarray2 (label//' gfkernel',gfkernel,gfref,
+     &                  nlmda,nflmda,1.0d-12,nfail)
+      call checkarray2 (label//' glkernel',glkernel,glref,
+     &                  nlmda,nflmda,1.0d-12,nfail)
+      call checkarray2 (label//' glfkernel',glfkernel,glfref,
+     &                  nlmda,nflmda,1.0d-12,nfail)
+      deallocate (gref)
+      deallocate (gfref)
+      deallocate (glref)
+      deallocate (glfref)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
 c     ##  subroutine sethist -- set one gaussian history entry     ##
 c     ##                                                           ##
 c     ###############################################################
@@ -1294,6 +2030,32 @@ c
      &                 actual(imax,jmax),maxdiff
    20    format (' FAIL ',a,': index ',i8,1x,i8,' expected ',
      &           g24.15,' actual ',g24.15,' diff ',g12.5)
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine checklogical -- check logical expected output ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine checklogical (name,actual,expected,nfail)
+      implicit none
+      integer nfail
+      logical actual,expected
+      character*(*) name
+c
+c
+      if (actual .eqv. expected) then
+         write (*,10)  name,actual
+   10    format (' PASS ',a,': ',l1)
+      else
+         nfail = nfail + 1
+         write (*,20)  name,expected,actual
+   20    format (' FAIL ',a,': expected ',l1,' actual ',l1)
       end if
       return
       end
