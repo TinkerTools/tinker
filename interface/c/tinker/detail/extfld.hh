@@ -5,6 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+extern double TINKER_MOD(extfld, exfe);
 extern double TINKER_MOD(extfld, exfreq);
 extern double TINKER_MOD(extfld, exfld)[3];
 extern double TINKER_MOD(extfld, texfld)[3];

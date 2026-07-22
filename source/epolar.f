@@ -2145,7 +2145,7 @@ c     compute energy of the lambda = 0 state
 c
       if (use_pol4i) then
          call altepdt (0.0d0)
-         call epolar0sub
+         call epolar0calc
 c
 c     copy energy of the lambda = 0 state
 c
@@ -2156,7 +2156,7 @@ c     compute energy of the lambda = 1 state
 c
       if (use_pol4f) then
          call altepdt (1.0d0)
-         call epolar0sub
+         call epolar0calc
 c
 c     copy energy of the lambda = 1 state
 c
@@ -2188,19 +2188,18 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine epolar0sub  --  subsystem polarization energy  ##
-c     ##                                                            ##
-c     ################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine epolar0calc  --  compute polarization energy  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "epolar0sub" evaluates the polarization energy for the atom
-c     subsystem installed by "altpolrsub", using the same non-pairwise
-c     induced dipole routine selection as "epolar0f"
+c     "epolar0calc" evaluates the polarization energy for the
+c     polarization parameter state currently installed
 c
 c
-      subroutine epolar0sub
+      subroutine epolar0calc
       implicit none
 c
 c
@@ -2235,7 +2234,7 @@ c
 c
 c     compute the polarization energy
 c
-      call epolar0sub
+      call epolar0calc
 c
 c     restore the electrostatics lambda state
 c
@@ -2268,16 +2267,16 @@ c
 c
 c
       call altpolrsub (.true.,.false.,.true.)
-      call epolar0sub
+      call epolar0calc
       epae = ep
       call altpolrsub (.false.,.true.,.true.)
-      call epolar0sub
+      call epolar0calc
       epbe = ep
       call altpolrsub (.true.,.false.,.false.)
-      call epolar0sub
+      call epolar0calc
       epa = ep
       call altpolrsub (.false.,.true.,.false.)
-      call epolar0sub
+      call epolar0calc
       epb = ep
       call altpolrsub (.true.,.true.,.true.)
       plambdaexp = plambda**epdtexp

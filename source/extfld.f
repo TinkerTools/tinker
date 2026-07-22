@@ -12,6 +12,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
+c     exfe         energy due to the applied external electric field
 c     exfreq       frequency of applied external field in gigahertz
 c     exfld        components of applied external electric field
 c     texfld       components of time dependent applied electric field
@@ -21,6 +22,7 @@ c
 c
       module extfld
       implicit none
+      real*8 exfe
       real*8 exfreq
       real*8 exfld(3)
       real*8 texfld(3)

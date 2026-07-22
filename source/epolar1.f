@@ -9704,7 +9704,7 @@ c     compute energy, force, and virial of the lambda = 0 state
 c
       if (use_pol4i) then
          call altepdt (0.0d0)
-         call epolar1sub
+         call epolar1calc
 c
 c     copy energy, force, and virial of the lambda = 0 state
 c
@@ -9725,7 +9725,7 @@ c     compute energy of the lambda = 1 state
 c
       if (use_pol4f) then
          call altepdt (1.0d0)
-         call epolar1sub
+         call epolar1calc
 c
 c     copy energy, force, and virial of the lambda = 1 state
 c
@@ -9804,19 +9804,19 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine epolar1sub  --  subsystem polarization derivs    ##
-c     ##                                                             ##
-c     #################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine epolar1calc  --  compute polarization derivs  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "epolar1sub" evaluates the polarization energy and Cartesian
-c     derivatives for the atom subsystem installed by "altpolrsub",
-c     using the same standard routine selection as "epolar1f"
+c     "epolar1calc" evaluates the polarization energy and Cartesian
+c     derivatives for the polarization parameter state currently
+c     installed
 c
 c
-      subroutine epolar1sub
+      subroutine epolar1calc
       use limits
       use polpot
       implicit none
@@ -9866,7 +9866,7 @@ c
 c
 c     compute the polarization energy and first derivatives
 c
-      call epolar1sub
+      call epolar1calc
 c
 c     restore the electrostatics lambda state
 c
@@ -9921,7 +9921,7 @@ c
 c     ligand A coupled to environment, group B fully decoupled
 c
       call altpolrsub (.true.,.false.,.true.)
-      call epolar1sub
+      call epolar1calc
       epae = ep
       do i = 1, n
          do j = 1, 3
@@ -9937,7 +9937,7 @@ c
 c     ligand B coupled to environment, group A fully decoupled
 c
       call altpolrsub (.false.,.true.,.true.)
-      call epolar1sub
+      call epolar1calc
       epbe = ep
       do i = 1, n
          do j = 1, 3
@@ -9953,7 +9953,7 @@ c
 c     ligand A alone, giving its intramolecular polarization energy
 c
       call altpolrsub (.true.,.false.,.false.)
-      call epolar1sub
+      call epolar1calc
       epa = ep
       do i = 1, n
          do j = 1, 3
@@ -9969,7 +9969,7 @@ c
 c     ligand B alone, giving its intramolecular polarization energy
 c
       call altpolrsub (.false.,.true.,.false.)
-      call epolar1sub
+      call epolar1calc
       epb = ep
       do i = 1, n
          do j = 1, 3

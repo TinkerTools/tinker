@@ -962,13 +962,13 @@ c     compute energy of the fully coupled vlambda = 1 state
 c
       vlambdaorig = vlambda
       vlambda = 1.0d0
-      call ehal0sub
+      call ehal0calc
       ev1 = ev
 c
 c     compute energy of the fully decoupled vlambda = 0 state
 c
       vlambda = 0.0d0
-      call ehal0sub
+      call ehal0calc
       ev0 = ev
 c
 c     restore the original vlambda value
@@ -983,20 +983,18 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ehal0sub  --  subsystem buffered 14-7 energy  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ehal0calc  --  compute buffered 14-7 energy  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "ehal0sub" evaluates the buffered 14-7 van der Waals energy for
-c     the atom subsystem currently flagged by "subon", using the same
-c     standard routine selection as "ehal0d"; the long range correction
-c     follows the active subsystem when enabled
+c     "ehal0calc" evaluates the buffered 14-7 van der Waals energy for
+c     the state currently installed
 c
 c
-      subroutine ehal0sub
+      subroutine ehal0calc
       use energi
       use limits
       use vdwpot
@@ -1047,16 +1045,16 @@ c
 c
 c
       call submask (.true.,.false.,.true.)
-      call ehal0sub
+      call ehal0calc
       evae = ev
       call submask (.false.,.true.,.true.)
-      call ehal0sub
+      call ehal0calc
       evbe = ev
       call submask (.true.,.false.,.false.)
-      call ehal0sub
+      call ehal0calc
       eva = ev
       call submask (.false.,.true.,.false.)
-      call ehal0sub
+      call ehal0calc
       evb = ev
       call submask (.true.,.true.,.true.)
       weight1 = vlambda**evdtexp

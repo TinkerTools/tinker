@@ -1340,7 +1340,7 @@ c     compute energy and derivatives of the vlambda = 1 state
 c
       vlambdaorig = vlambda
       vlambda = 1.0d0
-      call ehal1sub
+      call ehal1calc
       ev1 = ev
       do i = 1, n
          do j = 1, 3
@@ -1356,7 +1356,7 @@ c
 c     compute energy and derivatives of the vlambda = 0 state
 c
       vlambda = 0.0d0
-      call ehal1sub
+      call ehal1calc
       ev0 = ev
       do i = 1, n
          do j = 1, 3
@@ -1397,20 +1397,18 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ehal1sub  --  subsystem buffered 14-7 derivs  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ehal1calc  --  compute buffered 14-7 derivs  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "ehal1sub" evaluates the buffered 14-7 van der Waals energy and
-c     Cartesian derivatives for the atom subsystem flagged by "subon",
-c     using the same standard routine selection as "ehal1d"; the long
-c     range correction follows the active subsystem when enabled
+c     "ehal1calc" evaluates the buffered 14-7 van der Waals energy and
+c     Cartesian derivatives for the state currently installed
 c
 c
-      subroutine ehal1sub
+      subroutine ehal1calc
       use energi
       use limits
       use vdwpot
@@ -1483,7 +1481,7 @@ c
 c     ligand A coupled to environment, group B fully decoupled
 c
       call submask (.true.,.false.,.true.)
-      call ehal1sub
+      call ehal1calc
       evae = ev
       do i = 1, n
          do j = 1, 3
@@ -1499,7 +1497,7 @@ c
 c     ligand B coupled to environment, group A fully decoupled
 c
       call submask (.false.,.true.,.true.)
-      call ehal1sub
+      call ehal1calc
       evbe = ev
       do i = 1, n
          do j = 1, 3
@@ -1515,7 +1513,7 @@ c
 c     ligand A alone, giving its intramolecular van der Waals energy
 c
       call submask (.true.,.false.,.false.)
-      call ehal1sub
+      call ehal1calc
       eva = ev
       do i = 1, n
          do j = 1, 3
@@ -1531,7 +1529,7 @@ c
 c     ligand B alone, giving its intramolecular van der Waals energy
 c
       call submask (.false.,.true.,.false.)
-      call ehal1sub
+      call ehal1calc
       evb = ev
       do i = 1, n
          do j = 1, 3

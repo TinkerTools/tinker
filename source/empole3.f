@@ -18,15 +18,11 @@ c
 c
       subroutine empole3
       use dlmda
-      use mutant
-      use energi
       use extfld
       use inform
       use iounit
-      use limits
+      use mutant
       implicit none
-      real*8 exf
-      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
@@ -37,35 +33,22 @@ c
          else
             call empole3e
          end if
-      else if (use_ewald) then
-         if (use_mlist) then
-            call empole3d
-         else
-            call empole3c
-         end if
       else
-         if (use_mlist) then
-            call empole3b
-         else
-            call empole3a
-         end if
+         call empole3calc
       end if
 c
-c     get contribution from external electric field if used
+c     report the external electric field energy
 c
       if (use_exfld) then
-         mode = 'MPOLE'
-         call exfield3 (mode,exf)
-         em = em + exf
-         if (verbose .and. exf.ne.0.0d0) then
+         if (verbose .and. exfe.ne.0.0d0) then
             if (digits .ge. 8) then
-               write (iout,10)  exf
+               write (iout,10)  exfe
    10          format (/,' External Electric Field :',7x,f16.8)
             else if (digits .ge. 6) then
-               write (iout,20)  exf
+               write (iout,20)  exfe
    20          format (/,' External Electric Field :',7x,f16.6)
             else
-               write (iout,30)  exf
+               write (iout,30)  exfe
    30          format (/,' External Electric Field :',7x,f16.4)
             end if
          end if
@@ -2369,6 +2352,7 @@ c
       use atoms
       use dlmda
       use energi
+      use extfld
       use inter
       use limits
       use mutant
@@ -2380,6 +2364,7 @@ c
       real*8 weight1,weight0
       real*8 einterorig
       real*8 einter1,einter0
+      real*8 exfe1,exfe0
       real*8, allocatable :: aem1(:)
       real*8, allocatable :: aem0(:)
 c
@@ -2394,9 +2379,10 @@ c
       elambdaorig = elambda
       einterorig = einter
       call altemdt (1.0d0)
-      call empole3sub
+      call empole3calc
       em1 = em
       nem1 = nem
+      exfe1 = exfe
       do i = 1, n
          aem1(i) = aem(i)
       end do
@@ -2410,8 +2396,9 @@ c
 c     compute energy and analysis of the elambda = 0 state
 c
       call altemdt (0.0d0)
-      call empole3sub
+      call empole3calc
       em0 = em
+      exfe0 = exfe
       do i = 1, n
          aem0(i) = aem(i)
       end do
@@ -2428,6 +2415,7 @@ c
       em = weight1*em1 + weight0*em0
       nem = nem1
       einter = einterorig + weight1*einter1 + weight0*einter0
+      exfe = weight1*exfe1 + weight0*exfe0
       do i = 1, n
          aem(i) = weight1*aem1(i) + weight0*aem0(i)
       end do
@@ -2440,21 +2428,24 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine empole3sub  --  subsystem multipole analysis  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine empole3calc  --  compute multipole analysis  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "empole3sub" evaluates the multipole energy and analysis for the
-c     atom subsystem currently installed by "altemdtsub", using the same
-c     standard routine selection as "empole3e"
+c     "empole3calc" evaluates the multipole energy and analysis for the
+c     the electrostatic parameter state currently installed
 c
 c
-      subroutine empole3sub
+      subroutine empole3calc
+      use energi
+      use extfld
       use limits
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
       if (use_ewald) then
@@ -2469,6 +2460,14 @@ c
          else
             call empole3a
          end if
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'MPOLE'
+         call exfield3 (mode,exf)
+         em = em + exf
       end if
       return
       end
@@ -2493,6 +2492,7 @@ c
       use atoms
       use dlmda
       use energi
+      use extfld
       use inter
       use limits
       use mutant
@@ -2506,6 +2506,8 @@ c
       real*8 einterorig
       real*8 einterae,einterbe
       real*8 eintera,einterb
+      real*8 exfeae,exfebe
+      real*8 exfea,exfeb
       real*8, allocatable :: aemae(:)
       real*8, allocatable :: aembe(:)
       real*8, allocatable :: aema(:)
@@ -2523,9 +2525,10 @@ c
 c     ligand A coupled to environment, group B fully decoupled
 c
       call altemdtsub (.true.,.false.,.true.)
-      call empole3sub
+      call empole3calc
       emae = em
       nemae = nem
+      exfeae = exfe
       do i = 1, n
          aemae(i) = aem(i)
       end do
@@ -2535,8 +2538,9 @@ c
 c     ligand B coupled to environment, group A fully decoupled
 c
       call altemdtsub (.false.,.true.,.true.)
-      call empole3sub
+      call empole3calc
       embe = em
+      exfebe = exfe
       do i = 1, n
          aembe(i) = aem(i)
       end do
@@ -2546,8 +2550,9 @@ c
 c     ligand A alone, giving its intramolecular multipole energy
 c
       call altemdtsub (.true.,.false.,.false.)
-      call empole3sub
+      call empole3calc
       ema = em
+      exfea = exfe
       do i = 1, n
          aema(i) = aem(i)
       end do
@@ -2557,8 +2562,9 @@ c
 c     ligand B alone, giving its intramolecular multipole energy
 c
       call altemdtsub (.false.,.true.,.false.)
-      call empole3sub
+      call empole3calc
       emb = em
+      exfeb = exfe
       do i = 1, n
          aemb(i) = aem(i)
       end do
@@ -2579,6 +2585,7 @@ c
       nem = nemae
       einter = einterorig + weight1*(einterae+einterb)
      &                    + weight0*(einterbe+eintera)
+      exfe = weight1*(exfeae+exfeb) + weight0*(exfebe+exfea)
       do i = 1, n
          aem(i) = weight1*(aemae(i)+aemb(i))
      &          + weight0*(aembe(i)+aema(i))

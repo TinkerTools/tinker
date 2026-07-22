@@ -686,8 +686,8 @@ void ehal0c_();
 #define tinker_f_ehal0c ehal0c_
 void ehal0d_();
 #define tinker_f_ehal0d ehal0d_
-void ehal0sub_();
-#define tinker_f_ehal0sub ehal0sub_
+void ehal0calc_();
+#define tinker_f_ehal0calc ehal0calc_
 void ehal0dr_();
 #define tinker_f_ehal0dr ehal0dr_
 
@@ -702,8 +702,8 @@ void ehal1c_();
 #define tinker_f_ehal1c ehal1c_
 void ehal1d_();
 #define tinker_f_ehal1d ehal1d_
-void ehal1sub_();
-#define tinker_f_ehal1sub ehal1sub_
+void ehal1calc_();
+#define tinker_f_ehal1calc ehal1calc_
 void ehal1dr_();
 #define tinker_f_ehal1dr ehal1dr_
 
@@ -722,8 +722,8 @@ void ehal3c_();
 #define tinker_f_ehal3c ehal3c_
 void ehal3d_();
 #define tinker_f_ehal3d ehal3d_
-void ehal3sub_();
-#define tinker_f_ehal3sub ehal3sub_
+void ehal3calc_();
+#define tinker_f_ehal3calc ehal3calc_
 void ehal3dr_();
 #define tinker_f_ehal3dr ehal3dr_
 
@@ -958,8 +958,8 @@ void emrecip_();
 #define tinker_f_emrecip emrecip_
 void empole0e_();
 #define tinker_f_empole0e empole0e_
-void empole0sub_();
-#define tinker_f_empole0sub empole0sub_
+void empole0calc_();
+#define tinker_f_empole0calc empole0calc_
 void empole0er_();
 #define tinker_f_empole0er empole0er_
 
@@ -982,8 +982,8 @@ void emrecip1_();
 #define tinker_f_emrecip1 emrecip1_
 void empole1e_();
 #define tinker_f_empole1e empole1e_
-void empole1sub_();
-#define tinker_f_empole1sub empole1sub_
+void empole1calc_();
+#define tinker_f_empole1calc empole1calc_
 void empole1er_();
 #define tinker_f_empole1er empole1er_
 
@@ -1012,8 +1012,8 @@ void emrecip3_();
 #define tinker_f_emrecip3 emrecip3_
 void empole3e_();
 #define tinker_f_empole3e empole3e_
-void empole3sub_();
-#define tinker_f_empole3sub empole3sub_
+void empole3calc_();
+#define tinker_f_empole3calc empole3calc_
 void empole3er_();
 #define tinker_f_empole3er empole3er_
 
@@ -1194,8 +1194,8 @@ void eprecip_();
 #define tinker_f_eprecip eprecip_
 void epolar0f_();
 #define tinker_f_epolar0f epolar0f_
-void epolar0sub_();
-#define tinker_f_epolar0sub epolar0sub_
+void epolar0calc_();
+#define tinker_f_epolar0calc epolar0calc_
 void epolar0p_();
 #define tinker_f_epolar0p epolar0p_
 void epolar0fr_();
@@ -1222,8 +1222,8 @@ void eprecip1_();
 #define tinker_f_eprecip1 eprecip1_
 void epolar1f_();
 #define tinker_f_epolar1f epolar1f_
-void epolar1sub_();
-#define tinker_f_epolar1sub epolar1sub_
+void epolar1calc_();
+#define tinker_f_epolar1calc epolar1calc_
 void epolar1p_();
 #define tinker_f_epolar1p epolar1p_
 void epolar1fr_();
@@ -1256,8 +1256,8 @@ void eprecip3_();
 #define tinker_f_eprecip3 eprecip3_
 void epolar3f_();
 #define tinker_f_epolar3f epolar3f_
-void epolar3sub_();
-#define tinker_f_epolar3sub epolar3sub_
+void epolar3calc_();
+#define tinker_f_epolar3calc epolar3calc_
 void epolar3p_();
 #define tinker_f_epolar3p epolar3p_
 void epolar3fr_();
@@ -1550,6 +1550,8 @@ void exfield3_(char* mode, double* exf, tinker_fchar_len_t mode_cap);
 inline void tinker_f_exfield3(tinker_fchars mode, double* exf) {
     return exfield3_(mode.string, exf, mode.capacity);
 }
+void exfield4_();
+#define tinker_f_exfield4 exfield4_
 
 // extra.f
 void extra_();

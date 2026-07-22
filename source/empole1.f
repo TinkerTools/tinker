@@ -19,14 +19,9 @@ c
       subroutine empole1
       use dlmda
       use mutant
-      use energi
-      use extfld
-      use limits
       use virial
       implicit none
       integer i,j
-      real*8 exf
-      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
@@ -37,26 +32,8 @@ c
          else
             call empole1e
          end if
-      else if (use_ewald) then
-         if (use_mlist) then
-            call empole1d
-         else
-            call empole1c
-         end if
       else
-         if (use_mlist) then
-            call empole1b
-         else
-            call empole1a
-         end if
-      end if
-c
-c     get contribution from external electric field if used
-c
-      if (use_exfld) then
-         mode = 'MPOLE'
-         call exfield1 (mode,exf)
-         em = em + exf
+         call empole1calc
       end if
 c
 c     add the electrostatic virial to main virial
@@ -4109,7 +4086,7 @@ c     compute energy and derivatives of the elambda = 1 state
 c
       elambdaorig = elambda
       call altemdt (1.0d0)
-      call empole1sub
+      call empole1calc
       em1 = em
       do i = 1, n
          do j = 1, 3
@@ -4125,7 +4102,7 @@ c
 c     compute energy and derivatives of the elambda = 0 state
 c
       call altemdt (0.0d0)
-      call empole1sub
+      call empole1calc
       em0 = em
       do i = 1, n
          do j = 1, 3
@@ -4166,21 +4143,24 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine empole1sub  --  subsystem multipole derivatives  ##
-c     ##                                                              ##
-c     ##################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine empole1calc  --  compute multipole derivatives  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "empole1sub" evaluates the multipole energy and derivatives for
-c     the atom subsystem currently installed by "altemdtsub", using the
-c     same standard non-lambda-aware routine selection as "empole1e"
+c     "empole1calc" evaluates the multipole energy and derivatives for
+c     the electrostatic parameter state currently installed
 c
 c
-      subroutine empole1sub
+      subroutine empole1calc
+      use energi
+      use extfld
       use limits
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
       if (use_ewald) then
@@ -4195,6 +4175,14 @@ c
          else
             call empole1a
          end if
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'MPOLE'
+         call exfield1 (mode,exf)
+         em = em + exf
       end if
       return
       end
@@ -4251,7 +4239,7 @@ c
 c     ligand A coupled to environment, group B fully decoupled
 c
       call altemdtsub (.true.,.false.,.true.)
-      call empole1sub
+      call empole1calc
       emae = em
       do i = 1, n
          do j = 1, 3
@@ -4267,7 +4255,7 @@ c
 c     ligand B coupled to environment, group A fully decoupled
 c
       call altemdtsub (.false.,.true.,.true.)
-      call empole1sub
+      call empole1calc
       embe = em
       do i = 1, n
          do j = 1, 3
@@ -4283,7 +4271,7 @@ c
 c     ligand A alone, giving its intramolecular multipole energy
 c
       call altemdtsub (.true.,.false.,.false.)
-      call empole1sub
+      call empole1calc
       ema = em
       do i = 1, n
          do j = 1, 3
@@ -4299,7 +4287,7 @@ c
 c     ligand B alone, giving its intramolecular multipole energy
 c
       call altemdtsub (.false.,.true.,.false.)
-      call empole1sub
+      call empole1calc
       emb = em
       do i = 1, n
          do j = 1, 3

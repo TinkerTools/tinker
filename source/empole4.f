@@ -19,15 +19,12 @@ c
 c
       subroutine empole4
       use dlmda
-      use mutant
-      use energi
       use extfld
       use limits
+      use mutant
       use virial
       implicit none
       integer i,j
-      real*8 exf
-      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
@@ -38,26 +35,24 @@ c
          else
             call empole4e
          end if
-      else if (use_ewald) then
-         if (use_mlist) then
-            call empole4d
-         else
-            call empole4c
-         end if
       else
-         if (use_mlist) then
-            call empole4b
+         if (use_ewald) then
+            if (use_mlist) then
+               call empole4d
+            else
+               call empole4c
+            end if
          else
-            call empole4a
+            if (use_mlist) then
+               call empole4b
+            else
+               call empole4a
+            end if
          end if
-      end if
 c
 c     get contribution from external electric field if used
 c
-      if (use_exfld) then
-         mode = 'MPOLE'
-         call exfield1 (mode,exf)
-         em = em + exf
+         if (use_exfld)  call exfield4
       end if
 c
 c     add the electrostatic virial to main virial
@@ -5239,7 +5234,7 @@ c     compute energy and derivatives of the elambda = 1 state
 c
       elambdaorig = elambda
       call altemdt (1.0d0)
-      call empole1sub
+      call empole1calc
       em1 = em
       do i = 1, n
          do j = 1, 3
@@ -5255,7 +5250,7 @@ c
 c     compute energy and derivatives of the elambda = 0 state
 c
       call altemdt (0.0d0)
-      call empole1sub
+      call empole1calc
       em0 = em
       do i = 1, n
          do j = 1, 3
@@ -5375,7 +5370,7 @@ c
 c     ligand A coupled to environment, group B fully decoupled
 c
       call altemdtsub (.true.,.false.,.true.)
-      call empole1sub
+      call empole1calc
       emae = em
       do i = 1, n
          do j = 1, 3
@@ -5391,7 +5386,7 @@ c
 c     ligand B coupled to environment, group A fully decoupled
 c
       call altemdtsub (.false.,.true.,.true.)
-      call empole1sub
+      call empole1calc
       embe = em
       do i = 1, n
          do j = 1, 3
@@ -5407,7 +5402,7 @@ c
 c     ligand A alone, giving its intramolecular multipole energy
 c
       call altemdtsub (.true.,.false.,.false.)
-      call empole1sub
+      call empole1calc
       ema = em
       do i = 1, n
          do j = 1, 3
@@ -5423,7 +5418,7 @@ c
 c     ligand B alone, giving its intramolecular multipole energy
 c
       call altemdtsub (.false.,.true.,.false.)
-      call empole1sub
+      call empole1calc
       emb = em
       do i = 1, n
          do j = 1, 3

@@ -1208,7 +1208,7 @@ c
       vlambdaorig = vlambda
       einterorig = einter
       vlambda = 1.0d0
-      call ehal3sub
+      call ehal3calc
       ev1 = ev
       nev1 = nev
       do i = 1, n
@@ -1224,7 +1224,7 @@ c
 c     compute energy and analysis of the vlambda = 0 state
 c
       vlambda = 0.0d0
-      call ehal3sub
+      call ehal3calc
       ev0 = ev
       do i = 1, n
          aev0(i) = aev(i)
@@ -1254,20 +1254,18 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine ehal3sub  --  subsystem buffered 14-7 analysis  ##
-c     ##                                                             ##
-c     #################################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine ehal3calc  --  compute buffered 14-7 analysis  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "ehal3sub" evaluates the buffered 14-7 van der Waals energy and
-c     analysis for the atom subsystem flagged by "subon", using the same
-c     standard routine selection as "ehal3d"; the long range correction
-c     follows the active subsystem when enabled
+c     "ehal3calc" evaluates the buffered 14-7 van der Waals energy and
+c     analysis for the state currently installed
 c
 c
-      subroutine ehal3sub
+      subroutine ehal3calc
       use analyz
       use atoms
       use energi
@@ -1360,7 +1358,7 @@ c
 c     ligand A coupled to environment, group B fully decoupled
 c
       call submask (.true.,.false.,.true.)
-      call ehal3sub
+      call ehal3calc
       evae = ev
       nevae = nev
       do i = 1, n
@@ -1372,7 +1370,7 @@ c
 c     ligand B coupled to environment, group A fully decoupled
 c
       call submask (.false.,.true.,.true.)
-      call ehal3sub
+      call ehal3calc
       evbe = ev
       do i = 1, n
          aevbe(i) = aev(i)
@@ -1383,7 +1381,7 @@ c
 c     ligand A alone, giving its intramolecular van der Waals energy
 c
       call submask (.true.,.false.,.false.)
-      call ehal3sub
+      call ehal3calc
       eva = ev
       do i = 1, n
          aeva(i) = aev(i)
@@ -1394,7 +1392,7 @@ c
 c     ligand B alone, giving its intramolecular van der Waals energy
 c
       call submask (.false.,.true.,.false.)
-      call ehal3sub
+      call ehal3calc
       evb = ev
       do i = 1, n
          aevb(i) = aev(i)

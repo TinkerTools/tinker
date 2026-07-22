@@ -2502,7 +2502,7 @@ c     compute energy of the lambda = 0 state
 c
       if (use_pol4i) then
          call altepdt (0.0d0)
-         call epolar3sub
+         call epolar3calc
 c
 c     copy energy of the lambda = 0 state
 c
@@ -2517,7 +2517,7 @@ c     compute energy of the lambda = 1 state
 c
       if (use_pol4f) then
          call altepdt (1.0d0)
-         call epolar3sub
+         call epolar3calc
 c
 c     copy energy of the lambda = 1 state
 c
@@ -2570,19 +2570,18 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine epolar3sub  --  subsystem polarization analysis  ##
-c     ##                                                              ##
-c     ##################################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine epolar3calc  --  compute polarization analysis  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "epolar3sub" evaluates the polarization energy and analysis for
-c     the atom subsystem installed by "altpolrsub", using the same
-c     pairwise routine selection as "epolar3f"
+c     "epolar3calc" evaluates the polarization energy and analysis for
+c     the polarization parameter state currently installed
 c
 c
-      subroutine epolar3sub
+      subroutine epolar3calc
       use limits
       implicit none
 c
@@ -2630,7 +2629,7 @@ c
 c
 c     compute and partition the polarization energy
 c
-      call epolar3sub
+      call epolar3calc
 c
 c     restore the electrostatics lambda state
 c
@@ -2681,7 +2680,7 @@ c
 c     ligand A coupled to environment, group B fully decoupled
 c
       call altpolrsub (.true.,.false.,.true.)
-      call epolar3sub
+      call epolar3calc
       epae = ep
       nepae = nep
       do i = 1, n
@@ -2691,7 +2690,7 @@ c
 c     ligand B coupled to environment, group A fully decoupled
 c
       call altpolrsub (.false.,.true.,.true.)
-      call epolar3sub
+      call epolar3calc
       epbe = ep
       do i = 1, n
          aepbe(i) = aep(i)
@@ -2700,7 +2699,7 @@ c
 c     ligand A alone, giving its intramolecular polarization energy
 c
       call altpolrsub (.true.,.false.,.false.)
-      call epolar3sub
+      call epolar3calc
       epa = ep
       do i = 1, n
          aepa(i) = aep(i)
@@ -2709,7 +2708,7 @@ c
 c     ligand B alone, giving its intramolecular polarization energy
 c
       call altpolrsub (.false.,.true.,.false.)
-      call epolar3sub
+      call epolar3calc
       epb = ep
       do i = 1, n
          aepb(i) = aep(i)
