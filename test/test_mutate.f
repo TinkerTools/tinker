@@ -29,6 +29,7 @@ c
       call test_mutate_exp
       call test_mutate_inv
       call test_mutate_exf
+      call test_mutate_emplar
       return
       end
 c
@@ -621,6 +622,70 @@ c
       call test_mutate_calc ('water2','118_water_exf_rdt_m05p05.key',
      &   '118_water_exf_rdt_m05p05.txt','118_water_exf_rdt_m05p05',
      &   .true.,  .true.,  .false., .true.,  .true.)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_emplar  --  mpole plus polar dt  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_emplar" runs the twelve water fixtures 119-130 that
+c     keep the multipole and polarization terms active together at
+c     matched ele-lambda and pol-lambda values, each carrying the
+c     "lambda-deriv" keyword and a dual topology keyword, and drives
+c     them through "test_mutate_calc" with the level 4 lambda derivative
+c     checks enabled; cases 119-124 use absolute dual topology and cases
+c     125-130 relative dual topology, each at ele-/pol-lambda values
+c     1.0, 0.5, and 0.0 with Ewald on and off; both terms use dual
+c     topology interpolation exponents of three so neither term can
+c     mask an error in the other; the no-Ewald cases cannot use a
+c     pairwise neighbor list
+c
+c
+      subroutine test_mutate_emplar
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','119_water_adt_ye_m10p10.key',
+     &   '119_water_adt_ye_m10p10.txt','119_water_adt_ye_m10p10',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','120_water_adt_ne_m10p10.key',
+     &   '120_water_adt_ne_m10p10.txt','120_water_adt_ne_m10p10',
+     &   .true.,  .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2','121_water_adt_ye_m05p05.key',
+     &   '121_water_adt_ye_m05p05.txt','121_water_adt_ye_m05p05',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','122_water_adt_ne_m05p05.key',
+     &   '122_water_adt_ne_m05p05.txt','122_water_adt_ne_m05p05',
+     &   .true.,  .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2','123_water_adt_ye_m00p00.key',
+     &   '123_water_adt_ye_m00p00.txt','123_water_adt_ye_m00p00',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','124_water_adt_ne_m00p00.key',
+     &   '124_water_adt_ne_m00p00.txt','124_water_adt_ne_m00p00',
+     &   .true.,  .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2','125_water_rdt_ye_m10p10.key',
+     &   '125_water_rdt_ye_m10p10.txt','125_water_rdt_ye_m10p10',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','126_water_rdt_ne_m10p10.key',
+     &   '126_water_rdt_ne_m10p10.txt','126_water_rdt_ne_m10p10',
+     &   .true.,  .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2','127_water_rdt_ye_m05p05.key',
+     &   '127_water_rdt_ye_m05p05.txt','127_water_rdt_ye_m05p05',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','128_water_rdt_ne_m05p05.key',
+     &   '128_water_rdt_ne_m05p05.txt','128_water_rdt_ne_m05p05',
+     &   .true.,  .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2','129_water_rdt_ye_m00p00.key',
+     &   '129_water_rdt_ye_m00p00.txt','129_water_rdt_ye_m00p00',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','130_water_rdt_ne_m00p00.key',
+     &   '130_water_rdt_ne_m00p00.txt','130_water_rdt_ne_m00p00',
+     &   .true.,  .true.,  .false., .false., .true.)
       return
       end
 c
