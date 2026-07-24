@@ -122,6 +122,7 @@ c
       use_ost = .false.
       use_ostdyn = .false.
       ostrestart = .false.
+      nosthistsave = 0
       use_meta = .false.
       use_metadyn = .false.
       metarestart = .false.

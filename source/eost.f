@@ -177,11 +177,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ostavgstd -- ost average and std deviation    ##
-c     ##                                                           ##
-c     ###############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine ostavgstd -- ost average and std deviation  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "ostavgstd" computes average and standard deviation values
@@ -222,11 +222,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine emetadyn -- 1D lambda metadynamics method    ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine emetadyn -- 1D lambda metadynamics method  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "emetadyn" applies a one-dimensional metadynamics bias along
@@ -276,11 +276,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine emetabias -- evaluate metadynamics bias      ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine emetabias -- evaluate metadynamics bias  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
 c     "emetabias" evaluates Vbias(lambda) and dVbias/dlambda for
@@ -347,11 +347,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine resizemeta -- resize metadynamics history     ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine resizemeta -- resize metadynamics history  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "resizemeta" doubles storage for saved metadynamics gaussians
@@ -522,11 +522,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ensureflambda -- resize flambda histogram     ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine ensureflambda -- resize flambda histogram  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "ensureflambda" grows the flambda grid if the current
@@ -715,11 +715,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine sublmdaexp -- exponential sublambda mapping   ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine sublmdaexp -- exponential sublambda mapping  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "sublmdaexp" maps from main lambda to a sublambda using a
@@ -772,11 +772,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine sublmdainvpower -- inverse-power mapping      ##
-c     ##                                                           ##
-c     ###############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine sublmdainvpower -- inverse-power mapping  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
 c     "sublmdainvpower" maps from main lambda to sublambda using a
@@ -1011,11 +1011,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine egkernelinterpolate -- interpolate g kernel   ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine egkernelinterpolate -- interpolate g kernel  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "egkernelinterpolate" evaluates the ost g kernel and its first
@@ -1272,11 +1272,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine buildostindex -- build ost histogram index    ##
-c     ##                                                           ##
-c     ###############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine buildostindex -- build ost histogram index  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "buildostindex" rebuilds the packed bin locations and
@@ -1354,11 +1354,11 @@ c
       end
 c
 c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine buildkernels -- build the ost kernels     ##
-c     ##                                                       ##
-c     ###########################################################
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine buildkernels -- build the ost kernels  ##
+c     ##                                                    ##
+c     ########################################################
 c
 c
 c     "buildkernels" builds both ost kernels by looping over saved
@@ -1418,11 +1418,11 @@ c
       end
 c
 c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine updatekernels -- update the ost kernels   ##
-c     ##                                                       ##
-c     ###########################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine updatekernels -- update the ost kernels  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
 c     "updatekernels" updates the ost kernels by spreading the most
@@ -1441,11 +1441,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine addgkernelhist -- add one histogram source    ##
-c     ##                                                           ##
-c     ###############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine addgkernelhist -- add one histogram source  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "addgkernelhist" spreads one saved histogram source to the
@@ -1539,11 +1539,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine addkernelhist -- add one histogram source     ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine addkernelhist -- add one histogram source  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "addkernelhist" spreads one saved histogram source to the
@@ -1638,11 +1638,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine addkernelpoint -- add one grid contribution   ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine addkernelpoint -- add one grid contribution  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "addkernelpoint" updates one g kernel cell and the associated
@@ -1848,15 +1848,16 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine saveost -- output ost restart information     ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine saveost -- output ost restart information  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "saveost" writes the information needed to restart an ost
-c     simulation to the external .ost restart file
+c     simulation to the external .ost restart file; the fixed-size
+c     header is updated in place and new history is appended
 c
 c
       subroutine saveost
@@ -1874,28 +1875,40 @@ c
       if (.not. use_ost)  return
       if (.not. allocated(osthist))  return
 c
-c     update an existing ost restart file or open a new one
+c     create a new restart file or append only new history entries;
+c     append before updating the header so an interrupted write leaves
+c     the previous history count as the last complete checkpoint
 c
       ihis = freeunit ()
       ostfile = filename(1:leng)//'.ost'
       inquire (file=ostfile,exist=exist)
-      if (exist) then
-         open (unit=ihis,file=ostfile,status='old')
-         rewind (unit=ihis)
+      if (.not. exist .or. nosthist.lt.nosthistsave) then
+         open (unit=ihis,file=ostfile,status='replace',
+     &         access='stream',form='formatted')
+         call prtost (ihis)
+         close (unit=ihis)
       else
-         open (unit=ihis,file=ostfile,status='new')
+         if (nosthist .gt. nosthistsave) then
+            open (unit=ihis,file=ostfile,status='old',
+     &            access='stream',form='formatted',position='append')
+            call prtosthist (ihis,nosthistsave+1,nosthist)
+            close (unit=ihis)
+         end if
+         open (unit=ihis,file=ostfile,status='old',
+     &         access='stream',form='unformatted',position='rewind')
+         call updosthead (ihis)
+         close (unit=ihis)
       end if
-      call prtost (ihis)
-      close (unit=ihis)
+      nosthistsave = nosthist
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine rdost -- input ost restart information        ##
-c     ##                                                           ##
-c     ###############################################################
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine rdost -- input ost restart information  ##
+c     ##                                                     ##
+c     #########################################################
 c
 c
 c     "rdost" reads the information needed to restart an ost
@@ -2088,6 +2101,7 @@ c
       end if
       eosttot = etotfkernel()
       ostrestart = .true.
+      nosthistsave = nosthist
       if (debug) then
          write (iout,20)  ostfile(1:trimtext(ostfile))
    20    format (/,' Restarting OST Bias from :  ',a)
@@ -2120,7 +2134,29 @@ c
       subroutine prtost (ihis)
       use ost
       implicit none
-      integer ihist
+      integer ihis
+c
+c     write the header followed by all current history entries
+c
+      call prtosthead (ihis)
+      call prtosthist (ihis,1,nosthist)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine prtosthead  --  output ost restart header  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "prtosthead" writes the fixed-size current ost restart header
+c
+c
+      subroutine prtosthead (ihis)
+      use ost
+      implicit none
       integer ihis
 c
 c
@@ -2138,14 +2174,6 @@ c
       write (ihis,80)
       write (ihis,90)  hbias,eosttot,oststdev
       write (ihis,100)
-c
-c     write saved gaussian histogram entries
-c
-      do ihist = 1, nosthist
-         write (ihis,110)  ihist,osthist(ihist),ostlhist(ihist),
-     &      ostfhist(ihist),osthhist(ihist),ostwlhist(ihist),
-     &      ostwfhist(ihist)
-      end do
    10 format (' Orthogonal Space Tempering Restart :')
    20 format (' Integer State :')
    30 format (7i12)
@@ -2156,16 +2184,116 @@ c
    80 format (' Bias State :')
    90 format (3d26.16)
   100 format (' Gaussian History :')
-  110 format (2i12,5d26.16)
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine savemeta -- output metadynamics restart       ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine updosthead  --  update ost restart header  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "updosthead" overwrites the fixed-size ost header in place;
+c     unformatted stream output avoids truncating the appended history
+c
+c
+      subroutine updosthead (ihis)
+      use ost
+      implicit none
+      integer ihis
+      integer ieol
+      integer leol
+      character*240 record
+      character*2 newline
+c
+c     preserve the file's existing line-ending convention
+c
+      read (ihis,pos=1)  record
+      ieol = index(record,achar(10))
+      newline = achar(10)//' '
+      leol = 1
+      if (ieol .gt. 1) then
+         if (record(ieol-1:ieol-1) .eq. achar(13)) then
+            newline = achar(13)//achar(10)
+            leol = 2
+         end if
+      end if
+c
+c     format each header record internally and write its raw bytes
+c
+      write (record,10)
+      write (ihis,pos=1)  record(1:len_trim(record)),newline(1:leol)
+      write (record,20)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,30)  iost,iosthist,nlmda,nflmda,
+     &                   fli0,nosthist,sizeosthist
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,40)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,50)  wlmda,wflmda,wlmda2,wflmda2
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,60)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,70)  ostlambda,ostlambdaavg,ostdedlavg,
+     &                   osttheta,ostvtheta,ostmass,ostfriction,ostdt
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,80)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,90)  hbias,eosttot,oststdev
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,100)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+   10 format (' Orthogonal Space Tempering Restart :')
+   20 format (' Integer State :')
+   30 format (7i12)
+   40 format (' Grid State :')
+   50 format (4d26.16)
+   60 format (' Lambda State :')
+   70 format (8d26.16)
+   80 format (' Bias State :')
+   90 format (3d26.16)
+  100 format (' Gaussian History :')
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine prtosthist  --  output ost history range  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "prtosthist" writes a requested range of gaussian histories
+c
+c
+      subroutine prtosthist (ihis,ifirst,ilast)
+      use ost
+      implicit none
+      integer ihis
+      integer ifirst
+      integer ilast
+      integer ihist
+c
+c     write saved gaussian histogram entries
+c
+      do ihist = ifirst, ilast
+         write (ihis,10)  ihist,osthist(ihist),ostlhist(ihist),
+     &      ostfhist(ihist),osthhist(ihist),ostwlhist(ihist),
+     &      ostwfhist(ihist)
+      end do
+   10 format (2i12,5d26.16)
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine savemeta -- output metadynamics restart  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
 c     "savemeta" writes the information needed to restart a
@@ -2204,11 +2332,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine rdmeta -- input metadynamics restart          ##
-c     ##                                                           ##
-c     ###############################################################
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine rdmeta -- input metadynamics restart  ##
+c     ##                                                   ##
+c     #######################################################
 c
 c
 c     "rdmeta" reads the information needed to restart a
@@ -2340,11 +2468,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine prtmeta -- output metadynamics restart        ##
-c     ##                                                           ##
-c     ###############################################################
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine prtmeta -- output metadynamics restart  ##
+c     ##                                                     ##
+c     #########################################################
 c
 c
 c     "prtmeta" writes current metadynamics restart state
@@ -2392,11 +2520,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ij_to_k -- convert 2D index to 1D index       ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine ij_to_k -- convert 2D index to 1D index  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
 c     "ij_to_k" converts the 2D indices i and j into the
@@ -2417,11 +2545,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine k_to_ij -- convert 1D index to 2D index       ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine k_to_ij -- convert 1D index to 2D index  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
 c     "k_to_ij" converts the 1D index k into the corresponding

@@ -19,6 +19,7 @@ c     nflmda        number of flambda bins
 c     nlmda         number of lambda bins
 c     nmetahist     total number of metadynamics gaussians
 c     nosthist      total number of histograms
+c     nosthistsave  number of histograms written to the restart file
 c     osteqratio    fraction of hist interval to equilibrate
 c     ostnavg       samples averaged between hist updates
 c     ostnequil     samples skipped before hist averaging
@@ -113,6 +114,7 @@ c
       integer nlmda
       integer nmetahist
       integer nosthist
+      integer nosthistsave
       integer ostnavg
       integer ostnequil
       integer ostemexp

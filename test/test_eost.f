@@ -38,8 +38,104 @@ c
       call test_eost_eginterpolate
       call test_eost_avgstd
       call test_eost_efkernel
+      call test_eost_save
       call test_eost_meta
       call final
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine test_eost_save  --  restart append test  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "test_eost_save" checks that repeated saves append only new
+c     histories while updating the fixed-size restart header in place
+c
+c
+      subroutine test_eost_save
+      use files
+      use ost
+      implicit none
+      integer i,ihis
+      integer ios
+      integer leng0
+      integer nline
+      integer nsave0
+      integer size1,size2,size3
+      integer freeunit
+      logical exist
+      character*240 filename0
+      character*240 ostfile
+      character*240 record
+c
+c     create a small deterministic history and a temporary restart
+c
+      filename0 = filename
+      leng0 = leng
+      filename = 'tinkertest-saveost'
+      leng = len_trim(filename)
+      ostfile = filename(1:leng)//'.ost'
+      inquire (file=ostfile,exist=exist)
+      if (exist) then
+         ihis = freeunit ()
+         open (unit=ihis,file=ostfile,status='old')
+         close (unit=ihis,status='delete')
+      end if
+      call resetost (3,5,3)
+      use_ost = .true.
+      nosthistsave = 0
+      iost = 10
+      osttheta = 0.0d0
+      ostvtheta = 0.0d0
+      ostmass = 1.0d0
+      ostfriction = 1.0d0
+      ostdt = 0.001d0
+      call sethist (1,0.1d0,1.0d0,2.0d0,0.01d0,1.0d0)
+      call sethist (2,0.2d0,2.0d0,3.0d0,0.01d0,1.0d0)
+      call sethist (3,0.3d0,3.0d0,4.0d0,0.01d0,1.0d0)
+c
+c     append two histories, then save again without adding history
+c
+      nosthist = 1
+      call saveost
+      inquire (file=ostfile,size=size1)
+      nosthist = 3
+      iost = 30
+      call saveost
+      inquire (file=ostfile,size=size2)
+      iost = 31
+      call saveost
+      inquire (file=ostfile,size=size3)
+      call assert_logical (size2.gt.size1,.true.,
+     &                     'saveost appends new history')
+      call assert_int (size3,size2,'saveost does not duplicate history')
+c
+c     check the refreshed header and the sequential history records
+c
+      ihis = freeunit ()
+      open (unit=ihis,file=ostfile,status='old')
+      read (ihis,'(a)')  record
+      read (ihis,'(a)')  record
+      read (ihis,'(a)')  record
+      read (record,*)  i,i,i,i,i,nsave0,i
+      do i = 1, 7
+         read (ihis,'(a)')  record
+      end do
+      nline = 0
+      do
+         read (ihis,'(a)',iostat=ios)  record
+         if (ios .ne. 0)  exit
+         nline = nline + 1
+      end do
+      close (unit=ihis,status='delete')
+      call assert_int (nsave0,3,'saveost updates history count')
+      call assert_int (nline,3,'saveost history record count')
+      filename = filename0
+      leng = leng0
       return
       end
 c
@@ -1076,6 +1172,7 @@ c
       maxwlhist = wlhist
       maxwfhist = wfhist
       nosthist = 0
+      nosthistsave = 0
       sizeosthist = nhist
       iosthist = 10
       ostnequil = 5

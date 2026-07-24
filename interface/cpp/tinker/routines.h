@@ -1078,6 +1078,8 @@ void eopdist3_();
 #define tinker_f_eopdist3 eopdist3_
 
 // eost.f
+void eostbias_();
+#define tinker_f_eostbias eostbias_
 void eostdyn_();
 #define tinker_f_eostdyn eostdyn_
 void ostavgstd_();
@@ -1144,6 +1146,12 @@ void rdost_();
 #define tinker_f_rdost rdost_
 void prtost_(int* ihis);
 #define tinker_f_prtost prtost_
+void prtosthead_(int* ihis);
+#define tinker_f_prtosthead prtosthead_
+void updosthead_(int* ihis);
+#define tinker_f_updosthead updosthead_
+void prtosthist_(int* ihis, int* ifirst, int* ilast);
+#define tinker_f_prtosthist prtosthist_
 void savemeta_();
 #define tinker_f_savemeta savemeta_
 void rdmeta_();
