@@ -550,8 +550,10 @@ c
       use mdstuf
       use molcul
       use moldyn
+      use ost
       use units
       use usage
+      use virial
       implicit none
       integer i,j,k
       integer start,stop
@@ -574,10 +576,13 @@ c
       real*8 hbox1(3,3)
       real*8 h0inv(3,3)
       real*8 ascale(3,3)
+      real*8 virsave(3,3)
       real*8, allocatable :: xold(:)
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
+      real*8, allocatable :: dtrial(:,:)
       logical dotrial
+      logical eostapprox
       logical isotropic
       logical idealgas
       logical semixy
@@ -606,6 +611,7 @@ c
          allocate (xold(n))
          allocate (yold(n))
          allocate (zold(n))
+         if (use_ostdyn)  allocate (dtrial(3,n))
 c
 c     save the system state prior to trial box size change
 c
@@ -1018,7 +1024,22 @@ c
 c
 c     get the potential energy and PV work changes for trial move
 c
-         epot = energy ()
+         if (use_ostdyn) then
+            eostapprox = .true.
+            if (eostapprox) then
+               epot = energy () + ostbvbias
+            else
+               virsave = vir
+               osttrial = .true.
+               call gradient (epot,dtrial)
+               osttrial = .false.
+               vir = virsave
+            end if
+         else if (use_metadyn) then
+            epot = energy () + ostbvbias
+         else
+            epot = energy ()
+         end if
          dpot = epot - eold
          dpv = atmsph * (volbox-volold) / prescon
 c
@@ -1087,6 +1108,7 @@ c
          deallocate (xold)
          deallocate (yold)
          deallocate (zold)
+         if (use_ostdyn)  deallocate (dtrial)
       end if
       return
       end

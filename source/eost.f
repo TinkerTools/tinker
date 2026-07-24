@@ -5,6 +5,81 @@ c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung and Jay W. Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine eostbias -- apply ost/metadynamics bias  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "eostbias" evaluates the orthogonal space tempering or
+c     metadynamics bias at the current configuration and folds it
+c     into the energy, Cartesian gradient, and virial.  It has no
+c     side effects on the histogram or the lambda particle, so it
+c     may be called from a Monte Carlo barostat trial as well as
+c     from a normal dynamics step.  The bias derivatives needed to
+c     propagate the lambda particle are saved for a later eostdyn
+c     or emetadyn call in the same step.
+c
+c
+      subroutine eostbias
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use ost
+      use virial
+      implicit none
+      integer i,j
+      real*8 egbias,dgdl,dgdfl
+      real*8 eostlmda,dfdl
+      real*8 vbias,dvdl
+c
+c
+c     refresh the unbiased dU/dlambda at the current configuration
+c
+      ostdedl = dedl
+c
+c     the metadynamics bias depends on lambda alone
+c
+      if (use_metadyn) then
+         call emetabias (ostlambda,vbias,dvdl)
+         esum = esum + vbias
+         ostbvbias = vbias
+         ostbdgdl = dvdl
+         return
+      end if
+c
+c     evaluate the ost g kernel bias and free energy f term
+c
+      if (ostinterpol) then
+         call egkernelinterpolate (egbias,dgdl,dgdfl)
+      else
+         call egkernel (egbias,dgdl,dgdfl)
+      end if
+      call efkernel (eostlmda,dfdl)
+      esum = esum + egbias - eostlmda
+      ostbvbias = egbias - eostlmda
+      ostbdgdl = dgdl
+      ostbdgdfl = dgdfl
+      ostbdfdl = dfdl
+c
+c     add the second order lambda force and virial from the bias
+c
+      do i = 1, n
+         do j = 1, 3
+            desum(j,i) = desum(j,i) + dgdfl*dfsumdl(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + dgdfl*dvirdl(j,i)
+         end do
+      end do
+      return
+      end
+c
+c
 c     ##################################################################
 c     ##                                                              ##
 c     ##  subroutine eostdyn -- orthogonal space tempering algorithm  ##
@@ -17,20 +92,13 @@ c     tempering algorithm using biasing gaussians
 c
 c
       subroutine eostdyn
-      use atoms
-      use deriv
       use dlmda
-      use energi
       use ost
-      use virial
       implicit none
-      integer i,j
       integer k
       integer isamp,istep
       integer ilmda,iflmda
       integer lambdabin,flambdabin
-      real*8 egbias,dgdl,dgdfl
-      real*8 eostlmda,dfdl
       real*8 etotfkernel
 c
 c
@@ -38,29 +106,12 @@ c     increment iost step counter
 c
       iost = iost + 1
 c
-c     compute current continuous g kernel bias and derivatives
+c     build the effective lambda derivative from the bias terms
+c     evaluated this step by eostbias, which also refreshed ostdedl
 c
-      if (ostinterpol) then
-         call egkernelinterpolate (egbias,dgdl,dgdfl)
-      else
-         call egkernel (egbias,dgdl,dgdfl)
-      end if
-      call efkernel (eostlmda,dfdl)
-      esum = esum + egbias - eostlmda
-      ostdedl = dedl
-      ostdgdl = dgdl + dgdfl*d2edl2
-      ostddgdl = dfdl
+      ostdgdl = ostbdgdl + ostbdgdfl*d2edl2
+      ostddgdl = ostbdfdl
       deffdl = ostdedl + ostdgdl - ostddgdl
-      do i = 1, n
-         do j = 1, 3
-            desum(j,i) = desum(j,i) + dgdfl*dfsumdl(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            vir(j,i) = vir(j,i) + dgdfl*dvirdl(j,i)
-         end do
-      end do
 c
 c     save all values in the hist interval, but average only after
 c     the requested equilibration fraction
@@ -183,12 +234,9 @@ c     the main lambda coordinate and deposits lambda gaussians
 c
 c
       subroutine emetadyn
-      use dlmda
-      use energi
       use ost
       implicit none
       integer istep,navg
-      real*8 vbias,dvdl
       real*8 metadeltag
 c
 c
@@ -196,12 +244,10 @@ c     increment adaptive-bias step counter
 c
       iost = iost + 1
 c
-c     evaluate current metadynamics bias and add dVbias/dlambda
+c     effective lambda derivative from the bias evaluated this step
+c     by eostbias, which also refreshed ostdedl
 c
-      call emetabias (ostlambda,vbias,dvdl)
-      esum = esum + vbias
-      ostdedl = dedl
-      deffdl = ostdedl + dvdl
+      deffdl = ostdedl + ostbdgdl
 c
 c     update average lambda only in the second half of each interval
 c

@@ -206,6 +206,7 @@ c
       use_meta = .false.
       use_metadyn = .false.
       metarestart = .false.
+      osttrial = .false.
 c
 c     flag for use of rigid bodies
 c

@@ -358,10 +358,13 @@ c
             end do
          end do
          if (use_ostdyn .or. use_metadyn) then
-            if (use_ostdyn) then
-               call eostdyn
-            else if (use_metadyn) then
-               call emetadyn
+            call eostbias
+            if (.not. osttrial) then
+               if (use_ostdyn) then
+                  call eostdyn
+               else if (use_metadyn) then
+                  call emetadyn
+               end if
             end if
             energy = esum
             do i = 1, n

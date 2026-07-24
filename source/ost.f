@@ -38,6 +38,10 @@ c     eosttot       total ost free energy
 c     hbias         height of biasing gaussian
 c     maxwfhist     maximum flambda width of histogram gaussians
 c     maxwlhist     maximum lambda width of histogram gaussians
+c     ostbdfdl      saved bias df/dlambda from eostbias for eostdyn
+c     ostbdgdfl     saved bias dg/dflambda from eostbias for eostdyn
+c     ostbdgdl      saved bias dg/dlambda from eostbias for eostdyn
+c     ostbvbias     saved bias energy shift from eostbias
 c     ostddgdl      current dDeltaG/dlambda value
 c     ostdedl       current unbiased dU/dlambda value
 c     ostdedlavg    average dE/dlambda value between hist updates
@@ -88,6 +92,7 @@ c     fastkernel    flag to use fused g and f kernel updates
 c     metarestart   flag to indicate metadynamics restart data was read
 c     ostinterpol   flag to interpolate ost g kernel from grid
 c     ostrestart    flag to indicate ost restart data was read
+c     osttrial      flag to evaluate ost bias without depositing gaussians
 c     use_meta      flag to use metadynamics
 c     use_metadyn   flag to propagate metadynamics lambda particle
 c     use_ost       flag to use orthogonal space tempering
@@ -126,6 +131,10 @@ c
       real*8 hbias
       real*8 maxwfhist
       real*8 maxwlhist
+      real*8 ostbdfdl
+      real*8 ostbdgdfl
+      real*8 ostbdgdl
+      real*8 ostbvbias
       real*8 ostddgdl
       real*8 ostdedl
       real*8 ostdedlavg
@@ -177,6 +186,7 @@ c
       logical metarestart
       logical ostinterpol
       logical ostrestart
+      logical osttrial
       logical use_meta
       logical use_metadyn
       logical use_ost
