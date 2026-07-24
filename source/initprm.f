@@ -429,6 +429,7 @@ c
       use_ielscf = .false.
       dpequal = .false.
       use_expol = .false.
+      nexpol = 0
 c
 c     set default control parameters for charge transfer terms
 c
