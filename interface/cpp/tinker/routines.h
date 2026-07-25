@@ -1082,8 +1082,8 @@ void eostbias_();
 #define tinker_f_eostbias eostbias_
 void eostdyn_();
 #define tinker_f_eostdyn eostdyn_
-void ostavgstd_();
-#define tinker_f_ostavgstd ostavgstd_
+void avgstd_(double* list, double* avg, double* std);
+#define tinker_f_avgstd avgstd_
 void emetadyn_();
 #define tinker_f_emetadyn emetadyn_
 void emetabias_(double* lambda, double* vbias, double* dvdl);

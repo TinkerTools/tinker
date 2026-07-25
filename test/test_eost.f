@@ -122,7 +122,7 @@ c
       read (ihis,'(a)')  record
       read (ihis,'(a)')  record
       read (record,*)  i,i,i,i,i,nsave0,i
-      do i = 1, 7
+      do i = 1, 5
          read (ihis,'(a)')  record
       end do
       nline = 0
@@ -864,16 +864,17 @@ c
          ostllist(i) = dble(i)
          ostflist(i) = 2.0d0*dble(i)
       end do
-      call ostavgstd
+      call avgstd (ostllist,ostlambdaavg,ostlambdastd)
+      call avgstd (ostflist,ostdedlavg,ostdedlstd)
       stdref = sqrt(1.25d0)
       call assert_real (ostlambdaavg,4.5d0,1.0d-12,
-     &                  'ostavgstd configurable lambda average')
+     &                  'avgstd configurable lambda average')
       call assert_real (ostdedlavg,9.0d0,1.0d-12,
-     &                  'ostavgstd configurable dE/dl average')
+     &                  'avgstd configurable dE/dl average')
       call assert_real (ostlambdastd,stdref,1.0d-12,
-     &                  'ostavgstd configurable lambda std')
+     &                  'avgstd configurable lambda std')
       call assert_real (ostdedlstd,2.0d0*stdref,1.0d-12,
-     &                  'ostavgstd configurable dE/dl std')
+     &                  'avgstd configurable dE/dl std')
       return
       end
 c
@@ -1139,6 +1140,7 @@ c     clear any previous allocation
 c
       if (allocated(osthhist))  deallocate (osthhist)
       if (allocated(osthist))  deallocate (osthist)
+      if (allocated(ostihist))  deallocate (ostihist)
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(ostnext))  deallocate (ostnext)
       if (allocated(ostllist))  deallocate (ostllist)
@@ -1205,6 +1207,7 @@ c
 c     allocate arrays
 c
       allocate (osthist(sizeosthist))
+      allocate (ostihist(sizeosthist))
       allocate (osthead(nlmda,nflmda))
       allocate (ostnext(sizeosthist))
       allocate (ostllist(iosthist))
@@ -1226,6 +1229,7 @@ c     initialize arrays
 c
       do i = 1, sizeosthist
          osthist(i) = 0
+         ostihist(i) = 0
          ostnext(i) = 0
          ostlhist(i) = 0.0d0
          ostfhist(i) = 0.0d0
@@ -1273,15 +1277,18 @@ c
 c
 c     clear and allocate metadynamics history arrays
 c
+      if (allocated(metaihist))  deallocate (metaihist)
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
       sizemetahist = nhist
       nmetahist = 0
+      allocate (metaihist(sizemetahist))
       allocate (metalhist(sizemetahist))
       allocate (metahhist(sizemetahist))
       allocate (metawhist(sizemetahist))
       do i = 1, sizemetahist
+         metaihist(i) = 0
          metalhist(i) = 0.0d0
          metahhist(i) = 0.0d0
          metawhist(i) = 0.0d0
