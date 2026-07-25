@@ -11,6 +11,7 @@ extern int TINKER_MOD(ost, iosthist);
 extern int TINKER_MOD(ost, nflmda);
 extern int TINKER_MOD(ost, nlmda);
 extern int TINKER_MOD(ost, nmetahist);
+extern int TINKER_MOD(ost, nmethistsave);
 extern int TINKER_MOD(ost, nosthist);
 extern int TINKER_MOD(ost, nosthistsave);
 extern int TINKER_MOD(ost, ostnavg);

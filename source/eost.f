@@ -2297,7 +2297,8 @@ c     ##########################################################
 c
 c
 c     "savemeta" writes the information needed to restart a
-c     metadynamics simulation to the external .meta restart file
+c     metadynamics simulation to the external .meta restart file; the
+c     fixed-size header is updated in place and new history is appended
 c
 c
       subroutine savemeta
@@ -2315,19 +2316,29 @@ c
       if (.not. use_meta)  return
       if (.not. allocated(metalhist))  return
 c
-c     update an existing metadynamics restart file or open a new one
+c     create a new restart file or append only new history entries
 c
       ihis = freeunit ()
       metafile = filename(1:leng)//'.meta'
       inquire (file=metafile,exist=exist)
-      if (exist) then
-         open (unit=ihis,file=metafile,status='old')
-         rewind (unit=ihis)
+      if (.not. exist .or. nmetahist.lt.nmethistsave) then
+         open (unit=ihis,file=metafile,status='replace',
+     &         access='stream',form='formatted')
+         call prtmeta (ihis)
+         close (unit=ihis)
       else
-         open (unit=ihis,file=metafile,status='new')
+         if (nmetahist .gt. nmethistsave) then
+            open (unit=ihis,file=metafile,status='old',
+     &            access='stream',form='formatted',position='append')
+            call prtmetahist (ihis,nmethistsave+1,nmetahist)
+            close (unit=ihis)
+         end if
+         open (unit=ihis,file=metafile,status='old',
+     &         access='stream',form='unformatted',position='rewind')
+         call updmetahead (ihis)
+         close (unit=ihis)
       end if
-      call prtmeta (ihis)
-      close (unit=ihis)
+      nmethistsave = nmetahist
       return
       end
 c
@@ -2449,6 +2460,7 @@ c
       close (unit=ihis)
       eosttot = metadeltag()
       metarestart = .true.
+      nmethistsave = nmetahist
       if (debug) then
          write (iout,20)  metafile(1:trimtext(metafile))
    20    format (/,' Restarting Metadynamics Bias from :  ',a)
@@ -2481,7 +2493,30 @@ c
       subroutine prtmeta (ihis)
       use ost
       implicit none
-      integer ihist
+      integer ihis
+c
+c
+c     write the header followed by all current history entries
+c
+      call prtmetahead (ihis)
+      call prtmetahist (ihis,1,nmetahist)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine prtmetahead  --  output metadynamics header  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "prtmetahead" writes the fixed-size metadynamics restart header
+c
+c
+      subroutine prtmetahead (ihis)
+      use ost
+      implicit none
       integer ihis
 c
 c
@@ -2498,13 +2533,6 @@ c
       write (ihis,80)
       write (ihis,90)  hbias,eosttot
       write (ihis,100)
-c
-c     write saved metadynamics gaussian entries
-c
-      do ihist = 1, nmetahist
-         write (ihis,110)  ihist,metalhist(ihist),
-     &      metahhist(ihist),metawhist(ihist)
-      end do
    10 format (' Metadynamics Restart :')
    20 format (' Integer State :')
    30 format (4i12)
@@ -2515,7 +2543,105 @@ c
    80 format (' Bias State :')
    90 format (2d26.16)
   100 format (' Gaussian History :')
-  110 format (i12,3d26.16)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine updmetahead  --  update metadynamics header  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "updmetahead" overwrites the fixed-size metadynamics header in
+c     place; unformatted stream output avoids truncating the history
+c
+c
+      subroutine updmetahead (ihis)
+      use ost
+      implicit none
+      integer ihis
+      integer ieol
+      integer leol
+      character*240 record
+      character*2 newline
+c
+c     preserve the file's existing line-ending convention
+c
+      read (ihis,pos=1)  record
+      ieol = index(record,achar(10))
+      newline = achar(10)//' '
+      leol = 1
+      if (ieol .gt. 1) then
+         if (record(ieol-1:ieol-1) .eq. achar(13)) then
+            newline = achar(13)//achar(10)
+            leol = 2
+         end if
+      end if
+c
+c     format each header record internally and write its raw bytes
+c
+      write (record,10)
+      write (ihis,pos=1)  record(1:len_trim(record)),newline(1:leol)
+      write (record,20)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,30)  iost,iosthist,nmetahist,sizemetahist
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,40)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,50)  wlmda,wlmda2
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,60)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,70)  ostlambda,ostlambdaavg,osttheta,
+     &                   ostvtheta,ostmass,ostfriction,ostdt
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,80)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,90)  hbias,eosttot
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,100)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+   10 format (' Metadynamics Restart :')
+   20 format (' Integer State :')
+   30 format (4i12)
+   40 format (' Grid State :')
+   50 format (2d26.16)
+   60 format (' Lambda State :')
+   70 format (7d26.16)
+   80 format (' Bias State :')
+   90 format (2d26.16)
+  100 format (' Gaussian History :')
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine prtmetahist  --  output metadynamics history  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "prtmetahist" writes a requested range of metadynamics gaussians
+c
+c
+      subroutine prtmetahist (ihis,ifirst,ilast)
+      use ost
+      implicit none
+      integer ihis
+      integer ifirst
+      integer ilast
+      integer ihist
+c
+c     write saved metadynamics gaussian entries
+c
+      do ihist = ifirst, ilast
+         write (ihis,10)  ihist,metalhist(ihist),
+     &      metahhist(ihist),metawhist(ihist)
+      end do
+   10 format (i12,3d26.16)
       return
       end
 c

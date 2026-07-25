@@ -1158,6 +1158,12 @@ void rdmeta_();
 #define tinker_f_rdmeta rdmeta_
 void prtmeta_(int* ihis);
 #define tinker_f_prtmeta prtmeta_
+void prtmetahead_(int* ihis);
+#define tinker_f_prtmetahead prtmetahead_
+void updmetahead_(int* ihis);
+#define tinker_f_updmetahead updmetahead_
+void prtmetahist_(int* ihis, int* ifirst, int* ilast);
+#define tinker_f_prtmetahist prtmetahist_
 void ij_to_k_(int* i, int* j, int* nrow, int* k);
 #define tinker_f_ij_to_k ij_to_k_
 void k_to_ij_(int* k, int* nrow, int* i, int* j);
