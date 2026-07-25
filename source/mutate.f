@@ -507,6 +507,7 @@ c
       if (use_ost) then
          if (allocated(osthhist))  deallocate (osthhist)
          if (allocated(osthist))  deallocate (osthist)
+         if (allocated(ostihist))  deallocate (ostihist)
          if (allocated(osthead))  deallocate (osthead)
          if (allocated(ostnext))  deallocate (ostnext)
          if (allocated(ostllist))  deallocate (ostllist)
@@ -526,6 +527,7 @@ c
          nosthist = 0
          allocate (osthhist(sizeosthist))
          allocate (osthist(sizeosthist))
+         allocate (ostihist(sizeosthist))
          allocate (osthead(nlmda,nflmda))
          allocate (ostnext(sizeosthist))
          allocate (ostllist(iosthist))
@@ -562,6 +564,7 @@ c
          end do
          do i = 1, sizeosthist
             osthist(i) = 0
+            ostihist(i) = 0
             ostnext(i) = 0
             ostlhist(i) = 0.0d0
             ostfhist(i) = 0.0d0
@@ -577,15 +580,23 @@ c
          if (allocated(metalhist))  deallocate (metalhist)
          if (allocated(metahhist))  deallocate (metahhist)
          if (allocated(metawhist))  deallocate (metawhist)
+         if (allocated(metaihist))  deallocate (metaihist)
+         if (allocated(ostllist))  deallocate (ostllist)
          sizemetahist = 10000
          nmetahist = 0
          allocate (metalhist(sizemetahist))
          allocate (metahhist(sizemetahist))
          allocate (metawhist(sizemetahist))
+         allocate (metaihist(sizemetahist))
+         allocate (ostllist(iosthist))
          do i = 1, sizemetahist
             metalhist(i) = 0.0d0
             metahhist(i) = 0.0d0
             metawhist(i) = 0.0d0
+            metaihist(i) = 0
+         end do
+         do i = 1, iosthist
+            ostllist(i) = 0.0d0
          end do
       end if
 c

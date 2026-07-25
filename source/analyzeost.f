@@ -361,7 +361,7 @@ c
             call buildfkernel
          end if
          freeeng = etotfkernel()
-         step = ihist * iosthist
+         step = ostihist(ihist)
          write (iout,20)  ihist,step,ostlhist(ihist),ostfhist(ihist),
      &      freeeng,osthhist(ihist),ostwlhist(ihist),ostwfhist(ihist)
    20    format (i7,i12,6d20.10)

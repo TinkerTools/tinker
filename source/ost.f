@@ -32,9 +32,11 @@ c     ostinvepn     inverse-power exponent for polarization mapping
 c     ostinvevn     inverse-power exponent for van der Waals mapping
 c     sizeosthist   current allocation size for saved histograms
 c     sizemetahist  current allocation size for metadynamics gaussians
-c     osthist       packed lambda/flambda bin for saved gaussians
-c     ostnext       next histogram index in the same lambda/flambda bin
+c     metaihist     iost step at which each gaussian was added
 c     osthead       first histogram index for each lambda/flambda bin
+c     osthist       packed lambda/flambda bin for saved gaussians
+c     ostihist      iost step at which each gaussian was added
+c     ostnext       next histogram index in the same lambda/flambda bin
 c     deffdl        effective lambda derivative for propagation
 c     eosttot       total ost free energy
 c     hbias         height of biasing gaussian
@@ -94,7 +96,7 @@ c     fastkernel    flag to use fused g and f kernel updates
 c     metarestart   flag to indicate metadynamics restart data was read
 c     ostinterpol   flag to interpolate ost g kernel from grid
 c     ostrestart    flag to indicate ost restart data was read
-c     osttrial      flag to evaluate ost bias without depositing gaussians
+c     osttrial      flag to evaluate ost bias w/o depositing gaussians
 c     use_meta      flag to use metadynamics
 c     use_metadyn   flag to propagate metadynamics lambda particle
 c     use_ost       flag to use orthogonal space tempering
@@ -127,9 +129,11 @@ c
       integer ostinvevn
       integer sizeosthist
       integer sizemetahist
-      integer, allocatable :: osthist(:)
-      integer, allocatable :: ostnext(:)
+      integer, allocatable :: metaihist(:)
       integer, allocatable :: osthead(:,:)
+      integer, allocatable :: osthist(:)
+      integer, allocatable :: ostihist(:)
+      integer, allocatable :: ostnext(:)
       real*8 deffdl
       real*8 eosttot
       real*8 hbias

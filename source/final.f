@@ -926,6 +926,7 @@ c     deallocation of global arrays from module ost
 c
       if (allocated(osthhist))  deallocate (osthhist)
       if (allocated(osthist))  deallocate (osthist)
+      if (allocated(ostihist))  deallocate (ostihist)
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(ostnext))  deallocate (ostnext)
       if (allocated(ostllist))  deallocate (ostllist)
@@ -944,6 +945,7 @@ c
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
+      if (allocated(metaihist))  deallocate (metaihist)
 c
 c     deallocation of global arrays from module output
 c
