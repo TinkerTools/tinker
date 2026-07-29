@@ -25,6 +25,7 @@ c                   2=ligand B) used for relative free energy dual topo
 c     lambda      generic weighting between initial and final states
 c     vlambda     state weighting value for van der Waals potentials
 c     elambda     state weighting value for electrostatic potentials
+c     plambda     state weighting value for polarization potentials
 c     tlambda     state weighting value for torsional potential
 c     scexp       scale factor for soft core buffered 14-7 potential
 c     scalpha     scale factor for soft core buffered 14-7 potential
@@ -49,6 +50,7 @@ c
       real*8 lambda
       real*8 vlambda
       real*8 elambda
+      real*8 plambda
       real*8 tlambda
       real*8 scexp
       real*8 scalpha

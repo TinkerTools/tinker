@@ -2126,7 +2126,6 @@ c
       use energi
       use limits
       use mutant
-      use ost
       use potent
       implicit none
       real*8 ep1,ep0
@@ -2222,7 +2221,7 @@ c     state left by "altelec"
 c
 c
       subroutine epolar0p
-      use dlmda
+      use mutant
       implicit none
       real*8 plmdaorig
 c

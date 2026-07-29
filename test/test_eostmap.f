@@ -58,13 +58,13 @@ c     test exponential sublambda maps and chain rule derivatives
 c
       call resetost (5,5,1)
       ostlambda = 0.25d0
-      ostpmap = 'EXP'
-      ostemap = 'EXP'
-      ostvmap = 'EXP'
-      ostepexp = 2
-      ostemexp = 3
-      ostevexp = 4
-      call mapsublmda
+      plmdamap = 'EXP'
+      elmdamap = 'EXP'
+      vlmdamap = 'EXP'
+      plmdaexp = 2
+      elmdaexp = 3
+      vlmdaexp = 4
+      call mapsublmda (ostlambda)
       call assert_real (plambda,0.0625d0,1.0d-12,
      &                  'mapsublmda exponential plambda')
       call assert_real (dpldlmda,0.5d0,1.0d-12,
@@ -88,16 +88,16 @@ c     test shifted inverse-power sublambda maps and derivatives
 c
       call resetost (5,5,1)
       ostlambda = 0.25d0
-      ostpmap = 'INV'
-      ostemap = 'INV'
-      ostvmap = 'INV'
-      ostinvepn = 2
-      ostinvemn = 3
-      ostinvevn = 4
-      ostinvepeps = 0.01d0
-      ostinvemeps = 0.02d0
-      ostinveveps = 0.03d0
-      call mapsublmda
+      plmdamap = 'INV'
+      elmdamap = 'INV'
+      vlmdamap = 'INV'
+      plmdainvn = 2
+      elmdainvn = 3
+      vlmdainvn = 4
+      plmdainveps = 0.01d0
+      elmdainveps = 0.02d0
+      vlmdainveps = 0.03d0
+      call mapsublmda (ostlambda)
       call assert_real (plambda,0.452936557937477d0,1.0d-12,
      &                  'mapsublmda invpower plambda')
       call assert_real (dpldlmda,1.08352945028593d0,1.0d-12,
@@ -122,21 +122,21 @@ c     where the sublambda is the complement of the taper
 c
       use_bounds = .false.
       call resetost (5,5,1)
-      ostplmda0 = 0.2d0
-      ostplmda1 = 0.8d0
-      ostelmda0 = 0.3d0
-      ostelmda1 = 0.7d0
-      ostvlmda0 = 0.1d0
-      ostvlmda1 = 0.9d0
-      ostpmap = 'QNT'
-      ostemap = 'QNT'
-      ostvmap = 'QNT'
+      qntplmda0 = 0.2d0
+      qntplmda1 = 0.8d0
+      qntelmda0 = 0.3d0
+      qntelmda1 = 0.7d0
+      qntvlmda0 = 0.1d0
+      qntvlmda1 = 0.9d0
+      plmdamap = 'QNT'
+      elmdamap = 'QNT'
+      vlmdamap = 'QNT'
       ostlambda = 0.5d0
 c
 c     each sublambda uses its own window, so the midpoint value is
 c     one half for all three but the slopes differ
 c
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_real (plambda,0.5d0,1.0d-12,
      &                  'mapsublmda taper plambda')
       call assert_real (elambda,0.5d0,1.0d-12,
@@ -161,7 +161,7 @@ c     off center where the second derivative is nonzero
 c
       ostlambda = 0.35d0
       call refquintic (0.35d0,0.2d0,0.8d0,tref,dtref,d2tref)
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_real (plambda,1.0d0-tref,1.0d-12,
      &                  'mapsublmda taper offcenter plambda')
       call assert_real (dpldlmda,-dtref,1.0d-12,
@@ -173,13 +173,13 @@ c     below the polarization window the sublambda is fully off and
 c     above it the sublambda is fully on
 c
       ostlambda = 0.1d0
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_real (plambda,0.0d0,1.0d-12,
      &                  'mapsublmda taper below window plambda')
       call assert_real (dpldlmda,0.0d0,1.0d-12,
      &                  'mapsublmda taper below window dpldlmda')
       ostlambda = 0.9d0
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_real (plambda,1.0d0,1.0d-12,
      &                  'mapsublmda taper above window plambda')
       call assert_real (dpldlmda,0.0d0,1.0d-12,
@@ -188,21 +188,21 @@ c
 c     a QNT polarization map sets the initial and final polarization
 c     flags by comparing lambda against the polarization window
 c
-      ostpmap = 'QNT'
+      plmdamap = 'QNT'
       ostlambda = 0.1d0
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i below window')
       call assert_logical (use_pol4f,.false.,
      &                     'mapsublmda qnt pol4f below window')
       ostlambda = 0.5d0
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i mid window')
       call assert_logical (use_pol4f,.true.,
      &                     'mapsublmda qnt pol4f mid window')
       ostlambda = 0.9d0
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_logical (use_pol4i,.false.,
      &                     'mapsublmda qnt pol4i above window')
       call assert_logical (use_pol4f,.true.,
@@ -212,13 +212,13 @@ c     anywhere inside the window both endpoint states still
 c     contribute, since plambda has not yet pinned to zero or one
 c
       ostlambda = 0.65d0
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i upper ramp')
       call assert_logical (use_pol4f,.true.,
      &                     'mapsublmda qnt pol4f upper ramp')
       ostlambda = 0.30d0
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i lower ramp')
       call assert_logical (use_pol4f,.true.,
@@ -227,14 +227,14 @@ c
 c     the window bounds are inclusive, so a lambda sitting exactly
 c     on either edge must keep both endpoint states
 c
-      ostlambda = ostplmda1
-      call mapsublmda
+      ostlambda = qntplmda1
+      call mapsublmda (ostlambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i at upper bound')
       call assert_logical (use_pol4f,.true.,
      &                     'mapsublmda qnt pol4f at upper bound')
-      ostlambda = ostplmda0
-      call mapsublmda
+      ostlambda = qntplmda0
+      call mapsublmda (ostlambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i at lower bound')
       call assert_logical (use_pol4f,.true.,
@@ -242,12 +242,12 @@ c
 c
 c     a non QNT polarization map must leave the flags untouched
 c
-      ostpmap = 'EXP'
-      ostepexp = 2
+      plmdamap = 'EXP'
+      plmdaexp = 2
       use_pol4i = .false.
       use_pol4f = .false.
       ostlambda = 0.5d0
-      call mapsublmda
+      call mapsublmda (ostlambda)
       call assert_logical (use_pol4i,.false.,
      &                     'mapsublmda exp leaves pol4i')
       call assert_logical (use_pol4f,.false.,
@@ -394,7 +394,7 @@ c
 c
       subroutine test_eostmap_taper
       use bound
-      use ost
+      use dlmda
       implicit none
       real*8 taper,dtaper,d2taper
       real*8 tref,dtref,d2tref
@@ -408,13 +408,13 @@ c
 c     use a distinct taper window for each sublambda so a mode
 c     that reads the wrong window cannot pass
 c
-      ostplmda0 = 0.2d0
-      ostplmda1 = 0.8d0
-      ostelmda0 = 0.3d0
-      ostelmda1 = 0.7d0
-      ostvlmda0 = 0.1d0
-      ostvlmda1 = 0.9d0
-      mode = 'OSTPOL'
+      qntplmda0 = 0.2d0
+      qntplmda1 = 0.8d0
+      qntelmda0 = 0.3d0
+      qntelmda1 = 0.7d0
+      qntvlmda0 = 0.1d0
+      qntvlmda1 = 0.9d0
+      mode = 'QNTPOL'
 c
 c     below and at the lower bound the taper is fully on and flat
 c
@@ -480,22 +480,22 @@ c
 c     the same lambda gives different results per mode because each
 c     mode selects its own taper window
 c
-      mode = 'OSTELE'
+      mode = 'QNTELE'
       call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
       call assert_real (taper,1.0d0,1.0d-12,
-     &                  'sublmdataper ostele below own cut')
-      mode = 'OSTVDW'
+     &                  'sublmdataper qntele below own cut')
+      mode = 'QNTVDW'
       call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
       call refquintic (0.25d0,0.1d0,0.9d0,tref,dtref,d2tref)
       call assert_real (taper,tref,1.0d-12,
-     &                  'sublmdataper ostvdw own window taper')
+     &                  'sublmdataper qntvdw own window taper')
       call assert_real (dtaper,dtref,1.0d-12,
-     &                  'sublmdataper ostvdw own window dtaper')
-      mode = 'OSTPOL'
+     &                  'sublmdataper qntvdw own window dtaper')
+      mode = 'QNTPOL'
       call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
       call refquintic (0.25d0,0.2d0,0.8d0,tref,dtref,d2tref)
       call assert_real (taper,tref,1.0d-12,
-     &                  'sublmdataper ostpol own window taper')
+     &                  'sublmdataper qntpol own window taper')
       return
       end
 c

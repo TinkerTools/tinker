@@ -22,6 +22,7 @@ c
       use bath
       use bndstr
       use bound
+      use dlmda
       use extfld
       use inform
       use iounit
@@ -235,7 +236,7 @@ c     read adaptive-bias restart files
 c
       if (use_ost)  call rdost
       if (use_meta)  call rdmeta
-      if (use_ost .or. use_meta)  call mapsublmda
+      if (use_ost .or. use_meta)  call mapsublmda (ostlambda)
 c
 c     perform the setup functions needed to run dynamics
 c

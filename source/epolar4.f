@@ -81,7 +81,6 @@ c
       use dlmda
       use limits
       use mutant
-      use ost
       use polar
       use polpot
       use potent

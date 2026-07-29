@@ -128,8 +128,10 @@ c
 c     add a new histogram count every iosthist steps
 c
       if (istep .eq. 0) then
-         call avgstd (ostllist,ostlambdaavg,ostlambdastd)
-         call avgstd (ostflist,ostdedlavg,ostdedlstd)
+         call avgstd (ostllist,ostnequil+1,ostnavg,
+     &                ostlambdaavg,ostlambdastd)
+         call avgstd (ostflist,ostnequil+1,ostnavg,
+     &                ostdedlavg,ostdedlstd)
          ilmda = lambdabin(ostlambdaavg)
 c
 c     ensure histogram contains the unbiased dU/dlambda value
@@ -168,46 +170,6 @@ c
 c     propagate the lambda particle for the next dynamics step
 c
       call ostlangevin
-      return 
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine avgstd -- average and std deviation kernel  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "avgstd" computes the average and population standard deviation
-c     of the post-equilibration samples collected between hist updates
-c
-c
-      subroutine avgstd (list,avg,std)
-      use ost
-      implicit none
-      integer i
-      real*8 avg,std
-      real*8 delta
-      real*8 list(*)
-c
-c
-c     compute the average from the collected samples
-c
-      avg = 0.0d0
-      do i = ostnequil+1, iosthist
-         avg = avg + list(i)
-      end do
-      avg = avg / dble(ostnavg)
-c
-c     compute the population standard deviation of the samples
-c
-      std = 0.0d0
-      do i = ostnequil+1, iosthist
-         delta = list(i) - avg
-         std = std + delta*delta
-      end do
-      std = sqrt(std/dble(ostnavg))
       return
       end
 c
@@ -252,7 +214,8 @@ c
 c     add a new metadynamics gaussian every iosthist steps
 c
       if (istep .eq. 0) then
-         call avgstd (ostllist,ostlambdaavg,ostlambdastd)
+         call avgstd (ostllist,ostnequil+1,ostnavg,
+     &                ostlambdaavg,ostlambdastd)
          nmetahist = nmetahist + 1
          if (nmetahist .gt. sizemetahist)  call resizemeta
          metalhist(nmetahist) = ostlambdaavg
@@ -471,54 +434,7 @@ c     map theta back to lambda and refresh sublambda values
 c
       sinth = sin(osttheta)
       ostlambda = sinth * sinth
-      call mapsublmda
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine lmdachain -- chain rule for main lambda deriv  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "lmdachain" applies chain rule to the main lambda derivative
-c     to compute the global lambda derivative of energy, energy^2,
-c     force, and virial
-c
-c
-      subroutine lmdachain
-      use atoms
-      use dlmda
-      use mutant
-      use ost
-      implicit none
-      integer i,j
-c
-c
-c     apply chain rule for derivative of energy wrt global lambda
-c
-      d2epdl2 = d2epdl2 * dpldlmda*dpldlmda + depdl * d2pldlmda2
-      depdl = depdl * dpldlmda
-      d2evdl2 = d2evdl2 * dvldlmda*dvldlmda + devdl * d2vldlmda2
-      devdl = devdl * dvldlmda
-      d2emdl2 = d2emdl2 * deldlmda*deldlmda + demdl * d2eldlmda2
-      demdl = demdl * deldlmda
-      do i = 1, n
-         do j = 1, 3
-            dfpdl(j,i) = dfpdl(j,i) * dpldlmda
-            dfmdl(j,i) = dfmdl(j,i) * deldlmda
-            dfvdl(j,i) = dfvdl(j,i) * dvldlmda
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            depvirdl(j,i) = depvirdl(j,i) * dpldlmda
-            demvirdl(j,i) = demvirdl(j,i) * deldlmda
-            devvirdl(j,i) = devvirdl(j,i) * dvldlmda
-         end do
-      end do
+      call mapsublmda (ostlambda)
       return
       end
 c
@@ -639,247 +555,6 @@ c
       deallocate (gkernel0)
       deallocate (glfkernel0)
       deallocate (glkernel0)
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine mapsublmda -- map from lambda to sublambda  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "mapsublmda" maps from main lambda to sublambdas
-c
-c
-      subroutine mapsublmda
-      use dlmda
-      use mutant
-      use ost
-      implicit none
-      real*8 taper
-      real*8 dtaper
-      real*8 d2taper
-      character*6 mode
-c
-c
-c     map from lambda to sublambdas
-c
-      if (ostpmap .eq. 'EXP') then
-         call sublmdaexp (ostlambda,ostepexp,plambda,
-     &                    dpldlmda,d2pldlmda2)
-      else if (ostpmap .eq. 'INV') then
-         call sublmdainvpower (ostlambda,ostinvepn,ostinvepeps,plambda,
-     &                         dpldlmda,d2pldlmda2)
-      else
-         mode = 'OSTPOL'
-         call sublmdataper (mode,ostlambda,taper,dtaper,d2taper)
-         plambda = 1.0d0 - taper
-         dpldlmda = -dtaper
-         d2pldlmda2 = -d2taper
-      end if
-      if (ostemap .eq. 'EXP') then
-         call sublmdaexp (ostlambda,ostemexp,elambda,
-     &                    deldlmda,d2eldlmda2)
-      else if (ostemap .eq. 'INV') then
-         call sublmdainvpower (ostlambda,ostinvemn,ostinvemeps,elambda,
-     &                         deldlmda,d2eldlmda2)
-      else
-         mode = 'OSTELE'
-         call sublmdataper (mode,ostlambda,taper,dtaper,d2taper)
-         elambda = 1.0d0 - taper
-         deldlmda = -dtaper
-         d2eldlmda2 = -d2taper
-      end if
-      if (ostvmap .eq. 'EXP') then
-         call sublmdaexp (ostlambda,ostevexp,vlambda,
-     &                    dvldlmda,d2vldlmda2)
-      else if (ostvmap .eq. 'INV') then
-         call sublmdainvpower (ostlambda,ostinvevn,ostinveveps,vlambda,
-     &                         dvldlmda,d2vldlmda2)
-      else
-         mode = 'OSTVDW'
-         call sublmdataper (mode,ostlambda,taper,dtaper,d2taper)
-         vlambda = 1.0d0 - taper
-         dvldlmda = -dtaper
-         d2vldlmda2 = -d2taper
-      end if
-c
-c     set flags to compute polarization lambda derivative
-c
-      if (ostpmap .eq. 'QNT') then
-         use_pol4i = (ostlambda .le. ostplmda1)
-         use_pol4f = (ostlambda .ge. ostplmda0)
-      end if
-      return
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine sublmdaexp -- exponential sublambda mapping  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "sublmdaexp" maps from main lambda to a sublambda using a
-c     power law and returns the first and second lambda derivatives
-c
-c
-      subroutine sublmdaexp (x,exponent,lmda,dlmda,d2lmda)
-      implicit none
-      integer exponent
-      real*8 x
-      real*8 lmda
-      real*8 dlmda
-      real*8 d2lmda
-      real*8 expnt
-c
-c
-c     initialize values and handle endpoints explicitly
-c
-      expnt = dble(exponent)
-      if (x .le. 0.0d0) then
-         lmda = 0.0d0
-         if (exponent .eq. 1) then
-            dlmda = 1.0d0
-            d2lmda = 0.0d0
-         else if (exponent .eq. 2) then
-            dlmda = 0.0d0
-            d2lmda = 2.0d0
-         else
-            dlmda = 0.0d0
-            d2lmda = 0.0d0
-         end if
-         return
-      else if (x .ge. 1.0d0) then
-         lmda = 1.0d0
-         dlmda = expnt
-         d2lmda = expnt * (expnt-1.0d0)
-         return
-      end if
-c
-c     compute lambda^exponent and its derivatives
-c
-      lmda = x**exponent
-      dlmda = expnt * x**(exponent-1)
-      if (exponent .eq. 1) then
-         d2lmda = 0.0d0
-      else
-         d2lmda = expnt * (expnt-1.0d0) * x**(exponent-2)
-      end if
-      return
-      end
-c
-c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine sublmdainvpower -- inverse-power mapping  ##
-c     ##                                                       ##
-c     ###########################################################
-c
-c
-c     "sublmdainvpower" maps from main lambda to sublambda using a
-c     shifted inverse-power law and returns first and second lambda
-c     derivatives
-c
-c
-      subroutine sublmdainvpower (x,n,eps,lmda,dlmda,d2lmda)
-      implicit none
-      integer n
-      real*8 x
-      real*8 eps
-      real*8 lmda
-      real*8 dlmda
-      real*8 d2lmda
-      real*8 xval
-      real*8 shift
-      real*8 power
-      real*8 root0
-      real*8 denom
-      real*8 base
-c
-c
-c     set a bounded coordinate and handle the identity map directly
-c
-      xval = x
-      if (xval .lt. 0.0d0)  xval = 0.0d0
-      if (xval .gt. 1.0d0)  xval = 1.0d0
-      if (n .le. 1) then
-         lmda = xval
-         dlmda = 1.0d0
-         d2lmda = 0.0d0
-         return
-      end if
-c
-c     compute normalized shifted inverse-power map
-c
-      shift = eps
-      if (shift .le. 0.0d0)  shift = 0.1d0
-      power = 1.0d0 / dble(n)
-      root0 = shift**power
-      denom = (1.0d0+shift)**power - root0
-      base = xval + shift
-      lmda = (base**power-root0) / denom
-      dlmda = power * base**(power-1.0d0) / denom
-      d2lmda = power * (power-1.0d0)
-     &           * base**(power-2.0d0) / denom
-      return
-      end
-c
-c
-c     #######################################################
-c     ##                                                   ##
-c     ##  subroutine sublmdataper -- tapers the sublambda  ##
-c     ##                                                   ##
-c     #######################################################
-c
-c
-c     "sublmdataper" tapers the mapping from main lambda to
-c     sublambda at the endpoints
-c
-c
-      subroutine sublmdataper (mode,x,taper,dtaper,d2taper)
-      use shunt
-      implicit none
-      real*8 taper
-      real*8 dtaper
-      real*8 d2taper
-      real*8 x,x2,x3
-      real*8 x4,x5
-      character*6 mode
-c
-c
-c     get taper coefficients from existing Tinker switch routine
-c
-      call switch (mode)
-c
-c     return if outside switching window
-c
-      if (x .le. cut) then
-         taper = 1.0d0
-         dtaper = 0.0d0
-         d2taper = 0.0d0
-         return
-      else if (x .ge. off) then
-         taper = 0.0d0
-         dtaper = 0.0d0
-         d2taper = 0.0d0
-         return
-      end if
-c
-c     compute the quintic taper and derivative
-c
-      x2 = x*x
-      x3 = x2*x
-      x4 = x2*x2
-      x5 = x2*x3
-      taper = c5*x5 + c4*x4 + c3*x3 + c2*x2 + c1*x + c0
-      dtaper = 5.0d0*c5*x4 + 4.0d0*c4*x3 + 3.0d0*c3*x2
-     &            + 2.0d0*c2*x + c1
-      d2taper = 20.0d0*c5*x3 + 12.0d0*c4*x2 + 6.0d0*c3*x
-     &             + 2.0d0*c2
       return
       end
 c
@@ -1870,6 +1545,7 @@ c     header is updated in place and new history is appended
 c
 c
       subroutine saveost
+      use dlmda
       use files
       use ost
       implicit none
@@ -1926,6 +1602,7 @@ c     the histogram lookup and bias kernels
 c
 c
       subroutine rdost
+      use dlmda
       use files
       use inform
       use iounit
@@ -2299,6 +1976,7 @@ c     fixed-size header is updated in place and new history is appended
 c
 c
       subroutine savemeta
+      use dlmda
       use files
       use ost
       implicit none
@@ -2352,6 +2030,7 @@ c     metadynamics simulation from the external .meta restart file
 c
 c
       subroutine rdmeta
+      use dlmda
       use files
       use inform
       use iounit

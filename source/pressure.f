@@ -545,6 +545,7 @@ c
       use atoms
       use bath
       use boxes
+      use dlmda
       use group
       use math
       use mdstuf

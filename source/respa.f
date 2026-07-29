@@ -772,7 +772,6 @@ c
       subroutine gradfast (energy,derivs)
       use dlmda
       use limits
-      use ost
       use potent
       implicit none
       real*8 energy

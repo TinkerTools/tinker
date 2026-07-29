@@ -5,11 +5,11 @@ c     ##  COPYRIGHT (C) 2026 by  Moses Chung, Pengyu Ren, Jay Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  program analyzeost  --  analyze an OST restart file     ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  program analyzeost  --  analyze an OST restart file  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
 c     "analyzeost" reads an orthogonal space tempering restart file
@@ -96,11 +96,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ostgridkey  --  override ost analysis grid    ##
-c     ##                                                           ##
-c     ###############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine ostgridkey  --  override ost analysis grid  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "ostgridkey" checks the keyfile for requested analysis grid
@@ -162,11 +162,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine remeshost  --  rebuild ost on a new grid      ##
-c     ##                                                           ##
-c     ###############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine remeshost  --  rebuild ost on a new grid  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
 c     "remeshost" changes the analysis grid while preserving the
@@ -267,11 +267,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ostbasename  --  set base name for OST file   ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine ostbasename  --  set base name for OST file  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "ostbasename" strips a trailing ".ost" suffix, if present, and
@@ -302,11 +302,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ostseries  --  print OST time series data     ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine ostseries  --  print OST time series data  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
 c     "ostseries" prints saved OST history entries and recomputes
@@ -374,11 +374,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ostfreeenergy  --  print final OST free energy##
-c     ##                                                           ##
-c     ###############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine ostfreeenergy  --  print final OST free energy  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
 c     "ostfreeenergy" prints the final free energy estimate from the
@@ -412,11 +412,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ostgkernel  --  print OST g kernel grid       ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine ostgkernel  --  print OST g kernel grid  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
 c     "ostgkernel" prints the OST g kernel on its lambda/flambda grid

@@ -146,24 +146,24 @@ c
 c
 c     set default mapping from main lambda to sublambda
 c
-      ostelmda1 = 0.8d0
-      ostelmda0 = 0.3d0
-      ostplmda1 = 1.0d0
-      ostplmda0 = 0.5d0
-      ostvlmda1 = 0.5d0
-      ostvlmda0 = 0.0d0
-      ostemap = 'QNT'
-      ostpmap = 'QNT'
-      ostvmap = 'QNT'
-      ostemexp = 1
-      ostepexp = 1
-      ostevexp = 1
-      ostinvemn = 4
-      ostinvepn = 4
-      ostinvevn = 4
-      ostinvemeps = 0.3d0
-      ostinvepeps = 0.3d0
-      ostinveveps = 0.3d0
+      qntelmda1 = 0.8d0
+      qntelmda0 = 0.3d0
+      qntplmda1 = 1.0d0
+      qntplmda0 = 0.5d0
+      qntvlmda1 = 0.5d0
+      qntvlmda0 = 0.0d0
+      elmdamap = 'QNT'
+      plmdamap = 'QNT'
+      vlmdamap = 'QNT'
+      elmdaexp = 1
+      plmdaexp = 1
+      vlmdaexp = 1
+      elmdainvn = 4
+      plmdainvn = 4
+      vlmdainvn = 4
+      elmdainveps = 0.3d0
+      plmdainveps = 0.3d0
+      vlmdainveps = 0.3d0
       ostlambda = 1.0d0
       ostlambdaavg = 0.0d0
       ostlambdastd = 0.0d0
@@ -321,49 +321,49 @@ c
             read (string,*,err=30)  osteqratio
          else if (keyword(1:15) .eq. 'ELE-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=30)  ostelmda0, ostelmda1
+            read (string,*,err=30)  qntelmda0, qntelmda1
          else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=30)  ostplmda0, ostplmda1
+            read (string,*,err=30)  qntplmda0, qntplmda1
          else if (keyword(1:15) .eq. 'VDW-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=30)  ostvlmda0, ostvlmda1
+            read (string,*,err=30)  qntvlmda0, qntvlmda1
          else if (keyword(1:13) .eq. 'ELE-LMDA-MAP ') then
-            call getword (record,ostemap,next)
-            call upcase (ostemap)
+            call getword (record,elmdamap,next)
+            call upcase (elmdamap)
          else if (keyword(1:13) .eq. 'POL-LMDA-MAP ') then
-            call getword (record,ostpmap,next)
-            call upcase (ostpmap)
+            call getword (record,plmdamap,next)
+            call upcase (plmdamap)
          else if (keyword(1:13) .eq. 'VDW-LMDA-MAP ') then
-            call getword (record,ostvmap,next)
-            call upcase (ostvmap)
+            call getword (record,vlmdamap,next)
+            call upcase (vlmdamap)
          else if (keyword(1:13) .eq. 'ELE-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  ostemexp
+            read (string,*,err=30)  elmdaexp
          else if (keyword(1:13) .eq. 'POL-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  ostepexp
+            read (string,*,err=30)  plmdaexp
          else if (keyword(1:13) .eq. 'VDW-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  ostevexp
+            read (string,*,err=30)  vlmdaexp
          else if (keyword(1:15) .eq. 'ELE-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=30)  ostinvemn
+            read (string,*,err=30)  elmdainvn
          else if (keyword(1:15) .eq. 'POL-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=30)  ostinvepn
+            read (string,*,err=30)  plmdainvn
          else if (keyword(1:15) .eq. 'VDW-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=30)  ostinvevn
+            read (string,*,err=30)  vlmdainvn
          else if (keyword(1:17) .eq. 'ELE-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=30)  ostinvemeps
+            read (string,*,err=30)  elmdainveps
          else if (keyword(1:17) .eq. 'POL-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=30)  ostinvepeps
+            read (string,*,err=30)  plmdainveps
          else if (keyword(1:17) .eq. 'VDW-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=30)  ostinveveps
+            read (string,*,err=30)  vlmdainveps
          else if (keyword(1:11) .eq. 'OST-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  ostlambda
@@ -419,17 +419,17 @@ c
 c
 c     validate mapping schemes from main lambda to sublambdas
 c
-      if (ostpmap.ne.'QNT' .and. ostpmap.ne.'EXP'
-     &       .and. ostpmap.ne.'INV') then
-         ostpmap = 'QNT'
+      if (plmdamap.ne.'QNT' .and. plmdamap.ne.'EXP'
+     &       .and. plmdamap.ne.'INV') then
+         plmdamap = 'QNT'
       end if
-      if (ostemap.ne.'QNT' .and. ostemap.ne.'EXP'
-     &       .and. ostemap.ne.'INV') then
-         ostemap = 'QNT'
+      if (elmdamap.ne.'QNT' .and. elmdamap.ne.'EXP'
+     &       .and. elmdamap.ne.'INV') then
+         elmdamap = 'QNT'
       end if
-      if (ostvmap.ne.'QNT' .and. ostvmap.ne.'EXP'
-     &       .and. ostvmap.ne.'INV') then
-         ostvmap = 'QNT'
+      if (vlmdamap.ne.'QNT' .and. vlmdamap.ne.'EXP'
+     &       .and. vlmdamap.ne.'INV') then
+         vlmdamap = 'QNT'
       end if
       if (emdtexp .lt. 1) then
          emdtexp = 1
@@ -437,32 +437,32 @@ c
       if (evdtexp .lt. 1) then
          evdtexp = 1
       end if
-      if (ostepexp .lt. 1) then
-         ostepexp = 1
+      if (plmdaexp .lt. 1) then
+         plmdaexp = 1
       end if
-      if (ostemexp .lt. 1) then
-         ostemexp = 1
+      if (elmdaexp .lt. 1) then
+         elmdaexp = 1
       end if
-      if (ostevexp .lt. 1) then
-         ostevexp = 1
+      if (vlmdaexp .lt. 1) then
+         vlmdaexp = 1
       end if
-      if (ostinvepn .lt. 1) then
-         ostinvepn = 1
+      if (plmdainvn .lt. 1) then
+         plmdainvn = 1
       end if
-      if (ostinvemn .lt. 1) then
-         ostinvemn = 1
+      if (elmdainvn .lt. 1) then
+         elmdainvn = 1
       end if
-      if (ostinvevn .lt. 1) then
-         ostinvevn = 1
+      if (vlmdainvn .lt. 1) then
+         vlmdainvn = 1
       end if
-      if (ostinvepeps .lt. 0.0d0) then
-         ostinvepeps = -ostinvepeps
+      if (plmdainveps .lt. 0.0d0) then
+         plmdainveps = -plmdainveps
       end if
-      if (ostinvemeps .lt. 0.0d0) then
-         ostinvemeps = -ostinvemeps
+      if (elmdainveps .lt. 0.0d0) then
+         elmdainveps = -elmdainveps
       end if
-      if (ostinveveps .lt. 0.0d0) then
-         ostinveveps = -ostinveveps
+      if (vlmdainveps .lt. 0.0d0) then
+         vlmdainveps = -vlmdainveps
       end if
 c
 c     set plambda to elambda if no values given
@@ -602,41 +602,41 @@ c
 c
 c     check sublambda intervals are in [0,1] and ordered
 c
-      if (ostplmda0 .lt. 0.0d0)  ostplmda0 = 0.0d0
-      if (ostplmda1 .lt. 0.0d0)  ostplmda1 = 0.0d0
-      if (ostelmda0 .lt. 0.0d0)  ostelmda0 = 0.0d0
-      if (ostelmda1 .lt. 0.0d0)  ostelmda1 = 0.0d0
-      if (ostvlmda0 .lt. 0.0d0)  ostvlmda0 = 0.0d0
-      if (ostvlmda1 .lt. 0.0d0)  ostvlmda1 = 0.0d0
+      if (qntplmda0 .lt. 0.0d0)  qntplmda0 = 0.0d0
+      if (qntplmda1 .lt. 0.0d0)  qntplmda1 = 0.0d0
+      if (qntelmda0 .lt. 0.0d0)  qntelmda0 = 0.0d0
+      if (qntelmda1 .lt. 0.0d0)  qntelmda1 = 0.0d0
+      if (qntvlmda0 .lt. 0.0d0)  qntvlmda0 = 0.0d0
+      if (qntvlmda1 .lt. 0.0d0)  qntvlmda1 = 0.0d0
       if (ostlambda .lt. 0.0d0)  ostlambda = 0.0d0
-      if (ostplmda0 .gt. 1.0d0)  ostplmda0 = 1.0d0
-      if (ostplmda1 .gt. 1.0d0)  ostplmda1 = 1.0d0
-      if (ostelmda0 .gt. 1.0d0)  ostelmda0 = 1.0d0
-      if (ostelmda1 .gt. 1.0d0)  ostelmda1 = 1.0d0
-      if (ostvlmda0 .gt. 1.0d0)  ostvlmda0 = 1.0d0
-      if (ostvlmda1 .gt. 1.0d0)  ostvlmda1 = 1.0d0
+      if (qntplmda0 .gt. 1.0d0)  qntplmda0 = 1.0d0
+      if (qntplmda1 .gt. 1.0d0)  qntplmda1 = 1.0d0
+      if (qntelmda0 .gt. 1.0d0)  qntelmda0 = 1.0d0
+      if (qntelmda1 .gt. 1.0d0)  qntelmda1 = 1.0d0
+      if (qntvlmda0 .gt. 1.0d0)  qntvlmda0 = 1.0d0
+      if (qntvlmda1 .gt. 1.0d0)  qntvlmda1 = 1.0d0
       if (ostlambda .gt. 1.0d0)  ostlambda = 1.0d0
       if (.not. ostrestart .and. .not. metarestart)
      &   osttheta = asin(sqrt(ostlambda))
-      if (ostplmda1 .lt. ostplmda0) then
-         temp = ostplmda0
-         ostplmda0 = ostplmda1
-         ostplmda1 = temp
+      if (qntplmda1 .lt. qntplmda0) then
+         temp = qntplmda0
+         qntplmda0 = qntplmda1
+         qntplmda1 = temp
       end if
-      if (ostelmda1 .lt. ostelmda0) then
-         temp = ostelmda0
-         ostelmda0 = ostelmda1
-         ostelmda1 = temp
+      if (qntelmda1 .lt. qntelmda0) then
+         temp = qntelmda0
+         qntelmda0 = qntelmda1
+         qntelmda1 = temp
       end if
-      if (ostvlmda1 .lt. ostvlmda0) then
-         temp = ostvlmda0
-         ostvlmda0 = ostvlmda1
-         ostvlmda1 = temp
+      if (qntvlmda1 .lt. qntvlmda0) then
+         temp = qntvlmda0
+         qntvlmda0 = qntvlmda1
+         qntvlmda1 = temp
       end if
 c
 c     get mapping from main lambda to sub-lambdas
 c
-      if (use_ost .or. use_meta)  call mapsublmda
+      if (use_ost .or. use_meta)  call mapsublmda (ostlambda)
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -1112,7 +1112,7 @@ c     rotate when the multipole term is in use
 c
 c
       subroutine altepdt (plmda)
-      use dlmda
+      use mutant
       implicit none
       real*8 plmda
 c

@@ -9673,7 +9673,6 @@ c
       use dlmda
       use limits
       use mutant
-      use ost
       use polpot
       use potent
       use virial
@@ -9854,7 +9853,7 @@ c     electrostatics lambda state left by "altelec"
 c
 c
       subroutine epolar1p
-      use dlmda
+      use mutant
       implicit none
       real*8 plmdaorig
 c

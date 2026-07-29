@@ -2474,7 +2474,6 @@ c
       use energi
       use limits
       use mutant
-      use ost
       use potent
       implicit none
       integer i
@@ -2617,7 +2616,7 @@ c     to the electrostatics lambda state left by "altelec"
 c
 c
       subroutine epolar3p
-      use dlmda
+      use mutant
       implicit none
       real*8 plmdaorig
 c

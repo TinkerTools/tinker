@@ -12,9 +12,15 @@ c     ##                                                  ##
 c     ######################################################
 c
 c
+c     elmdaexp      exponent for electrostatic exponential mapping
+c     elmdainvn     inverse-power exponent for electrostatic mapping
 c     emdtexp       multipole exponent for dual topology interpolation
 c     epdtexp       polarization lambda exponent for dual topology
-c     evdtexp       van der Waals exponent for dual topology interpolation
+c     evdtexp       van der Waals exponent for dual topo interpolation
+c     plmdaexp      exponent for polarization exponential mapping
+c     plmdainvn     inverse-power exponent for polarization mapping
+c     vlmdaexp      exponent for van der Waals exponential mapping
+c     vlmdainvn     inverse-power exponent for van der Waals mapping
 c     d2edl2        total energy second order lambda derivative
 c     d2eldlmda2    second derivative of elambda wrt main lambda
 c     d2emdl2       multipole second order lambda derivative
@@ -29,7 +35,15 @@ c     depdl         polarization lambda derivative
 c     devdl         van der Waals lambda derivative
 c     dpldlmda      derivative of plambda wrt main lambda
 c     dvldlmda      derivative of vlambda wrt main lambda
-c     plambda       state weighting value for polarization potentials
+c     elmdainveps   shift for electrostatic inverse-power mapping
+c     plmdainveps   shift for polarization inverse-power mapping
+c     qntelmda0     sublambda lower bound for electrostatics
+c     qntelmda1     sublambda upper bound for electrostatics
+c     qntplmda0     sublambda lower bound for polarization
+c     qntplmda1     sublambda upper bound for polarization
+c     qntvlmda0     sublambda lower bound for van der Waals
+c     qntvlmda1     sublambda upper bound for van der Waals
+c     vlmdainveps   shift for van der Waals inverse-power mapping
 c     demvirdl      multipole virial lambda derivative
 c     depvirdl      polarization virial lambda derivative
 c     devvirdl      van der Waals virial lambda derivative
@@ -58,15 +72,30 @@ c     use_dlmda     logical flag governing use of lambda derivative
 c     use_emdt      flag governing use of multipole dual topology
 c     use_evdt      flag governing use of van der Waals dual topology
 c     use_epdt      flag governing use of polarization dual topology
+c     use_meta      flag to use metadynamics
+c     use_metadyn   flag to propagate metadynamics lambda particle
+c     use_ost       flag to use orthogonal space tempering
+c     use_ostdyn    flag to propagate lambda particle
 c     use_plmda     flag governing rescale to a decoupled plambda
+c     use_pol4f     flag to compute polarization lambda deriv for lmda=1
+c     use_pol4i     flag to compute polarization lambda deriv for lmda=0
 c     douindorig    original douind
+c     elmdamap      mapping type from main to electrostatic lambda
+c     plmdamap      mapping type from main to polarization lambda
+c     vlmdamap      mapping type from main to van der Waals lambda
 c
 c
       module dlmda
       implicit none
+      integer elmdaexp
+      integer elmdainvn
       integer emdtexp
       integer epdtexp
       integer evdtexp
+      integer plmdaexp
+      integer plmdainvn
+      integer vlmdaexp
+      integer vlmdainvn
       real*8 d2edl2
       real*8 d2eldlmda2
       real*8 d2emdl2
@@ -81,7 +110,15 @@ c
       real*8 devdl
       real*8 dpldlmda
       real*8 dvldlmda
-      real*8 plambda
+      real*8 elmdainveps
+      real*8 plmdainveps
+      real*8 qntelmda0
+      real*8 qntelmda1
+      real*8 qntplmda0
+      real*8 qntplmda1
+      real*8 qntvlmda0
+      real*8 qntvlmda1
+      real*8 vlmdainveps
       real*8 demvirdl(3,3)
       real*8 depvirdl(3,3)
       real*8 devvirdl(3,3)
@@ -110,7 +147,16 @@ c
       logical use_emdt
       logical use_epdt
       logical use_evdt
+      logical use_meta
+      logical use_metadyn
+      logical use_ost
+      logical use_ostdyn
       logical use_plmda
+      logical use_pol4f
+      logical use_pol4i
       logical, allocatable :: douindorig(:)
+      character*3 elmdamap
+      character*3 plmdamap
+      character*3 vlmdamap
       save
       end

@@ -57,6 +57,7 @@ c     histories while updating the fixed-size restart header in place
 c
 c
       subroutine test_eost_save
+      use dlmda
       use files
       use ost
       implicit none
@@ -864,8 +865,10 @@ c
          ostllist(i) = dble(i)
          ostflist(i) = 2.0d0*dble(i)
       end do
-      call avgstd (ostllist,ostlambdaavg,ostlambdastd)
-      call avgstd (ostflist,ostdedlavg,ostdedlstd)
+      call avgstd (ostllist,ostnequil+1,ostnavg,
+     &             ostlambdaavg,ostlambdastd)
+      call avgstd (ostflist,ostnequil+1,ostnavg,
+     &             ostdedlavg,ostdedlstd)
       stdref = sqrt(1.25d0)
       call assert_real (ostlambdaavg,4.5d0,1.0d-12,
      &                  'avgstd configurable lambda average')
@@ -1130,6 +1133,7 @@ c     state to deterministic unit-test defaults
 c
 c
       subroutine resetost (nl,nf,nhist)
+      use dlmda
       use ost
       implicit none
       integer nl,nf,nhist
@@ -1186,18 +1190,18 @@ c
       ostdedlavg = 0.0d0
       ostdedlstd = 0.0d0
       deffdl = 0.0d0
-      ostpmap = 'QNT'
-      ostemap = 'QNT'
-      ostvmap = 'QNT'
-      ostepexp = 1
-      ostemexp = 1
-      ostevexp = 1
-      ostinvepn = 1
-      ostinvemn = 1
-      ostinvevn = 1
-      ostinvepeps = 0.0d0
-      ostinvemeps = 0.0d0
-      ostinveveps = 0.0d0
+      plmdamap = 'QNT'
+      elmdamap = 'QNT'
+      vlmdamap = 'QNT'
+      plmdaexp = 1
+      elmdaexp = 1
+      vlmdaexp = 1
+      plmdainvn = 1
+      elmdainvn = 1
+      vlmdainvn = 1
+      plmdainveps = 0.0d0
+      elmdainveps = 0.0d0
+      vlmdainveps = 0.0d0
       osteqratio = 0.5d0
       hbias = 0.0d0
       eosttot = 0.0d0

@@ -18,9 +18,9 @@ c
 c
       subroutine predict
       use atoms
+      use dlmda
       use ielscf
       use keys
-      use ost
       use uprior
       implicit none
       integer i,j,k

@@ -26,7 +26,6 @@ c
       use inform
       use iounit
       use mutant
-      use ost
       use usage
       use virial
       implicit none
