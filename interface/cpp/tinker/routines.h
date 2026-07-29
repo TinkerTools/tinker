@@ -303,6 +303,22 @@ inline void tinker_f_gdastat(int* nstep, double* beta, double* xx, tinker_fchars
     return gdastat_(nstep, beta, xx, status.string, status.capacity);
 }
 
+// dlambda.f
+void mapsublmda_(double* lmda);
+#define tinker_f_mapsublmda mapsublmda_
+void sublmdaexp_(double* x, int* exponent, double* lmda, double* dlmda, double* d2lmda);
+#define tinker_f_sublmdaexp sublmdaexp_
+void sublmdainvpower_(double* x, int* n, double* eps, double* lmda, double* dlmda, double* d2lmda);
+#define tinker_f_sublmdainvpower sublmdainvpower_
+void sublmdataper_(char* mode, double* x, double* taper, double* dtaper, double* d2taper, tinker_fchar_len_t mode_cap);
+inline void tinker_f_sublmdataper(tinker_fchars mode, double* x, double* taper, double* dtaper, double* d2taper) {
+    return sublmdataper_(mode.string, x, taper, dtaper, d2taper, mode.capacity);
+}
+void lmdachain_();
+#define tinker_f_lmdachain lmdachain_
+void avgstd_(double* list, int* begin, int* count, double* avg, double* std);
+#define tinker_f_avgstd avgstd_
+
 // eangang.f
 void eangang_();
 #define tinker_f_eangang eangang_
@@ -1082,8 +1098,6 @@ void eostbias_();
 #define tinker_f_eostbias eostbias_
 void eostdyn_();
 #define tinker_f_eostdyn eostdyn_
-void avgstd_(double* list, double* avg, double* std);
-#define tinker_f_avgstd avgstd_
 void emetadyn_();
 #define tinker_f_emetadyn emetadyn_
 void emetabias_(double* lambda, double* vbias, double* dvdl);
@@ -1094,20 +1108,8 @@ void resizemeta_();
 #define tinker_f_resizemeta resizemeta_
 void ostlangevin_();
 #define tinker_f_ostlangevin ostlangevin_
-void lmdachain_();
-#define tinker_f_lmdachain lmdachain_
 void ensureflambda_(double* dudl);
 #define tinker_f_ensureflambda ensureflambda_
-void mapsublmda_();
-#define tinker_f_mapsublmda mapsublmda_
-void sublmdaexp_(double* x, int* exponent, double* lmda, double* dlmda, double* d2lmda);
-#define tinker_f_sublmdaexp sublmdaexp_
-void sublmdainvpower_(double* x, int* n, double* eps, double* lmda, double* dlmda, double* d2lmda);
-#define tinker_f_sublmdainvpower sublmdainvpower_
-void sublmdataper_(char* mode, double* x, double* taper, double* dtaper, double* d2taper, tinker_fchar_len_t mode_cap);
-inline void tinker_f_sublmdataper(tinker_fchars mode, double* x, double* taper, double* dtaper, double* d2taper) {
-    return sublmdataper_(mode.string, x, taper, dtaper, d2taper, mode.capacity);
-}
 void egkernel_(double* egbias, double* dgdl, double* dgdfl);
 #define tinker_f_egkernel egkernel_
 void egkernelinterpolate_(double* egbias, double* dgdl, double* dgdfl);
