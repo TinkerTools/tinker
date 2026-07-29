@@ -220,6 +220,7 @@ add_library (tinkerObjF OBJECT
 ../source/dexpol.f
 ../source/diagq.f
 ../source/diffeq.f
+../source/dlambda.f
 ../source/eangang.f
 ../source/eangang1.f
 ../source/eangang2.f
