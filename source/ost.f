@@ -22,6 +22,7 @@ c     nmethistsave  number of metadynamics gaussians written to restart
 c     nosthist      total number of histograms
 c     nosthistsave  number of histograms written to the restart file
 c     osteqratio    fraction of hist interval to equilibrate
+c     ostcvbin      convergence sub-bins per gaussian deposit interval
 c     ostnavg       samples averaged between hist updates
 c     ostnequil     samples skipped before hist averaging
 c     sizeosthist   current allocation size for saved histograms
@@ -40,6 +41,10 @@ c     ostbdfdl      saved bias df/dlambda from eostbias for eostdyn
 c     ostbdgdfl     saved bias dg/dflambda from eostbias for eostdyn
 c     ostbdgdl      saved bias dg/dlambda from eostbias for eostdyn
 c     ostbvbias     saved bias energy shift from eostbias
+c     ostcvdif      max drift between first and last convergence bin
+c     ostcvrat      max ratio of sample deviation to sample average
+c     ostcvslp      max fitted sample slope over a deposit interval
+c     ostcvstd      max sample deviation over a deposit interval
 c     ostddgdl      current dDeltaG/dlambda value
 c     ostdedl       current unbiased dU/dlambda value
 c     ostdedlavg    average dE/dlambda value between hist updates
@@ -54,6 +59,8 @@ c     ostmass       fictitious mass of theta lambda coordinate
 c     oststdev      gaussian cutoff distance in standard deviations
 c     osttheta      theta coordinate used to propagate lambda
 c     ostvtheta     velocity of the theta lambda coordinate
+c     tempergamma   tempering factor scaling the height decay by kT
+c     temperthresh  bias level below which heights are untempered
 c     wfhist        flambda width of new histogram gaussians
 c     wflmda        width of flambda bins
 c     wflmda2       half width of flambda bins
@@ -79,6 +86,7 @@ c     glkernel      d(gkernel)/dlambda values on grid
 c     pfkernel      partition function for free energy mean force
 c     fastkernel    flag to use fused g and f kernel updates
 c     metarestart   flag to indicate metadynamics restart data was read
+c     ostemper      flag to temper the deposited gaussian heights
 c     ostinterpol   flag to interpolate ost g kernel from grid
 c     ostrestart    flag to indicate ost restart data was read
 c     osttrial      flag to evaluate ost bias w/o depositing gaussians
@@ -95,6 +103,7 @@ c
       integer nmethistsave
       integer nosthist
       integer nosthistsave
+      integer ostcvbin
       integer ostnavg
       integer ostnequil
       integer sizeosthist
@@ -113,6 +122,10 @@ c
       real*8 ostbdgdfl
       real*8 ostbdgdl
       real*8 ostbvbias
+      real*8 ostcvdif
+      real*8 ostcvrat
+      real*8 ostcvslp
+      real*8 ostcvstd
       real*8 ostddgdl
       real*8 ostdedl
       real*8 ostdedlavg
@@ -128,6 +141,8 @@ c
       real*8 oststdev
       real*8 osttheta
       real*8 ostvtheta
+      real*8 tempergamma
+      real*8 temperthresh
       real*8 wfhist
       real*8 wflmda
       real*8 wflmda2
@@ -153,6 +168,7 @@ c
       real*8, allocatable :: pfkernel(:)
       logical fastkernel
       logical metarestart
+      logical ostemper
       logical ostinterpol
       logical ostrestart
       logical osttrial

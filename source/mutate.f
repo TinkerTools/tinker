@@ -52,6 +52,7 @@ c
       use ost
       use polar
       use potent
+      use thrmint
       implicit none
       integer i,j,k,ihyb
       integer it0,it1
@@ -64,6 +65,7 @@ c
       real*8 eps
       real*8 temp
       logical setplambda
+      logical uselmdachain
       character*20 keyword
       character*240 record
       character*240 string
@@ -127,6 +129,22 @@ c
       use_meta = .false.
       use_metadyn = .false.
       metarestart = .false.
+      use_ti = .false.
+c
+c     set defaults for thermodynamic integration windows
+c
+      tibin = 0
+      tinbin = 21
+      tinequil = 0
+      tinstepavg = 100
+      tiwindow = 0
+      tieqratio = 0.5d0
+      tilmda = 1.0d0
+c
+c     set defaults describing the flavor of the lambda calculation
+c
+      lmdaengymode = 'ABS'
+      lmdasampmode = 'NONE'
 c
 c     set defaults for dual topology
 c
@@ -143,6 +161,30 @@ c
       ostddgdl = 0.0d0
       ostdgdl = 0.0d0
       osteqratio = 0.5d0
+c
+c     set default criteria for judging convergence of a deposit
+c
+      ostcvbin = 2
+      ostcvdif = 25.0d0
+      ostcvrat = 0.1d0
+      ostcvslp = 1.0d0
+      ostcvstd = 10.0d0
+c
+c     set defaults for tempering of the deposited gaussian heights
+c
+      ostemper = .false.
+      tempergamma = 1.0d0
+      temperthresh = 1.0d0
+c
+c     set defaults for the staged relative free energy schedule
+c
+      use_relstage = .false.
+      relstg1lmda0 = 0.0d0
+      relstg1lmda1 = 0.3d0
+      relstg2lmda0 = 0.7d0
+      relstg2lmda1 = 1.0d0
+      relstage = 'VDWM'
+      relstagemix = .false.
 c
 c     set default mapping from main lambda to sublambda
 c
@@ -310,9 +352,24 @@ c
          else if (keyword(1:4) .eq. 'OST ') then
             use_dlmda = .true.
             use_ost = .true.
+            lmdasampmode = 'OST'
          else if (keyword(1:8) .eq. 'METADYN ') then
             use_dlmda = .true.
             use_meta = .true.
+            lmdasampmode = 'META'
+         else if (keyword(1:11) .eq. 'THERM-INTG ') then
+            use_dlmda = .true.
+            use_ti = .true.
+            lmdasampmode = 'TI'
+         else if (keyword(1:8) .eq. 'TI-NBIN ') then
+            string = record(next:240)
+            read (string,*,err=30)  tinbin
+         else if (keyword(1:12) .eq. 'TI-NSTEPAVG ') then
+            string = record(next:240)
+            read (string,*,err=30)  tinstepavg
+         else if (keyword(1:15) .eq. 'TI-EQUIL-RATIO ') then
+            string = record(next:240)
+            read (string,*,err=30)  tieqratio
          else if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
             string = record(next:240)
             read (string,*,err=30)  iosthist
@@ -397,16 +454,117 @@ c
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
             read (string,*,err=30)  hbias
+         else if (keyword(1:13) .eq. 'OST-CONV-BIN ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostcvbin
+         else if (keyword(1:16) .eq. 'OST-CONVCRI-DIF ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostcvdif
+         else if (keyword(1:16) .eq. 'OST-CONVCRI-RAT ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostcvrat
+         else if (keyword(1:16) .eq. 'OST-CONVCRI-SLP ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostcvslp
+         else if (keyword(1:16) .eq. 'OST-CONVCRI-STD ') then
+            string = record(next:240)
+            read (string,*,err=30)  ostcvstd
+         else if (keyword(1:11) .eq. 'OST-TEMPER ') then
+            ostemper = .true.
+         else if (keyword(1:17) .eq. 'OST-TEMPER-GAMMA ') then
+            string = record(next:240)
+            read (string,*,err=30)  tempergamma
+         else if (keyword(1:18) .eq. 'OST-TEMPER-THRESH ') then
+            string = record(next:240)
+            read (string,*,err=30)  temperthresh
+         else if (keyword(1:10) .eq. 'REL-STAGE ') then
+            use_relstage = .true.
+         else if (keyword(1:19) .eq. 'REL-LIG1-ELE-RANGE ') then
+            string = record(next:240)
+            read (string,*,err=30)  relstg1lmda0, relstg1lmda1
+         else if (keyword(1:19) .eq. 'REL-LIG2-ELE-RANGE ') then
+            string = record(next:240)
+            read (string,*,err=30)  relstg2lmda0, relstg2lmda1
          end if
    30    continue
       end do
 c
-c     only one adaptive lambda bias method can be active at a time
+c     only one method can sample the main lambda at a time
 c
-      if (use_ost .and. use_meta) then
+      if ((use_ost .and. use_meta) .or. (use_ost .and. use_ti)
+     &       .or. (use_meta .and. use_ti)) then
          write (iout,40)
-   40    format (/,' MUTATE  --  OST and METADYN cannot both be active')
+   40    format (/,' MUTATE  --  Only one of OST, METADYN and',
+     &              ' THERM-INTG can be active')
          call fatal
+      end if
+c
+c     a second ligand group makes the free energy a relative one
+c
+      if (use_rel)  lmdaengymode = 'REL'
+c
+c     the lambda windows must span [0,1] and leave room to average
+c
+      if (use_ti) then
+         if (tinbin .lt. 2) then
+            write (iout,46)
+   46       format (/,' MUTATE  --  TI-NBIN must be at least 2')
+            call fatal
+         end if
+         if (tinstepavg .lt. 1) then
+            write (iout,47)
+   47       format (/,' MUTATE  --  TI-NSTEPAVG must be positive')
+            call fatal
+         end if
+         if (tieqratio.lt.0.0d0 .or. tieqratio.ge.1.0d0) then
+            write (iout,48)
+   48       format (/,' MUTATE  --  TI-EQUIL-RATIO must be',
+     &                 ' in [0,1)')
+            call fatal
+         end if
+      end if
+c
+c     ligand window must be an ordered subrange of [0,1] and not overlap
+c
+      if (use_relstage) then
+         if (relstg1lmda0.lt.0.0d0 .or.
+     &       relstg1lmda0.ge.relstg1lmda1 .or.
+     &       relstg1lmda1.gt.1.0d0) then
+            write (iout,41)
+   41       format (/,' MUTATE  --  REL-LIG1-ELE-RANGE must satisfy',
+     &                 ' 0 <= lo < hi <= 1')
+            call fatal
+         end if
+         if (relstg2lmda0.lt.0.0d0 .or.
+     &       relstg2lmda0.ge.relstg2lmda1 .or.
+     &       relstg2lmda1.gt.1.0d0) then
+            write (iout,42)
+   42       format (/,' MUTATE  --  REL-LIG2-ELE-RANGE must satisfy',
+     &                 ' 0 <= lo < hi <= 1')
+            call fatal
+         end if
+         if (relstg1lmda1 .gt. relstg2lmda0) then
+            write (iout,43)
+   43       format (/,' MUTATE  --  REL-LIG1-ELE-RANGE and',
+     &                 ' REL-LIG2-ELE-RANGE overlap; the ligand 1',
+     &                 ' window must end at or below the start of',
+     &                 ' the ligand 2 window')
+            call fatal
+         end if
+         if (.not.use_dlmda .or. .not.uselmdachain()) then
+            write (iout,44)
+   44       format (/,' MUTATE  --  REL-STAGE needs a main lambda to',
+     &                 ' drive the schedule; add the OST, METADYN',
+     &                 ' or THERM-INTG keyword')
+            call fatal
+         end if
+         if (.not. use_rel) then
+            write (iout,45)
+   45       format (/,' MUTATE  --  REL-STAGE is a relative free',
+     &                 ' energy schedule and needs a second ligand',
+     &                 ' group; add the LIGAND2 keyword')
+            call fatal
+         end if
       end if
 c
 c     lambda derivatives of polarization require dual topology
@@ -597,6 +755,17 @@ c
          end do
          do i = 1, iosthist
             ostllist(i) = 0.0d0
+         end do
+      end if
+c
+c     allocate the dU/dlambda block buffer; the per-window averages
+c     are sized in "inittidyn" once the step count is known
+c
+      if (use_ti) then
+         if (allocated(tidedllist))  deallocate (tidedllist)
+         allocate (tidedllist(tinstepavg))
+         do i = 1, tinstepavg
+            tidedllist(i) = 0.0d0
          end do
       end if
 c

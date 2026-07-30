@@ -43,6 +43,10 @@ c     qntplmda0     sublambda lower bound for polarization
 c     qntplmda1     sublambda upper bound for polarization
 c     qntvlmda0     sublambda lower bound for van der Waals
 c     qntvlmda1     sublambda upper bound for van der Waals
+c     relstg1lmda0  main lambda where ligand 1 electrostatics start
+c     relstg1lmda1  main lambda where ligand 1 electrostatics end
+c     relstg2lmda0  main lambda where ligand 2 electrostatics start
+c     relstg2lmda1  main lambda where ligand 2 electrostatics end
 c     vlmdainveps   shift for van der Waals inverse-power mapping
 c     demvirdl      multipole virial lambda derivative
 c     depvirdl      polarization virial lambda derivative
@@ -68,6 +72,7 @@ c     polarityorig  original polarity
 c     poleorig      original pole
 c     pval0orig     original pval0
 c     pvalorig      original pval
+c     relstagemix   flag that the active leg mixes two endpoint states
 c     use_dlmda     logical flag governing use of lambda derivative
 c     use_emdt      flag governing use of multipole dual topology
 c     use_evdt      flag governing use of van der Waals dual topology
@@ -79,10 +84,15 @@ c     use_ostdyn    flag to propagate lambda particle
 c     use_plmda     flag governing rescale to a decoupled plambda
 c     use_pol4f     flag to compute polarization lambda deriv for lmda=1
 c     use_pol4i     flag to compute polarization lambda deriv for lmda=0
+c     use_relstage  flag to use staged relative free energy schedule
+c     use_ti        flag to use thermodynamic integration
 c     douindorig    original douind
 c     elmdamap      mapping type from main to electrostatic lambda
 c     plmdamap      mapping type from main to polarization lambda
 c     vlmdamap      mapping type from main to van der Waals lambda
+c     lmdaengymode  free energy being computed, ABS or REL
+c     lmdasampmode  method sampling the main lambda, META, OST or TI
+c     relstage      active leg of the staged schedule
 c
 c
       module dlmda
@@ -118,6 +128,10 @@ c
       real*8 qntplmda1
       real*8 qntvlmda0
       real*8 qntvlmda1
+      real*8 relstg1lmda0
+      real*8 relstg1lmda1
+      real*8 relstg2lmda0
+      real*8 relstg2lmda1
       real*8 vlmdainveps
       real*8 demvirdl(3,3)
       real*8 depvirdl(3,3)
@@ -143,6 +157,7 @@ c
       real*8, allocatable :: poleorig(:,:)
       real*8, allocatable :: pval0orig(:)
       real*8, allocatable :: pvalorig(:)
+      logical relstagemix
       logical use_dlmda
       logical use_emdt
       logical use_epdt
@@ -154,9 +169,14 @@ c
       logical use_plmda
       logical use_pol4f
       logical use_pol4i
+      logical use_relstage
+      logical use_ti
       logical, allocatable :: douindorig(:)
       character*3 elmdamap
       character*3 plmdamap
       character*3 vlmdamap
+      character*4 lmdaengymode
+      character*4 lmdasampmode
+      character*4 relstage
       save
       end

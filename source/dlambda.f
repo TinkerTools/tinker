@@ -247,6 +247,29 @@ c
       end
 c
 c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  function uselmdachain -- test for an active main lambda  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "uselmdachain" is true when one of the lambda dynamics methods
+c     drives a main lambda, so the sublambdas follow it through the
+c     mapping and chain rule instead of being set independently
+c
+c
+      function uselmdachain ()
+      use dlmda
+      implicit none
+      logical uselmdachain
+c
+c
+      uselmdachain = (use_ost .or. use_meta .or. use_ti)
+      return
+      end
+c
+c
 c     ################################################################
 c     ##                                                            ##
 c     ##  subroutine lmdachain -- chain rule for main lambda deriv  ##
