@@ -772,8 +772,8 @@ c
       call test_mutate_calc ('water2','138_water_rels_ye_l050.key',
      &   '138_water_rels_ye_l050.txt','138_water_rels_ye_l050',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','139water_rels_ye_l030.key',
-     &   '139water_rels_ye_l030.txt','139water_rels_ye_l030',
+      call test_mutate_calc ('water2','139_water_rels_ye_l030.key',
+     &   '139_water_rels_ye_l030.txt','139_water_rels_ye_l030',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2','140_water_rels_ye_l015.key',
      &   '140_water_rels_ye_l015.txt','140_water_rels_ye_l015',
