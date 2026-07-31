@@ -558,13 +558,6 @@ c
      &                 ' or THERM-INTG keyword')
             call fatal
          end if
-         if (.not. use_rel) then
-            write (iout,45)
-   45       format (/,' MUTATE  --  REL-STAGE is a relative free',
-     &                 ' energy schedule and needs a second ligand',
-     &                 ' group; add the LIGAND2 keyword')
-            call fatal
-         end if
       end if
 c
 c     lambda derivatives of polarization require dual topology
@@ -891,6 +884,13 @@ c     in that mode the resting parameters are left at their unscaled
 c     values and each subsystem state is built on demand by the combiner
 c
       use_rel = (nmutb .gt. 0)
+      if (use_relstage .and. .not.use_rel) then
+         write (iout,45)
+   45    format (/,' MUTATE  --  REL-STAGE is a relative free',
+     &              ' energy schedule and needs a second ligand',
+     &              ' group; add the LIGAND2 keyword')
+         call fatal
+      end if
       if (use_rel) then
          use_epdt = .true.
          use_emdt = .true.
