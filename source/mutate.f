@@ -59,12 +59,13 @@ c
       integer k1,k2
       integer igrp
       integer next,size
-      integer ntbnd
+      integer ntbnd,ntiwin
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
       real*8 eps
       real*8 temp
       logical setplambda
+      logical tinbinset
       logical uselmdachain
       character*20 keyword
       character*240 record
@@ -257,6 +258,13 @@ c
          itbnd(2,i) = 0
       end do
 c
+c     size the lambda window schedule to the worst case
+c
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
+      allocate (tilmdalist(max(1,nkey)))
+      ntiwin = 0
+      tinbinset = .false.
+c
 c     search keywords for free energy perturbation options
 c
       do i = 1, nkey
@@ -365,6 +373,12 @@ c
          else if (keyword(1:8) .eq. 'TI-NBIN ') then
             string = record(next:240)
             read (string,*,err=30)  tinbin
+            tinbinset = .true.
+         else if (keyword(1:10) .eq. 'TI-WINDOW ') then
+            string = record(next:240)
+            read (string,*,err=30)  temp
+            ntiwin = ntiwin + 1
+            tilmdalist(ntiwin) = temp
          else if (keyword(1:12) .eq. 'TI-NSTEPAVG ') then
             string = record(next:240)
             read (string,*,err=30)  tinstepavg
@@ -507,22 +521,18 @@ c
 c     the lambda windows must span [0,1] and leave room to average
 c
       if (use_ti) then
-         if (tinbin .lt. 2) then
-            write (iout,46)
-   46       format (/,' MUTATE  --  TI-NBIN must be at least 2')
-            call fatal
-         end if
          if (tinstepavg .lt. 1) then
-            write (iout,47)
-   47       format (/,' MUTATE  --  TI-NSTEPAVG must be positive')
+            write (iout,46)
+   46       format (/,' MUTATE  --  TI-NSTEPAVG must be positive')
             call fatal
          end if
          if (tieqratio.lt.0.0d0 .or. tieqratio.ge.1.0d0) then
-            write (iout,48)
-   48       format (/,' MUTATE  --  TI-EQUIL-RATIO must be',
+            write (iout,47)
+   47       format (/,' MUTATE  --  TI-EQUIL-RATIO must be',
      &                 ' in [0,1)')
             call fatal
          end if
+         call settisched (ntiwin,tinbinset)
       end if
 c
 c     ligand window must be an ordered subrange of [0,1] and not overlap

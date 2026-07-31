@@ -12,7 +12,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     tibin         index of the current lambda window, 0 to tinbin-1
+c     tibin         index of the current lambda window, 1 to tinbin
 c     tinbin        number of lambda windows spanning the [0,1] range
 c     tinblock      number of averaged blocks held by each lambda window
 c     tinequil      equilibration steps per window, tiwindow*tieqratio
@@ -22,6 +22,7 @@ c     tinbcount     number of blocks recorded so far in each window
 c     tieqratio     fraction of each window discarded as equilibration
 c     tilmda        main lambda value of the current window
 c     tidedllist    dU/dlambda values saved within the current block
+c     tilmdalist    main lambda value of each window in schedule order
 c     tilmdadedl    block averaged dU/dlambda for each lambda window
 c     tilmdadedlstd standard deviation within each averaged block
 c
@@ -38,6 +39,7 @@ c
       real*8 tieqratio
       real*8 tilmda
       real*8, allocatable :: tidedllist(:)
+      real*8, allocatable :: tilmdalist(:)
       real*8, allocatable :: tilmdadedl(:,:)
       real*8, allocatable :: tilmdadedlstd(:,:)
       save

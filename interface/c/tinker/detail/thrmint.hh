@@ -15,6 +15,7 @@ extern int* TINKER_MOD(thrmint, tinbcount);
 extern double TINKER_MOD(thrmint, tieqratio);
 extern double TINKER_MOD(thrmint, tilmda);
 extern double* TINKER_MOD(thrmint, tidedllist);
+extern double* TINKER_MOD(thrmint, tilmdalist);
 extern double* TINKER_MOD(thrmint, tilmdadedl);
 extern double* TINKER_MOD(thrmint, tilmdadedlstd);
 #ifdef __cplusplus

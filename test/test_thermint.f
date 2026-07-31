@@ -33,6 +33,7 @@ c
       call initial
       call test_thermint_avgstd
       call test_thermint_schedule
+      call test_thermint_settisched
       call test_thermint_data
       call test_thermint_inittidyn
       call test_thermint_etidyn
@@ -135,8 +136,8 @@ c     ##############################################################
 c
 c
 c     "test_thermint_schedule" checks that the main lambda walks
-c     from one down to zero in equal decrements and clamps at the
-c     lower endpoint
+c     the schedule table one window at a time and stops moving once
+c     the final window has been passed
 c
 c
       subroutine test_thermint_schedule
@@ -156,7 +157,7 @@ c
          call tischedule
          write (label,10)  k
    10    format ('tischedule 21 bin index ',i0)
-         call assert_int (tibin,k,label)
+         call assert_int (tibin,k+1,label)
          write (label,20)  k
    20    format ('tischedule 21 bin lambda ',i0)
          call assert_real (tilmda,1.0d0-dble(k)/20.0d0,eps,label)
@@ -167,12 +168,13 @@ c
       call assert_real (tilmda,0.0d0,0.0d0,
      &                  'tischedule 21 bin endpoint')
 c
-c     one call past the end clamps instead of going negative
+c     one call past the end advances the index but leaves lambda
+c     where the last window left it
 c
       call tischedule
       call assert_real (tilmda,0.0d0,0.0d0,
-     &                  'tischedule 21 bin clamp')
-      call assert_int (tibin,21,'tischedule 21 bin clamp index')
+     &                  'tischedule 21 bin past end lambda')
+      call assert_int (tibin,22,'tischedule 21 bin past end index')
 c
 c     five windows give lambda of 1.00, 0.75, 0.50, 0.25 and 0.00
 c
@@ -196,7 +198,162 @@ c
       call assert_real (tilmda,1.0d0,0.0d0,'tischedule 2 bin start')
       call tischedule
       call assert_real (tilmda,0.0d0,0.0d0,'tischedule 2 bin end')
-      call assert_int (tibin,1,'tischedule 2 bin index')
+      call assert_int (tibin,2,'tischedule 2 bin index')
+c
+c     an ascending schedule must not be clamped back toward zero
+c
+      call resetti (4,10,40,20)
+      tilmdalist(1) = 0.0d0
+      tilmdalist(2) = 0.1d0
+      tilmdalist(3) = 0.4d0
+      tilmdalist(4) = 1.0d0
+      tilmda = tilmdalist(1)
+      do k = 2, 4
+         call tischedule
+         write (label,40)  k
+   40    format ('tischedule ascending step ',i0)
+         call assert_real (tilmda,tilmdalist(k),eps,label)
+      end do
+      call tischedule
+      call assert_real (tilmda,1.0d0,0.0d0,
+     &                  'tischedule ascending holds at one')
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_thermint_settisched  --  table setup  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_thermint_settisched" checks that the schedule table is
+c     generated from TI-NBIN when no windows are given explicitly,
+c     and is taken verbatim from the TI-WINDOW values when they are
+c
+c     the rejection of out of range and non-monotonic schedules is
+c     not covered here, since those paths end in "fatal" and would
+c     stop the test binary
+c
+c
+      subroutine test_thermint_settisched
+      use thrmint
+      implicit none
+      integer k
+      real*8 eps
+      character*40 label
+c
+c
+c     with no explicit windows the table comes from TI-NBIN and must
+c     reproduce the evenly spaced schedule exactly
+c
+      eps = 1.0d-12
+      tinbin = 21
+      call settisched (0,.false.)
+      call assert_int (tinbin,21,'settisched 21 bin count')
+      call assert_int (size(tilmdalist),21,'settisched 21 bin size')
+      do k = 1, 21
+         write (label,10)  k
+   10    format ('settisched 21 bin value ',i0)
+         call assert_real (tilmdalist(k),1.0d0-dble(k-1)/20.0d0,
+     &                     eps,label)
+      end do
+      call assert_real (tilmdalist(21),0.0d0,0.0d0,
+     &                  'settisched 21 bin endpoint')
+      call assert_int (tibin,1,'settisched 21 bin start index')
+      call assert_real (tilmda,1.0d0,0.0d0,'settisched 21 bin start')
+c
+c     five and two window schedules hit their endpoints exactly
+c
+      tinbin = 5
+      call settisched (0,.false.)
+      call assert_real (tilmdalist(1),1.00d0,eps,'settisched 5 bin 1')
+      call assert_real (tilmdalist(2),0.75d0,eps,'settisched 5 bin 2')
+      call assert_real (tilmdalist(3),0.50d0,eps,'settisched 5 bin 3')
+      call assert_real (tilmdalist(4),0.25d0,eps,'settisched 5 bin 4')
+      call assert_real (tilmdalist(5),0.00d0,0.0d0,
+     &                  'settisched 5 bin 5')
+      tinbin = 2
+      call settisched (0,.false.)
+      call assert_real (tilmdalist(1),1.0d0,0.0d0,'settisched 2 bin 1')
+      call assert_real (tilmdalist(2),0.0d0,0.0d0,'settisched 2 bin 2')
+c
+c     an explicit descending schedule sets the window count itself
+c     and is compacted down from the parse buffer
+c
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
+      allocate (tilmdalist(40))
+      tilmdalist(1) = 1.0d0
+      tilmdalist(2) = 0.9d0
+      tilmdalist(3) = 0.2d0
+      tilmdalist(4) = 0.0d0
+      tinbin = 0
+      call settisched (4,.false.)
+      call assert_int (tinbin,4,'settisched explicit count')
+      call assert_int (size(tilmdalist),4,'settisched explicit size')
+      call assert_real (tilmdalist(1),1.0d0,eps,'settisched down 1')
+      call assert_real (tilmdalist(2),0.9d0,eps,'settisched down 2')
+      call assert_real (tilmdalist(3),0.2d0,eps,'settisched down 3')
+      call assert_real (tilmdalist(4),0.0d0,eps,'settisched down 4')
+      call assert_int (tibin,1,'settisched explicit start index')
+      call assert_real (tilmda,1.0d0,eps,'settisched explicit start')
+c
+c     an ascending schedule is equally valid and starts at its own
+c     first value rather than at one
+c
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
+      allocate (tilmdalist(40))
+      tilmdalist(1) = 0.0d0
+      tilmdalist(2) = 0.1d0
+      tilmdalist(3) = 0.4d0
+      tilmdalist(4) = 1.0d0
+      tinbin = 0
+      call settisched (4,.false.)
+      call assert_int (tinbin,4,'settisched ascending count')
+      call assert_real (tilmdalist(1),0.0d0,eps,'settisched up 1')
+      call assert_real (tilmdalist(2),0.1d0,eps,'settisched up 2')
+      call assert_real (tilmdalist(3),0.4d0,eps,'settisched up 3')
+      call assert_real (tilmdalist(4),1.0d0,eps,'settisched up 4')
+      call assert_real (tilmda,0.0d0,eps,'settisched ascending start')
+c
+c     the schedule need not touch either endpoint; any monotonic
+c     run of values inside [0,1] is a valid set of windows
+c
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
+      allocate (tilmdalist(40))
+      tilmdalist(1) = 0.75d0
+      tilmdalist(2) = 0.70d0
+      tilmdalist(3) = 0.20d0
+      tinbin = 0
+      call settisched (3,.false.)
+      call assert_int (tinbin,3,'settisched interior count')
+      call assert_real (tilmdalist(1),0.75d0,eps,
+     &                  'settisched interior 1')
+      call assert_real (tilmdalist(2),0.70d0,eps,
+     &                  'settisched interior 2')
+      call assert_real (tilmdalist(3),0.20d0,eps,
+     &                  'settisched interior 3')
+      call assert_real (tilmda,0.75d0,eps,
+     &                  'settisched interior start')
+c
+c     a single window is legal and covers the whole trajectory,
+c     which the old closed form schedule could not express
+c
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
+      allocate (tilmdalist(40))
+      tilmdalist(1) = 0.5d0
+      tinbin = 0
+      call settisched (1,.false.)
+      call assert_int (tinbin,1,'settisched single count')
+      call assert_real (tilmdalist(1),0.5d0,eps,'settisched single')
+      tinstepavg = 10
+      tieqratio = 0.0d0
+      call inittidyn (200)
+      call assert_int (tiwindow,200,'settisched single window')
+      call assert_int (tinequil,0,'settisched single equilibration')
+      call assert_int (tinblock,20,'settisched single blocks')
+      call assert_real (tilmda,0.5d0,eps,'settisched single lambda')
       return
       end
 c
@@ -234,7 +391,7 @@ c
       call assert_int (size(tilmdadedlstd,1),7,'tidata std window rows')
       call assert_int (size(tilmdadedlstd,2),2,'tidata std block cols')
       call assert_int (size(tinbcount),7,'tidata block count size')
-      call assert_int (tibin,0,'tidata initial window index')
+      call assert_int (tibin,1,'tidata initial window index')
       call assert_real (tilmda,1.0d0,0.0d0,'tidata initial lambda')
 c
 c     every window starts with no recorded blocks
@@ -263,7 +420,7 @@ c
      &                  'tidata reinit dedl')
       call assert_real (tilmdadedlstd(3,1),0.0d0,0.0d0,
      &                  'tidata reinit std')
-      call assert_int (tibin,0,'tidata reinit window index')
+      call assert_int (tibin,1,'tidata reinit window index')
       call assert_real (tilmda,1.0d0,0.0d0,'tidata reinit lambda')
       return
       end
@@ -295,7 +452,7 @@ c
       call assert_int (tiwindow,40,'inittidyn 200 step window')
       call assert_int (tinequil,20,'inittidyn 200 step equilibration')
       call assert_int (tinblock,2,'inittidyn 200 step blocks')
-      call assert_int (tibin,0,'inittidyn 200 step window index')
+      call assert_int (tibin,1,'inittidyn 200 step window index')
       call assert_real (tilmda,1.0d0,0.0d0,'inittidyn 200 step lambda')
 c
 c     a quarter of each window discarded over twenty one windows
@@ -393,7 +550,7 @@ c
       end do
       call assert_real (dmax,0.0d0,1.0d-12,
      &                  'etidyn lambda schedule over 200 steps')
-      call assert_int (tibin,5,'etidyn final window index')
+      call assert_int (tibin,6,'etidyn final window index')
       call assert_real (tilmda,0.0d0,0.0d0,'etidyn final lambda')
 c
 c     the same run with every equilibration step poisoned; the
@@ -509,7 +666,7 @@ c
          dedl = dble(istep)
          call etidyn (istep)
       end do
-      call assert_int (tibin,5,'trailing final window index')
+      call assert_int (tibin,6,'trailing final window index')
       do w = 1, 5
          write (label,10)  w
    10    format ('trailing window ',i0,' block count')
@@ -562,8 +719,6 @@ c
       if (window .gt. 0)  tieqratio = dble(nequil) / dble(window)
       tinblock = 0
       if (nstepavg .gt. 0)  tinblock = (window-nequil) / nstepavg
-      tibin = 0
-      tilmda = 1.0d0
       dedl = 0.0d0
 c
 c     clear any previous allocation and size the accumulators
@@ -579,6 +734,11 @@ c
       do i = 1, nstepavg
          tidedllist(i) = 0.0d0
       end do
+c
+c     build the default evenly spaced schedule, which also sets
+c     "tibin" and "tilmda" to the first window
+c
+      call settisched (0,.false.)
       do i = 1, nbin
          tinbcount(i) = 0
          do j = 1, tinblock
@@ -617,5 +777,6 @@ c
       if (allocated(tidedllist))  deallocate (tidedllist)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
       return
       end

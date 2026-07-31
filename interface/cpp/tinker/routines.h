@@ -1512,6 +1512,8 @@ void estrtor3_();
 #define tinker_f_estrtor3 estrtor3_
 
 // ethrmint.f
+void settisched_(int* ntiwin, int* tinbinset);
+#define tinker_f_settisched settisched_
 void inittidyn_(int* nstep);
 #define tinker_f_inittidyn inittidyn_
 void etidyn_(int* istep);

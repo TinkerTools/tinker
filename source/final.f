@@ -1255,6 +1255,7 @@ c
       if (allocated(tidedllist))  deallocate (tidedllist)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
 c
 c     deallocation of global arrays from module tors
 c
