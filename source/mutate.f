@@ -653,6 +653,32 @@ c
       ostnequil = max(0,min(ostnequil,iosthist-1))
       ostnavg = iosthist - ostnequil
 c
+c     allocate the convergence sub-bins
+c
+      if (ostcvbin .lt. 0)  ostcvbin = 0
+      if (use_ost .or. use_meta) then
+         if (allocated(ostlmdaavgbin))  deallocate (ostlmdaavgbin)
+         if (allocated(ostlmdaslpbin))  deallocate (ostlmdaslpbin)
+         if (allocated(ostlmdastdbin))  deallocate (ostlmdastdbin)
+         if (allocated(ostdedlavgbin))  deallocate (ostdedlavgbin)
+         if (allocated(ostdedlslpbin))  deallocate (ostdedlslpbin)
+         if (allocated(ostdedlstdbin))  deallocate (ostdedlstdbin)
+         allocate (ostlmdaavgbin(max(ostcvbin,1)))
+         allocate (ostlmdaslpbin(max(ostcvbin,1)))
+         allocate (ostlmdastdbin(max(ostcvbin,1)))
+         allocate (ostdedlavgbin(max(ostcvbin,1)))
+         allocate (ostdedlslpbin(max(ostcvbin,1)))
+         allocate (ostdedlstdbin(max(ostcvbin,1)))
+         do i = 1, max(ostcvbin,1)
+            ostlmdaavgbin(i) = 0.0d0
+            ostlmdaslpbin(i) = 0.0d0
+            ostlmdastdbin(i) = 0.0d0
+            ostdedlavgbin(i) = 0.0d0
+            ostdedlslpbin(i) = 0.0d0
+            ostdedlstdbin(i) = 0.0d0
+         end do
+      end if
+c
 c     allocate ost histogram and kernels
 c
       if (use_ost) then
@@ -674,6 +700,7 @@ c
          if (allocated(glfkernel))  deallocate (glfkernel)
          if (allocated(glkernel))  deallocate (glkernel)
          if (allocated(pfkernel))  deallocate (pfkernel)
+         if (allocated(vkernelmax))  deallocate (vkernelmax)
          sizeosthist = 10000
          nosthist = 0
          allocate (osthhist(sizeosthist))
@@ -694,6 +721,7 @@ c
          allocate (glfkernel(nlmda,nflmda))
          allocate (glkernel(nlmda,nflmda))
          allocate (pfkernel(nlmda))
+         allocate (vkernelmax(nlmda))
 c
 c     initialize ost histogram and kernels
 c
@@ -701,6 +729,7 @@ c
             fkernel(i) = 0.0d0
             fsumkernel(i) = 0.0d0
             pfkernel(i) = 0.0d0
+            vkernelmax(i) = 0.0d0
             do k = 1, nflmda
                gfkernel(i,k) = 0.0d0
                gkernel(i,k) = 0.0d0
@@ -733,6 +762,8 @@ c
          if (allocated(metawhist))  deallocate (metawhist)
          if (allocated(metaihist))  deallocate (metaihist)
          if (allocated(ostllist))  deallocate (ostllist)
+         if (allocated(vmetagrid))  deallocate (vmetagrid)
+         if (allocated(dvmetagrid))  deallocate (dvmetagrid)
          sizemetahist = 10000
          nmetahist = 0
          allocate (metalhist(sizemetahist))
@@ -740,6 +771,8 @@ c
          allocate (metawhist(sizemetahist))
          allocate (metaihist(sizemetahist))
          allocate (ostllist(iosthist))
+         allocate (vmetagrid(nlmda))
+         allocate (dvmetagrid(nlmda))
          do i = 1, sizemetahist
             metalhist(i) = 0.0d0
             metahhist(i) = 0.0d0
@@ -748,6 +781,10 @@ c
          end do
          do i = 1, iosthist
             ostllist(i) = 0.0d0
+         end do
+         do i = 1, nlmda
+            vmetagrid(i) = 0.0d0
+            dvmetagrid(i) = 0.0d0
          end do
       end if
 c

@@ -37,9 +37,18 @@ c
       call test_eost_kernelbuilds
       call test_eost_eginterpolate
       call test_eost_avgstd
+      call test_eost_histstat
+      call test_eost_drift
+      call test_eost_depcriteria
       call test_eost_efkernel
+      call test_eost_vkernelmax
+      call test_eost_tempering
+      call test_eost_ostdyn
       call test_eost_save
       call test_eost_meta
+      call test_eost_metaimage
+      call test_eost_metadyn
+      call test_eost_metatemper
       call final
       return
       end
@@ -68,6 +77,7 @@ c
       integer nsave0
       integer size1,size2,size3
       integer freeunit
+      real*8 brutevkmax
       logical exist
       character*240 filename0
       character*240 ostfile
@@ -114,6 +124,22 @@ c
       call assert_logical (size2.gt.size1,.true.,
      &                     'saveost appends new history')
       call assert_int (size3,size2,'saveost does not duplicate history')
+c
+c     the per-gaussian heights survive a round trip, and the derived
+c     running maxima are rebuilt from the restored history
+c
+      call rdost
+      call assert_int (nosthist,3,'rdost restores the history count')
+      call assert_real (osthhist(1),2.0d0,1.0d-12,
+     &                  'rdost restores height 1')
+      call assert_real (osthhist(2),3.0d0,1.0d-12,
+     &                  'rdost restores height 2')
+      call assert_real (osthhist(3),4.0d0,1.0d-12,
+     &                  'rdost restores height 3')
+      do i = 1, nlmda
+         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+     &                     'rdost rebuilds the running maximum')
+      end do
 c
 c     check the refreshed header and the sequential history records
 c
@@ -1087,16 +1113,23 @@ c
       metahhist(1) = 2.0d0
       metawhist(1) = 0.25d0
       pref = metahhist(1) / (metawhist(1)*sqrt(2.0d0*pi))
+c
+c     a gaussian centered midway is symmetric in its two images
+c
       call emetabias (0.5d0,vbias,dvdl)
-      call assert_real (vbias,pref,1.0d-12,
+      expected = pref * (1.0d0 + 2.0d0*exp(-8.0d0))
+      call assert_real (vbias,expected,1.0d-12,
      &                  'emetabias center value')
       call assert_real (dvdl,0.0d0,1.0d-12,
      &                  'emetabias center derivative')
       call emetabias (0.75d0,vbias,dvdl)
-      expected = pref * exp(-0.5d0)
+      expected = pref * (exp(-0.5d0)+exp(-12.5d0)+exp(-4.5d0))
       call assert_real (vbias,expected,1.0d-12,
      &                  'emetabias off-center value')
-      call assert_real (dvdl,-4.0d0*expected,1.0d-12,
+      expected = -16.0d0 * pref
+     &              * (0.25d0*exp(-0.5d0) + 1.25d0*exp(-12.5d0)
+     &                 - 0.75d0*exp(-4.5d0))
+      call assert_real (dvdl,expected,1.0d-12,
      &                  'emetabias off-center derivative')
 c
 c     symmetric gaussian has zero endpoint free energy difference
@@ -1121,6 +1154,774 @@ c
       end
 c
 c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_eost_histstat  --  interval stat test  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_eost_histstat" checks the whole-slice and convergence
+c     sub-bin statistics gathered over a deposit interval
+c
+c
+      subroutine test_eost_histstat
+      use ost
+      implicit none
+      integer i
+      real*8 stdref
+c
+c
+c     average the samples following the equilibration prefix
+c
+      call resetost (5,5,1)
+      iosthist = 6
+      ostnequil = 2
+      ostnavg = 4
+      do i = 1, iosthist
+         ostllist(i) = dble(i)
+         ostflist(i) = 2.0d0*dble(i)
+      end do
+c
+c     four samples split evenly into two sub-bins
+c
+      ostcvbin = 2
+      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call histstat (ostflist,ostdedlavg,ostdedlstd,ostdedlslp,
+     &               ostdedlavgbin,ostdedlstdbin,ostdedlslpbin)
+      stdref = sqrt(1.25d0)
+      call assert_real (ostlambdaavg,4.5d0,1.0d-12,
+     &                  'histstat lambda average')
+      call assert_real (ostdedlavg,9.0d0,1.0d-12,
+     &                  'histstat dE/dl average')
+      call assert_real (ostlambdastd,stdref,1.0d-12,
+     &                  'histstat lambda deviation')
+      call assert_real (ostdedlstd,2.0d0*stdref,1.0d-12,
+     &                  'histstat dE/dl deviation')
+c
+c     the fitted drift keeps the scale of each ramp
+c
+      call assert_real (ostlambdaslp,1.0d0,1.0d-12,
+     &                  'histstat lambda slope')
+      call assert_real (ostdedlslp,2.0d0,1.0d-12,
+     &                  'histstat dE/dl slope')
+      call assert_real (ostlmdaslpbin(1),1.0d0,1.0d-12,
+     &                  'histstat lambda slope bin 1')
+      call assert_real (ostlmdaslpbin(2),1.0d0,1.0d-12,
+     &                  'histstat lambda slope bin 2')
+      call assert_real (ostdedlslpbin(1),2.0d0,1.0d-12,
+     &                  'histstat dE/dl slope bin 1')
+      call assert_real (ostdedlslpbin(2),2.0d0,1.0d-12,
+     &                  'histstat dE/dl slope bin 2')
+c
+c     each sub-bin holds two samples, {3,4} then {5,6}
+c
+      call assert_real (ostlmdaavgbin(1),3.5d0,1.0d-12,
+     &                  'histstat lambda average bin 1')
+      call assert_real (ostlmdaavgbin(2),5.5d0,1.0d-12,
+     &                  'histstat lambda average bin 2')
+      call assert_real (ostlmdastdbin(1),0.5d0,1.0d-12,
+     &                  'histstat lambda deviation bin 1')
+      call assert_real (ostlmdastdbin(2),0.5d0,1.0d-12,
+     &                  'histstat lambda deviation bin 2')
+      call assert_real (ostdedlavgbin(1),7.0d0,1.0d-12,
+     &                  'histstat dE/dl average bin 1')
+      call assert_real (ostdedlavgbin(2),11.0d0,1.0d-12,
+     &                  'histstat dE/dl average bin 2')
+c
+c     four samples in three sub-bins keeps one per bin and drops
+c     the leading sample from the sub-bins but not from the slice
+c
+      ostcvbin = 3
+      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call assert_real (ostlmdaavgbin(1),4.0d0,1.0d-12,
+     &                  'histstat uneven split bin 1')
+      call assert_real (ostlmdaavgbin(2),5.0d0,1.0d-12,
+     &                  'histstat uneven split bin 2')
+      call assert_real (ostlmdaavgbin(3),6.0d0,1.0d-12,
+     &                  'histstat uneven split bin 3')
+      do i = 1, 3
+         call assert_real (ostlmdastdbin(i),0.0d0,1.0d-12,
+     &                     'histstat single sample deviation')
+         call assert_real (ostlmdaslpbin(i),0.0d0,1.0d-12,
+     &                     'histstat single sample slope')
+      end do
+      call assert_real (ostlambdaslp,1.0d0,1.0d-12,
+     &                  'histstat uneven split slope')
+c
+c     without sub-bins the slice statistics are unchanged and the
+c     sub-bin arrays are left alone
+c
+      ostcvbin = 0
+      do i = 1, 3
+         ostlmdaavgbin(i) = -7.0d0
+         ostlmdastdbin(i) = -7.0d0
+         ostlmdaslpbin(i) = -7.0d0
+      end do
+      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call assert_real (ostlambdaavg,4.5d0,1.0d-12,
+     &                  'histstat no bins average')
+      call assert_real (ostlambdastd,stdref,1.0d-12,
+     &                  'histstat no bins deviation')
+      call assert_real (ostlambdaslp,1.0d0,1.0d-12,
+     &                  'histstat no bins slope')
+      do i = 1, 3
+         call assert_real (ostlmdaavgbin(i),-7.0d0,1.0d-12,
+     &                     'histstat no bins leaves sub-bins')
+      end do
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_eost_drift  --  interval drift tests  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_eost_drift" checks the fitted sample drift for flat,
+c     ramped and folded series, and its conditioning against a
+c     large constant offset
+c
+c
+      subroutine test_eost_drift
+      use ost
+      implicit none
+      integer i
+      real*8 v(8)
+      data v / 4.0d0,3.0d0,2.0d0,1.0d0,1.0d0,2.0d0,3.0d0,4.0d0 /
+c
+c
+c     a flat series has no drift
+c
+      call resetost (5,5,1)
+      iosthist = 8
+      ostnequil = 0
+      ostnavg = 8
+      ostcvbin = 2
+      do i = 1, iosthist
+         ostllist(i) = 7.0d0
+      end do
+      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call assert_real (ostlambdaavg,7.0d0,1.0d-12,
+     &                  'histstat flat average')
+      call assert_real (ostlambdaslp,0.0d0,1.0d-12,
+     &                  'histstat flat slope')
+      call assert_real (ostlmdaslpbin(1),0.0d0,1.0d-12,
+     &                  'histstat flat slope bin 1')
+c
+c     a decreasing ramp keeps its change per sample
+c
+      do i = 1, iosthist
+         ostllist(i) = -0.5d0*dble(i-1)
+      end do
+      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call assert_real (ostlambdaslp,-0.5d0,1.0d-12,
+     &                  'histstat ramp slope')
+      call assert_real (ostlmdaslpbin(1),-0.5d0,1.0d-12,
+     &                  'histstat ramp slope bin 1')
+      call assert_real (ostlmdaslpbin(2),-0.5d0,1.0d-12,
+     &                  'histstat ramp slope bin 2')
+c
+c     a folded series has no net drift, but each half drifts fully
+c
+      do i = 1, iosthist
+         ostllist(i) = v(i)
+      end do
+      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call assert_real (ostlambdaslp,0.0d0,1.0d-12,
+     &                  'histstat folded slope')
+      call assert_real (ostlmdaslpbin(1),-1.0d0,1.0d-12,
+     &                  'histstat folded slope bin 1')
+      call assert_real (ostlmdaslpbin(2),1.0d0,1.0d-12,
+     &                  'histstat folded slope bin 2')
+c
+c     a large offset must not swamp a small drift
+c
+      do i = 1, iosthist
+         ostllist(i) = 5000.0d0 + 1.0d-6*dble(i-1)
+      end do
+      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call assert_real (ostlambdaslp,1.0d-6,1.0d-9,
+     &                  'histstat offset slope')
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_eost_depcriteria  --  deposit gate tests  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_eost_depcriteria" checks the deposition gate against a
+c     tolerance built from an absolute and a relative part
+c
+c
+      subroutine test_eost_depcriteria
+      use ost
+      implicit none
+      logical depcriteria
+c
+c
+c     the tolerance is ostcvstd plus ostcvrat times the average
+c
+      ostcvstd = 10.0d0
+      ostcvrat = 0.2d0
+      call assert_logical (depcriteria(0.0d0,9.9d0),.true.,
+     &                     'depcriteria inside absolute tolerance')
+      call assert_logical (depcriteria(0.0d0,10.0d0),.false.,
+     &                     'depcriteria at absolute tolerance')
+      call assert_logical (depcriteria(50.0d0,19.9d0),.true.,
+     &                     'depcriteria inside relative tolerance')
+      call assert_logical (depcriteria(50.0d0,20.0d0),.false.,
+     &                     'depcriteria at relative tolerance')
+      call assert_logical (depcriteria(-50.0d0,19.9d0),.true.,
+     &                     'depcriteria relative tolerance is signless')
+      call assert_logical (depcriteria(-50.0d0,20.0d0),.false.,
+     &                     'depcriteria negative average at tolerance')
+c
+c     a vanishing tolerance rejects every interval
+c
+      ostcvstd = 0.0d0
+      ostcvrat = 0.0d0
+      call assert_logical (depcriteria(1.0d0,0.0d0),.false.,
+     &                     'depcriteria zero tolerance')
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_eost_vkernelmax  --  bias level test  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_eost_vkernelmax" checks the running maximum of the g
+c     kernel along flambda and the global path bias level derived
+c     from it, over every path that fills the kernel
+c
+c
+      subroutine test_eost_vkernelmax
+      use bath
+      use ost
+      implicit none
+      integer i
+      real*8 vmin
+      real*8 brutevkmax
+      real*8 ostvminimax
+      real*8, allocatable :: gsave(:,:)
+c
+c
+c     two saved sources spread over the whole kernel
+c
+      kelvin = 300.0d0
+      call resetost (5,5,4)
+      nosthist = 2
+      call sethist (1,0.25d0,0.0d0,1.0d0,0.25d0,1.0d0)
+      call sethist (2,0.75d0,1.0d0,2.0d0,0.25d0,1.0d0)
+      call buildostindex
+      call buildkernels
+      vmin = brutevkmax (1)
+      do i = 1, nlmda
+         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+     &                     'buildkernels running maximum')
+         vmin = min(vmin,brutevkmax(i))
+      end do
+      call assert_real (ostvminimax(),vmin,1.0d-12,
+     &                  'ostvminimax over lambda')
+      call assert_logical (vmin.gt.0.0d0,.true.,
+     &                     'ostvminimax reaches every lambda bin')
+c
+c     the incremental update path stays exact
+c
+      nosthist = 3
+      call sethist (3,0.5d0,-1.0d0,1.5d0,0.25d0,1.0d0)
+      call buildostindex
+      call updatekernels
+      do i = 1, nlmda
+         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+     &                     'updatekernels running maximum')
+      end do
+c
+c     the g kernel only path reproduces both kernel and maximum
+c
+      allocate (gsave(nlmda,nflmda))
+      gsave = gkernel
+      call buildgkernel
+      call assert_array2 (gkernel,gsave,nlmda,nflmda,1.0d-12,
+     &                    'buildgkernel reproduces gkernel')
+      do i = 1, nlmda
+         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+     &                     'buildgkernel running maximum')
+      end do
+      deallocate (gsave)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  function brutevkmax  --  direct kernel column maximum  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "brutevkmax" scans the g kernel directly for the largest
+c     value at one lambda bin, ignoring the running maximum
+c
+c
+      function brutevkmax (ilmda)
+      use ost
+      implicit none
+      integer ilmda,j
+      real*8 brutevkmax
+c
+c
+      brutevkmax = 0.0d0
+      do j = 1, nflmda
+         brutevkmax = max(brutevkmax,gkernel(ilmda,j))
+      end do
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_eost_tempering  --  height decay test  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_eost_tempering" checks that the deposited gaussian
+c     height decays once the global path bias level passes the
+c     tempering threshold
+c
+c
+      subroutine test_eost_tempering
+      use bath
+      use ost
+      use units
+      implicit none
+      integer i
+      real*8 rt
+      real*8 h,prev
+      real*8 h1,h2
+      real*8 temperedheight
+      real*8 vstar(4)
+      data vstar / 1.5d0,2.0d0,3.0d0,5.0d0 /
+c
+c
+c     an untempered run deposits at the full height
+c
+      kelvin = 300.0d0
+      call resetost (5,5,1)
+      hbias = 1.0d-5
+      rt = gasconst * kelvin
+      ostemper = .false.
+      temperthresh = 1.0d0
+      tempergamma = 1.0d0
+      call assert_real (temperedheight(0.0d0),hbias,1.0d-18,
+     &                  'temperedheight disabled empty path')
+      call assert_real (temperedheight(50.0d0),hbias,1.0d-18,
+     &                  'temperedheight disabled filled path')
+c
+c     at or below the threshold the height is still untempered
+c
+      ostemper = .true.
+      call assert_real (temperedheight(0.0d0),hbias,1.0d-18,
+     &                  'temperedheight below threshold')
+      call assert_real (temperedheight(1.0d0),hbias,1.0d-18,
+     &                  'temperedheight at threshold')
+c
+c     above the threshold the height decays exponentially
+c
+      prev = hbias
+      do i = 1, 4
+         h = temperedheight(vstar(i))
+         call assert_real (h,hbias*exp(-(vstar(i)-1.0d0)/rt),1.0d-18,
+     &                     'temperedheight above threshold')
+         call assert_logical (h.lt.prev,.true.,
+     &                        'temperedheight decays monotonically')
+         prev = h
+      end do
+c
+c     a larger tempering factor decays more slowly
+c
+      tempergamma = 1.0d0
+      h1 = temperedheight(3.0d0)
+      tempergamma = 2.0d0
+      h2 = temperedheight(3.0d0)
+      call assert_logical (h2.gt.h1,.true.,
+     &                     'temperedheight larger gamma decays slower')
+      call assert_real (h2,hbias*exp(-2.0d0/(2.0d0*rt)),1.0d-18,
+     &                  'temperedheight gamma scaling')
+c
+c     a non-positive tempering factor disables the decay
+c
+      tempergamma = 0.0d0
+      call assert_real (temperedheight(50.0d0),hbias,1.0d-18,
+     &                  'temperedheight zero gamma')
+      tempergamma = -1.0d0
+      call assert_real (temperedheight(50.0d0),hbias,1.0d-18,
+     &                  'temperedheight negative gamma')
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_eost_metaimage  --  meta image tests  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_eost_metaimage" checks that the metadynamics bias sums
+c     the same three reflected lambda images as the g kernel
+c
+c
+      subroutine test_eost_metaimage
+      use math
+      use ost
+      implicit none
+      integer m,t
+      real*8 vbias,dvdl
+      real*8 vref,dref
+      real*8 delta,bias
+      real*8 pref,sig2
+      real*8 single,far
+      real*8 src(3)
+      real*8 lam(4)
+      data lam / 0.0d0,0.1d0,0.5d0,1.0d0 /
+c
+c
+c     one gaussian near the lambda = 0 wall
+c
+      call resetost (5,5,1)
+      call resetmeta (2)
+      nmetahist = 1
+      metalhist(1) = 0.1d0
+      metahhist(1) = 2.0d0
+      metawhist(1) = 0.25d0
+      pref = metahhist(1) / (metawhist(1)*sqrt(2.0d0*pi))
+      sig2 = metawhist(1) * metawhist(1)
+      src(1) = 0.1d0
+      src(2) = -0.1d0
+      src(3) = 1.9d0
+c
+c     the bias and derivative match a direct three image sum
+c
+      do t = 1, 4
+         vref = 0.0d0
+         dref = 0.0d0
+         do m = 1, 3
+            delta = lam(t) - src(m)
+            bias = pref * exp(-0.5d0*delta*delta/sig2)
+            vref = vref + bias
+            dref = dref - delta*bias/sig2
+         end do
+         call emetabias (lam(t),vbias,dvdl)
+         call assert_real (vbias,vref,1.0d-12,
+     &                     'emetabias image sum value')
+         call assert_real (dvdl,dref,1.0d-12,
+     &                     'emetabias image sum derivative')
+      end do
+c
+c     at the wall the nearby image doubles the bias
+c
+      single = pref * exp(-0.5d0*0.01d0/sig2)
+      far = pref * exp(-0.5d0*1.9d0*1.9d0/sig2)
+      call emetabias (0.0d0,vbias,dvdl)
+      call assert_real (vbias,2.0d0*single+far,1.0d-12,
+     &                  'emetabias doubles at the lambda wall')
+      call assert_logical (vbias.gt.single,.true.,
+     &                     'emetabias wall raises the bias')
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_eost_metadyn  --  meta deposit tests  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_eost_metadyn" drives one full deposit interval and
+c     checks the gaussian that emetadyn stores
+c
+c
+      subroutine test_eost_metadyn
+      use ost
+      implicit none
+      integer istep
+      real*8 avgref
+      real*8 lam(4)
+      data lam / 0.1d0,0.2d0,0.4d0,0.6d0 /
+c
+c
+c     a frozen lambda particle keeps the sampled values controlled
+c
+      call resetost (5,5,1)
+      call resetmeta (2)
+      iosthist = 4
+      ostnequil = 2
+      ostnavg = 2
+      hbias = 2.0d0
+      wlmda = 0.25d0
+      ostdedl = 0.0d0
+      ostdt = 0.0d0
+      iost = 0
+      do istep = 1, iosthist
+         ostlambda = lam(istep)
+         call emetadyn
+         if (istep .lt. iosthist) then
+            call assert_int (nmetahist,0,
+     &                       'emetadyn waits for the interval end')
+         end if
+      end do
+c
+c     only the samples after the equilibration prefix are averaged
+c
+      avgref = (lam(3)+lam(4)) / dble(ostnavg)
+      call assert_int (nmetahist,1,'emetadyn deposits one gaussian')
+      call assert_real (metalhist(1),avgref,1.0d-12,
+     &                  'emetadyn gaussian center')
+      call assert_real (metahhist(1),hbias,1.0d-12,
+     &                  'emetadyn gaussian height')
+      call assert_real (metawhist(1),wlmda,1.0d-12,
+     &                  'emetadyn gaussian width')
+      call assert_int (metaihist(1),iosthist,
+     &                 'emetadyn gaussian step stamp')
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_eost_metatemper  --  meta decay tests  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_eost_metatemper" drives several deposit intervals with
+c     tempering enabled and checks the deposited heights and the
+c     accumulated metadynamics grid
+c
+c
+      subroutine test_eost_metatemper
+      use bath
+      use ost
+      implicit none
+      integer il,istep,k
+      integer ndep
+      parameter (ndep=5)
+      real*8 lambda
+      real*8 vd,dd,vi,di
+      real*8 refvstar
+      real*8 temperedheight
+c
+c
+c     deposit repeatedly at a fixed lambda with tempering on
+c
+      kelvin = 300.0d0
+      call resetost (5,5,1)
+      call resetmeta (8)
+      iosthist = 4
+      ostnequil = 2
+      ostnavg = 2
+      hbias = 2.0d0
+      ostdedl = 0.0d0
+      ostdt = 0.0d0
+      ostemper = .true.
+      temperthresh = 0.5d0
+      tempergamma = 1.0d0
+      iost = 0
+      do istep = 1, ndep*iosthist
+         ostlambda = 0.5d0
+         call emetadyn
+      end do
+      call assert_int (nmetahist,ndep,'emetadyn deposit count')
+c
+c     the first deposit sees an empty bias, so it is untempered
+c
+      call assert_real (metahhist(1),hbias,1.0d-12,
+     &                  'emetadyn first height untempered')
+      call assert_logical (refvstar(1).gt.temperthresh,.true.,
+     &                     'emetadyn crosses the threshold')
+c
+c     every later height follows the pre-deposit bias level
+c
+      do k = 2, ndep
+         call assert_real (metahhist(k),temperedheight(refvstar(k-1)),
+     &                     1.0d-12,'emetadyn tempered height')
+         call assert_logical (metahhist(k).lt.metahhist(k-1),.true.,
+     &                        'emetadyn heights decay')
+      end do
+c
+c     the grid matches the direct sum at each bin center, and the
+c     interpolation reproduces it exactly at those nodes
+c
+      do il = 1, nlmda
+         lambda = dble(il-1) * wlmda
+         ostinterpol = .false.
+         call emetabias (lambda,vd,dd)
+         call assert_real (vmetagrid(il),vd,1.0d-12,
+     &                     'addmetagrid matches the direct sum')
+         call assert_real (dvmetagrid(il),dd,1.0d-12,
+     &                     'addmetagrid matches the direct slope')
+         ostinterpol = .true.
+         call emetabias (lambda,vi,di)
+         call assert_real (vi,vd,1.0d-12,
+     &                     'emetabiasinterpolate at a node')
+         call assert_real (di,dd,1.0d-12,
+     &                     'emetabiasinterpolate slope at a node')
+      end do
+      ostinterpol = .false.
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  function refvstar  --  direct metadynamics bias level  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "refvstar" sums the first "upto" saved metadynamics gaussians
+c     directly and returns the smallest bias over the lambda bins
+c
+c
+      function refvstar (upto)
+      use math
+      use ost
+      implicit none
+      integer upto
+      integer il,j,m
+      real*8 refvstar
+      real*8 lambda,delta
+      real*8 sig,sig2,pref
+      real*8 v
+      real*8 src(3)
+c
+c
+      refvstar = 0.0d0
+      do il = 1, nlmda
+         lambda = dble(il-1) * wlmda
+         v = 0.0d0
+         do j = 1, upto
+            sig = metawhist(j)
+            sig2 = sig * sig
+            pref = metahhist(j) / (sig*sqrt(2.0d0*pi))
+            src(1) = metalhist(j)
+            src(2) = -metalhist(j)
+            src(3) = 2.0d0 - metalhist(j)
+            do m = 1, 3
+               delta = lambda - src(m)
+               v = v + pref*exp(-0.5d0*delta*delta/sig2)
+            end do
+         end do
+         if (il .eq. 1) then
+            refvstar = v
+         else
+            refvstar = min(refvstar,v)
+         end if
+      end do
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine test_eost_ostdyn  --  ost deposit tests  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "test_eost_ostdyn" drives eostdyn over two deposit intervals
+c     and checks that a settled interval deposits while an unsettled
+c     one is rejected
+c
+c
+      subroutine test_eost_ostdyn
+      use bath
+      use dlmda
+      use ost
+      implicit none
+      integer istep
+      real*8 eostsave
+c
+c
+c     a settled interval deposits one gaussian at the interval end
+c
+      kelvin = 300.0d0
+      call resetost (5,5,4)
+      iosthist = 4
+      ostnequil = 0
+      ostnavg = 4
+      ostcvbin = 0
+      ostcvstd = 1.0d0
+      ostcvrat = 0.0d0
+      hbias = 1.0d0
+      ostdt = 0.0d0
+      fastkernel = .true.
+      d2edl2 = 0.0d0
+      ostbdgdl = 0.0d0
+      ostbdgdfl = 0.0d0
+      ostbdfdl = 0.0d0
+      iost = 0
+      do istep = 1, iosthist
+         ostlambda = 0.5d0
+         ostdedl = 1.0d0
+         call eostdyn
+         if (istep .lt. iosthist) then
+            call assert_int (nosthist,0,
+     &                       'eostdyn waits for the interval end')
+         end if
+      end do
+      call assert_int (nosthist,1,'eostdyn deposits a settled interval')
+      call assert_int (ostihist(1),iosthist,'eostdyn stamps the step')
+      call assert_real (ostlhist(1),0.5d0,1.0d-12,
+     &                  'eostdyn gaussian lambda center')
+      call assert_real (ostfhist(1),1.0d0,1.0d-12,
+     &                  'eostdyn gaussian flambda center')
+      call assert_real (osthhist(1),hbias,1.0d-12,
+     &                  'eostdyn untempered gaussian height')
+      call assert_real (ostwlhist(1),wlhist,1.0d-12,
+     &                  'eostdyn gaussian lambda width')
+c
+c     an unsettled interval is rejected and changes nothing
+c
+      eostsave = eosttot
+      do istep = 1, iosthist
+         ostlambda = 0.5d0
+         ostdedl = 1.0d0
+         if (mod(istep,2) .eq. 0)  ostdedl = 11.0d0
+         call eostdyn
+      end do
+      call assert_real (ostdedlavg,6.0d0,1.0d-12,
+     &                  'eostdyn unsettled interval average')
+      call assert_real (ostdedlstd,5.0d0,1.0d-12,
+     &                  'eostdyn unsettled interval deviation')
+      call assert_int (nosthist,1,'eostdyn rejects an unsettled '//
+     &                 'interval')
+      call assert_real (eosttot,eostsave,1.0d-12,
+     &                  'eostdyn rejection leaves the free energy')
+      return
+      end
+c
+c
 c     #####################################################
 c     ##                                                 ##
 c     ##  subroutine resetost  --  reset OST test state  ##
@@ -1138,6 +1939,8 @@ c
       implicit none
       integer nl,nf,nhist
       integer i,j
+      integer maxcvbin
+      parameter (maxcvbin=16)
 c
 c
 c     clear any previous allocation
@@ -1160,9 +1963,16 @@ c
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(pfkernel))  deallocate (pfkernel)
+      if (allocated(vkernelmax))  deallocate (vkernelmax)
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
+      if (allocated(ostlmdaavgbin))  deallocate (ostlmdaavgbin)
+      if (allocated(ostlmdaslpbin))  deallocate (ostlmdaslpbin)
+      if (allocated(ostlmdastdbin))  deallocate (ostlmdastdbin)
+      if (allocated(ostdedlavgbin))  deallocate (ostdedlavgbin)
+      if (allocated(ostdedlslpbin))  deallocate (ostdedlslpbin)
+      if (allocated(ostdedlstdbin))  deallocate (ostdedlstdbin)
 c
 c     set scalar state
 c
@@ -1186,10 +1996,20 @@ c
       ostlambda = 0.0d0
       ostlambdaavg = 0.0d0
       ostlambdastd = 0.0d0
+      ostlambdaslp = 0.0d0
       ostdedl = 0.0d0
       ostdedlavg = 0.0d0
       ostdedlstd = 0.0d0
+      ostdedlslp = 0.0d0
       deffdl = 0.0d0
+      ostcvbin = 0
+      ostcvdif = 0.0d0
+      ostcvrat = 0.0d0
+      ostcvslp = 0.0d0
+      ostcvstd = 0.0d0
+      ostemper = .false.
+      tempergamma = 1.0d0
+      temperthresh = 0.0d0
       plmdamap = 'QNT'
       elmdamap = 'QNT'
       vlmdamap = 'QNT'
@@ -1207,6 +2027,7 @@ c
       eosttot = 0.0d0
       oststdev = 1.0d0
       ostinterpol = .false.
+      fastkernel = .false.
 c
 c     allocate arrays
 c
@@ -1228,6 +2049,25 @@ c
       allocate (glfkernel(nlmda,nflmda))
       allocate (glkernel(nlmda,nflmda))
       allocate (pfkernel(nlmda))
+      allocate (vkernelmax(nlmda))
+c
+c     the sub-bin arrays are sized generously so that a test may
+c     vary ostcvbin without reallocating them
+c
+      allocate (ostlmdaavgbin(maxcvbin))
+      allocate (ostlmdaslpbin(maxcvbin))
+      allocate (ostlmdastdbin(maxcvbin))
+      allocate (ostdedlavgbin(maxcvbin))
+      allocate (ostdedlslpbin(maxcvbin))
+      allocate (ostdedlstdbin(maxcvbin))
+      do i = 1, maxcvbin
+         ostlmdaavgbin(i) = 0.0d0
+         ostlmdaslpbin(i) = 0.0d0
+         ostlmdastdbin(i) = 0.0d0
+         ostdedlavgbin(i) = 0.0d0
+         ostdedlslpbin(i) = 0.0d0
+         ostdedlstdbin(i) = 0.0d0
+      end do
 c
 c     initialize arrays
 c
@@ -1249,6 +2089,7 @@ c
          fkernel(i) = 0.0d0
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
+         vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             osthead(i,j) = 0
             gfkernel(i,j) = 0.0d0
@@ -1285,17 +2126,25 @@ c
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
+      if (allocated(vmetagrid))  deallocate (vmetagrid)
+      if (allocated(dvmetagrid))  deallocate (dvmetagrid)
       sizemetahist = nhist
       nmetahist = 0
       allocate (metaihist(sizemetahist))
       allocate (metalhist(sizemetahist))
       allocate (metahhist(sizemetahist))
       allocate (metawhist(sizemetahist))
+      allocate (vmetagrid(nlmda))
+      allocate (dvmetagrid(nlmda))
       do i = 1, sizemetahist
          metaihist(i) = 0
          metalhist(i) = 0.0d0
          metahhist(i) = 0.0d0
          metawhist(i) = 0.0d0
+      end do
+      do i = 1, nlmda
+         vmetagrid(i) = 0.0d0
+         dvmetagrid(i) = 0.0d0
       end do
       return
       end

@@ -1102,8 +1102,24 @@ void eostdyn_();
 #define tinker_f_eostdyn eostdyn_
 void emetadyn_();
 #define tinker_f_emetadyn emetadyn_
+void histstat_(double* list, double* avg, double* std, double* slp, double* avgbin, double* stdbin, double* slpbin);
+#define tinker_f_histstat histstat_
+double fitslope_(double* tdot, double* total, int* n);
+#define tinker_f_fitslope fitslope_
+int depcriteria_(double* avg, double* std);
+#define tinker_f_depcriteria depcriteria_
+double ostvminimax_();
+#define tinker_f_ostvminimax ostvminimax_
+double metavminimax_();
+#define tinker_f_metavminimax metavminimax_
+double temperedheight_(double* vminimax);
+#define tinker_f_temperedheight temperedheight_
 void emetabias_(double* lambda, double* vbias, double* dvdl);
 #define tinker_f_emetabias emetabias_
+void emetabiasinterpolate_(double* lambda, double* vbias, double* dvdl);
+#define tinker_f_emetabiasinterpolate emetabiasinterpolate_
+void addmetagrid_(int* ihist);
+#define tinker_f_addmetagrid addmetagrid_
 double metadeltag_();
 #define tinker_f_metadeltag metadeltag_
 void resizemeta_();

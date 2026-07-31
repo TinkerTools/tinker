@@ -232,6 +232,7 @@ c
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(pfkernel))  deallocate (pfkernel)
+      if (allocated(vkernelmax))  deallocate (vkernelmax)
       allocate (osthead(nlmda,nflmda))
       allocate (fkernel(nlmda))
       allocate (fsumkernel(nlmda))
@@ -240,10 +241,12 @@ c
       allocate (glfkernel(nlmda,nflmda))
       allocate (glkernel(nlmda,nflmda))
       allocate (pfkernel(nlmda))
+      allocate (vkernelmax(nlmda))
       do i = 1, nlmda
          fkernel(i) = 0.0d0
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
+         vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             gfkernel(i,j) = 0.0d0
             gkernel(i,j) = 0.0d0
@@ -345,6 +348,7 @@ c
          fkernel(i) = 0.0d0
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
+         vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             gfkernel(i,j) = 0.0d0
             gkernel(i,j) = 0.0d0

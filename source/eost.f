@@ -100,6 +100,9 @@ c
       integer ilmda,iflmda
       integer lambdabin,flambdabin
       real*8 etotfkernel
+      real*8 ostvminimax
+      real*8 temperedheight
+      logical depcriteria
 c
 c
 c     increment iost step counter
@@ -128,43 +131,50 @@ c
 c     add a new histogram count every iosthist steps
 c
       if (istep .eq. 0) then
-         call avgstd (ostllist,ostnequil+1,ostnavg,
-     &                ostlambdaavg,ostlambdastd)
-         call avgstd (ostflist,ostnequil+1,ostnavg,
-     &                ostdedlavg,ostdedlstd)
-         ilmda = lambdabin(ostlambdaavg)
+         call histstat (ostllist,ostlambdaavg,ostlambdastd,
+     &                  ostlambdaslp,ostlmdaavgbin,ostlmdastdbin,
+     &                  ostlmdaslpbin)
+         call histstat (ostflist,ostdedlavg,ostdedlstd,
+     &                  ostdedlslp,ostdedlavgbin,ostdedlstdbin,
+     &                  ostdedlslpbin)
+c
+c     deposit only when the interval samples are converged enough
+c
+         if (depcriteria(ostdedlavg,ostdedlstd)) then
+            ilmda = lambdabin(ostlambdaavg)
 c
 c     ensure histogram contains the unbiased dU/dlambda value
 c
-         maxwlhist = max(maxwlhist,wlhist)
-         maxwfhist = max(maxwfhist,wfhist)
-         call ensureflambda (ostdedlavg)
-         iflmda = flambdabin(ostdedlavg)
+            maxwlhist = max(maxwlhist,wlhist)
+            maxwfhist = max(maxwfhist,wfhist)
+            call ensureflambda (ostdedlavg)
+            iflmda = flambdabin(ostdedlavg)
 c
 c     ensure histogram array is sufficiently large
 c
-         nosthist = nosthist + 1
-         if (nosthist .gt. sizeosthist)  call resizeosthist
-         call ij_to_k(ilmda,iflmda,nlmda,k)
+            nosthist = nosthist + 1
+            if (nosthist .gt. sizeosthist)  call resizeosthist
+            call ij_to_k(ilmda,iflmda,nlmda,k)
 c
 c     save histogram information
 c
-         osthist(nosthist) = k
-         ostihist(nosthist) = iost
-         ostlhist(nosthist) = ostlambdaavg
-         ostfhist(nosthist) = ostdedlavg
-         osthhist(nosthist) = hbias
-         ostwlhist(nosthist) = wlhist
-         ostwfhist(nosthist) = wfhist
-         ostnext(nosthist) = osthead(ilmda,iflmda)
-         osthead(ilmda,iflmda) = nosthist
-         if (fastkernel) then
-            call updatekernels
-         else
-            call updategkernel
-            call buildfkernel
+            osthist(nosthist) = k
+            ostihist(nosthist) = iost
+            ostlhist(nosthist) = ostlambdaavg
+            ostfhist(nosthist) = ostdedlavg
+            osthhist(nosthist) = temperedheight(ostvminimax())
+            ostwlhist(nosthist) = wlhist
+            ostwfhist(nosthist) = wfhist
+            ostnext(nosthist) = osthead(ilmda,iflmda)
+            osthead(ilmda,iflmda) = nosthist
+            if (fastkernel) then
+               call updatekernels
+            else
+               call updategkernel
+               call buildfkernel
+            end if
+            eosttot = etotfkernel()
          end if
-         eosttot = etotfkernel()
       end if
 c
 c     propagate the lambda particle for the next dynamics step
@@ -190,6 +200,8 @@ c
       implicit none
       integer istep,isamp
       real*8 metadeltag
+      real*8 metavminimax
+      real*8 temperedheight
 c
 c
 c     increment adaptive-bias step counter
@@ -214,20 +226,264 @@ c
 c     add a new metadynamics gaussian every iosthist steps
 c
       if (istep .eq. 0) then
-         call avgstd (ostllist,ostnequil+1,ostnavg,
-     &                ostlambdaavg,ostlambdastd)
+         call histstat (ostllist,ostlambdaavg,ostlambdastd,
+     &                  ostlambdaslp,ostlmdaavgbin,ostlmdastdbin,
+     &                  ostlmdaslpbin)
          nmetahist = nmetahist + 1
          if (nmetahist .gt. sizemetahist)  call resizemeta
          metalhist(nmetahist) = ostlambdaavg
-         metahhist(nmetahist) = hbias
+         metahhist(nmetahist) = temperedheight(metavminimax())
          metawhist(nmetahist) = wlmda
          metaihist(nmetahist) = iost
+         call addmetagrid (nmetahist)
          eosttot = metadeltag()
       end if
 c
 c     propagate the lambda particle for the next dynamics step
 c
       call ostlangevin
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine histstat -- interval convergence statistics  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "histstat" computes the average, standard deviation and fitted
+c     drift of the samples collected since the last gaussian deposit,
+c     both over the whole post-equilibration slice and within each of
+c     the ostcvbin convergence sub-bins
+c
+c
+      subroutine histstat (list,avg,std,slp,avgbin,stdbin,slpbin)
+      use ost
+      implicit none
+      integer i,b
+      integer i0
+      integer nper,nbin
+      integer ibegin
+      real*8 avg,std,slp
+      real*8 fitslope
+      real*8 k,d
+      real*8 total,tdot
+      real*8 a,tloc
+      real*8 list(*)
+      real*8 avgbin(*)
+      real*8 stdbin(*)
+      real*8 slpbin(*)
+c
+c
+c     split the averaging slice into equal convergence sub-bins,
+c     leaving any leading remainder samples outside the sub-bins
+c
+      nper = 0
+      if (ostcvbin .gt. 0)  nper = ostnavg / ostcvbin
+      nbin = 0
+      if (nper .gt. 0)  nbin = ostcvbin
+      ibegin = ostnequil + ostnavg - nper*nbin + 1
+      do b = 1, ostcvbin
+         avgbin(b) = 0.0d0
+         stdbin(b) = 0.0d0
+         slpbin(b) = 0.0d0
+      end do
+c
+c     accumulate the drift sums about a shifted origin, so that a
+c     small drift on top of a large offset is not lost to roundoff
+c
+      k = list(ostnequil+1)
+      total = 0.0d0
+      tdot = 0.0d0
+      do i = ostnequil+1, ibegin-1
+         d = list(i) - k
+         total = total + d
+         tdot = tdot + dble(i-ostnequil-1)*d
+      end do
+c
+c     accumulate each sub-bin and fold it into the whole-slice sums
+c
+      do b = 1, nbin
+         i0 = ibegin + (b-1)*nper
+         a = 0.0d0
+         tloc = 0.0d0
+         do i = i0, i0+nper-1
+            d = list(i) - k
+            a = a + d
+            tloc = tloc + dble(i-i0)*d
+         end do
+         total = total + a
+         tdot = tdot + tloc + dble(i0-1-ostnequil)*a
+         call avgstd (list,i0,nper,avgbin(b),stdbin(b))
+         slpbin(b) = fitslope (tloc,a,nper)
+      end do
+c
+c     average and deviation come from the whole averaging slice
+c
+      call avgstd (list,ostnequil+1,ostnavg,avg,std)
+      slp = fitslope (tdot,total,ostnavg)
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  function fitslope -- least squares drift per sample  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "fitslope" returns the least squares slope per sample of a
+c     series whose shifted sum is "total" and whose sum weighted by
+c     the sample index is "tdot", for "n" evenly spaced samples
+c
+c
+      function fitslope (tdot,total,n)
+      implicit none
+      integer n
+      real*8 fitslope
+      real*8 tdot,total
+      real*8 sxx,sxy
+c
+c
+c     a single sample has no drift to fit
+c
+      fitslope = 0.0d0
+      if (n .lt. 2)  return
+      sxx = dble(n) * (dble(n)*dble(n)-1.0d0) / 12.0d0
+      sxy = tdot - 0.5d0*dble(n-1)*total
+      fitslope = sxy / sxx
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  function depcriteria -- gaussian deposition criterion  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "depcriteria" decides whether the samples collected over the
+c     last deposit interval are converged enough to deposit a new
+c     biasing gaussian, by comparing their deviation against a
+c     tolerance with both absolute and relative parts
+c
+c
+      function depcriteria (avg,std)
+      use ost
+      implicit none
+      logical depcriteria
+      real*8 avg,std
+      real*8 tolerance
+c
+c
+c     accept only a deviation strictly inside the tolerance
+c
+      depcriteria = .false.
+      tolerance = ostcvstd + ostcvrat*abs(avg)
+      if (tolerance .gt. 0.0d0) then
+         if (std/tolerance .lt. 1.0d0)  depcriteria = .true.
+      end if
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  function ostvminimax -- global ost path bias level  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "ostvminimax" returns the minimum over lambda of the maximum
+c     ost bias reached along flambda, the bias level that any path
+c     across the lambda range has to have been filled to
+c
+c
+      function ostvminimax ()
+      use ost
+      implicit none
+      integer i
+      real*8 ostvminimax
+c
+c
+c     reduce the running per lambda bin maxima
+c
+      ostvminimax = 0.0d0
+      if (nlmda .lt. 1)  return
+      if (.not. allocated(vkernelmax))  return
+      ostvminimax = vkernelmax(1)
+      do i = 2, nlmda
+         ostvminimax = min(ostvminimax,vkernelmax(i))
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  function metavminimax -- global metadynamics bias level  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "metavminimax" returns the minimum over lambda of the deposited
+c     metadynamics bias, the level any path across lambda is filled to
+c
+c
+      function metavminimax ()
+      use ost
+      implicit none
+      integer i
+      real*8 metavminimax
+c
+c
+c     reduce the metadynamics bias over the lambda bin centers
+c
+      metavminimax = 0.0d0
+      if (nlmda .lt. 1)  return
+      if (.not. allocated(vmetagrid))  return
+      metavminimax = vmetagrid(1)
+      do i = 2, nlmda
+         metavminimax = min(metavminimax,vmetagrid(i))
+      end do
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  function temperedheight -- tempered gaussian height  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "temperedheight" scales down the height of a new biasing
+c     gaussian once the global path bias level has passed the
+c     tempering threshold, decaying on a scale of kT*tempergamma
+c
+c
+      function temperedheight (vminimax)
+      use bath
+      use ost
+      use units
+      implicit none
+      real*8 temperedheight
+      real*8 vminimax
+      real*8 denom,excess
+c
+c
+c     an untempered run always deposits at the full height
+c
+      temperedheight = hbias
+      if (.not. ostemper)  return
+      denom = gasconst * kelvin * tempergamma
+      if (denom .le. 0.0d0)  return
+      excess = max(0.0d0,vminimax-temperthresh)
+      temperedheight = hbias * exp(-excess/denom)
       return
       end
 c
@@ -239,20 +495,23 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "emetabias" evaluates Vbias(lambda) and dVbias/dlambda for
-c     the sum of one-dimensional normalized metadynamics gaussians
+c     "emetabias" evaluates Vbias(lambda) and dVbias/dlambda for the
+c     sum of one-dimensional normalized metadynamics gaussians, each
+c     counted along with its two images reflected at the lambda end
+c     points so that the bias has no gradient through the walls
 c
 c
       subroutine emetabias (lambda,vbias,dvdl)
       use math
       use ost
       implicit none
-      integer ihist
+      integer ihist,img
       real*8 lambda
       real*8 vbias,dvdl
       real*8 delta
       real*8 sig,sig2
       real*8 bias,pref
+      real*8 src(3)
 c
 c
 c     initialize metadynamics bias and derivative
@@ -260,18 +519,150 @@ c
       vbias = 0.0d0
       dvdl = 0.0d0
 c
-c     loop over saved metadynamics gaussians
+c     use the accumulated grid when interpolation was requested
+c
+      if (ostinterpol .and. nmetahist.gt.0) then
+         call emetabiasinterpolate (lambda,vbias,dvdl)
+         return
+      end if
+c
+c     loop over saved metadynamics gaussians and their images
 c
       do ihist = 1, nmetahist
          sig = metawhist(ihist)
          if (sig .gt. 0.0d0) then
             sig2 = sig * sig
-            delta = lambda - metalhist(ihist)
             pref = metahhist(ihist) / (sig*sqrt(2.0d0*pi))
-            bias = pref * exp(-0.5d0*delta*delta/sig2)
-            vbias = vbias + bias
-            dvdl = dvdl - delta*bias/sig2
+            src(1) = metalhist(ihist)
+            src(2) = -metalhist(ihist)
+            src(3) = 2.0d0 - metalhist(ihist)
+            do img = 1, 3
+               delta = lambda - src(img)
+               bias = pref * exp(-0.5d0*delta*delta/sig2)
+               vbias = vbias + bias
+               dvdl = dvdl - delta*bias/sig2
+            end do
          end if
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine emetabiasinterpolate -- interpolated meta bias  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "emetabiasinterpolate" evaluates the metadynamics bias and its
+c     lambda derivative by cubic Hermite interpolation of the values
+c     accumulated at the lambda bin centers
+c
+c
+      subroutine emetabiasinterpolate (lambda,vbias,dvdl)
+      use ost
+      implicit none
+      integer i,ia
+      integer il0
+      real*8 lambda
+      real*8 vbias,dvdl
+      real*8 lam,l0,x
+      real*8 x2,x3
+      real*8 val,der
+      real*8 hxv(2),hxd(2)
+      real*8 dhxv(2),dhxd(2)
+c
+c
+c     initialize metadynamics bias and derivative
+c
+      vbias = 0.0d0
+      dvdl = 0.0d0
+      if (nlmda .lt. 2)  return
+c
+c     find the lambda interval holding the requested value
+c
+      lam = min(1.0d0,max(0.0d0,lambda))
+      if (lam .ge. 1.0d0) then
+         il0 = nlmda - 1
+      else
+         il0 = int(lam/wlmda) + 1
+         il0 = max(1,min(il0,nlmda-1))
+      end if
+      l0 = dble(il0-1) * wlmda
+      x = (lam-l0) / wlmda
+c
+c     cubic Hermite basis functions and their derivatives
+c
+      x2 = x * x
+      x3 = x2 * x
+      hxv(1) = 2.0d0*x3 - 3.0d0*x2 + 1.0d0
+      hxv(2) = -2.0d0*x3 + 3.0d0*x2
+      hxd(1) = x3 - 2.0d0*x2 + x
+      hxd(2) = x3 - x2
+      dhxv(1) = 6.0d0*x2 - 6.0d0*x
+      dhxv(2) = -6.0d0*x2 + 6.0d0*x
+      dhxd(1) = 3.0d0*x2 - 4.0d0*x + 1.0d0
+      dhxd(2) = 3.0d0*x2 - 2.0d0*x
+c
+c     accumulate the value and slope contributions of both nodes
+c
+      do ia = 1, 2
+         i = il0 + ia - 1
+         val = vmetagrid(i)
+         der = wlmda * dvmetagrid(i)
+         vbias = vbias + hxv(ia)*val + hxd(ia)*der
+         dvdl = dvdl + dhxv(ia)*val + dhxd(ia)*der
+      end do
+      dvdl = dvdl / wlmda
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine addmetagrid -- accumulate one meta gaussian  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "addmetagrid" adds one deposited metadynamics gaussian and its
+c     two reflected images to the bias and derivative values stored
+c     at the lambda bin centers
+c
+c
+      subroutine addmetagrid (ihist)
+      use math
+      use ost
+      implicit none
+      integer ihist
+      integer il,img
+      real*8 lambda,delta
+      real*8 sig,sig2
+      real*8 bias,pref
+      real*8 src(3)
+c
+c
+c     a zero width gaussian makes no contribution
+c
+      sig = metawhist(ihist)
+      if (sig .le. 0.0d0)  return
+      sig2 = sig * sig
+      pref = metahhist(ihist) / (sig*sqrt(2.0d0*pi))
+      src(1) = metalhist(ihist)
+      src(2) = -metalhist(ihist)
+      src(3) = 2.0d0 - metalhist(ihist)
+c
+c     spread the gaussian over every lambda bin center
+c
+      do il = 1, nlmda
+         lambda = dble(il-1) * wlmda
+         do img = 1, 3
+            delta = lambda - src(img)
+            bias = pref * exp(-0.5d0*delta*delta/sig2)
+            vmetagrid(il) = vmetagrid(il) + bias
+            dvmetagrid(il) = dvmetagrid(il) - delta*bias/sig2
+         end do
       end do
       return
       end
@@ -1021,9 +1412,10 @@ c
       integer ihist
 c
 c
-c     zero out g kernel
+c     zero out g kernel and its running maxima
 c
       do i = 1, nlmda
+         vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             gkernel(i,j) = 0.0d0
          end do
@@ -1062,6 +1454,7 @@ c
          fkernel(i) = 0.0d0
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
+         vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             gfkernel(i,j) = 0.0d0
             gkernel(i,j) = 0.0d0
@@ -1213,6 +1606,8 @@ c
                   expfl = exp(-fldelta2 / (2.0d0*sigf2))
                   e = pref * expl * expfl
                   gkernel(ilmda,iflmda) = gkernel(ilmda,iflmda) + e
+                  vkernelmax(ilmda) = max(vkernelmax(ilmda),
+     &                                    gkernel(ilmda,iflmda))
    20             continue
                end do
    10          continue
@@ -1367,6 +1762,7 @@ c
       d2gdlfl = ldelta * fldelta * e / (sigl2*sigf2)
       gfkernel(ilmda,iflmda) = gfkernel(ilmda,iflmda) + dgdfl
       gkernel(ilmda,iflmda) = newg
+      vkernelmax(ilmda) = max(vkernelmax(ilmda),newg)
       glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda) + d2gdlfl
       glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
       fsumkernel(ilmda) = fsumkernel(ilmda) + flmda*delweight
@@ -1682,6 +2078,7 @@ c
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(pfkernel))  deallocate (pfkernel)
+      if (allocated(vkernelmax))  deallocate (vkernelmax)
       allocate (osthhist(sizeosthist0))
       allocate (osthist(sizeosthist0))
       allocate (ostihist(sizeosthist0))
@@ -1700,6 +2097,7 @@ c
       allocate (glfkernel(nlmda0,nflmda0))
       allocate (glkernel(nlmda0,nflmda0))
       allocate (pfkernel(nlmda0))
+      allocate (vkernelmax(nlmda0))
 c
 c     set scalar ost state from the restart file
 c
@@ -1738,6 +2136,7 @@ c
          fkernel(i) = 0.0d0
          fsumkernel(i) = 0.0d0
          pfkernel(i) = 0.0d0
+         vkernelmax(i) = 0.0d0
          do ihist = 1, nflmda
             gfkernel(i,ihist) = 0.0d0
             gkernel(i,ihist) = 0.0d0
@@ -2099,7 +2498,8 @@ c
       allocate (metaihist(sizemetahist0))
       allocate (ostllist(iosthist0))
 c
-c     set scalar metadynamics state from the restart file
+c     set scalar metadynamics state from the restart file; only the
+c     bin width is stored, so recover the bin count that goes with it
 c
       iost = iost0
       iosthist = iosthist0
@@ -2110,6 +2510,19 @@ c
       sizemetahist = sizemetahist0
       wlmda = wlmda0
       wlmda2 = 0.5d0 * wlmda
+      nlmda = nint(1.0d0/wlmda) + 1
+      nlmda = max(2,nlmda)
+c
+c     reallocate the metadynamics grid for the restored bin count
+c
+      if (allocated(vmetagrid))  deallocate (vmetagrid)
+      if (allocated(dvmetagrid))  deallocate (dvmetagrid)
+      allocate (vmetagrid(nlmda))
+      allocate (dvmetagrid(nlmda))
+      do i = 1, nlmda
+         vmetagrid(i) = 0.0d0
+         dvmetagrid(i) = 0.0d0
+      end do
       ostlambda = ostlambda0
       ostlambdaavg = 0.0d0
       osttheta = osttheta0
@@ -2140,6 +2553,12 @@ c
      &      metalhist(ihist),metahhist(ihist),metawhist(ihist)
       end do
       close (unit=ihis)
+c
+c     replay the saved gaussians onto the metadynamics grid
+c
+      do ihist = 1, nmetahist
+         call addmetagrid (ihist)
+      end do
       eosttot = metadeltag()
       metarestart = .true.
       nmethistsave = nmetahist
