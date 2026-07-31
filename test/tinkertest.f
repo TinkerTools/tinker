@@ -88,6 +88,7 @@ c
       call test_rephippo
       call test_strbnd
       call test_strtor
+      call test_thermint
       call test_torsion
       call test_tortor
       call test_urey

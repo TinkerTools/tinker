@@ -32,6 +32,7 @@ c
       use potent
       use stodyn
       use output
+      use thrmint
       use usage
       implicit none
       integer i,next,mode
@@ -242,6 +243,10 @@ c     perform the setup functions needed to run dynamics
 c
       call mdinit (dt)
 c
+c     lay out the thermodynamic integration lambda windows
+c
+      if (use_ti)  call inittidyn (nstep)
+c
 c     only allow Montecarlo or anisotropic barostat
 c     for NPT + extfield simulation
 c
@@ -341,12 +346,17 @@ c
          else
             call beeman (istep,dt)
          end if
+         if (use_ti)  call etidyn (istep)
       end do
 c
 c     save ost and metadynamics restart information
 c
       if (use_ostdyn)  call saveost
       if (use_metadyn)  call savemeta
+c
+c     save the thermodynamic integration block averages
+c
+      if (use_ti)  call tiprint
 c
 c     save dynamic at the end if it was not saved during simulation
 c

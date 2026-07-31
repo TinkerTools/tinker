@@ -133,6 +133,7 @@ c
       use syntrn
       use tarray
       use tettor
+      use thrmint
       use tors
       use tortor
       use tritor
@@ -942,10 +943,19 @@ c
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(pfkernel))  deallocate (pfkernel)
+      if (allocated(vkernelmax))  deallocate (vkernelmax)
+      if (allocated(ostlmdaavgbin))  deallocate (ostlmdaavgbin)
+      if (allocated(ostlmdaslpbin))  deallocate (ostlmdaslpbin)
+      if (allocated(ostlmdastdbin))  deallocate (ostlmdastdbin)
+      if (allocated(ostdedlavgbin))  deallocate (ostdedlavgbin)
+      if (allocated(ostdedlslpbin))  deallocate (ostdedlslpbin)
+      if (allocated(ostdedlstdbin))  deallocate (ostdedlstdbin)
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
       if (allocated(metaihist))  deallocate (metaihist)
+      if (allocated(vmetagrid))  deallocate (vmetagrid)
+      if (allocated(dvmetagrid))  deallocate (dvmetagrid)
 c
 c     deallocation of global arrays from module output
 c
@@ -1238,6 +1248,13 @@ c
 c     deallocation of global arrays from module tettor
 c
       if (allocated(ibitor))  deallocate (itettor)
+c
+c     deallocation of global arrays from module thrmint
+c
+      if (allocated(tinbcount))  deallocate (tinbcount)
+      if (allocated(tidedllist))  deallocate (tidedllist)
+      if (allocated(tilmdadedl))  deallocate (tilmdadedl)
+      if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
 c
 c     deallocation of global arrays from module tors
 c

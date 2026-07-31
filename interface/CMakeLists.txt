@@ -341,6 +341,7 @@ add_library (tinkerObjF OBJECT
 ../source/estrtor1.f
 ../source/estrtor2.f
 ../source/estrtor3.f
+../source/ethrmint.f
 ../source/etors.f
 ../source/etors1.f
 ../source/etors2.f

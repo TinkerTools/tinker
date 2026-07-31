@@ -135,6 +135,7 @@ c     set defaults for thermodynamic integration windows
 c
       tibin = 0
       tinbin = 21
+      tinblock = 0
       tinequil = 0
       tinstepavg = 100
       tiwindow = 0

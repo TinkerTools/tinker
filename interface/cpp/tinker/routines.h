@@ -1511,6 +1511,16 @@ void estrtor2_(int* i);
 void estrtor3_();
 #define tinker_f_estrtor3 estrtor3_
 
+// ethrmint.f
+void inittidyn_(int* nstep);
+#define tinker_f_inittidyn inittidyn_
+void etidyn_(int* istep);
+#define tinker_f_etidyn etidyn_
+void tischedule_();
+#define tinker_f_tischedule tischedule_
+void tiprint_();
+#define tinker_f_tiprint tiprint_
+
 // etors.f
 void etors_();
 #define tinker_f_etors etors_
