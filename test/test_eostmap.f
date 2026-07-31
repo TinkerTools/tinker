@@ -29,6 +29,7 @@ c
       call test_eostmap_sublmda
       call test_eostmap_taper
       call test_eostmap_lmdachain
+      call test_eostmap_relstage
       call final
       return
       end
@@ -160,7 +161,9 @@ c     the taper branch must negate the taper derivatives, checked
 c     off center where the second derivative is nonzero
 c
       ostlambda = 0.35d0
-      call refquintic (0.35d0,0.2d0,0.8d0,tref,dtref,d2tref)
+      tref = 0.896484375d0
+      dtref = -1.7578125d0
+      d2tref = -15.625d0
       call mapsublmda (ostlambda)
       call assert_real (plambda,1.0d0-tref,1.0d-12,
      &                  'mapsublmda taper offcenter plambda')
@@ -393,141 +396,103 @@ c     derivatives and per-mode lambda windows
 c
 c
       subroutine test_eostmap_taper
-      use bound
-      use dlmda
       implicit none
       real*8 taper,dtaper,d2taper
-      real*8 tref,dtref,d2tref
-      character*6 mode
 c
-c
-c     avoid the periodic image search inside the switch routine
-c
-      use_bounds = .false.
-c
-c     use a distinct taper window for each sublambda so a mode
-c     that reads the wrong window cannot pass
-c
-      qntplmda0 = 0.2d0
-      qntplmda1 = 0.8d0
-      qntelmda0 = 0.3d0
-      qntelmda1 = 0.7d0
-      qntvlmda0 = 0.1d0
-      qntvlmda1 = 0.9d0
-      mode = 'QNTPOL'
 c
 c     below and at the lower bound the taper is fully on and flat
 c
-      call sublmdataper (mode,0.05d0,taper,dtaper,d2taper)
+      call quintaper (0.05d0,0.2d0,0.8d0,taper,dtaper,d2taper)
       call assert_real (taper,1.0d0,1.0d-12,
-     &                  'sublmdataper below cut taper')
+     &                  'quintaper below cut taper')
       call assert_real (dtaper,0.0d0,1.0d-12,
-     &                  'sublmdataper below cut dtaper')
+     &                  'quintaper below cut dtaper')
       call assert_real (d2taper,0.0d0,1.0d-12,
-     &                  'sublmdataper below cut d2taper')
-      call sublmdataper (mode,0.2d0,taper,dtaper,d2taper)
+     &                  'quintaper below cut d2taper')
+      call quintaper (0.2d0,0.2d0,0.8d0,taper,dtaper,d2taper)
       call assert_real (taper,1.0d0,1.0d-12,
-     &                  'sublmdataper at cut taper')
+     &                  'quintaper at cut taper')
       call assert_real (dtaper,0.0d0,1.0d-12,
-     &                  'sublmdataper at cut dtaper')
+     &                  'quintaper at cut dtaper')
 c
 c     above and at the upper bound the taper is fully off and flat
 c
-      call sublmdataper (mode,0.95d0,taper,dtaper,d2taper)
+      call quintaper (0.95d0,0.2d0,0.8d0,taper,dtaper,d2taper)
       call assert_real (taper,0.0d0,1.0d-12,
-     &                  'sublmdataper above off taper')
+     &                  'quintaper above off taper')
       call assert_real (dtaper,0.0d0,1.0d-12,
-     &                  'sublmdataper above off dtaper')
+     &                  'quintaper above off dtaper')
       call assert_real (d2taper,0.0d0,1.0d-12,
-     &                  'sublmdataper above off d2taper')
-      call sublmdataper (mode,0.8d0,taper,dtaper,d2taper)
+     &                  'quintaper above off d2taper')
+      call quintaper (0.8d0,0.2d0,0.8d0,taper,dtaper,d2taper)
       call assert_real (taper,0.0d0,1.0d-12,
-     &                  'sublmdataper at off taper')
+     &                  'quintaper at off taper')
       call assert_real (dtaper,0.0d0,1.0d-12,
-     &                  'sublmdataper at off dtaper')
+     &                  'quintaper at off dtaper')
 c
 c     the quintic is the unique polynomial that is one at cut and
 c     zero at off with vanishing first and second derivatives at
-c     both ends, so it must equal the analytic smoothstep form
+c     both ends, so it must equal the analytic smoothstep form; the
+c     reference values below are that form evaluated exactly
 c
-      call sublmdataper (mode,0.5d0,taper,dtaper,d2taper)
-      call refquintic (0.5d0,0.2d0,0.8d0,tref,dtref,d2tref)
+      call quintaper (0.5d0,0.2d0,0.8d0,taper,dtaper,d2taper)
       call assert_real (taper,0.5d0,1.0d-12,
-     &                  'sublmdataper midpoint taper')
-      call assert_real (taper,tref,1.0d-12,
-     &                  'sublmdataper midpoint reference')
-      call assert_real (dtaper,dtref,1.0d-12,
-     &                  'sublmdataper midpoint dtaper')
+     &                  'quintaper midpoint taper')
+      call assert_real (dtaper,-3.125d0,1.0d-12,
+     &                  'quintaper midpoint dtaper')
       call assert_real (d2taper,0.0d0,1.0d-12,
-     &                  'sublmdataper midpoint d2taper')
-      call sublmdataper (mode,0.35d0,taper,dtaper,d2taper)
-      call refquintic (0.35d0,0.2d0,0.8d0,tref,dtref,d2tref)
-      call assert_real (taper,tref,1.0d-12,
-     &                  'sublmdataper offcenter taper')
-      call assert_real (dtaper,dtref,1.0d-12,
-     &                  'sublmdataper offcenter dtaper')
-      call assert_real (d2taper,d2tref,1.0d-12,
-     &                  'sublmdataper offcenter d2taper')
-      call sublmdataper (mode,0.70d0,taper,dtaper,d2taper)
-      call refquintic (0.70d0,0.2d0,0.8d0,tref,dtref,d2tref)
-      call assert_real (taper,tref,1.0d-12,
-     &                  'sublmdataper upper half taper')
-      call assert_real (dtaper,dtref,1.0d-12,
-     &                  'sublmdataper upper half dtaper')
-      call assert_real (d2taper,d2tref,1.0d-12,
-     &                  'sublmdataper upper half d2taper')
+     &                  'quintaper midpoint d2taper')
+      call quintaper (0.35d0,0.2d0,0.8d0,taper,dtaper,d2taper)
+      call assert_real (taper,0.896484375d0,1.0d-12,
+     &                  'quintaper offcenter taper')
+      call assert_real (dtaper,-1.7578125d0,1.0d-12,
+     &                  'quintaper offcenter dtaper')
+      call assert_real (d2taper,-15.625d0,1.0d-12,
+     &                  'quintaper offcenter d2taper')
+      call quintaper (0.70d0,0.2d0,0.8d0,taper,dtaper,d2taper)
+      call assert_real (taper,0.035493827160493825d0,1.0d-12,
+     &                  'quintaper upper half taper')
+      call assert_real (dtaper,-0.96450617283950613d0,1.0d-12,
+     &                  'quintaper upper half dtaper')
+      call assert_real (d2taper,15.432098765432098d0,1.0d-12,
+     &                  'quintaper upper half d2taper')
 c
-c     the same lambda gives different results per mode because each
-c     mode selects its own taper window
+c     the same lambda gives different results for different windows,
+c     since the bounds are passed in rather than read from a mode
 c
-      mode = 'QNTELE'
-      call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
+      call quintaper (0.25d0,0.3d0,0.7d0,taper,dtaper,d2taper)
       call assert_real (taper,1.0d0,1.0d-12,
-     &                  'sublmdataper qntele below own cut')
-      mode = 'QNTVDW'
-      call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
-      call refquintic (0.25d0,0.1d0,0.9d0,tref,dtref,d2tref)
-      call assert_real (taper,tref,1.0d-12,
-     &                  'sublmdataper qntvdw own window taper')
-      call assert_real (dtaper,dtref,1.0d-12,
-     &                  'sublmdataper qntvdw own window dtaper')
-      mode = 'QNTPOL'
-      call sublmdataper (mode,0.25d0,taper,dtaper,d2taper)
-      call refquintic (0.25d0,0.2d0,0.8d0,tref,dtref,d2tref)
-      call assert_real (taper,tref,1.0d-12,
-     &                  'sublmdataper qntpol own window taper')
-      return
-      end
+     &                  'quintaper narrow window below cut')
+      call quintaper (0.25d0,0.1d0,0.9d0,taper,dtaper,d2taper)
+      call assert_real (taper,0.95123100280761719d0,1.0d-12,
+     &                  'quintaper wide window taper')
+      call assert_real (dtaper,-0.87032318115234375d0,1.0d-12,
+     &                  'quintaper wide window dtaper')
+      call quintaper (0.25d0,0.2d0,0.8d0,taper,dtaper,d2taper)
+      call assert_real (taper,0.99491222993827155d0,1.0d-12,
+     &                  'quintaper middle window taper')
 c
+c     the reduced-coordinate form stays accurate on a window narrow
+c     enough that the "switch" coefficients lose most of their digits;
+c     the bounds are exact binary fractions half a step either side of
+c     one half, so the reference values below are exact as well
 c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine refquintic  --  analytic taper reference  ##
-c     ##                                                       ##
-c     ###########################################################
-c
-c
-c     "refquintic" evaluates the quintic taper and its
-c     first two derivatives from the smoothstep formula
-c
-c
-      subroutine refquintic (x,cutval,offval,taper,dtaper,d2taper)
-      implicit none
-      real*8 x,cutval,offval
-      real*8 taper,dtaper,d2taper
-      real*8 t,t2,t3,t4,t5
-      real*8 w
-c
-c
-      w = offval - cutval
-      t = (x-cutval) / w
-      t2 = t * t
-      t3 = t2 * t
-      t4 = t2 * t2
-      t5 = t2 * t3
-      taper = 1.0d0 - (6.0d0*t5-15.0d0*t4+10.0d0*t3)
-      dtaper = -(30.0d0*t4-60.0d0*t3+30.0d0*t2) / w
-      d2taper = -(120.0d0*t3-180.0d0*t2+60.0d0*t) / (w*w)
+      call quintaper (0.5d0,0.4990234375d0,0.5009765625d0,
+     &                taper,dtaper,d2taper)
+      call assert_real (taper,0.5d0,1.0d-12,
+     &                  'quintaper narrow midpoint taper')
+      call assert_real (dtaper,-960.0d0,1.0d-9,
+     &                  'quintaper narrow midpoint dtaper')
+      call assert_real (d2taper,0.0d0,1.0d-9,
+     &                  'quintaper narrow midpoint d2taper')
+      call quintaper (0.50048828125d0,0.4990234375d0,0.5009765625d0,
+     &                taper,dtaper,d2taper)
+      call assert_real (taper,0.103515625d0,1.0d-12,
+     &                  'quintaper narrow offcenter taper')
+      call assert_real (dtaper,-540.0d0,1.0d-9,
+     &                  'quintaper narrow offcenter dtaper')
+      call assert_real (d2taper,1474560.0d0,1.0d-6,
+     &                  'quintaper narrow offcenter d2taper')
       return
       end
 c
@@ -655,5 +620,258 @@ c
       deallocate (dfpdl)
       deallocate (dfmdl)
       deallocate (dfvdl)
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine test_eostmap_relstage  --  staged lambda  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "test_eostmap_relstage" checks the staged relative free energy
+c     schedule, in which the electrostatic sublambda discharges one
+c     ligand over a low lambda window, stays zero while van der Waals
+c     morphs between the two ligands, then recharges the other ligand
+c     over a high lambda window
+c
+c
+      subroutine test_eostmap_relstage
+      use dlmda
+      use mutant
+      implicit none
+      integer i
+      real*8 edge,eps
+      real*8 dbound,window
+      real*8 whi,wlo,dhi,dlo
+      real*8 tref(3),dtref(3),d2tref(3)
+      real*8 probe(3)
+c
+c
+c     drive the schedule directly; only the scalar mapping is
+c     exercised here, the endpoint mixing needs a real system
+c
+      use_relstage = .true.
+      relstg1lmda0 = 0.0d0
+      relstg1lmda1 = 0.3d0
+      relstg2lmda0 = 0.7d0
+      relstg2lmda1 = 1.0d0
+      vlmdamap = 'QNT'
+      qntvlmda0 = 0.3d0
+      qntvlmda1 = 0.7d0
+c
+c     lambda of one, ligand 1 fully coupled and van der Waals with it
+c
+      call mapsublmda (1.0d0)
+      call assert_logical (relstage.eq.'LIG1',.true.,
+     &                     'maprelstage relstage at lambda one')
+      call assert_real (elambda,1.0d0,1.0d-14,
+     &                  'maprelstage elambda at lambda one')
+      call assert_logical (relstagemix,.false.,
+     &                     'maprelstage relstagemix at lambda one')
+      call assert_real (vlambda,1.0d0,1.0d-14,
+     &                  'maprelstage vlambda at lambda one')
+      call assert_real (deldlmda,0.0d0,1.0d-14,
+     &                  'maprelstage deldlmda at lambda one')
+c
+c     interior of the ligand 1 discharge leg, weight grows with lambda
+c
+      call mapsublmda (0.85d0)
+      call assert_logical (relstage.eq.'LIG1',.true.,
+     &                     'maprelstage relstage on ligand 1 leg')
+      call assert_real (elambda,0.5d0,1.0d-12,
+     &                  'maprelstage elambda on ligand 1 leg')
+      call assert_logical (relstagemix,.true.,
+     &                     'maprelstage relstagemix on ligand 1 leg')
+      call assert_logical (deldlmda.gt.0.0d0,.true.,
+     &                     'maprelstage deldlmda sign on ligand 1 leg')
+      call assert_real (vlambda,1.0d0,1.0d-14,
+     &                  'maprelstage vlambda on ligand 1 leg')
+c
+c     the van der Waals morph window, both ligands decoupled
+c
+      probe(1) = 0.7d0
+      probe(2) = 0.5d0
+      probe(3) = 0.3d0
+      do i = 1, 3
+         call mapsublmda (probe(i))
+         call assert_logical (relstage.eq.'VDWM',.true.,
+     &                        'maprelstage relstage in morph window')
+         call assert_real (elambda,0.0d0,1.0d-14,
+     &                     'maprelstage elambda in morph window')
+         call assert_logical (relstagemix,.false.,
+     &                        'maprelstage relstagemix in morph window')
+         call assert_real (deldlmda,0.0d0,1.0d-14,
+     &                     'maprelstage deldlmda in morph window')
+         call assert_real (d2eldlmda2,0.0d0,1.0d-14,
+     &                     'maprelstage d2eldlmda2 in morph window')
+      end do
+      call mapsublmda (0.5d0)
+      call assert_real (vlambda,0.5d0,1.0d-12,
+     &                  'maprelstage vlambda in morph window')
+c
+c     interior of the ligand 0 recharge leg, weight grows as lambda falls
+c
+      call mapsublmda (0.15d0)
+      call assert_logical (relstage.eq.'LIG0',.true.,
+     &                     'maprelstage relstage on ligand 0 leg')
+      call assert_real (elambda,0.5d0,1.0d-12,
+     &                  'maprelstage elambda on ligand 0 leg')
+      call assert_logical (relstagemix,.true.,
+     &                     'maprelstage relstagemix on ligand 0 leg')
+      call assert_logical (deldlmda.lt.0.0d0,.true.,
+     &                     'maprelstage deldlmda sign on ligand 0 leg')
+      call assert_real (vlambda,0.0d0,1.0d-14,
+     &                  'maprelstage vlambda on ligand 0 leg')
+c
+c     lambda of zero, ligand 0 fully coupled
+c
+      call mapsublmda (0.0d0)
+      call assert_logical (relstage.eq.'LIG0',.true.,
+     &                     'maprelstage relstage at lambda zero')
+      call assert_real (elambda,1.0d0,1.0d-14,
+     &                  'maprelstage elambda at lambda zero')
+      call assert_logical (relstagemix,.false.,
+     &                     'maprelstage relstagemix at lambda zero')
+      call assert_real (vlambda,0.0d0,1.0d-14,
+     &                  'maprelstage vlambda at lambda zero')
+      call assert_real (deldlmda,0.0d0,1.0d-14,
+     &                  'maprelstage deldlmda at lambda zero')
+c
+c     just inside a leg the weight is built by cancellation and
+c     collapses onto zero, or a little past it, for about 7e-7 of
+c     main lambda past the decoupled edge; that has to clamp to
+c     zero and report the morph window, since a leg with no mix
+c     means a weight of one to the energy routines and would switch
+c     a whole ligand on inside a window lambda dynamics can visit
+c
+      probe(1) = 1.0d-7
+      probe(2) = 5.0d-7
+      do i = 1, 2
+         call mapsublmda (0.7d0+probe(i))
+         call assert_real (elambda,0.0d0,0.0d0,
+     &                     'maprelstage collapsed weight above morph')
+         call assert_logical (relstage.eq.'VDWM',.true.,
+     &                        'maprelstage collapsed leg above morph')
+         call assert_logical (relstagemix,.false.,
+     &                        'maprelstage collapsed mix above morph')
+         call mapsublmda (0.3d0-probe(i))
+         call assert_real (elambda,0.0d0,0.0d0,
+     &                     'maprelstage collapsed weight below morph')
+         call assert_logical (relstage.eq.'VDWM',.true.,
+     &                        'maprelstage collapsed leg below morph')
+         call assert_logical (relstagemix,.false.,
+     &                        'maprelstage collapsed mix below morph')
+      end do
+c
+c     past the collapse the weight survives and the leg resumes
+c     with a mix rather than a bare endpoint
+c
+      call mapsublmda (0.7d0+1.0d-5)
+      call assert_logical (elambda.gt.0.0d0,.true.,
+     &                     'maprelstage revived weight above morph')
+      call assert_logical (relstage.eq.'VDWM',.false.,
+     &                     'maprelstage revived leg above morph')
+      call assert_logical (relstagemix,.true.,
+     &                     'maprelstage revived mix above morph')
+      call mapsublmda (0.3d0-1.0d-5)
+      call assert_logical (elambda.gt.0.0d0,.true.,
+     &                     'maprelstage revived weight below morph')
+      call assert_logical (relstage.eq.'VDWM',.false.,
+     &                     'maprelstage revived leg below morph')
+      call assert_logical (relstagemix,.true.,
+     &                     'maprelstage revived mix below morph')
+c
+c     polarization tracks the multipoles exactly across the whole
+c     schedule, so the fused multipole plus polarization path stays
+c     usable and the two terms never see different states
+c
+      probe(1) = 0.95d0
+      probe(2) = 0.72d0
+      probe(3) = 0.05d0
+      do i = 1, 3
+         call mapsublmda (probe(i))
+         call assert_real (plambda,elambda,1.0d-15,
+     &                     'maprelstage plambda tracks elambda')
+         call assert_real (dpldlmda,deldlmda,1.0d-15,
+     &                     'maprelstage dpldlmda tracks deldlmda')
+         call assert_real (d2pldlmda2,d2eldlmda2,1.0d-15,
+     &                     'maprelstage d2pldlmda2 tracks d2eldlmda2')
+      end do
+c
+c     the weight and its derivative approach each leg boundary
+c     continuously from the inside, so dU/dlambda has no step where
+c     one leg hands over to the next; the weight is flat to machine
+c     precision and the derivative vanishes quadratically, so it is
+c     checked against the analytic bound 30*(eps/w)**2/w for a window
+c     of width w, doubled to leave room for round-off
+c
+      eps = 1.0d-7
+      window = 0.3d0
+      dbound = 60.0d0 * (eps/window) * (eps/window) / window
+      do i = 1, 2
+         if (i .eq. 1) then
+            edge = 0.7d0
+         else
+            edge = 0.3d0
+         end if
+         call mapsublmda (edge+eps)
+         whi = elambda
+         dhi = deldlmda
+         call mapsublmda (edge-eps)
+         wlo = elambda
+         dlo = deldlmda
+         call assert_real (whi,wlo,1.0d-14,
+     &                     'maprelstage weight across leg boundary')
+         call assert_logical (abs(dhi-dlo).le.dbound,.true.,
+     &                        'maprelstage deriv step at leg boundary')
+         call assert_logical (abs(dhi).le.dbound,.true.,
+     &                        'maprelstage deriv above leg boundary')
+         call assert_logical (abs(dlo).le.dbound,.true.,
+     &                        'maprelstage deriv below leg boundary')
+      end do
+c
+c     each leg is the quintic taper of its own window, so the staged
+c     weight is smooth in the main lambda all the way across
+c
+      probe(1) = 0.75d0
+      probe(2) = 0.85d0
+      probe(3) = 0.95d0
+      tref(1) = 0.96450617283950613d0
+      tref(2) = 0.5d0
+      tref(3) = 0.035493827160493825d0
+      dtref(1) = -1.9290123456790123d0
+      dtref(2) = -6.25d0
+      dtref(3) = -1.9290123456790123d0
+      d2tref(1) = -61.728395061728392d0
+      d2tref(2) = 0.0d0
+      d2tref(3) = 61.728395061728392d0
+      do i = 1, 3
+         call mapsublmda (probe(i))
+         call assert_real (elambda,1.0d0-tref(i),1.0d-12,
+     &                     'maprelstage ligand 1 leg weight')
+         call assert_real (deldlmda,-dtref(i),1.0d-12,
+     &                     'maprelstage ligand 1 leg deldlmda')
+         call assert_real (d2eldlmda2,-d2tref(i),1.0d-12,
+     &                     'maprelstage ligand 1 leg d2eldlmda2')
+      end do
+      probe(1) = 0.05d0
+      probe(2) = 0.15d0
+      probe(3) = 0.25d0
+      do i = 1, 3
+         call mapsublmda (probe(i))
+         call assert_real (elambda,tref(i),1.0d-12,
+     &                     'maprelstage ligand 0 leg weight')
+         call assert_real (deldlmda,dtref(i),1.0d-12,
+     &                     'maprelstage ligand 0 leg deldlmda')
+         call assert_real (d2eldlmda2,d2tref(i),1.0d-12,
+     &                     'maprelstage ligand 0 leg d2eldlmda2')
+      end do
+c
+c     the ordinary maps must be untouched when staging is off
+c
+      use_relstage = .false.
       return
       end

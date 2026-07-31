@@ -833,9 +833,44 @@ c
          qntvlmda1 = temp
       end if
 c
+c     the staged schedule morphs van der Waals between the two ligands
+c     while both are electrostatically decoupled, so the van der Waals
+c     map has to be the windowed quintic taper and the window has to
+c     close before either electrostatic leg opens; the unwindowed maps
+c     never finish the morph and leave dU/dlambda nonzero at the ends
+c
+      if (use_relstage) then
+         if (vlmdamap .ne. 'QNT') then
+            write (iout,51)
+   51       format (/,' MUTATE  --  REL-STAGE requires the QNT van der',
+     &                 ' Waals lambda map; set VDW-LMDA-MAP to QNT')
+            call fatal
+         end if
+         if (qntvlmda0 .lt. relstg1lmda1) then
+            write (iout,52)
+   52       format (/,' MUTATE  --  VDW-LMDA-RANGE starts before the',
+     &                 ' ligand 1 electrostatic window ends; raise the',
+     &                 ' lower bound to at least the upper bound of',
+     &                 ' REL-LIG1-ELE-RANGE')
+            call fatal
+         end if
+         if (qntvlmda1 .gt. relstg2lmda0) then
+            write (iout,53)
+   53       format (/,' MUTATE  --  VDW-LMDA-RANGE ends after the',
+     &                 ' ligand 2 electrostatic window starts; lower',
+     &                 ' the upper bound to at most the lower bound of',
+     &                 ' REL-LIG2-ELE-RANGE')
+            call fatal
+         end if
+      end if
+c
 c     get mapping from main lambda to sub-lambdas
 c
-      if (use_ost .or. use_meta)  call mapsublmda (ostlambda)
+      if (use_ost .or. use_meta) then
+         call mapsublmda (ostlambda)
+      else if (use_ti) then
+         call mapsublmda (tilmda)
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c

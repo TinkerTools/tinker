@@ -29,7 +29,11 @@ c
       pairwise = .true.
       if (use_epdt) then
          if (use_rel) then
-            call epolar3fr
+            if (use_relstage) then
+               call epolar3frs
+            else
+               call epolar3fr
+            end if
          else
             call epolar3f
          end if
@@ -2732,5 +2736,166 @@ c
       deallocate (aepbe)
       deallocate (aepa)
       deallocate (aepb)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine epolar3frs  --  staged rel dual topo pol anal  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "epolar3frs" calculates the polarization energy and partitions
+c     the energy among the atoms for a two-ligand relative dual
+c     topology calculation run on the staged schedule, combining the
+c     same subsystem states as "epolar1frs",
+c
+c        E0 = E(env) + E(A) + E(B)
+c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
+c        E  = plambda*E1 + (1-plambda)*E0
+c
+c
+      subroutine epolar3frs
+      use action
+      use analyz
+      use atoms
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      integer i
+      integer nep0,nep1
+      real*8 ep0,ep1
+      real*8 weight1,weight0
+      logical lig1,domix,dovdwm,needref
+      real*8, allocatable :: aep0(:)
+      real*8, allocatable :: aep1(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aep0(n))
+      allocate (aep1(n))
+c
+c     decide which leg of the staged schedule is active
+c
+      lig1 = (relstage .eq. 'LIG1')
+      dovdwm = (relstage .eq. 'VDWM')
+      domix = relstagemix
+      needref = (dovdwm .or. domix)
+c
+c     zero out the two endpoint accumulators
+c
+      ep0 = 0.0d0
+      ep1 = 0.0d0
+      nep0 = 0
+      nep1 = 0
+      do i = 1, n
+         aep0(i) = 0.0d0
+         aep1(i) = 0.0d0
+      end do
+c
+c     environment alone, part of the decoupled reference
+c
+      if (needref) then
+         call altpolrsub (.false.,.false.,.true.)
+         call epolar3calc
+         ep0 = ep0 + ep
+         nep0 = nep0 + nep
+         do i = 1, n
+            aep0(i) = aep0(i) + aep(i)
+         end do
+      end if
+c
+c     ligand A alone, in the reference and in the ligand 0 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
+         call altpolrsub (.true.,.false.,.false.)
+         call epolar3calc
+         if (needref) then
+            ep0 = ep0 + ep
+            nep0 = nep0 + nep
+            do i = 1, n
+               aep0(i) = aep0(i) + aep(i)
+            end do
+         end if
+         if (.not.dovdwm .and. .not.lig1) then
+            ep1 = ep1 + ep
+            do i = 1, n
+               aep1(i) = aep1(i) + aep(i)
+            end do
+         end if
+      end if
+c
+c     ligand B alone, in the reference and in the ligand 1 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. lig1)) then
+         call altpolrsub (.false.,.true.,.false.)
+         call epolar3calc
+         if (needref) then
+            ep0 = ep0 + ep
+            nep0 = nep0 + nep
+            do i = 1, n
+               aep0(i) = aep0(i) + aep(i)
+            end do
+         end if
+         if (.not.dovdwm .and. lig1) then
+            ep1 = ep1 + ep
+            do i = 1, n
+               aep1(i) = aep1(i) + aep(i)
+            end do
+         end if
+      end if
+c
+c     the active ligand coupled to the environment
+c
+      if (.not. dovdwm) then
+         if (lig1) then
+            call altpolrsub (.true.,.false.,.true.)
+         else
+            call altpolrsub (.false.,.true.,.true.)
+         end if
+         call epolar3calc
+         ep1 = ep1 + ep
+         nep1 = nep1 + nep
+         do i = 1, n
+            aep1(i) = aep1(i) + aep(i)
+         end do
+      end if
+c
+c     restore the original full system parameters
+c
+      call altpolrsub (.true.,.true.,.true.)
+c
+c     interpolate the active leg, or take the reference in the middle
+c
+      if (dovdwm) then
+         ep = ep0
+         nep = nep0
+         do i = 1, n
+            aep(i) = aep0(i)
+         end do
+      else if (domix) then
+         weight1 = plambda
+         weight0 = 1.0d0 - weight1
+         ep = weight1*ep1 + weight0*ep0
+         nep = nep1
+         do i = 1, n
+            aep(i) = weight1*aep1(i) + weight0*aep0(i)
+         end do
+      else
+         ep = ep1
+         nep = nep1
+         do i = 1, n
+            aep(i) = aep1(i)
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aep0)
+      deallocate (aep1)
       return
       end

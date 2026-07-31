@@ -24,8 +24,14 @@ c
       real*8 taper
       real*8 dtaper
       real*8 d2taper
-      character*6 mode
 c
+c
+c     the staged relative schedule maps the sublambdas its own way
+c
+      if (use_relstage) then
+         call maprelstage (lmda)
+         return
+      end if
 c
 c     map from lambda to sublambdas
 c
@@ -36,8 +42,8 @@ c
          call sublmdainvpower (lmda,plmdainvn,plmdainveps,plambda,
      &                         dpldlmda,d2pldlmda2)
       else
-         mode = 'QNTPOL'
-         call sublmdataper (mode,lmda,taper,dtaper,d2taper)
+         call quintaper (lmda,qntplmda0,qntplmda1,
+     &                   taper,dtaper,d2taper)
          plambda = 1.0d0 - taper
          dpldlmda = -dtaper
          d2pldlmda2 = -d2taper
@@ -49,8 +55,8 @@ c
          call sublmdainvpower (lmda,elmdainvn,elmdainveps,elambda,
      &                         deldlmda,d2eldlmda2)
       else
-         mode = 'QNTELE'
-         call sublmdataper (mode,lmda,taper,dtaper,d2taper)
+         call quintaper (lmda,qntelmda0,qntelmda1,
+     &                   taper,dtaper,d2taper)
          elambda = 1.0d0 - taper
          deldlmda = -dtaper
          d2eldlmda2 = -d2taper
@@ -62,8 +68,8 @@ c
          call sublmdainvpower (lmda,vlmdainvn,vlmdainveps,vlambda,
      &                         dvldlmda,d2vldlmda2)
       else
-         mode = 'QNTVDW'
-         call sublmdataper (mode,lmda,taper,dtaper,d2taper)
+         call quintaper (lmda,qntvlmda0,qntvlmda1,
+     &                   taper,dtaper,d2taper)
          vlambda = 1.0d0 - taper
          dvldlmda = -dtaper
          d2vldlmda2 = -d2taper
@@ -75,6 +81,140 @@ c
          use_pol4i = (lmda .le. qntplmda1)
          use_pol4f = (lmda .ge. qntplmda0)
       end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine maprelstage -- staged relative lambda mapping  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "maprelstage" maps the main lambda "lmda" onto the sublambdas for
+c     the staged relative free energy schedule, in which the two ligands
+c     are discharged and recharged one at a time while the van der Waals
+c     terms morph between them in the middle window
+c
+c        lmda > relstg2lmda0    ligand 1 electrostatics, weight 0 -> 1
+c        lmda < relstg1lmda1    ligand 0 electrostatics, weight 1 -> 0
+c        otherwise              both ligands electrostatically decoupled
+c
+c     the electrostatic weight is the quintic taper, so the mixing
+c     exponent used by the energy routines is one and the whole main
+c     lambda chain rule is carried by "deldlmda"; polarization stages
+c     with the multipoles while van der Waals morphs over its own window
+c
+c
+      subroutine maprelstage (lmda)
+      use dlmda
+      use mutant
+      implicit none
+      real*8 lmda
+      real*8 w
+      real*8 taper
+      real*8 dtaper
+      real*8 d2taper
+c
+c
+c     find the leg the main lambda sits in and its weight
+c
+      if (lmda .gt. relstg2lmda0) then
+         call quintaper (lmda,relstg2lmda0,relstg2lmda1,
+     &                   taper,dtaper,d2taper)
+         relstage = 'LIG1'
+         w = 1.0d0 - taper
+         deldlmda = -dtaper
+         d2eldlmda2 = -d2taper
+      else if (lmda .lt. relstg1lmda1) then
+         call quintaper (lmda,relstg1lmda0,relstg1lmda1,
+     &                   taper,dtaper,d2taper)
+         relstage = 'LIG0'
+         w = taper
+         deldlmda = dtaper
+         d2eldlmda2 = d2taper
+      else
+         relstage = 'VDWM'
+         w = 0.0d0
+         deldlmda = 0.0d0
+         d2eldlmda2 = 0.0d0
+      end if
+c
+c     numerical guard for w = 1.0d0 - taper
+c
+      elambda = min(1.0d0,max(0.0d0,w))
+      if (elambda .eq. 0.0d0)  relstage = 'VDWM'
+      relstagemix = (elambda .gt. 0.0d0 .and. elambda .lt. 1.0d0)
+c
+c     polarization stages with the multipoles, same states same weight
+c
+      plambda = elambda
+      dpldlmda = deldlmda
+      d2pldlmda2 = d2eldlmda2
+c
+c     van der Waals morphs between the two ligands
+c
+      call quintaper (lmda,qntvlmda0,qntvlmda1,
+     &                taper,dtaper,d2taper)
+      vlambda = 1.0d0 - taper
+      dvldlmda = -dtaper
+      d2vldlmda2 = -d2taper
+c
+c     the staged routines branch on "relstagemix" instead of the
+c     quantized endpoint flags, so leave the flags fully open
+c
+      use_pol4i = .true.
+      use_pol4f = .true.
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine quintaper -- quintic taper over a window  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "quintaper" evaluates the quintic switching polynomial and its
+c     first two derivatives over an arbitrary window, the taper falling
+c     smoothly from one at "cut" to zero at "off"; the polynomial is
+c     evaluated in the reduced coordinate (x-cut)/(off-cut) rather than
+c     from the coefficients of "switch", which carry 1/(off-cut)**5 and
+c     lose most of their precision once the window is narrow
+c
+c
+      subroutine quintaper (x,cut,off,taper,dtaper,d2taper)
+      implicit none
+      real*8 x,cut,off
+      real*8 taper
+      real*8 dtaper
+      real*8 d2taper
+      real*8 rinv,u,u2,v
+c
+c
+c     return if outside the switching window
+c
+      dtaper = 0.0d0
+      d2taper = 0.0d0
+      if (x .le. cut) then
+         taper = 1.0d0
+         return
+      else if (x .ge. off) then
+         taper = 0.0d0
+         return
+      end if
+c
+c     compute the quintic taper and its derivatives
+c
+      rinv = 1.0d0 / (off-cut)
+      u = (x-cut) * rinv
+      u2 = u * u
+      v = 1.0d0 - u
+      taper = 1.0d0 - u2*u*(10.0d0-15.0d0*u+6.0d0*u2)
+      dtaper = -30.0d0 * u2 * v * v * rinv
+      d2taper = -60.0d0 * u * v * (1.0d0-2.0d0*u) * rinv * rinv
       return
       end
 c
@@ -188,61 +328,6 @@ c
       dlmda = power * base**(power-1.0d0) / denom
       d2lmda = power * (power-1.0d0)
      &           * base**(power-2.0d0) / denom
-      return
-      end
-c
-c
-c     #######################################################
-c     ##                                                   ##
-c     ##  subroutine sublmdataper -- tapers the sublambda  ##
-c     ##                                                   ##
-c     #######################################################
-c
-c
-c     "sublmdataper" tapers the mapping from main lambda to
-c     sublambda at the endpoints
-c
-c
-      subroutine sublmdataper (mode,x,taper,dtaper,d2taper)
-      use shunt
-      implicit none
-      real*8 taper
-      real*8 dtaper
-      real*8 d2taper
-      real*8 x,x2,x3
-      real*8 x4,x5
-      character*6 mode
-c
-c
-c     get taper coefficients from existing Tinker switch routine
-c
-      call switch (mode)
-c
-c     return if outside switching window
-c
-      if (x .le. cut) then
-         taper = 1.0d0
-         dtaper = 0.0d0
-         d2taper = 0.0d0
-         return
-      else if (x .ge. off) then
-         taper = 0.0d0
-         dtaper = 0.0d0
-         d2taper = 0.0d0
-         return
-      end if
-c
-c     compute the quintic taper and derivative
-c
-      x2 = x*x
-      x3 = x2*x
-      x4 = x2*x2
-      x5 = x2*x3
-      taper = c5*x5 + c4*x4 + c3*x3 + c2*x2 + c1*x + c0
-      dtaper = 5.0d0*c5*x4 + 4.0d0*c4*x3 + 3.0d0*c3*x2
-     &            + 2.0d0*c2*x + c1
-      d2taper = 20.0d0*c5*x3 + 12.0d0*c4*x2 + 6.0d0*c3*x
-     &             + 2.0d0*c2
       return
       end
 c

@@ -17,7 +17,6 @@ c     order polynomial switching functions for spherical cutoffs
 c
 c
       subroutine switch (mode)
-      use dlmda
       use limits
       use nonpol
       use shunt
@@ -71,15 +70,6 @@ c
       else if (mode(1:4) .eq. 'GKSA') then
          off = stcut
          cut = stoff
-      else if (mode(1:6) .eq. 'QNTPOL') then
-         off = qntplmda1
-         cut = qntplmda0
-      else if (mode(1:6) .eq. 'QNTELE') then
-         off = qntelmda1
-         cut = qntelmda0
-      else if (mode(1:6) .eq. 'QNTVDW') then
-         off = qntvlmda1
-         cut = qntvlmda0
       else
          off = min(vdwcut,repcut,dispcut,chgcut,
      &                dplcut,mpolecut,ctrncut)

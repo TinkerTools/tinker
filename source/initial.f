@@ -195,18 +195,22 @@ c
 c
 c     flag for use of lambda derivative
 c
+      osttrial = .false.
+      relstagemix = .false.
       use_dlmda = .false.
       use_emdt = .false.
-      use_evdt = .false.
       use_epdt = .false.
-      use_plmda = .false.
-      use_ost = .false.
-      use_ostdyn = .false.
-      ostrestart = .false.
+      use_evdt = .false.
       use_meta = .false.
       use_metadyn = .false.
+      use_ost = .false.
+      use_ostdyn = .false.
+      use_plmda = .false.
+      use_relstage = .false.
+      use_ti = .false.
+      relstage = 'VDWM'
       metarestart = .false.
-      osttrial = .false.
+      ostrestart = .false.
 c
 c     flag for use of rigid bodies
 c

@@ -30,6 +30,7 @@ c
       call test_mutate_inv
       call test_mutate_exf
       call test_mutate_emplar
+      call test_mutate_rels
       return
       end
 c
@@ -686,6 +687,57 @@ c
       call test_mutate_calc ('water2','130_water_rdt_ne_m00p00v10.key',
      &   '130_water_rdt_ne_m00p00v10.txt','130_water_rdt_ne_m00p00v10',
      &   .true.,  .true.,  .false., .false., .true.)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_mutate_rels  --  staged rel dual topo  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_mutate_rels" runs the seven water fixtures 135-141 that
+c     drive the staged relative free energy schedule with a main lambda,
+c     so the two ligands are discharged and recharged one at a time while
+c     van der Waals morphs between them in the middle window; the cases
+c     sit one per regime of the schedule, at main lambda values 1.0 and
+c     0.0 where a leg is flat and only the coupled endpoint is built,
+c     0.85 and 0.15 inside the two mixing legs, 0.7 and 0.3 at the leg
+c     boundaries where the van der Waals morph window opens and closes,
+c     and 0.5 in the middle of that window where both ligands are
+c     decoupled and every electrostatic lambda derivative vanishes; all
+c     seven carry the "lambda-deriv" keyword and run the level 4 lambda
+c     derivative checks, and the reference values agree with the tinker9
+c     CUDA implementation of the same schedule
+c
+c
+      subroutine test_mutate_rels
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','135_water_rels_ye_l100.key',
+     &   '135_water_rels_ye_l100.txt','135_water_rels_ye_l100',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','136_water_rels_ye_l085.key',
+     &   '136_water_rels_ye_l085.txt','136_water_rels_ye_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','137_water_rels_ye_l070.key',
+     &   '137_water_rels_ye_l070.txt','137_water_rels_ye_l070',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','138_water_rels_ye_l050.key',
+     &   '138_water_rels_ye_l050.txt','138_water_rels_ye_l050',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','139water_rels_ye_l030.key',
+     &   '139water_rels_ye_l030.txt','139water_rels_ye_l030',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','140_water_rels_ye_l015.key',
+     &   '140_water_rels_ye_l015.txt','140_water_rels_ye_l015',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','141_water_rels_ye_l000.key',
+     &   '141_water_rels_ye_l000.txt','141_water_rels_ye_l000',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c

@@ -31,7 +31,11 @@ c     choose the method to sum over multipole interactions
 c
       if (use_emdt) then
          if (use_rel) then
-            call empole4er
+            if (use_relstage) then
+               call empole4ers
+            else
+               call empole4er
+            end if
          else
             call empole4e
          end if
@@ -5491,5 +5495,263 @@ c
       deallocate (dembe)
       deallocate (dema)
       deallocate (demb)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine empole4ers  --  staged rel dual topo deriv  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "empole4ers" calculates the multipole energy, Cartesian gradient
+c     and lambda derivatives for a two-ligand relative dual topology
+c     calculation run on the staged schedule, combining the same
+c     subsystem states as "empole1ers",
+c
+c        E0 = E(env) + E(A) + E(B)
+c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
+c        E  = elambda*E1 + (1-elambda)*E0
+c
+c     which are themselves independent of elambda, so the sublambda
+c     derivatives follow directly from the interpolation weight
+c
+c
+      subroutine empole4ers
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use limits
+      use mutant
+      use virial
+      implicit none
+      integer i,j
+      real*8 em0,em1
+      real*8 weight1,weight0
+      real*8 emvir0(3,3),emvir1(3,3)
+      logical lig1,domix,dovdwm,needref
+      real*8, allocatable :: dem0(:,:)
+      real*8, allocatable :: dem1(:,:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (dem0(3,n))
+      allocate (dem1(3,n))
+c
+c     decide which leg of the staged schedule is active
+c
+      lig1 = (relstage .eq. 'LIG1')
+      dovdwm = (relstage .eq. 'VDWM')
+      domix = relstagemix
+      needref = (dovdwm .or. domix)
+c
+c     zero out the two endpoint accumulators
+c
+      em0 = 0.0d0
+      em1 = 0.0d0
+      do i = 1, n
+         do j = 1, 3
+            dem0(j,i) = 0.0d0
+            dem1(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            emvir0(j,i) = 0.0d0
+            emvir1(j,i) = 0.0d0
+         end do
+      end do
+c
+c     environment alone, part of the decoupled reference
+c
+      if (needref) then
+         call altemdtsub (.false.,.false.,.true.)
+         call empole1calc
+         em0 = em0 + em
+         do i = 1, n
+            do j = 1, 3
+               dem0(j,i) = dem0(j,i) + dem(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvir0(j,i) = emvir0(j,i) + emvir(j,i)
+            end do
+         end do
+      end if
+c
+c     ligand A alone, in the reference and in the ligand 0 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
+         call altemdtsub (.true.,.false.,.false.)
+         call empole1calc
+         if (needref) then
+            em0 = em0 + em
+            do i = 1, n
+               do j = 1, 3
+                  dem0(j,i) = dem0(j,i) + dem(j,i)
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  emvir0(j,i) = emvir0(j,i) + emvir(j,i)
+               end do
+            end do
+         end if
+         if (.not.dovdwm .and. .not.lig1) then
+            em1 = em1 + em
+            do i = 1, n
+               do j = 1, 3
+                  dem1(j,i) = dem1(j,i) + dem(j,i)
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  emvir1(j,i) = emvir1(j,i) + emvir(j,i)
+               end do
+            end do
+         end if
+      end if
+c
+c     ligand B alone, in the reference and in the ligand 1 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. lig1)) then
+         call altemdtsub (.false.,.true.,.false.)
+         call empole1calc
+         if (needref) then
+            em0 = em0 + em
+            do i = 1, n
+               do j = 1, 3
+                  dem0(j,i) = dem0(j,i) + dem(j,i)
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  emvir0(j,i) = emvir0(j,i) + emvir(j,i)
+               end do
+            end do
+         end if
+         if (.not.dovdwm .and. lig1) then
+            em1 = em1 + em
+            do i = 1, n
+               do j = 1, 3
+                  dem1(j,i) = dem1(j,i) + dem(j,i)
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  emvir1(j,i) = emvir1(j,i) + emvir(j,i)
+               end do
+            end do
+         end if
+      end if
+c
+c     the active ligand coupled to the environment
+c
+      if (.not. dovdwm) then
+         if (lig1) then
+            call altemdtsub (.true.,.false.,.true.)
+         else
+            call altemdtsub (.false.,.true.,.true.)
+         end if
+         call empole1calc
+         em1 = em1 + em
+         do i = 1, n
+            do j = 1, 3
+               dem1(j,i) = dem1(j,i) + dem(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvir1(j,i) = emvir1(j,i) + emvir(j,i)
+            end do
+         end do
+      end if
+c
+c     restore the original full system parameters
+c
+      call altemdtsub (.true.,.true.,.true.)
+c
+c     interpolate the active leg, or take the reference in the middle
+c
+      if (dovdwm) then
+         em = em0
+         do i = 1, n
+            do j = 1, 3
+               dem(j,i) = dem0(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvir(j,i) = emvir0(j,i)
+            end do
+         end do
+      else if (domix) then
+         weight1 = elambda
+         weight0 = 1.0d0 - weight1
+         em = weight1*em1 + weight0*em0
+         do i = 1, n
+            do j = 1, 3
+               dem(j,i) = weight1*dem1(j,i) + weight0*dem0(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvir(j,i) = weight1*emvir1(j,i) + weight0*emvir0(j,i)
+            end do
+         end do
+      else
+         em = em1
+         do i = 1, n
+            do j = 1, 3
+               dem(j,i) = dem1(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvir(j,i) = emvir1(j,i)
+            end do
+         end do
+      end if
+c
+c     the interpolation weight is linear in elambda, so its first
+c     derivative is one and its second derivative vanishes; on the
+c     middle window and at a flat leg end there is nothing to mix and
+c     every lambda derivative is zero, as "deldlmda" is zero there too
+c
+      demdl = 0.0d0
+      d2emdl2 = 0.0d0
+      do i = 1, 3
+         do j = 1, 3
+            demvirdl(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, n
+         do j = 1, 3
+            dfmdl(j,i) = 0.0d0
+         end do
+      end do
+      if (domix) then
+         demdl = em1 - em0
+         do i = 1, 3
+            do j = 1, 3
+               demvirdl(j,i) = emvir1(j,i) - emvir0(j,i)
+            end do
+         end do
+         do i = 1, n
+            do j = 1, 3
+               dfmdl(j,i) = dem1(j,i) - dem0(j,i)
+            end do
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (dem0)
+      deallocate (dem1)
       return
       end

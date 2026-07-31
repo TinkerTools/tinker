@@ -26,7 +26,11 @@ c     choose the method to sum over multipole interactions
 c
       if (use_emdt) then
          if (use_rel) then
-            call empole0er
+            if (use_relstage) then
+               call empole0ers
+            else
+               call empole0er
+            end if
          else
             call empole0e
          end if
@@ -2081,5 +2085,97 @@ c
       em1 = emae + emb
       em0 = embe + ema
       em = weight1*em1 + weight0*em0
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine empole0ers  --  staged rel dual topo mpole eng  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "empole0ers" calculates the multipole energy for a two-ligand
+c     relative dual topology calculation run on the staged schedule,
+c     where at most one ligand is coupled to the environment,
+c
+c        E0 = E(env) + E(A) + E(B)
+c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
+c        E  = elambda*E1 + (1-elambda)*E0
+c
+c
+      subroutine empole0ers
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      real*8 em0,em1
+      real*8 weight1,weight0
+      logical lig1,domix,dovdwm,needref
+c
+c
+c     decide which leg of the staged schedule is active
+c
+      lig1 = (relstage .eq. 'LIG1')
+      dovdwm = (relstage .eq. 'VDWM')
+      domix = relstagemix
+      needref = (dovdwm .or. domix)
+      em0 = 0.0d0
+      em1 = 0.0d0
+c
+c     environment alone, part of the decoupled reference
+c
+      if (needref) then
+         call altemdtsub (.false.,.false.,.true.)
+         call empole0calc
+         em0 = em0 + em
+      end if
+c
+c     ligand A alone, in the reference and in the ligand 0 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
+         call altemdtsub (.true.,.false.,.false.)
+         call empole0calc
+         if (needref)  em0 = em0 + em
+         if (.not.dovdwm .and. .not.lig1)  em1 = em1 + em
+      end if
+c
+c     ligand B alone, in the reference and in the ligand 1 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. lig1)) then
+         call altemdtsub (.false.,.true.,.false.)
+         call empole0calc
+         if (needref)  em0 = em0 + em
+         if (.not.dovdwm .and. lig1)  em1 = em1 + em
+      end if
+c
+c     the active ligand coupled to the environment
+c
+      if (.not. dovdwm) then
+         if (lig1) then
+            call altemdtsub (.true.,.false.,.true.)
+         else
+            call altemdtsub (.false.,.true.,.true.)
+         end if
+         call empole0calc
+         em1 = em1 + em
+      end if
+c
+c     restore the original full system parameters
+c
+      call altemdtsub (.true.,.true.,.true.)
+c
+c     interpolate the active leg, or take the reference in the middle
+c
+      if (dovdwm) then
+         em = em0
+      else if (domix) then
+         weight1 = elambda
+         weight0 = 1.0d0 - weight1
+         em = weight1*em1 + weight0*em0
+      else
+         em = em1
+      end if
       return
       end

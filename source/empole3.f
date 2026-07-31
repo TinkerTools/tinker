@@ -29,7 +29,11 @@ c     choose the method to sum over multipole interactions
 c
       if (use_emdt) then
          if (use_rel) then
-            call empole3er
+            if (use_relstage) then
+               call empole3ers
+            else
+               call empole3er
+            end if
          else
             call empole3e
          end if
@@ -2597,5 +2601,199 @@ c
       deallocate (aembe)
       deallocate (aema)
       deallocate (aemb)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine empole3ers  --  staged rel dual topo mpole anal  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "empole3ers" calculates the multipole energy and partitions the
+c     energy among the atoms for a two-ligand relative dual topology
+c     calculation run on the staged schedule, combining the same
+c     subsystem states as "empole1ers",
+c
+c        E0 = E(env) + E(A) + E(B)
+c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
+c        E  = elambda*E1 + (1-elambda)*E0
+c
+c
+      subroutine empole3ers
+      use action
+      use analyz
+      use atoms
+      use dlmda
+      use energi
+      use extfld
+      use inter
+      use limits
+      use mutant
+      implicit none
+      integer i
+      integer nem0,nem1
+      real*8 em0,em1
+      real*8 weight1,weight0
+      real*8 einterorig
+      real*8 einter0,einter1
+      real*8 exfe0,exfe1
+      logical lig1,domix,dovdwm,needref
+      real*8, allocatable :: aem0(:)
+      real*8, allocatable :: aem1(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (aem0(n))
+      allocate (aem1(n))
+      einterorig = einter
+c
+c     decide which leg of the staged schedule is active
+c
+      lig1 = (relstage .eq. 'LIG1')
+      dovdwm = (relstage .eq. 'VDWM')
+      domix = relstagemix
+      needref = (dovdwm .or. domix)
+c
+c     zero out the two endpoint accumulators
+c
+      em0 = 0.0d0
+      em1 = 0.0d0
+      nem0 = 0
+      nem1 = 0
+      einter0 = 0.0d0
+      einter1 = 0.0d0
+      exfe0 = 0.0d0
+      exfe1 = 0.0d0
+      do i = 1, n
+         aem0(i) = 0.0d0
+         aem1(i) = 0.0d0
+      end do
+c
+c     environment alone, part of the decoupled reference
+c
+      if (needref) then
+         call altemdtsub (.false.,.false.,.true.)
+         call empole3calc
+         em0 = em0 + em
+         nem0 = nem0 + nem
+         exfe0 = exfe0 + exfe
+         einter0 = einter0 + einter - einterorig
+         einter = einterorig
+         do i = 1, n
+            aem0(i) = aem0(i) + aem(i)
+         end do
+      end if
+c
+c     ligand A alone, in the reference and in the ligand 0 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
+         call altemdtsub (.true.,.false.,.false.)
+         call empole3calc
+         if (needref) then
+            em0 = em0 + em
+            nem0 = nem0 + nem
+            exfe0 = exfe0 + exfe
+            einter0 = einter0 + einter - einterorig
+            do i = 1, n
+               aem0(i) = aem0(i) + aem(i)
+            end do
+         end if
+         if (.not.dovdwm .and. .not.lig1) then
+            em1 = em1 + em
+            exfe1 = exfe1 + exfe
+            einter1 = einter1 + einter - einterorig
+            do i = 1, n
+               aem1(i) = aem1(i) + aem(i)
+            end do
+         end if
+         einter = einterorig
+      end if
+c
+c     ligand B alone, in the reference and in the ligand 1 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. lig1)) then
+         call altemdtsub (.false.,.true.,.false.)
+         call empole3calc
+         if (needref) then
+            em0 = em0 + em
+            nem0 = nem0 + nem
+            exfe0 = exfe0 + exfe
+            einter0 = einter0 + einter - einterorig
+            do i = 1, n
+               aem0(i) = aem0(i) + aem(i)
+            end do
+         end if
+         if (.not.dovdwm .and. lig1) then
+            em1 = em1 + em
+            exfe1 = exfe1 + exfe
+            einter1 = einter1 + einter - einterorig
+            do i = 1, n
+               aem1(i) = aem1(i) + aem(i)
+            end do
+         end if
+         einter = einterorig
+      end if
+c
+c     the active ligand coupled to the environment
+c
+      if (.not. dovdwm) then
+         if (lig1) then
+            call altemdtsub (.true.,.false.,.true.)
+         else
+            call altemdtsub (.false.,.true.,.true.)
+         end if
+         call empole3calc
+         em1 = em1 + em
+         nem1 = nem1 + nem
+         exfe1 = exfe1 + exfe
+         einter1 = einter1 + einter - einterorig
+         einter = einterorig
+         do i = 1, n
+            aem1(i) = aem1(i) + aem(i)
+         end do
+      end if
+c
+c     restore the original full system parameters
+c
+      call altemdtsub (.true.,.true.,.true.)
+c
+c     interpolate the active leg, or take the reference in the middle
+c
+      if (dovdwm) then
+         em = em0
+         nem = nem0
+         exfe = exfe0
+         einter = einterorig + einter0
+         do i = 1, n
+            aem(i) = aem0(i)
+         end do
+      else if (domix) then
+         weight1 = elambda
+         weight0 = 1.0d0 - weight1
+         em = weight1*em1 + weight0*em0
+         nem = nem1
+         exfe = weight1*exfe1 + weight0*exfe0
+         einter = einterorig + weight1*einter1 + weight0*einter0
+         do i = 1, n
+            aem(i) = weight1*aem1(i) + weight0*aem0(i)
+         end do
+      else
+         em = em1
+         nem = nem1
+         exfe = exfe1
+         einter = einterorig + einter1
+         do i = 1, n
+            aem(i) = aem1(i)
+         end do
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (aem0)
+      deallocate (aem1)
       return
       end

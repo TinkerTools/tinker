@@ -28,7 +28,11 @@ c     choose the method to sum over polarization interactions
 c
       if (use_epdt) then
          if (use_rel) then
-            call epolar0fr
+            if (use_relstage) then
+               call epolar0frs
+            else
+               call epolar0fr
+            end if
          else
             call epolar0f
          end if
@@ -2282,5 +2286,97 @@ c
       ep1 = epae + epb
       ep0 = epbe + epa
       ep = plambdaexp*ep1 + (1.0d0-plambdaexp)*ep0
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine epolar0frs  --  staged rel dual topo pol energy  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "epolar0frs" calculates the polarization energy for a two-ligand
+c     relative dual topology calculation run on the staged schedule,
+c     where at most one ligand is coupled to the environment,
+c
+c        E0 = E(env) + E(A) + E(B)
+c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
+c        E  = plambda*E1 + (1-plambda)*E0
+c
+c
+      subroutine epolar0frs
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      real*8 ep0,ep1
+      real*8 weight1,weight0
+      logical lig1,domix,dovdwm,needref
+c
+c
+c     decide which leg of the staged schedule is active
+c
+      lig1 = (relstage .eq. 'LIG1')
+      dovdwm = (relstage .eq. 'VDWM')
+      domix = relstagemix
+      needref = (dovdwm .or. domix)
+      ep0 = 0.0d0
+      ep1 = 0.0d0
+c
+c     environment alone, part of the decoupled reference
+c
+      if (needref) then
+         call altpolrsub (.false.,.false.,.true.)
+         call epolar0calc
+         ep0 = ep0 + ep
+      end if
+c
+c     ligand A alone, in the reference and in the ligand 0 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
+         call altpolrsub (.true.,.false.,.false.)
+         call epolar0calc
+         if (needref)  ep0 = ep0 + ep
+         if (.not.dovdwm .and. .not.lig1)  ep1 = ep1 + ep
+      end if
+c
+c     ligand B alone, in the reference and in the ligand 1 endpoint
+c
+      if (needref .or. (.not.dovdwm .and. lig1)) then
+         call altpolrsub (.false.,.true.,.false.)
+         call epolar0calc
+         if (needref)  ep0 = ep0 + ep
+         if (.not.dovdwm .and. lig1)  ep1 = ep1 + ep
+      end if
+c
+c     the active ligand coupled to the environment
+c
+      if (.not. dovdwm) then
+         if (lig1) then
+            call altpolrsub (.true.,.false.,.true.)
+         else
+            call altpolrsub (.false.,.true.,.true.)
+         end if
+         call epolar0calc
+         ep1 = ep1 + ep
+      end if
+c
+c     restore the original full system parameters
+c
+      call altpolrsub (.true.,.true.,.true.)
+c
+c     interpolate the active leg, or take the reference in the middle
+c
+      if (dovdwm) then
+         ep = ep0
+      else if (domix) then
+         weight1 = plambda
+         weight0 = 1.0d0 - weight1
+         ep = weight1*ep1 + weight0*ep0
+      else
+         ep = ep1
+      end if
       return
       end
