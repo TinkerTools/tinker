@@ -30,6 +30,7 @@ c
       call test_mutate_inv
       call test_mutate_exf
       call test_mutate_emplar
+      call test_mutate_qntrng
       call test_mutate_rels
       return
       end
@@ -691,6 +692,48 @@ c
       end
 c
 c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_qntrng  --  narrowed quintic range  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_qntrng" runs the three water fixtures 132-134 that
+c     narrow the quintic sub-lambda windows to 0.1-0.9 with the
+c     "ele-lmda-range", "pol-lmda-range" and "vdw-lmda-range" keywords,
+c     then sample the main lambda at the 1.0 and 0.0 endpoints which
+c     now sit outside every window; there the quintic taper is on its
+c     flat plateau, so each sub-lambda is pinned fully coupled at 1.0
+c     and fully decoupled at 0.0 while every first and second lambda
+c     derivative vanishes, which the level 4 checks confirm; case 132
+c     uses absolute dual topology at ost-lambda 0.0 and cases 133-134
+c     relative dual topology at 1.0 and 0.0, with a different dual
+c     topology interpolation exponent per term so no term can mask an
+c     error in another; all three use Ewald and support a pairwise
+c     neighbor list
+c
+c
+      subroutine test_mutate_qntrng
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','131_water_qnt_adt_l10.key',
+     &   '131_water_qnt_adt_l10.txt','131_water_qnt_adt_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','132_water_qnt_adt_l00.key',
+     &   '132_water_qnt_adt_l00.txt','132_water_qnt_adt_l00',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','133_water_qnt_rdt_l10.key',
+     &   '133_water_qnt_rdt_l10.txt','133_water_qnt_rdt_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','134_water_qnt_rdt_l00.key',
+     &   '134_water_qnt_rdt_l00.txt','134_water_qnt_rdt_l00',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
 c     #############################################################
 c     ##                                                         ##
 c     ##  subroutine test_mutate_rels  --  staged rel dual topo  ##
@@ -700,7 +743,7 @@ c
 c
 c     "test_mutate_rels" runs the seven water fixtures 135-141 that
 c     drive the staged relative free energy schedule with a main lambda,
-c     so the two ligands are discharged and recharged one at a time while
+c     so the two ligands are discharged and recharged separately while
 c     van der Waals morphs between them in the middle window; the cases
 c     sit one per regime of the schedule, at main lambda values 1.0 and
 c     0.0 where a leg is flat and only the coupled endpoint is built,
