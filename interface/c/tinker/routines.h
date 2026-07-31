@@ -314,6 +314,8 @@ void sublmdataper_(char* mode, double* x, double* taper, double* dtaper, double*
 inline void tinker_f_sublmdataper(tinker_fchars mode, double* x, double* taper, double* dtaper, double* d2taper) {
     return sublmdataper_(mode.string, x, taper, dtaper, d2taper, mode.capacity);
 }
+int uselmdachain_();
+#define tinker_f_uselmdachain uselmdachain_
 void lmdachain_();
 #define tinker_f_lmdachain lmdachain_
 void avgstd_(double* list, int* begin, int* count, double* avg, double* std);

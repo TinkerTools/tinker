@@ -158,6 +158,7 @@
 #include "detail/syntrn.hh"
 #include "detail/tarray.hh"
 #include "detail/tettor.hh"
+#include "detail/thrmint.hh"
 #include "detail/titles.hh"
 #include "detail/torpot.hh"
 #include "detail/tors.hh"

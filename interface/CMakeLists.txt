@@ -162,6 +162,7 @@ add_library (tinkerObjF OBJECT
 ../source/syntrn.f
 ../source/tarray.f
 ../source/tettor.f
+../source/thrmint.f
 ../source/titles.f
 ../source/torpot.f
 ../source/tors.f

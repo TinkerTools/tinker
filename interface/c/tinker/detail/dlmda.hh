@@ -36,6 +36,10 @@ extern double TINKER_MOD(dlmda, qntplmda0);
 extern double TINKER_MOD(dlmda, qntplmda1);
 extern double TINKER_MOD(dlmda, qntvlmda0);
 extern double TINKER_MOD(dlmda, qntvlmda1);
+extern double TINKER_MOD(dlmda, relstg1lmda0);
+extern double TINKER_MOD(dlmda, relstg1lmda1);
+extern double TINKER_MOD(dlmda, relstg2lmda0);
+extern double TINKER_MOD(dlmda, relstg2lmda1);
 extern double TINKER_MOD(dlmda, vlmdainveps);
 extern double TINKER_MOD(dlmda, demvirdl)[3][3];
 extern double TINKER_MOD(dlmda, depvirdl)[3][3];
@@ -61,6 +65,7 @@ extern double* TINKER_MOD(dlmda, polarityorig);
 extern double* TINKER_MOD(dlmda, poleorig);
 extern double* TINKER_MOD(dlmda, pval0orig);
 extern double* TINKER_MOD(dlmda, pvalorig);
+extern int TINKER_MOD(dlmda, relstagemix);
 extern int TINKER_MOD(dlmda, use_dlmda);
 extern int TINKER_MOD(dlmda, use_emdt);
 extern int TINKER_MOD(dlmda, use_epdt);
@@ -72,10 +77,15 @@ extern int TINKER_MOD(dlmda, use_ostdyn);
 extern int TINKER_MOD(dlmda, use_plmda);
 extern int TINKER_MOD(dlmda, use_pol4f);
 extern int TINKER_MOD(dlmda, use_pol4i);
+extern int TINKER_MOD(dlmda, use_relstage);
+extern int TINKER_MOD(dlmda, use_ti);
 extern int* TINKER_MOD(dlmda, douindorig);
 extern char TINKER_MOD(dlmda, elmdamap)[3];
 extern char TINKER_MOD(dlmda, plmdamap)[3];
 extern char TINKER_MOD(dlmda, vlmdamap)[3];
+extern char TINKER_MOD(dlmda, lmdaengymode)[4];
+extern char TINKER_MOD(dlmda, lmdasampmode)[4];
+extern char TINKER_MOD(dlmda, relstage)[4];
 #ifdef __cplusplus
 }
 #endif
