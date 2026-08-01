@@ -1928,27 +1928,70 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine saveost -- output ost restart information  ##
-c     ##                                                        ##
-c     ############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine initostfile -- open the ost history file  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
-c     "saveost" writes the information needed to restart an ost
-c     simulation to the external .ost restart file; the fixed-size
-c     header is updated in place and new history is appended
+c     "initostfile" opens the external file that will hold the ost
+c     bias history and writes its initial header; a new version is
+c     claimed so a rerun cannot append onto an earlier history
 c
 c
-      subroutine saveost
+      subroutine initostfile
       use dlmda
       use files
+      use iounit
       use ost
       implicit none
       integer ihis
       integer freeunit
-      logical exist
-      character*240 ostfile
+      integer trimtext
+c
+c
+c     return if ost has not been initialized
+c
+      if (.not. use_ost)  return
+c
+c     open a new file, keeping any output from a previous run
+c
+      ihis = freeunit ()
+      ostsavefile = filename(1:leng)//'.ost'
+      call version (ostsavefile,'new')
+      open (unit=ihis,file=ostsavefile,status='new',
+     &      access='stream',form='formatted')
+      call prtost (ihis)
+      close (unit=ihis)
+      nosthistsave = nosthist
+c
+c     report the name of the file holding the bias history
+c
+      write (iout,10)  ostsavefile(1:trimtext(ostsavefile))
+   10 format (/,' OST  --  Bias History Written To  ',a)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine saveost -- output ost history information  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "saveost" appends to the external .ost file the bias history
+c     accumulated since the previous call, so a running simulation
+c     can be monitored; the fixed-size header is updated in place
+c
+c
+      subroutine saveost
+      use dlmda
+      use ost
+      implicit none
+      integer ihis
+      integer freeunit
 c
 c
 c     return if ost has not been initialized
@@ -1956,30 +1999,21 @@ c
       if (.not. use_ost)  return
       if (.not. allocated(osthist))  return
 c
-c     create a new restart file or append only new history entries;
-c     append before updating the header so an interrupted write leaves
-c     the previous history count as the last complete checkpoint
+c     append the history recorded since the previous call before
+c     updating the header, so an interrupted write leaves the
+c     previous history count as the last complete checkpoint
 c
       ihis = freeunit ()
-      ostfile = filename(1:leng)//'.ost'
-      inquire (file=ostfile,exist=exist)
-      if (.not. exist .or. nosthist.lt.nosthistsave) then
-         open (unit=ihis,file=ostfile,status='replace',
-     &         access='stream',form='formatted')
-         call prtost (ihis)
-         close (unit=ihis)
-      else
-         if (nosthist .gt. nosthistsave) then
-            open (unit=ihis,file=ostfile,status='old',
-     &            access='stream',form='formatted',position='append')
-            call prtosthist (ihis,nosthistsave+1,nosthist)
-            close (unit=ihis)
-         end if
-         open (unit=ihis,file=ostfile,status='old',
-     &         access='stream',form='unformatted',position='rewind')
-         call updosthead (ihis)
+      if (nosthist .gt. nosthistsave) then
+         open (unit=ihis,file=ostsavefile,status='old',
+     &         access='stream',form='formatted',position='append')
+         call prtosthist (ihis,nosthistsave+1,nosthist)
          close (unit=ihis)
       end if
+      open (unit=ihis,file=ostsavefile,status='old',
+     &      access='stream',form='unformatted',position='rewind')
+      call updosthead (ihis)
+      close (unit=ihis)
       nosthistsave = nosthist
       return
       end
@@ -1987,14 +2021,14 @@ c
 c
 c     #########################################################
 c     ##                                                     ##
-c     ##  subroutine rdost -- input ost restart information  ##
+c     ##  subroutine rdost -- input ost history information  ##
 c     ##                                                     ##
 c     #########################################################
 c
 c
-c     "rdost" reads the information needed to restart an ost
-c     simulation from the external .ost restart file, then rebuilds
-c     the histogram lookup and bias kernels
+c     "rdost" reads a saved ost bias history from the external
+c     .ost file, then rebuilds the histogram lookup and bias
+c     kernels; used for analysis, not to restart a simulation
 c
 c
       subroutine rdost
@@ -2023,16 +2057,16 @@ c
       character*240 record
 c
 c
-c     return unless an ost restart file is present
+c     return unless an ost history file is present
 c
-      ostfile = filename(1:leng)//'.ost'
+      ostfile = ostsavefile
       inquire (file=ostfile,exist=exist)
       if (.not. exist)  return
       ihis = freeunit ()
       open (unit=ihis,file=ostfile,status='old')
       rewind (unit=ihis)
 c
-c     read scalar ost restart state
+c     read scalar ost state
 c
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
@@ -2048,7 +2082,7 @@ c
      &   ostmass0,ostfriction0,ostdt0,eosttot0
    10 format (a240)
 c
-c     validate restart dimensions
+c     validate the stored dimensions
 c
       if (nlmda0 .lt. 2)  goto 90
       if (nflmda0 .lt. 1)  goto 90
@@ -2058,7 +2092,7 @@ c
       if (sizeosthist0 .lt. nosthist0)  sizeosthist0 = nosthist0
       if (sizeosthist0 .lt. 1)  sizeosthist0 = 1
 c
-c     reallocate ost arrays to match the restart file
+c     reallocate ost arrays to match the history file
 c
       if (allocated(osthhist))  deallocate (osthhist)
       if (allocated(osthist))  deallocate (osthist)
@@ -2099,7 +2133,7 @@ c
       allocate (pfkernel(nlmda0))
       allocate (vkernelmax(nlmda0))
 c
-c     set scalar ost state from the restart file
+c     set scalar ost state from the history file
 c
       iost = iost0
       iosthist = iosthist0
@@ -2183,23 +2217,21 @@ c
          call buildfkernel
       end if
       eosttot = etotfkernel()
-      ostrestart = .true.
       nosthistsave = nosthist
       if (debug) then
          write (iout,20)  ostfile(1:trimtext(ostfile))
-   20    format (/,' Restarting OST Bias from :  ',a)
+   20    format (/,' Reading OST Bias from :  ',a)
       end if
       return
 c
-c     malformed restart file
+c     malformed history file
 c
    90 continue
       close (unit=ihis)
       write (iout,30)  ostfile(1:trimtext(ostfile))
-   30 format (/,' RDOST  --  Error while Reading OST Restart File',
+   30 format (/,' RDOST  --  Error while Reading OST History File',
      &        /,'            File Name :  ',a)
       use_ost = .false.
-      ostrestart = .false.
       call fatal
       end
 c
@@ -2211,7 +2243,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "prtost" writes current ost restart state
+c     "prtost" writes current ost history state
 c
 c
       subroutine prtost (ihis)
@@ -2229,12 +2261,12 @@ c
 c
 c     ############################################################
 c     ##                                                        ##
-c     ##  subroutine prtosthead  --  output ost restart header  ##
+c     ##  subroutine prtosthead  --  output ost history header  ##
 c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "prtosthead" writes the fixed-size current ost restart header
+c     "prtosthead" writes the fixed-size current ost history header
 c
 c
       subroutine prtosthead (ihis)
@@ -2243,7 +2275,7 @@ c
       integer ihis
 c
 c
-c     write scalar ost restart state
+c     write scalar ost state
 c
       write (ihis,10)
       write (ihis,20)
@@ -2255,7 +2287,7 @@ c
       write (ihis,70)  ostlambda,osttheta,ostvtheta,
      &                 ostmass,ostfriction,ostdt,eosttot
       write (ihis,80)
-   10 format (' Orthogonal Space Tempering Restart :')
+   10 format (' Orthogonal Space Tempering History :')
    20 format (' Integer State :')
    30 format (7i12)
    40 format (' Grid State :')
@@ -2269,7 +2301,7 @@ c
 c
 c     ############################################################
 c     ##                                                        ##
-c     ##  subroutine updosthead  --  update ost restart header  ##
+c     ##  subroutine updosthead  --  update ost history header  ##
 c     ##                                                        ##
 c     ############################################################
 c
@@ -2320,7 +2352,7 @@ c
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,80)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-   10 format (' Orthogonal Space Tempering Restart :')
+   10 format (' Orthogonal Space Tempering History :')
    20 format (' Integer State :')
    30 format (7i12)
    40 format (' Grid State :')
@@ -2362,27 +2394,70 @@ c
       end
 c
 c
-c     ##########################################################
-c     ##                                                      ##
-c     ##  subroutine savemeta -- output metadynamics restart  ##
-c     ##                                                      ##
-c     ##########################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine initmetafile  --  open metadyn history file  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "savemeta" writes the information needed to restart a
-c     metadynamics simulation to the external .meta restart file; the
-c     fixed-size header is updated in place and new history is appended
+c     "initmetafile" opens the external file that will hold the
+c     metadynamics bias history and writes its initial header; a new
+c     version is claimed so a rerun cannot append onto an earlier one
 c
 c
-      subroutine savemeta
+      subroutine initmetafile
       use dlmda
       use files
+      use iounit
       use ost
       implicit none
       integer ihis
       integer freeunit
-      logical exist
-      character*240 metafile
+      integer trimtext
+c
+c
+c     return if metadynamics has not been initialized
+c
+      if (.not. use_meta)  return
+c
+c     open a new file, keeping any output from a previous run
+c
+      ihis = freeunit ()
+      metasavefile = filename(1:leng)//'.meta'
+      call version (metasavefile,'new')
+      open (unit=ihis,file=metasavefile,status='new',
+     &      access='stream',form='formatted')
+      call prtmeta (ihis)
+      close (unit=ihis)
+      nmethistsave = nmetahist
+c
+c     report the name of the file holding the bias history
+c
+      write (iout,10)  metasavefile(1:trimtext(metasavefile))
+   10 format (/,' METADYN  --  Bias History Written To  ',a)
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine savemeta -- output metadynamics history  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "savemeta" appends to the external .meta file the bias history
+c     accumulated since the previous call, so a running simulation
+c     can be monitored; the fixed-size header is updated in place
+c
+c
+      subroutine savemeta
+      use dlmda
+      use ost
+      implicit none
+      integer ihis
+      integer freeunit
 c
 c
 c     return if metadynamics has not been initialized
@@ -2390,28 +2465,21 @@ c
       if (.not. use_meta)  return
       if (.not. allocated(metalhist))  return
 c
-c     create a new restart file or append only new history entries
+c     append the history recorded since the previous call before
+c     updating the header, so an interrupted write leaves the
+c     previous history count as the last complete checkpoint
 c
       ihis = freeunit ()
-      metafile = filename(1:leng)//'.meta'
-      inquire (file=metafile,exist=exist)
-      if (.not. exist .or. nmetahist.lt.nmethistsave) then
-         open (unit=ihis,file=metafile,status='replace',
-     &         access='stream',form='formatted')
-         call prtmeta (ihis)
-         close (unit=ihis)
-      else
-         if (nmetahist .gt. nmethistsave) then
-            open (unit=ihis,file=metafile,status='old',
-     &            access='stream',form='formatted',position='append')
-            call prtmetahist (ihis,nmethistsave+1,nmetahist)
-            close (unit=ihis)
-         end if
-         open (unit=ihis,file=metafile,status='old',
-     &         access='stream',form='unformatted',position='rewind')
-         call updmetahead (ihis)
+      if (nmetahist .gt. nmethistsave) then
+         open (unit=ihis,file=metasavefile,status='old',
+     &         access='stream',form='formatted',position='append')
+         call prtmetahist (ihis,nmethistsave+1,nmetahist)
          close (unit=ihis)
       end if
+      open (unit=ihis,file=metasavefile,status='old',
+     &      access='stream',form='unformatted',position='rewind')
+      call updmetahead (ihis)
+      close (unit=ihis)
       nmethistsave = nmetahist
       return
       end
@@ -2419,13 +2487,13 @@ c
 c
 c     #######################################################
 c     ##                                                   ##
-c     ##  subroutine rdmeta -- input metadynamics restart  ##
+c     ##  subroutine rdmeta -- input metadynamics history  ##
 c     ##                                                   ##
 c     #######################################################
 c
 c
-c     "rdmeta" reads the information needed to restart a
-c     metadynamics simulation from the external .meta restart file
+c     "rdmeta" reads a saved metadynamics bias history from the
+c     external .meta file; used for analysis, not to restart a run
 c
 c
       subroutine rdmeta
@@ -2452,16 +2520,16 @@ c
       character*240 record
 c
 c
-c     return unless a metadynamics restart file is present
+c     return unless a metadynamics history file is present
 c
-      metafile = filename(1:leng)//'.meta'
+      metafile = metasavefile
       inquire (file=metafile,exist=exist)
       if (.not. exist)  return
       ihis = freeunit ()
       open (unit=ihis,file=metafile,status='old')
       rewind (unit=ihis)
 c
-c     read scalar metadynamics restart state
+c     read scalar metadynamics state
 c
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
@@ -2477,7 +2545,7 @@ c
      &   ostmass0,ostfriction0,ostdt0,eosttot0
    10 format (a240)
 c
-c     validate restart dimensions
+c     validate the stored dimensions
 c
       if (iosthist0 .lt. 1)  goto 90
       if (nmetahist0 .lt. 0)  goto 90
@@ -2485,7 +2553,7 @@ c
      &   sizemetahist0 = nmetahist0
       if (sizemetahist0 .lt. 1)  sizemetahist0 = 1
 c
-c     reallocate metadynamics arrays to match the restart file
+c     reallocate metadynamics arrays to match the history file
 c
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
@@ -2498,7 +2566,7 @@ c
       allocate (metaihist(sizemetahist0))
       allocate (ostllist(iosthist0))
 c
-c     set scalar metadynamics state from the restart file; only the
+c     set scalar metadynamics state from the history file; only the
 c     bin width is stored, so recover the bin count that goes with it
 c
       iost = iost0
@@ -2560,35 +2628,33 @@ c
          call addmetagrid (ihist)
       end do
       eosttot = metadeltag()
-      metarestart = .true.
       nmethistsave = nmetahist
       if (debug) then
          write (iout,20)  metafile(1:trimtext(metafile))
-   20    format (/,' Restarting Metadynamics Bias from :  ',a)
+   20    format (/,' Reading Metadynamics Bias from :  ',a)
       end if
       return
 c
-c     malformed restart file
+c     malformed history file
 c
    90 continue
       close (unit=ihis)
       write (iout,30)  metafile(1:trimtext(metafile))
    30 format (/,' RDMETA  --  Error while Reading Metadynamics',
-     &           ' Restart File',/,'             File Name :  ',a)
+     &           ' History File',/,'             File Name :  ',a)
       use_meta = .false.
-      metarestart = .false.
       call fatal
       end
 c
 c
 c     #########################################################
 c     ##                                                     ##
-c     ##  subroutine prtmeta -- output metadynamics restart  ##
+c     ##  subroutine prtmeta -- output metadynamics history  ##
 c     ##                                                     ##
 c     #########################################################
 c
 c
-c     "prtmeta" writes current metadynamics restart state
+c     "prtmeta" writes current metadynamics history state
 c
 c
       subroutine prtmeta (ihis)
@@ -2612,7 +2678,7 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "prtmetahead" writes the fixed-size metadynamics restart header
+c     "prtmetahead" writes the fixed-size metadynamics history header
 c
 c
       subroutine prtmetahead (ihis)
@@ -2621,7 +2687,7 @@ c
       integer ihis
 c
 c
-c     write scalar metadynamics restart state
+c     write scalar metadynamics state
 c
       write (ihis,10)
       write (ihis,20)
@@ -2632,7 +2698,7 @@ c
       write (ihis,70)  ostlambda,osttheta,ostvtheta,
      &                 ostmass,ostfriction,ostdt,eosttot
       write (ihis,80)
-   10 format (' Metadynamics Restart :')
+   10 format (' Metadynamics History :')
    20 format (' Integer State :')
    30 format (4i12)
    40 format (' Grid State :')
@@ -2696,7 +2762,7 @@ c
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,80)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-   10 format (' Metadynamics Restart :')
+   10 format (' Metadynamics History :')
    20 format (' Integer State :')
    30 format (4i12)
    40 format (' Grid State :')

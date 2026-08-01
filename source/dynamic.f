@@ -28,7 +28,6 @@ c
       use iounit
       use keys
       use mdstuf
-      use ost
       use potent
       use stodyn
       use output
@@ -233,15 +232,14 @@ c
          end if
       end if
 c
-c     read adaptive-bias restart files
-c
-      if (use_ost)  call rdost
-      if (use_meta)  call rdmeta
-      if (use_ost .or. use_meta)  call mapsublmda (ostlambda)
-c
 c     perform the setup functions needed to run dynamics
 c
       call mdinit (dt)
+c
+c     open the file holding the adaptive bias history
+c
+      if (use_ostdyn)  call initostfile
+      if (use_metadyn)  call initmetafile
 c
 c     lay out the thermodynamic integration lambda windows
 c

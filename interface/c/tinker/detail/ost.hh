@@ -89,11 +89,11 @@ extern double* TINKER_MOD(ost, glfkernel);
 extern double* TINKER_MOD(ost, glkernel);
 extern double* TINKER_MOD(ost, pfkernel);
 extern int TINKER_MOD(ost, fastkernel);
-extern int TINKER_MOD(ost, metarestart);
 extern int TINKER_MOD(ost, ostemper);
 extern int TINKER_MOD(ost, ostinterpol);
-extern int TINKER_MOD(ost, ostrestart);
 extern int TINKER_MOD(ost, osttrial);
+extern char TINKER_MOD(ost, metasavefile)[240];
+extern char TINKER_MOD(ost, ostsavefile)[240];
 #ifdef __cplusplus
 }
 #endif

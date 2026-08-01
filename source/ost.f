@@ -18,9 +18,9 @@ c     iosthist       steps between histogram additions
 c     nflmda         number of flambda bins
 c     nlmda          number of lambda bins
 c     nmetahist      total number of metadynamics gaussians
-c     nmethistsave   number of metadynamics gaussians written to restart
+c     nmethistsave   number of metadynamics gaussians written to file
 c     nosthist       total number of histograms
-c     nosthistsave   number of histograms written to the restart file
+c     nosthistsave   number of histograms written to the history file
 c     osteqratio     fraction of hist interval to equilibrate
 c     ostcvbin       convergence sub-bins per gaussian deposit interval
 c     ostnavg        samples averaged between hist updates
@@ -96,11 +96,11 @@ c     glfkernel      mixed derivative of gkernel on grid
 c     glkernel       d(gkernel)/dlambda values on grid
 c     pfkernel       partition function for free energy mean force
 c     fastkernel     flag to use fused g and f kernel updates
-c     metarestart    flag to indicate metadynamics restart data was read
 c     ostemper       flag to temper the deposited gaussian heights
 c     ostinterpol    flag to interpolate ost g kernel from grid
-c     ostrestart     flag to indicate ost restart data was read
 c     osttrial       flag to evaluate ost bias w/o depositing gaussians
+c     metasavefile   name of the file holding the metadynamics history
+c     ostsavefile    name of the file holding the ost history
 c
 c
       module ost
@@ -189,10 +189,10 @@ c
       real*8, allocatable :: glkernel(:,:)
       real*8, allocatable :: pfkernel(:)
       logical fastkernel
-      logical metarestart
       logical ostemper
       logical ostinterpol
-      logical ostrestart
       logical osttrial
+      character*240 metasavefile
+      character*240 ostsavefile
       save
       end

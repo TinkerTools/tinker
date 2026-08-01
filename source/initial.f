@@ -209,8 +209,6 @@ c
       use_relstage = .false.
       use_ti = .false.
       relstage = 'VDWM'
-      metarestart = .false.
-      ostrestart = .false.
 c
 c     flag for use of rigid bodies
 c

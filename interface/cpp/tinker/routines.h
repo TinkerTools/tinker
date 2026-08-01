@@ -1168,6 +1168,8 @@ double etotfkernel_();
 #define tinker_f_etotfkernel etotfkernel_
 void efkernel_(double* eostlmda, double* dfdl);
 #define tinker_f_efkernel efkernel_
+void initostfile_();
+#define tinker_f_initostfile initostfile_
 void saveost_();
 #define tinker_f_saveost saveost_
 void rdost_();
@@ -1180,6 +1182,8 @@ void updosthead_(int* ihis);
 #define tinker_f_updosthead updosthead_
 void prtosthist_(int* ihis, int* ifirst, int* ilast);
 #define tinker_f_prtosthist prtosthist_
+void initmetafile_();
+#define tinker_f_initmetafile initmetafile_
 void savemeta_();
 #define tinker_f_savemeta savemeta_
 void rdmeta_();

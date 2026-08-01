@@ -121,16 +121,14 @@ c
       use_emdt = .false.
       use_epdt = .false.
       use_evdt = .false.
-      use_plmda = .false.
-      use_ost = .false.
-      use_ostdyn = .false.
-      ostrestart = .false.
-      nosthistsave = 0
-      nmethistsave = 0
       use_meta = .false.
       use_metadyn = .false.
-      metarestart = .false.
+      use_ost = .false.
+      use_ostdyn = .false.
+      use_plmda = .false.
       use_ti = .false.
+      nosthistsave = 0
+      nmethistsave = 0
 c
 c     set defaults for thermodynamic integration windows
 c
@@ -826,8 +824,7 @@ c
       if (qntvlmda0 .gt. 1.0d0)  qntvlmda0 = 1.0d0
       if (qntvlmda1 .gt. 1.0d0)  qntvlmda1 = 1.0d0
       if (ostlambda .gt. 1.0d0)  ostlambda = 1.0d0
-      if (.not. ostrestart .and. .not. metarestart)
-     &   osttheta = asin(sqrt(ostlambda))
+      osttheta = asin(sqrt(ostlambda))
       if (qntplmda1 .lt. qntplmda0) then
          temp = qntplmda0
          qntplmda0 = qntplmda1

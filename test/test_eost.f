@@ -109,6 +109,10 @@ c
       call sethist (2,0.2d0,2.0d0,3.0d0,0.01d0,1.0d0)
       call sethist (3,0.3d0,3.0d0,4.0d0,0.01d0,1.0d0)
 c
+c     open the history file the way "dynamic" does before sampling
+c
+      call initostfile
+c
 c     append two histories, then save again without adding history
 c
       nosthist = 1

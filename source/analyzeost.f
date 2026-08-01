@@ -31,21 +31,22 @@ c
       character*240 string
 c
 c
-c     get the name of the OST restart file
+c     get the name of the OST history file
 c
       call initial
       call nextarg (ostfile,exist)
       if (.not. exist) then
          write (iout,10)
-   10    format (/,' Enter OST Restart File Name :  ',$)
+   10    format (/,' Enter OST History File Name :  ',$)
          read (input,20)  ostfile
    20    format (a240)
       end if
 c
-c     set the base filename used by the OST restart reader
+c     set the base filename and read the keyfile, then read
+c     exactly the file that was named on the command line
 c
-      call ostbasename (ostfile)
-      call getkey
+      call basefile (ostfile)
+      ostsavefile = ostfile
 c
 c     use room temperature if no simulation temperature is available
 c
@@ -266,41 +267,6 @@ c
          call buildfkernel
       end if
       eosttot = etotfkernel()
-      return
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine ostbasename  --  set base name for OST file  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "ostbasename" strips a trailing ".ost" suffix, if present, and
-c     sets the global base filename used by the OST restart reader
-c
-c
-      subroutine ostbasename (ostfile)
-      use files
-      implicit none
-      integer trimtext
-      character*240 ostfile
-      character*240 suffix
-c
-c
-c     remove a trailing ".ost" suffix, accepting either case
-c
-      filename = ostfile
-      leng = trimtext (filename)
-      if (leng .ge. 4) then
-         suffix = filename(leng-3:leng)
-         call upcase (suffix)
-         if (suffix(1:4) .eq. '.OST') then
-            filename(leng-3:leng) = '    '
-            leng = leng - 4
-         end if
-      end if
       return
       end
 c

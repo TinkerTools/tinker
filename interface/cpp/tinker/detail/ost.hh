@@ -87,11 +87,11 @@ extern double*& glfkernel;
 extern double*& glkernel;
 extern double*& pfkernel;
 extern int& fastkernel;
-extern int& metarestart;
 extern int& ostemper;
 extern int& ostinterpol;
-extern int& ostrestart;
 extern int& osttrial;
+extern char (&metasavefile)[240];
+extern char (&ostsavefile)[240];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" int TINKER_MOD(ost, fli0);
@@ -178,11 +178,11 @@ extern "C" double* TINKER_MOD(ost, glfkernel);
 extern "C" double* TINKER_MOD(ost, glkernel);
 extern "C" double* TINKER_MOD(ost, pfkernel);
 extern "C" int TINKER_MOD(ost, fastkernel);
-extern "C" int TINKER_MOD(ost, metarestart);
 extern "C" int TINKER_MOD(ost, ostemper);
 extern "C" int TINKER_MOD(ost, ostinterpol);
-extern "C" int TINKER_MOD(ost, ostrestart);
 extern "C" int TINKER_MOD(ost, osttrial);
+extern "C" char TINKER_MOD(ost, metasavefile)[240];
+extern "C" char TINKER_MOD(ost, ostsavefile)[240];
 
 int& fli0 = TINKER_MOD(ost, fli0);
 int& iost = TINKER_MOD(ost, iost);
@@ -268,10 +268,10 @@ double*& glfkernel = TINKER_MOD(ost, glfkernel);
 double*& glkernel = TINKER_MOD(ost, glkernel);
 double*& pfkernel = TINKER_MOD(ost, pfkernel);
 int& fastkernel = TINKER_MOD(ost, fastkernel);
-int& metarestart = TINKER_MOD(ost, metarestart);
 int& ostemper = TINKER_MOD(ost, ostemper);
 int& ostinterpol = TINKER_MOD(ost, ostinterpol);
-int& ostrestart = TINKER_MOD(ost, ostrestart);
 int& osttrial = TINKER_MOD(ost, osttrial);
+char (&metasavefile)[240] = TINKER_MOD(ost, metasavefile);
+char (&ostsavefile)[240] = TINKER_MOD(ost, ostsavefile);
 #endif
 } }
