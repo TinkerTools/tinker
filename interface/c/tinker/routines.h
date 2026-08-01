@@ -1511,18 +1511,6 @@ void estrtor2_(int* i);
 void estrtor3_();
 #define tinker_f_estrtor3 estrtor3_
 
-// ethrmint.f
-void settisched_(int* ntiwin, int* tinbinset);
-#define tinker_f_settisched settisched_
-void inittidyn_(int* nstep);
-#define tinker_f_inittidyn inittidyn_
-void etidyn_(int* istep);
-#define tinker_f_etidyn etidyn_
-void tischedule_();
-#define tinker_f_tischedule tischedule_
-void tiprint_();
-#define tinker_f_tiprint tiprint_
-
 // etors.f
 void etors_();
 #define tinker_f_etors etors_
@@ -2950,6 +2938,20 @@ void temper2_(double* dt, double* temp);
 // tettors.f
 void tettors_();
 #define tinker_f_tettors tettors_
+
+// thermint.f
+void settisched_(int* ntiwin, int* tinbinset);
+#define tinker_f_settisched settisched_
+void inittidyn_(int* nstep);
+#define tinker_f_inittidyn inittidyn_
+void prttihead_();
+#define tinker_f_prttihead prttihead_
+void etidyn_(int* istep);
+#define tinker_f_etidyn etidyn_
+void tischedule_();
+#define tinker_f_tischedule tischedule_
+void saveti_();
+#define tinker_f_saveti saveti_
 
 // tncg.f
 void tncg_(char* mode, char* method, int* nvar, double* x0, double* minimum, double* grdmin, double (*fgvalue)(double*, double*), void (*hmatrix)(char*, double*, double*, int*, int*, int*, double*, tinker_fchar_len_t), void (*optsave)(int*, double*, double*), tinker_fchar_len_t mode_cap, tinker_fchar_len_t method_cap);

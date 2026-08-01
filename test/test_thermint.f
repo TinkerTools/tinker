@@ -39,6 +39,7 @@ c
       call test_thermint_etidyn
       call test_thermint_partialblock
       call test_thermint_trailing
+      call test_thermint_save
       call clearti
       call final
       return
@@ -676,6 +677,182 @@ c
       end
 c
 c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_thermint_save  --  incremental output  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_thermint_save" checks that the block averages reach the
+c     external file as the windows complete, that each row is
+c     written exactly once, and that a call with nothing new to
+c     report leaves the file alone
+c
+c
+      subroutine test_thermint_save
+      use dlmda
+      use files
+      use thrmint
+      implicit none
+      integer w
+      integer istep
+      integer nrow,ntot
+      integer oldleng
+      logical exist
+      character*40 label
+      character*240 oldname
+c
+c
+c     write into the test root under a name of our own, keeping the
+c     caller's file name to restore on the way out
+c
+      oldname = filename
+      oldleng = leng
+      filename = 'tisave_tmp'
+      leng = 10
+      call tiwipe ('tisave_tmp.ti')
+c
+c     five windows of forty steps, twenty of them equilibration,
+c     leaving two blocks of ten production steps per window
+c
+      call resetti (5,10,40,20)
+      tieqratio = 0.5d0
+      call inittidyn (200)
+      call assert_int (tinblock,2,'saveti blocks per window')
+c
+c     "inittidyn" must not touch the file system; only "prttihead"
+c     creates the file, and it starts with a header alone
+c
+      inquire (file='tisave_tmp.ti',exist=exist)
+      call assert_logical (exist,.false.,
+     &                     'saveti inittidyn writes no file')
+      call prttihead
+      call ticount ('tisave_tmp.ti',nrow)
+      call assert_int (nrow,0,'saveti header only at start')
+c
+c     the first two windows contribute two blocks each
+c
+      do istep = 1, 80
+         dedl = dble(istep)
+         call etidyn (istep)
+      end do
+      call saveti
+      call ticount ('tisave_tmp.ti',nrow)
+      call assert_int (nrow,4,'saveti rows after two windows')
+c
+c     two more windows append four more rows and no others
+c
+      do istep = 81, 160
+         dedl = dble(istep)
+         call etidyn (istep)
+      end do
+      call saveti
+      call ticount ('tisave_tmp.ti',nrow)
+      call assert_int (nrow,8,'saveti rows after four windows')
+c
+c     a call with nothing new must not repeat anything
+c
+      call saveti
+      call ticount ('tisave_tmp.ti',nrow)
+      call assert_int (nrow,8,'saveti no rows when nothing is new')
+c
+c     the final window closes out the schedule
+c
+      do istep = 161, 200
+         dedl = dble(istep)
+         call etidyn (istep)
+      end do
+      call saveti
+      call ticount ('tisave_tmp.ti',nrow)
+      call assert_int (nrow,10,'saveti rows after all windows')
+c
+c     every recorded block must appear exactly once, so the row
+c     count has to match the number of blocks collected
+c
+      ntot = 0
+      do w = 1, tinbin
+         ntot = ntot + tinbcount(w)
+      end do
+      call assert_int (nrow,ntot,'saveti rows match blocks recorded')
+      do w = 1, tinbin
+         write (label,10)  w
+   10    format ('saveti window ',i0,' fully written')
+         call assert_int (tinbsave(w),tinbcount(w),label)
+      end do
+c
+c     clean up and put the caller's file name back
+c
+      call tiwipe ('tisave_tmp.ti')
+      filename = oldname
+      leng = oldleng
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine ticount  --  count TI file data records  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "ticount" returns the number of records in a block average
+c     file that are not commented out with a leading hash
+c
+c
+      subroutine ticount (fname,nrow)
+      implicit none
+      integer nrow
+      integer iti
+      integer freeunit
+      character*(*) fname
+      character*240 record
+c
+c
+      nrow = 0
+      iti = freeunit ()
+      open (unit=iti,file=fname,status='old')
+   10 continue
+      read (iti,20,end=30)  record
+   20 format (a240)
+      if (record(1:1) .ne. '#')  nrow = nrow + 1
+      goto 10
+   30 continue
+      close (unit=iti)
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine tiwipe  --  remove a TI file if present  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "tiwipe" deletes the named block average file when it exists,
+c     so the test always starts from a predictable file name
+c
+c
+      subroutine tiwipe (fname)
+      implicit none
+      integer iti
+      integer freeunit
+      logical exist
+      character*(*) fname
+c
+c
+      inquire (file=fname,exist=exist)
+      if (exist) then
+         iti = freeunit ()
+         open (unit=iti,file=fname,status='old')
+         close (unit=iti,status='delete')
+      end if
+      return
+      end
+c
+c
 c     ###################################################
 c     ##                                               ##
 c     ##  subroutine resetti  --  reset TI test state  ##
@@ -724,10 +901,12 @@ c
 c     clear any previous allocation and size the accumulators
 c
       if (allocated(tinbcount))  deallocate (tinbcount)
+      if (allocated(tinbsave))  deallocate (tinbsave)
       if (allocated(tidedllist))  deallocate (tidedllist)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
       allocate (tinbcount(nbin))
+      allocate (tinbsave(nbin))
       allocate (tidedllist(nstepavg))
       allocate (tilmdadedl(nbin,tinblock))
       allocate (tilmdadedlstd(nbin,tinblock))
@@ -741,6 +920,7 @@ c
       call settisched (0,.false.)
       do i = 1, nbin
          tinbcount(i) = 0
+         tinbsave(i) = 0
          do j = 1, tinblock
             tilmdadedl(i,j) = 0.0d0
             tilmdadedlstd(i,j) = 0.0d0
@@ -774,6 +954,7 @@ c
       tinblock = 0
       tilmda = 1.0d0
       if (allocated(tinbcount))  deallocate (tinbcount)
+      if (allocated(tinbsave))  deallocate (tinbsave)
       if (allocated(tidedllist))  deallocate (tidedllist)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)

@@ -38,6 +38,7 @@ c
       use potent
       use rgddyn
       use socket
+      use thrmint
       use titles
       use uatom
       use units
@@ -327,6 +328,7 @@ c     update the information needed to restart the trajectory
 c
       if (use_ostdyn)  call saveost
       if (use_metadyn)  call savemeta
+      if (use_ti)  call saveti
       if (dynsave)  call prtdyn
 c
 c     save the velocity vector components at the current step

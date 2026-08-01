@@ -1252,6 +1252,7 @@ c
 c     deallocation of global arrays from module thrmint
 c
       if (allocated(tinbcount))  deallocate (tinbcount)
+      if (allocated(tinbsave))  deallocate (tinbsave)
       if (allocated(tidedllist))  deallocate (tidedllist)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)

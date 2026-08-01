@@ -341,7 +341,6 @@ add_library (tinkerObjF OBJECT
 ../source/estrtor1.f
 ../source/estrtor2.f
 ../source/estrtor3.f
-../source/ethrmint.f
 ../source/etors.f
 ../source/etors1.f
 ../source/etors2.f
@@ -542,6 +541,7 @@ add_library (tinkerObjF OBJECT
 ../source/tcgstuf.f
 ../source/temper.f
 ../source/tettors.f
+../source/thermint.f
 ../source/tncg.f
 ../source/torphase.f
 ../source/torque.f

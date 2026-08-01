@@ -245,7 +245,10 @@ c
 c
 c     lay out the thermodynamic integration lambda windows
 c
-      if (use_ti)  call inittidyn (nstep)
+      if (use_ti) then
+         call inittidyn (nstep)
+         call prttihead
+      end if
 c
 c     only allow Montecarlo or anisotropic barostat
 c     for NPT + extfield simulation
@@ -349,14 +352,11 @@ c
          if (use_ti)  call etidyn (istep)
       end do
 c
-c     save ost and metadynamics restart information
+c     save lambda dynamics information
 c
       if (use_ostdyn)  call saveost
       if (use_metadyn)  call savemeta
-c
-c     save the thermodynamic integration block averages
-c
-      if (use_ti)  call tiprint
+      if (use_ti)  call saveti
 c
 c     save dynamic at the end if it was not saved during simulation
 c

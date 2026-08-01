@@ -155,9 +155,11 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(tinbcount))  deallocate (tinbcount)
+      if (allocated(tinbsave))  deallocate (tinbsave)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
       allocate (tinbcount(tinbin))
+      allocate (tinbsave(tinbin))
       allocate (tilmdadedl(tinbin,tinblock))
       allocate (tilmdadedlstd(tinbin,tinblock))
 c
@@ -165,6 +167,7 @@ c     zero out the block averages for each lambda window
 c
       do i = 1, tinbin
          tinbcount(i) = 0
+         tinbsave(i) = 0
          do j = 1, tinblock
             tilmdadedl(i,j) = 0.0d0
             tilmdadedlstd(i,j) = 0.0d0
@@ -176,6 +179,64 @@ c
       tibin = 1
       tilmda = tilmdalist(1)
       call mapsublmda (tilmda)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine prttihead  --  start the block average file  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "prttihead" creates the external file that collects the block
+c     averaged lambda derivatives and writes the fixed header that
+c     describes the window layout and the lambda schedule; the block
+c     averages themselves are appended later by "saveti"
+c
+c
+      subroutine prttihead
+      use files
+      use iounit
+      use thrmint
+      implicit none
+      integer w
+      integer iti
+      integer freeunit
+      integer trimtext
+c
+c
+c     open a new file, keeping any output from a previous run
+c
+      iti = freeunit ()
+      tifile = filename(1:leng)//'.ti'
+      call version (tifile,'new')
+      open (unit=iti,file=tifile,status='new')
+c
+c     write a header describing the window and block layout
+c
+      write (iti,10)
+   10 format ('# tinker thermodynamic integration')
+      write (iti,20)  tinbin,tinstepavg,tieqratio,tiwindow,tinequil
+   20 format ('# tinbin ',i0,' tinstepavg ',i0,' tieqratio ',f12.6,
+     &           ' tiwindow ',i0,' tinequil ',i0)
+c
+c     record the full schedule, so the file still describes every
+c     window when an interrupted run leaves some of them empty
+c
+      do w = 1, tinbin
+         write (iti,30)  w,tilmdalist(w)
+   30    format ('# schedule ',i0,1x,f12.8)
+      end do
+      write (iti,40)
+   40 format ('# window lambda block dedl dedlstd')
+      close (unit=iti)
+c
+c     report the name of the file holding the block averages
+c
+      write (iout,50)  tifile(1:trimtext(tifile))
+   50 format (/,' TI  --  dU/dlambda Block Averages Written To  ',a)
       return
       end
 c
@@ -265,30 +326,28 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine tiprint  --  output of block averaged dU/dl  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine saveti  --  append new TI block averages  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
-c     "tiprint" writes the block averaged lambda derivatives and
-c     their deviations to an external file, one row per block, as a
-c     whitespace delimited table
+c     "saveti" appends to the external file the block averaged
+c     lambda derivatives and their deviations recorded since the
+c     previous call, so a running simulation can be monitored as
+c     the lambda windows are completed
 c
 c
-      subroutine tiprint
+      subroutine saveti
       use dlmda
-      use files
-      use iounit
       use thrmint
       implicit none
       integer b,w
       integer iti
       integer freeunit
-      integer trimtext
       real*8 lam
-      character*240 tifile
+      logical new
 c
 c
 c     return if thermodynamic integration was never initialized
@@ -296,46 +355,28 @@ c
       if (.not. use_ti)  return
       if (.not. allocated(tilmdadedl))  return
 c
-c     open a new file to hold the block averages
+c     skip the file entirely when no block has completed since the
+c     last time the averages were written out
+c
+      new = .false.
+      do w = 1, tinbin
+         if (tinbcount(w) .gt. tinbsave(w))  new = .true.
+      end do
+      if (.not. new)  return
+c
+c     append the block averages recorded since the previous call
 c
       iti = freeunit ()
-      tifile = filename(1:leng)//'.ti'
-      call version (tifile,'new')
-      open (unit=iti,file=tifile,status='new')
-c
-c     write a header describing the window and block layout
-c
-      write (iti,10)
-   10 format ('# tinker thermodynamic integration')
-      write (iti,20)  tinbin,tinstepavg,tieqratio,tiwindow,tinequil
-   20 format ('# tinbin ',i0,' tinstepavg ',i0,' tieqratio ',f12.6,
-     &           ' tiwindow ',i0,' tinequil ',i0)
-c
-c     record the full schedule, so the file still describes every
-c     window when an interrupted run leaves some of them empty
-c
-      do w = 1, tinbin
-         write (iti,30)  w,tilmdalist(w)
-   30    format ('# schedule ',i0,1x,f12.8)
-      end do
-      write (iti,40)
-   40 format ('# window lambda block dedl dedlstd')
-c
-c     write the block averages for each lambda window in turn
-c
+      open (unit=iti,file=tifile,status='old',position='append')
       do w = 1, tinbin
          lam = tilmdalist(w)
-         do b = 1, tinbcount(w)
-            write (iti,50)  w,lam,b,tilmdadedl(w,b),
+         do b = tinbsave(w)+1, tinbcount(w)
+            write (iti,10)  w,lam,b,tilmdadedl(w,b),
      &                      tilmdadedlstd(w,b)
-   50       format (i6,1x,f12.8,1x,i6,1p,1x,e20.10,1x,e20.10)
+   10       format (i6,1x,f12.8,1x,i6,1p,1x,e20.10,1x,e20.10)
          end do
+         tinbsave(w) = tinbcount(w)
       end do
       close (unit=iti)
-c
-c     report the name of the file holding the block averages
-c
-      write (iout,60)  tifile(1:trimtext(tifile))
-   60 format (/,' TI  --  dU/dlambda Block Averages Written To  ',a)
       return
       end
