@@ -165,7 +165,7 @@ c
       write (iout,10)
    10 format (/,' Enter One Residue Name per Line as the Standard',
      &           ' Three-Letter Code, and',
-     &        /,' optionally, Phi-Psi-Omega Angles (3F), Chi Angles'
+     &        /,' optionally, Phi-Psi-Omega Angles (3F), Chi Angles',
      &           ' (4F), Disulfide Partner',
      &        /,' if CYX Residue (I), and D/L Chirality (A1)',
      &        //,' If Only Residue Names are Entered, the Default',
