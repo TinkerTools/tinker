@@ -1,3 +1,0 @@
-cp helix.1st helix.xyz
-../bin/optrigid helix 0.0001
-rm helix.xyz*

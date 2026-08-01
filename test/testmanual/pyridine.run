@@ -1,3 +1,0 @@
-../bin/xyzedit pyridine < pyridine.dat
-../bin/analyze -p ../params/basic pyridine e
-rm pyridine.xyz_*
