@@ -1,0 +1,147 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                       Version 26.1   February 2026                       ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2026               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Enter Cartesian Coordinate File Name :  
+ Number of Distance Geometry Structures Desired [1] :  
+ Impose Chirality Constraints on Tetrahedral Atoms [Y] :  
+ Use "Floating" Chirality for -XH2- and -XH3 Groups [N] :  
+ Impose Planarity and/or Chirality of Trigonal Atoms [Y] :  
+ Impose Torsional Planarity on Adjacent Trigonal Atoms [Y] :  
+ Do You Wish to Examine or Alter the Bounds Matrix [N] :  
+ Select the Enantiomer Closest to the Input Structure [N] :  
+ Refinement via Minimization or Annealing [M or A, <Enter>=A] :  
+ Bounds Smoothing via Triangle and Inverse Triangle Inequality :
+
+ Largest Upper Bound Distance :                       65.6036
+
+ Generation via Distance Geometry of Structure    1
+
+ Trial Distance Beta Distribution :     0.58 +/- 0.15   Alpha-Beta  5.52  4.00
+
+ RMS Superposition for Original and Enantiomer :     128.8477    128.8541
+
+ Molecular Dynamics Simulated Annealing Refinement :
+
+ Steps:  1000   Time/Step: 0.040 ps   LogMass: 4.00   Temp: 200.0 to 200.0
+
+ Molecular Dynamics Simulated Annealing Refinement :
+
+ Steps: 10000   Time/Step: 0.200 ps   LogMass: 4.00   Temp: 200.0 to   0.0
+
+ Results of Distance Geometry Protocol :
+
+ Final Error Function Value :                   29.3815
+
+ Distance Restraint Error :                      4.9898
+ Hard Sphere Contact Error :                     7.5217
+ Local Geometry Error :                          8.5172
+ Chirality-Planarity Error :                     2.2713
+ Torsional Restraint Error :                     6.0816
+
+ Fit to Bounds after Refinement :
+
+ Num Upper Bound Violations :           2951  of      2233441
+ Num Lower Bound Violations :           4963  of      2233441
+ Max Upper Bound Violation :          1.0127  at    124  2028
+ Max Lower Bound Violation :          1.2075  at    385   452
+ RMS Deviation from Bounds :          0.0049
+
+ Num Upper Restraint Violations :        251  of        13587
+ Num Lower Restraint Violations :         34  of        13587
+ Max Upper Restraint Violation :      1.0127  at    124  2028
+ Max Lower Restraint Violation :      0.1164  at   1867  1967
+ RMS Restraint Dist Violation :       0.0290
+
+ Radius of Gyration after Refinement  :               13.3354
+
+ Generation via Distance Geometry of Structure    2
+
+ Trial Distances Selected at Random from Uniform Distribution
+
+ RMS Superposition for Original and Enantiomer :     128.7524    128.7425
+
+ Molecular Dynamics Simulated Annealing Refinement :
+
+ Steps:  1000   Time/Step: 0.040 ps   LogMass: 4.00   Temp: 200.0 to 200.0
+
+ Molecular Dynamics Simulated Annealing Refinement :
+
+ Steps: 10000   Time/Step: 0.200 ps   LogMass: 4.00   Temp: 200.0 to   0.0
+
+ Results of Distance Geometry Protocol :
+
+ Final Error Function Value :                   40.8987
+
+ Distance Restraint Error :                      4.7908
+ Hard Sphere Contact Error :                     9.3324
+ Local Geometry Error :                          9.8827
+ Chirality-Planarity Error :                     2.4360
+ Torsional Restraint Error :                    14.4568
+
+ Fit to Bounds after Refinement :
+
+ Num Upper Bound Violations :           2943  of      2233441
+ Num Lower Bound Violations :           5081  of      2233441
+ Max Upper Bound Violation :          0.9285  at    279   328
+ Max Lower Bound Violation :          1.3924  at    209   268
+ RMS Deviation from Bounds :          0.0053
+
+ Num Upper Restraint Violations :        259  of        13587
+ Num Lower Restraint Violations :         33  of        13587
+ Max Upper Restraint Violation :      0.9285  at    279   328
+ Max Lower Restraint Violation :      0.1230  at   1327  1431
+ RMS Restraint Dist Violation :       0.0292
+
+ Radius of Gyration after Refinement  :               13.3003
+
+ Generation via Distance Geometry of Structure    3
+
+ Trial Distances Selected at Random from Uniform Distribution
+
+ RMS Superposition for Original and Enantiomer :     129.5543    129.5626
+
+ Molecular Dynamics Simulated Annealing Refinement :
+
+ Steps:  1000   Time/Step: 0.040 ps   LogMass: 4.00   Temp: 200.0 to 200.0
+
+ Molecular Dynamics Simulated Annealing Refinement :
+
+ Steps: 10000   Time/Step: 0.200 ps   LogMass: 4.00   Temp: 200.0 to   0.0
+
+ Results of Distance Geometry Protocol :
+
+ Final Error Function Value :                   11.9604
+
+ Distance Restraint Error :                      2.8508
+ Hard Sphere Contact Error :                     3.3100
+ Local Geometry Error :                          4.5207
+ Chirality-Planarity Error :                     1.1262
+ Torsional Restraint Error :                     0.1526
+
+ Fit to Bounds after Refinement :
+
+ Num Upper Bound Violations :           2852  of      2233441
+ Num Lower Bound Violations :           4756  of      2233441
+ Max Upper Bound Violation :          0.8129  at   1631  1643
+ Max Lower Bound Violation :          0.6448  at   2058  2080
+ RMS Deviation from Bounds :          0.0033
+
+ Num Upper Restraint Violations :        205  of        13587
+ Num Lower Restraint Violations :         17  of        13587
+ Max Upper Restraint Violation :      0.8129  at   1643  1631
+ Max Lower Restraint Violation :      0.1141  at   2067   105
+ RMS Restraint Dist Violation :       0.0204
+
+ Radius of Gyration after Refinement  :               13.5074

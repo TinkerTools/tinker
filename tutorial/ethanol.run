@@ -1,0 +1,2 @@
+../bin/torsfit < ethanol.dat
+rm ethanol.key_*

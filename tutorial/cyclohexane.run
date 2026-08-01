@@ -1,0 +1,8 @@
+../bin/saddle cyclohexane.chair cyclohexane.boat 0.1 y
+mv tstate.xyz cyclohexane.xyz
+../bin/newton cyclohexane a a 0.0001
+../bin/vibrate cyclohexane 0
+../bin/path cyclohexane.chair cyclohexane.boat 9 0.0001
+../bin/newton cyclohexane.005 a a 0.0001
+../bin/vibrate cyclohexane 0
+rm cyclohexane.xyz* cyclohexane.0*

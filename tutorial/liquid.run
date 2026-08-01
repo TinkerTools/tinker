@@ -1,0 +1,3 @@
+../bin/analyze liquid.amoeba -k liquid.kamoeba ge
+../bin/analyze liquid.aplus -k liquid.kaplus ge
+../bin/analyze liquid.hippo -k liquid.khippo ge

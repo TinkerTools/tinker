@@ -1,0 +1,22 @@
+parameters        ../params/water21
+verbose
+
+a-axis                       18.643
+integrator                    RESPA
+thermostat                    BUSSI
+barostat                 MONTECARLO
+neighbor-list
+
+ewald
+ewald-cutoff                    7.0
+pme-grid                   24 24 24
+pme-order                         5
+
+dewald
+dewald-cutoff                   6.0
+dpme-grid                  24 24 24
+dpme-order                        4
+
+polarization                 MUTUAL
+polar-eps                   0.00001
+polar-predict

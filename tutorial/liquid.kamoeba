@@ -1,0 +1,26 @@
+parameters        ../params/water03
+verbose
+
+a-axis                       18.643
+integrator                    RESPA
+thermostat                    BUSSI
+barostat                 MONTECARLO
+
+neighbor-list
+list-buffer                     0.2
+vdw-cutoff                      9.0
+ewald
+ewald-cutoff                    7.0
+
+polarization                 MUTUAL
+polar-eps                   0.00001
+polar-predict
+#polar-print
+#polar-iter                       3
+#pcg-noprecond
+#pcg-noguess
+#pcg-peek                       1.0
+
+#polarization                DIRECT
+#polarization                  OPT3
+#polarization                  TCG2

@@ -1,0 +1,3 @@
+../bin/minimize tip4p 0.01
+../bin/dynamic tip4p 2000 2.0 1.0 2 298.0
+rm tip4p.xyz_* tip4p.arc* tip4p.dyn*
