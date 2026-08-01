@@ -27,6 +27,7 @@ c     yzqpl    total quadrupole tensor yz-component in global frame
 c     zxqpl    total quadrupole tensor zx-component in global frame
 c     zyqpl    total quadrupole tensor zy-component in global frame
 c     zzqpl    total quadrupole tensor zz-component in global frame
+c     momuse   true if an atom is used for system moment calculation
 c
 c
       module moment
@@ -37,5 +38,6 @@ c
       real*8 xxqpl,xyqpl,xzqpl
       real*8 yxqpl,yyqpl,yzqpl
       real*8 zxqpl,zyqpl,zzqpl
+      logical, allocatable :: momuse(:)
       save
       end

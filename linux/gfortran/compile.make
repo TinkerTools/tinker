@@ -528,14 +528,11 @@ gfortran -c -O3 -fopenmp prtarc.f
 gfortran -c -O3 -fopenmp prtcif.f
 gfortran -c -O3 -fopenmp prtdyn.f
 gfortran -c -O3 -fopenmp prterr.f
-gfortran -c -O3 -fopenmp prtfrc.f
 gfortran -c -O3 -fopenmp prtint.f
 gfortran -c -O3 -fopenmp prtmol2.f
 gfortran -c -O3 -fopenmp prtpdb.f
 gfortran -c -O3 -fopenmp prtprm.f
 gfortran -c -O3 -fopenmp prtseq.f
-gfortran -c -O3 -fopenmp prtuind.f
-gfortran -c -O3 -fopenmp prtvel.f
 gfortran -c -O3 -fopenmp prtxyz.f
 gfortran -c -O3 -fopenmp pss.f
 gfortran -c -O3 -fopenmp pssrigid.f

@@ -11,6 +11,7 @@ doc/hippo
 !doc/mechanic
 doc/multipoles
 !doc/sphinx
+doc/sphinx/*/_build/
 !doc/word
 #fftw
 lib/linux/*
@@ -26,4 +27,8 @@ source/*.o
 source/*.x
 source/*.make
 source/*-*
+test/build
+test/*.o
+test/*.mod
+test/*.x
 usage
