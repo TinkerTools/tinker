@@ -63,6 +63,7 @@ c
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
       real*8 eps
+      real*8 frac
       real*8 temp
       logical setplambda
       logical tinbinset
@@ -135,6 +136,9 @@ c
       tibin = 0
       tinbin = 21
       tinblock = 0
+      tinbcount = 0
+      tinbsave = 0
+      tinbtot = 0
       tinequil = 0
       tinstepavg = 100
       tiwindow = 0
@@ -259,7 +263,13 @@ c
 c     size the lambda window schedule to the worst case
 c
       if (allocated(tilmdalist))  deallocate (tilmdalist)
+      if (allocated(tifraclist))  deallocate (tifraclist)
       allocate (tilmdalist(max(1,nkey)))
+      allocate (tifraclist(max(1,nkey)))
+      do i = 1, max(1,nkey)
+         tilmdalist(i) = 0.0d0
+         tifraclist(i) = -1.0d0
+      end do
       ntiwin = 0
       tinbinset = .false.
 c
@@ -373,10 +383,14 @@ c
             read (string,*,err=30)  tinbin
             tinbinset = .true.
          else if (keyword(1:10) .eq. 'TI-WINDOW ') then
+            temp = 0.0d0
+            frac = -1.0d0
             string = record(next:240)
-            read (string,*,err=30)  temp
+            read (string,*,err=25,end=25)  temp,frac
+   25       continue
             ntiwin = ntiwin + 1
             tilmdalist(ntiwin) = temp
+            tifraclist(ntiwin) = frac
          else if (keyword(1:12) .eq. 'TI-NSTEPAVG ') then
             string = record(next:240)
             read (string,*,err=30)  tinstepavg

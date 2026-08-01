@@ -16,7 +16,8 @@ c     "settisched" fills the list of lambda values visited by the
 c     thermodynamic integration windows, either from the explicit
 c     "TI-WINDOW" keyword lines already parsed into "tilmdalist"
 c     or, by default, as the "tinbin" evenly spaced values that
-c     descend from one to zero
+c     descend from one to zero; the fraction of the run spent in
+c     each window is resolved into "tifraclist" summing to one
 c
 c
       subroutine settisched (ntiwin,tinbinset)
@@ -25,8 +26,10 @@ c
       implicit none
       integer i
       integer ntiwin
+      integer nunspec
       logical tinbinset
       logical up,down
+      real*8 fsum,frem
       real*8, allocatable :: tlist(:)
 c
 c
@@ -39,9 +42,12 @@ c
             call fatal
          end if
          if (allocated(tilmdalist))  deallocate (tilmdalist)
+         if (allocated(tifraclist))  deallocate (tifraclist)
          allocate (tilmdalist(tinbin))
+         allocate (tifraclist(tinbin))
          do i = 1, tinbin
             tilmdalist(i) = 1.0d0 - dble(i-1)/dble(tinbin-1)
+            tifraclist(i) = 1.0d0 / dble(tinbin)
          end do
          tilmdalist(tinbin) = 0.0d0
       else
@@ -67,7 +73,61 @@ c
          do i = 1, tinbin
             tilmdalist(i) = tlist(i)
          end do
+         do i = 1, tinbin
+            tlist(i) = tifraclist(i)
+         end do
+         deallocate (tifraclist)
+         allocate (tifraclist(tinbin))
+         do i = 1, tinbin
+            tifraclist(i) = tlist(i)
+         end do
          deallocate (tlist)
+c
+c     a time share that was given must be a positive fraction
+c
+         fsum = 0.0d0
+         nunspec = 0
+         do i = 1, tinbin
+            if (tifraclist(i) .lt. 0.0d0) then
+               nunspec = nunspec + 1
+            else if (tifraclist(i) .eq. 0.0d0) then
+               write (iout,50)  i
+   50          format (/,' SETTISCHED  --  TI-WINDOW',i5,' was given',
+     &                    ' a time fraction of zero')
+               call fatal
+            else
+               fsum = fsum + tifraclist(i)
+            end if
+         end do
+c
+c     share whatever time is left among the windows that did not
+c     ask for a fraction of their own
+c
+         if (nunspec .gt. 0) then
+            frem = 1.0d0 - fsum
+            if (frem .le. 0.0d0) then
+               write (iout,60)  fsum
+   60          format (/,' SETTISCHED  --  TI-WINDOW fractions total',
+     &                    f12.6,' leaving no time for the windows',
+     &                 /,'                 without an explicit value')
+               call fatal
+            end if
+            do i = 1, tinbin
+               if (tifraclist(i) .lt. 0.0d0) then
+                  tifraclist(i) = frem / dble(nunspec)
+               end if
+            end do
+         end if
+c
+c     rescale the time shares so that they span the whole run
+c
+         fsum = 0.0d0
+         do i = 1, tinbin
+            fsum = fsum + tifraclist(i)
+         end do
+         do i = 1, tinbin
+            tifraclist(i) = tifraclist(i) / fsum
+         end do
 c
 c     each window must sit within the physical lambda range
 c
@@ -114,71 +174,138 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "inittidyn" divides a dynamics run of "nstep" steps into equal
-c     lambda windows, sizes the block average accumulators, and puts
-c     the main lambda at the start of the schedule
+c     "inittidyn" divides a dynamics run of "nstep" steps among the
+c     lambda windows according to their requested time fractions,
+c     sizes the block average accumulators, and puts the main lambda
+c     at the start of the schedule
 c
 c
       subroutine inittidyn (nstep)
       use dlmda
+      use thrmint
+      implicit none
+      integer i
+      integer nstep
+      real*8 cum
+c
+c
+c     give each window the share of the run that it asked for, and
+c     pin the last boundary so the whole trajectory is covered
+c
+      if (allocated(tiwinend))  deallocate (tiwinend)
+      allocate (tiwinend(tinbin))
+      cum = 0.0d0
+      do i = 1, tinbin
+         cum = cum + tifraclist(i)
+         tiwinend(i) = nint(cum*dble(nstep))
+      end do
+      tiwinend(tinbin) = nstep
+c
+c     size the accumulators to the schedule and map the sublambdas
+c
+      call settiblocks
+      call mapsublmda (tilmda)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine settiblocks  --  size the block accumulators  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "settiblocks" counts the block averages the window boundaries
+c     in "tiwinend" can hold, allocates the recording arrays to that
+c     exact length, and rewinds the schedule to its first window
+c
+c
+      subroutine settiblocks
       use iounit
       use thrmint
       implicit none
-      integer i,j
-      integer nstep
+      integer i
+      integer nw,ne,nb
+      integer istart
 c
 c
-c     split the trajectory evenly among the requested lambda windows
+c     count the blocks each window can hold; a window too short for
+c     a complete block still runs, but records nothing
 c
-      tiwindow = nstep / tinbin
-      if (tiwindow .lt. 1) then
-         write (iout,10)
-   10    format (/,' INITTIDYN  --  Fewer Dynamics Steps than',
-     &              ' TI-NBIN Windows')
-         call fatal
-      end if
-c
-c     discard the leading fraction of each window as equilibration
-c
-      tinequil = int(dble(tiwindow) * tieqratio)
-      if (tiwindow-tinequil .lt. tinstepavg) then
-         write (iout,20)
-   20    format (/,' INITTIDYN  --  Production Block is Shorter',
-     &              ' than TI-NSTEPAVG')
-         call fatal
-      end if
-c
-c     each window holds the same number of complete blocks
-c
-      tinblock = (tiwindow-tinequil) / tinstepavg
+      tinbtot = 0
+      istart = 0
+      do i = 1, tinbin
+         nw = tiwinend(i) - istart
+         if (nw .lt. 1) then
+            write (iout,10)  i,tilmdalist(i)
+   10       format (/,' SETTIBLOCKS  --  TI-WINDOW',i5,' at lambda',
+     &                 f12.6,' was given no dynamics steps')
+            call fatal
+         end if
+         ne = int(dble(nw) * tieqratio)
+         nb = (nw-ne) / tinstepavg
+         if (nb .eq. 0) then
+            write (iout,20)  i,tilmdalist(i),tifraclist(i)
+   20       format (/,' SETTIBLOCKS  --  TI-WINDOW',i5,' at lambda',
+     &                 f12.6,' with fraction',f12.6,
+     &              /,'                  is shorter than TI-NSTEPAVG',
+     &                 ' and will record no samples')
+         end if
+         tinbtot = tinbtot + nb
+         istart = tiwinend(i)
+      end do
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (allocated(tinbcount))  deallocate (tinbcount)
-      if (allocated(tinbsave))  deallocate (tinbsave)
+      if (allocated(tilmdahist))  deallocate (tilmdahist)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
-      allocate (tinbcount(tinbin))
-      allocate (tinbsave(tinbin))
-      allocate (tilmdadedl(tinbin,tinblock))
-      allocate (tilmdadedlstd(tinbin,tinblock))
+      allocate (tilmdahist(max(1,tinbtot)))
+      allocate (tilmdadedl(max(1,tinbtot)))
+      allocate (tilmdadedlstd(max(1,tinbtot)))
 c
-c     zero out the block averages for each lambda window
+c     zero out the block averages recorded along the schedule
 c
-      do i = 1, tinbin
-         tinbcount(i) = 0
-         tinbsave(i) = 0
-         do j = 1, tinblock
-            tilmdadedl(i,j) = 0.0d0
-            tilmdadedlstd(i,j) = 0.0d0
-         end do
+      do i = 1, max(1,tinbtot)
+         tilmdahist(i) = 0.0d0
+         tilmdadedl(i) = 0.0d0
+         tilmdadedlstd(i) = 0.0d0
       end do
+      tinbcount = 0
+      tinbsave = 0
 c
-c     start the schedule at the first window and map the sublambdas
+c     start the schedule at its first window
 c
       tibin = 1
       tilmda = tilmdalist(1)
-      call mapsublmda (tilmda)
+      call settiwindow
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine settiwindow  --  size the current TI window  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "settiwindow" sets the step count, equilibration length and
+c     block capacity of the lambda window that is currently active
+c
+c
+      subroutine settiwindow
+      use thrmint
+      implicit none
+c
+c
+c     measure the current window against the preceding boundary
+c
+      tiwindow = tiwinend(tibin)
+      if (tibin .gt. 1)  tiwindow = tiwinend(tibin) - tiwinend(tibin-1)
+      tinequil = int(dble(tiwindow) * tieqratio)
+      tinblock = (tiwindow-tinequil) / tinstepavg
       return
       end
 c
@@ -218,19 +345,20 @@ c     write a header describing the window and block layout
 c
       write (iti,10)
    10 format ('# tinker thermodynamic integration')
-      write (iti,20)  tinbin,tinstepavg,tieqratio,tiwindow,tinequil
+      write (iti,20)  tinbin,tinstepavg,tieqratio,tiwinend(tinbin),
+     &                tinbtot
    20 format ('# tinbin ',i0,' tinstepavg ',i0,' tieqratio ',f12.6,
-     &           ' tiwindow ',i0,' tinequil ',i0)
+     &           ' nstep ',i0,' tinbtot ',i0)
 c
 c     record the full schedule, so the file still describes every
 c     window when an interrupted run leaves some of them empty
 c
       do w = 1, tinbin
-         write (iti,30)  w,tilmdalist(w)
-   30    format ('# schedule ',i0,1x,f12.8)
+         write (iti,30)  w,tilmdalist(w),tifraclist(w),tiwinend(w)
+   30    format ('# schedule ',i0,1x,f12.8,1x,f12.8,1x,i0)
       end do
       write (iti,40)
-   40 format ('# window lambda block dedl dedlstd')
+   40 format ('# index lambda dedl dedlstd')
       close (unit=iti)
 c
 c     report the name of the file holding the block averages
@@ -261,17 +389,19 @@ c
       integer istep
       integer tistep
       integer tiprod
+      integer tistart
       real*8 avg,std
 c
 c
-c     a trailing partial window is left unsampled when the step
-c     count is not an exact multiple of the number of windows
+c     nothing is left to sample once the schedule has run out
 c
       if (tibin .gt. tinbin)  return
 c
 c     find the position of this step within the current window
 c
-      tistep = mod(istep-1,tiwindow) + 1
+      tistart = 0
+      if (tibin .gt. 1)  tistart = tiwinend(tibin-1)
+      tistep = istep - tistart
 c
 c     nothing is stored while the window is equilibrating
 c
@@ -279,21 +409,23 @@ c
          tiprod = tistep - tinequil
          tidedllist(mod(tiprod-1,tinstepavg)+1) = dedl
 c
-c     reduce a full block into its average and deviation
+c     reduce a full block into its average and deviation, keeping
+c     the lambda that produced it alongside the block itself
 c
          if (mod(tiprod,tinstepavg) .eq. 0) then
             call avgstd (tidedllist,1,tinstepavg,avg,std)
-            if (tinbcount(tibin) .lt. tinblock) then
-               tinbcount(tibin) = tinbcount(tibin) + 1
-               tilmdadedl(tibin,tinbcount(tibin)) = avg
-               tilmdadedlstd(tibin,tinbcount(tibin)) = std
+            if (tinbcount .lt. tinbtot) then
+               tinbcount = tinbcount + 1
+               tilmdahist(tinbcount) = tilmda
+               tilmdadedl(tinbcount) = avg
+               tilmdadedlstd(tinbcount) = std
             end if
          end if
       end if
 c
 c     move on to the next lambda window at the window boundary
 c
-      if (tistep .eq. tiwindow)  call tischedule
+      if (istep .eq. tiwinend(tibin))  call tischedule
       return
       end
 c
@@ -320,6 +452,7 @@ c
       tibin = tibin + 1
       if (tibin .le. tinbin) then
          tilmda = tilmdalist(tibin)
+         call settiwindow
          call mapsublmda (tilmda)
       end if
       return
@@ -343,11 +476,9 @@ c
       use dlmda
       use thrmint
       implicit none
-      integer b,w
+      integer i
       integer iti
       integer freeunit
-      real*8 lam
-      logical new
 c
 c
 c     return if thermodynamic integration was never initialized
@@ -358,25 +489,18 @@ c
 c     skip the file entirely when no block has completed since the
 c     last time the averages were written out
 c
-      new = .false.
-      do w = 1, tinbin
-         if (tinbcount(w) .gt. tinbsave(w))  new = .true.
-      end do
-      if (.not. new)  return
+      if (tinbcount .le. tinbsave)  return
 c
 c     append the block averages recorded since the previous call
 c
       iti = freeunit ()
       open (unit=iti,file=tifile,status='old',position='append')
-      do w = 1, tinbin
-         lam = tilmdalist(w)
-         do b = tinbsave(w)+1, tinbcount(w)
-            write (iti,10)  w,lam,b,tilmdadedl(w,b),
-     &                      tilmdadedlstd(w,b)
-   10       format (i6,1x,f12.8,1x,i6,1p,1x,e20.10,1x,e20.10)
-         end do
-         tinbsave(w) = tinbcount(w)
+      do i = tinbsave+1, tinbcount
+         write (iti,10)  i,tilmdahist(i),tilmdadedl(i),
+     &                   tilmdadedlstd(i)
+   10    format (i6,1x,f12.8,1p,1x,e20.10,1x,e20.10)
       end do
+      tinbsave = tinbcount
       close (unit=iti)
       return
       end

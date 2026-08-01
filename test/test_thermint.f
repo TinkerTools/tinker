@@ -34,8 +34,10 @@ c
       call test_thermint_avgstd
       call test_thermint_schedule
       call test_thermint_settisched
+      call test_thermint_fraction
       call test_thermint_data
       call test_thermint_inittidyn
+      call test_thermint_uneven
       call test_thermint_etidyn
       call test_thermint_partialblock
       call test_thermint_trailing
@@ -283,8 +285,7 @@ c
 c     an explicit descending schedule sets the window count itself
 c     and is compacted down from the parse buffer
 c
-      if (allocated(tilmdalist))  deallocate (tilmdalist)
-      allocate (tilmdalist(40))
+      call tibufinit
       tilmdalist(1) = 1.0d0
       tilmdalist(2) = 0.9d0
       tilmdalist(3) = 0.2d0
@@ -293,6 +294,7 @@ c
       call settisched (4,.false.)
       call assert_int (tinbin,4,'settisched explicit count')
       call assert_int (size(tilmdalist),4,'settisched explicit size')
+      call assert_int (size(tifraclist),4,'settisched explicit fracs')
       call assert_real (tilmdalist(1),1.0d0,eps,'settisched down 1')
       call assert_real (tilmdalist(2),0.9d0,eps,'settisched down 2')
       call assert_real (tilmdalist(3),0.2d0,eps,'settisched down 3')
@@ -300,11 +302,18 @@ c
       call assert_int (tibin,1,'settisched explicit start index')
       call assert_real (tilmda,1.0d0,eps,'settisched explicit start')
 c
+c     with no fractions asked for, the run is split evenly
+c
+      do k = 1, 4
+         write (label,20)  k
+   20    format ('settisched even share ',i0)
+         call assert_real (tifraclist(k),0.25d0,eps,label)
+      end do
+c
 c     an ascending schedule is equally valid and starts at its own
 c     first value rather than at one
 c
-      if (allocated(tilmdalist))  deallocate (tilmdalist)
-      allocate (tilmdalist(40))
+      call tibufinit
       tilmdalist(1) = 0.0d0
       tilmdalist(2) = 0.1d0
       tilmdalist(3) = 0.4d0
@@ -321,8 +330,7 @@ c
 c     the schedule need not touch either endpoint; any monotonic
 c     run of values inside [0,1] is a valid set of windows
 c
-      if (allocated(tilmdalist))  deallocate (tilmdalist)
-      allocate (tilmdalist(40))
+      call tibufinit
       tilmdalist(1) = 0.75d0
       tilmdalist(2) = 0.70d0
       tilmdalist(3) = 0.20d0
@@ -341,20 +349,280 @@ c
 c     a single window is legal and covers the whole trajectory,
 c     which the old closed form schedule could not express
 c
-      if (allocated(tilmdalist))  deallocate (tilmdalist)
-      allocate (tilmdalist(40))
+      call tibufinit
       tilmdalist(1) = 0.5d0
       tinbin = 0
       call settisched (1,.false.)
       call assert_int (tinbin,1,'settisched single count')
       call assert_real (tilmdalist(1),0.5d0,eps,'settisched single')
-      tinstepavg = 10
+      call assert_real (tifraclist(1),1.0d0,eps,
+     &                  'settisched single share')
+      call tisetavg (10)
       tieqratio = 0.0d0
       call inittidyn (200)
       call assert_int (tiwindow,200,'settisched single window')
       call assert_int (tinequil,0,'settisched single equilibration')
       call assert_int (tinblock,20,'settisched single blocks')
+      call assert_int (tinbtot,20,'settisched single capacity')
       call assert_real (tilmda,0.5d0,eps,'settisched single lambda')
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine tibufinit  --  fresh TI keyword parse buffer  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "tibufinit" sizes the schedule parse buffers the way "mutate"
+c     does before reading keywords, with every time fraction left
+c     marked as not specified
+c
+c
+      subroutine tibufinit
+      use thrmint
+      implicit none
+      integer i
+c
+c
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
+      if (allocated(tifraclist))  deallocate (tifraclist)
+      allocate (tilmdalist(40))
+      allocate (tifraclist(40))
+      do i = 1, 40
+         tilmdalist(i) = 0.0d0
+         tifraclist(i) = -1.0d0
+      end do
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine tisetavg  --  resize the TI sample buffer  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "tisetavg" changes the number of steps averaged into a block
+c     and resizes the sample buffer to match; "mutate" sizes that
+c     buffer once from the keyword value, so a test that moves
+c     "tinstepavg" afterwards has to resize it as well
+c
+c
+      subroutine tisetavg (nstepavg)
+      use thrmint
+      implicit none
+      integer nstepavg
+      integer i
+c
+c
+      tinstepavg = nstepavg
+      if (allocated(tidedllist))  deallocate (tidedllist)
+      allocate (tidedllist(nstepavg))
+      do i = 1, nstepavg
+         tidedllist(i) = 0.0d0
+      end do
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_thermint_fraction  --  window time share  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_thermint_fraction" checks how the time fraction given on
+c     a "TI-WINDOW" line is resolved: windows that ask for a share
+c     keep it, windows that stay silent split whatever is left, and
+c     the whole table is rescaled to span exactly one run
+c
+c
+      subroutine test_thermint_fraction
+      use thrmint
+      implicit none
+      integer k
+      real*8 eps,fsum
+c
+c
+c     two of four windows name a share, the other two split the rest
+c
+      eps = 1.0d-12
+      call tibufinit
+      tilmdalist(1) = 1.0d0
+      tilmdalist(2) = 0.7d0
+      tilmdalist(3) = 0.3d0
+      tilmdalist(4) = 0.0d0
+      tifraclist(1) = 0.4d0
+      tifraclist(3) = 0.2d0
+      tinbin = 0
+      call settisched (4,.false.)
+      call assert_real (tifraclist(1),0.4d0,eps,'tifrac given share 1')
+      call assert_real (tifraclist(2),0.2d0,eps,'tifrac spread share 2')
+      call assert_real (tifraclist(3),0.2d0,eps,'tifrac given share 3')
+      call assert_real (tifraclist(4),0.2d0,eps,'tifrac spread share 4')
+c
+c     the resolved shares always cover the whole run
+c
+      fsum = 0.0d0
+      do k = 1, 4
+         fsum = fsum + tifraclist(k)
+      end do
+      call assert_real (fsum,1.0d0,eps,'tifrac shares total one')
+c
+c     a single unspecified window absorbs everything left over
+c
+      call tibufinit
+      tilmdalist(1) = 1.0d0
+      tilmdalist(2) = 0.5d0
+      tilmdalist(3) = 0.0d0
+      tifraclist(1) = 0.25d0
+      tifraclist(2) = 0.25d0
+      tinbin = 0
+      call settisched (3,.false.)
+      call assert_real (tifraclist(3),0.5d0,eps,
+     &                  'tifrac single leftover')
+c
+c     shares that do not total one are rescaled, so the same ratios
+c     describe the same schedule however they were written down
+c
+      call tibufinit
+      tilmdalist(1) = 1.0d0
+      tilmdalist(2) = 0.5d0
+      tilmdalist(3) = 0.0d0
+      tifraclist(1) = 0.1d0
+      tifraclist(2) = 0.2d0
+      tifraclist(3) = 0.1d0
+      tinbin = 0
+      call settisched (3,.false.)
+      call assert_real (tifraclist(1),0.25d0,eps,'tifrac rescaled 1')
+      call assert_real (tifraclist(2),0.50d0,eps,'tifrac rescaled 2')
+      call assert_real (tifraclist(3),0.25d0,eps,'tifrac rescaled 3')
+c
+c     the same ratios written to total one give the same schedule
+c
+      call tibufinit
+      tilmdalist(1) = 1.0d0
+      tilmdalist(2) = 0.5d0
+      tilmdalist(3) = 0.0d0
+      tifraclist(1) = 0.25d0
+      tifraclist(2) = 0.50d0
+      tifraclist(3) = 0.25d0
+      tinbin = 0
+      call settisched (3,.false.)
+      call assert_real (tifraclist(1),0.25d0,eps,'tifrac direct 1')
+      call assert_real (tifraclist(2),0.50d0,eps,'tifrac direct 2')
+      call assert_real (tifraclist(3),0.25d0,eps,'tifrac direct 3')
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_thermint_uneven  --  uneven schedule  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_thermint_uneven" runs a schedule whose windows have very
+c     different lengths, and checks that the step boundaries, the
+c     equilibration split and the recorded blocks all follow the
+c     requested time fractions
+c
+c
+      subroutine test_thermint_uneven
+      use dlmda
+      use thrmint
+      implicit none
+      integer istep
+      real*8 eps
+c
+c
+c     half the run at lambda one, most of the rest at lambda a half,
+c     and a brief two percent visit to lambda zero
+c
+      eps = 1.0d-12
+      call tibufinit
+      tilmdalist(1) = 1.0d0
+      tilmdalist(2) = 0.5d0
+      tilmdalist(3) = 0.0d0
+      tifraclist(1) = 0.5d0
+      tifraclist(3) = 0.02d0
+      tinbin = 0
+      call settisched (3,.false.)
+      call assert_real (tifraclist(2),0.48d0,eps,'uneven middle share')
+c
+c     one thousand steps split 500, 480 and 20 with half of each
+c     window spent equilibrating
+c
+      call tisetavg (10)
+      tieqratio = 0.5d0
+      call inittidyn (1000)
+      call assert_int (tiwinend(1),500,'uneven first boundary')
+      call assert_int (tiwinend(2),980,'uneven second boundary')
+      call assert_int (tiwinend(3),1000,'uneven last boundary')
+c
+c     the first window keeps 250 production steps, giving 25 blocks,
+c     the second 240 steps giving 24, and the short window keeps 10
+c
+      call assert_int (tiwindow,500,'uneven first window length')
+      call assert_int (tinequil,250,'uneven first equilibration')
+      call assert_int (tinblock,25,'uneven first blocks')
+      call assert_int (tinbtot,50,'uneven total capacity')
+c
+c     walking the whole run fills the accumulators exactly
+c
+      do istep = 1, 1000
+         dedl = dble(istep)
+         call etidyn (istep)
+      end do
+      call assert_int (tibin,4,'uneven schedule exhausted')
+      call assert_int (tinbcount,50,'uneven blocks recorded')
+c
+c     the lambda tags show where the time actually went
+c
+      call assert_real (tilmdahist(1),1.0d0,eps,'uneven first lambda')
+      call assert_real (tilmdahist(25),1.0d0,eps,
+     &                  'uneven lambda one end')
+      call assert_real (tilmdahist(26),0.5d0,eps,'uneven middle lambda')
+      call assert_real (tilmdahist(49),0.5d0,eps,'uneven middle end')
+      call assert_real (tilmdahist(50),0.0d0,eps,'uneven short lambda')
+c
+c     the first block averages steps 251 to 260 of the run
+c
+      call assert_real (tilmdadedl(1),255.5d0,eps,'uneven first block')
+c
+c     the short window equilibrates for its first ten steps and
+c     records a single block from steps 991 to 1000
+c
+      call assert_real (tilmdadedl(50),995.5d0,eps,'uneven short block')
+c
+c     a window too short for one block records nothing at all, but
+c     the run still visits its lambda
+c
+      call tibufinit
+      tilmdalist(1) = 1.0d0
+      tilmdalist(2) = 0.5d0
+      tilmdalist(3) = 0.0d0
+      tifraclist(2) = 0.01d0
+      tinbin = 0
+      call settisched (3,.false.)
+      call tisetavg (50)
+      tieqratio = 0.5d0
+      call inittidyn (1000)
+      call assert_int (tiwinend(2)-tiwinend(1),10,'uneven tiny window')
+      call assert_int (tinbtot,8,'uneven tiny window capacity')
+      do istep = 1, 1000
+         dedl = dble(istep)
+         call etidyn (istep)
+      end do
+      call assert_int (tinbcount,8,'uneven tiny window records')
+      call assert_real (tilmdahist(4),1.0d0,eps,'uneven tiny before')
+      call assert_real (tilmdahist(5),0.0d0,eps,'uneven tiny after')
       return
       end
 c
@@ -366,16 +634,16 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_thermint_data" checks that the block average arrays are
-c     sized to one row per lambda window and are fully cleared each
-c     time the windows are laid out
+c     "test_thermint_data" checks that the recording arrays are sized
+c     to the exact number of blocks the schedule can hold and are
+c     fully cleared each time the windows are laid out
 c
 c
       subroutine test_thermint_data
       use dlmda
       use thrmint
       implicit none
-      integer i,j
+      integer i
       logical ok
 c
 c
@@ -386,40 +654,54 @@ c
       call inittidyn (420)
       call assert_int (tiwindow,60,'tidata window length')
       call assert_int (tinequil,30,'tidata equilibration steps')
-      call assert_int (tinblock,2,'tidata blocks per window')
-      call assert_int (size(tilmdadedl,1),7,'tidata dedl window rows')
-      call assert_int (size(tilmdadedl,2),2,'tidata dedl block cols')
-      call assert_int (size(tilmdadedlstd,1),7,'tidata std window rows')
-      call assert_int (size(tilmdadedlstd,2),2,'tidata std block cols')
-      call assert_int (size(tinbcount),7,'tidata block count size')
+      call assert_int (tinblock,2,'tidata blocks in first window')
+      call assert_int (tinbtot,14,'tidata total block capacity')
+      call assert_int (size(tilmdadedl),14,'tidata dedl length')
+      call assert_int (size(tilmdadedlstd),14,'tidata std length')
+      call assert_int (size(tilmdahist),14,'tidata lambda hist length')
+      call assert_int (size(tiwinend),7,'tidata window end size')
+      call assert_int (tinbcount,0,'tidata initial block count')
+      call assert_int (tinbsave,0,'tidata initial blocks saved')
       call assert_int (tibin,1,'tidata initial window index')
       call assert_real (tilmda,1.0d0,0.0d0,'tidata initial lambda')
 c
-c     every window starts with no recorded blocks
+c     the boundaries march evenly to the end of the trajectory
 c
       ok = .true.
       do i = 1, 7
-         if (tinbcount(i) .ne. 0)  ok = .false.
-         do j = 1, 2
-            if (tilmdadedl(i,j) .ne. 0.0d0)  ok = .false.
-            if (tilmdadedlstd(i,j) .ne. 0.0d0)  ok = .false.
-         end do
+         if (tiwinend(i) .ne. 60*i)  ok = .false.
+      end do
+      call assert_logical (ok,.true.,'tidata window boundaries')
+      call assert_int (tiwinend(7),420,'tidata last boundary')
+c
+c     nothing is recorded before the run starts
+c
+      ok = .true.
+      do i = 1, 14
+         if (tilmdahist(i) .ne. 0.0d0)  ok = .false.
+         if (tilmdadedl(i) .ne. 0.0d0)  ok = .false.
+         if (tilmdadedlstd(i) .ne. 0.0d0)  ok = .false.
       end do
       call assert_logical (ok,.true.,'tidata rows start empty')
 c
 c     laying out the windows again clears whatever had accumulated
 c
-      tinbcount(3) = 1
-      tilmdadedl(3,1) = 5.0d0
-      tilmdadedlstd(3,1) = 6.0d0
+      tinbcount = 3
+      tinbsave = 2
+      tilmdahist(3) = 4.0d0
+      tilmdadedl(3) = 5.0d0
+      tilmdadedlstd(3) = 6.0d0
       tibin = 4
       tilmda = 0.25d0
       call inittidyn (420)
-      call assert_int (size(tilmdadedl,1),7,'tidata reinit rows')
-      call assert_int (tinbcount(3),0,'tidata reinit block count')
-      call assert_real (tilmdadedl(3,1),0.0d0,0.0d0,
+      call assert_int (size(tilmdadedl),14,'tidata reinit length')
+      call assert_int (tinbcount,0,'tidata reinit block count')
+      call assert_int (tinbsave,0,'tidata reinit blocks saved')
+      call assert_real (tilmdahist(3),0.0d0,0.0d0,
+     &                  'tidata reinit lambda hist')
+      call assert_real (tilmdadedl(3),0.0d0,0.0d0,
      &                  'tidata reinit dedl')
-      call assert_real (tilmdadedlstd(3,1),0.0d0,0.0d0,
+      call assert_real (tilmdadedlstd(3),0.0d0,0.0d0,
      &                  'tidata reinit std')
       call assert_int (tibin,1,'tidata reinit window index')
       call assert_real (tilmda,1.0d0,0.0d0,'tidata reinit lambda')
@@ -447,32 +729,36 @@ c
 c     two hundred steps over five windows of forty
 c
       call resetti (5,10,40,20)
-      tinbin = 5
-      tieqratio = 0.5d0
       call inittidyn (200)
       call assert_int (tiwindow,40,'inittidyn 200 step window')
       call assert_int (tinequil,20,'inittidyn 200 step equilibration')
       call assert_int (tinblock,2,'inittidyn 200 step blocks')
+      call assert_int (tinbtot,10,'inittidyn 200 step capacity')
+      call assert_int (tiwinend(5),200,'inittidyn 200 step coverage')
       call assert_int (tibin,1,'inittidyn 200 step window index')
       call assert_real (tilmda,1.0d0,0.0d0,'inittidyn 200 step lambda')
 c
 c     a quarter of each window discarded over twenty one windows
 c
-      tinbin = 21
-      tieqratio = 0.25d0
+      call resetti (21,10,100,25)
       call inittidyn (2100)
       call assert_int (tiwindow,100,'inittidyn 2100 step window')
       call assert_int (tinequil,25,'inittidyn 2100 step equilibration')
       call assert_int (tinblock,7,'inittidyn 2100 step blocks')
+      call assert_int (tinbtot,147,'inittidyn 2100 step capacity')
+      call assert_int (tiwinend(21),2100,'inittidyn 2100 step coverage')
 c
-c     integer truncation, 205/5 gives 41 steps and 41*0.5 gives 20
+c     an odd step count is absorbed by the boundaries rather than
+c     left as a trailing remainder, and 41*0.5 truncates to 20
 c
-      tinbin = 5
-      tieqratio = 0.5d0
+      call resetti (5,10,40,20)
       call inittidyn (205)
       call assert_int (tiwindow,41,'inittidyn 205 step window')
       call assert_int (tinequil,20,'inittidyn 205 step equilibration')
       call assert_int (tinblock,2,'inittidyn 205 step blocks')
+      call assert_int (tiwinend(1),41,'inittidyn 205 step boundary')
+      call assert_int (tiwinend(5),205,'inittidyn 205 step coverage')
+      call assert_int (tinbtot,10,'inittidyn 205 step capacity')
       return
       end
 c
@@ -485,7 +771,8 @@ c     ###############################################################
 c
 c
 c     "test_thermint_etidyn" checks that only production steps are
-c     averaged into blocks, that each window gets its own blocks,
+c     averaged into blocks, that the blocks are appended in the order
+c     they were recorded along with the lambda that produced them,
 c     and that the schedule advances exactly at the window boundary
 c
 c
@@ -493,11 +780,11 @@ c
       use dlmda
       use thrmint
       implicit none
-      integer b,w
+      integer b,i,w
       integer istep,tistep
       real*8 eps,sd10
       real*8 lref,dmax
-      real*8 ref(2,5)
+      real*8 ref(10)
       real*8 lmdaseen(200)
       character*40 label
 c
@@ -507,16 +794,16 @@ c     leaving two blocks of ten production steps per window
 c
       eps = 1.0d-12
       sd10 = sqrt(8.25d0)
-      ref(1,1) = 25.5d0
-      ref(2,1) = 35.5d0
-      ref(1,2) = 65.5d0
-      ref(2,2) = 75.5d0
-      ref(1,3) = 105.5d0
-      ref(2,3) = 115.5d0
-      ref(1,4) = 145.5d0
-      ref(2,4) = 155.5d0
-      ref(1,5) = 185.5d0
-      ref(2,5) = 195.5d0
+      ref(1) = 25.5d0
+      ref(2) = 35.5d0
+      ref(3) = 65.5d0
+      ref(4) = 75.5d0
+      ref(5) = 105.5d0
+      ref(6) = 115.5d0
+      ref(7) = 145.5d0
+      ref(8) = 155.5d0
+      ref(9) = 185.5d0
+      ref(10) = 195.5d0
 c
       call resetti (5,10,40,20)
       do istep = 1, 200
@@ -525,20 +812,23 @@ c
          call etidyn (istep)
       end do
 c
-c     each window holds the mean of ten consecutive integers
+c     the blocks land end to end, each holding the mean of ten
+c     consecutive integers and tagged with its own lambda
 c
-      do w = 1, 5
-         write (label,10)  w
-   10    format ('etidyn window ',i0,' block count')
-         call assert_int (tinbcount(w),2,label)
-         do b = 1, 2
-            write (label,20)  w,b
-   20       format ('etidyn window ',i0,' block ',i0,' average')
-            call assert_real (tilmdadedl(w,b),ref(b,w),eps,label)
-            write (label,30)  w,b
-   30       format ('etidyn window ',i0,' block ',i0,' deviation')
-            call assert_real (tilmdadedlstd(w,b),sd10,eps,label)
-         end do
+      call assert_int (tinbcount,10,'etidyn total block count')
+      do i = 1, 10
+         w = (i-1)/2 + 1
+         b = mod(i-1,2) + 1
+         write (label,20)  w,b
+   20    format ('etidyn window ',i0,' block ',i0,' average')
+         call assert_real (tilmdadedl(i),ref(i),eps,label)
+         write (label,30)  w,b
+   30    format ('etidyn window ',i0,' block ',i0,' deviation')
+         call assert_real (tilmdadedlstd(i),sd10,eps,label)
+         write (label,40)  w,b
+   40    format ('etidyn window ',i0,' block ',i0,' lambda')
+         lref = 1.0d0 - dble(w-1)/4.0d0
+         call assert_real (tilmdahist(i),lref,eps,label)
       end do
 c
 c     the schedule must advance at the window boundary, not one
@@ -568,15 +858,11 @@ c
          end if
          call etidyn (istep)
       end do
-      do w = 1, 5
-         write (label,50)  w
-   50    format ('etidyn poisoned window ',i0,' block count')
-         call assert_int (tinbcount(w),2,label)
-         do b = 1, 2
-            write (label,60)  w,b
-   60       format ('etidyn poisoned window ',i0,' block ',i0)
-            call assert_real (tilmdadedl(w,b),ref(b,w),eps,label)
-         end do
+      call assert_int (tinbcount,10,'etidyn poisoned block count')
+      do i = 1, 10
+         write (label,60)  i
+   60    format ('etidyn poisoned block ',i0)
+         call assert_real (tilmdadedl(i),ref(i),eps,label)
       end do
       return
       end
@@ -598,10 +884,8 @@ c
       use dlmda
       use thrmint
       implicit none
-      integer w
       integer istep
       real*8 eps
-      character*40 label
 c
 c
 c     twenty five production steps per window with blocks of ten
@@ -613,27 +897,29 @@ c
          dedl = dble(istep)
          call etidyn (istep)
       end do
-      do w = 1, 5
-         write (label,10)  w
-   10    format ('partialblock window ',i0,' block count')
-         call assert_int (tinbcount(w),2,label)
-      end do
+      call assert_int (tinbtot,10,'partialblock capacity')
+      call assert_int (tinbcount,10,'partialblock block count')
 c
 c     window one covers steps 16-25 and 26-35, and steps 36-40
 c     are orphaned in the unflushed block
 c
-      call assert_real (tilmdadedl(1,1),20.5d0,eps,
+      call assert_real (tilmdadedl(1),20.5d0,eps,
      &                  'partialblock window 1 block 1')
-      call assert_real (tilmdadedl(1,2),30.5d0,eps,
+      call assert_real (tilmdadedl(2),30.5d0,eps,
      &                  'partialblock window 1 block 2')
 c
 c     window two production starts at step 56, so a leak from the
 c     previous window would drag this below 60.5
 c
-      call assert_real (tilmdadedl(2,1),60.5d0,eps,
+      call assert_real (tilmdadedl(3),60.5d0,eps,
      &                  'partialblock window 2 block 1')
-      call assert_real (tilmdadedl(2,2),70.5d0,eps,
+      call assert_real (tilmdadedl(4),70.5d0,eps,
      &                  'partialblock window 2 block 2')
+c
+c     the stranded samples never earn a lambda tag of their own
+c
+      call assert_real (tilmdahist(3),0.75d0,eps,
+     &                  'partialblock window 2 lambda')
       return
       end
 c
@@ -645,8 +931,9 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "test_thermint_trailing" checks that dynamics steps past the
-c     end of the last lambda window are ignored rather than writing
+c     "test_thermint_trailing" checks that the windows laid out by
+c     "inittidyn" span the whole trajectory, and that steps pushed
+c     past the end of the schedule are ignored rather than writing
 c     beyond the block average arrays
 c
 c
@@ -654,13 +941,24 @@ c
       use dlmda
       use thrmint
       implicit none
-      integer w
       integer istep
-      character*40 label
 c
+c
+c     an awkward step count is still covered to the last step, so
+c     no dynamics is left running outside the schedule
+c
+      call resetti (5,10,40,20)
+      call inittidyn (203)
+      call assert_int (tiwinend(5),203,'trailing schedule coverage')
+      do istep = 1, 203
+         dedl = dble(istep)
+         call etidyn (istep)
+      end do
+      call assert_int (tibin,6,'trailing schedule exhausted')
+      call assert_int (tinbcount,tinbtot,'trailing capacity filled')
 c
 c     two hundred ten steps over five windows of forty, so the last
-c     ten steps fall past the schedule
+c     ten steps fall past the schedule and must be dropped
 c
       call resetti (5,10,40,20)
       do istep = 1, 210
@@ -668,11 +966,8 @@ c
          call etidyn (istep)
       end do
       call assert_int (tibin,6,'trailing final window index')
-      do w = 1, 5
-         write (label,10)  w
-   10    format ('trailing window ',i0,' block count')
-         call assert_int (tinbcount(w),2,label)
-      end do
+      call assert_int (tinbcount,10,'trailing block count')
+      call assert_int (tinbcount,tinbtot,'trailing no overflow')
       return
       end
 c
@@ -695,12 +990,11 @@ c
       use files
       use thrmint
       implicit none
-      integer w
       integer istep
-      integer nrow,ntot
+      integer nrow
       integer oldleng
+      real*8 lam
       logical exist
-      character*40 label
       character*240 oldname
 c
 c
@@ -717,7 +1011,6 @@ c     five windows of forty steps, twenty of them equilibration,
 c     leaving two blocks of ten production steps per window
 c
       call resetti (5,10,40,20)
-      tieqratio = 0.5d0
       call inittidyn (200)
       call assert_int (tinblock,2,'saveti blocks per window')
 c
@@ -770,16 +1063,19 @@ c
 c     every recorded block must appear exactly once, so the row
 c     count has to match the number of blocks collected
 c
-      ntot = 0
-      do w = 1, tinbin
-         ntot = ntot + tinbcount(w)
-      end do
-      call assert_int (nrow,ntot,'saveti rows match blocks recorded')
-      do w = 1, tinbin
-         write (label,10)  w
-   10    format ('saveti window ',i0,' fully written')
-         call assert_int (tinbsave(w),tinbcount(w),label)
-      end do
+      call assert_int (nrow,tinbcount,
+     &                 'saveti rows match blocks recorded')
+      call assert_int (tinbsave,tinbcount,'saveti fully written')
+c
+c     the rows carry the lambda that produced them, in the order
+c     the blocks were recorded
+c
+      call tirowlmda ('tisave_tmp.ti',1,lam)
+      call assert_real (lam,1.0d0,1.0d-8,'saveti first row lambda')
+      call tirowlmda ('tisave_tmp.ti',10,lam)
+      call assert_real (lam,0.0d0,1.0d-8,'saveti last row lambda')
+      call tirowlmda ('tisave_tmp.ti',5,lam)
+      call assert_real (lam,0.5d0,1.0d-8,'saveti middle row lambda')
 c
 c     clean up and put the caller's file name back
 c
@@ -824,6 +1120,50 @@ c
       end
 c
 c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine tirowlmda  --  lambda column of a TI row  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "tirowlmda" returns the lambda recorded in the requested data
+c     record of a block average file, counting only the rows that
+c     are not commented out with a leading hash
+c
+c
+      subroutine tirowlmda (fname,irow,lam)
+      implicit none
+      integer irow
+      integer nrow,idx
+      integer iti
+      integer freeunit
+      real*8 lam
+      character*(*) fname
+      character*240 record
+c
+c
+      lam = -1.0d0
+      nrow = 0
+      iti = freeunit ()
+      open (unit=iti,file=fname,status='old')
+   10 continue
+      read (iti,20,end=30)  record
+   20 format (a240)
+      if (record(1:1) .ne. '#') then
+         nrow = nrow + 1
+         if (nrow .eq. irow) then
+            read (record,*,err=30,end=30)  idx,lam
+            goto 30
+         end if
+      end if
+      goto 10
+   30 continue
+      close (unit=iti)
+      return
+      end
+c
+c
 c     ##########################################################
 c     ##                                                      ##
 c     ##  subroutine tiwipe  --  remove a TI file if present  ##
@@ -860,18 +1200,52 @@ c     ##                                               ##
 c     ###################################################
 c
 c
-c     "resetti" sizes the thermodynamic integration accumulators
-c     directly and sets the scalar state to deterministic unit test
-c     defaults, bypassing "inittidyn" so the accumulation tests do
-c     not depend on it
+c     "resetti" lays out a schedule of equal length lambda windows
+c     and sets the scalar state to deterministic unit test defaults,
+c     bypassing "inittidyn" so the accumulation tests do not depend
+c     on how the step budget is divided
 c
 c
       subroutine resetti (nbin,nstepavg,window,nequil)
-      use dlmda
       use thrmint
       implicit none
       integer nbin,nstepavg,window,nequil
-      integer i,j
+      integer i
+      integer, allocatable :: steps(:)
+c
+c
+c     hand every window the same number of steps
+c
+      allocate (steps(nbin))
+      do i = 1, nbin
+         steps(i) = window
+      end do
+      call resettisteps (nbin,nstepavg,steps,nequil)
+      deallocate (steps)
+      return
+      end
+c
+c
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine resettisteps  --  uneven TI test state  ##
+c     ##                                                     ##
+c     #########################################################
+c
+c
+c     "resettisteps" is "resetti" for a schedule whose windows have
+c     different lengths, given as the step count of each window; the
+c     equilibration ratio is taken from the first window so the test
+c     geometry stays easy to state
+c
+c
+      subroutine resettisteps (nbin,nstepavg,steps,nequil)
+      use dlmda
+      use thrmint
+      implicit none
+      integer nbin,nstepavg,nequil
+      integer steps(*)
+      integer i
 c
 c
 c     put the sublambda maps on the power law branch, which is
@@ -890,26 +1264,14 @@ c
       use_ti = .true.
       tinbin = nbin
       tinstepavg = nstepavg
-      tiwindow = window
-      tinequil = nequil
       tieqratio = 0.0d0
-      if (window .gt. 0)  tieqratio = dble(nequil) / dble(window)
-      tinblock = 0
-      if (nstepavg .gt. 0)  tinblock = (window-nequil) / nstepavg
+      if (steps(1) .gt. 0)  tieqratio = dble(nequil) / dble(steps(1))
       dedl = 0.0d0
 c
-c     clear any previous allocation and size the accumulators
+c     clear any previous allocation and size the sample buffer
 c
-      if (allocated(tinbcount))  deallocate (tinbcount)
-      if (allocated(tinbsave))  deallocate (tinbsave)
       if (allocated(tidedllist))  deallocate (tidedllist)
-      if (allocated(tilmdadedl))  deallocate (tilmdadedl)
-      if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
-      allocate (tinbcount(nbin))
-      allocate (tinbsave(nbin))
       allocate (tidedllist(nstepavg))
-      allocate (tilmdadedl(nbin,tinblock))
-      allocate (tilmdadedlstd(nbin,tinblock))
       do i = 1, nstepavg
          tidedllist(i) = 0.0d0
       end do
@@ -918,14 +1280,17 @@ c     build the default evenly spaced schedule, which also sets
 c     "tibin" and "tilmda" to the first window
 c
       call settisched (0,.false.)
-      do i = 1, nbin
-         tinbcount(i) = 0
-         tinbsave(i) = 0
-         do j = 1, tinblock
-            tilmdadedl(i,j) = 0.0d0
-            tilmdadedlstd(i,j) = 0.0d0
-         end do
+c
+c     turn the requested window lengths into step boundaries, then
+c     size the accumulators the same way production code does
+c
+      if (allocated(tiwinend))  deallocate (tiwinend)
+      allocate (tiwinend(nbin))
+      tiwinend(1) = steps(1)
+      do i = 2, nbin
+         tiwinend(i) = tiwinend(i-1) + steps(i)
       end do
+      call settiblocks
       return
       end
 c
@@ -952,12 +1317,16 @@ c
       use_ti = .false.
       tibin = 0
       tinblock = 0
+      tinbcount = 0
+      tinbsave = 0
+      tinbtot = 0
       tilmda = 1.0d0
-      if (allocated(tinbcount))  deallocate (tinbcount)
-      if (allocated(tinbsave))  deallocate (tinbsave)
+      if (allocated(tiwinend))  deallocate (tiwinend)
       if (allocated(tidedllist))  deallocate (tidedllist)
+      if (allocated(tilmdahist))  deallocate (tilmdahist)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
       if (allocated(tilmdalist))  deallocate (tilmdalist)
+      if (allocated(tifraclist))  deallocate (tifraclist)
       return
       end

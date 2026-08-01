@@ -2948,6 +2948,10 @@ void settisched_(int* ntiwin, int* tinbinset);
 #define tinker_f_settisched settisched_
 void inittidyn_(int* nstep);
 #define tinker_f_inittidyn inittidyn_
+void settiblocks_();
+#define tinker_f_settiblocks settiblocks_
+void settiwindow_();
+#define tinker_f_settiwindow settiwindow_
 void prttihead_();
 #define tinker_f_prttihead prttihead_
 void etidyn_(int* istep);
