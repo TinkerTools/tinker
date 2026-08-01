@@ -31,6 +31,7 @@ c
       call test_mutate_exf
       call test_mutate_emplar
       call test_mutate_qntrng
+      call test_mutate_vcorr
       call test_mutate_rels
       return
       end
@@ -736,6 +737,49 @@ c
 c
 c     #############################################################
 c     ##                                                         ##
+c     ##  subroutine test_mutate_vcorr  --  VDW correction tests  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_mutate_vcorr" runs the four VDW-only water fixtures
+c     142-145 with the long-range VDW correction enabled; cases
+c     142-143 use absolute dual topology at the coupled and decoupled
+c     quintic endpoints, while cases 144-145 use relative dual
+c     topology at the same endpoints; all four support a pairwise
+c     neighbor list and exercise the level 4 lambda derivative checks
+c
+c
+      subroutine test_mutate_vcorr
+      implicit none
+c
+c
+      call test_mutate_calc ('water2',
+     &   '142_water_qnt_vcorr_adt_l10.key',
+     &   '142_water_qnt_vcorr_adt_l10.txt',
+     &   '142_water_qnt_vcorr_adt_l10',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '143_water_qnt_vcorr_adt_l00.key',
+     &   '143_water_qnt_vcorr_adt_l00.txt',
+     &   '143_water_qnt_vcorr_adt_l00',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '144_water_qnt_vcorr_rdt_l10.key',
+     &   '144_water_qnt_vcorr_rdt_l10.txt',
+     &   '144_water_qnt_vcorr_rdt_l10',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '145_water_qnt_vcorr_rdt_l00.key',
+     &   '145_water_qnt_vcorr_rdt_l00.txt',
+     &   '145_water_qnt_vcorr_rdt_l00',
+     &   .false., .false., .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
 c     ##  subroutine test_mutate_rels  --  staged rel dual topo  ##
 c     ##                                                         ##
 c     #############################################################
@@ -883,6 +927,7 @@ c
          eps_e = 1.0d-4
          eps_g = 1.0d-4
          eps_v = 1.0d-3
+         if (index(cname,'_vcorr_') .ne. 0)  eps_v = 1.0d-2
 c
 c     read the reference lambda derivatives for the level 4 checks
 c

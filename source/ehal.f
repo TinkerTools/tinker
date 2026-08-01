@@ -961,15 +961,27 @@ c
 c     compute energy of the fully coupled vlambda = 1 state
 c
       vlambdaorig = vlambda
-      vlambda = 1.0d0
-      call ehal0calc
-      ev1 = ev
+      if (use_vdw4f) then
+         vlambda = 1.0d0
+         call ehal0calc
+         ev1 = ev
+      end if
 c
 c     compute energy of the fully decoupled vlambda = 0 state
 c
-      vlambda = 0.0d0
-      call ehal0calc
-      ev0 = ev
+      if (use_vdw4i) then
+         vlambda = 0.0d0
+         call ehal0calc
+         ev0 = ev
+      end if
+c
+c     copy energy if only one endpoint state is computed
+c
+      if (use_vdw4i .and. .not.use_vdw4f) then
+         ev1 = ev0
+      else if (.not.use_vdw4i .and. use_vdw4f) then
+         ev0 = ev1
+      end if
 c
 c     restore the original vlambda value
 c
@@ -1044,18 +1056,37 @@ c
       real*8 weight1,weight0
 c
 c
-      call submask (.true.,.false.,.true.)
-      call ehal0calc
-      evae = ev
-      call submask (.false.,.true.,.true.)
-      call ehal0calc
-      evbe = ev
-      call submask (.true.,.false.,.false.)
-      call ehal0calc
-      eva = ev
-      call submask (.false.,.true.,.false.)
-      call ehal0calc
-      evb = ev
+c     compute E0 = E(B+environment) + E(A)
+c
+      if (use_vdw4i) then
+         call submask (.false.,.true.,.true.)
+         call ehal0calc
+         evbe = ev
+         call submask (.true.,.false.,.false.)
+         call ehal0calc
+         eva = ev
+      end if
+c
+c     compute E1 = E(A+environment) + E(B)
+c
+      if (use_vdw4f) then
+         call submask (.true.,.false.,.true.)
+         call ehal0calc
+         evae = ev
+         call submask (.false.,.true.,.false.)
+         call ehal0calc
+         evb = ev
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_vdw4i .and. .not.use_vdw4f) then
+         evae = evbe
+         evb = eva
+      else if (.not.use_vdw4i .and. use_vdw4f) then
+         evbe = evae
+         eva = evb
+      end if
       call submask (.true.,.true.,.true.)
       weight1 = vlambda**evdtexp
       weight0 = 1.0d0 - weight1

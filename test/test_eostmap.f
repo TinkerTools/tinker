@@ -243,18 +243,98 @@ c
       call assert_logical (use_pol4f,.true.,
      &                     'mapsublmda qnt pol4f at lower bound')
 c
-c     a non QNT polarization map must leave the flags untouched
+c     QNT electrostatic and van der Waals maps use their own windows
+c     to select the required endpoint states
 c
-      plmdamap = 'EXP'
-      plmdaexp = 2
-      use_pol4i = .false.
-      use_pol4f = .false.
+      ostlambda = 0.1d0
+      call mapsublmda (ostlambda)
+      call assert_logical (use_ele4i,.true.,
+     &                     'mapsublmda qnt ele4i below window')
+      call assert_logical (use_ele4f,.false.,
+     &                     'mapsublmda qnt ele4f below window')
       ostlambda = 0.5d0
       call mapsublmda (ostlambda)
+      call assert_logical (use_ele4i,.true.,
+     &                     'mapsublmda qnt ele4i mid window')
+      call assert_logical (use_ele4f,.true.,
+     &                     'mapsublmda qnt ele4f mid window')
+      ostlambda = 0.9d0
+      call mapsublmda (ostlambda)
+      call assert_logical (use_ele4i,.false.,
+     &                     'mapsublmda qnt ele4i above window')
+      call assert_logical (use_ele4f,.true.,
+     &                     'mapsublmda qnt ele4f above window')
+      ostlambda = qntelmda0
+      call mapsublmda (ostlambda)
+      call assert_logical (use_ele4i,.true.,
+     &                     'mapsublmda qnt ele4i at lower bound')
+      call assert_logical (use_ele4f,.true.,
+     &                     'mapsublmda qnt ele4f at lower bound')
+      ostlambda = qntelmda1
+      call mapsublmda (ostlambda)
+      call assert_logical (use_ele4i,.true.,
+     &                     'mapsublmda qnt ele4i at upper bound')
+      call assert_logical (use_ele4f,.true.,
+     &                     'mapsublmda qnt ele4f at upper bound')
+      ostlambda = 0.0d0
+      call mapsublmda (ostlambda)
+      call assert_logical (use_vdw4i,.true.,
+     &                     'mapsublmda qnt vdw4i below window')
+      call assert_logical (use_vdw4f,.false.,
+     &                     'mapsublmda qnt vdw4f below window')
+      ostlambda = 0.5d0
+      call mapsublmda (ostlambda)
+      call assert_logical (use_vdw4i,.true.,
+     &                     'mapsublmda qnt vdw4i mid window')
+      call assert_logical (use_vdw4f,.true.,
+     &                     'mapsublmda qnt vdw4f mid window')
+      ostlambda = 1.0d0
+      call mapsublmda (ostlambda)
+      call assert_logical (use_vdw4i,.false.,
+     &                     'mapsublmda qnt vdw4i above window')
+      call assert_logical (use_vdw4f,.true.,
+     &                     'mapsublmda qnt vdw4f above window')
+      ostlambda = qntvlmda0
+      call mapsublmda (ostlambda)
+      call assert_logical (use_vdw4i,.true.,
+     &                     'mapsublmda qnt vdw4i at lower bound')
+      call assert_logical (use_vdw4f,.true.,
+     &                     'mapsublmda qnt vdw4f at lower bound')
+      ostlambda = qntvlmda1
+      call mapsublmda (ostlambda)
+      call assert_logical (use_vdw4i,.true.,
+     &                     'mapsublmda qnt vdw4i at upper bound')
+      call assert_logical (use_vdw4f,.true.,
+     &                     'mapsublmda qnt vdw4f at upper bound')
+c
+c     non-QNT maps must leave all endpoint flags untouched
+c
+      plmdamap = 'EXP'
+      elmdamap = 'EXP'
+      vlmdamap = 'EXP'
+      plmdaexp = 2
+      elmdaexp = 2
+      vlmdaexp = 2
+      use_ele4i = .false.
+      use_ele4f = .false.
+      use_pol4i = .false.
+      use_pol4f = .false.
+      use_vdw4i = .false.
+      use_vdw4f = .false.
+      ostlambda = 0.5d0
+      call mapsublmda (ostlambda)
+      call assert_logical (use_ele4i,.false.,
+     &                     'mapsublmda exp leaves ele4i')
+      call assert_logical (use_ele4f,.false.,
+     &                     'mapsublmda exp leaves ele4f')
       call assert_logical (use_pol4i,.false.,
      &                     'mapsublmda exp leaves pol4i')
       call assert_logical (use_pol4f,.false.,
      &                     'mapsublmda exp leaves pol4f')
+      call assert_logical (use_vdw4i,.false.,
+     &                     'mapsublmda exp leaves vdw4i')
+      call assert_logical (use_vdw4f,.false.,
+     &                     'mapsublmda exp leaves vdw4f')
       return
       end
 c

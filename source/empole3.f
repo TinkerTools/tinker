@@ -2382,31 +2382,63 @@ c     compute energy and analysis of the elambda = 1 state
 c
       elambdaorig = elambda
       einterorig = einter
-      call altemdt (1.0d0)
-      call empole3calc
-      em1 = em
-      nem1 = nem
-      exfe1 = exfe
-      do i = 1, n
-         aem1(i) = aem(i)
-      end do
+      if (use_ele4f) then
+         call altemdt (1.0d0)
+         call empole3calc
+         em1 = em
+         nem1 = nem
+         exfe1 = exfe
+         do i = 1, n
+            aem1(i) = aem(i)
+         end do
 c
 c     the intermolecular energy accumulates across energy terms, so
 c     save and remove the contribution from the elambda = 1 state
 c
-      einter1 = einter - einterorig
-      einter = einterorig
+         einter1 = einter - einterorig
+         einter = einterorig
+      end if
 c
 c     compute energy and analysis of the elambda = 0 state
 c
-      call altemdt (0.0d0)
-      call empole3calc
-      em0 = em
-      exfe0 = exfe
-      do i = 1, n
-         aem0(i) = aem(i)
-      end do
-      einter0 = einter - einterorig
+      if (use_ele4i) then
+         call altemdt (0.0d0)
+         call empole3calc
+         em0 = em
+         exfe0 = exfe
+         do i = 1, n
+            aem0(i) = aem(i)
+         end do
+         einter0 = einter - einterorig
+      end if
+c
+c     retain the historical analysis count from the fully coupled
+c     endpoint even when its energy and analysis are not needed
+c
+      if (.not.use_ele4f) then
+         call altemdt (1.0d0)
+         call empole3calc
+         nem1 = nem
+         einter = einterorig
+      end if
+c
+c     copy results if only one endpoint state is computed
+c
+      if (use_ele4i .and. .not.use_ele4f) then
+         em1 = em0
+         exfe1 = exfe0
+         einter1 = einter0
+         do i = 1, n
+            aem1(i) = aem0(i)
+         end do
+      else if (.not.use_ele4i .and. use_ele4f) then
+         em0 = em1
+         exfe0 = exfe1
+         einter0 = einter1
+         do i = 1, n
+            aem0(i) = aem1(i)
+         end do
+      end if
 c
 c     restore original elambda and dependent parameters
 c
@@ -2528,52 +2560,96 @@ c
 c
 c     ligand A coupled to environment, group B fully decoupled
 c
-      call altemdtsub (.true.,.false.,.true.)
-      call empole3calc
-      emae = em
-      nemae = nem
-      exfeae = exfe
-      do i = 1, n
-         aemae(i) = aem(i)
-      end do
-      einterae = einter - einterorig
-      einter = einterorig
+      if (use_ele4f) then
+         call altemdtsub (.true.,.false.,.true.)
+         call empole3calc
+         emae = em
+         nemae = nem
+         exfeae = exfe
+         do i = 1, n
+            aemae(i) = aem(i)
+         end do
+         einterae = einter - einterorig
+         einter = einterorig
+      end if
 c
 c     ligand B coupled to environment, group A fully decoupled
 c
-      call altemdtsub (.false.,.true.,.true.)
-      call empole3calc
-      embe = em
-      exfebe = exfe
-      do i = 1, n
-         aembe(i) = aem(i)
-      end do
-      einterbe = einter - einterorig
-      einter = einterorig
+      if (use_ele4i) then
+         call altemdtsub (.false.,.true.,.true.)
+         call empole3calc
+         embe = em
+         exfebe = exfe
+         do i = 1, n
+            aembe(i) = aem(i)
+         end do
+         einterbe = einter - einterorig
+         einter = einterorig
+      end if
 c
 c     ligand A alone, giving its intramolecular multipole energy
 c
-      call altemdtsub (.true.,.false.,.false.)
-      call empole3calc
-      ema = em
-      exfea = exfe
-      do i = 1, n
-         aema(i) = aem(i)
-      end do
-      eintera = einter - einterorig
-      einter = einterorig
+      if (use_ele4i) then
+         call altemdtsub (.true.,.false.,.false.)
+         call empole3calc
+         ema = em
+         exfea = exfe
+         do i = 1, n
+            aema(i) = aem(i)
+         end do
+         eintera = einter - einterorig
+         einter = einterorig
+      end if
 c
 c     ligand B alone, giving its intramolecular multipole energy
 c
-      call altemdtsub (.false.,.true.,.false.)
-      call empole3calc
-      emb = em
-      exfeb = exfe
-      do i = 1, n
-         aemb(i) = aem(i)
-      end do
-      einterb = einter - einterorig
-      einter = einterorig
+      if (use_ele4f) then
+         call altemdtsub (.false.,.true.,.false.)
+         call empole3calc
+         emb = em
+         exfeb = exfe
+         do i = 1, n
+            aemb(i) = aem(i)
+         end do
+         einterb = einter - einterorig
+         einter = einterorig
+      end if
+c
+c     retain the historical analysis count from the ligand A coupled
+c     endpoint even when its energy and analysis are not needed
+c
+      if (.not.use_ele4f) then
+         call altemdtsub (.true.,.false.,.true.)
+         call empole3calc
+         nemae = nem
+         einter = einterorig
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_ele4i .and. .not.use_ele4f) then
+         emae = embe
+         emb = ema
+         exfeae = exfebe
+         exfeb = exfea
+         einterae = einterbe
+         einterb = eintera
+         do i = 1, n
+            aemae(i) = aembe(i)
+            aemb(i) = aema(i)
+         end do
+      else if (.not.use_ele4i .and. use_ele4f) then
+         embe = emae
+         ema = emb
+         exfebe = exfeae
+         exfea = exfeb
+         einterbe = einterae
+         eintera = einterb
+         do i = 1, n
+            aembe(i) = aemae(i)
+            aema(i) = aemb(i)
+         end do
+      end if
 c
 c     restore the original full system parameters
 c

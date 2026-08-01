@@ -75,11 +75,20 @@ c
          d2vldlmda2 = -d2taper
       end if
 c
-c     set flags to compute polarization lambda derivative
+c     select the dual topology endpoints needed by QNT maps; both
+c     endpoints remain active on and within each switching window
 c
+      if (elmdamap .eq. 'QNT') then
+         use_ele4i = (lmda .le. qntelmda1)
+         use_ele4f = (lmda .ge. qntelmda0)
+      end if
       if (plmdamap .eq. 'QNT') then
          use_pol4i = (lmda .le. qntplmda1)
          use_pol4f = (lmda .ge. qntplmda0)
+      end if
+      if (vlmdamap .eq. 'QNT') then
+         use_vdw4i = (lmda .le. qntvlmda1)
+         use_vdw4f = (lmda .ge. qntvlmda0)
       end if
       return
       end
@@ -164,8 +173,12 @@ c
 c     the staged routines branch on "relstagemix" instead of the
 c     quantized endpoint flags, so leave the flags fully open
 c
+      use_ele4i = .true.
+      use_ele4f = .true.
       use_pol4i = .true.
       use_pol4f = .true.
+      use_vdw4i = .true.
+      use_vdw4f = .true.
       return
       end
 c

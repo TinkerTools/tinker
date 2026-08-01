@@ -1782,35 +1782,67 @@ c
 c     compute energy and derivatives of the vlambda = 1 state
 c
       vlambdaorig = vlambda
-      vlambda = 1.0d0
-      call ehal1calc
-      ev1 = ev
-      do i = 1, n
-         do j = 1, 3
-            dev1(j,i) = dev(j,i)
+      if (use_vdw4f) then
+         vlambda = 1.0d0
+         call ehal1calc
+         ev1 = ev
+         do i = 1, n
+            do j = 1, 3
+               dev1(j,i) = dev(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvir1(j,i) = evvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               evvir1(j,i) = evvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     compute energy and derivatives of the vlambda = 0 state
 c
-      vlambda = 0.0d0
-      call ehal1calc
-      ev0 = ev
-      do i = 1, n
-         do j = 1, 3
-            dev0(j,i) = dev(j,i)
+      if (use_vdw4i) then
+         vlambda = 0.0d0
+         call ehal1calc
+         ev0 = ev
+         do i = 1, n
+            do j = 1, 3
+               dev0(j,i) = dev(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvir0(j,i) = evvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               evvir0(j,i) = evvir(j,i)
+            end do
          end do
-      end do
+      end if
+c
+c     copy results if only one endpoint state is computed
+c
+      if (use_vdw4i .and. .not.use_vdw4f) then
+         ev1 = ev0
+         do i = 1, n
+            do j = 1, 3
+               dev1(j,i) = dev0(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               evvir1(j,i) = evvir0(j,i)
+            end do
+         end do
+      else if (.not.use_vdw4i .and. use_vdw4f) then
+         ev0 = ev1
+         do i = 1, n
+            do j = 1, 3
+               dev0(j,i) = dev1(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               evvir0(j,i) = evvir1(j,i)
+            end do
+         end do
+      end if
 c
 c     restore the original vlambda value
 c
@@ -1915,67 +1947,109 @@ c
 c
 c     ligand A coupled to environment, group B fully decoupled
 c
-      call submask (.true.,.false.,.true.)
-      call ehal1calc
-      evae = ev
-      do i = 1, n
-         do j = 1, 3
-            devae(j,i) = dev(j,i)
+      if (use_vdw4f) then
+         call submask (.true.,.false.,.true.)
+         call ehal1calc
+         evae = ev
+         do i = 1, n
+            do j = 1, 3
+               devae(j,i) = dev(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvirae(j,i) = evvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               evvirae(j,i) = evvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand B coupled to environment, group A fully decoupled
 c
-      call submask (.false.,.true.,.true.)
-      call ehal1calc
-      evbe = ev
-      do i = 1, n
-         do j = 1, 3
-            devbe(j,i) = dev(j,i)
+      if (use_vdw4i) then
+         call submask (.false.,.true.,.true.)
+         call ehal1calc
+         evbe = ev
+         do i = 1, n
+            do j = 1, 3
+               devbe(j,i) = dev(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvirbe(j,i) = evvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               evvirbe(j,i) = evvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand A alone, giving its intramolecular van der Waals energy
 c
-      call submask (.true.,.false.,.false.)
-      call ehal1calc
-      eva = ev
-      do i = 1, n
-         do j = 1, 3
-            deva(j,i) = dev(j,i)
+      if (use_vdw4i) then
+         call submask (.true.,.false.,.false.)
+         call ehal1calc
+         eva = ev
+         do i = 1, n
+            do j = 1, 3
+               deva(j,i) = dev(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvira(j,i) = evvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               evvira(j,i) = evvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand B alone, giving its intramolecular van der Waals energy
 c
-      call submask (.false.,.true.,.false.)
-      call ehal1calc
-      evb = ev
-      do i = 1, n
-         do j = 1, 3
-            devb(j,i) = dev(j,i)
+      if (use_vdw4f) then
+         call submask (.false.,.true.,.false.)
+         call ehal1calc
+         evb = ev
+         do i = 1, n
+            do j = 1, 3
+               devb(j,i) = dev(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvirb(j,i) = evvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               evvirb(j,i) = evvir(j,i)
+            end do
          end do
-      end do
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_vdw4i .and. .not.use_vdw4f) then
+         evae = evbe
+         evb = eva
+         do i = 1, n
+            do j = 1, 3
+               devae(j,i) = devbe(j,i)
+               devb(j,i) = deva(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               evvirae(j,i) = evvirbe(j,i)
+               evvirb(j,i) = evvira(j,i)
+            end do
+         end do
+      else if (.not.use_vdw4i .and. use_vdw4f) then
+         evbe = evae
+         eva = evb
+         do i = 1, n
+            do j = 1, 3
+               devbe(j,i) = devae(j,i)
+               deva(j,i) = devb(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               evvirbe(j,i) = evvirae(j,i)
+               evvira(j,i) = evvirb(j,i)
+            end do
+         end do
+      end if
 c
 c     restore full system and interpolate the dual topology result
 c

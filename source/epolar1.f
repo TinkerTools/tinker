@@ -9923,67 +9923,109 @@ c
 c
 c     ligand A coupled to environment, group B fully decoupled
 c
-      call altpolrsub (.true.,.false.,.true.)
-      call epolar1calc
-      epae = ep
-      do i = 1, n
-         do j = 1, 3
-            depae(j,i) = dep(j,i)
+      if (use_pol4f) then
+         call altpolrsub (.true.,.false.,.true.)
+         call epolar1calc
+         epae = ep
+         do i = 1, n
+            do j = 1, 3
+               depae(j,i) = dep(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvirae(j,i) = epvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               epvirae(j,i) = epvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand B coupled to environment, group A fully decoupled
 c
-      call altpolrsub (.false.,.true.,.true.)
-      call epolar1calc
-      epbe = ep
-      do i = 1, n
-         do j = 1, 3
-            depbe(j,i) = dep(j,i)
+      if (use_pol4i) then
+         call altpolrsub (.false.,.true.,.true.)
+         call epolar1calc
+         epbe = ep
+         do i = 1, n
+            do j = 1, 3
+               depbe(j,i) = dep(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvirbe(j,i) = epvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               epvirbe(j,i) = epvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand A alone, giving its intramolecular polarization energy
 c
-      call altpolrsub (.true.,.false.,.false.)
-      call epolar1calc
-      epa = ep
-      do i = 1, n
-         do j = 1, 3
-            depa(j,i) = dep(j,i)
+      if (use_pol4i) then
+         call altpolrsub (.true.,.false.,.false.)
+         call epolar1calc
+         epa = ep
+         do i = 1, n
+            do j = 1, 3
+               depa(j,i) = dep(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvira(j,i) = epvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               epvira(j,i) = epvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand B alone, giving its intramolecular polarization energy
 c
-      call altpolrsub (.false.,.true.,.false.)
-      call epolar1calc
-      epb = ep
-      do i = 1, n
-         do j = 1, 3
-            depb(j,i) = dep(j,i)
+      if (use_pol4f) then
+         call altpolrsub (.false.,.true.,.false.)
+         call epolar1calc
+         epb = ep
+         do i = 1, n
+            do j = 1, 3
+               depb(j,i) = dep(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvirb(j,i) = epvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               epvirb(j,i) = epvir(j,i)
+            end do
          end do
-      end do
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_pol4i .and. .not.use_pol4f) then
+         epae = epbe
+         epb = epa
+         do i = 1, n
+            do j = 1, 3
+               depae(j,i) = depbe(j,i)
+               depb(j,i) = depa(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               epvirae(j,i) = epvirbe(j,i)
+               epvirb(j,i) = epvira(j,i)
+            end do
+         end do
+      else if (.not.use_pol4i .and. use_pol4f) then
+         epbe = epae
+         epa = epb
+         do i = 1, n
+            do j = 1, 3
+               depbe(j,i) = depae(j,i)
+               depa(j,i) = depb(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               epvirbe(j,i) = epvirae(j,i)
+               epvira(j,i) = epvirb(j,i)
+            end do
+         end do
+      end if
 c
 c     restore full system and interpolate the dual topology result
 c

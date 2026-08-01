@@ -1975,15 +1975,27 @@ c
 c     compute energy of the fully coupled elambda = 1 state
 c
       elambdaorig = elambda
-      call altemdt (1.0d0)
-      call empole0calc
-      em1 = em
+      if (use_ele4f) then
+         call altemdt (1.0d0)
+         call empole0calc
+         em1 = em
+      end if
 c
 c     compute energy of the fully decoupled elambda = 0 state
 c
-      call altemdt (0.0d0)
-      call empole0calc
-      em0 = em
+      if (use_ele4i) then
+         call altemdt (0.0d0)
+         call empole0calc
+         em0 = em
+      end if
+c
+c     copy energy if only one endpoint state is computed
+c
+      if (use_ele4i .and. .not.use_ele4f) then
+         em1 = em0
+      else if (.not.use_ele4i .and. use_ele4f) then
+         em0 = em1
+      end if
 c
 c     restore original elambda and dependent parameters
 c
@@ -2067,18 +2079,37 @@ c
       real*8 weight1,weight0
 c
 c
-      call altemdtsub (.true.,.false.,.true.)
-      call empole0calc
-      emae = em
-      call altemdtsub (.false.,.true.,.true.)
-      call empole0calc
-      embe = em
-      call altemdtsub (.true.,.false.,.false.)
-      call empole0calc
-      ema = em
-      call altemdtsub (.false.,.true.,.false.)
-      call empole0calc
-      emb = em
+c     compute E0 = E(B+environment) + E(A)
+c
+      if (use_ele4i) then
+         call altemdtsub (.false.,.true.,.true.)
+         call empole0calc
+         embe = em
+         call altemdtsub (.true.,.false.,.false.)
+         call empole0calc
+         ema = em
+      end if
+c
+c     compute E1 = E(A+environment) + E(B)
+c
+      if (use_ele4f) then
+         call altemdtsub (.true.,.false.,.true.)
+         call empole0calc
+         emae = em
+         call altemdtsub (.false.,.true.,.false.)
+         call empole0calc
+         emb = em
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_ele4i .and. .not.use_ele4f) then
+         emae = embe
+         emb = ema
+      else if (.not.use_ele4i .and. use_ele4f) then
+         embe = emae
+         ema = emb
+      end if
       call altemdtsub (.true.,.true.,.true.)
       weight1 = elambda**emdtexp
       weight0 = 1.0d0 - weight1

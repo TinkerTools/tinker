@@ -1207,29 +1207,59 @@ c     compute energy and analysis of the vlambda = 1 state
 c
       vlambdaorig = vlambda
       einterorig = einter
-      vlambda = 1.0d0
-      call ehal3calc
-      ev1 = ev
-      nev1 = nev
-      do i = 1, n
-         aev1(i) = aev(i)
-      end do
+      if (use_vdw4f) then
+         vlambda = 1.0d0
+         call ehal3calc
+         ev1 = ev
+         nev1 = nev
+         do i = 1, n
+            aev1(i) = aev(i)
+         end do
 c
 c     the intermolecular energy accumulates across energy terms, so
 c     save and remove the contribution from the vlambda = 1 state
 c
-      einter1 = einter - einterorig
-      einter = einterorig
+         einter1 = einter - einterorig
+         einter = einterorig
+      end if
 c
 c     compute energy and analysis of the vlambda = 0 state
 c
-      vlambda = 0.0d0
-      call ehal3calc
-      ev0 = ev
-      do i = 1, n
-         aev0(i) = aev(i)
-      end do
-      einter0 = einter - einterorig
+      if (use_vdw4i) then
+         vlambda = 0.0d0
+         call ehal3calc
+         ev0 = ev
+         do i = 1, n
+            aev0(i) = aev(i)
+         end do
+         einter0 = einter - einterorig
+      end if
+c
+c     retain the historical analysis count from the fully coupled
+c     endpoint even when its energy and analysis are not needed
+c
+      if (.not.use_vdw4f) then
+         vlambda = 1.0d0
+         call ehal3calc
+         nev1 = nev
+         einter = einterorig
+      end if
+c
+c     copy results if only one endpoint state is computed
+c
+      if (use_vdw4i .and. .not.use_vdw4f) then
+         ev1 = ev0
+         einter1 = einter0
+         do i = 1, n
+            aev1(i) = aev0(i)
+         end do
+      else if (.not.use_vdw4i .and. use_vdw4f) then
+         ev0 = ev1
+         einter0 = einter1
+         do i = 1, n
+            aev0(i) = aev1(i)
+         end do
+      end if
 c
 c     restore the original vlambda value
 c
@@ -1357,48 +1387,88 @@ c
 c
 c     ligand A coupled to environment, group B fully decoupled
 c
-      call submask (.true.,.false.,.true.)
-      call ehal3calc
-      evae = ev
-      nevae = nev
-      do i = 1, n
-         aevae(i) = aev(i)
-      end do
-      einterae = einter - einterorig
-      einter = einterorig
+      if (use_vdw4f) then
+         call submask (.true.,.false.,.true.)
+         call ehal3calc
+         evae = ev
+         nevae = nev
+         do i = 1, n
+            aevae(i) = aev(i)
+         end do
+         einterae = einter - einterorig
+         einter = einterorig
+      end if
 c
 c     ligand B coupled to environment, group A fully decoupled
 c
-      call submask (.false.,.true.,.true.)
-      call ehal3calc
-      evbe = ev
-      do i = 1, n
-         aevbe(i) = aev(i)
-      end do
-      einterbe = einter - einterorig
-      einter = einterorig
+      if (use_vdw4i) then
+         call submask (.false.,.true.,.true.)
+         call ehal3calc
+         evbe = ev
+         do i = 1, n
+            aevbe(i) = aev(i)
+         end do
+         einterbe = einter - einterorig
+         einter = einterorig
+      end if
 c
 c     ligand A alone, giving its intramolecular van der Waals energy
 c
-      call submask (.true.,.false.,.false.)
-      call ehal3calc
-      eva = ev
-      do i = 1, n
-         aeva(i) = aev(i)
-      end do
-      eintera = einter - einterorig
-      einter = einterorig
+      if (use_vdw4i) then
+         call submask (.true.,.false.,.false.)
+         call ehal3calc
+         eva = ev
+         do i = 1, n
+            aeva(i) = aev(i)
+         end do
+         eintera = einter - einterorig
+         einter = einterorig
+      end if
 c
 c     ligand B alone, giving its intramolecular van der Waals energy
 c
-      call submask (.false.,.true.,.false.)
-      call ehal3calc
-      evb = ev
-      do i = 1, n
-         aevb(i) = aev(i)
-      end do
-      einterb = einter - einterorig
-      einter = einterorig
+      if (use_vdw4f) then
+         call submask (.false.,.true.,.false.)
+         call ehal3calc
+         evb = ev
+         do i = 1, n
+            aevb(i) = aev(i)
+         end do
+         einterb = einter - einterorig
+         einter = einterorig
+      end if
+c
+c     retain the historical analysis count from the ligand A coupled
+c     endpoint even when its energy and analysis are not needed
+c
+      if (.not.use_vdw4f) then
+         call submask (.true.,.false.,.true.)
+         call ehal3calc
+         nevae = nev
+         einter = einterorig
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_vdw4i .and. .not.use_vdw4f) then
+         evae = evbe
+         evb = eva
+         einterae = einterbe
+         einterb = eintera
+         do i = 1, n
+            aevae(i) = aevbe(i)
+            aevb(i) = aeva(i)
+         end do
+      else if (.not.use_vdw4i .and. use_vdw4f) then
+         evbe = evae
+         eva = evb
+         einterbe = einterae
+         eintera = einterb
+         do i = 1, n
+            aevbe(i) = aevae(i)
+            aeva(i) = aevb(i)
+         end do
+      end if
 c
 c     restore full system and interpolate the dual topology result
 c

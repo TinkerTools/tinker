@@ -2682,40 +2682,75 @@ c
 c
 c     ligand A coupled to environment, group B fully decoupled
 c
-      call altpolrsub (.true.,.false.,.true.)
-      call epolar3calc
-      epae = ep
-      nepae = nep
-      do i = 1, n
-         aepae(i) = aep(i)
-      end do
+      if (use_pol4f) then
+         call altpolrsub (.true.,.false.,.true.)
+         call epolar3calc
+         epae = ep
+         nepae = nep
+         do i = 1, n
+            aepae(i) = aep(i)
+         end do
+      end if
 c
 c     ligand B coupled to environment, group A fully decoupled
 c
-      call altpolrsub (.false.,.true.,.true.)
-      call epolar3calc
-      epbe = ep
-      do i = 1, n
-         aepbe(i) = aep(i)
-      end do
+      if (use_pol4i) then
+         call altpolrsub (.false.,.true.,.true.)
+         call epolar3calc
+         epbe = ep
+         do i = 1, n
+            aepbe(i) = aep(i)
+         end do
+      end if
 c
 c     ligand A alone, giving its intramolecular polarization energy
 c
-      call altpolrsub (.true.,.false.,.false.)
-      call epolar3calc
-      epa = ep
-      do i = 1, n
-         aepa(i) = aep(i)
-      end do
+      if (use_pol4i) then
+         call altpolrsub (.true.,.false.,.false.)
+         call epolar3calc
+         epa = ep
+         do i = 1, n
+            aepa(i) = aep(i)
+         end do
+      end if
 c
 c     ligand B alone, giving its intramolecular polarization energy
 c
-      call altpolrsub (.false.,.true.,.false.)
-      call epolar3calc
-      epb = ep
-      do i = 1, n
-         aepb(i) = aep(i)
-      end do
+      if (use_pol4f) then
+         call altpolrsub (.false.,.true.,.false.)
+         call epolar3calc
+         epb = ep
+         do i = 1, n
+            aepb(i) = aep(i)
+         end do
+      end if
+c
+c     retain the historical analysis count from the ligand A coupled
+c     endpoint even when its energy and analysis are not needed
+c
+      if (.not.use_pol4f) then
+         call altpolrsub (.true.,.false.,.true.)
+         call epolar3calc
+         nepae = nep
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_pol4i .and. .not.use_pol4f) then
+         epae = epbe
+         epb = epa
+         do i = 1, n
+            aepae(i) = aepbe(i)
+            aepb(i) = aepa(i)
+         end do
+      else if (.not.use_pol4i .and. use_pol4f) then
+         epbe = epae
+         epa = epb
+         do i = 1, n
+            aepbe(i) = aepae(i)
+            aepa(i) = aepb(i)
+         end do
+      end if
 c
 c     restore full system and interpolate the dual topology result
 c

@@ -5237,35 +5237,67 @@ c
 c     compute energy and derivatives of the elambda = 1 state
 c
       elambdaorig = elambda
-      call altemdt (1.0d0)
-      call empole1calc
-      em1 = em
-      do i = 1, n
-         do j = 1, 3
-            dem1(j,i) = dem(j,i)
+      if (use_ele4f) then
+         call altemdt (1.0d0)
+         call empole1calc
+         em1 = em
+         do i = 1, n
+            do j = 1, 3
+               dem1(j,i) = dem(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir1(j,i) = emvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               emvir1(j,i) = emvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     compute energy and derivatives of the elambda = 0 state
 c
-      call altemdt (0.0d0)
-      call empole1calc
-      em0 = em
-      do i = 1, n
-         do j = 1, 3
-            dem0(j,i) = dem(j,i)
+      if (use_ele4i) then
+         call altemdt (0.0d0)
+         call empole1calc
+         em0 = em
+         do i = 1, n
+            do j = 1, 3
+               dem0(j,i) = dem(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir0(j,i) = emvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               emvir0(j,i) = emvir(j,i)
+            end do
          end do
-      end do
+      end if
+c
+c     copy results if only one endpoint state is computed
+c
+      if (use_ele4i .and. .not.use_ele4f) then
+         em1 = em0
+         do i = 1, n
+            do j = 1, 3
+               dem1(j,i) = dem0(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvir1(j,i) = emvir0(j,i)
+            end do
+         end do
+      else if (.not.use_ele4i .and. use_ele4f) then
+         em0 = em1
+         do i = 1, n
+            do j = 1, 3
+               dem0(j,i) = dem1(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvir0(j,i) = emvir1(j,i)
+            end do
+         end do
+      end if
 c
 c     restore original elambda and dependent parameters
 c
@@ -5373,67 +5405,109 @@ c
 c
 c     ligand A coupled to environment, group B fully decoupled
 c
-      call altemdtsub (.true.,.false.,.true.)
-      call empole1calc
-      emae = em
-      do i = 1, n
-         do j = 1, 3
-            demae(j,i) = dem(j,i)
+      if (use_ele4f) then
+         call altemdtsub (.true.,.false.,.true.)
+         call empole1calc
+         emae = em
+         do i = 1, n
+            do j = 1, 3
+               demae(j,i) = dem(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvirae(j,i) = emvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               emvirae(j,i) = emvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand B coupled to environment, group A fully decoupled
 c
-      call altemdtsub (.false.,.true.,.true.)
-      call empole1calc
-      embe = em
-      do i = 1, n
-         do j = 1, 3
-            dembe(j,i) = dem(j,i)
+      if (use_ele4i) then
+         call altemdtsub (.false.,.true.,.true.)
+         call empole1calc
+         embe = em
+         do i = 1, n
+            do j = 1, 3
+               dembe(j,i) = dem(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvirbe(j,i) = emvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               emvirbe(j,i) = emvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand A alone, giving its intramolecular multipole energy
 c
-      call altemdtsub (.true.,.false.,.false.)
-      call empole1calc
-      ema = em
-      do i = 1, n
-         do j = 1, 3
-            dema(j,i) = dem(j,i)
+      if (use_ele4i) then
+         call altemdtsub (.true.,.false.,.false.)
+         call empole1calc
+         ema = em
+         do i = 1, n
+            do j = 1, 3
+               dema(j,i) = dem(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvira(j,i) = emvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               emvira(j,i) = emvir(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     ligand B alone, giving its intramolecular multipole energy
 c
-      call altemdtsub (.false.,.true.,.false.)
-      call empole1calc
-      emb = em
-      do i = 1, n
-         do j = 1, 3
-            demb(j,i) = dem(j,i)
+      if (use_ele4f) then
+         call altemdtsub (.false.,.true.,.false.)
+         call empole1calc
+         emb = em
+         do i = 1, n
+            do j = 1, 3
+               demb(j,i) = dem(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvirb(j,i) = emvir(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               emvirb(j,i) = emvir(j,i)
+            end do
          end do
-      end do
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_ele4i .and. .not.use_ele4f) then
+         emae = embe
+         emb = ema
+         do i = 1, n
+            do j = 1, 3
+               demae(j,i) = dembe(j,i)
+               demb(j,i) = dema(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvirae(j,i) = emvirbe(j,i)
+               emvirb(j,i) = emvira(j,i)
+            end do
+         end do
+      else if (.not.use_ele4i .and. use_ele4f) then
+         embe = emae
+         ema = emb
+         do i = 1, n
+            do j = 1, 3
+               dembe(j,i) = demae(j,i)
+               dema(j,i) = demb(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               emvirbe(j,i) = emvirae(j,i)
+               emvira(j,i) = emvirb(j,i)
+            end do
+         end do
+      end if
 c
 c     restore the original full system parameters
 c

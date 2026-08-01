@@ -2269,18 +2269,37 @@ c
       real*8 plambdaexp
 c
 c
-      call altpolrsub (.true.,.false.,.true.)
-      call epolar0calc
-      epae = ep
-      call altpolrsub (.false.,.true.,.true.)
-      call epolar0calc
-      epbe = ep
-      call altpolrsub (.true.,.false.,.false.)
-      call epolar0calc
-      epa = ep
-      call altpolrsub (.false.,.true.,.false.)
-      call epolar0calc
-      epb = ep
+c     compute E0 = E(B+environment) + E(A)
+c
+      if (use_pol4i) then
+         call altpolrsub (.false.,.true.,.true.)
+         call epolar0calc
+         epbe = ep
+         call altpolrsub (.true.,.false.,.false.)
+         call epolar0calc
+         epa = ep
+      end if
+c
+c     compute E1 = E(A+environment) + E(B)
+c
+      if (use_pol4f) then
+         call altpolrsub (.true.,.false.,.true.)
+         call epolar0calc
+         epae = ep
+         call altpolrsub (.false.,.true.,.false.)
+         call epolar0calc
+         epb = ep
+      end if
+c
+c     alias the omitted composite endpoint to the computed endpoint
+c
+      if (use_pol4i .and. .not.use_pol4f) then
+         epae = epbe
+         epb = epa
+      else if (.not.use_pol4i .and. use_pol4f) then
+         epbe = epae
+         epa = epb
+      end if
       call altpolrsub (.true.,.true.,.true.)
       plambdaexp = plambda**epdtexp
       ep1 = epae + epb

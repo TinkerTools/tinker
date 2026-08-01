@@ -223,10 +223,14 @@ c
       ostfriction = 0.01d0
       ostdt = 0.001d0
 c
-c     set default flag to compute specific lambda deriv
+c     enable both dual topology endpoints by default
 c
-      use_pol4i = .false.
-      use_pol4f = .false.
+      use_ele4i = .true.
+      use_ele4f = .true.
+      use_pol4i = .true.
+      use_pol4f = .true.
+      use_vdw4i = .true.
+      use_vdw4f = .true.
 c
 c     set default ost lambda bin values
 c
@@ -583,12 +587,20 @@ c
          end if
       end if
 c
-c     lambda derivatives of polarization require dual topology
+c     enable both endpoints for each active dual term by default
 c
       if (use_dlmda)  use_epdt = .true.
+      if (use_emdt) then
+         use_ele4i = .true.
+         use_ele4f = .true.
+      end if
       if (use_epdt) then
          use_pol4i = .true.
          use_pol4f = .true.
+      end if
+      if (use_evdt) then
+         use_vdw4i = .true.
+         use_vdw4f = .true.
       end if
 c
 c     validate mapping schemes from main lambda to sublambdas

@@ -84,8 +84,12 @@ c     set flag to use lambda derivative
 c
       use_dlmda = .true.
       use_epdt = .true.
+      use_ele4i = .true.
+      use_ele4f = .true.
       use_pol4i = .true.
       use_pol4f = .true.
+      use_vdw4i = .true.
+      use_vdw4f = .true.
 c
 c     decide whether to do an analytical derivative calculation
 c
