@@ -32,42 +32,26 @@ c     Potential", PNAS, 105, 6290-6295 (2008)
 c
 c
       subroutine mutate
-      use angbnd
-      use atomid
       use atoms
       use bndstr
-      use cflux
-      use charge
-      use chgpen
-      use dipole
       use dlmda
       use inform
       use iounit
       use katoms
       use keys
-      use math
-      use mplpot
-      use mpole
       use mutant
       use ost
-      use polar
       use potent
       use thrmint
       implicit none
       integer i,j,k,ihyb
       integer it0,it1
-      integer k1,k2
       integer igrp
       integer next,size
-      integer ntbnd,ntiwin
+      integer ntbnd
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
-      real*8 eps
-      real*8 frac
-      real*8 temp
       logical setplambda
-      logical tinbinset
-      logical uselmdachain
       character*20 keyword
       character*240 record
       character*240 string
@@ -116,137 +100,6 @@ c
       scexp = 5.0d0
       scalpha = 0.7d0
 c
-c     flag for use of lambda derivative
-c
-      use_dlmda = .false.
-      use_emdt = .false.
-      use_epdt = .false.
-      use_evdt = .false.
-      use_meta = .false.
-      use_metadyn = .false.
-      use_ost = .false.
-      use_ostdyn = .false.
-      use_plmda = .false.
-      use_ti = .false.
-      nosthistsave = 0
-      nmethistsave = 0
-c
-c     set defaults for thermodynamic integration windows
-c
-      tibin = 0
-      tinbin = 21
-      tinblock = 0
-      tinbcount = 0
-      tinbsave = 0
-      tinbtot = 0
-      tinequil = 0
-      tinstepavg = 100
-      tiwindow = 0
-      tieqratio = 0.5d0
-      tilmda = 1.0d0
-c
-c     set defaults describing the flavor of the lambda calculation
-c
-      lmdaengymode = 'ABS'
-      lmdasampmode = 'NONE'
-c
-c     set defaults for dual topology
-c
-      emdtexp = 1
-      epdtexp = 1
-      evdtexp = 1
-c
-c     set default ost update intervals
-c
-      iost = 0
-      iosthist = 10
-      ostnequil = 5
-      ostnavg = 5
-      ostddgdl = 0.0d0
-      ostdgdl = 0.0d0
-      osteqratio = 0.5d0
-c
-c     set default criteria for judging convergence of a deposit
-c
-      ostcvbin = 2
-      ostcvdif = 25.0d0
-      ostcvrat = 0.1d0
-      ostcvslp = 1.0d0
-      ostcvstd = 10.0d0
-c
-c     set defaults for tempering of the deposited gaussian heights
-c
-      ostemper = .false.
-      tempergamma = 1.0d0
-      temperthresh = 1.0d0
-c
-c     set defaults for the staged relative free energy schedule
-c
-      use_relstage = .false.
-      relstg1lmda0 = 0.0d0
-      relstg1lmda1 = 0.3d0
-      relstg2lmda0 = 0.7d0
-      relstg2lmda1 = 1.0d0
-      relstage = 'VDWM'
-      relstagemix = .false.
-c
-c     set default mapping from main lambda to sublambda
-c
-      qntelmda1 = 0.8d0
-      qntelmda0 = 0.3d0
-      qntplmda1 = 1.0d0
-      qntplmda0 = 0.5d0
-      qntvlmda1 = 0.5d0
-      qntvlmda0 = 0.0d0
-      elmdamap = 'QNT'
-      plmdamap = 'QNT'
-      vlmdamap = 'QNT'
-      elmdaexp = 1
-      plmdaexp = 1
-      vlmdaexp = 1
-      elmdainvn = 4
-      plmdainvn = 4
-      vlmdainvn = 4
-      elmdainveps = 0.3d0
-      plmdainveps = 0.3d0
-      vlmdainveps = 0.3d0
-      ostlambda = 1.0d0
-      ostlambdaavg = 0.0d0
-      ostlambdastd = 0.0d0
-      ostdedlavg = 0.0d0
-      ostdedlstd = 0.0d0
-      ostdedl = 0.0d0
-      deffdl = 0.0d0
-      osttheta = pi / 2.0d0
-      ostvtheta = 0.0d0
-      ostmass = 25.0d0
-      ostfriction = 0.01d0
-      ostdt = 0.001d0
-c
-c     enable both dual topology endpoints by default
-c
-      use_ele4i = .true.
-      use_ele4f = .true.
-      use_pol4i = .true.
-      use_pol4f = .true.
-      use_vdw4i = .true.
-      use_vdw4f = .true.
-c
-c     set default ost lambda bin values
-c
-      nlmda = 201
-      nflmda = 1001
-      wflmda = 1.0d0
-      wlhist = 0.005d0
-      wfhist = 1.0d0
-      fli0 = (nflmda + 1) / 2 + (nflmda - 1) / 4
-      hbias = 0.00001d0
-      oststdev = 4.0d0
-      eosttot = 0.0d0
-      nmetahist = 0
-      fastkernel = .true.
-      ostinterpol = .false.
-c
 c     zero out number of hybrid atoms and mutated torsions
 c
       nmut = 0
@@ -263,19 +116,6 @@ c
          itbnd(1,i) = 0
          itbnd(2,i) = 0
       end do
-c
-c     size the lambda window schedule to the worst case
-c
-      if (allocated(tilmdalist))  deallocate (tilmdalist)
-      if (allocated(tifraclist))  deallocate (tifraclist)
-      allocate (tilmdalist(max(1,nkey)))
-      allocate (tifraclist(max(1,nkey)))
-      do i = 1, max(1,nkey)
-         tilmdalist(i) = 0.0d0
-         tifraclist(i) = -1.0d0
-      end do
-      ntiwin = 0
-      tinbinset = .false.
 c
 c     search keywords for free energy perturbation options
 c
@@ -302,21 +142,6 @@ c
             read (string,*,err=30)  tlambda
          else if (keyword(1:15) .eq. 'VDW-ANNIHILATE ') then
             vcouple = 1
-         else if (keyword(1:13) .eq. 'ELE-DUALTOPO ') then
-            use_emdt = .true.
-         else if (keyword(1:17) .eq. 'ELE-DUALTOPO-EXP ') then
-            string = record(next:240)
-            read (string,*,err=30)  emdtexp
-         else if (keyword(1:13) .eq. 'POL-DUALTOPO ') then
-            use_epdt = .true.
-         else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
-            string = record(next:240)
-            read (string,*,err=30)  epdtexp
-         else if (keyword(1:13) .eq. 'VDW-DUALTOPO ') then
-            use_evdt = .true.
-         else if (keyword(1:17) .eq. 'VDW-DUALTOPO-EXP ') then
-            string = record(next:240)
-            read (string,*,err=30)  evdtexp
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:240)
             read (string,*,err=30)  ihyb,it0,it1
@@ -368,7 +193,213 @@ c
                itbnd(2,ntbnd) = list(k+1)
                k = k + 2
             end do
-         else if (keyword(1:13) .eq. 'LAMBDA-DERIV ') then
+         end if
+   30    continue
+      end do
+c
+c     set plambda to elambda if no values given
+c
+      if (.not. setplambda)  plambda = elambda
+c
+c     a second ligand group makes the free energy a relative one
+c
+      use_rel = (nmutb .gt. 0)
+c
+c     turn off hybrid potentials if no sites are mutated
+c
+      use_mutate = .true.
+      if (nmut .eq. 0)  use_mutate = .false.
+c
+c     set the options for each flavor of the lambda calculation
+c
+      call mutate_dlmda
+      call mutate_ost
+      call mutate_meta
+      call mutate_ti
+      call mutate_check
+c
+c     get mapping from main lambda to sub-lambdas
+c
+      if (use_ost .or. use_meta) then
+         call mapsublmda (ostlambda)
+      else if (use_ti) then
+         call mapsublmda (tilmda)
+      end if
+c
+c     scale electrostatic parameter values based on lambda
+c
+      if (.not.use_rel .and.
+     &    elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
+         call altelec
+      end if
+c
+c     scale torsional parameter values based on lambda
+c
+      if (.not.use_rel .and.
+     &    tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0) then
+         if (ntbnd .ne. 0)  call alttors (ntbnd,itbnd)
+      end if
+c
+c     scale implicit solvation parameter values based on lambda
+c
+      if (.not.use_rel .and.
+     &    elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
+         call altsolv
+      end if
+c
+c     write status of current hybrid potential lambda values
+c
+      if (use_mutate .and. .not.silent) then
+         write (iout,50)
+   50    format (/,' Free Energy Perturbation Parameters :')
+         write (iout,60)  nmut,vlambda,elambda,plambda,tlambda
+   60    format (/,' Number of FEP Hybrid Atoms',9x,i8,
+     &           /,' van der Waals Lambda Value',9x,f8.3,
+     &           /,' Electrostatics Lambda Value',8x,f8.3,
+     &           /,' Polarization Lambda Value',10x,f8.3,
+     &           /,' Torsion Angle Lambda Value',9x,f8.3)
+         if (use_dlmda) then
+            write (iout,70)
+   70       format (/,' Lambda Sampling Mode',8x,'Lambda Dynamics')
+         else
+            write (iout,80)
+   80       format (/,' Lambda Sampling Mode',11x,'Fixed Lambda')
+         end if
+         if (use_plmda) then
+            write (iout,90)
+   90       format (' Polarization Lambda Decoupled from',
+     &              ' Electrostatics Lambda')
+         end if
+         if (use_rel) then
+            write (iout,100)  nmut-nmutb,nmutb
+  100       format (/,' Relative Dual Topology Active :',
+     &              /,' Number of Ligand1 Atoms',12x,i8,
+     &              /,' Number of Ligand2 Atoms',12x,i8)
+         end if
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (list)
+      deallocate (itbnd)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine mutate_dlmda  --  lambda derivative settings  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "mutate_dlmda" sets the options governing the lambda derivative,
+c     which method drives the main lambda, the dual topology end state
+c     treatment and the mapping from the main lambda to the individual
+c     electrostatic, polarization and van der Waals sublambdas
+c
+c     note the copy of the unscaled electrostatic parameters is made
+c     for every hybrid system, since "altelec" rebuilds the scaled
+c     values from that copy even when no lambda derivative is used
+c
+c
+      subroutine mutate_dlmda
+      use angbnd
+      use atoms
+      use bndstr
+      use cflux
+      use charge
+      use chgpen
+      use dipole
+      use dlmda
+      use iounit
+      use keys
+      use mplpot
+      use mpole
+      use mutant
+      use polar
+      use potent
+      implicit none
+      integer i,j,k
+      integer next
+      real*8 temp
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     flag for use of lambda derivative
+c
+      use_dlmda = .false.
+      use_emdt = .false.
+      use_epdt = .false.
+      use_evdt = .false.
+      use_meta = .false.
+      use_metadyn = .false.
+      use_ost = .false.
+      use_ostdyn = .false.
+      use_plmda = .false.
+      use_ti = .false.
+c
+c     set defaults describing the flavor of the lambda calculation
+c
+      lmdaengymode = 'ABS'
+      lmdasampmode = 'NONE'
+c
+c     set defaults for dual topology
+c
+      emdtexp = 1
+      epdtexp = 1
+      evdtexp = 1
+c
+c     enable both dual topology endpoints by default
+c
+      use_ele4i = .true.
+      use_ele4f = .true.
+      use_pol4i = .true.
+      use_pol4f = .true.
+      use_vdw4i = .true.
+      use_vdw4f = .true.
+c
+c     set defaults for the staged relative free energy schedule
+c
+      use_relstage = .false.
+      relstg1lmda0 = 0.0d0
+      relstg1lmda1 = 0.3d0
+      relstg2lmda0 = 0.7d0
+      relstg2lmda1 = 1.0d0
+      relstage = 'VDWM'
+      relstagemix = .false.
+c
+c     set default mapping from main lambda to sublambda
+c
+      qntelmda1 = 0.8d0
+      qntelmda0 = 0.3d0
+      qntplmda1 = 1.0d0
+      qntplmda0 = 0.5d0
+      qntvlmda1 = 0.5d0
+      qntvlmda0 = 0.0d0
+      elmdamap = 'QNT'
+      plmdamap = 'QNT'
+      vlmdamap = 'QNT'
+      elmdaexp = 1
+      plmdaexp = 1
+      vlmdaexp = 1
+      elmdainvn = 4
+      plmdainvn = 4
+      vlmdainvn = 4
+      elmdainveps = 0.3d0
+      plmdainveps = 0.3d0
+      vlmdainveps = 0.3d0
+c
+c     search keywords for lambda derivative options
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:13) .eq. 'LAMBDA-DERIV ') then
             use_dlmda = .true.
          else if (keyword(1:4) .eq. 'OST ') then
             use_dlmda = .true.
@@ -382,40 +413,30 @@ c
             use_dlmda = .true.
             use_ti = .true.
             lmdasampmode = 'TI'
-         else if (keyword(1:8) .eq. 'TI-NBIN ') then
+         else if (keyword(1:13) .eq. 'ELE-DUALTOPO ') then
+            use_emdt = .true.
+         else if (keyword(1:17) .eq. 'ELE-DUALTOPO-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  tinbin
-            tinbinset = .true.
-         else if (keyword(1:10) .eq. 'TI-WINDOW ') then
-            temp = 0.0d0
-            frac = -1.0d0
+            read (string,*,err=10)  emdtexp
+         else if (keyword(1:13) .eq. 'POL-DUALTOPO ') then
+            use_epdt = .true.
+         else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
-            read (string,*,err=25,end=25)  temp,frac
-   25       continue
-            ntiwin = ntiwin + 1
-            tilmdalist(ntiwin) = temp
-            tifraclist(ntiwin) = frac
-         else if (keyword(1:12) .eq. 'TI-NSTEPAVG ') then
+            read (string,*,err=10)  epdtexp
+         else if (keyword(1:13) .eq. 'VDW-DUALTOPO ') then
+            use_evdt = .true.
+         else if (keyword(1:17) .eq. 'VDW-DUALTOPO-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  tinstepavg
-         else if (keyword(1:15) .eq. 'TI-EQUIL-RATIO ') then
-            string = record(next:240)
-            read (string,*,err=30)  tieqratio
-         else if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
-            string = record(next:240)
-            read (string,*,err=30)  iosthist
-         else if (keyword(1:15) .eq. 'OSTEQUIL-RATIO ') then
-            string = record(next:240)
-            read (string,*,err=30)  osteqratio
+            read (string,*,err=10)  evdtexp
          else if (keyword(1:15) .eq. 'ELE-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=30)  qntelmda0, qntelmda1
+            read (string,*,err=10)  qntelmda0, qntelmda1
          else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=30)  qntplmda0, qntplmda1
+            read (string,*,err=10)  qntplmda0, qntplmda1
          else if (keyword(1:15) .eq. 'VDW-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=30)  qntvlmda0, qntvlmda1
+            read (string,*,err=10)  qntvlmda0, qntvlmda1
          else if (keyword(1:13) .eq. 'ELE-LMDA-MAP ') then
             call getword (record,elmdamap,next)
             call upcase (elmdamap)
@@ -427,164 +448,51 @@ c
             call upcase (vlmdamap)
          else if (keyword(1:13) .eq. 'ELE-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  elmdaexp
+            read (string,*,err=10)  elmdaexp
          else if (keyword(1:13) .eq. 'POL-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  plmdaexp
+            read (string,*,err=10)  plmdaexp
          else if (keyword(1:13) .eq. 'VDW-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=30)  vlmdaexp
+            read (string,*,err=10)  vlmdaexp
          else if (keyword(1:15) .eq. 'ELE-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=30)  elmdainvn
+            read (string,*,err=10)  elmdainvn
          else if (keyword(1:15) .eq. 'POL-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=30)  plmdainvn
+            read (string,*,err=10)  plmdainvn
          else if (keyword(1:15) .eq. 'VDW-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=30)  vlmdainvn
+            read (string,*,err=10)  vlmdainvn
          else if (keyword(1:17) .eq. 'ELE-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=30)  elmdainveps
+            read (string,*,err=10)  elmdainveps
          else if (keyword(1:17) .eq. 'POL-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=30)  plmdainveps
+            read (string,*,err=10)  plmdainveps
          else if (keyword(1:17) .eq. 'VDW-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=30)  vlmdainveps
-         else if (keyword(1:11) .eq. 'OST-LAMBDA ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostlambda
-         else if (keyword(1:8) .eq. 'OST-DT ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostdt
-         else if (keyword(1:9) .eq. 'OST-MASS ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostmass
-         else if (keyword(1:13) .eq. 'OST-FRICTION ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostfriction
-         else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
-            string = record(next:240)
-            read (string,*,err=30)  nlmda
-         else if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
-            string = record(next:240)
-            read (string,*,err=30)  wflmda
-         else if (keyword(1:7) .eq. 'WLHIST ') then
-            string = record(next:240)
-            read (string,*,err=30)  wlhist
-         else if (keyword(1:7) .eq. 'WFHIST ') then
-            string = record(next:240)
-            read (string,*,err=30)  wfhist
-         else if (keyword(1:11) .eq. 'OST-STDDEV ') then
-            string = record(next:240)
-            read (string,*,err=30)  oststdev
-         else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
-            ostinterpol = .true.
-            fastkernel = .true.
-         else if (keyword(1:6) .eq. 'HBIAS ') then
-            string = record(next:240)
-            read (string,*,err=30)  hbias
-         else if (keyword(1:13) .eq. 'OST-CONV-BIN ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostcvbin
-         else if (keyword(1:16) .eq. 'OST-CONVCRI-DIF ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostcvdif
-         else if (keyword(1:16) .eq. 'OST-CONVCRI-RAT ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostcvrat
-         else if (keyword(1:16) .eq. 'OST-CONVCRI-SLP ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostcvslp
-         else if (keyword(1:16) .eq. 'OST-CONVCRI-STD ') then
-            string = record(next:240)
-            read (string,*,err=30)  ostcvstd
-         else if (keyword(1:11) .eq. 'OST-TEMPER ') then
-            ostemper = .true.
-         else if (keyword(1:17) .eq. 'OST-TEMPER-GAMMA ') then
-            string = record(next:240)
-            read (string,*,err=30)  tempergamma
-         else if (keyword(1:18) .eq. 'OST-TEMPER-THRESH ') then
-            string = record(next:240)
-            read (string,*,err=30)  temperthresh
+            read (string,*,err=10)  vlmdainveps
          else if (keyword(1:10) .eq. 'REL-STAGE ') then
+            use_rel = .true.
             use_relstage = .true.
          else if (keyword(1:19) .eq. 'REL-LIG1-ELE-RANGE ') then
             string = record(next:240)
-            read (string,*,err=30)  relstg1lmda0, relstg1lmda1
+            read (string,*,err=10)  relstg1lmda0, relstg1lmda1
          else if (keyword(1:19) .eq. 'REL-LIG2-ELE-RANGE ') then
             string = record(next:240)
-            read (string,*,err=30)  relstg2lmda0, relstg2lmda1
+            read (string,*,err=10)  relstg2lmda0, relstg2lmda1
          end if
-   30    continue
+   10    continue
       end do
 c
-c     only one method can sample the main lambda at a time
+c     enable dual topology for relative free energy
 c
-      if ((use_ost .and. use_meta) .or. (use_ost .and. use_ti)
-     &       .or. (use_meta .and. use_ti)) then
-         write (iout,40)
-   40    format (/,' MUTATE  --  Only one of OST, METADYN and',
-     &              ' THERM-INTG can be active')
-         call fatal
-      end if
-c
-c     a second ligand group makes the free energy a relative one
-c
-      if (use_rel)  lmdaengymode = 'REL'
-c
-c     the lambda windows must span [0,1] and leave room to average
-c
-      if (use_ti) then
-         if (tinstepavg .lt. 1) then
-            write (iout,46)
-   46       format (/,' MUTATE  --  TI-NSTEPAVG must be positive')
-            call fatal
-         end if
-         if (tieqratio.lt.0.0d0 .or. tieqratio.ge.1.0d0) then
-            write (iout,47)
-   47       format (/,' MUTATE  --  TI-EQUIL-RATIO must be',
-     &                 ' in [0,1)')
-            call fatal
-         end if
-         call settisched (ntiwin,tinbinset)
-      end if
-c
-c     ligand window must be an ordered subrange of [0,1] and not overlap
-c
-      if (use_relstage) then
-         if (relstg1lmda0.lt.0.0d0 .or.
-     &       relstg1lmda0.ge.relstg1lmda1 .or.
-     &       relstg1lmda1.gt.1.0d0) then
-            write (iout,41)
-   41       format (/,' MUTATE  --  REL-LIG1-ELE-RANGE must satisfy',
-     &                 ' 0 <= lo < hi <= 1')
-            call fatal
-         end if
-         if (relstg2lmda0.lt.0.0d0 .or.
-     &       relstg2lmda0.ge.relstg2lmda1 .or.
-     &       relstg2lmda1.gt.1.0d0) then
-            write (iout,42)
-   42       format (/,' MUTATE  --  REL-LIG2-ELE-RANGE must satisfy',
-     &                 ' 0 <= lo < hi <= 1')
-            call fatal
-         end if
-         if (relstg1lmda1 .gt. relstg2lmda0) then
-            write (iout,43)
-   43       format (/,' MUTATE  --  REL-LIG1-ELE-RANGE and',
-     &                 ' REL-LIG2-ELE-RANGE overlap; the ligand 1',
-     &                 ' window must end at or below the start of',
-     &                 ' the ligand 2 window')
-            call fatal
-         end if
-         if (.not.use_dlmda .or. .not.uselmdachain()) then
-            write (iout,44)
-   44       format (/,' MUTATE  --  REL-STAGE needs a main lambda to',
-     &                 ' drive the schedule; add the OST, METADYN',
-     &                 ' or THERM-INTG keyword')
-            call fatal
-         end if
+      if (use_rel) then
+         lmdaengymode = 'REL'
+         use_emdt = .true.
+         use_epdt = .true.
+         use_evdt = .true.
       end if
 c
 c     enable both endpoints for each active dual term by default
@@ -605,55 +513,353 @@ c
 c
 c     validate mapping schemes from main lambda to sublambdas
 c
-      if (plmdamap.ne.'QNT' .and. plmdamap.ne.'EXP'
-     &       .and. plmdamap.ne.'INV') then
-         plmdamap = 'QNT'
-      end if
       if (elmdamap.ne.'QNT' .and. elmdamap.ne.'EXP'
      &       .and. elmdamap.ne.'INV') then
          elmdamap = 'QNT'
+      end if
+      if (plmdamap.ne.'QNT' .and. plmdamap.ne.'EXP'
+     &       .and. plmdamap.ne.'INV') then
+         plmdamap = 'QNT'
       end if
       if (vlmdamap.ne.'QNT' .and. vlmdamap.ne.'EXP'
      &       .and. vlmdamap.ne.'INV') then
          vlmdamap = 'QNT'
       end if
-      if (emdtexp .lt. 1) then
-         emdtexp = 1
+      if (emdtexp .lt. 1)  emdtexp = 1
+      if (epdtexp .lt. 1)  epdtexp = 1
+      if (evdtexp .lt. 1)  evdtexp = 1
+      if (elmdaexp .lt. 1)  elmdaexp = 1
+      if (plmdaexp .lt. 1)  plmdaexp = 1
+      if (vlmdaexp .lt. 1)  vlmdaexp = 1
+      if (elmdainvn .lt. 1)  elmdainvn = 1
+      if (plmdainvn .lt. 1)  plmdainvn = 1
+      if (vlmdainvn .lt. 1)  vlmdainvn = 1
+      if (elmdainveps .lt. 0.0d0)  elmdainveps = -elmdainveps
+      if (plmdainveps .lt. 0.0d0)  plmdainveps = -plmdainveps
+      if (vlmdainveps .lt. 0.0d0)  vlmdainveps = -vlmdainveps
+c
+c     check sublambda intervals are in [0,1] and ordered
+c
+      if (qntelmda0 .lt. 0.0d0)  qntelmda0 = 0.0d0
+      if (qntelmda1 .lt. 0.0d0)  qntelmda1 = 0.0d0
+      if (qntplmda0 .lt. 0.0d0)  qntplmda0 = 0.0d0
+      if (qntplmda1 .lt. 0.0d0)  qntplmda1 = 0.0d0
+      if (qntvlmda0 .lt. 0.0d0)  qntvlmda0 = 0.0d0
+      if (qntvlmda1 .lt. 0.0d0)  qntvlmda1 = 0.0d0
+      if (qntelmda0 .gt. 1.0d0)  qntelmda0 = 1.0d0
+      if (qntelmda1 .gt. 1.0d0)  qntelmda1 = 1.0d0
+      if (qntplmda0 .gt. 1.0d0)  qntplmda0 = 1.0d0
+      if (qntplmda1 .gt. 1.0d0)  qntplmda1 = 1.0d0
+      if (qntvlmda0 .gt. 1.0d0)  qntvlmda0 = 1.0d0
+      if (qntvlmda1 .gt. 1.0d0)  qntvlmda1 = 1.0d0
+      if (qntelmda1 .lt. qntelmda0) then
+         temp = qntelmda0
+         qntelmda0 = qntelmda1
+         qntelmda1 = temp
       end if
-      if (evdtexp .lt. 1) then
-         evdtexp = 1
+      if (qntplmda1 .lt. qntplmda0) then
+         temp = qntplmda0
+         qntplmda0 = qntplmda1
+         qntplmda1 = temp
       end if
-      if (plmdaexp .lt. 1) then
-         plmdaexp = 1
-      end if
-      if (elmdaexp .lt. 1) then
-         elmdaexp = 1
-      end if
-      if (vlmdaexp .lt. 1) then
-         vlmdaexp = 1
-      end if
-      if (plmdainvn .lt. 1) then
-         plmdainvn = 1
-      end if
-      if (elmdainvn .lt. 1) then
-         elmdainvn = 1
-      end if
-      if (vlmdainvn .lt. 1) then
-         vlmdainvn = 1
-      end if
-      if (plmdainveps .lt. 0.0d0) then
-         plmdainveps = -plmdainveps
-      end if
-      if (elmdainveps .lt. 0.0d0) then
-         elmdainveps = -elmdainveps
-      end if
-      if (vlmdainveps .lt. 0.0d0) then
-         vlmdainveps = -vlmdainveps
+      if (qntvlmda1 .lt. qntvlmda0) then
+         temp = qntvlmda0
+         qntvlmda0 = qntvlmda1
+         qntvlmda1 = temp
       end if
 c
-c     set plambda to elambda if no values given
+c     ligand window must be an ordered subrange of [0,1] and not overlap
 c
-      if (.not. setplambda)  plambda = elambda
+      if (use_relstage) then
+         if (relstg1lmda0.lt.0.0d0 .or.
+     &       relstg1lmda0.ge.relstg1lmda1 .or.
+     &       relstg1lmda1.gt.1.0d0) then
+            write (iout,20)
+   20       format (/,' MUTATE_DLMDA  --  REL-LIG1-ELE-RANGE must',
+     &                 ' satisfy 0 <= lo < hi <= 1')
+            call fatal
+         end if
+         if (relstg2lmda0.lt.0.0d0 .or.
+     &       relstg2lmda0.ge.relstg2lmda1 .or.
+     &       relstg2lmda1.gt.1.0d0) then
+            write (iout,30)
+   30       format (/,' MUTATE_DLMDA  --  REL-LIG2-ELE-RANGE must',
+     &                 ' satisfy 0 <= lo < hi <= 1')
+            call fatal
+         end if
+         if (relstg1lmda1 .gt. relstg2lmda0) then
+            write (iout,40)
+   40       format (/,' MUTATE_DLMDA  --  REL-LIG1-ELE-RANGE and',
+     &                 ' REL-LIG2-ELE-RANGE overlap; the ligand 1',
+     &                 ' window must end at or below the start of',
+     &                 ' the ligand 2 window')
+            call fatal
+         end if
+      end if
+c
+c     the staged schedule morphs van der Waals between the two ligands
+c
+      if (use_relstage) then
+         if (vlmdamap .ne. 'QNT') then
+            write (iout,50)
+   50       format (/,' MUTATE_DLMDA  --  REL-STAGE requires the QNT',
+     &                 ' van der Waals lambda map; set VDW-LMDA-MAP',
+     &                 ' to QNT')
+            call fatal
+         end if
+         if (qntvlmda0 .lt. relstg1lmda1) then
+            write (iout,60)
+   60       format (/,' MUTATE_DLMDA  --  VDW-LMDA-RANGE starts before',
+     &                 ' the ligand 1 electrostatic window ends; raise',
+     &                 ' the lower bound to at least the upper bound',
+     &                 ' of REL-LIG1-ELE-RANGE')
+            call fatal
+         end if
+         if (qntvlmda1 .gt. relstg2lmda0) then
+            write (iout,70)
+   70       format (/,' MUTATE_DLMDA  --  VDW-LMDA-RANGE ends after',
+     &                 ' the ligand 2 electrostatic window starts;',
+     &                 ' lower the upper bound to at most the lower',
+     &                 ' bound of REL-LIG2-ELE-RANGE')
+            call fatal
+         end if
+      end if
+c
+c     enable use_plmda rescale if ele and pol are decoupled
+c
+      if (use_mutate .and. .not.use_rel .and. .not.use_epdt
+     &       .and. use_polar) then
+         if (plambda .ne. elambda)  use_plmda = .true.
+      end if
+c
+c     perform dynamic allocation of some global arrays
+c
+      if (allocated(pchgorig))  deallocate (pchgorig)
+      if (allocated(pchg0orig))  deallocate (pchg0orig)
+      if (allocated(bdplorig))  deallocate (bdplorig)
+      if (allocated(poleorig))  deallocate (poleorig)
+      if (allocated(pcoreorig))  deallocate (pcoreorig)
+      if (allocated(pvalorig))  deallocate (pvalorig)
+      if (allocated(pval0orig))  deallocate (pval0orig)
+      if (allocated(polarityorig))  deallocate (polarityorig)
+      if (allocated(bflxorig))  deallocate (bflxorig)
+      if (allocated(aflxorig))  deallocate (aflxorig)
+      if (allocated(abflxorig))  deallocate (abflxorig)
+      if (allocated(douindorig))  deallocate (douindorig)
+      allocate (pchgorig(n))
+      allocate (pchg0orig(n))
+      allocate (bdplorig(nbond))
+      allocate (poleorig(maxpole,n))
+      allocate (pcoreorig(n))
+      allocate (pvalorig(n))
+      allocate (pval0orig(n))
+      allocate (polarityorig(n))
+      allocate (bflxorig(nbond))
+      allocate (aflxorig(2,nangle))
+      allocate (abflxorig(2,nangle))
+      allocate (douindorig(n))
+c
+c     copy original parameters for lambda derivative calculations
+c
+      if (use_charge) then
+         do i = 1, nion
+            k = iion(i)
+            pchgorig(k) = pchg(k)
+            pchg0orig(k) = pchg0(k)
+         end do
+      end if
+      if (use_dipole) then
+         do i = 1, ndipole
+            bdplorig(i) = bdpl(i)
+         end do
+      end if
+      if (use_mpole .or. use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            do j = 1, 13
+               poleorig(j,k) = pole(j,k)
+            end do
+            if (use_chgpen) then
+               pcoreorig(k) = pcore(k)
+               pvalorig(k) = pval(k)
+               pval0orig(k) = pval0(k)
+            end if
+         end do
+      end if
+      if (use_polar) then
+         do i = 1, npole
+            k = ipole(i)
+            polarityorig(k) = polarity(k)
+            douindorig(k) = douind(k)
+         end do
+      end if
+      if (use_chgflx) then
+         do i = 1, nbond
+            bflxorig(i) = bflx(i)
+         end do
+         do i = 1, nangle
+            aflxorig(1,i) = aflx(1,i)
+            aflxorig(2,i) = aflx(2,i)
+            abflxorig(1,i) = abflx(1,i)
+            abflxorig(2,i) = abflx(2,i)
+         end do
+      end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine mutate_ost  --  orthogonal space tempering set  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "mutate_ost" sets the lambda grid, the gaussian deposit interval,
+c     the convergence criteria and the lambda particle parameters used
+c     by orthogonal space tempering, then allocates the histogram and
+c     the bias kernels when the method is active
+c
+c
+      subroutine mutate_ost
+      use dlmda
+      use keys
+      use math
+      use ost
+      implicit none
+      integer i,k
+      integer next
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     set default ost update intervals
+c
+      iost = 0
+      iosthist = 10
+      ostnequil = 5
+      ostnavg = 5
+      ostddgdl = 0.0d0
+      ostdgdl = 0.0d0
+      osteqratio = 0.5d0
+      nosthistsave = 0
+c
+c     set default criteria for judging convergence of a deposit
+c
+      ostcvbin = 2
+      ostcvdif = 25.0d0
+      ostcvrat = 0.1d0
+      ostcvslp = 1.0d0
+      ostcvstd = 10.0d0
+c
+c     set defaults for tempering of the deposited gaussian heights
+c
+      ostemper = .false.
+      tempergamma = 1.0d0
+      temperthresh = 1.0d0
+c
+c     set defaults for the lambda particle propagation
+c
+      ostlambda = 1.0d0
+      ostlambdaavg = 0.0d0
+      ostlambdastd = 0.0d0
+      ostdedlavg = 0.0d0
+      ostdedlstd = 0.0d0
+      ostdedl = 0.0d0
+      deffdl = 0.0d0
+      osttheta = pi / 2.0d0
+      ostvtheta = 0.0d0
+      ostmass = 25.0d0
+      ostfriction = 0.01d0
+      ostdt = 0.001d0
+c
+c     set default ost lambda bin values
+c
+      nlmda = 201
+      nflmda = 1001
+      wflmda = 1.0d0
+      wlhist = 0.005d0
+      wfhist = 1.0d0
+      fli0 = (nflmda + 1) / 2 + (nflmda - 1) / 4
+      hbias = 0.00001d0
+      oststdev = 4.0d0
+      eosttot = 0.0d0
+      fastkernel = .true.
+      ostinterpol = .false.
+c
+c     search keywords for orthogonal space tempering options
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
+            string = record(next:240)
+            read (string,*,err=10)  iosthist
+         else if (keyword(1:15) .eq. 'OSTEQUIL-RATIO ') then
+            string = record(next:240)
+            read (string,*,err=10)  osteqratio
+         else if (keyword(1:11) .eq. 'OST-LAMBDA ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostlambda
+         else if (keyword(1:8) .eq. 'OST-DT ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostdt
+         else if (keyword(1:9) .eq. 'OST-MASS ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostmass
+         else if (keyword(1:13) .eq. 'OST-FRICTION ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostfriction
+         else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
+            string = record(next:240)
+            read (string,*,err=10)  nlmda
+         else if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
+            string = record(next:240)
+            read (string,*,err=10)  wflmda
+         else if (keyword(1:7) .eq. 'WLHIST ') then
+            string = record(next:240)
+            read (string,*,err=10)  wlhist
+         else if (keyword(1:7) .eq. 'WFHIST ') then
+            string = record(next:240)
+            read (string,*,err=10)  wfhist
+         else if (keyword(1:11) .eq. 'OST-STDDEV ') then
+            string = record(next:240)
+            read (string,*,err=10)  oststdev
+         else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
+            ostinterpol = .true.
+            fastkernel = .true.
+         else if (keyword(1:6) .eq. 'HBIAS ') then
+            string = record(next:240)
+            read (string,*,err=10)  hbias
+         else if (keyword(1:13) .eq. 'OST-CONV-BIN ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostcvbin
+         else if (keyword(1:16) .eq. 'OST-CONVCRI-DIF ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostcvdif
+         else if (keyword(1:16) .eq. 'OST-CONVCRI-RAT ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostcvrat
+         else if (keyword(1:16) .eq. 'OST-CONVCRI-SLP ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostcvslp
+         else if (keyword(1:16) .eq. 'OST-CONVCRI-STD ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostcvstd
+         else if (keyword(1:11) .eq. 'OST-TEMPER ') then
+            ostemper = .true.
+         else if (keyword(1:17) .eq. 'OST-TEMPER-GAMMA ') then
+            string = record(next:240)
+            read (string,*,err=10)  tempergamma
+         else if (keyword(1:18) .eq. 'OST-TEMPER-THRESH ') then
+            string = record(next:240)
+            read (string,*,err=10)  temperthresh
+         end if
+   10    continue
+      end do
 c
 c     define lambda width and flambda range
 c
@@ -687,6 +893,12 @@ c
       ostnequil = int(osteqratio*dble(iosthist))
       ostnequil = max(0,min(ostnequil,iosthist-1))
       ostnavg = iosthist - ostnequil
+c
+c     keep the lambda particle within the physical lambda range
+c
+      if (ostlambda .lt. 0.0d0)  ostlambda = 0.0d0
+      if (ostlambda .gt. 1.0d0)  ostlambda = 1.0d0
+      osttheta = asin(sqrt(ostlambda))
 c
 c     allocate the convergence sub-bins
 c
@@ -788,6 +1000,33 @@ c
             ostwfhist(i) = 0.0d0
          end do
       end if
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine mutate_meta  --  metadynamics parameters  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "mutate_meta" allocates the history of gaussians deposited along
+c     the main lambda coordinate and the grid holding the accumulated
+c     metadynamics bias
+c
+c
+      subroutine mutate_meta
+      use dlmda
+      use ost
+      implicit none
+      integer i
+c
+c
+c     zero out the count of deposited metadynamics gaussians
+c
+      nmetahist = 0
+      nmethistsave = 0
 c
 c     allocate metadynamics gaussian history
 c
@@ -800,7 +1039,6 @@ c
          if (allocated(vmetagrid))  deallocate (vmetagrid)
          if (allocated(dvmetagrid))  deallocate (dvmetagrid)
          sizemetahist = 10000
-         nmetahist = 0
          allocate (metalhist(sizemetahist))
          allocate (metahhist(sizemetahist))
          allocate (metawhist(sizemetahist))
@@ -822,255 +1060,154 @@ c
             dvmetagrid(i) = 0.0d0
          end do
       end if
+      return
+      end
 c
-c     allocate the dU/dlambda block buffer; the per-window averages
-c     are sized in "inittidyn" once the step count is known
+c
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine mutate_ti  --  lambda window schedule  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+c     "mutate_ti" sets the lambda window schedule and the block size
+c     used to average dU/dlambda during a thermodynamic integration,
+c     either from explicit "TI-WINDOW" values or from the "TI-NBIN"
+c     count of evenly spaced windows
+c
+c
+      subroutine mutate_ti
+      use dlmda
+      use iounit
+      use keys
+      use thrmint
+      implicit none
+      integer i
+      integer next
+      integer ntiwin
+      real*8 frac
+      real*8 temp
+      logical tinbinset
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     set defaults for thermodynamic integration windows
+c
+      tibin = 0
+      tinbin = 21
+      tinblock = 0
+      tinbcount = 0
+      tinbsave = 0
+      tinbtot = 0
+      tinequil = 0
+      tinstepavg = 100
+      tiwindow = 0
+      tieqratio = 0.5d0
+      tilmda = 1.0d0
+c
+c     size the lambda window schedule to the worst case
+c
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
+      if (allocated(tifraclist))  deallocate (tifraclist)
+      allocate (tilmdalist(max(1,nkey)))
+      allocate (tifraclist(max(1,nkey)))
+      do i = 1, max(1,nkey)
+         tilmdalist(i) = 0.0d0
+         tifraclist(i) = -1.0d0
+      end do
+      ntiwin = 0
+      tinbinset = .false.
+c
+c     search keywords for thermodynamic integration options
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:8) .eq. 'TI-NBIN ') then
+            string = record(next:240)
+            read (string,*,err=20)  tinbin
+            tinbinset = .true.
+         else if (keyword(1:10) .eq. 'TI-WINDOW ') then
+            temp = 0.0d0
+            frac = -1.0d0
+            string = record(next:240)
+            read (string,*,err=10,end=10)  temp,frac
+   10       continue
+            ntiwin = ntiwin + 1
+            tilmdalist(ntiwin) = temp
+            tifraclist(ntiwin) = frac
+         else if (keyword(1:12) .eq. 'TI-NSTEPAVG ') then
+            string = record(next:240)
+            read (string,*,err=20)  tinstepavg
+         else if (keyword(1:15) .eq. 'TI-EQUIL-RATIO ') then
+            string = record(next:240)
+            read (string,*,err=20)  tieqratio
+         end if
+   20    continue
+      end do
+c
+c     the lambda windows must span [0,1] and leave room to average
 c
       if (use_ti) then
+         if (tinstepavg .lt. 1) then
+            write (iout,30)
+   30       format (/,' MUTATE_TI  --  TI-NSTEPAVG must be positive')
+            call fatal
+         end if
+         if (tieqratio.lt.0.0d0 .or. tieqratio.ge.1.0d0) then
+            write (iout,40)
+   40       format (/,' MUTATE_TI  --  TI-EQUIL-RATIO must be',
+     &                 ' in [0,1)')
+            call fatal
+         end if
+         call settisched (ntiwin,tinbinset)
+c
+c     allocate the dU/dlambda block buffer
+c
          if (allocated(tidedllist))  deallocate (tidedllist)
          allocate (tidedllist(tinstepavg))
          do i = 1, tinstepavg
             tidedllist(i) = 0.0d0
          end do
       end if
+      return
+      end
 c
-c     check sublambda intervals are in [0,1] and ordered
 c
-      if (qntplmda0 .lt. 0.0d0)  qntplmda0 = 0.0d0
-      if (qntplmda1 .lt. 0.0d0)  qntplmda1 = 0.0d0
-      if (qntelmda0 .lt. 0.0d0)  qntelmda0 = 0.0d0
-      if (qntelmda1 .lt. 0.0d0)  qntelmda1 = 0.0d0
-      if (qntvlmda0 .lt. 0.0d0)  qntvlmda0 = 0.0d0
-      if (qntvlmda1 .lt. 0.0d0)  qntvlmda1 = 0.0d0
-      if (ostlambda .lt. 0.0d0)  ostlambda = 0.0d0
-      if (qntplmda0 .gt. 1.0d0)  qntplmda0 = 1.0d0
-      if (qntplmda1 .gt. 1.0d0)  qntplmda1 = 1.0d0
-      if (qntelmda0 .gt. 1.0d0)  qntelmda0 = 1.0d0
-      if (qntelmda1 .gt. 1.0d0)  qntelmda1 = 1.0d0
-      if (qntvlmda0 .gt. 1.0d0)  qntvlmda0 = 1.0d0
-      if (qntvlmda1 .gt. 1.0d0)  qntvlmda1 = 1.0d0
-      if (ostlambda .gt. 1.0d0)  ostlambda = 1.0d0
-      osttheta = asin(sqrt(ostlambda))
-      if (qntplmda1 .lt. qntplmda0) then
-         temp = qntplmda0
-         qntplmda0 = qntplmda1
-         qntplmda1 = temp
-      end if
-      if (qntelmda1 .lt. qntelmda0) then
-         temp = qntelmda0
-         qntelmda0 = qntelmda1
-         qntelmda1 = temp
-      end if
-      if (qntvlmda1 .lt. qntvlmda0) then
-         temp = qntvlmda0
-         qntvlmda0 = qntvlmda1
-         qntvlmda1 = temp
-      end if
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine mutate_check  --  hybrid system consistency  ##
+c     ##                                                          ##
+c     ##############################################################
 c
-c     the staged schedule morphs van der Waals between the two ligands
-c     while both are electrostatically decoupled, so the van der Waals
-c     map has to be the windowed quintic taper and the window has to
-c     close before either electrostatic leg opens; the unwindowed maps
-c     never finish the morph and leave dU/dlambda nonzero at the ends
 c
-      if (use_relstage) then
-         if (vlmdamap .ne. 'QNT') then
-            write (iout,51)
-   51       format (/,' MUTATE  --  REL-STAGE requires the QNT van der',
-     &                 ' Waals lambda map; set VDW-LMDA-MAP to QNT')
-            call fatal
-         end if
-         if (qntvlmda0 .lt. relstg1lmda1) then
-            write (iout,52)
-   52       format (/,' MUTATE  --  VDW-LMDA-RANGE starts before the',
-     &                 ' ligand 1 electrostatic window ends; raise the',
-     &                 ' lower bound to at least the upper bound of',
-     &                 ' REL-LIG1-ELE-RANGE')
-            call fatal
-         end if
-         if (qntvlmda1 .gt. relstg2lmda0) then
-            write (iout,53)
-   53       format (/,' MUTATE  --  VDW-LMDA-RANGE ends after the',
-     &                 ' ligand 2 electrostatic window starts; lower',
-     &                 ' the upper bound to at most the lower bound of',
-     &                 ' REL-LIG2-ELE-RANGE')
-            call fatal
-         end if
-      end if
+c     "mutate_check" tests the free energy options that span more than
+c     one of the setup routines, with each routine having already
+c     validated the keywords that it owns
 c
-c     get mapping from main lambda to sub-lambdas
 c
-      if (use_ost .or. use_meta) then
-         call mapsublmda (ostlambda)
-      else if (use_ti) then
-         call mapsublmda (tilmda)
-      end if
+      subroutine mutate_check
+      use dlmda
+      use iounit
+      use mutant
+      implicit none
+      logical uselmdachain
 c
-c     perform dynamic allocation of some global arrays
 c
-      if (allocated(pchgorig))  deallocate (pchgorig)
-      if (allocated(pchg0orig))  deallocate (pchg0orig)
-      if (allocated(bdplorig))  deallocate (bdplorig)
-      if (allocated(poleorig))  deallocate (poleorig)
-      if (allocated(pcoreorig))  deallocate (pcoreorig)
-      if (allocated(pvalorig))  deallocate (pvalorig)
-      if (allocated(pval0orig))  deallocate (pval0orig)
-      if (allocated(polarityorig))  deallocate (polarityorig)
-      if (allocated(bflxorig))  deallocate (bflxorig)
-      if (allocated(aflxorig))  deallocate (aflxorig)
-      if (allocated(abflxorig))  deallocate (abflxorig)
-      if (allocated(douindorig))  deallocate (douindorig)
-      allocate (pchgorig(n))
-      allocate (pchg0orig(n))
-      allocate (bdplorig(nbond))
-      allocate (poleorig(maxpole,n))
-      allocate (pcoreorig(n))
-      allocate (pvalorig(n))
-      allocate (pval0orig(n))
-      allocate (polarityorig(n))
-      allocate (bflxorig(nbond))
-      allocate (aflxorig(2,nangle))
-      allocate (abflxorig(2,nangle))
-      allocate (douindorig(n))
+c     only one method can sample the main lambda at a time
 c
-c     copy original parameters for lambda derivative calculations
-c
-      if (use_charge) then
-         do i = 1, nion
-            k = iion(i)
-            pchgorig(k) = pchg(k)
-            pchg0orig(k) = pchg0(k)
-         end do
-      end if
-      if (use_dipole) then
-         do i = 1, ndipole
-            k1 = idpl(1,i)
-            k2 = idpl(2,i)
-            bdplorig(i) = bdpl(i)
-         end do
-      end if
-      if (use_mpole .or. use_polar) then
-         do i = 1, npole
-            k = ipole(i)
-            do j = 1, 13
-               poleorig(j,k) = pole(j,k)
-            end do
-            if (use_chgpen) then
-               pcoreorig(k) = pcore(k)
-               pvalorig(k) = pval(k)
-               pval0orig(k) = pval0(k)
-            end if
-         end do
-      end if
-      if (use_polar) then
-         do i = 1, npole
-            k = ipole(i)
-            polarityorig(k) = polarity(k)
-            douindorig(k) = douind(k)
-         end do
-      end if
-      if (use_chgflx) then
-         do i = 1, nbond
-            bflxorig(i) = bflx(i)
-         end do
-      end if
-      if (use_chgflx) then
-         do i = 1, nangle
-            aflxorig(1,i) = aflx(1,i)
-            aflxorig(2,i) = aflx(2,i)
-            abflxorig(1,i) = abflx(1,i)
-            abflxorig(2,i) = abflx(2,i)
-         end do
-      end if
-c
-c     scale electrostatic parameter values based on lambda
-c
-c     enable two-ligand relative dual topo if a second ligand exists;
-c     in that mode the resting parameters are left at their unscaled
-c     values and each subsystem state is built on demand by the combiner
-c
-      use_rel = (nmutb .gt. 0)
-      if (use_relstage .and. .not.use_rel) then
-         write (iout,45)
-   45    format (/,' MUTATE  --  REL-STAGE is a relative free',
-     &              ' energy schedule and needs a second ligand',
-     &              ' group; add the LIGAND2 keyword')
+      if ((use_ost .and. use_meta) .or. (use_ost .and. use_ti)
+     &       .or. (use_meta .and. use_ti)) then
+         write (iout,10)
+   10    format (/,' MUTATE_CHECK  --  Only one of OST, METADYN and',
+     &              ' THERM-INTG can be active')
          call fatal
       end if
-      if (use_rel) then
-         use_epdt = .true.
-         use_emdt = .true.
-         use_evdt = .true.
-      end if
-      if (.not.use_rel .and.
-     &    elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
-         call altelec
-      end if
-c
-c     scale torsional parameter values based on lambda
-c
-      if (.not.use_rel .and.
-     &    tlambda.ge.0.0d0 .and. tlambda.lt.1.0d0) then
-         if (ntbnd .ne. 0)  call alttors (ntbnd,itbnd)
-      end if
-c
-c     scale implicit solvation parameter values based on lambda
-c
-      if (.not.use_rel .and.
-     &    elambda.ge.0.0d0 .and. elambda.lt.1.0d0) then
-         call altsolv
-      end if
-c
-c     turn off hybrid potentials if no sites are mutated
-c
-      use_mutate = .true.
-      if (nmut .eq. 0)  use_mutate = .false.
-c
-c     enable rescale of the electrostatic parameters inside the
-c     polarization routines when the polarization lambda has been
-c     decoupled from the electrostatics lambda; when the two are
-c     equal, "altelec" has already installed the correct values
-c
-      if (use_mutate .and. .not.use_rel .and. .not.use_epdt
-     &       .and. use_polar) then
-         if (plambda .ne. elambda)  use_plmda = .true.
-      end if
-c
-c     write status of current hybrid potential lambda values
-c
-      if (use_mutate .and. .not.silent) then
-         write (iout,50)
-   50    format (/,' Free Energy Perturbation Parameters :')
-         write (iout,60)  nmut,vlambda,elambda,plambda,tlambda
-   60    format (/,' Number of FEP Hybrid Atoms',9x,i8,
-     &           /,' van der Waals Lambda Value',9x,f8.3,
-     &           /,' Electrostatics Lambda Value',8x,f8.3,
-     &           /,' Polarization Lambda Value',10x,f8.3,
-     &           /,' Torsion Angle Lambda Value',9x,f8.3)
-         if (use_dlmda) then
-            write (iout,70)
-   70       format (/,' Lambda Sampling Mode',8x,'Lambda Dynamics')
-         else
-            write (iout,80)
-   80       format (/,' Lambda Sampling Mode',11x,'Fixed Lambda')
-         end if
-         if (use_plmda) then
-            write (iout,90)
-   90       format (' Polarization Lambda Decoupled from',
-     &              ' Electrostatics Lambda')
-         end if
-         if (use_rel) then
-            write (iout,100)  nmut-nmutb,nmutb
-  100       format (/,' Relative Dual Topology Active :',
-     &              /,' Number of Ligand1 Atoms',12x,i8,
-     &              /,' Number of Ligand2 Atoms',12x,i8)
-         end if
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (list)
-      deallocate (itbnd)
       return
       end
 c
