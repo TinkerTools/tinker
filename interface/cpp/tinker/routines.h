@@ -314,8 +314,6 @@ void sublmdaexp_(double* x, int* exponent, double* lmda, double* dlmda, double* 
 #define tinker_f_sublmdaexp sublmdaexp_
 void sublmdainvpower_(double* x, int* n, double* eps, double* lmda, double* dlmda, double* d2lmda);
 #define tinker_f_sublmdainvpower sublmdainvpower_
-int uselmdachain_();
-#define tinker_f_uselmdachain uselmdachain_
 void lmdachain_();
 #define tinker_f_lmdachain lmdachain_
 void avgstd_(double* list, int* begin, int* count, double* avg, double* std);
