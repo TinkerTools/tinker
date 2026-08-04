@@ -32,6 +32,7 @@ c
       use mdstuf
       use moment
       use mpole
+      use mutant
       use output
       use ost
       use polar
@@ -162,6 +163,31 @@ c
          else
             write (iout,210)  ostlambda
             write (iout,250)  eosttot
+         end if
+c
+c     print the lambda derivative of a run with no adaptive bias
+c
+      else if (use_ti) then
+         if (digits .ge. 8) then
+            write (iout,110)  tilmda
+            write (iout,120)  dedl
+         else if (digits .ge. 6) then
+            write (iout,160)  tilmda
+            write (iout,170)  dedl
+         else
+            write (iout,210)  tilmda
+            write (iout,220)  dedl
+         end if
+      else if (use_dlmda) then
+         if (digits .ge. 8) then
+            write (iout,110)  lambda
+            write (iout,120)  dedl
+         else if (digits .ge. 6) then
+            write (iout,160)  lambda
+            write (iout,170)  dedl
+         else
+            write (iout,210)  lambda
+            write (iout,220)  dedl
          end if
       end if
 c

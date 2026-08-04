@@ -59,6 +59,9 @@ c     test exponential sublambda maps and chain rule derivatives
 c
       call resetost (5,5,1)
       ostlambda = 0.25d0
+      use_plmdamap = .true.
+      use_elmdamap = .true.
+      use_vlmdamap = .true.
       plmdamap = 'EXP'
       elmdamap = 'EXP'
       vlmdamap = 'EXP'
@@ -89,6 +92,9 @@ c     test shifted inverse-power sublambda maps and derivatives
 c
       call resetost (5,5,1)
       ostlambda = 0.25d0
+      use_plmdamap = .true.
+      use_elmdamap = .true.
+      use_vlmdamap = .true.
       plmdamap = 'INV'
       elmdamap = 'INV'
       vlmdamap = 'INV'
@@ -129,6 +135,9 @@ c
       qntelmda1 = 0.7d0
       qntvlmda0 = 0.1d0
       qntvlmda1 = 0.9d0
+      use_plmdamap = .true.
+      use_elmdamap = .true.
+      use_vlmdamap = .true.
       plmdamap = 'QNT'
       elmdamap = 'QNT'
       vlmdamap = 'QNT'

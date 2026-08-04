@@ -35,58 +35,64 @@ c
 c
 c     map from lambda to sublambdas
 c
-      if (plmdamap .eq. 'EXP') then
-         call sublmdaexp (lmda,plmdaexp,plambda,
-     &                    dpldlmda,d2pldlmda2)
-      else if (plmdamap .eq. 'INV') then
-         call sublmdainvpower (lmda,plmdainvn,plmdainveps,plambda,
-     &                         dpldlmda,d2pldlmda2)
-      else
-         call quintaper (lmda,qntplmda0,qntplmda1,
-     &                   taper,dtaper,d2taper)
-         plambda = 1.0d0 - taper
-         dpldlmda = -dtaper
-         d2pldlmda2 = -d2taper
+      if (use_plmdamap) then
+         if (plmdamap .eq. 'EXP') then
+            call sublmdaexp (lmda,plmdaexp,plambda,
+     &                       dpldlmda,d2pldlmda2)
+         else if (plmdamap .eq. 'INV') then
+            call sublmdainvpower (lmda,plmdainvn,plmdainveps,plambda,
+     &                            dpldlmda,d2pldlmda2)
+         else
+            call quintaper (lmda,qntplmda0,qntplmda1,
+     &                      taper,dtaper,d2taper)
+            plambda = 1.0d0 - taper
+            dpldlmda = -dtaper
+            d2pldlmda2 = -d2taper
+         end if
       end if
-      if (elmdamap .eq. 'EXP') then
-         call sublmdaexp (lmda,elmdaexp,elambda,
-     &                    deldlmda,d2eldlmda2)
-      else if (elmdamap .eq. 'INV') then
-         call sublmdainvpower (lmda,elmdainvn,elmdainveps,elambda,
-     &                         deldlmda,d2eldlmda2)
-      else
-         call quintaper (lmda,qntelmda0,qntelmda1,
-     &                   taper,dtaper,d2taper)
-         elambda = 1.0d0 - taper
-         deldlmda = -dtaper
-         d2eldlmda2 = -d2taper
+      if (use_elmdamap) then
+         if (elmdamap .eq. 'EXP') then
+            call sublmdaexp (lmda,elmdaexp,elambda,
+     &                       deldlmda,d2eldlmda2)
+         else if (elmdamap .eq. 'INV') then
+            call sublmdainvpower (lmda,elmdainvn,elmdainveps,elambda,
+     &                            deldlmda,d2eldlmda2)
+         else
+            call quintaper (lmda,qntelmda0,qntelmda1,
+     &                      taper,dtaper,d2taper)
+            elambda = 1.0d0 - taper
+            deldlmda = -dtaper
+            d2eldlmda2 = -d2taper
+         end if
       end if
-      if (vlmdamap .eq. 'EXP') then
-         call sublmdaexp (lmda,vlmdaexp,vlambda,
-     &                    dvldlmda,d2vldlmda2)
-      else if (vlmdamap .eq. 'INV') then
-         call sublmdainvpower (lmda,vlmdainvn,vlmdainveps,vlambda,
-     &                         dvldlmda,d2vldlmda2)
-      else
-         call quintaper (lmda,qntvlmda0,qntvlmda1,
-     &                   taper,dtaper,d2taper)
-         vlambda = 1.0d0 - taper
-         dvldlmda = -dtaper
-         d2vldlmda2 = -d2taper
+      if (use_vlmdamap) then
+         if (vlmdamap .eq. 'EXP') then
+            call sublmdaexp (lmda,vlmdaexp,vlambda,
+     &                       dvldlmda,d2vldlmda2)
+         else if (vlmdamap .eq. 'INV') then
+            call sublmdainvpower (lmda,vlmdainvn,vlmdainveps,vlambda,
+     &                            dvldlmda,d2vldlmda2)
+         else
+            call quintaper (lmda,qntvlmda0,qntvlmda1,
+     &                      taper,dtaper,d2taper)
+            vlambda = 1.0d0 - taper
+            dvldlmda = -dtaper
+            d2vldlmda2 = -d2taper
+         end if
       end if
 c
 c     select the dual topology endpoints needed by QNT maps; both
 c     endpoints remain active on and within each switching window
 c
-      if (elmdamap .eq. 'QNT') then
+      if (use_elmdamap .and. elmdamap.eq.'QNT') then
          use_ele4i = (lmda .le. qntelmda1)
          use_ele4f = (lmda .ge. qntelmda0)
       end if
-      if (plmdamap .eq. 'QNT') then
+      if (use_plmdamap .and. plmdamap.eq.'QNT') then
          use_pol4i = (lmda .le. qntplmda1)
          use_pol4f = (lmda .ge. qntplmda0)
       end if
-      if (vlmdamap .eq. 'QNT') then
+      if (use_vlmdamap .and. vlmdamap.eq.'QNT') then
          use_vdw4i = (lmda .le. qntvlmda1)
          use_vdw4f = (lmda .ge. qntvlmda0)
       end if
@@ -341,29 +347,6 @@ c
       dlmda = power * base**(power-1.0d0) / denom
       d2lmda = power * (power-1.0d0)
      &           * base**(power-2.0d0) / denom
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  function uselmdachain -- test for an active main lambda  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "uselmdachain" is true when one of the lambda dynamics methods
-c     drives a main lambda, so the sublambdas follow it through the
-c     mapping and chain rule instead of being set independently
-c
-c
-      function uselmdachain ()
-      use dlmda
-      implicit none
-      logical uselmdachain
-c
-c
-      uselmdachain = (use_ost .or. use_meta .or. use_ti)
       return
       end
 c

@@ -292,9 +292,9 @@ c
                end do
             end do
 c
-c     apply chain rule if using global lambda in ost
+c     apply chain rule
 c
-            if (use_ost) then
+            if (use_dlmda) then
                nd2epdl2 = nd2epdl2 * dpldlmda*dpldlmda
      &                           + ndepdl * d2pldlmda2
                ndepdl = ndepdl * dpldlmda

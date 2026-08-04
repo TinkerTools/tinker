@@ -76,6 +76,7 @@ c     relstagemix   flag that the active leg mixes two endpoint states
 c     use_dlmda     logical flag governing use of lambda derivative
 c     use_ele4f     flag to compute electrostatic final endpoint
 c     use_ele4i     flag to compute electrostatic initial endpoint
+c     use_elmdamap  flag that elambda follows the main lambda map
 c     use_emdt      flag governing use of multipole dual topology
 c     use_evdt      flag governing use of van der Waals dual topology
 c     use_epdt      flag governing use of polarization dual topology
@@ -84,12 +85,14 @@ c     use_metadyn   flag to propagate metadynamics lambda particle
 c     use_ost       flag to use orthogonal space tempering
 c     use_ostdyn    flag to propagate lambda particle
 c     use_plmda     flag governing rescale to a decoupled plambda
+c     use_plmdamap  flag that plambda follows the main lambda map
 c     use_pol4f     flag to compute polarization final endpoint
 c     use_pol4i     flag to compute polarization initial endpoint
 c     use_relstage  flag to use staged relative free energy schedule
 c     use_ti        flag to use thermodynamic integration
 c     use_vdw4f     flag to compute van der Waals final endpoint
 c     use_vdw4i     flag to compute van der Waals initial endpoint
+c     use_vlmdamap  flag that vlambda follows the main lambda map
 c     douindorig    original douind
 c     elmdamap      mapping type from main to electrostatic lambda
 c     plmdamap      mapping type from main to polarization lambda
@@ -165,6 +168,7 @@ c
       logical use_dlmda
       logical use_ele4f
       logical use_ele4i
+      logical use_elmdamap
       logical use_emdt
       logical use_epdt
       logical use_evdt
@@ -173,12 +177,14 @@ c
       logical use_ost
       logical use_ostdyn
       logical use_plmda
+      logical use_plmdamap
       logical use_pol4f
       logical use_pol4i
       logical use_relstage
       logical use_ti
       logical use_vdw4f
       logical use_vdw4i
+      logical use_vlmdamap
       logical, allocatable :: douindorig(:)
       character*3 elmdamap
       character*3 plmdamap

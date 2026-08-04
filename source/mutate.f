@@ -224,6 +224,8 @@ c
          call mapsublmda (ostlambda)
       else if (use_ti) then
          call mapsublmda (tilmda)
+      else if (use_dlmda) then
+         call mapsublmda (lambda)
       end if
 c
 c     scale electrostatic parameter values based on lambda
@@ -250,29 +252,79 @@ c
 c     write status of current hybrid potential lambda values
 c
       if (use_mutate .and. .not.silent) then
-         write (iout,50)
-   50    format (/,' Free Energy Perturbation Parameters :')
-         write (iout,60)  nmut,vlambda,elambda,plambda,tlambda
-   60    format (/,' Number of FEP Hybrid Atoms',9x,i8,
+         write (iout,40)
+   40    format (/,' Free Energy Perturbation Parameters :')
+         write (iout,50)  nmut,vlambda,elambda,plambda,tlambda
+   50    format (/,' Number of FEP Hybrid Atoms',9x,i8,
      &           /,' van der Waals Lambda Value',9x,f8.3,
      &           /,' Electrostatics Lambda Value',8x,f8.3,
      &           /,' Polarization Lambda Value',10x,f8.3,
      &           /,' Torsion Angle Lambda Value',9x,f8.3)
-         if (use_dlmda) then
+c
+c     report the mode chosen along each axis of the calculation
+c
+         if (use_relstage) then
+            write (iout,60)
+   60       format (/,' Free Energy Mode',12x,'Staged Relative')
+         else if (use_rel) then
             write (iout,70)
-   70       format (/,' Lambda Sampling Mode',8x,'Lambda Dynamics')
+   70       format (/,' Free Energy Mode',19x,'Relative')
          else
             write (iout,80)
-   80       format (/,' Lambda Sampling Mode',11x,'Fixed Lambda')
+   80       format (/,' Free Energy Mode',19x,'Absolute')
+         end if
+         if (use_ost) then
+            write (iout,90)
+   90       format (' Sampling Mode',27x,'OST')
+         else if (use_meta) then
+            write (iout,100)
+  100       format (' Sampling Mode',18x,'Metadynamics')
+         else if (use_ti) then
+            write (iout,110)
+  110       format (' Sampling Mode',28x,'TI')
+         else
+            write (iout,120)
+  120       format (' Sampling Mode',18x,'Fixed Lambda')
+         end if
+         if (use_emdt) then
+            write (iout,130)
+  130       format (' Electrostatics Topology',16x,'Dual')
+         else
+            write (iout,140)
+  140       format (' Electrostatics Topology',14x,'Single')
+         end if
+         if (use_epdt) then
+            write (iout,150)
+  150       format (' Polarization Topology',18x,'Dual')
+         else
+            write (iout,160)
+  160       format (' Polarization Topology',16x,'Single')
+         end if
+         if (use_evdt) then
+            write (iout,170)
+  170       format (' van der Waals Topology',17x,'Dual')
+         else
+            write (iout,180)
+  180       format (' van der Waals Topology',15x,'Single')
+         end if
+         if (use_dlmda) then
+            if (use_ost .or. use_meta) then
+               write (iout,190)  ostlambda
+            else if (use_ti) then
+               write (iout,190)  tilmda
+            else
+               write (iout,190)  lambda
+            end if
+  190       format (' Main Lambda Value',18x,f8.3)
          end if
          if (use_plmda) then
-            write (iout,90)
-   90       format (' Polarization Lambda Decoupled from',
+            write (iout,200)
+  200       format (' Polarization Lambda Decoupled from',
      &              ' Electrostatics Lambda')
          end if
          if (use_rel) then
-            write (iout,100)  nmut-nmutb,nmutb
-  100       format (/,' Relative Dual Topology Active :',
+            write (iout,210)  nmut-nmutb,nmutb
+  210       format (/,' Relative Dual Topology Active :',
      &              /,' Number of Ligand1 Atoms',12x,i8,
      &              /,' Number of Ligand2 Atoms',12x,i8)
          end if
@@ -331,6 +383,7 @@ c
 c     flag for use of lambda derivative
 c
       use_dlmda = .false.
+      use_elmdamap = .false.
       use_emdt = .false.
       use_epdt = .false.
       use_evdt = .false.
@@ -339,7 +392,9 @@ c
       use_ost = .false.
       use_ostdyn = .false.
       use_plmda = .false.
+      use_plmdamap = .false.
       use_ti = .false.
+      use_vlmdamap = .false.
 c
 c     set defaults describing the flavor of the lambda calculation
 c
@@ -392,6 +447,15 @@ c
       plmdainveps = 0.3d0
       vlmdainveps = 0.3d0
 c
+c     a sublambda not driven by the main lambda has an identity chain
+c
+      deldlmda = 1.0d0
+      dpldlmda = 1.0d0
+      dvldlmda = 1.0d0
+      d2eldlmda2 = 0.0d0
+      d2pldlmda2 = 0.0d0
+      d2vldlmda2 = 0.0d0
+c
 c     search keywords for lambda derivative options
 c
       do i = 1, nkey
@@ -438,12 +502,15 @@ c
             string = record(next:240)
             read (string,*,err=10)  qntvlmda0, qntvlmda1
          else if (keyword(1:13) .eq. 'ELE-LMDA-MAP ') then
+            use_elmdamap = .true.
             call getword (record,elmdamap,next)
             call upcase (elmdamap)
          else if (keyword(1:13) .eq. 'POL-LMDA-MAP ') then
+            use_plmdamap = .true.
             call getword (record,plmdamap,next)
             call upcase (plmdamap)
          else if (keyword(1:13) .eq. 'VDW-LMDA-MAP ') then
+            use_vlmdamap = .true.
             call getword (record,vlmdamap,next)
             call upcase (vlmdamap)
          else if (keyword(1:13) .eq. 'ELE-LMDA-EXP ') then
@@ -495,9 +562,12 @@ c
          use_evdt = .true.
       end if
 c
+c     ost and meta require second and force lambda derivatives
+c
+      if (use_ost .or. use_meta)  use_epdt = .true.
+c
 c     enable both endpoints for each active dual term by default
 c
-      if (use_dlmda)  use_epdt = .true.
       if (use_emdt) then
          use_ele4i = .true.
          use_ele4f = .true.
@@ -628,7 +698,7 @@ c
 c     enable use_plmda rescale if ele and pol are decoupled
 c
       if (use_mutate .and. .not.use_rel .and. .not.use_epdt
-     &       .and. use_polar) then
+     &       .and. .not.use_dlmda .and. use_polar) then
          if (plambda .ne. elambda)  use_plmda = .true.
       end if
 c
@@ -1195,8 +1265,8 @@ c
       use dlmda
       use iounit
       use mutant
+      use potent
       implicit none
-      logical uselmdachain
 c
 c
 c     only one method can sample the main lambda at a time
@@ -1206,6 +1276,56 @@ c
          write (iout,10)
    10    format (/,' MUTATE_CHECK  --  Only one of OST, METADYN and',
      &              ' THERM-INTG can be active')
+         call fatal
+      end if
+c
+c     "epolar4" carries the polarization lambda derivative only through
+c     its dual topology routines, so single topology cannot supply one
+c
+      if (use_dlmda .and. use_polar .and. .not.use_epdt) then
+         write (iout,20)
+   20    format (/,' MUTATE_CHECK  --  The Polarization Lambda',
+     &              ' Derivative is Available only for Dual Topology;',
+     &              ' add the POL-DUALTOPO keyword')
+         call fatal
+      end if
+c
+c     a sampled main lambda must drive every active potential term,
+c     since an unmapped term would hold its own sublambda fixed while
+c     still contributing to the derivative; the staged relative
+c     schedule is exempt because it maps the sublambdas itself
+c
+      if ((use_ost .or. use_meta .or. use_ti)
+     &       .and. .not.use_relstage) then
+         if ((use_mpole .or. use_charge) .and. .not.use_elmdamap) then
+            write (iout,30)
+   30       format (/,' MUTATE_CHECK  --  Sampling the Main Lambda',
+     &                 ' with Electrostatics Active requires the',
+     &                 ' ELE-LMDA-MAP keyword')
+            call fatal
+         end if
+         if (use_polar .and. .not.use_plmdamap) then
+            write (iout,40)
+   40       format (/,' MUTATE_CHECK  --  Sampling the Main Lambda',
+     &                 ' with Polarization Active requires the',
+     &                 ' POL-LMDA-MAP keyword')
+            call fatal
+         end if
+         if (use_vdw .and. .not.use_vlmdamap) then
+            write (iout,50)
+   50       format (/,' MUTATE_CHECK  --  Sampling the Main Lambda',
+     &                 ' with van der Waals Active requires the',
+     &                 ' VDW-LMDA-MAP keyword')
+            call fatal
+         end if
+      end if
+c
+c     the staged relative schedule morphs one ligand into another
+c
+      if (use_relstage .and. nmutb.eq.0) then
+         write (iout,60)
+   60    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
+     &              ' ligand group; add the LIGAND2 keyword')
          call fatal
       end if
       return

@@ -34,7 +34,6 @@ c
       integer i,j
       real*8 energy,cutoff
       real*8 derivs(3,*)
-      logical uselmdachain
 c
 c
 c     zero out each of the potential energy components
@@ -345,7 +344,7 @@ c
 c     sum up to get the total lambda derivative
 c
       if (use_dlmda) then
-         if (uselmdachain())  call lmdachain
+         if (use_dlmda)  call lmdachain
          dedl = devdl + demdl + depdl
          d2edl2 = d2evdl2 + d2emdl2 + d2epdl2
          do i = 1, n
