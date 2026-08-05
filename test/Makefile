@@ -111,8 +111,9 @@ COMMON := assert.o test_amoeba.o test_angle.o test_angtor.o test_aplusgas.o \
  test_localframe2.o test_localframe3.o test_mutate.o test_nacl.o \
  test_opbend.o test_partialcharge.o test_pdbxyz.o test_pitors.o \
  test_polpair.o test_potential.o test_rephippo.o test_strbnd.o \
- test_strtor.o test_thermint.o test_tinkernist.o test_torsion.o \
- test_tortor.o test_urey.o test_vdw14.o test_xyzpdb.o
+ test_strtor.o test_testgrad.o test_testlmda.o test_thermint.o \
+ test_tinkernist.o test_torsion.o test_tortor.o test_urey.o test_vdw14.o \
+ test_xyzpdb.o
 
 EXEFILES := tinkertest.x
 
