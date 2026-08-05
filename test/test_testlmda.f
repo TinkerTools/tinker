@@ -22,7 +22,8 @@ c
 c
 c
       call test_testlmda_case ('01_water_ye_m05v05')
-      call test_testlmda_case ('02_water_ye_l05')
+      call test_testlmda_case ('02_water_adt_l05')
+      call test_testlmda_case ('03_water_ast_l05')
       return
       end
 c
@@ -51,7 +52,7 @@ c
       character*512 args
 c
 c
-      if (skiptest('test_testlmda_'//base,'testlmda mutate'))  return
+      if (skiptest('test_testlmda_'//base,'testlmda'))  return
       call pushdir ('file/testlmda')
       call execute_command_line ('rm -f out.txt')
       args = '-k '//base//'.key water2.xyz Y Y 1e-4'

@@ -51,7 +51,7 @@ c
       character*512 args
 c
 c
-      if (skiptest('test_testgrad_'//base,'testgrad mutate'))  return
+      if (skiptest('test_testgrad_'//base,'testgrad'))  return
       call pushdir ('file/testgrad')
       call execute_command_line ('rm -f out.txt')
       args = '-k '//base//'.key water2 Y Y 0.00001'
