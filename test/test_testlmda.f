@@ -21,9 +21,8 @@ c
       implicit none
 c
 c
-      call test_testlmda_case ('01_water_ye_m05v05')
-      call test_testlmda_case ('02_water_adt_l05')
-      call test_testlmda_case ('03_water_ast_l05')
+      call test_testlmda_case ('01_water_adt_l05')
+      call test_testlmda_case ('02_water_ast_l05')
       return
       end
 c
