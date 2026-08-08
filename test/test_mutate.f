@@ -20,6 +20,7 @@ c
       implicit none
 c
 c
+      call test_mutate_refresh
       call test_mutate_mv
       call test_mutate_mp
       call test_mutate_ast
@@ -33,6 +34,181 @@ c
       call test_mutate_qntrng
       call test_mutate_vcorr
       call test_mutate_rels
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_refresh  --  lambda state refresh  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_refresh" advances a TI window while leaving the old
+c     mapped parameter arrays installed, then checks that energy,
+c     analysis and gradient refresh the complete lambda state before use
+c
+c
+      subroutine test_mutate_refresh
+      use atoms
+      use dlmda
+      use energi
+      use mutant
+      use ost
+      use thrmint
+      implicit none
+      real*8 energy
+      real*8 e,eref,earef
+      real*8 eoneref,emoneref
+      real*8 emref,epref,evref
+      real*8 emaref,eparef,evaref
+      real*8 dedlref,d2edlref
+      real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: derivsref(:,:)
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_refresh','mutate'))  return
+      call pushdir ('file/mutate')
+      call loadfix ('water2','085_water_exp_ast_l05.key')
+      allocate (derivs(3,n))
+      allocate (derivsref(3,n))
+c
+c     replace OST ownership with a deterministic three-window TI schedule
+c
+      use_ost = .false.
+      use_ostdyn = .false.
+      use_meta = .false.
+      use_metadyn = .false.
+      use_ti = .true.
+      use_mainlmda = .true.
+      tinbin = 3
+      tibin = 1
+      tieqratio = 0.0d0
+      tinstepavg = 1
+      if (allocated(tilmdalist))  deallocate (tilmdalist)
+      if (allocated(tiwinend))  deallocate (tiwinend)
+      allocate (tilmdalist(tinbin))
+      allocate (tiwinend(tinbin))
+      tilmdalist(1) = 0.50d0
+      tilmdalist(2) = 0.25d0
+      tilmdalist(3) = 1.00d0
+      tiwinend(1) = 10
+      tiwinend(2) = 20
+      tiwinend(3) = 30
+      tilmda = tilmdalist(2)
+      call mapsublmda (tilmda)
+      call altelec
+      eref = energy ()
+      emref = em
+      epref = ep
+      evref = ev
+      call analysis (earef)
+      emaref = em
+      eparef = ep
+      evaref = ev
+      call gradient (eref,derivsref)
+      dedlref = dedl
+      d2edlref = d2edl2
+c
+c     install the first-window arrays, advance only the authoritative TI
+c     lambda, and require energy to rebuild all dependent parameter state
+c
+      tibin = 1
+      tilmda = tilmdalist(1)
+      call mapsublmda (tilmda)
+      call altelec
+      call tischedule
+      call assert_real (tilmda,0.25d0,0.0d0,
+     &                  'energy refresh TI window')
+      call assert_real (elambda,0.50d0,0.0d0,
+     &                  'energy refresh stale elambda')
+      e = energy ()
+      call assert_real (elambda,0.25d0,0.0d0,
+     &                  'energy refresh elambda')
+      call assert_real (e,eref,1.0d-10,
+     &                  'energy refresh total')
+      call assert_real (em,emref,1.0d-10,
+     &                  'energy refresh multipole')
+      call assert_real (ep,epref,1.0d-10,
+     &                  'energy refresh polarization')
+      call assert_real (ev,evref,1.0d-10,
+     &                  'energy refresh van der Waals')
+c
+c     returning from a fractional state to one must restore originals
+c
+      tilmda = tilmdalist(3)
+      call mapsublmda (tilmda)
+      call altelec
+      eoneref = energy ()
+      emoneref = em
+      tibin = 2
+      tilmda = tilmdalist(2)
+      call mapsublmda (tilmda)
+      call altelec
+      call tischedule
+      e = energy ()
+      call assert_real (elambda,1.0d0,0.0d0,
+     &                  'energy refresh endpoint elambda')
+      call assert_real (e,eoneref,1.0d-10,
+     &                  'energy refresh endpoint total')
+      call assert_real (em,emoneref,1.0d-10,
+     &                  'energy refresh endpoint multipole')
+c
+c     repeat with stale first-window arrays at the analysis boundary
+c
+      tibin = 1
+      tilmda = tilmdalist(1)
+      call mapsublmda (tilmda)
+      call altelec
+      call tischedule
+      call analysis (e)
+      call assert_real (e,earef,1.0d-10,
+     &                  'analysis refresh total')
+      call assert_real (em,emaref,1.0d-10,
+     &                  'analysis refresh multipole')
+      call assert_real (ep,eparef,1.0d-10,
+     &                  'analysis refresh polarization')
+      call assert_real (ev,evaref,1.0d-10,
+     &                  'analysis refresh van der Waals')
+c
+c     poison the mapped scalars as well as leaving first-window arrays
+c     installed, then require gradient to refresh values and derivatives
+c
+      tibin = 1
+      tilmda = tilmdalist(1)
+      call mapsublmda (tilmda)
+      call altelec
+      call tischedule
+      elambda = -1.0d0
+      plambda = -1.0d0
+      vlambda = -1.0d0
+      deldlmda = -1.0d0
+      dpldlmda = -1.0d0
+      dvldlmda = -1.0d0
+      call gradient (e,derivs)
+      call assert_real (elambda,0.25d0,0.0d0,
+     &                  'gradient refresh elambda')
+      call assert_real (plambda,0.0625d0,1.0d-15,
+     &                  'gradient refresh plambda')
+      call assert_real (vlambda,0.015625d0,1.0d-15,
+     &                  'gradient refresh vlambda')
+      call assert_real (e,eref,1.0d-10,
+     &                  'gradient refresh total')
+      call assert_real (dedl,dedlref,1.0d-10,
+     &                  'gradient refresh dE/dL')
+      call assert_real (d2edl2,d2edlref,1.0d-10,
+     &                  'gradient refresh d2E/dL2')
+      call assert_grad (derivs,derivsref,n,1.0d-10,
+     &                  'gradient refresh Cartesian gradient')
+c
+c     clean up the molecular fixture and schedule storage
+c
+      deallocate (derivs)
+      deallocate (derivsref)
+      call popdir
+      call final
       return
       end
 c

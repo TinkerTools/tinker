@@ -26,6 +26,8 @@ c
       use inform
       use iounit
       use mutant
+      use ost
+      use thrmint
       use usage
       use virial
       implicit none
@@ -35,7 +37,7 @@ c
       integer nask
       real*8 eval,energy
       real*8 eps,eps0
-      real*8 lmda,lmda0
+      real*8 lmda0
       real*8 adedl,adevdl
       real*8 ademdl,adepdl
       real*8 ad2edl2,ad2evdl2
@@ -212,26 +214,29 @@ c
             oldvdl = vlambda
             oldeml = elambda
             oldepl = plambda
-            vlambda = oldvdl + eps
-            elambda = oldeml + eps
-            plambda = oldepl + eps
-            call altelec
+            lmda0 = 0.0d0
+            if (use_mainlmda) then
+               if (use_ost .or. use_meta) then
+                  lmda0 = ostlambda
+               else if (use_ti) then
+                  lmda0 = tilmda
+               else
+                  lmda0 = lambda
+               end if
+            end if
+            call settestlmda (use_mainlmda,lmda0+eps,oldvdl+eps,
+     &                        oldeml+eps,oldepl+eps)
             esum2 = energy ()
             ev2 = ev
             em2 = em
             ep2 = ep
-            vlambda = oldvdl - eps
-            elambda = oldeml - eps
-            plambda = oldepl - eps
-            call altelec
+            call settestlmda (use_mainlmda,lmda0-eps,oldvdl-eps,
+     &                        oldeml-eps,oldepl-eps)
             esum0 = energy ()
             ev0 = ev
             em0 = em
             ep0 = ep
-            vlambda = oldvdl
-            elambda = oldeml
-            plambda = oldepl
-            call altelec
+            call settestlmda (use_mainlmda,lmda0,oldvdl,oldeml,oldepl)
             esum1 = energy ()
             ev1 = ev
             em1 = em
@@ -244,10 +249,8 @@ c
             nd2evdl2 = (ev2 - 2.0d0 * ev1 + ev0) / (eps*eps)
             nd2emdl2 = (em2 - 2.0d0 * em1 + em0) / (eps*eps)
             nd2epdl2 = (ep2 - 2.0d0 * ep1 + ep0) / (eps*eps)
-            vlambda = oldvdl + eps
-            elambda = oldeml + eps
-            plambda = oldepl + eps
-            call altelec
+            call settestlmda (use_mainlmda,lmda0+eps,oldvdl+eps,
+     &                        oldeml+eps,oldepl+eps)
             call gradient (eval,derivs)
             do i = 1, n
                do j = 1, 3
@@ -265,10 +268,8 @@ c
                   ndevvirdl(j,i) = evvir(j,i)
                end do
             end do
-            vlambda = oldvdl - eps
-            elambda = oldeml - eps
-            plambda = oldepl - eps
-            call altelec
+            call settestlmda (use_mainlmda,lmda0-eps,oldvdl-eps,
+     &                        oldeml-eps,oldepl-eps)
             call gradient (eval,derivs)
             do i = 1, n
                do j = 1, 3
@@ -292,9 +293,9 @@ c
                end do
             end do
 c
-c     apply chain rule
+c     apply the chain rule to direct sublambda finite differences
 c
-            if (use_dlmda) then
+            if (use_dlmda .and. .not.use_mainlmda) then
                nd2epdl2 = nd2epdl2 * dpldlmda*dpldlmda
      &                           + ndepdl * d2pldlmda2
                ndepdl = ndepdl * dpldlmda
@@ -324,10 +325,7 @@ c
                   end do
                end do
             end if
-            vlambda = oldvdl
-            elambda = oldeml
-            plambda = oldepl
-            call altelec
+            call settestlmda (use_mainlmda,lmda0,oldvdl,oldeml,oldepl)
          end if
 c
 c     print the analytical lambda derivatives
@@ -484,4 +482,44 @@ c
 c     perform any final tasks before program exit
 c
       call final
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine settestlmda  --  set finite-diff lambda  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "settestlmda" sets either the main lambda owned by the active
+c     method or the explicit sublambdas, then updates scaled parameters
+c
+c
+      subroutine settestlmda (mainlmda,lmda,vlmda,elmda,plmda)
+      use dlmda
+      use mutant
+      use ost
+      use thrmint
+      implicit none
+      real*8 lmda,vlmda,elmda,plmda
+      logical mainlmda
+c
+c
+      if (mainlmda) then
+         if (use_ost .or. use_meta) then
+            ostlambda = lmda
+         else if (use_ti) then
+            tilmda = lmda
+         else
+            lambda = lmda
+         end if
+         call refreshsublmda
+      else
+         vlambda = vlmda
+         elambda = elmda
+         plambda = plmda
+         call altelec
+      end if
+      return
       end

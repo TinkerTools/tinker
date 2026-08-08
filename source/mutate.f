@@ -220,15 +220,9 @@ c
       call mutate_ti
       call mutate_check
 c
-c     get mapping from main lambda to sub-lambdas
+c     map the active main lambda and install its dependent parameters
 c
-      if (use_ost .or. use_meta) then
-         call mapsublmda (ostlambda)
-      else if (use_ti) then
-         call mapsublmda (tilmda)
-      else if (use_dlmda) then
-         call mapsublmda (lambda)
-      end if
+      call refreshsublmda
 c
 c     scale electrostatic parameter values based on lambda
 c
@@ -470,10 +464,12 @@ c
          else if (keyword(1:4) .eq. 'OST ') then
             use_dlmda = .true.
             use_ost = .true.
+            use_mainlmda = .true.
             lmdasampmode = 'OST'
          else if (keyword(1:8) .eq. 'METADYN ') then
             use_dlmda = .true.
             use_meta = .true.
+            use_mainlmda = .true.
             lmdasampmode = 'META'
          else if (keyword(1:11) .eq. 'THERM-INTG ') then
             use_dlmda = .true.
@@ -877,7 +873,6 @@ c
          else if (keyword(1:11) .eq. 'OST-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=10)  ostlambda
-            use_mainlmda = .true.
          else if (keyword(1:8) .eq. 'OST-DT ') then
             string = record(next:240)
             read (string,*,err=10)  ostdt

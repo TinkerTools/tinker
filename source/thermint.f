@@ -201,10 +201,9 @@ c
       end do
       tiwinend(tinbin) = nstep
 c
-c     size the accumulators to the schedule and map the sublambdas
+c     size the accumulators to the schedule
 c
       call settiblocks
-      call mapsublmda (tilmda)
       return
       end
 c
@@ -447,13 +446,12 @@ c
       implicit none
 c
 c
-c     take the next lambda and refresh the sublambda values
+c     take the next lambda value
 c
       tibin = tibin + 1
       if (tibin .le. tinbin) then
          tilmda = tilmdalist(tibin)
          call settiwindow
-         call mapsublmda (tilmda)
       end if
       return
       end

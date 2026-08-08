@@ -821,11 +821,10 @@ c
          osttheta = osttheta + 2.0d0*pi
       end do
 c
-c     map theta back to lambda and refresh sublambda values
+c     map theta back to the main lambda
 c
       sinth = sin(osttheta)
       ostlambda = sinth * sinth
-      call mapsublmda (ostlambda)
       return
       end
 c

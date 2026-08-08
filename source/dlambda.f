@@ -5,6 +5,55 @@ c     ##  COPYRIGHT (C) 2026 by  Moses K. J. Chung and Jay W. Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine refreshsublmda  --  refresh active sublambdas  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "refreshsublmda" selects the main lambda owned by the active
+c     sampling method, maps it onto the component sublambdas, and
+c     installs the resulting absolute-topology electrostatic state
+c
+c
+      subroutine refreshsublmda
+      use dlmda
+      use mutant
+      use ost
+      use thrmint
+      implicit none
+      real*8 lmda
+c
+c
+c     return when no main lambda drives the sublambda maps
+c
+      if (.not. use_dlmda)  return
+c
+c     select the main lambda owned by the active sampling method
+c
+      if (use_ost .or. use_meta) then
+         lmda = ostlambda
+      else if (use_ti) then
+         lmda = tilmda
+      else if (use_mainlmda) then
+         lmda = lambda
+      else
+         return
+      end if
+c
+c     update sublambdas, mapping derivatives and endpoint flags
+c
+      call mapsublmda (lmda)
+c
+c     ordinary absolute-topology energy routines consume installed
+c     parameter arrays instead of applying elambda themselves; relative
+c     dual topology routines install their own subsystem endpoint states
+c
+      if (.not. use_rel)  call altelec
+      return
+      end
+c
 c     #############################################################
 c     ##                                                         ##
 c     ##  subroutine mapsublmda -- map from lambda to sublambda  ##

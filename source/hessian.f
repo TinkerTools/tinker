@@ -45,6 +45,10 @@ c
       data first  / .true. /
 c
 c
+c     refresh sublambdas and their dependent parameter state
+c
+      call refreshsublmda
+c
 c     zero out total number of indexed Hessian elements
 c
       nhess = 0

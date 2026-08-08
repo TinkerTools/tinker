@@ -25,12 +25,96 @@ c
 c
       if (skiptest(tname,'ost'))  return
       call initial
+      call test_eostmap_refresh
       call test_eostmap_mapsub
       call test_eostmap_sublmda
       call test_eostmap_taper
       call test_eostmap_lmdachain
       call test_eostmap_relstage
       call final
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eostmap_refresh  --  map owner routing  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eostmap_refresh" checks that refreshsublmda selects the
+c     main lambda owned by the active method and leaves explicit
+c     sublambdas alone when no main lambda is present
+c
+c
+      subroutine test_eostmap_refresh
+      use dlmda
+      use mutant
+      use ost
+      use thrmint
+      implicit none
+c
+c
+c     use identity maps and distinct values for each possible owner
+c
+      use_dlmda = .true.
+      use_elmdamap = .true.
+      use_plmdamap = .true.
+      use_vlmdamap = .true.
+      use_relstage = .false.
+      elmdamap = 'EXP'
+      plmdamap = 'EXP'
+      vlmdamap = 'EXP'
+      elmdaexp = 1
+      plmdaexp = 1
+      vlmdaexp = 1
+      lambda = 0.25d0
+      tilmda = 0.50d0
+      ostlambda = 0.75d0
+c
+c     a static main lambda is used when no sampling method owns it
+c
+      use_ost = .false.
+      use_meta = .false.
+      use_ti = .false.
+      use_mainlmda = .true.
+      call refreshsublmda
+      call assert_real (elambda,lambda,0.0d0,
+     &                  'refreshsublmda static owner')
+c
+c     thermodynamic integration owns the TI window lambda
+c
+      use_ti = .true.
+      call refreshsublmda
+      call assert_real (elambda,tilmda,0.0d0,
+     &                  'refreshsublmda TI owner')
+c
+c     OST and metadynamics both own the OST lambda coordinate
+c
+      use_ti = .false.
+      use_ost = .true.
+      call refreshsublmda
+      call assert_real (elambda,ostlambda,0.0d0,
+     &                  'refreshsublmda OST owner')
+      use_ost = .false.
+      use_meta = .true.
+      call refreshsublmda
+      call assert_real (elambda,ostlambda,0.0d0,
+     &                  'refreshsublmda metadynamics owner')
+c
+c     explicit sublambdas remain unchanged without a main-lambda owner
+c
+      use_meta = .false.
+      use_mainlmda = .false.
+      elambda = 0.125d0
+      call refreshsublmda
+      call assert_real (elambda,0.125d0,0.0d0,
+     &                  'refreshsublmda no owner')
+      use_dlmda = .false.
+      use_elmdamap = .false.
+      use_plmdamap = .false.
+      use_vlmdamap = .false.
       return
       end
 c

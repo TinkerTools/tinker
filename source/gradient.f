@@ -36,6 +36,10 @@ c
       real*8 derivs(3,*)
 c
 c
+c     refresh sublambdas from the active main lambda
+c
+      call refreshsublmda
+c
 c     zero out each of the potential energy components
 c
       esum = 0.0d0
