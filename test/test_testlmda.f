@@ -23,6 +23,8 @@ c
 c
       call test_testlmda_case ('01_water_adt_l05')
       call test_testlmda_case ('02_water_ast_l05')
+      call test_testlmda_case ('03_water_adt_m06p05v04')
+      call test_testlmda_case ('04_water_ast_m06v04')
       return
       end
 c

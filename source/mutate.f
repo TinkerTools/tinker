@@ -88,6 +88,7 @@ c
       elambda = 1.0d0
       vlambda = 1.0d0
       tlambda = 1.0d0
+      use_mainlmda = .false.
 c
 c     set defaults for lambda scaling for lambda derivatives
 c
@@ -127,6 +128,7 @@ c
          if (keyword(1:7) .eq. 'LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  lambda
+            use_mainlmda = .true.
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  elambda
@@ -476,6 +478,7 @@ c
          else if (keyword(1:11) .eq. 'THERM-INTG ') then
             use_dlmda = .true.
             use_ti = .true.
+            use_mainlmda = .true.
             lmdasampmode = 'TI'
          else if (keyword(1:13) .eq. 'ELE-DUALTOPO ') then
             use_emdt = .true.
@@ -874,6 +877,7 @@ c
          else if (keyword(1:11) .eq. 'OST-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=10)  ostlambda
+            use_mainlmda = .true.
          else if (keyword(1:8) .eq. 'OST-DT ') then
             string = record(next:240)
             read (string,*,err=10)  ostdt

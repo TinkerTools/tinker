@@ -80,6 +80,7 @@ c     use_elmdamap  flag that elambda follows the main lambda map
 c     use_emdt      flag governing use of multipole dual topology
 c     use_evdt      flag governing use of van der Waals dual topology
 c     use_epdt      flag governing use of polarization dual topology
+c     use_mainlmda  flag that a main lambda value was specified
 c     use_meta      flag to use metadynamics
 c     use_metadyn   flag to propagate metadynamics lambda particle
 c     use_ost       flag to use orthogonal space tempering
@@ -172,6 +173,7 @@ c
       logical use_emdt
       logical use_epdt
       logical use_evdt
+      logical use_mainlmda
       logical use_meta
       logical use_metadyn
       logical use_ost

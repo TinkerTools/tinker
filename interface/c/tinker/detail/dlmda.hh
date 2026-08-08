@@ -73,6 +73,7 @@ extern int TINKER_MOD(dlmda, use_elmdamap);
 extern int TINKER_MOD(dlmda, use_emdt);
 extern int TINKER_MOD(dlmda, use_epdt);
 extern int TINKER_MOD(dlmda, use_evdt);
+extern int TINKER_MOD(dlmda, use_mainlmda);
 extern int TINKER_MOD(dlmda, use_meta);
 extern int TINKER_MOD(dlmda, use_metadyn);
 extern int TINKER_MOD(dlmda, use_ost);
