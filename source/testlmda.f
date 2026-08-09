@@ -82,17 +82,6 @@ c
       call getxyz
       call mechanic
 c
-c     set flag to use lambda derivative
-c
-      use_dlmda = .true.
-      use_epdt = .true.
-      use_ele4i = .true.
-      use_ele4f = .true.
-      use_pol4i = .true.
-      use_pol4f = .true.
-      use_vdw4i = .true.
-      use_vdw4f = .true.
-c
 c     decide whether to do an analytical derivative calculation
 c
       doanalyt = .true.
@@ -183,6 +172,7 @@ c
 c     compute the analytical lambda derivatives
 c
          if (doanalyt) then
+            use_dlmda = .true.
             call altelec
             call gradient (eval,derivs)
             adedl = dedl
@@ -211,6 +201,7 @@ c
 c     compute the numerical lambda derivatives
 c
          if (donumer) then
+            use_dlmda = .false.
             oldvdl = vlambda
             oldeml = elambda
             oldepl = plambda
@@ -295,7 +286,7 @@ c
 c
 c     apply the chain rule to direct sublambda finite differences
 c
-            if (use_dlmda .and. .not.use_mainlmda) then
+            if (.not. use_mainlmda) then
                nd2epdl2 = nd2epdl2 * dpldlmda*dpldlmda
      &                           + ndepdl * d2pldlmda2
                ndepdl = ndepdl * dpldlmda

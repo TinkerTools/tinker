@@ -28,7 +28,7 @@ c
 c
 c     return when no main lambda drives the sublambda maps
 c
-      if (.not. use_dlmda)  return
+      if (.not. use_mainlmda)  return
 c
 c     select the main lambda owned by the active sampling method
 c
