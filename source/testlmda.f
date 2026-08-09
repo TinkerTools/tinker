@@ -70,6 +70,7 @@ c
       real*8, allocatable :: ndfpdl(:,:)
       logical exist,query
       logical doanalyt,donumer
+      logical keylmda
       character*1 answer
       character*240 xyzfile
       character*240 record
@@ -81,6 +82,7 @@ c
       call initial
       call getxyz
       call mechanic
+      keylmda = use_dlmda
 c
 c     decide whether to do an analytical derivative calculation
 c
@@ -169,9 +171,35 @@ c
    80       format (/,' Analysis for Archive Structure :',8x,i8)
          end if
 c
-c     compute the analytical lambda derivatives
+c     zero analytical derivatives
 c
          if (doanalyt) then
+            adedl = 0.0d0
+            adevdl = 0.0d0
+            ademdl = 0.0d0
+            adepdl = 0.0d0
+            ad2edl2 = 0.0d0
+            ad2evdl2 = 0.0d0
+            ad2emdl2 = 0.0d0
+            ad2epdl2 = 0.0d0
+            do i = 1, n
+               do j = 1, 3
+                  adfsumdl(j,i) = 0.0d0
+                  adfvdl(j,i) = 0.0d0
+                  adfmdl(j,i) = 0.0d0
+                  adfpdl(j,i) = 0.0d0
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  advirdl(j,i) = 0.0d0
+               end do
+            end do
+         end if
+c
+c     compute the analytical lambda derivatives
+c
+         if (doanalyt .and. keylmda) then
             use_dlmda = .true.
             call altelec
             call gradient (eval,derivs)
@@ -198,9 +226,38 @@ c
             end do
          end if
 c
-c     compute the numerical lambda derivatives
+c     zero numerical derivatives
 c
          if (donumer) then
+            ndedl = 0.0d0
+            ndevdl = 0.0d0
+            ndemdl = 0.0d0
+            ndepdl = 0.0d0
+            nd2edl2 = 0.0d0
+            nd2evdl2 = 0.0d0
+            nd2emdl2 = 0.0d0
+            nd2epdl2 = 0.0d0
+            do i = 1, n
+               do j = 1, 3
+                  ndfsumdl(j,i) = 0.0d0
+                  ndfvdl(j,i) = 0.0d0
+                  ndfmdl(j,i) = 0.0d0
+                  ndfpdl(j,i) = 0.0d0
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  ndvirdl(j,i) = 0.0d0
+                  ndepvirdl(j,i) = 0.0d0
+                  ndemvirdl(j,i) = 0.0d0
+                  ndevvirdl(j,i) = 0.0d0
+               end do
+            end do
+         end if
+c
+c     compute the numerical lambda derivatives
+c
+         if (donumer .and. keylmda) then
             use_dlmda = .false.
             oldvdl = vlambda
             oldeml = elambda

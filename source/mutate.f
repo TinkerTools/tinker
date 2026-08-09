@@ -51,7 +51,6 @@ c
       integer ntbnd
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
-      logical setplambda
       character*20 keyword
       character*240 record
       character*240 string
@@ -92,7 +91,9 @@ c
 c
 c     set defaults for lambda scaling for lambda derivatives
 c
+      setelambda = .false.
       setplambda = .false.
+      setvlambda = .false.
       plambda = 1.0d0
 c
 c     set defaults for vdw coupling type and soft core vdw
@@ -132,6 +133,7 @@ c
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  elambda
+            setelambda = .true.
          else if (keyword(1:11) .eq. 'POL-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  plambda
@@ -139,6 +141,7 @@ c
          else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  vlambda
+            setvlambda = .true.
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  tlambda
@@ -303,7 +306,7 @@ c
             write (iout,180)
   180       format (' van der Waals Topology',15x,'Single')
          end if
-         if (use_dlmda) then
+         if (use_mainlmda) then
             if (use_ost .or. use_meta) then
                write (iout,190)  ostlambda
             else if (use_ti) then
@@ -371,6 +374,7 @@ c
       integer i,j,k
       integer next
       real*8 temp
+      logical elmdamapset
       character*20 keyword
       character*240 record
       character*240 string
@@ -551,6 +555,42 @@ c
          end if
    10    continue
       end do
+c
+c     a main lambda drives every sublambda
+c
+      if (use_mainlmda .and. .not.use_relstage) then
+         elmdamapset = use_elmdamap
+         if (.not.use_elmdamap .and. .not.setelambda) then
+            use_elmdamap = .true.
+            elmdamap = 'EXP'
+         end if
+c
+c     polarization follows electrostatics unless told otherwise
+c
+         if (.not.use_plmdamap .and. .not.setplambda) then
+            use_plmdamap = .true.
+            if (elmdamapset) then
+               plmdamap = elmdamap
+               plmdaexp = elmdaexp
+               plmdainvn = elmdainvn
+               plmdainveps = elmdainveps
+               qntplmda0 = qntelmda0
+               qntplmda1 = qntelmda1
+            else
+               plmdamap = 'EXP'
+            end if
+         end if
+         if (.not.use_vlmdamap .and. .not.setvlambda) then
+            use_vlmdamap = .true.
+            vlmdamap = 'EXP'
+         end if
+c
+c     a pinned sublambda is held fixed as the main lambda moves
+c
+         if (.not. use_elmdamap)  deldlmda = 0.0d0
+         if (.not. use_plmdamap)  dpldlmda = 0.0d0
+         if (.not. use_vlmdamap)  dvldlmda = 0.0d0
+      end if
 c
 c     enable dual topology for relative free energy
 c
@@ -1289,41 +1329,23 @@ c
          call fatal
       end if
 c
-c     a sampled main lambda must drive every active potential term,
-c     since an unmapped term would hold its own sublambda fixed while
-c     still contributing to the derivative; the staged relative
-c     schedule is exempt because it maps the sublambdas itself
+c     the staged relative schedule maps every sublambda on its own,
+c     so a sublambda pinned by its own keyword would be overwritten
 c
-      if ((use_ost .or. use_meta .or. use_ti)
-     &       .and. .not.use_relstage) then
-         if ((use_mpole .or. use_charge) .and. .not.use_elmdamap) then
-            write (iout,30)
-   30       format (/,' MUTATE_CHECK  --  Sampling the Main Lambda',
-     &                 ' with Electrostatics Active requires the',
-     &                 ' ELE-LMDA-MAP keyword')
-            call fatal
-         end if
-         if (use_polar .and. .not.use_plmdamap) then
-            write (iout,40)
-   40       format (/,' MUTATE_CHECK  --  Sampling the Main Lambda',
-     &                 ' with Polarization Active requires the',
-     &                 ' POL-LMDA-MAP keyword')
-            call fatal
-         end if
-         if (use_vdw .and. .not.use_vlmdamap) then
-            write (iout,50)
-   50       format (/,' MUTATE_CHECK  --  Sampling the Main Lambda',
-     &                 ' with van der Waals Active requires the',
-     &                 ' VDW-LMDA-MAP keyword')
-            call fatal
-         end if
+      if (use_relstage .and.
+     &    (setelambda .or. setplambda .or. setvlambda)) then
+         write (iout,30)
+   30    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
+     &              ' from its own schedule; remove the ELE-LAMBDA,',
+     &              ' POL-LAMBDA and VDW-LAMBDA keywords')
+         call fatal
       end if
 c
 c     the staged relative schedule morphs one ligand into another
 c
       if (use_relstage .and. nmutb.eq.0) then
-         write (iout,60)
-   60    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
+         write (iout,40)
+   40    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
      &              ' ligand group; add the LIGAND2 keyword')
          call fatal
       end if

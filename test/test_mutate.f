@@ -21,6 +21,8 @@ c
 c
 c
       call test_mutate_refresh
+      call test_mutate_lmda
+      call test_mutate_lmdafix
       call test_mutate_mv
       call test_mutate_mp
       call test_mutate_ast
@@ -209,6 +211,116 @@ c
       deallocate (derivsref)
       call popdir
       call final
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_mutate_lmda  --  main lambda keyword  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_mutate_lmda" checks that the "LAMBDA" keyword drives the
+c     electrostatic, polarization and van der Waals sublambdas; with no
+c     map keyword the relation is linear, a map keyword is honored and
+c     mirrored onto polarization, and a sublambda given its own keyword
+c     is pinned and drops out of the chain rule; each mapped fixture is
+c     compared against the explicit sublambda fixture it should match
+c
+c
+      subroutine test_mutate_lmda
+      use atoms
+      use dlmda
+      use mutant
+      implicit none
+      real*8 energy
+      real*8 e,eref
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_lmda','mutate'))  return
+      call pushdir ('file/mutate')
+c
+c     a main lambda with no map keyword drives all three sublambdas
+c
+      call loadfix ('water2','146_water_lmda_ast_l05.key')
+      call assert_logical (use_mainlmda,.true.,
+     &                  'lmda linear use_mainlmda')
+      call assert_logical (use_elmdamap,.true.,
+     &                  'lmda linear use_elmdamap')
+      call assert_logical (use_plmdamap,.true.,
+     &                  'lmda linear use_plmdamap')
+      call assert_logical (use_vlmdamap,.true.,
+     &                  'lmda linear use_vlmdamap')
+      call assert_real (elambda,0.5d0,0.0d0,'lmda linear elambda')
+      call assert_real (plambda,0.5d0,0.0d0,'lmda linear plambda')
+      call assert_real (vlambda,0.5d0,0.0d0,'lmda linear vlambda')
+      call assert_real (deldlmda,1.0d0,0.0d0,'lmda linear deldlmda')
+      call assert_real (dpldlmda,1.0d0,0.0d0,'lmda linear dpldlmda')
+      call assert_real (dvldlmda,1.0d0,0.0d0,'lmda linear dvldlmda')
+      e = energy ()
+      call final
+      call loadfix ('water2','147_water_lmda_ast_e05.key')
+      eref = energy ()
+      call assert_real (e,eref,1.0d-10,'lmda linear energy')
+      call final
+c
+c     the fully coupled endpoint matches a fixture with no lambda
+c
+      call loadfix ('water2','148_water_lmda_ast_l10.key')
+      call assert_real (elambda,1.0d0,0.0d0,'lmda endpoint elambda')
+      call assert_real (plambda,1.0d0,0.0d0,'lmda endpoint plambda')
+      call assert_real (vlambda,1.0d0,0.0d0,'lmda endpoint vlambda')
+      e = energy ()
+      call final
+      call loadfix ('water2','149_water_lmda_ast_none.key')
+      eref = energy ()
+      call assert_real (e,eref,1.0d-10,'lmda endpoint energy')
+      call final
+c
+c     a sublambda given its own keyword is pinned and leaves the chain
+c
+      call loadfix ('water2','150_water_lmda_pin_l05v10.key')
+      call assert_logical (use_vlmdamap,.false.,
+     &                  'lmda pinned use_vlmdamap')
+      call assert_real (elambda,0.5d0,0.0d0,'lmda pinned elambda')
+      call assert_real (plambda,0.5d0,0.0d0,'lmda pinned plambda')
+      call assert_real (vlambda,1.0d0,0.0d0,'lmda pinned vlambda')
+      call assert_real (deldlmda,1.0d0,0.0d0,'lmda pinned deldlmda')
+      call assert_real (dpldlmda,1.0d0,0.0d0,'lmda pinned dpldlmda')
+      call assert_real (dvldlmda,0.0d0,0.0d0,'lmda pinned dvldlmda')
+      e = energy ()
+      call final
+      call loadfix ('water2','151_water_lmda_pin_e05v10.key')
+      eref = energy ()
+      call assert_real (e,eref,1.0d-10,'lmda pinned energy')
+      call final
+c
+c     polarization mirrors an explicit electrostatic map
+c
+      call loadfix ('water2','152_water_lmda_qnt_l05.key')
+      call assert_logical (plmdamap.eq.'QNT',.true.,
+     &                  'lmda mirror plmdamap')
+      call assert_real (qntplmda0,0.0d0,0.0d0,'lmda mirror qntplmda0')
+      call assert_real (qntplmda1,1.0d0,0.0d0,'lmda mirror qntplmda1')
+      call assert_real (elambda,0.5d0,1.0d-15,'lmda mirror elambda')
+      call assert_real (plambda,elambda,0.0d0,'lmda mirror plambda')
+      call assert_real (vlambda,0.5d0,0.0d0,'lmda mirror vlambda')
+      call final
+c
+c     an explicit map on one term leaves the others linear
+c
+      call loadfix ('water2','153_water_lmda_vexp_l05.key')
+      call assert_logical (vlmdamap.eq.'EXP',.true.,
+     &                  'lmda vexp vlmdamap')
+      call assert_real (elambda,0.5d0,0.0d0,'lmda vexp elambda')
+      call assert_real (plambda,0.5d0,0.0d0,'lmda vexp plambda')
+      call assert_real (vlambda,0.125d0,1.0d-15,'lmda vexp vlambda')
+      call assert_real (dvldlmda,0.75d0,1.0d-15,'lmda vexp dvldlmda')
+      call final
+      call popdir
       return
       end
 c
@@ -913,49 +1025,6 @@ c
 c
 c     #############################################################
 c     ##                                                         ##
-c     ##  subroutine test_mutate_vcorr  --  VDW correction tests  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "test_mutate_vcorr" runs the four VDW-only water fixtures
-c     142-145 with the long-range VDW correction enabled; cases
-c     142-143 use absolute dual topology at the coupled and decoupled
-c     quintic endpoints, while cases 144-145 use relative dual
-c     topology at the same endpoints; all four support a pairwise
-c     neighbor list and exercise the level 4 lambda derivative checks
-c
-c
-      subroutine test_mutate_vcorr
-      implicit none
-c
-c
-      call test_mutate_calc ('water2',
-     &   '142_water_qnt_vcorr_adt_l10.key',
-     &   '142_water_qnt_vcorr_adt_l10.txt',
-     &   '142_water_qnt_vcorr_adt_l10',
-     &   .false., .false., .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2',
-     &   '143_water_qnt_vcorr_adt_l00.key',
-     &   '143_water_qnt_vcorr_adt_l00.txt',
-     &   '143_water_qnt_vcorr_adt_l00',
-     &   .false., .false., .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2',
-     &   '144_water_qnt_vcorr_rdt_l10.key',
-     &   '144_water_qnt_vcorr_rdt_l10.txt',
-     &   '144_water_qnt_vcorr_rdt_l10',
-     &   .false., .false., .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2',
-     &   '145_water_qnt_vcorr_rdt_l00.key',
-     &   '145_water_qnt_vcorr_rdt_l00.txt',
-     &   '145_water_qnt_vcorr_rdt_l00',
-     &   .false., .false., .true.,  .true.,  .true.)
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
 c     ##  subroutine test_mutate_rels  --  staged rel dual topo  ##
 c     ##                                                         ##
 c     #############################################################
@@ -1001,6 +1070,101 @@ c
       call test_mutate_calc ('water2','141_water_rels_ye_l000.key',
      &   '141_water_rels_ye_l000.txt','141_water_rels_ye_l000',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_mutate_vcorr  --  VDW correction tests  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_mutate_vcorr" runs the four VDW-only water fixtures
+c     142-145 with the long-range VDW correction enabled; cases
+c     142-143 use absolute dual topology at the coupled and decoupled
+c     quintic endpoints, while cases 144-145 use relative dual
+c     topology at the same endpoints; all four support a pairwise
+c     neighbor list and exercise the level 4 lambda derivative checks
+c
+c
+      subroutine test_mutate_vcorr
+      implicit none
+c
+c
+      call test_mutate_calc ('water2',
+     &   '142_water_qnt_vcorr_adt_l10.key',
+     &   '142_water_qnt_vcorr_adt_l10.txt',
+     &   '142_water_qnt_vcorr_adt_l10',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '143_water_qnt_vcorr_adt_l00.key',
+     &   '143_water_qnt_vcorr_adt_l00.txt',
+     &   '143_water_qnt_vcorr_adt_l00',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '144_water_qnt_vcorr_rdt_l10.key',
+     &   '144_water_qnt_vcorr_rdt_l10.txt',
+     &   '144_water_qnt_vcorr_rdt_l10',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '145_water_qnt_vcorr_rdt_l00.key',
+     &   '145_water_qnt_vcorr_rdt_l00.txt',
+     &   '145_water_qnt_vcorr_rdt_l00',
+     &   .false., .false., .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_lmdafix  --  main lambda fixtures  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_lmdafix" runs the eight water fixtures 146-153 that
+c     drive the sublambdas from the "lambda" keyword at a fixed lambda
+c     value; no fixture carries the "lambda-deriv" keyword, so the level
+c     4 checks stay off and only the energy, gradient, virial and named
+c     components are verified; cases 146 and 147, 148 and 149, and 150
+c     and 151 are pairs that must agree, respectively pinning the linear
+c     map against explicit sublambdas, the fully coupled endpoint
+c     against a fixture with no lambda at all, and a pinned van der
+c     Waals term against explicit sublambdas; case 152 mirrors an
+c     explicit electrostatic map onto polarization while 153 maps only
+c     van der Waals; all fixtures use Ewald and support a neighbor list
+c
+c
+      subroutine test_mutate_lmdafix
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','146_water_lmda_ast_l05.key',
+     &   '146_water_lmda_ast_l05.txt','146_water_lmda_ast_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','147_water_lmda_ast_e05.key',
+     &   '147_water_lmda_ast_e05.txt','147_water_lmda_ast_e05',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','148_water_lmda_ast_l10.key',
+     &   '148_water_lmda_ast_l10.txt','148_water_lmda_ast_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','149_water_lmda_ast_none.key',
+     &   '149_water_lmda_ast_none.txt','149_water_lmda_ast_none',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','150_water_lmda_pin_l05v10.key',
+     &   '150_water_lmda_pin_l05v10.txt','150_water_lmda_pin_l05v10',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','151_water_lmda_pin_e05v10.key',
+     &   '151_water_lmda_pin_e05v10.txt','151_water_lmda_pin_e05v10',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','152_water_lmda_qnt_l05.key',
+     &   '152_water_lmda_qnt_l05.txt','152_water_lmda_qnt_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','153_water_lmda_vexp_l05.key',
+     &   '153_water_lmda_vexp_l05.txt','153_water_lmda_vexp_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
       return
       end
 c

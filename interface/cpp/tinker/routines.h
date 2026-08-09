@@ -304,6 +304,8 @@ inline void tinker_f_gdastat(int* nstep, double* beta, double* xx, tinker_fchars
 }
 
 // dlambda.f
+void refreshsublmda_();
+#define tinker_f_refreshsublmda refreshsublmda_
 void mapsublmda_(double* lmda);
 #define tinker_f_mapsublmda mapsublmda_
 void maprelstage_(double* lmda);
