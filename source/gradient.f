@@ -348,19 +348,7 @@ c
 c     sum up to get the total lambda derivative
 c
       if (use_dlmda) then
-         if (use_dlmda)  call lmdachain
-         dedl = devdl + demdl + depdl
-         d2edl2 = d2evdl2 + d2emdl2 + d2epdl2
-         do i = 1, n
-            do j = 1, 3
-               dfsumdl(j,i) = dfvdl(j,i) + dfmdl(j,i) + dfpdl(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               dvirdl(j,i) = devvirdl(j,i)+demvirdl(j,i)+depvirdl(j,i)
-            end do
-         end do
+         call lmdachain
          if (use_ostdyn .or. use_metadyn) then
             call eostbias
             if (.not. osttrial) then

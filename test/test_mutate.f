@@ -22,7 +22,6 @@ c
 c
       call test_mutate_refresh
       call test_mutate_lmda
-      call test_mutate_lmdafix
       call test_mutate_mv
       call test_mutate_mp
       call test_mutate_ast
@@ -34,8 +33,9 @@ c
       call test_mutate_exf
       call test_mutate_emplar
       call test_mutate_qntrng
-      call test_mutate_vcorr
       call test_mutate_rels
+      call test_mutate_vcorr
+      call test_mutate_lmdafix
       return
       end
 c

@@ -701,9 +701,11 @@ c
       if (allocated(dfpdl))  deallocate (dfpdl)
       if (allocated(dfmdl))  deallocate (dfmdl)
       if (allocated(dfvdl))  deallocate (dfvdl)
+      if (allocated(dfsumdl))  deallocate (dfsumdl)
       allocate (dfpdl(3,n))
       allocate (dfmdl(3,n))
       allocate (dfvdl(3,n))
+      allocate (dfsumdl(3,n))
       dpldlmda = 2.0d0
       d2pldlmda2 = 3.0d0
       deldlmda = 11.0d0
@@ -793,6 +795,7 @@ c
       deallocate (dfpdl)
       deallocate (dfmdl)
       deallocate (dfvdl)
+      deallocate (dfsumdl)
       return
       end
 c
