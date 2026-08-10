@@ -515,7 +515,7 @@ c
 c     egkernel evaluates the continuous gaussian and derivatives
 c
       lambda = 0.75d0
-      ostdedl = 1.0d0
+      dedl = 1.0d0
       call egkernel (egbias,dgdl,dgdfl)
       expected = 2.0d0 + exp(-1.0d0)
       call assert_real (egbias,expected,1.0d-12,
@@ -534,7 +534,7 @@ c
       call sethist (2,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       lambda = 0.50d0
-      ostdedl = 0.0d0
+      dedl = 0.0d0
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,2.0d0,1.0d-12,
      &                  'egkernel same-bin linked bias')
@@ -554,7 +554,7 @@ c
       call sethist (3,0.75d0,1.0d0,3.0d0*height,wlmda,wflmda)
       call buildostindex
       lambda = 0.75d0
-      ostdedl = 1.0d0
+      dedl = 1.0d0
       call egkernel (egbias,dgdl,dgdfl)
       expected = 3.0d0 + 3.0d0*exp(-1.0d0)
       call assert_real (egbias,expected,1.0d-12,
@@ -572,7 +572,7 @@ c
       call sethist (1,0.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       lambda = 0.0d0
-      ostdedl = 0.0d0
+      dedl = 0.0d0
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,2.0d0,1.0d-12,
      &                  'egkernel left mirror bias')
@@ -587,7 +587,7 @@ c
       call sethist (1,1.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       lambda = 1.0d0
-      ostdedl = 0.0d0
+      dedl = 0.0d0
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,2.0d0,1.0d-12,
      &                  'egkernel right mirror bias')
@@ -612,7 +612,7 @@ c
       call assert_real (gkernel(22,46),expected,1.0d-12,
      &                  'buildgkernel wide hist width')
       lambda = targetl
-      ostdedl = targetf
+      dedl = targetf
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,expected,1.0d-12,
      &                  'egkernel wide hist width bias')
@@ -630,7 +630,7 @@ c
       call sethist (1,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       lambda = 0.50d0
-      ostdedl = 100.0d0
+      dedl = 100.0d0
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,0.0d0,1.0d-12,
      &                  'egkernel outside flambda bias')
@@ -925,6 +925,7 @@ c     bias values and derivatives
 c
 c
       subroutine test_eost_eginterpolate
+      use dlmda
       use math
       use mutant
       use ost
@@ -950,7 +951,7 @@ c
       call buildostindex
       call buildkernels
       lambda = 0.50d0
-      ostdedl = 0.0d0
+      dedl = 0.0d0
       ostinterpol = .false.
       call egkernel (egbias0,dgdl0,dgdfl0)
       call egkernelinterpolate (egbias1,dgdl1,dgdfl1)
@@ -976,7 +977,7 @@ c
       call buildostindex
       call buildkernels
       lambda = 0.53125d0
-      ostdedl = 0.25d0
+      dedl = 0.25d0
       ostinterpol = .false.
       call egkernel (egbias0,dgdl0,dgdfl0)
       call egkernelinterpolate (egbias1,dgdl1,dgdfl1)
@@ -1669,6 +1670,7 @@ c     checks the gaussian that emetadyn stores
 c
 c
       subroutine test_eost_metadyn
+      use dlmda
       use mutant
       use ost
       implicit none
@@ -1687,7 +1689,7 @@ c
       ostnavg = 2
       hbias = 2.0d0
       wlmda = 0.25d0
-      ostdedl = 0.0d0
+      dedl = 0.0d0
       ostdt = 0.0d0
       iost = 0
       do istep = 1, iosthist
@@ -1729,6 +1731,7 @@ c
 c
       subroutine test_eost_metatemper
       use bath
+      use dlmda
       use mutant
       use ost
       implicit none
@@ -1750,7 +1753,7 @@ c
       ostnequil = 2
       ostnavg = 2
       hbias = 2.0d0
-      ostdedl = 0.0d0
+      dedl = 0.0d0
       ostdt = 0.0d0
       ostemper = .true.
       temperthresh = 0.5d0
@@ -1893,7 +1896,7 @@ c
       iost = 0
       do istep = 1, iosthist
          lambda = 0.5d0
-         ostdedl = 1.0d0
+         dedl = 1.0d0
          call eostdyn
          if (istep .lt. iosthist) then
             call assert_int (nosthist,0,
@@ -1916,8 +1919,8 @@ c
       eostsave = eosttot
       do istep = 1, iosthist
          lambda = 0.5d0
-         ostdedl = 1.0d0
-         if (mod(istep,2) .eq. 0)  ostdedl = 11.0d0
+         dedl = 1.0d0
+         if (mod(istep,2) .eq. 0)  dedl = 11.0d0
          call eostdyn
       end do
       call assert_real (ostdedlavg,6.0d0,1.0d-12,
@@ -2008,7 +2011,7 @@ c
       ostlambdaavg = 0.0d0
       ostlambdastd = 0.0d0
       ostlambdaslp = 0.0d0
-      ostdedl = 0.0d0
+      dedl = 0.0d0
       ostdedlavg = 0.0d0
       ostdedlstd = 0.0d0
       ostdedlslp = 0.0d0

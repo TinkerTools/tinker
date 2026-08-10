@@ -46,7 +46,6 @@ c     ostcvrat       max ratio of sample deviation to sample average
 c     ostcvslp       max fitted sample slope over a deposit interval
 c     ostcvstd       max sample deviation over a deposit interval
 c     ostddgdl       current dDeltaG/dlambda value
-c     ostdedl        current unbiased dU/dL value
 c     ostdedlavg     average dU/dL value between hist updates
 c     ostdedlslp     fitted dU/dL change per sample over an interval
 c     ostdedlstd     standard deviation of dU/dL between updates
@@ -137,7 +136,6 @@ c
       real*8 ostcvslp
       real*8 ostcvstd
       real*8 ostddgdl
-      real*8 ostdedl
       real*8 ostdedlavg
       real*8 ostdedlslp
       real*8 ostdedlstd

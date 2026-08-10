@@ -121,7 +121,7 @@ c
          if (digits .ge. 8) then
             write (iout,110)  lambda
   110       format (' Current Lambda',6x,f19.8)
-            write (iout,120)  ostdedl
+            write (iout,120)  dedl
   120       format (' Current dU/dLambda',2x,f19.8,' Kcal/mole')
             write (iout,130)  ostdgdl
   130       format (' Current dg/dLambda',2x,f19.8,' Kcal/mole')
@@ -132,7 +132,7 @@ c
          else if (digits .ge. 6) then
             write (iout,160)  lambda
   160       format (' Current Lambda',6x,f17.6)
-            write (iout,170)  ostdedl
+            write (iout,170)  dedl
   170       format (' Current dU/dLambda',2x,f17.6,' Kcal/mole')
             write (iout,180)  ostdgdl
   180       format (' Current dg/dLambda',2x,f17.6,' Kcal/mole')
@@ -143,7 +143,7 @@ c
          else
             write (iout,210)  lambda
   210       format (' Current Lambda',6x,f15.4)
-            write (iout,220)  ostdedl
+            write (iout,220)  dedl
   220       format (' Current dU/dLambda',2x,f15.4,' Kcal/mole')
             write (iout,230)  ostdgdl
   230       format (' Current dg/dLambda',2x,f15.4,' Kcal/mole')

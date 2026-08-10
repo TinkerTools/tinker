@@ -37,10 +37,6 @@ c
       real*8 vbias,dvdl
 c
 c
-c     refresh the unbiased dU/dlambda at the current configuration
-c
-      ostdedl = dedl
-c
 c     the metadynamics bias depends on lambda alone
 c
       if (use_metadyn) then
@@ -111,12 +107,13 @@ c     increment iost step counter
 c
       iost = iost + 1
 c
-c     build the effective lambda derivative from the bias terms
-c     evaluated this step by eostbias, which also refreshed ostdedl
+c     build the effective lambda derivative from the unbiased value
+c     summed by lmdachain and the bias terms evaluated this step by
+c     eostbias
 c
       ostdgdl = ostbdgdl + ostbdgdfl*d2edl2
       ostddgdl = ostbdfdl
-      deffdl = ostdedl + ostdgdl - ostddgdl
+      deffdl = dedl + ostdgdl - ostddgdl
 c
 c     save all values in the hist interval, but average only after
 c     the requested equilibration fraction
@@ -128,7 +125,7 @@ c
          isamp = istep
       end if
       ostllist(isamp) = lambda
-      ostflist(isamp) = ostdedl
+      ostflist(isamp) = dedl
 c
 c     add a new histogram count every iosthist steps
 c
@@ -198,6 +195,7 @@ c     the main lambda coordinate and deposits lambda gaussians
 c
 c
       subroutine emetadyn
+      use dlmda
       use mutant
       use ost
       implicit none
@@ -211,10 +209,10 @@ c     increment adaptive-bias step counter
 c
       iost = iost + 1
 c
-c     effective lambda derivative from the bias evaluated this step
-c     by eostbias, which also refreshed ostdedl
+c     effective lambda derivative from the unbiased value summed by
+c     lmdachain and the bias evaluated this step by eostbias
 c
-      deffdl = ostdedl + ostbdgdl
+      deffdl = dedl + ostbdgdl
 c
 c     save all lambda values in the hist interval
 c
@@ -965,6 +963,7 @@ c     derivatives at the current lambda and unbiased dU/dlambda values
 c
 c
       subroutine egkernel (egbias,dgdl,dgdfl)
+      use dlmda
       use math
       use mutant
       use ost
@@ -997,7 +996,7 @@ c
 c     get the current lambda and flambda bin indices
 c
       ilmda = lambdabin(lambda)
-      iflmda = nint(ostdedl / wflmda) + fli0
+      iflmda = nint(dedl / wflmda) + fli0
       if (iflmda .lt. 1 .or. iflmda .gt. nflmda)  return
 c
 c     use max gaussian widths for conservative bin cutoffs
@@ -1033,7 +1032,7 @@ c
                      sigl = ostwlhist(ihist)
                      sigf = ostwfhist(ihist)
                      sourcefl = ostfhist(ihist)
-                     fldelta = ostdedl - sourcefl
+                     fldelta = dedl - sourcefl
                      if (abs(fldelta) .le. oststdev*sigf) then
                         sigl2 = sigl * sigl
                         sigf2 = sigf * sigf
@@ -1094,6 +1093,7 @@ c     derivatives using bicubic Hermite interpolation on the grid
 c
 c
       subroutine egkernelinterpolate (egbias,dgdl,dgdfl)
+      use dlmda
       use mutant
       use ost
       implicit none
@@ -1119,7 +1119,7 @@ c
       flend = dble(nflmda-fli0) * wflmda
       if (lambda .lt. 0.0d0 .or. lambda .gt. 1.0d0)
      &   return
-      if (ostdedl .lt. flstart .or. ostdedl .gt. flend)  return
+      if (dedl .lt. flstart .or. dedl .gt. flend)  return
 c
 c     locate the lower-left grid point of the interpolation cell
 c
@@ -1129,16 +1129,16 @@ c
          il0 = int(lambda/wlmda) + 1
          il0 = max(1,min(il0,nlmda-1))
       end if
-      if (ostdedl .ge. flend) then
+      if (dedl .ge. flend) then
          if0 = nflmda - 1
       else
-         if0 = int((ostdedl-flstart)/wflmda) + 1
+         if0 = int((dedl-flstart)/wflmda) + 1
          if0 = max(1,min(if0,nflmda-1))
       end if
       l0 = dble(il0-1) * wlmda
       f0 = dble(if0-fli0) * wflmda
       x = (lambda-l0) / wlmda
-      y = (ostdedl-f0) / wflmda
+      y = (dedl-f0) / wflmda
 c
 c     cubic Hermite basis functions and normalized derivatives
 c

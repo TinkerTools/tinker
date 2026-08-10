@@ -28,7 +28,7 @@ c     d2epdl2       polarization second order lambda derivative
 c     d2evdl2       van der Waals second order lambda derivative
 c     d2pldlmda2    second derivative of plambda wrt main lambda
 c     d2vldlmda2    second derivative of vlambda wrt main lambda
-c     dedl          total energy lambda derivative
+c     dedl          total unbiased energy lambda derivative
 c     deldlmda      derivative of elambda wrt main lambda
 c     demdl         multipole lambda derivative
 c     depdl         polarization lambda derivative

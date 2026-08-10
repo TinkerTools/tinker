@@ -453,6 +453,11 @@ c
       d2pldlmda2 = 0.0d0
       d2vldlmda2 = 0.0d0
 c
+c     the lambda derivative is undefined until a gradient is taken
+c
+      dedl = 0.0d0
+      d2edl2 = 0.0d0
+c
 c     search keywords for lambda derivative options
 c
       do i = 1, nkey
@@ -872,7 +877,6 @@ c
       ostlambdastd = 0.0d0
       ostdedlavg = 0.0d0
       ostdedlstd = 0.0d0
-      ostdedl = 0.0d0
       deffdl = 0.0d0
       osttheta = pi / 2.0d0
       ostvtheta = 0.0d0
