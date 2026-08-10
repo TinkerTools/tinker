@@ -12,39 +12,24 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "refreshsublmda" selects the main lambda owned by the active
-c     sampling method, maps it onto the component sublambdas, and
-c     installs the resulting absolute-topology electrostatic state
+c     "refreshsublmda" maps the main lambda onto the component
+c     sublambdas and installs the resulting absolute-topology
+c     electrostatic state
 c
 c
       subroutine refreshsublmda
       use dlmda
       use mutant
-      use ost
-      use thrmint
       implicit none
-      real*8 lmda
 c
 c
 c     return when no main lambda drives the sublambda maps
 c
       if (.not. use_mainlmda)  return
 c
-c     select the main lambda owned by the active sampling method
-c
-      if (use_ost .or. use_meta) then
-         lmda = ostlambda
-      else if (use_ti) then
-         lmda = tilmda
-      else if (use_mainlmda) then
-         lmda = lambda
-      else
-         return
-      end if
-c
 c     update sublambdas, mapping derivatives and endpoint flags
 c
-      call mapsublmda (lmda)
+      call mapsublmda (lambda)
 c
 c     ordinary absolute-topology energy routines consume installed
 c     parameter arrays instead of applying elambda themselves; relative

@@ -144,6 +144,7 @@ c     the final window has been passed
 c
 c
       subroutine test_thermint_schedule
+      use mutant
       use thrmint
       implicit none
       integer k
@@ -163,19 +164,19 @@ c
          call assert_int (tibin,k+1,label)
          write (label,20)  k
    20    format ('tischedule 21 bin lambda ',i0)
-         call assert_real (tilmda,1.0d0-dble(k)/20.0d0,eps,label)
+         call assert_real (lambda,1.0d0-dble(k)/20.0d0,eps,label)
       end do
 c
 c     the final window must sit exactly on the endpoint
 c
-      call assert_real (tilmda,0.0d0,0.0d0,
+      call assert_real (lambda,0.0d0,0.0d0,
      &                  'tischedule 21 bin endpoint')
 c
 c     one call past the end advances the index but leaves lambda
 c     where the last window left it
 c
       call tischedule
-      call assert_real (tilmda,0.0d0,0.0d0,
+      call assert_real (lambda,0.0d0,0.0d0,
      &                  'tischedule 21 bin past end lambda')
       call assert_int (tibin,22,'tischedule 21 bin past end index')
 c
@@ -190,17 +191,17 @@ c
          call tischedule
          write (label,30)  k
    30    format ('tischedule 5 bin step ',i0)
-         call assert_real (tilmda,lref5(k),eps,label)
+         call assert_real (lambda,lref5(k),eps,label)
       end do
-      call assert_real (tilmda,0.0d0,0.0d0,
+      call assert_real (lambda,0.0d0,0.0d0,
      &                  'tischedule 5 bin endpoint')
 c
 c     two windows sample only the two endpoints
 c
       call resetti (2,10,40,20)
-      call assert_real (tilmda,1.0d0,0.0d0,'tischedule 2 bin start')
+      call assert_real (lambda,1.0d0,0.0d0,'tischedule 2 bin start')
       call tischedule
-      call assert_real (tilmda,0.0d0,0.0d0,'tischedule 2 bin end')
+      call assert_real (lambda,0.0d0,0.0d0,'tischedule 2 bin end')
       call assert_int (tibin,2,'tischedule 2 bin index')
 c
 c     an ascending schedule must not be clamped back toward zero
@@ -210,15 +211,15 @@ c
       tilmdalist(2) = 0.1d0
       tilmdalist(3) = 0.4d0
       tilmdalist(4) = 1.0d0
-      tilmda = tilmdalist(1)
+      lambda = tilmdalist(1)
       do k = 2, 4
          call tischedule
          write (label,40)  k
    40    format ('tischedule ascending step ',i0)
-         call assert_real (tilmda,tilmdalist(k),eps,label)
+         call assert_real (lambda,tilmdalist(k),eps,label)
       end do
       call tischedule
-      call assert_real (tilmda,1.0d0,0.0d0,
+      call assert_real (lambda,1.0d0,0.0d0,
      &                  'tischedule ascending holds at one')
       return
       end
@@ -241,6 +242,7 @@ c     stop the test binary
 c
 c
       subroutine test_thermint_settisched
+      use mutant
       use thrmint
       implicit none
       integer k
@@ -265,7 +267,7 @@ c
       call assert_real (tilmdalist(21),0.0d0,0.0d0,
      &                  'settisched 21 bin endpoint')
       call assert_int (tibin,1,'settisched 21 bin start index')
-      call assert_real (tilmda,1.0d0,0.0d0,'settisched 21 bin start')
+      call assert_real (lambda,1.0d0,0.0d0,'settisched 21 bin start')
 c
 c     five and two window schedules hit their endpoints exactly
 c
@@ -300,7 +302,7 @@ c
       call assert_real (tilmdalist(3),0.2d0,eps,'settisched down 3')
       call assert_real (tilmdalist(4),0.0d0,eps,'settisched down 4')
       call assert_int (tibin,1,'settisched explicit start index')
-      call assert_real (tilmda,1.0d0,eps,'settisched explicit start')
+      call assert_real (lambda,1.0d0,eps,'settisched explicit start')
 c
 c     with no fractions asked for, the run is split evenly
 c
@@ -325,7 +327,7 @@ c
       call assert_real (tilmdalist(2),0.1d0,eps,'settisched up 2')
       call assert_real (tilmdalist(3),0.4d0,eps,'settisched up 3')
       call assert_real (tilmdalist(4),1.0d0,eps,'settisched up 4')
-      call assert_real (tilmda,0.0d0,eps,'settisched ascending start')
+      call assert_real (lambda,0.0d0,eps,'settisched ascending start')
 c
 c     the schedule need not touch either endpoint; any monotonic
 c     run of values inside [0,1] is a valid set of windows
@@ -343,7 +345,7 @@ c
      &                  'settisched interior 2')
       call assert_real (tilmdalist(3),0.20d0,eps,
      &                  'settisched interior 3')
-      call assert_real (tilmda,0.75d0,eps,
+      call assert_real (lambda,0.75d0,eps,
      &                  'settisched interior start')
 c
 c     a single window is legal and covers the whole trajectory,
@@ -364,7 +366,7 @@ c
       call assert_int (tinequil,0,'settisched single equilibration')
       call assert_int (tinblock,20,'settisched single blocks')
       call assert_int (tinbtot,20,'settisched single capacity')
-      call assert_real (tilmda,0.5d0,eps,'settisched single lambda')
+      call assert_real (lambda,0.5d0,eps,'settisched single lambda')
       return
       end
 c
@@ -641,6 +643,7 @@ c
 c
       subroutine test_thermint_data
       use dlmda
+      use mutant
       use thrmint
       implicit none
       integer i
@@ -663,7 +666,7 @@ c
       call assert_int (tinbcount,0,'tidata initial block count')
       call assert_int (tinbsave,0,'tidata initial blocks saved')
       call assert_int (tibin,1,'tidata initial window index')
-      call assert_real (tilmda,1.0d0,0.0d0,'tidata initial lambda')
+      call assert_real (lambda,1.0d0,0.0d0,'tidata initial lambda')
 c
 c     the boundaries march evenly to the end of the trajectory
 c
@@ -692,7 +695,7 @@ c
       tilmdadedl(3) = 5.0d0
       tilmdadedlstd(3) = 6.0d0
       tibin = 4
-      tilmda = 0.25d0
+      lambda = 0.25d0
       call inittidyn (420)
       call assert_int (size(tilmdadedl),14,'tidata reinit length')
       call assert_int (tinbcount,0,'tidata reinit block count')
@@ -704,7 +707,7 @@ c
       call assert_real (tilmdadedlstd(3),0.0d0,0.0d0,
      &                  'tidata reinit std')
       call assert_int (tibin,1,'tidata reinit window index')
-      call assert_real (tilmda,1.0d0,0.0d0,'tidata reinit lambda')
+      call assert_real (lambda,1.0d0,0.0d0,'tidata reinit lambda')
       return
       end
 c
@@ -722,6 +725,7 @@ c     including the integer truncation of both divisions
 c
 c
       subroutine test_thermint_inittidyn
+      use mutant
       use thrmint
       implicit none
 c
@@ -736,7 +740,7 @@ c
       call assert_int (tinbtot,10,'inittidyn 200 step capacity')
       call assert_int (tiwinend(5),200,'inittidyn 200 step coverage')
       call assert_int (tibin,1,'inittidyn 200 step window index')
-      call assert_real (tilmda,1.0d0,0.0d0,'inittidyn 200 step lambda')
+      call assert_real (lambda,1.0d0,0.0d0,'inittidyn 200 step lambda')
 c
 c     a quarter of each window discarded over twenty one windows
 c
@@ -778,6 +782,7 @@ c
 c
       subroutine test_thermint_etidyn
       use dlmda
+      use mutant
       use thrmint
       implicit none
       integer b,i,w
@@ -808,7 +813,7 @@ c
       call resetti (5,10,40,20)
       do istep = 1, 200
          dedl = dble(istep)
-         lmdaseen(istep) = tilmda
+         lmdaseen(istep) = lambda
          call etidyn (istep)
       end do
 c
@@ -842,7 +847,7 @@ c
       call assert_real (dmax,0.0d0,1.0d-12,
      &                  'etidyn lambda schedule over 200 steps')
       call assert_int (tibin,6,'etidyn final window index')
-      call assert_real (tilmda,0.0d0,0.0d0,'etidyn final lambda')
+      call assert_real (lambda,0.0d0,0.0d0,'etidyn final lambda')
 c
 c     the same run with every equilibration step poisoned; the
 c     block averages must be untouched, which makes the discard
@@ -1277,7 +1282,7 @@ c
       end do
 c
 c     build the default evenly spaced schedule, which also sets
-c     "tibin" and "tilmda" to the first window
+c     "tibin" and "lambda" to the first window
 c
       call settisched (0,.false.)
 c
@@ -1310,6 +1315,7 @@ c
 c
       subroutine clearti
       use dlmda
+      use mutant
       use thrmint
       implicit none
 c
@@ -1320,7 +1326,7 @@ c
       tinbcount = 0
       tinbsave = 0
       tinbtot = 0
-      tilmda = 1.0d0
+      lambda = 1.0d0
       if (allocated(tiwinend))  deallocate (tiwinend)
       if (allocated(tidedllist))  deallocate (tidedllist)
       if (allocated(tilmdahist))  deallocate (tilmdahist)

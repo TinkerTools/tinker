@@ -46,7 +46,6 @@ extern double TINKER_MOD(ost, ostdgdl);
 extern double TINKER_MOD(ost, ostdt);
 extern double TINKER_MOD(ost, osteqratio);
 extern double TINKER_MOD(ost, ostfriction);
-extern double TINKER_MOD(ost, ostlambda);
 extern double TINKER_MOD(ost, ostlambdaavg);
 extern double TINKER_MOD(ost, ostlambdaslp);
 extern double TINKER_MOD(ost, ostlambdastd);

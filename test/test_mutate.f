@@ -99,8 +99,8 @@ c
       tiwinend(1) = 10
       tiwinend(2) = 20
       tiwinend(3) = 30
-      tilmda = tilmdalist(2)
-      call mapsublmda (tilmda)
+      lambda = tilmdalist(2)
+      call mapsublmda (lambda)
       call altelec
       eref = energy ()
       emref = em
@@ -118,11 +118,11 @@ c     install the first-window arrays, advance only the authoritative TI
 c     lambda, and require energy to rebuild all dependent parameter state
 c
       tibin = 1
-      tilmda = tilmdalist(1)
-      call mapsublmda (tilmda)
+      lambda = tilmdalist(1)
+      call mapsublmda (lambda)
       call altelec
       call tischedule
-      call assert_real (tilmda,0.25d0,0.0d0,
+      call assert_real (lambda,0.25d0,0.0d0,
      &                  'energy refresh TI window')
       call assert_real (elambda,0.50d0,0.0d0,
      &                  'energy refresh stale elambda')
@@ -140,14 +140,14 @@ c
 c
 c     returning from a fractional state to one must restore originals
 c
-      tilmda = tilmdalist(3)
-      call mapsublmda (tilmda)
+      lambda = tilmdalist(3)
+      call mapsublmda (lambda)
       call altelec
       eoneref = energy ()
       emoneref = em
       tibin = 2
-      tilmda = tilmdalist(2)
-      call mapsublmda (tilmda)
+      lambda = tilmdalist(2)
+      call mapsublmda (lambda)
       call altelec
       call tischedule
       e = energy ()
@@ -161,8 +161,8 @@ c
 c     repeat with stale first-window arrays at the analysis boundary
 c
       tibin = 1
-      tilmda = tilmdalist(1)
-      call mapsublmda (tilmda)
+      lambda = tilmdalist(1)
+      call mapsublmda (lambda)
       call altelec
       call tischedule
       call analysis (e)
@@ -179,8 +179,8 @@ c     poison the mapped scalars as well as leaving first-window arrays
 c     installed, then require gradient to refresh values and derivatives
 c
       tibin = 1
-      tilmda = tilmdalist(1)
-      call mapsublmda (tilmda)
+      lambda = tilmdalist(1)
+      call mapsublmda (lambda)
       call altelec
       call tischedule
       elambda = -1.0d0
@@ -686,7 +686,7 @@ c     "ost" keyword and drives "test_mutate_calc" with the level 4
 c     lambda derivative checks enabled, verifying the multipole,
 c     polarization and van der Waals components together; cases 075-077
 c     use single topology, 078-080 absolute dual topology and 081-083
-c     relative dual topology, each at ost-lambda values 1.0, 0.5 and
+c     relative dual topology, each at main lambda values 1.0, 0.5 and
 c     0.0; all fixtures use Ewald and support a pairwise neighbor list
 c
 c
@@ -739,7 +739,7 @@ c     the "ost" keyword and drives "test_mutate_calc" with the level 4
 c     lambda derivative checks enabled, verifying the multipole,
 c     polarization and van der Waals components together; cases 084-086
 c     use single topology, 087-089 absolute dual topology and 090-092
-c     relative dual topology, each at ost-lambda values 1.0, 0.5 and
+c     relative dual topology, each at main lambda values 1.0, 0.5 and
 c     0.0; all fixtures use Ewald and support a pairwise neighbor list
 c
 c
@@ -792,7 +792,7 @@ c     "ost" keyword and drives "test_mutate_calc" with the level 4
 c     lambda derivative checks enabled, verifying the multipole,
 c     polarization and van der Waals components together; cases 093-095
 c     use single topology, 096-098 absolute dual topology and 099-101
-c     relative dual topology, each at ost-lambda values 1.0, 0.5 and
+c     relative dual topology, each at main lambda values 1.0, 0.5 and
 c     0.0; all fixtures use Ewald and support a pairwise neighbor list
 c
 c
@@ -996,7 +996,7 @@ c     now sit outside every window; there the quintic taper is on its
 c     flat plateau, so each sub-lambda is pinned fully coupled at 1.0
 c     and fully decoupled at 0.0 while every first and second lambda
 c     derivative vanishes, which the level 4 checks confirm; case 132
-c     uses absolute dual topology at ost-lambda 0.0 and cases 133-134
+c     uses absolute dual topology at main lambda 0.0 and cases 133-134
 c     relative dual topology at 1.0 and 0.0, with a different dual
 c     topology interpolation exponent per term so no term can mask an
 c     error in another; all three use Ewald and support a pairwise

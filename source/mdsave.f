@@ -39,7 +39,6 @@ c
       use potent
       use rgddyn
       use socket
-      use thrmint
       use titles
       use uatom
       use units
@@ -120,7 +119,7 @@ c     print adaptive lambda bias information if present
 c
       if (use_ostdyn) then
          if (digits .ge. 8) then
-            write (iout,110)  ostlambda
+            write (iout,110)  lambda
   110       format (' Current Lambda',6x,f19.8)
             write (iout,120)  ostdedl
   120       format (' Current dU/dLambda',2x,f19.8,' Kcal/mole')
@@ -131,7 +130,7 @@ c
             write (iout,150)  eosttot
   150       format (' Estimated Delta G',3x,f19.8,' Kcal/mole')
          else if (digits .ge. 6) then
-            write (iout,160)  ostlambda
+            write (iout,160)  lambda
   160       format (' Current Lambda',6x,f17.6)
             write (iout,170)  ostdedl
   170       format (' Current dU/dLambda',2x,f17.6,' Kcal/mole')
@@ -142,7 +141,7 @@ c
             write (iout,200)  eosttot
   200       format (' Estimated Delta G',3x,f17.6,' Kcal/mole')
          else
-            write (iout,210)  ostlambda
+            write (iout,210)  lambda
   210       format (' Current Lambda',6x,f15.4)
             write (iout,220)  ostdedl
   220       format (' Current dU/dLambda',2x,f15.4,' Kcal/mole')
@@ -155,29 +154,18 @@ c
          end if
       else if (use_metadyn) then
          if (digits .ge. 8) then
-            write (iout,110)  ostlambda
+            write (iout,110)  lambda
             write (iout,150)  eosttot
          else if (digits .ge. 6) then
-            write (iout,160)  ostlambda
+            write (iout,160)  lambda
             write (iout,200)  eosttot
          else
-            write (iout,210)  ostlambda
+            write (iout,210)  lambda
             write (iout,250)  eosttot
          end if
 c
 c     print the lambda derivative of a run with no adaptive bias
 c
-      else if (use_ti) then
-         if (digits .ge. 8) then
-            write (iout,110)  tilmda
-            write (iout,120)  dedl
-         else if (digits .ge. 6) then
-            write (iout,160)  tilmda
-            write (iout,170)  dedl
-         else
-            write (iout,210)  tilmda
-            write (iout,220)  dedl
-         end if
       else if (use_dlmda) then
          if (digits .ge. 8) then
             write (iout,110)  lambda

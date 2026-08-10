@@ -22,6 +22,7 @@ c
 c
       subroutine settisched (ntiwin,tinbinset)
       use iounit
+      use mutant
       use thrmint
       implicit none
       integer i
@@ -162,7 +163,7 @@ c
 c     start the schedule at its first window
 c
       tibin = 1
-      tilmda = tilmdalist(1)
+      lambda = tilmdalist(1)
       return
       end
 c
@@ -222,6 +223,7 @@ c
 c
       subroutine settiblocks
       use iounit
+      use mutant
       use thrmint
       implicit none
       integer i
@@ -277,7 +279,7 @@ c
 c     start the schedule at its first window
 c
       tibin = 1
-      tilmda = tilmdalist(1)
+      lambda = tilmdalist(1)
       call settiwindow
       return
       end
@@ -383,6 +385,7 @@ c
 c
       subroutine etidyn (istep)
       use dlmda
+      use mutant
       use thrmint
       implicit none
       integer istep
@@ -415,7 +418,7 @@ c
             call avgstd (tidedllist,1,tinstepavg,avg,std)
             if (tinbcount .lt. tinbtot) then
                tinbcount = tinbcount + 1
-               tilmdahist(tinbcount) = tilmda
+               tilmdahist(tinbcount) = lambda
                tilmdadedl(tinbcount) = avg
                tilmdadedlstd(tinbcount) = std
             end if
@@ -442,6 +445,7 @@ c     left where it is, and "etidyn" stops collecting samples
 c
 c
       subroutine tischedule
+      use mutant
       use thrmint
       implicit none
 c
@@ -450,7 +454,7 @@ c     take the next lambda value
 c
       tibin = tibin + 1
       if (tibin .le. tinbin) then
-         tilmda = tilmdalist(tibin)
+         lambda = tilmdalist(tibin)
          call settiwindow
       end if
       return

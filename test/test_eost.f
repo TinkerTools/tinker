@@ -421,6 +421,7 @@ c
       subroutine test_eost_gkernels
       use dlmda
       use math
+      use mutant
       use ost
       implicit none
       real*8 egbias,dgdl,dgdfl
@@ -513,7 +514,7 @@ c
 c
 c     egkernel evaluates the continuous gaussian and derivatives
 c
-      ostlambda = 0.75d0
+      lambda = 0.75d0
       ostdedl = 1.0d0
       call egkernel (egbias,dgdl,dgdfl)
       expected = 2.0d0 + exp(-1.0d0)
@@ -532,7 +533,7 @@ c
       call sethist (1,0.50d0,0.0d0,height,wlmda,wflmda)
       call sethist (2,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
-      ostlambda = 0.50d0
+      lambda = 0.50d0
       ostdedl = 0.0d0
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,2.0d0,1.0d-12,
@@ -552,7 +553,7 @@ c
       call sethist (2,0.50d0,0.0d0,2.0d0*height,wlmda,wflmda)
       call sethist (3,0.75d0,1.0d0,3.0d0*height,wlmda,wflmda)
       call buildostindex
-      ostlambda = 0.75d0
+      lambda = 0.75d0
       ostdedl = 1.0d0
       call egkernel (egbias,dgdl,dgdfl)
       expected = 3.0d0 + 3.0d0*exp(-1.0d0)
@@ -570,7 +571,7 @@ c
       nosthist = 1
       call sethist (1,0.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
-      ostlambda = 0.0d0
+      lambda = 0.0d0
       ostdedl = 0.0d0
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,2.0d0,1.0d-12,
@@ -585,7 +586,7 @@ c
       nosthist = 1
       call sethist (1,1.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
-      ostlambda = 1.0d0
+      lambda = 1.0d0
       ostdedl = 0.0d0
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,2.0d0,1.0d-12,
@@ -610,7 +611,7 @@ c
       expected = exp(-0.25d0)
       call assert_real (gkernel(22,46),expected,1.0d-12,
      &                  'buildgkernel wide hist width')
-      ostlambda = targetl
+      lambda = targetl
       ostdedl = targetf
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,expected,1.0d-12,
@@ -628,7 +629,7 @@ c
       nosthist = 1
       call sethist (1,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
-      ostlambda = 0.50d0
+      lambda = 0.50d0
       ostdedl = 100.0d0
       call egkernel (egbias,dgdl,dgdfl)
       call assert_real (egbias,0.0d0,1.0d-12,
@@ -925,6 +926,7 @@ c
 c
       subroutine test_eost_eginterpolate
       use math
+      use mutant
       use ost
       implicit none
       real*8 egbias0,dgdl0,dgdfl0
@@ -947,7 +949,7 @@ c
       call sethist (3,0.75d0, 1.0d0,2.3d0*height,sigl,sigf)
       call buildostindex
       call buildkernels
-      ostlambda = 0.50d0
+      lambda = 0.50d0
       ostdedl = 0.0d0
       ostinterpol = .false.
       call egkernel (egbias0,dgdl0,dgdfl0)
@@ -973,7 +975,7 @@ c
       call sethist (3,0.75d0, 2.0d0,1.6d0*height,sigl,sigf)
       call buildostindex
       call buildkernels
-      ostlambda = 0.53125d0
+      lambda = 0.53125d0
       ostdedl = 0.25d0
       ostinterpol = .false.
       call egkernel (egbias0,dgdl0,dgdfl0)
@@ -1000,6 +1002,7 @@ c     total free-energy integration from f kernels
 c
 c
       subroutine test_eost_efkernel
+      use mutant
       use ost
       implicit none
       integer i
@@ -1014,12 +1017,12 @@ c
       do i = 1, nlmda
          fkernel(i) = dble(i-1) * wlmda
       end do
-      ostlambda = 0.375d0
+      lambda = 0.375d0
       call efkernel (eostlmda,dfdl)
-      expected = 0.5d0 * ostlambda * ostlambda
+      expected = 0.5d0 * lambda * lambda
       call assert_real (eostlmda,expected,1.0d-12,
      &                  'efkernel DeltaG lambda=.375')
-      call assert_real (dfdl,ostlambda,1.0d-12,
+      call assert_real (dfdl,lambda,1.0d-12,
      &                  'efkernel dDeltaG/dlambda')
 c
 c     use fkernel(lambda)=1+lambda so the endpoint mean forces are
@@ -1033,13 +1036,13 @@ c
 c     at and below lambda = 0 the free energy is zero and the
 c     derivative comes from the first lambda bin
 c
-      ostlambda = 0.0d0
+      lambda = 0.0d0
       call efkernel (eostlmda,dfdl)
       call assert_real (eostlmda,0.0d0,1.0d-12,
      &                  'efkernel DeltaG lambda=0')
       call assert_real (dfdl,1.0d0,1.0d-12,
      &                  'efkernel dDeltaG/dlambda lambda=0')
-      ostlambda = -0.25d0
+      lambda = -0.25d0
       call efkernel (eostlmda,dfdl)
       call assert_real (eostlmda,0.0d0,1.0d-12,
      &                  'efkernel DeltaG lambda below 0')
@@ -1049,13 +1052,13 @@ c
 c     at lambda = 1 the last interval is integrated in full, and
 c     beyond lambda = 1 the loop falls through to the same result
 c
-      ostlambda = 1.0d0
+      lambda = 1.0d0
       call efkernel (eostlmda,dfdl)
       call assert_real (eostlmda,1.5d0,1.0d-12,
      &                  'efkernel DeltaG lambda=1')
       call assert_real (dfdl,2.0d0,1.0d-12,
      &                  'efkernel dDeltaG/dlambda lambda=1')
-      ostlambda = 1.25d0
+      lambda = 1.25d0
       call efkernel (eostlmda,dfdl)
       call assert_real (eostlmda,1.5d0,1.0d-12,
      &                  'efkernel DeltaG lambda above 1')
@@ -1666,6 +1669,7 @@ c     checks the gaussian that emetadyn stores
 c
 c
       subroutine test_eost_metadyn
+      use mutant
       use ost
       implicit none
       integer istep
@@ -1687,7 +1691,7 @@ c
       ostdt = 0.0d0
       iost = 0
       do istep = 1, iosthist
-         ostlambda = lam(istep)
+         lambda = lam(istep)
          call emetadyn
          if (istep .lt. iosthist) then
             call assert_int (nmetahist,0,
@@ -1725,12 +1729,13 @@ c
 c
       subroutine test_eost_metatemper
       use bath
+      use mutant
       use ost
       implicit none
       integer il,istep,k
       integer ndep
       parameter (ndep=5)
-      real*8 lambda
+      real*8 lmda
       real*8 vd,dd,vi,di
       real*8 refvstar
       real*8 temperedheight
@@ -1752,7 +1757,7 @@ c
       tempergamma = 1.0d0
       iost = 0
       do istep = 1, ndep*iosthist
-         ostlambda = 0.5d0
+         lambda = 0.5d0
          call emetadyn
       end do
       call assert_int (nmetahist,ndep,'emetadyn deposit count')
@@ -1777,15 +1782,15 @@ c     the grid matches the direct sum at each bin center, and the
 c     interpolation reproduces it exactly at those nodes
 c
       do il = 1, nlmda
-         lambda = dble(il-1) * wlmda
+         lmda = dble(il-1) * wlmda
          ostinterpol = .false.
-         call emetabias (lambda,vd,dd)
+         call emetabias (lmda,vd,dd)
          call assert_real (vmetagrid(il),vd,1.0d-12,
      &                     'addmetagrid matches the direct sum')
          call assert_real (dvmetagrid(il),dd,1.0d-12,
      &                     'addmetagrid matches the direct slope')
          ostinterpol = .true.
-         call emetabias (lambda,vi,di)
+         call emetabias (lmda,vi,di)
          call assert_real (vi,vd,1.0d-12,
      &                     'emetabiasinterpolate at a node')
          call assert_real (di,dd,1.0d-12,
@@ -1861,6 +1866,7 @@ c
       subroutine test_eost_ostdyn
       use bath
       use dlmda
+      use mutant
       use ost
       implicit none
       integer istep
@@ -1886,7 +1892,7 @@ c
       ostbdfdl = 0.0d0
       iost = 0
       do istep = 1, iosthist
-         ostlambda = 0.5d0
+         lambda = 0.5d0
          ostdedl = 1.0d0
          call eostdyn
          if (istep .lt. iosthist) then
@@ -1909,7 +1915,7 @@ c     an unsettled interval is rejected and changes nothing
 c
       eostsave = eosttot
       do istep = 1, iosthist
-         ostlambda = 0.5d0
+         lambda = 0.5d0
          ostdedl = 1.0d0
          if (mod(istep,2) .eq. 0)  ostdedl = 11.0d0
          call eostdyn
@@ -1939,6 +1945,7 @@ c
 c
       subroutine resetost (nl,nf,nhist)
       use dlmda
+      use mutant
       use ost
       implicit none
       integer nl,nf,nhist
@@ -1997,7 +2004,7 @@ c
       iosthist = 10
       ostnequil = 5
       ostnavg = 5
-      ostlambda = 0.0d0
+      lambda = 0.0d0
       ostlambdaavg = 0.0d0
       ostlambdastd = 0.0d0
       ostlambdaslp = 0.0d0

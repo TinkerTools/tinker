@@ -27,6 +27,7 @@ c
       use deriv
       use dlmda
       use energi
+      use mutant
       use ost
       use virial
       implicit none
@@ -43,7 +44,7 @@ c
 c     the metadynamics bias depends on lambda alone
 c
       if (use_metadyn) then
-         call emetabias (ostlambda,vbias,dvdl)
+         call emetabias (lambda,vbias,dvdl)
          esum = esum + vbias
          ostbvbias = vbias
          ostbdgdl = dvdl
@@ -93,6 +94,7 @@ c
 c
       subroutine eostdyn
       use dlmda
+      use mutant
       use ost
       implicit none
       integer k
@@ -125,7 +127,7 @@ c
       else
          isamp = istep
       end if
-      ostllist(isamp) = ostlambda
+      ostllist(isamp) = lambda
       ostflist(isamp) = ostdedl
 c
 c     add a new histogram count every iosthist steps
@@ -196,6 +198,7 @@ c     the main lambda coordinate and deposits lambda gaussians
 c
 c
       subroutine emetadyn
+      use mutant
       use ost
       implicit none
       integer istep,isamp
@@ -221,7 +224,7 @@ c
       else
          isamp = istep
       end if
-      ostllist(isamp) = ostlambda
+      ostllist(isamp) = lambda
 c
 c     add a new metadynamics gaussian every iosthist steps
 c
@@ -775,6 +778,7 @@ c
       subroutine ostlangevin
       use bath
       use math
+      use mutant
       use ost
       use units
       implicit none
@@ -824,7 +828,7 @@ c
 c     map theta back to the main lambda
 c
       sinth = sin(osttheta)
-      ostlambda = sinth * sinth
+      lambda = sinth * sinth
       return
       end
 c
@@ -962,6 +966,7 @@ c
 c
       subroutine egkernel (egbias,dgdl,dgdfl)
       use math
+      use mutant
       use ost
       implicit none
       integer ihist
@@ -991,7 +996,7 @@ c
 c
 c     get the current lambda and flambda bin indices
 c
-      ilmda = lambdabin(ostlambda)
+      ilmda = lambdabin(lambda)
       iflmda = nint(ostdedl / wflmda) + fli0
       if (iflmda .lt. 1 .or. iflmda .gt. nflmda)  return
 c
@@ -1055,7 +1060,7 @@ c
                            else
                               sourcel = ostlhist(ihist)
                            end if
-                           ldelta = ostlambda - sourcel
+                           ldelta = lambda - sourcel
                            if (abs(ldelta) .le. oststdev*sigl) then
                               ldelta2 = ldelta * ldelta
                               expl = exp(-0.5d0*ldelta2*sigl2inv)
@@ -1089,6 +1094,7 @@ c     derivatives using bicubic Hermite interpolation on the grid
 c
 c
       subroutine egkernelinterpolate (egbias,dgdl,dgdfl)
+      use mutant
       use ost
       implicit none
       integer i,j
@@ -1111,16 +1117,16 @@ c
       dgdfl = 0.0d0
       flstart = dble(1-fli0) * wflmda
       flend = dble(nflmda-fli0) * wflmda
-      if (ostlambda .lt. 0.0d0 .or. ostlambda .gt. 1.0d0)
+      if (lambda .lt. 0.0d0 .or. lambda .gt. 1.0d0)
      &   return
       if (ostdedl .lt. flstart .or. ostdedl .gt. flend)  return
 c
 c     locate the lower-left grid point of the interpolation cell
 c
-      if (ostlambda .ge. 1.0d0) then
+      if (lambda .ge. 1.0d0) then
          il0 = nlmda - 1
       else
-         il0 = int(ostlambda/wlmda) + 1
+         il0 = int(lambda/wlmda) + 1
          il0 = max(1,min(il0,nlmda-1))
       end if
       if (ostdedl .ge. flend) then
@@ -1131,7 +1137,7 @@ c
       end if
       l0 = dble(il0-1) * wlmda
       f0 = dble(if0-fli0) * wflmda
-      x = (ostlambda-l0) / wlmda
+      x = (lambda-l0) / wlmda
       y = (ostdedl-f0) / wflmda
 c
 c     cubic Hermite basis functions and normalized derivatives
@@ -1197,7 +1203,7 @@ c     ##                                                  ##
 c     ######################################################
 c
 c
-c     "lambdabin" computes the bin index for ostlambda
+c     "lambdabin" computes the bin index for lambda
 c
 c
       function lambdabin (lambda)
@@ -1867,12 +1873,13 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "efkernel" computes DeltaG at the current ostlambda by
+c     "efkernel" computes DeltaG at the current lambda by
 c     integrating the f kernel using linear interpolation, and also
-c     returns dDeltaG/dlambda at the current ostlambda
+c     returns dDeltaG/dlambda at the current lambda
 c
 c
       subroutine efkernel (eostlmda,dfdl)
+      use mutant
       use ost
       implicit none
       integer ilmda0,ilmda1
@@ -1890,7 +1897,7 @@ c
 c
 c     handle endpoint at lambda = 0
 c
-      if (ostlambda .le. 0.0d0) then
+      if (lambda .le. 0.0d0) then
          dfdl = fkernel(1)
          return
       end if
@@ -1905,10 +1912,10 @@ c
          fl1 = fkernel(ilmda1)
          slope = (fl1-fl0) / wlmda
 c
-c     integrate only to ostlambda if it lies in this interval
+c     integrate only to lambda if it lies in this interval
 c
-         if (ostlambda .le. lmda1) then
-            x = ostlambda - lmda0
+         if (lambda .le. lmda1) then
+            x = lambda - lmda0
             eostlmda = eostlmda + fl0*x + 0.5d0*slope*x*x
             dfdl = fl0 + slope*x
             return
@@ -2035,6 +2042,7 @@ c
       use files
       use inform
       use iounit
+      use mutant
       use ost
       implicit none
       integer i,ihis
@@ -2046,7 +2054,7 @@ c
       integer nosthist0,sizeosthist0
       integer osthist0
       real*8 wlmda0,wflmda0
-      real*8 ostlambda0
+      real*8 lambda0
       real*8 osttheta0,ostvtheta0
       real*8 ostmass0,ostfriction0,ostdt0
       real*8 eosttot0,oststdev0
@@ -2077,7 +2085,7 @@ c
       read (record,*,err=90,end=90)  wlmda0,wflmda0,oststdev0
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  ostlambda0,osttheta0,ostvtheta0,
+      read (record,*,err=90,end=90)  lambda0,osttheta0,ostvtheta0,
      &   ostmass0,ostfriction0,ostdt0,eosttot0
    10 format (a240)
 c
@@ -2150,7 +2158,7 @@ c
       wflmda2 = 0.5d0 * wflmda
       maxwlhist = wlhist
       maxwfhist = wfhist
-      ostlambda = ostlambda0
+      lambda = lambda0
       ostlambdaavg = 0.0d0
       ostlambdastd = 0.0d0
       ostdedlavg = 0.0d0
@@ -2269,6 +2277,7 @@ c     "prtosthead" writes the fixed-size current ost history header
 c
 c
       subroutine prtosthead (ihis)
+      use mutant
       use ost
       implicit none
       integer ihis
@@ -2283,7 +2292,7 @@ c
       write (ihis,40)
       write (ihis,50)  wlmda,wflmda,oststdev
       write (ihis,60)
-      write (ihis,70)  ostlambda,osttheta,ostvtheta,
+      write (ihis,70)  lambda,osttheta,ostvtheta,
      &                 ostmass,ostfriction,ostdt,eosttot
       write (ihis,80)
    10 format (' Orthogonal Space Tempering History :')
@@ -2310,6 +2319,7 @@ c     unformatted stream output avoids truncating the appended history
 c
 c
       subroutine updosthead (ihis)
+      use mutant
       use ost
       implicit none
       integer ihis
@@ -2346,7 +2356,7 @@ c
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,60)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,70)  ostlambda,osttheta,ostvtheta,
+      write (record,70)  lambda,osttheta,ostvtheta,
      &                   ostmass,ostfriction,ostdt,eosttot
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,80)
@@ -2500,6 +2510,7 @@ c
       use files
       use inform
       use iounit
+      use mutant
       use ost
       implicit none
       integer i,ihis
@@ -2509,7 +2520,7 @@ c
       integer iost0,iosthist0
       integer nmetahist0,sizemetahist0
       real*8 wlmda0
-      real*8 ostlambda0
+      real*8 lambda0
       real*8 osttheta0,ostvtheta0
       real*8 ostmass0,ostfriction0,ostdt0
       real*8 eosttot0
@@ -2540,7 +2551,7 @@ c
       read (record,*,err=90,end=90)  wlmda0
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  ostlambda0,osttheta0,ostvtheta0,
+      read (record,*,err=90,end=90)  lambda0,osttheta0,ostvtheta0,
      &   ostmass0,ostfriction0,ostdt0,eosttot0
    10 format (a240)
 c
@@ -2590,7 +2601,7 @@ c
          vmetagrid(i) = 0.0d0
          dvmetagrid(i) = 0.0d0
       end do
-      ostlambda = ostlambda0
+      lambda = lambda0
       ostlambdaavg = 0.0d0
       osttheta = osttheta0
       ostvtheta = ostvtheta0
@@ -2681,6 +2692,7 @@ c     "prtmetahead" writes the fixed-size metadynamics history header
 c
 c
       subroutine prtmetahead (ihis)
+      use mutant
       use ost
       implicit none
       integer ihis
@@ -2694,7 +2706,7 @@ c
       write (ihis,40)
       write (ihis,50)  wlmda
       write (ihis,60)
-      write (ihis,70)  ostlambda,osttheta,ostvtheta,
+      write (ihis,70)  lambda,osttheta,ostvtheta,
      &                 ostmass,ostfriction,ostdt,eosttot
       write (ihis,80)
    10 format (' Metadynamics History :')
@@ -2721,6 +2733,7 @@ c     place; unformatted stream output avoids truncating the history
 c
 c
       subroutine updmetahead (ihis)
+      use mutant
       use ost
       implicit none
       integer ihis
@@ -2756,7 +2769,7 @@ c
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,60)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,70)  ostlambda,osttheta,ostvtheta,
+      write (record,70)  lambda,osttheta,ostvtheta,
      &                   ostmass,ostfriction,ostdt,eosttot
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,80)

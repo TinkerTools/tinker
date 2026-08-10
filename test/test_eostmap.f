@@ -43,20 +43,18 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "test_eostmap_refresh" checks that refreshsublmda selects the
-c     main lambda owned by the active method and leaves explicit
-c     sublambdas alone when no main lambda is present
+c     "test_eostmap_refresh" checks that refreshsublmda maps the one
+c     main lambda whichever sampling method is active, and leaves
+c     explicit sublambdas alone when no main lambda is present
 c
 c
       subroutine test_eostmap_refresh
       use dlmda
       use mutant
-      use ost
-      use thrmint
       implicit none
 c
 c
-c     use identity maps and distinct values for each possible owner
+c     use identity maps so a sublambda tracks the main lambda exactly
 c
       use_dlmda = .true.
       use_elmdamap = .true.
@@ -69,39 +67,40 @@ c
       elmdaexp = 1
       plmdaexp = 1
       vlmdaexp = 1
-      lambda = 0.25d0
-      tilmda = 0.50d0
-      ostlambda = 0.75d0
 c
-c     a static main lambda is used when no sampling method owns it
+c     a static main lambda drives the map with no sampling method
 c
       use_ost = .false.
       use_meta = .false.
       use_ti = .false.
       use_mainlmda = .true.
+      lambda = 0.25d0
       call refreshsublmda
-      call assert_real (elambda,lambda,0.0d0,
-     &                  'refreshsublmda static owner')
+      call assert_real (elambda,0.25d0,0.0d0,
+     &                  'refreshsublmda static lambda')
 c
-c     thermodynamic integration owns the TI window lambda
+c     thermodynamic integration reads the same main lambda
 c
       use_ti = .true.
+      lambda = 0.50d0
       call refreshsublmda
-      call assert_real (elambda,tilmda,0.0d0,
-     &                  'refreshsublmda TI owner')
+      call assert_real (elambda,0.50d0,0.0d0,
+     &                  'refreshsublmda TI lambda')
 c
-c     OST and metadynamics both own the OST lambda coordinate
+c     so do OST and metadynamics
 c
       use_ti = .false.
       use_ost = .true.
+      lambda = 0.75d0
       call refreshsublmda
-      call assert_real (elambda,ostlambda,0.0d0,
-     &                  'refreshsublmda OST owner')
+      call assert_real (elambda,0.75d0,0.0d0,
+     &                  'refreshsublmda OST lambda')
       use_ost = .false.
       use_meta = .true.
+      lambda = 0.40d0
       call refreshsublmda
-      call assert_real (elambda,ostlambda,0.0d0,
-     &                  'refreshsublmda metadynamics owner')
+      call assert_real (elambda,0.40d0,0.0d0,
+     &                  'refreshsublmda metadynamics lambda')
 c
 c     explicit sublambdas remain unchanged without a main-lambda owner
 c
@@ -142,7 +141,7 @@ c
 c     test exponential sublambda maps and chain rule derivatives
 c
       call resetost (5,5,1)
-      ostlambda = 0.25d0
+      lambda = 0.25d0
       use_plmdamap = .true.
       use_elmdamap = .true.
       use_vlmdamap = .true.
@@ -152,7 +151,7 @@ c
       plmdaexp = 2
       elmdaexp = 3
       vlmdaexp = 4
-      call mapsublmda (ostlambda)
+      call mapsublmda (lambda)
       call assert_real (plambda,0.0625d0,1.0d-12,
      &                  'mapsublmda exponential plambda')
       call assert_real (dpldlmda,0.5d0,1.0d-12,
@@ -175,7 +174,7 @@ c
 c     test shifted inverse-power sublambda maps and derivatives
 c
       call resetost (5,5,1)
-      ostlambda = 0.25d0
+      lambda = 0.25d0
       use_plmdamap = .true.
       use_elmdamap = .true.
       use_vlmdamap = .true.
@@ -188,7 +187,7 @@ c
       plmdainveps = 0.01d0
       elmdainveps = 0.02d0
       vlmdainveps = 0.03d0
-      call mapsublmda (ostlambda)
+      call mapsublmda (lambda)
       call assert_real (plambda,0.452936557937477d0,1.0d-12,
      &                  'mapsublmda invpower plambda')
       call assert_real (dpldlmda,1.08352945028593d0,1.0d-12,
@@ -225,12 +224,12 @@ c
       plmdamap = 'QNT'
       elmdamap = 'QNT'
       vlmdamap = 'QNT'
-      ostlambda = 0.5d0
+      lambda = 0.5d0
 c
 c     each sublambda uses its own window, so the midpoint value is
 c     one half for all three but the slopes differ
 c
-      call mapsublmda (ostlambda)
+      call mapsublmda (lambda)
       call assert_real (plambda,0.5d0,1.0d-12,
      &                  'mapsublmda taper plambda')
       call assert_real (elambda,0.5d0,1.0d-12,
@@ -253,11 +252,11 @@ c
 c     the taper branch must negate the taper derivatives, checked
 c     off center where the second derivative is nonzero
 c
-      ostlambda = 0.35d0
+      lambda = 0.35d0
       tref = 0.896484375d0
       dtref = -1.7578125d0
       d2tref = -15.625d0
-      call mapsublmda (ostlambda)
+      call mapsublmda (lambda)
       call assert_real (plambda,1.0d0-tref,1.0d-12,
      &                  'mapsublmda taper offcenter plambda')
       call assert_real (dpldlmda,-dtref,1.0d-12,
@@ -268,14 +267,14 @@ c
 c     below the polarization window the sublambda is fully off and
 c     above it the sublambda is fully on
 c
-      ostlambda = 0.1d0
-      call mapsublmda (ostlambda)
+      lambda = 0.1d0
+      call mapsublmda (lambda)
       call assert_real (plambda,0.0d0,1.0d-12,
      &                  'mapsublmda taper below window plambda')
       call assert_real (dpldlmda,0.0d0,1.0d-12,
      &                  'mapsublmda taper below window dpldlmda')
-      ostlambda = 0.9d0
-      call mapsublmda (ostlambda)
+      lambda = 0.9d0
+      call mapsublmda (lambda)
       call assert_real (plambda,1.0d0,1.0d-12,
      &                  'mapsublmda taper above window plambda')
       call assert_real (dpldlmda,0.0d0,1.0d-12,
@@ -285,20 +284,20 @@ c     a QNT polarization map sets the initial and final polarization
 c     flags by comparing lambda against the polarization window
 c
       plmdamap = 'QNT'
-      ostlambda = 0.1d0
-      call mapsublmda (ostlambda)
+      lambda = 0.1d0
+      call mapsublmda (lambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i below window')
       call assert_logical (use_pol4f,.false.,
      &                     'mapsublmda qnt pol4f below window')
-      ostlambda = 0.5d0
-      call mapsublmda (ostlambda)
+      lambda = 0.5d0
+      call mapsublmda (lambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i mid window')
       call assert_logical (use_pol4f,.true.,
      &                     'mapsublmda qnt pol4f mid window')
-      ostlambda = 0.9d0
-      call mapsublmda (ostlambda)
+      lambda = 0.9d0
+      call mapsublmda (lambda)
       call assert_logical (use_pol4i,.false.,
      &                     'mapsublmda qnt pol4i above window')
       call assert_logical (use_pol4f,.true.,
@@ -307,14 +306,14 @@ c
 c     anywhere inside the window both endpoint states still
 c     contribute, since plambda has not yet pinned to zero or one
 c
-      ostlambda = 0.65d0
-      call mapsublmda (ostlambda)
+      lambda = 0.65d0
+      call mapsublmda (lambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i upper ramp')
       call assert_logical (use_pol4f,.true.,
      &                     'mapsublmda qnt pol4f upper ramp')
-      ostlambda = 0.30d0
-      call mapsublmda (ostlambda)
+      lambda = 0.30d0
+      call mapsublmda (lambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i lower ramp')
       call assert_logical (use_pol4f,.true.,
@@ -323,14 +322,14 @@ c
 c     the window bounds are inclusive, so a lambda sitting exactly
 c     on either edge must keep both endpoint states
 c
-      ostlambda = qntplmda1
-      call mapsublmda (ostlambda)
+      lambda = qntplmda1
+      call mapsublmda (lambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i at upper bound')
       call assert_logical (use_pol4f,.true.,
      &                     'mapsublmda qnt pol4f at upper bound')
-      ostlambda = qntplmda0
-      call mapsublmda (ostlambda)
+      lambda = qntplmda0
+      call mapsublmda (lambda)
       call assert_logical (use_pol4i,.true.,
      &                     'mapsublmda qnt pol4i at lower bound')
       call assert_logical (use_pol4f,.true.,
@@ -339,62 +338,62 @@ c
 c     QNT electrostatic and van der Waals maps use their own windows
 c     to select the required endpoint states
 c
-      ostlambda = 0.1d0
-      call mapsublmda (ostlambda)
+      lambda = 0.1d0
+      call mapsublmda (lambda)
       call assert_logical (use_ele4i,.true.,
      &                     'mapsublmda qnt ele4i below window')
       call assert_logical (use_ele4f,.false.,
      &                     'mapsublmda qnt ele4f below window')
-      ostlambda = 0.5d0
-      call mapsublmda (ostlambda)
+      lambda = 0.5d0
+      call mapsublmda (lambda)
       call assert_logical (use_ele4i,.true.,
      &                     'mapsublmda qnt ele4i mid window')
       call assert_logical (use_ele4f,.true.,
      &                     'mapsublmda qnt ele4f mid window')
-      ostlambda = 0.9d0
-      call mapsublmda (ostlambda)
+      lambda = 0.9d0
+      call mapsublmda (lambda)
       call assert_logical (use_ele4i,.false.,
      &                     'mapsublmda qnt ele4i above window')
       call assert_logical (use_ele4f,.true.,
      &                     'mapsublmda qnt ele4f above window')
-      ostlambda = qntelmda0
-      call mapsublmda (ostlambda)
+      lambda = qntelmda0
+      call mapsublmda (lambda)
       call assert_logical (use_ele4i,.true.,
      &                     'mapsublmda qnt ele4i at lower bound')
       call assert_logical (use_ele4f,.true.,
      &                     'mapsublmda qnt ele4f at lower bound')
-      ostlambda = qntelmda1
-      call mapsublmda (ostlambda)
+      lambda = qntelmda1
+      call mapsublmda (lambda)
       call assert_logical (use_ele4i,.true.,
      &                     'mapsublmda qnt ele4i at upper bound')
       call assert_logical (use_ele4f,.true.,
      &                     'mapsublmda qnt ele4f at upper bound')
-      ostlambda = 0.0d0
-      call mapsublmda (ostlambda)
+      lambda = 0.0d0
+      call mapsublmda (lambda)
       call assert_logical (use_vdw4i,.true.,
      &                     'mapsublmda qnt vdw4i below window')
       call assert_logical (use_vdw4f,.false.,
      &                     'mapsublmda qnt vdw4f below window')
-      ostlambda = 0.5d0
-      call mapsublmda (ostlambda)
+      lambda = 0.5d0
+      call mapsublmda (lambda)
       call assert_logical (use_vdw4i,.true.,
      &                     'mapsublmda qnt vdw4i mid window')
       call assert_logical (use_vdw4f,.true.,
      &                     'mapsublmda qnt vdw4f mid window')
-      ostlambda = 1.0d0
-      call mapsublmda (ostlambda)
+      lambda = 1.0d0
+      call mapsublmda (lambda)
       call assert_logical (use_vdw4i,.false.,
      &                     'mapsublmda qnt vdw4i above window')
       call assert_logical (use_vdw4f,.true.,
      &                     'mapsublmda qnt vdw4f above window')
-      ostlambda = qntvlmda0
-      call mapsublmda (ostlambda)
+      lambda = qntvlmda0
+      call mapsublmda (lambda)
       call assert_logical (use_vdw4i,.true.,
      &                     'mapsublmda qnt vdw4i at lower bound')
       call assert_logical (use_vdw4f,.true.,
      &                     'mapsublmda qnt vdw4f at lower bound')
-      ostlambda = qntvlmda1
-      call mapsublmda (ostlambda)
+      lambda = qntvlmda1
+      call mapsublmda (lambda)
       call assert_logical (use_vdw4i,.true.,
      &                     'mapsublmda qnt vdw4i at upper bound')
       call assert_logical (use_vdw4f,.true.,
@@ -414,8 +413,8 @@ c
       use_pol4f = .false.
       use_vdw4i = .false.
       use_vdw4f = .false.
-      ostlambda = 0.5d0
-      call mapsublmda (ostlambda)
+      lambda = 0.5d0
+      call mapsublmda (lambda)
       call assert_logical (use_ele4i,.false.,
      &                     'mapsublmda exp leaves ele4i')
       call assert_logical (use_ele4f,.false.,

@@ -23,7 +23,6 @@ c     tinstepavg     steps averaged into one dU/dlambda sample
 c     tiwindow       total dynamics steps in the current window
 c     tiwinend       last dynamics step belonging to each window
 c     tieqratio      fraction of each window discarded as equilibration
-c     tilmda         main lambda value of the current window
 c     tidedllist     dU/dlambda values saved within the current block
 c     tifraclist     fraction of the run spent in each lambda window
 c     tilmdadedl     block averaged dU/dlambda in the order recorded
@@ -46,7 +45,6 @@ c
       integer tiwindow
       integer, allocatable :: tiwinend(:)
       real*8 tieqratio
-      real*8 tilmda
       real*8, allocatable :: tidedllist(:)
       real*8, allocatable :: tifraclist(:)
       real*8, allocatable :: tilmdadedl(:)

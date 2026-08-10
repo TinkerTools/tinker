@@ -26,8 +26,6 @@ c
       use inform
       use iounit
       use mutant
-      use ost
-      use thrmint
       use usage
       use virial
       implicit none
@@ -263,15 +261,7 @@ c
             oldeml = elambda
             oldepl = plambda
             lmda0 = 0.0d0
-            if (use_mainlmda) then
-               if (use_ost .or. use_meta) then
-                  lmda0 = ostlambda
-               else if (use_ti) then
-                  lmda0 = tilmda
-               else
-                  lmda0 = lambda
-               end if
-            end if
+            if (use_mainlmda)  lmda0 = lambda
             call settestlmda (use_mainlmda,lmda0+eps,oldvdl+eps,
      &                        oldeml+eps,oldepl+eps)
             esum2 = energy ()
@@ -547,21 +537,13 @@ c
       subroutine settestlmda (mainlmda,lmda,vlmda,elmda,plmda)
       use dlmda
       use mutant
-      use ost
-      use thrmint
       implicit none
       real*8 lmda,vlmda,elmda,plmda
       logical mainlmda
 c
 c
       if (mainlmda) then
-         if (use_ost .or. use_meta) then
-            ostlambda = lmda
-         else if (use_ti) then
-            tilmda = lmda
-         else
-            lambda = lmda
-         end if
+         lambda = lmda
          call refreshsublmda
       else
          vlambda = vlmda

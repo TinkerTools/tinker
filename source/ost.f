@@ -53,7 +53,6 @@ c     ostdedlstd     standard deviation of dU/dL between updates
 c     ostdgdl        current dg/dlambda value
 c     ostdt          time step for theta lambda propagation
 c     ostfriction    friction coefficient for theta lambda coordinate
-c     ostlambda      main lambda value in orthogonal space sampling
 c     ostlambdaavg   average main lambda value between hist updates
 c     ostlambdaslp   fitted lambda change per sample over an interval
 c     ostlambdastd   standard deviation of lambda between hist updates
@@ -146,7 +145,6 @@ c
       real*8 ostdt
       real*8 osteqratio
       real*8 ostfriction
-      real*8 ostlambda
       real*8 ostlambdaavg
       real*8 ostlambdaslp
       real*8 ostlambdastd

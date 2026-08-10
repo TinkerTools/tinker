@@ -16,7 +16,6 @@ extern int TINKER_MOD(thrmint, tinstepavg);
 extern int TINKER_MOD(thrmint, tiwindow);
 extern int* TINKER_MOD(thrmint, tiwinend);
 extern double TINKER_MOD(thrmint, tieqratio);
-extern double TINKER_MOD(thrmint, tilmda);
 extern double* TINKER_MOD(thrmint, tidedllist);
 extern double* TINKER_MOD(thrmint, tifraclist);
 extern double* TINKER_MOD(thrmint, tilmdadedl);

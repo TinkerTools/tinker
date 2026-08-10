@@ -40,9 +40,7 @@ c
       use katoms
       use keys
       use mutant
-      use ost
       use potent
-      use thrmint
       implicit none
       integer i,j,k,ihyb
       integer it0,it1
@@ -206,6 +204,11 @@ c     set plambda to elambda if no values given
 c
       if (.not. setplambda)  plambda = elambda
 c
+c     keep the main lambda within the physical lambda range
+c
+      if (lambda .lt. 0.0d0)  lambda = 0.0d0
+      if (lambda .gt. 1.0d0)  lambda = 1.0d0
+c
 c     a second ligand group makes the free energy a relative one
 c
       use_rel = (nmutb .gt. 0)
@@ -307,13 +310,7 @@ c
   180       format (' van der Waals Topology',15x,'Single')
          end if
          if (use_mainlmda) then
-            if (use_ost .or. use_meta) then
-               write (iout,190)  ostlambda
-            else if (use_ti) then
-               write (iout,190)  tilmda
-            else
-               write (iout,190)  lambda
-            end if
+            write (iout,190)  lambda
   190       format (' Main Lambda Value',18x,f8.3)
          end if
          if (use_plmda) then
@@ -834,6 +831,7 @@ c
       use dlmda
       use keys
       use math
+      use mutant
       use ost
       implicit none
       integer i,k
@@ -870,7 +868,6 @@ c
 c
 c     set defaults for the lambda particle propagation
 c
-      ostlambda = 1.0d0
       ostlambdaavg = 0.0d0
       ostlambdastd = 0.0d0
       ostdedlavg = 0.0d0
@@ -910,9 +907,6 @@ c
          else if (keyword(1:15) .eq. 'OSTEQUIL-RATIO ') then
             string = record(next:240)
             read (string,*,err=10)  osteqratio
-         else if (keyword(1:11) .eq. 'OST-LAMBDA ') then
-            string = record(next:240)
-            read (string,*,err=10)  ostlambda
          else if (keyword(1:8) .eq. 'OST-DT ') then
             string = record(next:240)
             read (string,*,err=10)  ostdt
@@ -1003,11 +997,9 @@ c
       ostnequil = max(0,min(ostnequil,iosthist-1))
       ostnavg = iosthist - ostnequil
 c
-c     keep the lambda particle within the physical lambda range
+c     start the lambda particle from the current main lambda
 c
-      if (ostlambda .lt. 0.0d0)  ostlambda = 0.0d0
-      if (ostlambda .gt. 1.0d0)  ostlambda = 1.0d0
-      osttheta = asin(sqrt(ostlambda))
+      osttheta = asin(sqrt(lambda))
 c
 c     allocate the convergence sub-bins
 c
@@ -1215,7 +1207,6 @@ c
       tinstepavg = 100
       tiwindow = 0
       tieqratio = 0.5d0
-      tilmda = 1.0d0
 c
 c     size the lambda window schedule to the worst case
 c
