@@ -29,9 +29,9 @@ c     plambda     state weighting value for polarization potentials
 c     tlambda     state weighting value for torsional potential
 c     scexp       scale factor for soft core buffered 14-7 potential
 c     scalpha     scale factor for soft core buffered 14-7 potential
-c     setelambda  flag that elambda was pinned by its own keyword
-c     setplambda  flag that plambda was pinned by its own keyword
-c     setvlambda  flag that vlambda was pinned by its own keyword
+c     setelambda  flag that elambda was set by its own keyword
+c     setplambda  flag that plambda was set by its own keyword
+c     setvlambda  flag that vlambda was set by its own keyword
 c     use_rel     flag to use two-ligand relative dual topology
 c     use_subsys  flag that a parameter-zeroed subsystem is active
 c     mut         true if an atom is to be mutated, false otherwise

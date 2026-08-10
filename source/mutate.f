@@ -562,14 +562,14 @@ c     a main lambda drives every sublambda
 c
       if (use_mainlmda .and. .not.use_relstage) then
          elmdamapset = use_elmdamap
-         if (.not.use_elmdamap .and. .not.setelambda) then
+         if (.not. use_elmdamap) then
             use_elmdamap = .true.
             elmdamap = 'EXP'
          end if
 c
 c     polarization follows electrostatics unless told otherwise
 c
-         if (.not.use_plmdamap .and. .not.setplambda) then
+         if (.not. use_plmdamap) then
             use_plmdamap = .true.
             if (elmdamapset) then
                plmdamap = elmdamap
@@ -582,16 +582,10 @@ c
                plmdamap = 'EXP'
             end if
          end if
-         if (.not.use_vlmdamap .and. .not.setvlambda) then
+         if (.not. use_vlmdamap) then
             use_vlmdamap = .true.
             vlmdamap = 'EXP'
          end if
-c
-c     a pinned sublambda is held fixed as the main lambda moves
-c
-         if (.not. use_elmdamap)  deldlmda = 0.0d0
-         if (.not. use_plmdamap)  dpldlmda = 0.0d0
-         if (.not. use_vlmdamap)  dvldlmda = 0.0d0
       end if
 c
 c     enable dual topology for relative free energy
@@ -1324,13 +1318,25 @@ c
          call fatal
       end if
 c
+c     a main lambda maps every sublambda on its own, so a sublambda
+c     set by its own keyword would be overwritten
+c
+      if (use_mainlmda .and.
+     &    (setelambda .or. setplambda .or. setvlambda)) then
+         write (iout,30)
+   30    format (/,' MUTATE_CHECK  --  LAMBDA sets each sublambda',
+     &              ' from its own map; remove the ELE-LAMBDA,',
+     &              ' POL-LAMBDA and VDW-LAMBDA keywords')
+         call fatal
+      end if
+c
 c     the staged relative schedule maps every sublambda on its own,
-c     so a sublambda pinned by its own keyword would be overwritten
+c     so a sublambda set by its own keyword would be overwritten
 c
       if (use_relstage .and.
      &    (setelambda .or. setplambda .or. setvlambda)) then
-         write (iout,30)
-   30    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
+         write (iout,40)
+   40    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
      &              ' from its own schedule; remove the ELE-LAMBDA,',
      &              ' POL-LAMBDA and VDW-LAMBDA keywords')
          call fatal
@@ -1339,8 +1345,8 @@ c
 c     the staged relative schedule morphs one ligand into another
 c
       if (use_relstage .and. nmutb.eq.0) then
-         write (iout,40)
-   40    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
+         write (iout,50)
+   50    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
      &              ' ligand group; add the LIGAND2 keyword')
          call fatal
       end if
