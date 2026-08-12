@@ -198,6 +198,7 @@ c
       osttrial = .false.
       relstagemix = .false.
       use_dlmda = .false.
+      use_edlmda = .false.
       use_elmdamap = .false.
       use_emdt = .false.
       use_epdt = .false.
@@ -207,10 +208,12 @@ c
       use_metadyn = .false.
       use_ost = .false.
       use_ostdyn = .false.
+      use_pdlmda = .false.
       use_plmda = .false.
       use_plmdamap = .false.
       use_relstage = .false.
       use_ti = .false.
+      use_vdlmda = .false.
       use_vlmdamap = .false.
       relstage = 'VDWM'
 c

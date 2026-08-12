@@ -74,6 +74,7 @@ c     pval0orig     original pval0
 c     pvalorig      original pval
 c     relstagemix   flag that the active leg mixes two endpoint states
 c     use_dlmda     logical flag governing use of lambda derivative
+c     use_edlmda    flag that the multipole term has a lambda deriv
 c     use_ele4f     flag to compute electrostatic final endpoint
 c     use_ele4i     flag to compute electrostatic initial endpoint
 c     use_elmdamap  flag that elambda follows the main lambda map
@@ -85,12 +86,14 @@ c     use_meta      flag to use metadynamics
 c     use_metadyn   flag to propagate metadynamics lambda particle
 c     use_ost       flag to use orthogonal space tempering
 c     use_ostdyn    flag to propagate lambda particle
+c     use_pdlmda    flag that the polarization term has a lambda deriv
 c     use_plmda     flag governing rescale to a decoupled plambda
 c     use_plmdamap  flag that plambda follows the main lambda map
 c     use_pol4f     flag to compute polarization final endpoint
 c     use_pol4i     flag to compute polarization initial endpoint
 c     use_relstage  flag to use staged relative free energy schedule
 c     use_ti        flag to use thermodynamic integration
+c     use_vdlmda    flag that the van der Waals term has a lambda deriv
 c     use_vdw4f     flag to compute van der Waals final endpoint
 c     use_vdw4i     flag to compute van der Waals initial endpoint
 c     use_vlmdamap  flag that vlambda follows the main lambda map
@@ -167,6 +170,7 @@ c
       real*8, allocatable :: pvalorig(:)
       logical relstagemix
       logical use_dlmda
+      logical use_edlmda
       logical use_ele4f
       logical use_ele4i
       logical use_elmdamap
@@ -178,12 +182,14 @@ c
       logical use_metadyn
       logical use_ost
       logical use_ostdyn
+      logical use_pdlmda
       logical use_plmda
       logical use_plmdamap
       logical use_pol4f
       logical use_pol4i
       logical use_relstage
       logical use_ti
+      logical use_vdlmda
       logical use_vdw4f
       logical use_vdw4i
       logical use_vlmdamap

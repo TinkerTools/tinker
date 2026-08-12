@@ -293,36 +293,18 @@ c
       real*8 expnt
 c
 c
-c     initialize values and handle endpoints explicitly
-c
-      expnt = dble(exponent)
-      if (x .le. 0.0d0) then
-         lmda = 0.0d0
-         if (exponent .eq. 1) then
-            dlmda = 1.0d0
-            d2lmda = 0.0d0
-         else if (exponent .eq. 2) then
-            dlmda = 0.0d0
-            d2lmda = 2.0d0
-         else
-            dlmda = 0.0d0
-            d2lmda = 0.0d0
-         end if
-         return
-      else if (x .ge. 1.0d0) then
-         lmda = 1.0d0
-         dlmda = expnt
-         d2lmda = expnt * (expnt-1.0d0)
-         return
-      end if
-c
-c     compute lambda^exponent and its derivatives
+c     compute map
 c
       lmda = x**exponent
-      dlmda = expnt * x**(exponent-1)
       if (exponent .eq. 1) then
+         dlmda = 1.0d0
          d2lmda = 0.0d0
+      else if (exponent .eq. 2) then
+         dlmda = 2.0d0 * x
+         d2lmda = 2.0d0
       else
+         expnt = dble(exponent)
+         dlmda = expnt * x**(exponent-1)
          d2lmda = expnt * (expnt-1.0d0) * x**(exponent-2)
       end if
       return
@@ -357,11 +339,9 @@ c
       real*8 base
 c
 c
-c     set a bounded coordinate and handle the identity map directly
+c     compute map
 c
       xval = x
-      if (xval .lt. 0.0d0)  xval = 0.0d0
-      if (xval .gt. 1.0d0)  xval = 1.0d0
       if (n .le. 1) then
          lmda = xval
          dlmda = 1.0d0

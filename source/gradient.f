@@ -157,21 +157,19 @@ c
          allocate (deg(3,n))
          allocate (dex(3,n))
       end if
-      if (use_dlmda) then
-         if (allocated(dfsumdl)) then
-            if (size(dfsumdl) .lt. 3*n) then
-               deallocate (dfsumdl)
-               deallocate (dfvdl)
-               deallocate (dfmdl)
-               deallocate (dfpdl)
-            end if
+      if (allocated(dfsumdl)) then
+         if (size(dfsumdl) .lt. 3*n) then
+            deallocate (dfsumdl)
+            deallocate (dfvdl)
+            deallocate (dfmdl)
+            deallocate (dfpdl)
          end if
-         if (.not. allocated(dfsumdl)) then
-            allocate (dfsumdl(3,n))
-            allocate (dfvdl(3,n))
-            allocate (dfmdl(3,n))
-            allocate (dfpdl(3,n))
-         end if
+      end if
+      if (.not. allocated(dfsumdl)) then
+         allocate (dfsumdl(3,n))
+         allocate (dfvdl(3,n))
+         allocate (dfmdl(3,n))
+         allocate (dfpdl(3,n))
       end if
 c
 c     zero out each of the first derivative components
@@ -210,16 +208,14 @@ c
             dex(j,i) = 0.0d0
          end do
       end do
-      if (use_dlmda) then
-         do i = 1, n
-            do j = 1, 3
-               dfsumdl(j,i) = 0.0d0
-               dfvdl(j,i) = 0.0d0
-               dfmdl(j,i) = 0.0d0
-               dfpdl(j,i) = 0.0d0
-            end do
+      do i = 1, n
+         do j = 1, 3
+            dfsumdl(j,i) = 0.0d0
+            dfvdl(j,i) = 0.0d0
+            dfmdl(j,i) = 0.0d0
+            dfpdl(j,i) = 0.0d0
          end do
-      end if
+      end do
 c
 c     zero out the virial and the intermolecular energy
 c
@@ -281,14 +277,14 @@ c
       if (use_chgdpl)  call echgdpl1
       if (use_dipole)  call edipole1
       if (use_mpole) then
-         if (use_dlmda) then
+         if (use_edlmda) then
             call empole4
          else
             call empole1
          end if
       end if
       if (use_polar) then
-         if (use_dlmda) then
+         if (use_pdlmda) then
             call epolar4
          else
             call epolar1
@@ -304,7 +300,7 @@ c
          if (vdwtyp .eq. 'BUCKINGHAM')  call ebuck1
          if (vdwtyp .eq. 'MM3-HBOND')  call emm3hb1
          if (vdwtyp .eq. 'BUFFERED-14-7') then
-            if (use_dlmda) then
+            if (use_vdlmda) then
                call ehal4
             else
                call ehal1

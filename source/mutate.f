@@ -371,7 +371,6 @@ c
       integer i,j,k
       integer next
       real*8 temp
-      logical elmdamapset
       character*20 keyword
       character*240 record
       character*240 string
@@ -558,35 +557,47 @@ c
    10    continue
       end do
 c
-c     a main lambda drives every sublambda
+c     a main lambda drives sublambdas that name a map
 c
-      if (use_mainlmda .and. .not.use_relstage) then
-         elmdamapset = use_elmdamap
-         if (.not. use_elmdamap) then
-            use_elmdamap = .true.
-            elmdamap = 'EXP'
-         end if
+      if (use_mainlmda .and. use_relstage) then
 c
-c     polarization follows electrostatics unless told otherwise
+c     the staged relative schedule maps every sublambda itself
 c
-         if (.not. use_plmdamap) then
-            use_plmdamap = .true.
-            if (elmdamapset) then
-               plmdamap = elmdamap
-               plmdaexp = elmdaexp
-               plmdainvn = elmdainvn
-               plmdainveps = elmdainveps
-               qntplmda0 = qntelmda0
-               qntplmda1 = qntelmda1
-            else
-               plmdamap = 'EXP'
+         use_elmdamap = .true.
+         use_plmdamap = .true.
+         use_vlmdamap = .true.
+      else if (use_mainlmda) then
+         if (.not. (use_elmdamap .or. use_plmdamap .or.
+     &              use_vlmdamap)) then
+            if (use_dlmda) then
+               write (iout,80)
+   80          format (/,' MUTATE_DLMDA  --  A Lambda Derivative',
+     &                    ' requires an explicit map for each driven',
+     &                    ' sublambda; add the ELE-LMDA-MAP,',
+     &                    ' POL-LMDA-MAP or VDW-LMDA-MAP keywords')
+               call fatal
             end if
-         end if
-         if (.not. use_vlmdamap) then
+            use_elmdamap = .true.
+            use_plmdamap = .true.
             use_vlmdamap = .true.
+            elmdamap = 'EXP'
+            plmdamap = 'EXP'
             vlmdamap = 'EXP'
          end if
+c
+c     a sublambda the main lambda does not drive is held at its value
+c     and leaves the chain rule
+c
+         if (.not. use_elmdamap)  deldlmda = 0.0d0
+         if (.not. use_plmdamap)  dpldlmda = 0.0d0
+         if (.not. use_vlmdamap)  dvldlmda = 0.0d0
       end if
+c
+c     set the terms that carry a lambda derivative
+c
+      use_edlmda = use_dlmda .and. use_elmdamap
+      use_pdlmda = use_dlmda .and. use_plmdamap
+      use_vdlmda = use_dlmda .and. use_vlmdamap
 c
 c     enable dual topology for relative free energy
 c
@@ -733,7 +744,7 @@ c
 c     enable use_plmda rescale if ele and pol are decoupled
 c
       if (use_mutate .and. .not.use_rel .and. .not.use_epdt
-     &       .and. .not.use_dlmda .and. use_polar) then
+     &       .and. .not.use_pdlmda .and. use_polar) then
          if (plambda .ne. elambda)  use_plmda = .true.
       end if
 c
@@ -1310,11 +1321,22 @@ c
 c     "epolar4" carries the polarization lambda derivative only through
 c     its dual topology routines, so single topology cannot supply one
 c
-      if (use_dlmda .and. use_polar .and. .not.use_epdt) then
+      if (use_pdlmda .and. use_polar .and. .not.use_epdt) then
          write (iout,20)
    20    format (/,' MUTATE_CHECK  --  The Polarization Lambda',
      &              ' Derivative is Available only for Dual Topology;',
      &              ' add the POL-DUALTOPO keyword')
+         call fatal
+      end if
+c
+c     every sublambda is mapped from the main lambda, so a lambda
+c     derivative has nothing to differentiate without one
+c
+      if (use_dlmda .and. .not.use_mainlmda) then
+         write (iout,25)
+   25    format (/,' MUTATE_CHECK  --  A Lambda Derivative requires',
+     &              ' a main lambda; add the LAMBDA keyword and a map',
+     &              ' for each driven sublambda')
          call fatal
       end if
 c

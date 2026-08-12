@@ -199,6 +199,9 @@ c     compute the analytical lambda derivatives
 c
          if (doanalyt .and. keylmda) then
             use_dlmda = .true.
+            use_edlmda = use_dlmda .and. use_elmdamap
+            use_pdlmda = use_dlmda .and. use_plmdamap
+            use_vdlmda = use_dlmda .and. use_vlmdamap
             call altelec
             call gradient (eval,derivs)
             adedl = dedl
@@ -257,6 +260,9 @@ c     compute the numerical lambda derivatives
 c
          if (donumer .and. keylmda) then
             use_dlmda = .false.
+            use_edlmda = use_dlmda .and. use_elmdamap
+            use_pdlmda = use_dlmda .and. use_plmdamap
+            use_vdlmda = use_dlmda .and. use_vlmdamap
             oldvdl = vlambda
             oldeml = elambda
             oldepl = plambda

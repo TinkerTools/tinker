@@ -472,11 +472,6 @@ c
      &                  'sublmdaexp x=0 n=3 dlmda')
       call assert_real (d2lmda,0.0d0,1.0d-12,
      &                  'sublmdaexp x=0 n=3 d2lmda')
-      call sublmdaexp (-0.5d0,2,lmda,dlmda,d2lmda)
-      call assert_real (lmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x below 0 lmda')
-      call assert_real (d2lmda,2.0d0,1.0d-12,
-     &                  'sublmdaexp x below 0 d2lmda')
 c
 c     at and above x=1 the exponential map saturates with the
 c     analytic power law derivatives
@@ -488,13 +483,6 @@ c
      &                  'sublmdaexp x=1 n=3 dlmda')
       call assert_real (d2lmda,6.0d0,1.0d-12,
      &                  'sublmdaexp x=1 n=3 d2lmda')
-      call sublmdaexp (1.5d0,1,lmda,dlmda,d2lmda)
-      call assert_real (lmda,1.0d0,1.0d-12,
-     &                  'sublmdaexp x above 1 n=1 lmda')
-      call assert_real (dlmda,1.0d0,1.0d-12,
-     &                  'sublmdaexp x above 1 n=1 dlmda')
-      call assert_real (d2lmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x above 1 n=1 d2lmda')
 c
 c     the interior exponential map is continuous with the x=1
 c     endpoint for an exponent of one
@@ -517,25 +505,6 @@ c
       call sublmdainvpower (0.4d0,0,0.1d0,lmda,dlmda,d2lmda)
       call assert_real (lmda,0.4d0,1.0d-12,
      &                  'sublmdainvpower n=0 lmda')
-c
-c     the identity map still clamps out of range coordinates
-c
-      call sublmdainvpower (1.5d0,1,0.1d0,lmda,dlmda,d2lmda)
-      call assert_real (lmda,1.0d0,1.0d-12,
-     &                  'sublmdainvpower n=1 clamp high')
-      call sublmdainvpower (-0.5d0,1,0.1d0,lmda,dlmda,d2lmda)
-      call assert_real (lmda,0.0d0,1.0d-12,
-     &                  'sublmdainvpower n=1 clamp low')
-c
-c     out of range coordinates clamp to the endpoint values of the
-c     shifted inverse power map, which is normalized to zero and one
-c
-      call sublmdainvpower (1.5d0,3,0.02d0,lmda,dlmda,d2lmda)
-      call assert_real (lmda,1.0d0,1.0d-12,
-     &                  'sublmdainvpower clamp high')
-      call sublmdainvpower (-0.5d0,3,0.02d0,lmda,dlmda,d2lmda)
-      call assert_real (lmda,0.0d0,1.0d-12,
-     &                  'sublmdainvpower clamp low')
 c
 c     a nonpositive shift falls back to a default shift of 0.1
 c

@@ -38,7 +38,6 @@ extern double TINKER_MOD(ost, ostcvrat);
 extern double TINKER_MOD(ost, ostcvslp);
 extern double TINKER_MOD(ost, ostcvstd);
 extern double TINKER_MOD(ost, ostddgdl);
-extern double TINKER_MOD(ost, ostdedl);
 extern double TINKER_MOD(ost, ostdedlavg);
 extern double TINKER_MOD(ost, ostdedlslp);
 extern double TINKER_MOD(ost, ostdedlstd);
