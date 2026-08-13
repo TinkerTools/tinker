@@ -299,17 +299,22 @@ c
       call assert_real (dvldlmda,0.0d0,0.0d0,'lmda ele only dvldlmda')
       call final
 c
-c     an explicit map on one term leaves the others fully coupled
+c     each sublambda follows the map named for it, so the three reach
+c     different values with different chain factors; the polarization
+c     window starts at the main lambda, leaving it on the flat side of
+c     its taper and fully decoupled
 c
       call loadfix ('water2','151_water_lmda_vexp_l05.key')
       call assert_logical (vlmdamap.eq.'EXP',.true.,
-     &                  'lmda vexp vlmdamap')
-      call assert_real (elambda,1.0d0,0.0d0,'lmda vexp elambda')
-      call assert_real (plambda,1.0d0,0.0d0,'lmda vexp plambda')
-      call assert_real (vlambda,0.125d0,1.0d-15,'lmda vexp vlambda')
-      call assert_real (deldlmda,0.0d0,0.0d0,'lmda vexp deldlmda')
-      call assert_real (dpldlmda,0.0d0,0.0d0,'lmda vexp dpldlmda')
-      call assert_real (dvldlmda,0.75d0,1.0d-15,'lmda vexp dvldlmda')
+     &                  'lmda mixed vlmdamap')
+      call assert_real (elambda,0.31744d0,1.0d-12,
+     &                  'lmda mixed elambda')
+      call assert_real (plambda,0.0d0,0.0d0,'lmda mixed plambda')
+      call assert_real (vlambda,0.125d0,1.0d-15,'lmda mixed vlambda')
+      call assert_real (deldlmda,3.456d0,1.0d-12,
+     &                  'lmda mixed deldlmda')
+      call assert_real (dpldlmda,0.0d0,0.0d0,'lmda mixed dpldlmda')
+      call assert_real (dvldlmda,0.75d0,1.0d-15,'lmda mixed dvldlmda')
       call final
 c
 c     naming two maps drives those terms and leaves the third fully

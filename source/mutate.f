@@ -743,10 +743,8 @@ c
 c
 c     enable use_plmda rescale if ele and pol are decoupled
 c
-      if (use_mutate .and. .not.use_rel .and. .not.use_epdt
-     &       .and. .not.use_pdlmda .and. use_polar) then
-         if (plambda .ne. elambda)  use_plmda = .true.
-      end if
+      use_plmda = (use_mutate .and. .not.use_rel .and. .not.use_epdt
+     &                .and. .not.use_pdlmda .and. use_polar)
 c
 c     perform dynamic allocation of some global arrays
 c
