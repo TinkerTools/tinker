@@ -313,14 +313,9 @@ c
             write (iout,190)  lambda
   190       format (' Main Lambda Value',18x,f8.3)
          end if
-         if (use_plmda) then
-            write (iout,200)
-  200       format (' Polarization Lambda Decoupled from',
-     &              ' Electrostatics Lambda')
-         end if
          if (use_rel) then
-            write (iout,210)  nmut-nmutb,nmutb
-  210       format (/,' Relative Dual Topology Active :',
+            write (iout,200)  nmut-nmutb,nmutb
+  200       format (/,' Relative Dual Topology Active :',
      &              /,' Number of Ligand1 Atoms',12x,i8,
      &              /,' Number of Ligand2 Atoms',12x,i8)
          end if
@@ -570,8 +565,8 @@ c
          if (.not. (use_elmdamap .or. use_plmdamap .or.
      &              use_vlmdamap)) then
             if (use_dlmda) then
-               write (iout,80)
-   80          format (/,' MUTATE_DLMDA  --  A Lambda Derivative',
+               write (iout,20)
+   20          format (/,' MUTATE_DLMDA  --  A Lambda Derivative',
      &                    ' requires an explicit map for each driven',
      &                    ' sublambda; add the ELE-LMDA-MAP,',
      &                    ' POL-LMDA-MAP or VDW-LMDA-MAP keywords')
@@ -690,22 +685,22 @@ c
          if (relstg1lmda0.lt.0.0d0 .or.
      &       relstg1lmda0.ge.relstg1lmda1 .or.
      &       relstg1lmda1.gt.1.0d0) then
-            write (iout,20)
-   20       format (/,' MUTATE_DLMDA  --  REL-LIG1-ELE-RANGE must',
+            write (iout,30)
+   30       format (/,' MUTATE_DLMDA  --  REL-LIG1-ELE-RANGE must',
      &                 ' satisfy 0 <= lo < hi <= 1')
             call fatal
          end if
          if (relstg2lmda0.lt.0.0d0 .or.
      &       relstg2lmda0.ge.relstg2lmda1 .or.
      &       relstg2lmda1.gt.1.0d0) then
-            write (iout,30)
-   30       format (/,' MUTATE_DLMDA  --  REL-LIG2-ELE-RANGE must',
+            write (iout,40)
+   40       format (/,' MUTATE_DLMDA  --  REL-LIG2-ELE-RANGE must',
      &                 ' satisfy 0 <= lo < hi <= 1')
             call fatal
          end if
          if (relstg1lmda1 .gt. relstg2lmda0) then
-            write (iout,40)
-   40       format (/,' MUTATE_DLMDA  --  REL-LIG1-ELE-RANGE and',
+            write (iout,50)
+   50       format (/,' MUTATE_DLMDA  --  REL-LIG1-ELE-RANGE and',
      &                 ' REL-LIG2-ELE-RANGE overlap; the ligand 1',
      &                 ' window must end at or below the start of',
      &                 ' the ligand 2 window')
@@ -717,23 +712,23 @@ c     the staged schedule morphs van der Waals between the two ligands
 c
       if (use_relstage) then
          if (vlmdamap .ne. 'QNT') then
-            write (iout,50)
-   50       format (/,' MUTATE_DLMDA  --  REL-STAGE requires the QNT',
+            write (iout,60)
+   60       format (/,' MUTATE_DLMDA  --  REL-STAGE requires the QNT',
      &                 ' van der Waals lambda map; set VDW-LMDA-MAP',
      &                 ' to QNT')
             call fatal
          end if
          if (qntvlmda0 .lt. relstg1lmda1) then
-            write (iout,60)
-   60       format (/,' MUTATE_DLMDA  --  VDW-LMDA-RANGE starts before',
+            write (iout,70)
+   70       format (/,' MUTATE_DLMDA  --  VDW-LMDA-RANGE starts before',
      &                 ' the ligand 1 electrostatic window ends; raise',
      &                 ' the lower bound to at least the upper bound',
      &                 ' of REL-LIG1-ELE-RANGE')
             call fatal
          end if
          if (qntvlmda1 .gt. relstg2lmda0) then
-            write (iout,70)
-   70       format (/,' MUTATE_DLMDA  --  VDW-LMDA-RANGE ends after',
+            write (iout,80)
+   80       format (/,' MUTATE_DLMDA  --  VDW-LMDA-RANGE ends after',
      &                 ' the ligand 2 electrostatic window starts;',
      &                 ' lower the upper bound to at most the lower',
      &                 ' bound of REL-LIG2-ELE-RANGE')
@@ -1331,8 +1326,8 @@ c     every sublambda is mapped from the main lambda, so a lambda
 c     derivative has nothing to differentiate without one
 c
       if (use_dlmda .and. .not.use_mainlmda) then
-         write (iout,25)
-   25    format (/,' MUTATE_CHECK  --  A Lambda Derivative requires',
+         write (iout,30)
+   30    format (/,' MUTATE_CHECK  --  A Lambda Derivative requires',
      &              ' a main lambda; add the LAMBDA keyword and a map',
      &              ' for each driven sublambda')
          call fatal
@@ -1343,8 +1338,8 @@ c     set by its own keyword would be overwritten
 c
       if (use_mainlmda .and.
      &    (setelambda .or. setplambda .or. setvlambda)) then
-         write (iout,30)
-   30    format (/,' MUTATE_CHECK  --  LAMBDA sets each sublambda',
+         write (iout,40)
+   40    format (/,' MUTATE_CHECK  --  LAMBDA sets each sublambda',
      &              ' from its own map; remove the ELE-LAMBDA,',
      &              ' POL-LAMBDA and VDW-LAMBDA keywords')
          call fatal
@@ -1355,8 +1350,8 @@ c     so a sublambda set by its own keyword would be overwritten
 c
       if (use_relstage .and.
      &    (setelambda .or. setplambda .or. setvlambda)) then
-         write (iout,40)
-   40    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
+         write (iout,50)
+   50    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
      &              ' from its own schedule; remove the ELE-LAMBDA,',
      &              ' POL-LAMBDA and VDW-LAMBDA keywords')
          call fatal
@@ -1365,8 +1360,8 @@ c
 c     the staged relative schedule morphs one ligand into another
 c
       if (use_relstage .and. nmutb.eq.0) then
-         write (iout,50)
-   50    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
+         write (iout,60)
+   60    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
      &              ' ligand group; add the LIGAND2 keyword')
          call fatal
       end if

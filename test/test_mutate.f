@@ -36,6 +36,7 @@ c
       call test_mutate_rels
       call test_mutate_vcorr
       call test_mutate_lmdafix
+      call test_mutate_lmdadrv
       return
       end
 c
@@ -1186,6 +1187,76 @@ c
       call test_mutate_calc ('water2','153_water_lmda_mp05_expl.key',
      &   '153_water_lmda_mp05_expl.txt','153_water_lmda_mp05_expl',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_lmdadrv  --  driven sublambda sets  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_lmdadrv" runs the fourteen water fixtures 154-167
+c     that name each combination of the electrostatic, polarization and
+c     van der Waals maps at a main lambda of 0.6, so every fixture
+c     drives one subset of the sublambdas on the identity map and holds
+c     the rest fully coupled at one; all three nonbonded terms stay
+c     active throughout, so an undriven term is present in the energy
+c     rather than switched off; cases 154-160 carry no "lambda-deriv"
+c     keyword while 161-167 repeat them with it, and the two halves
+c     share their energy, gradient and virial values, which holds the
+c     plain and the lambda derivative energy routines to the same
+c     result; the level 4 checks run only for the derivative half
+c
+c
+      subroutine test_mutate_lmdadrv
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','154_water_lmda_e_l06.key',
+     &   '154_water_lmda_e_l06.txt','154_water_lmda_e_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','155_water_lmda_p_l06.key',
+     &   '155_water_lmda_p_l06.txt','155_water_lmda_p_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','156_water_lmda_v_l06.key',
+     &   '156_water_lmda_v_l06.txt','156_water_lmda_v_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','157_water_lmda_ep_l06.key',
+     &   '157_water_lmda_ep_l06.txt','157_water_lmda_ep_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','158_water_lmda_ev_l06.key',
+     &   '158_water_lmda_ev_l06.txt','158_water_lmda_ev_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','159_water_lmda_pv_l06.key',
+     &   '159_water_lmda_pv_l06.txt','159_water_lmda_pv_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','160_water_lmda_epv_l06.key',
+     &   '160_water_lmda_epv_l06.txt','160_water_lmda_epv_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','161_water_dlmda_e_l06.key',
+     &   '161_water_dlmda_e_l06.txt','161_water_dlmda_e_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','162_water_dlmda_p_l06.key',
+     &   '162_water_dlmda_p_l06.txt','162_water_dlmda_p_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','163_water_dlmda_v_l06.key',
+     &   '163_water_dlmda_v_l06.txt','163_water_dlmda_v_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','164_water_dlmda_ep_l06.key',
+     &   '164_water_dlmda_ep_l06.txt','164_water_dlmda_ep_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','165_water_dlmda_ev_l06.key',
+     &   '165_water_dlmda_ev_l06.txt','165_water_dlmda_ev_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','166_water_dlmda_pv_l06.key',
+     &   '166_water_dlmda_pv_l06.txt','166_water_dlmda_pv_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','167_water_dlmda_epv_l06.key',
+     &   '167_water_dlmda_epv_l06.txt','167_water_dlmda_epv_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c
