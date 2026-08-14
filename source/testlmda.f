@@ -429,7 +429,7 @@ c
                totnorm = totnorm + denorm
                denorm = sqrt(denorm)
                write (iout,150)  i,(adfsumdl(j,i),j=1,3),denorm
-  150          format (' Anlyt',2x,i8,3x,3f14.6,2x,f14.6)
+  150          format (' Anlyt',2x,i8,3x,4f14.6)
             end if
             if (donumer .and. use(i)) then
                ndenorm = ndfsumdl(1,i)**2 + ndfsumdl(2,i)**2
@@ -437,7 +437,7 @@ c
                ntotnorm = ntotnorm + ndenorm
                ndenorm = sqrt(ndenorm)
                write (iout,160)  i,(ndfsumdl(j,i),j=1,3),ndenorm
-  160          format (' Numer',2x,i8,3x,3f14.6,2x,f14.6)
+  160          format (' Numer',2x,i8,3x,4f14.6)
             end if
          end do
 c
