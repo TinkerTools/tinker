@@ -342,10 +342,6 @@ c     which method drives the main lambda, the dual topology end state
 c     treatment and the mapping from the main lambda to the individual
 c     electrostatic, polarization and van der Waals sublambdas
 c
-c     note the copy of the unscaled electrostatic parameters is made
-c     for every hybrid system, since "altelec" rebuilds the scaled
-c     values from that copy even when no lambda derivative is used
-c
 c
       subroutine mutate_dlmda
       use angbnd
@@ -1346,35 +1342,51 @@ c
          call fatal
       end if
 c
-c     a main lambda maps every sublambda on its own, so a sublambda
-c     set by its own keyword would be overwritten
-c
-      if (use_mainlmda .and.
-     &    (setelambda .or. setplambda .or. setvlambda)) then
-         write (iout,40)
-   40    format (/,' MUTATE_CHECK  --  LAMBDA sets each sublambda',
-     &              ' from its own map; remove the ELE-LAMBDA,',
-     &              ' POL-LAMBDA and VDW-LAMBDA keywords')
-         call fatal
-      end if
-c
 c     the staged relative schedule maps every sublambda on its own,
 c     so a sublambda set by its own keyword would be overwritten
 c
       if (use_relstage .and.
      &    (setelambda .or. setplambda .or. setvlambda)) then
-         write (iout,50)
-   50    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
+         write (iout,40)
+   40    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
      &              ' from its own schedule; remove the ELE-LAMBDA,',
      &              ' POL-LAMBDA and VDW-LAMBDA keywords')
+         call fatal
+      end if
+c
+c     a main lambda maps each sublambda that names a map, so one set by
+c     its own keyword would be overwritten; a sublambda the main lambda
+c     does not drive is free to be pinned by its own keyword, which is
+c     how a leg holds a term at a fixed coupling state while the main
+c     lambda morphs another term
+c
+      if (use_mainlmda .and. use_elmdamap .and. setelambda) then
+         write (iout,50)
+   50    format (/,' MUTATE_CHECK  --  LAMBDA drives elambda through',
+     &              ' a lambda map; remove the ELE-LAMBDA keyword, or',
+     &              ' name a map only for the sublambdas LAMBDA drives')
+         call fatal
+      end if
+      if (use_mainlmda .and. use_plmdamap .and. setplambda) then
+         write (iout,60)
+   60    format (/,' MUTATE_CHECK  --  LAMBDA drives plambda through',
+     &              ' a lambda map; remove the POL-LAMBDA keyword, or',
+     &              ' name a map only for the sublambdas LAMBDA drives')
+         call fatal
+      end if
+      if (use_mainlmda .and. use_vlmdamap .and. setvlambda) then
+         write (iout,70)
+   70    format (/,' MUTATE_CHECK  --  LAMBDA drives vlambda through',
+     &              ' a lambda map; remove the VDW-LAMBDA keyword, or',
+     &              ' name a map only for the sublambdas LAMBDA drives')
          call fatal
       end if
 c
 c     the staged relative schedule morphs one ligand into another
 c
       if (use_relstage .and. nmutb.eq.0) then
-         write (iout,60)
-   60    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
+         write (iout,80)
+   80    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
      &              ' ligand group; add the LIGAND2 keyword')
          call fatal
       end if

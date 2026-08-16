@@ -37,6 +37,7 @@ c
       call test_mutate_vcorr
       call test_mutate_lmdafix
       call test_mutate_lmdadrv
+      call test_mutate_lmdapin
       return
       end
 c
@@ -1271,6 +1272,70 @@ c
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2','167_water_dlmda_epv_l06.key',
      &   '167_water_dlmda_epv_l06.txt','167_water_dlmda_epv_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_lmdapin  --  pinned sublambda legs  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_lmdapin" runs the six water fixtures 170-175 that
+c     hold one term at a fixed coupling state while the main lambda
+c     morphs another, the way a leg of a two simulation free energy
+c     split is set up; the "epin" fixtures pin electrostatics and
+c     polarization decoupled by their own keywords and drive van der
+c     Waals from the "lambda" keyword, while the "vpin" fixtures pin
+c     van der Waals decoupled and drive the other two
+c
+c     the three pairs walk one topology and one map form each, 170 and
+c     171 absolute single topology on the exponential map at a main
+c     lambda of 0.5, 172 and 173 absolute dual topology on the quintic
+c     map at 0.6, and 174 and 175 relative dual topology on the inverse
+c     power map at 0.7; 171 carries POL-DUALTOPO even though the rest
+c     of that pair is single topology, since "epolar4" supplies the
+c     polarization lambda derivative only through dual topology
+c
+c     a pinned sublambda is held at its own keyword value and leaves the
+c     chain rule, so every fixture names the "lambda-deriv" keyword and
+c     runs the level 4 checks, where the pinned terms report exact zeros
+c     and the driven ones carry the whole derivative; all three
+c     nonbonded terms stay active, so a pinned term is still present in
+c     the energy rather than switched off, and all six fixtures use
+c     Ewald and support a neighbor list
+c
+c
+      subroutine test_mutate_lmdapin
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','170_water_lmda_ast_epin_l05.key',
+     &   '170_water_lmda_ast_epin_l05.txt',
+     &   '170_water_lmda_ast_epin_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','171_water_lmda_ast_vpin_l05.key',
+     &   '171_water_lmda_ast_vpin_l05.txt',
+     &   '171_water_lmda_ast_vpin_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','172_water_lmda_adt_epin_l06.key',
+     &   '172_water_lmda_adt_epin_l06.txt',
+     &   '172_water_lmda_adt_epin_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','173_water_lmda_adt_vpin_l06.key',
+     &   '173_water_lmda_adt_vpin_l06.txt',
+     &   '173_water_lmda_adt_vpin_l06',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','174_water_lmda_rdt_epin_l07.key',
+     &   '174_water_lmda_rdt_epin_l07.txt',
+     &   '174_water_lmda_rdt_epin_l07',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','175_water_lmda_rdt_vpin_l07.key',
+     &   '175_water_lmda_rdt_vpin_l07.txt',
+     &   '175_water_lmda_rdt_vpin_l07',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
