@@ -1173,10 +1173,6 @@ c     method, in which the fully coupled (vlambda=1) and the fully
 c     decoupled (vlambda=0) states are each evaluated in full and
 c     combined by a power law interpolation in vlambda
 c
-c     note the long range correction depends on vlambda, so it must be
-c     evaluated separately for each end state and interpolated along
-c     with the pairwise energy
-c
 c
       subroutine ehal3d
       use action
@@ -1187,11 +1183,13 @@ c
       use inter
       use mutant
       implicit none
+      real*8 weight1,dweight1,d2weight1
+      logical need0,need1
       integer i
       integer nev1
       real*8 ev1,ev0
       real*8 vlambdaorig
-      real*8 weight1,weight0
+      real*8 weight0
       real*8 einterorig
       real*8 einter1,einter0
       real*8, allocatable :: aev1(:)
@@ -1207,7 +1205,13 @@ c     compute energy and analysis of the vlambda = 1 state
 c
       vlambdaorig = vlambda
       einterorig = einter
-      if (use_vdw4f) then
+c
+c     an endpoint is live when it carries weight or a lambda derivative
+c
+      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dvldlmda,d2vldlmda2,need0,need1)
+      if (need1) then
          vlambda = 1.0d0
          call ehal3calc
          ev1 = ev
@@ -1225,7 +1229,7 @@ c
 c
 c     compute energy and analysis of the vlambda = 0 state
 c
-      if (use_vdw4i) then
+      if (need0) then
          vlambda = 0.0d0
          call ehal3calc
          ev0 = ev
@@ -1238,7 +1242,7 @@ c
 c     retain the historical analysis count from the fully coupled
 c     endpoint even when its energy and analysis are not needed
 c
-      if (.not.use_vdw4f) then
+      if (.not.need1) then
          vlambda = 1.0d0
          call ehal3calc
          nev1 = nev
@@ -1247,13 +1251,13 @@ c
 c
 c     copy results if only one endpoint state is computed
 c
-      if (use_vdw4i .and. .not.use_vdw4f) then
+      if (need0 .and. .not.need1) then
          ev1 = ev0
          einter1 = einter0
          do i = 1, n
             aev1(i) = aev0(i)
          end do
-      else if (.not.use_vdw4i .and. use_vdw4f) then
+      else if (.not.need0 .and. need1) then
          ev0 = ev1
          einter0 = einter1
          do i = 1, n
@@ -1267,7 +1271,6 @@ c
 c
 c     interpolate the dual topology energy and analysis
 c
-      weight1 = vlambda**evdtexp
       weight0 = 1.0d0 - weight1
       ev = weight1*ev1 + weight0*ev0
       nev = nev1
@@ -1338,19 +1341,18 @@ c
       end if
       return
       end
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine ehal3dr  --  relative dual topo 14-7 analysis  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine ehal3dr  --  relative dual topology 14-7 anlys  ##
-c     ##                                                             ##
-c     #################################################################
+c     "ehal3dr" interpolates between the two coupling states of a
+c     two-ligand relative dual topology calculation, accumulating the
+c     partitioned energy of each parameter-zeroed subsystem,
 c
-c
-c     "ehal3dr" calculates the buffered 14-7 van der Waals energy and
-c     analysis for a two-ligand relative dual topology calculation by
-c     combining four subsystem states, E1 = E(A+env) + E(B) and
-c     E0 = E(B+env) + E(A)
+c        E = weight1*E(vrelst1) + (1-weight1)*E(vrelst0)
 c
 c
       subroutine ehal3dr
@@ -1362,135 +1364,120 @@ c
       use inter
       use mutant
       implicit none
-      integer i
-      integer nevae
-      real*8 evae,evbe
-      real*8 eva,evb
-      real*8 ev1,ev0
-      real*8 weight1,weight0
+      real*8 weight1,dweight1,d2weight1
+      integer i,k
+      integer nev0,nev1
+      integer ncpl0,ncpl1
+      real*8 ev0,ev1
       real*8 einterorig
-      real*8 einterae,einterbe
-      real*8 eintera,einterb
-      real*8, allocatable :: aevae(:)
-      real*8, allocatable :: aevbe(:)
-      real*8, allocatable :: aeva(:)
-      real*8, allocatable :: aevb(:)
+      real*8 einter0,einter1
+      logical la,lb,le
+      logical in0,in1
+      logical need0,need1
+      real*8, allocatable :: aev0(:)
+      real*8, allocatable :: aev1(:)
 c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (aevae(n))
-      allocate (aevbe(n))
-      allocate (aeva(n))
-      allocate (aevb(n))
+      allocate (aev0(n))
+      allocate (aev1(n))
       einterorig = einter
 c
-c     ligand A coupled to environment, group B fully decoupled
+c     an endpoint is live when it carries weight or a lambda derivative
 c
-      if (use_vdw4f) then
-         call submask (.true.,.false.,.true.)
+      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dvldlmda,d2vldlmda2,need0,need1)
+c
+c     zero out the two endpoint accumulators
+c
+      ev0 = 0.0d0
+      ev1 = 0.0d0
+      nev0 = 0
+      nev1 = 0
+      ncpl0 = -1
+      ncpl1 = -1
+      einter0 = 0.0d0
+      einter1 = 0.0d0
+      do i = 1, n
+         aev0(i) = 0.0d0
+         aev1(i) = 0.0d0
+      end do
+c
+c     build each subsystem once, add to the endpoints
+c
+      do k = 1, nrelsub
+         call relslot (k,vrelst0,vrelst1,la,lb,le,in0,in1)
+         in0 = in0 .and. need0
+         in1 = in1 .and. need1
+         if (.not. (in0 .or. in1))  cycle
+         call submask (la,lb,le)
          call ehal3calc
-         evae = ev
-         nevae = nev
-         do i = 1, n
-            aevae(i) = aev(i)
-         end do
-         einterae = einter - einterorig
+         if (in0) then
+            ev0 = ev0 + ev
+            nev0 = nev0 + nev
+            if (le .and. (la .or. lb))  ncpl0 = nev
+            einter0 = einter0 + einter - einterorig
+            do i = 1, n
+               aev0(i) = aev0(i) + aev(i)
+            end do
+         end if
+         if (in1) then
+            ev1 = ev1 + ev
+            einter1 = einter1 + einter - einterorig
+            do i = 1, n
+               aev1(i) = aev1(i) + aev(i)
+            end do
+            nev1 = nev1 + nev
+            if (le .and. (la .or. lb))  ncpl1 = nev
+         end if
          einter = einterorig
-      end if
+      end do
 c
-c     ligand B coupled to environment, group A fully decoupled
-c
-      if (use_vdw4i) then
-         call submask (.false.,.true.,.true.)
-         call ehal3calc
-         evbe = ev
-         do i = 1, n
-            aevbe(i) = aev(i)
-         end do
-         einterbe = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     ligand A alone, giving its intramolecular van der Waals energy
-c
-      if (use_vdw4i) then
-         call submask (.true.,.false.,.false.)
-         call ehal3calc
-         eva = ev
-         do i = 1, n
-            aeva(i) = aev(i)
-         end do
-         eintera = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     ligand B alone, giving its intramolecular van der Waals energy
-c
-      if (use_vdw4f) then
-         call submask (.false.,.true.,.false.)
-         call ehal3calc
-         evb = ev
-         do i = 1, n
-            aevb(i) = aev(i)
-         end do
-         einterb = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     retain the historical analysis count from the ligand A coupled
-c     endpoint even when its energy and analysis are not needed
-c
-      if (.not.use_vdw4f) then
-         call submask (.true.,.false.,.true.)
-         call ehal3calc
-         nevae = nev
-         einter = einterorig
-      end if
-c
-c     alias the omitted composite endpoint to the computed endpoint
-c
-      if (use_vdw4i .and. .not.use_vdw4f) then
-         evae = evbe
-         evb = eva
-         einterae = einterbe
-         einterb = eintera
-         do i = 1, n
-            aevae(i) = aevbe(i)
-            aevb(i) = aeva(i)
-         end do
-      else if (.not.use_vdw4i .and. use_vdw4f) then
-         evbe = evae
-         eva = evb
-         einterbe = einterae
-         eintera = einterb
-         do i = 1, n
-            aevbe(i) = aevae(i)
-            aeva(i) = aevb(i)
-         end do
-      end if
-c
-c     restore full system and interpolate the dual topology result
+c     restore the original full system parameters
 c
       call submask (.true.,.true.,.true.)
-      weight1 = vlambda**evdtexp
-      weight0 = 1.0d0 - weight1
-      ev1 = evae + evb
-      ev0 = evbe + eva
-      ev = weight1*ev1 + weight0*ev0
-      nev = nevae
-      einter = einterorig + weight1*(einterae+einterb)
-     &                    + weight0*(einterbe+eintera)
+c
+c     copy energy if only one endpoint state is computed
+c
+      if (.not. need0) then
+         ev0 = ev1
+         einter0 = einter1
+         do i = 1, n
+            aev0(i) = aev1(i)
+         end do
+      else if (.not. need1) then
+         ev1 = ev0
+         einter1 = einter0
+         do i = 1, n
+            aev1(i) = aev0(i)
+         end do
+      end if
+c
+c     interpolate between the two endpoint states
+c
+      ev = weight1*ev1 + (1.0d0-weight1)*ev0
+      einter = einterorig + weight1*einter1
+     &                    + (1.0d0-weight1)*einter0
       do i = 1, n
-         aev(i) = weight1*(aevae(i)+aevb(i))
-     &          + weight0*(aevbe(i)+aeva(i))
+         aev(i) = weight1*aev1(i) + (1.0d0-weight1)*aev0(i)
       end do
+c
+c     the count comes from the coupled subsystem while an endpoint
+c     holding one is live, and from the decoupled reference otherwise
+c
+      if (ncpl0 .ge. 0)  nev0 = ncpl0
+      if (ncpl1 .ge. 0)  nev1 = ncpl1
+      if (need1) then
+         nev = nev1
+      else
+         nev = nev0
+      end if
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (aevae)
-      deallocate (aevbe)
-      deallocate (aeva)
-      deallocate (aevb)
+      deallocate (aev0)
+      deallocate (aev1)
       return
       end

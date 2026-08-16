@@ -308,8 +308,16 @@ void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
 void mapsublmda_(double* lmda);
 #define tinker_f_mapsublmda mapsublmda_
+void sublmdamap_(double* lmda, char* map, int* nexp, int* invn, double* inveps, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub, tinker_fchar_len_t map_cap);
+inline void tinker_f_sublmdamap(double* lmda, tinker_fchars map, int* nexp, int* invn, double* inveps, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub) {
+    return sublmdamap_(lmda, map.string, nexp, invn, inveps, qnt0, qnt1, sub, dsub, d2sub, map.capacity);
+}
 void maprelstage_(double* lmda);
 #define tinker_f_maprelstage maprelstage_
+void relpowerwt_(double* x, int* nexp, double* w, double* dw, double* d2w);
+#define tinker_f_relpowerwt relpowerwt_
+void relneed_(double* w, double* dw, double* d2w, double* chain, double* d2chain, int* need0, int* need1);
+#define tinker_f_relneed relneed_
 void quintaper_(double* x, double* cut, double* off, double* taper, double* dtaper, double* d2taper);
 #define tinker_f_quintaper quintaper_
 void sublmdaexp_(double* x, int* exponent, double* lmda, double* dlmda, double* d2lmda);
@@ -980,8 +988,6 @@ void empole0calc_();
 #define tinker_f_empole0calc empole0calc_
 void empole0er_();
 #define tinker_f_empole0er empole0er_
-void empole0ers_();
-#define tinker_f_empole0ers empole0ers_
 
 // empole1.f
 void empole1_();
@@ -1006,8 +1012,6 @@ void empole1calc_();
 #define tinker_f_empole1calc empole1calc_
 void empole1er_();
 #define tinker_f_empole1er empole1er_
-void empole1ers_();
-#define tinker_f_empole1ers empole1ers_
 
 // empole2.f
 void empole2_(int* i);
@@ -1038,8 +1042,6 @@ void empole3calc_();
 #define tinker_f_empole3calc empole3calc_
 void empole3er_();
 #define tinker_f_empole3er empole3er_
-void empole3ers_();
-#define tinker_f_empole3ers empole3ers_
 
 // empole4.f
 void empole4_();
@@ -1062,8 +1064,6 @@ void empole4e_();
 #define tinker_f_empole4e empole4e_
 void empole4er_();
 #define tinker_f_empole4er empole4er_
-void empole4ers_();
-#define tinker_f_empole4ers empole4ers_
 
 // energy.f
 double energy_();
@@ -1246,8 +1246,6 @@ void epolar0p_();
 #define tinker_f_epolar0p epolar0p_
 void epolar0fr_();
 #define tinker_f_epolar0fr epolar0fr_
-void epolar0frs_();
-#define tinker_f_epolar0frs epolar0frs_
 
 // epolar1.f
 void epolar1_();
@@ -1276,8 +1274,6 @@ void epolar1p_();
 #define tinker_f_epolar1p epolar1p_
 void epolar1fr_();
 #define tinker_f_epolar1fr epolar1fr_
-void epolar1frs_();
-#define tinker_f_epolar1frs epolar1frs_
 
 // epolar2.f
 void epolar2_(int* i);
@@ -1312,8 +1308,6 @@ void epolar3p_();
 #define tinker_f_epolar3p epolar3p_
 void epolar3fr_();
 #define tinker_f_epolar3fr epolar3fr_
-void epolar3frs_();
-#define tinker_f_epolar3frs epolar3frs_
 
 // epolar4.f
 void epolar4_();
@@ -1322,8 +1316,6 @@ void epolar4f_();
 #define tinker_f_epolar4f epolar4f_
 void epolar4fr_();
 #define tinker_f_epolar4fr epolar4fr_
-void epolar4frs_();
-#define tinker_f_epolar4frs epolar4frs_
 
 // erepel.f
 void erepel_();
@@ -2222,6 +2214,8 @@ void mutate_();
 #define tinker_f_mutate mutate_
 void mutate_dlmda_();
 #define tinker_f_mutate_dlmda mutate_dlmda_
+void setdlmdaterms_();
+#define tinker_f_setdlmdaterms setdlmdaterms_
 void mutate_ost_();
 #define tinker_f_mutate_ost mutate_ost_
 void mutate_meta_();
@@ -2248,6 +2242,8 @@ void altsolv_();
 #define tinker_f_altsolv altsolv_
 void submask_(int* la, int* lb, int* le);
 #define tinker_f_submask submask_
+void relslot_(int* k, int* ist0, int* ist1, int* la, int* lb, int* le, int* in0, int* in1);
+#define tinker_f_relslot relslot_
 void setsubelec_();
 #define tinker_f_setsubelec setsubelec_
 void altemdtsub_(int* la, int* lb, int* le);

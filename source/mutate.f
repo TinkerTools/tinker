@@ -266,8 +266,9 @@ c
 c     report the mode chosen along each axis of the calculation
 c
          if (use_relstage) then
-            write (iout,60)
-   60       format (/,' Free Energy Mode',12x,'Staged Relative')
+            write (iout,60)  relstage
+   60       format (/,' Free Energy Mode',12x,'Staged Relative',
+     &              /,' Staged Leg',29x,a4)
          else if (use_rel) then
             write (iout,70)
    70       format (/,' Free Energy Mode',19x,'Relative')
@@ -366,6 +367,8 @@ c
       integer i,j,k
       integer next
       real*8 temp
+      logical setpolrng
+      character*4 legword
       character*20 keyword
       character*240 record
       character*240 string
@@ -398,24 +401,21 @@ c
       epdtexp = 1
       evdtexp = 1
 c
-c     enable both dual topology endpoints by default
+c     interpolate between the two coupled states unless a staged
+c     leg says otherwise
 c
-      use_ele4i = .true.
-      use_ele4f = .true.
-      use_pol4i = .true.
-      use_pol4f = .true.
-      use_vdw4i = .true.
-      use_vdw4f = .true.
+      erelst0 = rellig2
+      erelst1 = rellig1
+      prelst0 = rellig2
+      prelst1 = rellig1
+      vrelst0 = rellig2
+      vrelst1 = rellig1
 c
 c     set defaults for the staged relative free energy schedule
 c
       use_relstage = .false.
-      relstg1lmda0 = 0.0d0
-      relstg1lmda1 = 0.3d0
-      relstg2lmda0 = 0.7d0
-      relstg2lmda1 = 1.0d0
       relstage = 'VDWM'
-      relstagemix = .false.
+      setpolrng = .false.
 c
 c     set default mapping from main lambda to sublambda
 c
@@ -495,6 +495,7 @@ c
             string = record(next:240)
             read (string,*,err=10)  qntelmda0, qntelmda1
          else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
+            setpolrng = .true.
             string = record(next:240)
             read (string,*,err=10)  qntplmda0, qntplmda1
          else if (keyword(1:15) .eq. 'VDW-LMDA-RANGE ') then
@@ -542,12 +543,9 @@ c
          else if (keyword(1:10) .eq. 'REL-STAGE ') then
             use_rel = .true.
             use_relstage = .true.
-         else if (keyword(1:19) .eq. 'REL-LIG1-ELE-RANGE ') then
-            string = record(next:240)
-            read (string,*,err=10)  relstg1lmda0, relstg1lmda1
-         else if (keyword(1:19) .eq. 'REL-LIG2-ELE-RANGE ') then
-            string = record(next:240)
-            read (string,*,err=10)  relstg2lmda0, relstg2lmda1
+            call getword (record,legword,next)
+            call upcase (legword)
+            relstage = legword
          end if
    10    continue
       end do
@@ -590,9 +588,7 @@ c
 c
 c     set the terms that carry a lambda derivative
 c
-      use_edlmda = use_dlmda .and. use_elmdamap
-      use_pdlmda = use_dlmda .and. use_plmdamap
-      use_vdlmda = use_dlmda .and. use_vlmdamap
+      call setdlmdaterms
 c
 c     enable dual topology for relative free energy
 c
@@ -606,21 +602,6 @@ c
 c     ost and meta require second and force lambda derivatives
 c
       if (use_ost .or. use_meta)  use_epdt = .true.
-c
-c     enable both endpoints for each active dual term by default
-c
-      if (use_emdt) then
-         use_ele4i = .true.
-         use_ele4f = .true.
-      end if
-      if (use_epdt) then
-         use_pol4i = .true.
-         use_pol4f = .true.
-      end if
-      if (use_evdt) then
-         use_vdw4i = .true.
-         use_vdw4f = .true.
-      end if
 c
 c     validate mapping schemes from main lambda to sublambdas
 c
@@ -679,61 +660,51 @@ c
          qntvlmda1 = temp
       end if
 c
-c     ligand window must be an ordered subrange of [0,1] and not overlap
+c     a staged run drives one leg, so the leg must be named and the
+c     window it walks must carry the quintic map
 c
       if (use_relstage) then
-         if (relstg1lmda0.lt.0.0d0 .or.
-     &       relstg1lmda0.ge.relstg1lmda1 .or.
-     &       relstg1lmda1.gt.1.0d0) then
+         if (relstage.ne.'LIG1' .and. relstage.ne.'LIG2'
+     &          .and. relstage.ne.'VDWM') then
             write (iout,30)
-   30       format (/,' MUTATE_DLMDA  --  REL-LIG1-ELE-RANGE must',
-     &                 ' satisfy 0 <= lo < hi <= 1')
+   30       format (/,' MUTATE_DLMDA  --  REL-STAGE requires the leg',
+     &                 ' to be named; use LIG2 to discharge ligand 2,',
+     &                 ' VDWM to morph van der Waals, or LIG1 to',
+     &                 ' charge ligand 1')
             call fatal
          end if
-         if (relstg2lmda0.lt.0.0d0 .or.
-     &       relstg2lmda0.ge.relstg2lmda1 .or.
-     &       relstg2lmda1.gt.1.0d0) then
+         if (relstage.eq.'VDWM' .and. vlmdamap.ne.'QNT') then
             write (iout,40)
-   40       format (/,' MUTATE_DLMDA  --  REL-LIG2-ELE-RANGE must',
-     &                 ' satisfy 0 <= lo < hi <= 1')
+   40       format (/,' MUTATE_DLMDA  --  The VDWM leg of REL-STAGE',
+     &                 ' requires the QNT van der Waals lambda map;',
+     &                 ' set VDW-LMDA-MAP to QNT')
             call fatal
          end if
-         if (relstg1lmda1 .gt. relstg2lmda0) then
+         if (relstage.ne.'VDWM' .and. elmdamap.ne.'QNT') then
             write (iout,50)
-   50       format (/,' MUTATE_DLMDA  --  REL-LIG1-ELE-RANGE and',
-     &                 ' REL-LIG2-ELE-RANGE overlap; the ligand 1',
-     &                 ' window must end at or below the start of',
-     &                 ' the ligand 2 window')
+   50       format (/,' MUTATE_DLMDA  --  A ligand leg of REL-STAGE',
+     &                 ' requires the QNT electrostatic lambda map;',
+     &                 ' set ELE-LMDA-MAP to QNT')
             call fatal
          end if
-      end if
 c
-c     the staged schedule morphs van der Waals between the two ligands
+c     polarization stages with the multipoles on its own window, so a
+c     window given for it would be silently ignored
 c
-      if (use_relstage) then
-         if (vlmdamap .ne. 'QNT') then
+         if (setpolrng) then
             write (iout,60)
-   60       format (/,' MUTATE_DLMDA  --  REL-STAGE requires the QNT',
-     &                 ' van der Waals lambda map; set VDW-LMDA-MAP',
-     &                 ' to QNT')
+   60       format (/,' MUTATE_DLMDA  --  REL-STAGE stages',
+     &                 ' polarization with the multipoles; remove the',
+     &                 ' POL-LMDA-RANGE keyword')
             call fatal
          end if
-         if (qntvlmda0 .lt. relstg1lmda1) then
-            write (iout,70)
-   70       format (/,' MUTATE_DLMDA  --  VDW-LMDA-RANGE starts before',
-     &                 ' the ligand 1 electrostatic window ends; raise',
-     &                 ' the lower bound to at least the upper bound',
-     &                 ' of REL-LIG1-ELE-RANGE')
-            call fatal
-         end if
-         if (qntvlmda1 .gt. relstg2lmda0) then
-            write (iout,80)
-   80       format (/,' MUTATE_DLMDA  --  VDW-LMDA-RANGE ends after',
-     &                 ' the ligand 2 electrostatic window starts;',
-     &                 ' lower the upper bound to at most the lower',
-     &                 ' bound of REL-LIG2-ELE-RANGE')
-            call fatal
-         end if
+c
+c     each staged weight is the quintic taper of its own window, so the
+c     dual topology exponents are already spent and stay at one
+c
+         emdtexp = 1
+         epdtexp = 1
+         evdtexp = 1
       end if
 c
 c     enable use_plmda rescale if ele and pol are decoupled
@@ -812,6 +783,48 @@ c
             abflxorig(1,i) = abflx(1,i)
             abflxorig(2,i) = abflx(2,i)
          end do
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine setdlmdaterms  --  terms with a lambda deriv  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "setdlmdaterms" decides which of the three terms carries a lambda
+c     derivative, and so which of them has to be routed to its "empole4"
+c     flavored energy routine rather than the plain gradient one
+c
+c     a term qualifies when the main lambda drives its sublambda through
+c     a map, except on a staged relative leg, which walks one window and
+c     pins the sublambdas of the other terms to a constant; a pinned
+c     sublambda has a flat chain rule, so its term has nothing for the
+c     lambda derivative to sample and the plain routine gives the same
+c     answer for less work
+c
+c     "gradient" zeroes every lambda derivative accumulator before it
+c     dispatches, so a term left out here reports exact zeros
+c
+c
+      subroutine setdlmdaterms
+      use dlmda
+      implicit none
+c
+c
+      use_edlmda = use_dlmda .and. use_elmdamap
+      use_pdlmda = use_dlmda .and. use_plmdamap
+      use_vdlmda = use_dlmda .and. use_vlmdamap
+      if (use_relstage) then
+         if (relstage .eq. 'VDWM') then
+            use_edlmda = .false.
+            use_pdlmda = .false.
+         else
+            use_vdlmda = .false.
+         end if
       end if
       return
       end
@@ -1924,6 +1937,59 @@ c
          end if
       end do
       use_subsys = .not. (la .and. lb .and. le)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine relslot  --  relative subsystem slot lookup  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "relslot" returns the group mask of the subsystem in slot "k"
+c     along with whether that subsystem belongs to the coupling states
+c     "ist0" and "ist1" holding the two interpolation endpoints
+c
+c     only five subsystems are reachable through "submask", and the
+c     three coupling states of a relative dual topology are sums of
+c     them, the decoupled state being the one that the plain relative
+c     schedule never needs and the staged schedule is built around,
+c
+c        slot   la     lb     le     subsystem
+c          1    T      F      T      ligand 1 with environment
+c          2    F      T      T      ligand 2 with environment
+c          3    F      F      T      environment alone
+c          4    T      F      F      ligand 1 alone
+c          5    F      T      F      ligand 2 alone
+c
+c        rellig1 = slots 1 and 5 ,   ligand 1 bound, ligand 2 free
+c        rellig2 = slots 2 and 4 ,   ligand 2 bound, ligand 1 free
+c        relnone = slots 3, 4 and 5 ,  neither ligand bound
+c
+c
+      subroutine relslot (k,ist0,ist1,la,lb,le,in0,in1)
+      implicit none
+      integer k,ist0,ist1
+      logical la,lb,le
+      logical in0,in1
+      logical subla(5),sublb(5),suble(5)
+      logical relmem(5,3)
+      save subla,sublb,suble,relmem
+      data subla  / .true., .false.,.false.,.true., .false. /
+      data sublb  / .false.,.true., .false.,.false.,.true.  /
+      data suble  / .true., .true., .true., .false.,.false. /
+      data relmem / .true., .false.,.false.,.false.,.true.,
+     &              .false.,.true., .false.,.true., .false.,
+     &              .false.,.false.,.true., .true., .true.  /
+c
+c
+      la = subla(k)
+      lb = sublb(k)
+      le = suble(k)
+      in0 = relmem(k,ist0)
+      in1 = relmem(k,ist1)
       return
       end
 c

@@ -1751,10 +1751,6 @@ c     fully coupled (vlambda=1) and fully decoupled (vlambda=0) states
 c     are each evaluated in full via the non-lambda-aware "ehal1"
 c     routines, then combined by a power law interpolation in vlambda
 c
-c     since the two end state energies do not themselves depend on
-c     vlambda, the lambda derivatives follow directly from the
-c     derivatives of the interpolation weight
-c
 c
       subroutine ehal4d
       use atoms
@@ -1764,11 +1760,12 @@ c
       use mutant
       use virial
       implicit none
+      real*8 weight1,dweight1,d2weight1
+      logical need0,need1
       integer i,j
       real*8 ev1,ev0
       real*8 vlambdaorig
-      real*8 weight1,weight0
-      real*8 dweight1,d2weight1
+      real*8 weight0
       real*8 evvir1(3,3),evvir0(3,3)
       real*8, allocatable :: dev1(:,:)
       real*8, allocatable :: dev0(:,:)
@@ -1782,7 +1779,13 @@ c
 c     compute energy and derivatives of the vlambda = 1 state
 c
       vlambdaorig = vlambda
-      if (use_vdw4f) then
+c
+c     an endpoint is live when it carries weight or a lambda derivative
+c
+      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dvldlmda,d2vldlmda2,need0,need1)
+      if (need1) then
          vlambda = 1.0d0
          call ehal1calc
          ev1 = ev
@@ -1800,7 +1803,7 @@ c
 c
 c     compute energy and derivatives of the vlambda = 0 state
 c
-      if (use_vdw4i) then
+      if (need0) then
          vlambda = 0.0d0
          call ehal1calc
          ev0 = ev
@@ -1818,7 +1821,7 @@ c
 c
 c     copy results if only one endpoint state is computed
 c
-      if (use_vdw4i .and. .not.use_vdw4f) then
+      if (need0 .and. .not.need1) then
          ev1 = ev0
          do i = 1, n
             do j = 1, 3
@@ -1830,7 +1833,7 @@ c
                evvir1(j,i) = evvir0(j,i)
             end do
          end do
-      else if (.not.use_vdw4i .and. use_vdw4f) then
+      else if (.not.need0 .and. need1) then
          ev0 = ev1
          do i = 1, n
             do j = 1, 3
@@ -1850,7 +1853,6 @@ c
 c
 c     interpolate the dual topology energy, derivatives and virial
 c
-      weight1 = vlambda**evdtexp
       weight0 = 1.0d0 - weight1
       ev = weight1*ev1 + weight0*ev0
       do i = 1, n
@@ -1863,20 +1865,6 @@ c
             evvir(j,i) = weight1*evvir1(j,i) + weight0*evvir0(j,i)
          end do
       end do
-c
-c     analytic first and second derivatives of the interpolation
-c     weight with respect to vlambda; guard against a negative power
-c     of zero when evdtexp equals one
-c
-      dweight1 = 0.0d0
-      d2weight1 = 0.0d0
-      if (evdtexp .ge. 2) then
-         dweight1 = dble(evdtexp) * vlambda**(evdtexp-1)
-         d2weight1 = dble(evdtexp) * dble(evdtexp-1)
-     &                  * vlambda**(evdtexp-2)
-      else if (evdtexp .eq. 1) then
-         dweight1 = 1.0d0
-      end if
 c
 c     set the lambda derivatives of energy, force and virial
 c
@@ -1899,21 +1887,18 @@ c
       deallocate (dev0)
       return
       end
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine ehal4dr  --  relative dual topo 14-7 dlmda  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine ehal4dr  --  relative dual topology 14-7 lambda  ##
-c     ##                                                              ##
-c     ##################################################################
+c     "ehal4dr" interpolates between the two coupling states of a
+c     two-ligand relative dual topology calculation, each state a sum
+c     of parameter-zeroed subsystem energies,
 c
-c
-c     "ehal4dr" calculates the buffered 14-7 van der Waals energy,
-c     Cartesian gradient and lambda derivatives for a two-ligand
-c     relative dual topology calculation, combining four subsystem
-c     states, E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A), which are
-c     independent of vlambda so the lambda derivatives follow directly
-c     from the interpolation weight as in "ehal4d"
+c        E = weight1*E(vrelst1) + (1-weight1)*E(vrelst0)
 c
 c
       subroutine ehal4dr
@@ -1924,189 +1909,147 @@ c
       use mutant
       use virial
       implicit none
-      integer i,j
-      real*8 evae,evbe
-      real*8 eva,evb
-      real*8 ev1,ev0
-      real*8 weight1,weight0
-      real*8 dweight1,d2weight1
-      real*8 evvirae(3,3),evvirbe(3,3)
-      real*8 evvira(3,3),evvirb(3,3)
-      real*8, allocatable :: devae(:,:)
-      real*8, allocatable :: devbe(:,:)
-      real*8, allocatable :: deva(:,:)
-      real*8, allocatable :: devb(:,:)
+      real*8 weight1,dweight1,d2weight1
+      integer i,j,k
+      real*8 ev0,ev1
+      real*8 evvir0(3,3),evvir1(3,3)
+      logical la,lb,le
+      logical in0,in1
+      logical need0,need1
+      real*8, allocatable :: dev0(:,:)
+      real*8, allocatable :: dev1(:,:)
 c
 c
 c     perform dynamic allocation of some local arrays
 c
-      allocate (devae(3,n))
-      allocate (devbe(3,n))
-      allocate (deva(3,n))
-      allocate (devb(3,n))
+      allocate (dev0(3,n))
+      allocate (dev1(3,n))
 c
-c     ligand A coupled to environment, group B fully decoupled
+c     an endpoint is live when it carries weight or a lambda derivative
 c
-      if (use_vdw4f) then
-         call submask (.true.,.false.,.true.)
-         call ehal1calc
-         evae = ev
-         do i = 1, n
-            do j = 1, 3
-               devae(j,i) = dev(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               evvirae(j,i) = evvir(j,i)
-            end do
-         end do
-      end if
+      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dvldlmda,d2vldlmda2,need0,need1)
 c
-c     ligand B coupled to environment, group A fully decoupled
+c     zero out the two endpoint accumulators
 c
-      if (use_vdw4i) then
-         call submask (.false.,.true.,.true.)
-         call ehal1calc
-         evbe = ev
-         do i = 1, n
-            do j = 1, 3
-               devbe(j,i) = dev(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               evvirbe(j,i) = evvir(j,i)
-            end do
-         end do
-      end if
-c
-c     ligand A alone, giving its intramolecular van der Waals energy
-c
-      if (use_vdw4i) then
-         call submask (.true.,.false.,.false.)
-         call ehal1calc
-         eva = ev
-         do i = 1, n
-            do j = 1, 3
-               deva(j,i) = dev(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               evvira(j,i) = evvir(j,i)
-            end do
-         end do
-      end if
-c
-c     ligand B alone, giving its intramolecular van der Waals energy
-c
-      if (use_vdw4f) then
-         call submask (.false.,.true.,.false.)
-         call ehal1calc
-         evb = ev
-         do i = 1, n
-            do j = 1, 3
-               devb(j,i) = dev(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               evvirb(j,i) = evvir(j,i)
-            end do
-         end do
-      end if
-c
-c     alias the omitted composite endpoint to the computed endpoint
-c
-      if (use_vdw4i .and. .not.use_vdw4f) then
-         evae = evbe
-         evb = eva
-         do i = 1, n
-            do j = 1, 3
-               devae(j,i) = devbe(j,i)
-               devb(j,i) = deva(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               evvirae(j,i) = evvirbe(j,i)
-               evvirb(j,i) = evvira(j,i)
-            end do
-         end do
-      else if (.not.use_vdw4i .and. use_vdw4f) then
-         evbe = evae
-         eva = evb
-         do i = 1, n
-            do j = 1, 3
-               devbe(j,i) = devae(j,i)
-               deva(j,i) = devb(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               evvirbe(j,i) = evvirae(j,i)
-               evvira(j,i) = evvirb(j,i)
-            end do
-         end do
-      end if
-c
-c     restore full system and interpolate the dual topology result
-c
-      call submask (.true.,.true.,.true.)
-      weight1 = vlambda**evdtexp
-      weight0 = 1.0d0 - weight1
-      ev1 = evae + evb
-      ev0 = evbe + eva
-      ev = weight1*ev1 + weight0*ev0
+      ev0 = 0.0d0
+      ev1 = 0.0d0
       do i = 1, n
          do j = 1, 3
-            dev(j,i) = weight1*(devae(j,i)+devb(j,i))
-     &               + weight0*(devbe(j,i)+deva(j,i))
+            dev0(j,i) = 0.0d0
+            dev1(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
-            evvir(j,i) = weight1*(evvirae(j,i)+evvirb(j,i))
-     &                 + weight0*(evvirbe(j,i)+evvira(j,i))
+            evvir0(j,i) = 0.0d0
+            evvir1(j,i) = 0.0d0
          end do
       end do
 c
-c     analytic first and second derivatives of the interpolation
-c     weight with respect to vlambda, as in "ehal4d"
+c     build each subsystem once, add to the endpoints
 c
-      dweight1 = 0.0d0
-      d2weight1 = 0.0d0
-      if (evdtexp .ge. 2) then
-         dweight1 = dble(evdtexp) * vlambda**(evdtexp-1)
-         d2weight1 = dble(evdtexp) * dble(evdtexp-1)
-     &                  * vlambda**(evdtexp-2)
-      else if (evdtexp .eq. 1) then
-         dweight1 = 1.0d0
+      do k = 1, nrelsub
+         call relslot (k,vrelst0,vrelst1,la,lb,le,in0,in1)
+         in0 = in0 .and. need0
+         in1 = in1 .and. need1
+         if (.not. (in0 .or. in1))  cycle
+         call submask (la,lb,le)
+         call ehal1calc
+         if (in0) then
+            ev0 = ev0 + ev
+            do i = 1, n
+               do j = 1, 3
+                  dev0(j,i) = dev0(j,i) + dev(j,i)
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  evvir0(j,i) = evvir0(j,i) + evvir(j,i)
+               end do
+            end do
+         end if
+         if (in1) then
+            ev1 = ev1 + ev
+            do i = 1, n
+               do j = 1, 3
+                  dev1(j,i) = dev1(j,i) + dev(j,i)
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  evvir1(j,i) = evvir1(j,i) + evvir(j,i)
+               end do
+            end do
+         end if
+      end do
+c
+c     restore the original full system parameters
+c
+      call submask (.true.,.true.,.true.)
+c
+c     copy energy if only one endpoint state is computed
+c
+      if (.not. need0) then
+         ev0 = ev1
+         do i = 1, n
+            do j = 1, 3
+               dev0(j,i) = dev1(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               evvir0(j,i) = evvir1(j,i)
+            end do
+         end do
+      else if (.not. need1) then
+         ev1 = ev0
+         do i = 1, n
+            do j = 1, 3
+               dev1(j,i) = dev0(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               evvir1(j,i) = evvir0(j,i)
+            end do
+         end do
       end if
 c
-c     set the lambda derivatives of energy, force and virial
+c     interpolate between the two endpoint states
+c
+      ev = weight1*ev1 + (1.0d0-weight1)*ev0
+      do i = 1, n
+         do j = 1, 3
+            dev(j,i) = weight1*dev1(j,i) + (1.0d0-weight1)*dev0(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            evvir(j,i) = weight1*evvir1(j,i)
+     &                + (1.0d0-weight1)*evvir0(j,i)
+         end do
+      end do
+c
+c     interpolate the lambda derivative
 c
       devdl = dweight1 * (ev1-ev0)
       d2evdl2 = d2weight1 * (ev1-ev0)
-      do i = 1, n
-         do j = 1, 3
-            dfvdl(j,i) = dweight1
-     &         * ((devae(j,i)+devb(j,i))-(devbe(j,i)+deva(j,i)))
-         end do
-      end do
       do i = 1, 3
          do j = 1, 3
-            devvirdl(j,i) = dweight1
-     &         * ((evvirae(j,i)+evvirb(j,i))-(evvirbe(j,i)+evvira(j,i)))
+            devvirdl(j,i) = dweight1 * (evvir1(j,i)-evvir0(j,i))
+         end do
+      end do
+      do i = 1, n
+         do j = 1, 3
+            dfvdl(j,i) = dweight1 * (dev1(j,i)-dev0(j,i))
          end do
       end do
 c
 c     perform deallocation of some local arrays
 c
-      deallocate (devae)
-      deallocate (devbe)
-      deallocate (deva)
-      deallocate (devb)
+      deallocate (dev0)
+      deallocate (dev1)
       return
       end

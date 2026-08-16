@@ -26,11 +26,7 @@ c     choose the method to sum over multipole interactions
 c
       if (use_emdt) then
          if (use_rel) then
-            if (use_relstage) then
-               call empole0ers
-            else
-               call empole0er
-            end if
+            call empole0er
          else
             call empole0e
          end if
@@ -1967,15 +1963,22 @@ c
       use limits
       use mutant
       implicit none
+      real*8 weight1,dweight1,d2weight1
+      logical need0,need1
       real*8 em1,em0
       real*8 elambdaorig
-      real*8 weight1
 c
 c
 c     compute energy of the fully coupled elambda = 1 state
 c
       elambdaorig = elambda
-      if (use_ele4f) then
+c
+c     an endpoint is live when it carries weight or a lambda derivative
+c
+      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 deldlmda,d2eldlmda2,need0,need1)
+      if (need1) then
          call altemdt (1.0d0)
          call empole0calc
          em1 = em
@@ -1983,7 +1986,7 @@ c
 c
 c     compute energy of the fully decoupled elambda = 0 state
 c
-      if (use_ele4i) then
+      if (need0) then
          call altemdt (0.0d0)
          call empole0calc
          em0 = em
@@ -1991,9 +1994,9 @@ c
 c
 c     copy energy if only one endpoint state is computed
 c
-      if (use_ele4i .and. .not.use_ele4f) then
+      if (need0 .and. .not.need1) then
          em1 = em0
-      else if (.not.use_ele4i .and. use_ele4f) then
+      else if (.not.need0 .and. need1) then
          em0 = em1
       end if
 c
@@ -2003,7 +2006,6 @@ c
 c
 c     interpolate the dual topology energy
 c
-      weight1 = elambda**emdtexp
       em = weight1*em1 + (1.0d0-weight1)*em0
       return
       end
@@ -2052,20 +2054,18 @@ c
       end if
       return
       end
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine empole0er  --  relative dual topo mpole  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine empole0er  --  relative dual topology mpole eng  ##
-c     ##                                                              ##
-c     ##################################################################
+c     "empole0er" interpolates between the two coupling states of a
+c     two-ligand relative dual topology calculation, each state a sum
+c     of parameter-zeroed subsystem energies,
 c
-c
-c     "empole0er" calculates the multipole energy for a two-ligand
-c     relative dual topology calculation by combining four parameter
-c     zeroed subsystem energies, E1 = E(A+env) + E(B) and E0 =
-c     E(B+env) + E(A), so all intramolecular interactions are kept at
-c     full strength while only ligand-environment coupling is scaled
+c        E = weight1*E(erelst1) + (1-weight1)*E(erelst0)
 c
 c
       subroutine empole0er
@@ -2073,140 +2073,56 @@ c
       use energi
       use mutant
       implicit none
-      real*8 emae,embe
-      real*8 ema,emb
-      real*8 em1,em0
-      real*8 weight1,weight0
-c
-c
-c     compute E0 = E(B+environment) + E(A)
-c
-      if (use_ele4i) then
-         call altemdtsub (.false.,.true.,.true.)
-         call empole0calc
-         embe = em
-         call altemdtsub (.true.,.false.,.false.)
-         call empole0calc
-         ema = em
-      end if
-c
-c     compute E1 = E(A+environment) + E(B)
-c
-      if (use_ele4f) then
-         call altemdtsub (.true.,.false.,.true.)
-         call empole0calc
-         emae = em
-         call altemdtsub (.false.,.true.,.false.)
-         call empole0calc
-         emb = em
-      end if
-c
-c     alias the omitted composite endpoint to the computed endpoint
-c
-      if (use_ele4i .and. .not.use_ele4f) then
-         emae = embe
-         emb = ema
-      else if (.not.use_ele4i .and. use_ele4f) then
-         embe = emae
-         ema = emb
-      end if
-      call altemdtsub (.true.,.true.,.true.)
-      weight1 = elambda**emdtexp
-      weight0 = 1.0d0 - weight1
-      em1 = emae + emb
-      em0 = embe + ema
-      em = weight1*em1 + weight0*em0
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine empole0ers  --  staged rel dual topo mpole eng  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "empole0ers" calculates the multipole energy for a two-ligand
-c     relative dual topology calculation run on the staged schedule,
-c     where at most one ligand is coupled to the environment,
-c
-c        E0 = E(env) + E(A) + E(B)
-c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
-c        E  = elambda*E1 + (1-elambda)*E0
-c
-c
-      subroutine empole0ers
-      use dlmda
-      use energi
-      use mutant
-      implicit none
+      real*8 weight1,dweight1,d2weight1
+      integer k
       real*8 em0,em1
-      real*8 weight1,weight0
-      logical lig1,domix,dovdwm,needref
+      logical la,lb,le
+      logical in0,in1
+      logical need0,need1
 c
 c
-c     decide which leg of the staged schedule is active
+c     an endpoint is live when it carries weight or a lambda derivative
 c
-      lig1 = (relstage .eq. 'LIG1')
-      dovdwm = (relstage .eq. 'VDWM')
-      domix = relstagemix
-      needref = (dovdwm .or. domix)
+      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 deldlmda,d2eldlmda2,need0,need1)
+c
+c     zero out the two endpoint accumulators
+c
       em0 = 0.0d0
       em1 = 0.0d0
 c
-c     environment alone, part of the decoupled reference
+c     build each subsystem once, add to the endpoints
 c
-      if (needref) then
-         call altemdtsub (.false.,.false.,.true.)
+      do k = 1, nrelsub
+         call relslot (k,erelst0,erelst1,la,lb,le,in0,in1)
+         in0 = in0 .and. need0
+         in1 = in1 .and. need1
+         if (.not. (in0 .or. in1))  cycle
+         call altemdtsub (la,lb,le)
          call empole0calc
-         em0 = em0 + em
-      end if
-c
-c     ligand A alone, in the reference and in the ligand 0 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
-         call altemdtsub (.true.,.false.,.false.)
-         call empole0calc
-         if (needref)  em0 = em0 + em
-         if (.not.dovdwm .and. .not.lig1)  em1 = em1 + em
-      end if
-c
-c     ligand B alone, in the reference and in the ligand 1 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. lig1)) then
-         call altemdtsub (.false.,.true.,.false.)
-         call empole0calc
-         if (needref)  em0 = em0 + em
-         if (.not.dovdwm .and. lig1)  em1 = em1 + em
-      end if
-c
-c     the active ligand coupled to the environment
-c
-      if (.not. dovdwm) then
-         if (lig1) then
-            call altemdtsub (.true.,.false.,.true.)
-         else
-            call altemdtsub (.false.,.true.,.true.)
+         if (in0) then
+            em0 = em0 + em
          end if
-         call empole0calc
-         em1 = em1 + em
-      end if
+         if (in1) then
+            em1 = em1 + em
+         end if
+      end do
 c
 c     restore the original full system parameters
 c
       call altemdtsub (.true.,.true.,.true.)
 c
-c     interpolate the active leg, or take the reference in the middle
+c     copy energy if only one endpoint state is computed
 c
-      if (dovdwm) then
-         em = em0
-      else if (domix) then
-         weight1 = elambda
-         weight0 = 1.0d0 - weight1
-         em = weight1*em1 + weight0*em0
-      else
-         em = em1
+      if (.not. need0) then
+         em0 = em1
+      else if (.not. need1) then
+         em1 = em0
       end if
+c
+c     interpolate between the two endpoint states
+c
+      em = weight1*em1 + (1.0d0-weight1)*em0
       return
       end

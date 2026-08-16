@@ -1051,19 +1051,26 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "test_mutate_rels" runs the seven water fixtures 135-141 that
-c     drive the staged relative free energy schedule with a main lambda,
-c     so the two ligands are discharged and recharged separately while
-c     van der Waals morphs between them in the middle window; the cases
-c     sit one per regime of the schedule, at main lambda values 1.0 and
-c     0.0 where a leg is flat and only the coupled endpoint is built,
-c     0.85 and 0.15 inside the two mixing legs, 0.7 and 0.3 at the leg
-c     boundaries where the van der Waals morph window opens and closes,
-c     and 0.5 in the middle of that window where both ligands are
-c     decoupled and every electrostatic lambda derivative vanishes; all
-c     seven carry the "lambda-deriv" keyword and run the level 4 lambda
-c     derivative checks, and the reference values agree with the tinker9
-c     CUDA implementation of the same schedule
+c     "test_mutate_rels" runs the nine water fixtures 135-141 and 168-169
+c     that drive the staged relative free energy schedule, each of them
+c     naming the one leg it walks, so ligand 2 is discharged on the LIG2
+c     leg, van der Waals morphs between the ligands on the VDWM leg, and
+c     ligand 1 is charged on the LIG1 leg; the cases sit one per regime,
+c     at main lambda values 1.0 and 0.0 where a leg is flat and only the
+c     coupled endpoint is built, 0.85 and 0.15 inside the two mixing
+c     legs, and 0.5 in the middle of the morph window where both ligands
+c     are decoupled and every electrostatic lambda derivative vanishes
+c
+c     the leg boundaries at 0.7 and 0.3 are each run twice, once from
+c     either side, since the quintic taper is flat at both ends of every
+c     window and leaves the boundary state derivative free; 139 and 168
+c     are the same state reached from the LIG2 and VDWM legs, and 137 and
+c     169 the same state reached from the VDWM and LIG1 legs, so each
+c     pair shares one set of reference values
+c
+c     all nine carry the "lambda-deriv" keyword and run the level 4
+c     lambda derivative checks, and the reference values agree with the
+c     tinker9 CUDA implementation of the same schedule
 c
 c
       subroutine test_mutate_rels
@@ -1079,11 +1086,19 @@ c
       call test_mutate_calc ('water2','137_water_rels_ye_l070.key',
      &   '137_water_rels_ye_l070.txt','137_water_rels_ye_l070',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','169_water_rels_ye_lig1_l070.key',
+     &   '169_water_rels_ye_lig1_l070.txt',
+     &   '169_water_rels_ye_lig1_l070',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2','138_water_rels_ye_l050.key',
      &   '138_water_rels_ye_l050.txt','138_water_rels_ye_l050',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2','139_water_rels_ye_l030.key',
      &   '139_water_rels_ye_l030.txt','139_water_rels_ye_l030',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','168_water_rels_ye_vdwm_l030.key',
+     &   '168_water_rels_ye_vdwm_l030.txt',
+     &   '168_water_rels_ye_vdwm_l030',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2','140_water_rels_ye_l015.key',
      &   '140_water_rels_ye_l015.txt','140_water_rels_ye_l015',

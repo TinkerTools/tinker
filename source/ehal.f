@@ -943,25 +943,28 @@ c     the dual topology method, in which the fully coupled (vlambda=1)
 c     and fully decoupled (vlambda=0) states are each evaluated in full
 c     and combined by a power law interpolation in vlambda
 c
-c     note the long range correction depends on vlambda, so it must be
-c     evaluated separately for each end state and interpolated along
-c     with the pairwise energy
-c
 c
       subroutine ehal0d
       use dlmda
       use energi
       use mutant
       implicit none
+      real*8 weight1,dweight1,d2weight1
+      logical need0,need1
       real*8 ev1,ev0
       real*8 vlambdaorig
-      real*8 weight1
 c
 c
 c     compute energy of the fully coupled vlambda = 1 state
 c
       vlambdaorig = vlambda
-      if (use_vdw4f) then
+c
+c     an endpoint is live when it carries weight or a lambda derivative
+c
+      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dvldlmda,d2vldlmda2,need0,need1)
+      if (need1) then
          vlambda = 1.0d0
          call ehal0calc
          ev1 = ev
@@ -969,7 +972,7 @@ c
 c
 c     compute energy of the fully decoupled vlambda = 0 state
 c
-      if (use_vdw4i) then
+      if (need0) then
          vlambda = 0.0d0
          call ehal0calc
          ev0 = ev
@@ -977,9 +980,9 @@ c
 c
 c     copy energy if only one endpoint state is computed
 c
-      if (use_vdw4i .and. .not.use_vdw4f) then
+      if (need0 .and. .not.need1) then
          ev1 = ev0
-      else if (.not.use_vdw4i .and. use_vdw4f) then
+      else if (.not.need0 .and. need1) then
          ev0 = ev1
       end if
 c
@@ -989,7 +992,6 @@ c
 c
 c     interpolate the dual topology energy
 c
-      weight1 = vlambda**evdtexp
       ev = weight1*ev1 + (1.0d0-weight1)*ev0
       return
       end
@@ -1029,20 +1031,18 @@ c
       end if
       return
       end
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine ehal0dr  --  relative dual topo 14-7  ##
+c     ##                                                   ##
+c     #######################################################
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine ehal0dr  --  relative dual topology 14-7 energy  ##
-c     ##                                                              ##
-c     ##################################################################
+c     "ehal0dr" interpolates between the two coupling states of a
+c     two-ligand relative dual topology calculation, each state a sum
+c     of parameter-zeroed subsystem energies,
 c
-c
-c     "ehal0dr" calculates the buffered 14-7 van der Waals energy for a
-c     two-ligand relative dual topology calculation by combining four
-c     subsystem energies, E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A),
-c     so that intramolecular van der Waals is preserved, only the ligand
-c     environment coupling is scaled, and the two ligands never interact
+c        E = weight1*E(vrelst1) + (1-weight1)*E(vrelst0)
 c
 c
       subroutine ehal0dr
@@ -1050,48 +1050,56 @@ c
       use energi
       use mutant
       implicit none
-      real*8 evae,evbe
-      real*8 eva,evb
-      real*8 ev1,ev0
-      real*8 weight1,weight0
+      real*8 weight1,dweight1,d2weight1
+      integer k
+      real*8 ev0,ev1
+      logical la,lb,le
+      logical in0,in1
+      logical need0,need1
 c
 c
-c     compute E0 = E(B+environment) + E(A)
+c     an endpoint is live when it carries weight or a lambda derivative
 c
-      if (use_vdw4i) then
-         call submask (.false.,.true.,.true.)
+      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dvldlmda,d2vldlmda2,need0,need1)
+c
+c     zero out the two endpoint accumulators
+c
+      ev0 = 0.0d0
+      ev1 = 0.0d0
+c
+c     build each subsystem once, add to the endpoints
+c
+      do k = 1, nrelsub
+         call relslot (k,vrelst0,vrelst1,la,lb,le,in0,in1)
+         in0 = in0 .and. need0
+         in1 = in1 .and. need1
+         if (.not. (in0 .or. in1))  cycle
+         call submask (la,lb,le)
          call ehal0calc
-         evbe = ev
-         call submask (.true.,.false.,.false.)
-         call ehal0calc
-         eva = ev
-      end if
+         if (in0) then
+            ev0 = ev0 + ev
+         end if
+         if (in1) then
+            ev1 = ev1 + ev
+         end if
+      end do
 c
-c     compute E1 = E(A+environment) + E(B)
+c     restore the original full system parameters
 c
-      if (use_vdw4f) then
-         call submask (.true.,.false.,.true.)
-         call ehal0calc
-         evae = ev
-         call submask (.false.,.true.,.false.)
-         call ehal0calc
-         evb = ev
-      end if
-c
-c     alias the omitted composite endpoint to the computed endpoint
-c
-      if (use_vdw4i .and. .not.use_vdw4f) then
-         evae = evbe
-         evb = eva
-      else if (.not.use_vdw4i .and. use_vdw4f) then
-         evbe = evae
-         eva = evb
-      end if
       call submask (.true.,.true.,.true.)
-      weight1 = vlambda**evdtexp
-      weight0 = 1.0d0 - weight1
-      ev1 = evae + evb
-      ev0 = evbe + eva
-      ev = weight1*ev1 + weight0*ev0
+c
+c     copy energy if only one endpoint state is computed
+c
+      if (.not. need0) then
+         ev0 = ev1
+      else if (.not. need1) then
+         ev1 = ev0
+      end if
+c
+c     interpolate between the two endpoint states
+c
+      ev = weight1*ev1 + (1.0d0-weight1)*ev0
       return
       end

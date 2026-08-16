@@ -28,11 +28,7 @@ c     choose the method to sum over polarization interactions
 c
       if (use_epdt) then
          if (use_rel) then
-            if (use_relstage) then
-               call epolar0frs
-            else
-               call epolar0fr
-            end if
+            call epolar0fr
          else
             call epolar0f
          end if
@@ -2132,10 +2128,11 @@ c
       use mutant
       use potent
       implicit none
+      real*8 weight1,dweight1,d2weight1
+      logical need0,need1
       real*8 ep1,ep0
       real*8 plambdaorig
       real*8 elambdaorig
-      real*8 plambdaexp
       character*6 mode
 c
 c
@@ -2146,7 +2143,13 @@ c
 c
 c     compute energy of the lambda = 0 state
 c
-      if (use_pol4i) then
+c
+c     an endpoint is live when it carries weight or a lambda derivative
+c
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dpldlmda,d2pldlmda2,need0,need1)
+      if (need0) then
          call altepdt (0.0d0)
          call epolar0calc
 c
@@ -2157,7 +2160,7 @@ c
 c
 c     compute energy of the lambda = 1 state
 c
-      if (use_pol4f) then
+      if (need1) then
          call altepdt (1.0d0)
          call epolar0calc
 c
@@ -2168,9 +2171,9 @@ c
 c
 c     copy energy if only one state is computed
 c
-      if (use_pol4i .and. .not.use_pol4f) then
+      if (need0 .and. .not.need1) then
          ep1 = ep0
-      else if (.not.use_pol4i .and. use_pol4f) then
+      else if (.not.need0 .and. need1) then
          ep0 = ep1
       end if
 c
@@ -2185,8 +2188,7 @@ c
 c
 c     interpolate energy
 c
-      plambdaexp = plambda**epdtexp
-      ep = plambdaexp * ep1 + (1.0d0 - plambdaexp) * ep0
+      ep = weight1 * ep1 + (1.0d0 - weight1) * ep0
       return
       end
 c
@@ -2244,18 +2246,18 @@ c
       call alteprst
       return
       end
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine epolar0fr  --  relative dual topo polar  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine epolar0fr  --  relative dual topo pol energy  ##
-c     ##                                                           ##
-c     ###############################################################
+c     "epolar0fr" interpolates between the two coupling states of a
+c     two-ligand relative dual topology calculation, each state a sum
+c     of parameter-zeroed subsystem energies,
 c
-c
-c     "epolar0fr" calculates the polarization energy for a two-ligand
-c     relative dual topology calculation by combining four subsystem
-c     energies, E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A)
+c        E = weight1*E(prelst1) + (1-weight1)*E(prelst0)
 c
 c
       subroutine epolar0fr
@@ -2263,139 +2265,56 @@ c
       use energi
       use mutant
       implicit none
-      real*8 epae,epbe
-      real*8 epa,epb
-      real*8 ep1,ep0
-      real*8 plambdaexp
-c
-c
-c     compute E0 = E(B+environment) + E(A)
-c
-      if (use_pol4i) then
-         call altpolrsub (.false.,.true.,.true.)
-         call epolar0calc
-         epbe = ep
-         call altpolrsub (.true.,.false.,.false.)
-         call epolar0calc
-         epa = ep
-      end if
-c
-c     compute E1 = E(A+environment) + E(B)
-c
-      if (use_pol4f) then
-         call altpolrsub (.true.,.false.,.true.)
-         call epolar0calc
-         epae = ep
-         call altpolrsub (.false.,.true.,.false.)
-         call epolar0calc
-         epb = ep
-      end if
-c
-c     alias the omitted composite endpoint to the computed endpoint
-c
-      if (use_pol4i .and. .not.use_pol4f) then
-         epae = epbe
-         epb = epa
-      else if (.not.use_pol4i .and. use_pol4f) then
-         epbe = epae
-         epa = epb
-      end if
-      call altpolrsub (.true.,.true.,.true.)
-      plambdaexp = plambda**epdtexp
-      ep1 = epae + epb
-      ep0 = epbe + epa
-      ep = plambdaexp*ep1 + (1.0d0-plambdaexp)*ep0
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine epolar0frs  --  staged rel dual topo pol energy  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "epolar0frs" calculates the polarization energy for a two-ligand
-c     relative dual topology calculation run on the staged schedule,
-c     where at most one ligand is coupled to the environment,
-c
-c        E0 = E(env) + E(A) + E(B)
-c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
-c        E  = plambda*E1 + (1-plambda)*E0
-c
-c
-      subroutine epolar0frs
-      use dlmda
-      use energi
-      use mutant
-      implicit none
+      real*8 weight1,dweight1,d2weight1
+      integer k
       real*8 ep0,ep1
-      real*8 weight1,weight0
-      logical lig1,domix,dovdwm,needref
+      logical la,lb,le
+      logical in0,in1
+      logical need0,need1
 c
 c
-c     decide which leg of the staged schedule is active
+c     an endpoint is live when it carries weight or a lambda derivative
 c
-      lig1 = (relstage .eq. 'LIG1')
-      dovdwm = (relstage .eq. 'VDWM')
-      domix = relstagemix
-      needref = (dovdwm .or. domix)
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dpldlmda,d2pldlmda2,need0,need1)
+c
+c     zero out the two endpoint accumulators
+c
       ep0 = 0.0d0
       ep1 = 0.0d0
 c
-c     environment alone, part of the decoupled reference
+c     build each subsystem once, add to the endpoints
 c
-      if (needref) then
-         call altpolrsub (.false.,.false.,.true.)
+      do k = 1, nrelsub
+         call relslot (k,prelst0,prelst1,la,lb,le,in0,in1)
+         in0 = in0 .and. need0
+         in1 = in1 .and. need1
+         if (.not. (in0 .or. in1))  cycle
+         call altpolrsub (la,lb,le)
          call epolar0calc
-         ep0 = ep0 + ep
-      end if
-c
-c     ligand A alone, in the reference and in the ligand 0 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
-         call altpolrsub (.true.,.false.,.false.)
-         call epolar0calc
-         if (needref)  ep0 = ep0 + ep
-         if (.not.dovdwm .and. .not.lig1)  ep1 = ep1 + ep
-      end if
-c
-c     ligand B alone, in the reference and in the ligand 1 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. lig1)) then
-         call altpolrsub (.false.,.true.,.false.)
-         call epolar0calc
-         if (needref)  ep0 = ep0 + ep
-         if (.not.dovdwm .and. lig1)  ep1 = ep1 + ep
-      end if
-c
-c     the active ligand coupled to the environment
-c
-      if (.not. dovdwm) then
-         if (lig1) then
-            call altpolrsub (.true.,.false.,.true.)
-         else
-            call altpolrsub (.false.,.true.,.true.)
+         if (in0) then
+            ep0 = ep0 + ep
          end if
-         call epolar0calc
-         ep1 = ep1 + ep
-      end if
+         if (in1) then
+            ep1 = ep1 + ep
+         end if
+      end do
 c
 c     restore the original full system parameters
 c
       call altpolrsub (.true.,.true.,.true.)
 c
-c     interpolate the active leg, or take the reference in the middle
+c     copy energy if only one endpoint state is computed
 c
-      if (dovdwm) then
-         ep = ep0
-      else if (domix) then
-         weight1 = plambda
-         weight0 = 1.0d0 - weight1
-         ep = weight1*ep1 + weight0*ep0
-      else
-         ep = ep1
+      if (.not. need0) then
+         ep0 = ep1
+      else if (.not. need1) then
+         ep1 = ep0
       end if
+c
+c     interpolate between the two endpoint states
+c
+      ep = weight1*ep1 + (1.0d0-weight1)*ep0
       return
       end

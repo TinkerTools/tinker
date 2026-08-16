@@ -196,7 +196,6 @@ c
 c     flag for use of lambda derivative
 c
       osttrial = .false.
-      relstagemix = .false.
       use_dlmda = .false.
       use_edlmda = .false.
       use_elmdamap = .false.

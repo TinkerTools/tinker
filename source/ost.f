@@ -21,17 +21,16 @@ c     nmetahist      total number of metadynamics gaussians
 c     nmethistsave   number of metadynamics gaussians written to file
 c     nosthist       total number of histograms
 c     nosthistsave   number of histograms written to the history file
-c     osteqratio     fraction of hist interval to equilibrate
 c     ostcvbin       convergence sub-bins per gaussian deposit interval
 c     ostnavg        samples averaged between hist updates
 c     ostnequil      samples skipped before hist averaging
-c     sizeosthist    current allocation size for saved histograms
 c     sizemetahist   current allocation size for metadynamics gaussians
+c     sizeosthist    current allocation size for saved histograms
 c     metaihist      iost step at which each gaussian was added
-c     osthead        first histogram index for each lambda/flambda bin
 c     osthist        packed lambda/flambda bin for saved gaussians
 c     ostihist       iost step at which each gaussian was added
 c     ostnext        next histogram index in the same lambda/flambda bin
+c     osthead        first histogram index for each lambda/flambda bin
 c     deffdl         effective lambda derivative for propagation
 c     eosttot        total ost free energy
 c     hbias          height of biasing gaussian
@@ -51,6 +50,7 @@ c     ostdedlslp     fitted dU/dL change per sample over an interval
 c     ostdedlstd     standard deviation of dU/dL between updates
 c     ostdgdl        current dg/dlambda value
 c     ostdt          time step for theta lambda propagation
+c     osteqratio     fraction of hist interval to equilibrate
 c     ostfriction    friction coefficient for theta lambda coordinate
 c     ostlambdaavg   average main lambda value between hist updates
 c     ostlambdaslp   fitted lambda change per sample over an interval
@@ -70,7 +70,6 @@ c     wlmda2         half width of lambda bins
 c     dvmetagrid     d(vmetagrid)/dlambda at each lambda bin
 c     fkernel        free energy mean force at each lambda bin
 c     fsumkernel     numerator of free energy mean force kernel
-c     gfkernel       d(gkernel)/dflambda values on grid
 c     metahhist      height of metadynamics gaussians
 c     metalhist      lambda center of metadynamics gaussians
 c     metawhist      lambda width of metadynamics gaussians
@@ -78,21 +77,22 @@ c     ostdedlavgbin  average dU/dL within each convergence sub-bin
 c     ostdedlslpbin  fitted dU/dL slope within each sub-bin
 c     ostdedlstdbin  deviation of dU/dL within each sub-bin
 c     ostfhist       flambda center of gaussians saved in histogram
-c     osthhist       height of gaussians saved in histogram
 c     ostflist       dU/dL values saved between hist updates
+c     osthhist       height of gaussians saved in histogram
+c     ostlhist       lambda center of gaussians saved in histogram
+c     ostllist       lambda values saved between hist updates
 c     ostlmdaavgbin  average lambda within each convergence sub-bin
 c     ostlmdaslpbin  fitted lambda slope within each sub-bin
 c     ostlmdastdbin  deviation of lambda within each sub-bin
-c     ostlhist       lambda center of gaussians saved in histogram
-c     ostllist       lambda values saved between hist updates
 c     ostwfhist      flambda width of gaussians saved in histogram
 c     ostwlhist      lambda width of gaussians saved in histogram
+c     pfkernel       partition function for free energy mean force
 c     vkernelmax     maximum gkernel over flambda at each lambda bin
 c     vmetagrid      metadynamics bias at each lambda bin center
+c     gfkernel       d(gkernel)/dflambda values on grid
 c     gkernel        ost bias potential on the lambda/flambda grid
 c     glfkernel      mixed derivative of gkernel on grid
 c     glkernel       d(gkernel)/dlambda values on grid
-c     pfkernel       partition function for free energy mean force
 c     fastkernel     flag to use fused g and f kernel updates
 c     ostemper       flag to temper the deposited gaussian heights
 c     ostinterpol    flag to interpolate ost g kernel from grid
@@ -115,13 +115,13 @@ c
       integer ostcvbin
       integer ostnavg
       integer ostnequil
-      integer sizeosthist
       integer sizemetahist
+      integer sizeosthist
       integer, allocatable :: metaihist(:)
-      integer, allocatable :: osthead(:,:)
       integer, allocatable :: osthist(:)
       integer, allocatable :: ostihist(:)
       integer, allocatable :: ostnext(:)
+      integer, allocatable :: osthead(:,:)
       real*8 deffdl
       real*8 eosttot
       real*8 hbias
@@ -161,29 +161,29 @@ c
       real*8, allocatable :: dvmetagrid(:)
       real*8, allocatable :: fkernel(:)
       real*8, allocatable :: fsumkernel(:)
-      real*8, allocatable :: gfkernel(:,:)
       real*8, allocatable :: metahhist(:)
       real*8, allocatable :: metalhist(:)
       real*8, allocatable :: metawhist(:)
       real*8, allocatable :: ostdedlavgbin(:)
       real*8, allocatable :: ostdedlslpbin(:)
       real*8, allocatable :: ostdedlstdbin(:)
-      real*8, allocatable :: ostflist(:)
       real*8, allocatable :: ostfhist(:)
+      real*8, allocatable :: ostflist(:)
       real*8, allocatable :: osthhist(:)
+      real*8, allocatable :: ostlhist(:)
+      real*8, allocatable :: ostllist(:)
       real*8, allocatable :: ostlmdaavgbin(:)
       real*8, allocatable :: ostlmdaslpbin(:)
       real*8, allocatable :: ostlmdastdbin(:)
-      real*8, allocatable :: ostllist(:)
-      real*8, allocatable :: ostlhist(:)
       real*8, allocatable :: ostwfhist(:)
       real*8, allocatable :: ostwlhist(:)
+      real*8, allocatable :: pfkernel(:)
       real*8, allocatable :: vkernelmax(:)
       real*8, allocatable :: vmetagrid(:)
+      real*8, allocatable :: gfkernel(:,:)
       real*8, allocatable :: gkernel(:,:)
       real*8, allocatable :: glfkernel(:,:)
       real*8, allocatable :: glkernel(:,:)
-      real*8, allocatable :: pfkernel(:)
       logical fastkernel
       logical ostemper
       logical ostinterpol

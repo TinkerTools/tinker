@@ -2,7 +2,7 @@
 
  EngCnt  Van der Waals                             2.3388              225
  EngCnt  Atomic Multipoles                        -6.8076              246
- EngCnt  Polarization                             -2.7426              388
+ EngCnt  Polarization                             -2.7426              246
 
  Internal Virial Tensor :                  -4.688        6.236        5.937
                                             6.236      -15.185       -1.998

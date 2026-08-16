@@ -1,8 +1,8 @@
  Total Potential Energy :                -23.8294 Kcal/mole
 
- EngCnt  Van der Waals                            10.5539              277
+ EngCnt  Van der Waals                            10.5539              288
  EngCnt  Atomic Multipoles                       -25.9924              307
- EngCnt  Polarization                             -8.3909              307
+ EngCnt  Polarization                             -8.3909              318
 
  Internal Virial Tensor :                  -7.760        9.985        4.951
                                             9.985      -16.900       -3.540

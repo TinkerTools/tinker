@@ -29,11 +29,7 @@ c
       pairwise = .true.
       if (use_epdt) then
          if (use_rel) then
-            if (use_relstage) then
-               call epolar3frs
-            else
-               call epolar3fr
-            end if
+            call epolar3fr
          else
             call epolar3f
          end if
@@ -2480,12 +2476,13 @@ c
       use mutant
       use potent
       implicit none
+      real*8 weight1,dweight1,d2weight1
+      logical need0,need1
       integer i
       integer nep1,nep0
       real*8 ep1,ep0
       real*8 plambdaorig
       real*8 elambdaorig
-      real*8 plambdaexp
       real*8, allocatable :: aep1(:)
       real*8, allocatable :: aep0(:)
       character*6 mode
@@ -2503,7 +2500,13 @@ c
 c
 c     compute energy of the lambda = 0 state
 c
-      if (use_pol4i) then
+c
+c     an endpoint is live when it carries weight or a lambda derivative
+c
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dpldlmda,d2pldlmda2,need0,need1)
+      if (need0) then
          call altepdt (0.0d0)
          call epolar3calc
 c
@@ -2518,7 +2521,7 @@ c
 c
 c     compute energy of the lambda = 1 state
 c
-      if (use_pol4f) then
+      if (need1) then
          call altepdt (1.0d0)
          call epolar3calc
 c
@@ -2533,13 +2536,13 @@ c
 c
 c     copy energy if only one state is computed
 c
-      if (use_pol4i .and. .not.use_pol4f) then
+      if (need0 .and. .not.need1) then
          ep1 = ep0
          nep1 = nep0
          do i = 1, n
             aep1(i) = aep0(i)
          end do
-      else if (.not.use_pol4i .and. use_pol4f) then
+      else if (.not.need0 .and. need1) then
          ep0 = ep1
          nep0 = nep1
          do i = 1, n
@@ -2558,10 +2561,9 @@ c
 c
 c     interpolate energy
 c
-      plambdaexp = plambda**epdtexp
-      ep = plambdaexp * ep1 + (1.0d0 - plambdaexp) * ep0
+      ep = weight1 * ep1 + (1.0d0 - weight1) * ep0
       do i = 1, n
-         aep(i) = plambdaexp * aep1(i) + (1.0d0-plambdaexp) * aep0(i)
+         aep(i) = weight1 * aep1(i) + (1.0d0-weight1) * aep0(i)
       end do
       nep = max(nep1,nep0)
 c
@@ -2606,11 +2608,11 @@ c
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine epolar3p  --  decoupled lambda pol analysis     ##
-c     ##                                                             ##
-c     #################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine epolar3p  --  decoupled lambda pol analysis  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
 c     "epolar3p" calculates the polarization energy and partitions
@@ -2639,18 +2641,18 @@ c
       call alteprst
       return
       end
-c
-c
 c     #################################################################
 c     ##                                                             ##
-c     ##  subroutine epolar3fr  --  relative dual topo pol analysis  ##
+c     ##  subroutine epolar3fr  --  relative dual topo polar analys  ##
 c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "epolar3fr" calculates the polarization energy and analysis for a
-c     two-ligand relative dual topology calculation by combining four
-c     subsystem states, E1 = E(A+env) + E(B) and E0 = E(B+env) + E(A)
+c     "epolar3fr" interpolates between the two coupling states of a
+c     two-ligand relative dual topology calculation, accumulating the
+c     partitioned energy of each parameter-zeroed subsystem,
+c
+c        E = weight1*E(prelst1) + (1-weight1)*E(prelst0)
 c
 c
       subroutine epolar3fr
@@ -2661,150 +2663,14 @@ c
       use energi
       use mutant
       implicit none
-      integer i
-      integer nepae
-      real*8 epae,epbe
-      real*8 epa,epb
-      real*8 ep1,ep0
-      real*8 plambdaexp
-      real*8, allocatable :: aepae(:)
-      real*8, allocatable :: aepbe(:)
-      real*8, allocatable :: aepa(:)
-      real*8, allocatable :: aepb(:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aepae(n))
-      allocate (aepbe(n))
-      allocate (aepa(n))
-      allocate (aepb(n))
-c
-c     ligand A coupled to environment, group B fully decoupled
-c
-      if (use_pol4f) then
-         call altpolrsub (.true.,.false.,.true.)
-         call epolar3calc
-         epae = ep
-         nepae = nep
-         do i = 1, n
-            aepae(i) = aep(i)
-         end do
-      end if
-c
-c     ligand B coupled to environment, group A fully decoupled
-c
-      if (use_pol4i) then
-         call altpolrsub (.false.,.true.,.true.)
-         call epolar3calc
-         epbe = ep
-         do i = 1, n
-            aepbe(i) = aep(i)
-         end do
-      end if
-c
-c     ligand A alone, giving its intramolecular polarization energy
-c
-      if (use_pol4i) then
-         call altpolrsub (.true.,.false.,.false.)
-         call epolar3calc
-         epa = ep
-         do i = 1, n
-            aepa(i) = aep(i)
-         end do
-      end if
-c
-c     ligand B alone, giving its intramolecular polarization energy
-c
-      if (use_pol4f) then
-         call altpolrsub (.false.,.true.,.false.)
-         call epolar3calc
-         epb = ep
-         do i = 1, n
-            aepb(i) = aep(i)
-         end do
-      end if
-c
-c     retain the historical analysis count from the ligand A coupled
-c     endpoint even when its energy and analysis are not needed
-c
-      if (.not.use_pol4f) then
-         call altpolrsub (.true.,.false.,.true.)
-         call epolar3calc
-         nepae = nep
-      end if
-c
-c     alias the omitted composite endpoint to the computed endpoint
-c
-      if (use_pol4i .and. .not.use_pol4f) then
-         epae = epbe
-         epb = epa
-         do i = 1, n
-            aepae(i) = aepbe(i)
-            aepb(i) = aepa(i)
-         end do
-      else if (.not.use_pol4i .and. use_pol4f) then
-         epbe = epae
-         epa = epb
-         do i = 1, n
-            aepbe(i) = aepae(i)
-            aepa(i) = aepb(i)
-         end do
-      end if
-c
-c     restore full system and interpolate the dual topology result
-c
-      call altpolrsub (.true.,.true.,.true.)
-      plambdaexp = plambda**epdtexp
-      ep1 = epae + epb
-      ep0 = epbe + epa
-      ep = plambdaexp*ep1 + (1.0d0-plambdaexp)*ep0
-      nep = nepae
-      do i = 1, n
-         aep(i) = plambdaexp*(aepae(i)+aepb(i))
-     &          + (1.0d0-plambdaexp)*(aepbe(i)+aepa(i))
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aepae)
-      deallocate (aepbe)
-      deallocate (aepa)
-      deallocate (aepb)
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine epolar3frs  --  staged rel dual topo pol anal  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "epolar3frs" calculates the polarization energy and partitions
-c     the energy among the atoms for a two-ligand relative dual
-c     topology calculation run on the staged schedule, combining the
-c     same subsystem states as "epolar1frs",
-c
-c        E0 = E(env) + E(A) + E(B)
-c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
-c        E  = plambda*E1 + (1-plambda)*E0
-c
-c
-      subroutine epolar3frs
-      use action
-      use analyz
-      use atoms
-      use dlmda
-      use energi
-      use mutant
-      implicit none
-      integer i
+      real*8 weight1,dweight1,d2weight1
+      integer i,k
       integer nep0,nep1
+      integer ncpl0,ncpl1
       real*8 ep0,ep1
-      real*8 weight1,weight0
-      logical lig1,domix,dovdwm,needref
+      logical la,lb,le
+      logical in0,in1
+      logical need0,need1
       real*8, allocatable :: aep0(:)
       real*8, allocatable :: aep1(:)
 c
@@ -2814,12 +2680,11 @@ c
       allocate (aep0(n))
       allocate (aep1(n))
 c
-c     decide which leg of the staged schedule is active
+c     an endpoint is live when it carries weight or a lambda derivative
 c
-      lig1 = (relstage .eq. 'LIG1')
-      dovdwm = (relstage .eq. 'VDWM')
-      domix = relstagemix
-      needref = (dovdwm .or. domix)
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dpldlmda,d2pldlmda2,need0,need1)
 c
 c     zero out the two endpoint accumulators
 c
@@ -2827,105 +2692,74 @@ c
       ep1 = 0.0d0
       nep0 = 0
       nep1 = 0
+      ncpl0 = -1
+      ncpl1 = -1
       do i = 1, n
          aep0(i) = 0.0d0
          aep1(i) = 0.0d0
       end do
 c
-c     environment alone, part of the decoupled reference
+c     build each subsystem once, add to the endpoints
 c
-      if (needref) then
-         call altpolrsub (.false.,.false.,.true.)
+      do k = 1, nrelsub
+         call relslot (k,prelst0,prelst1,la,lb,le,in0,in1)
+         in0 = in0 .and. need0
+         in1 = in1 .and. need1
+         if (.not. (in0 .or. in1))  cycle
+         call altpolrsub (la,lb,le)
          call epolar3calc
-         ep0 = ep0 + ep
-         nep0 = nep0 + nep
-         do i = 1, n
-            aep0(i) = aep0(i) + aep(i)
-         end do
-      end if
-c
-c     ligand A alone, in the reference and in the ligand 0 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
-         call altpolrsub (.true.,.false.,.false.)
-         call epolar3calc
-         if (needref) then
+         if (in0) then
             ep0 = ep0 + ep
             nep0 = nep0 + nep
+            if (le .and. (la .or. lb))  ncpl0 = nep
             do i = 1, n
                aep0(i) = aep0(i) + aep(i)
             end do
          end if
-         if (.not.dovdwm .and. .not.lig1) then
+         if (in1) then
             ep1 = ep1 + ep
             do i = 1, n
                aep1(i) = aep1(i) + aep(i)
             end do
+            nep1 = nep1 + nep
+            if (le .and. (la .or. lb))  ncpl1 = nep
          end if
-      end if
-c
-c     ligand B alone, in the reference and in the ligand 1 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. lig1)) then
-         call altpolrsub (.false.,.true.,.false.)
-         call epolar3calc
-         if (needref) then
-            ep0 = ep0 + ep
-            nep0 = nep0 + nep
-            do i = 1, n
-               aep0(i) = aep0(i) + aep(i)
-            end do
-         end if
-         if (.not.dovdwm .and. lig1) then
-            ep1 = ep1 + ep
-            do i = 1, n
-               aep1(i) = aep1(i) + aep(i)
-            end do
-         end if
-      end if
-c
-c     the active ligand coupled to the environment
-c
-      if (.not. dovdwm) then
-         if (lig1) then
-            call altpolrsub (.true.,.false.,.true.)
-         else
-            call altpolrsub (.false.,.true.,.true.)
-         end if
-         call epolar3calc
-         ep1 = ep1 + ep
-         nep1 = nep1 + nep
-         do i = 1, n
-            aep1(i) = aep1(i) + aep(i)
-         end do
-      end if
+      end do
 c
 c     restore the original full system parameters
 c
       call altpolrsub (.true.,.true.,.true.)
 c
-c     interpolate the active leg, or take the reference in the middle
+c     copy energy if only one endpoint state is computed
 c
-      if (dovdwm) then
-         ep = ep0
-         nep = nep0
+      if (.not. need0) then
+         ep0 = ep1
          do i = 1, n
-            aep(i) = aep0(i)
+            aep0(i) = aep1(i)
          end do
-      else if (domix) then
-         weight1 = plambda
-         weight0 = 1.0d0 - weight1
-         ep = weight1*ep1 + weight0*ep0
+      else if (.not. need1) then
+         ep1 = ep0
+         do i = 1, n
+            aep1(i) = aep0(i)
+         end do
+      end if
+c
+c     interpolate between the two endpoint states
+c
+      ep = weight1*ep1 + (1.0d0-weight1)*ep0
+      do i = 1, n
+         aep(i) = weight1*aep1(i) + (1.0d0-weight1)*aep0(i)
+      end do
+c
+c     the count comes from the coupled subsystem while an endpoint
+c     holding one is live, and from the decoupled reference otherwise
+c
+      if (ncpl0 .ge. 0)  nep0 = ncpl0
+      if (ncpl1 .ge. 0)  nep1 = ncpl1
+      if (need1) then
          nep = nep1
-         do i = 1, n
-            aep(i) = weight1*aep1(i) + weight0*aep0(i)
-         end do
       else
-         ep = ep1
-         nep = nep1
-         do i = 1, n
-            aep(i) = aep1(i)
-         end do
+         nep = nep0
       end if
 c
 c     perform deallocation of some local arrays

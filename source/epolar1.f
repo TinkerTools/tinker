@@ -41,11 +41,7 @@ c     choose the method to sum over polarization interactions
 c
       if (use_epdt) then
          if (use_rel) then
-            if (use_relstage) then
-               call epolar1frs
-            else
-               call epolar1fr
-            end if
+            call epolar1fr
          else
             call epolar1f
          end if
@@ -9681,11 +9677,12 @@ c
       use potent
       use virial
       implicit none
+      real*8 weight1,dweight1,d2weight1
+      logical need0,need1
       integer i,j
       real*8 ep1,ep0
       real*8 plambdaorig
       real*8 elambdaorig
-      real*8 plambdaexp
       real*8 epvir1(3,3)
       real*8 epvir0(3,3)
       real*8, allocatable :: dep1(:,:)
@@ -9705,7 +9702,13 @@ c
 c
 c     compute energy, force, and virial of the lambda = 0 state
 c
-      if (use_pol4i) then
+c
+c     an endpoint is live when it carries weight or a lambda derivative
+c
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dpldlmda,d2pldlmda2,need0,need1)
+      if (need0) then
          call altepdt (0.0d0)
          call epolar1calc
 c
@@ -9726,7 +9729,7 @@ c
 c
 c     compute energy of the lambda = 1 state
 c
-      if (use_pol4f) then
+      if (need1) then
          call altepdt (1.0d0)
          call epolar1calc
 c
@@ -9747,7 +9750,7 @@ c
 c
 c     copy energy, force, and virial if only one state is computed
 c
-      if (use_pol4i .and. .not.use_pol4f) then
+      if (need0 .and. .not.need1) then
          ep1 = ep0
          do i = 1, n
             do j = 1, 3
@@ -9759,7 +9762,7 @@ c
                epvir1(j,i) = epvir0(j,i)
             end do
          end do
-      else if (.not.use_pol4i .and. use_pol4f) then
+      else if (.not.need0 .and. need1) then
          ep0 = ep1
          do i = 1, n
             do j = 1, 3
@@ -9784,18 +9787,17 @@ c
 c
 c     interpolate energy, force, and virial
 c
-      plambdaexp = plambda**epdtexp
-      ep = plambdaexp * ep1 + (1.0d0 - plambdaexp) * ep0
+      ep = weight1 * ep1 + (1.0d0 - weight1) * ep0
       do i = 1, n
          do j = 1, 3
-            dep(j,i) = plambdaexp * dep1(j,i)
-     &                 + (1.0d0 - plambdaexp) * dep0(j,i)
+            dep(j,i) = weight1 * dep1(j,i)
+     &                 + (1.0d0 - weight1) * dep0(j,i)
          end do
       end do
       do i = 1, 3
          do j = 1, 3
-            epvir(j,i) = plambdaexp * epvir1(j,i)
-     &                 + (1.0d0 - plambdaexp) * epvir0(j,i)
+            epvir(j,i) = weight1 * epvir1(j,i)
+     &                 + (1.0d0 - weight1) * epvir0(j,i)
          end do
       end do
 c
@@ -9876,21 +9878,18 @@ c
       call alteprst
       return
       end
-c
-c
 c     ###############################################################
 c     ##                                                           ##
-c     ##  subroutine epolar1fr  --  relative dual topo pol derivs  ##
+c     ##  subroutine epolar1fr  --  relative dual topo polar grad  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "epolar1fr" calculates the polarization energy and first
-c     derivatives for a two-ligand relative dual topology calculation
-c     by combining four self-consistent subsystem states, E1 =
-c     E(A+env) + E(B) and E0 = E(B+env) + E(A); each subsystem is a
-c     complete induced dipole solve, so the environment never responds
-c     to both ligands at once and the two endpoints are well defined
+c     "epolar1fr" interpolates between the two coupling states of a
+c     two-ligand relative dual topology calculation, each state a sum
+c     of parameter-zeroed subsystem energies,
+c
+c        E = weight1*E(prelst1) + (1-weight1)*E(prelst0)
 c
 c
       subroutine epolar1fr
@@ -9901,200 +9900,13 @@ c
       use mutant
       use virial
       implicit none
-      integer i,j
-      real*8 epae,epbe
-      real*8 epa,epb
-      real*8 ep1,ep0
-      real*8 plambdaexp,plambdaex0
-      real*8 epvirae(3,3),epvirbe(3,3)
-      real*8 epvira(3,3),epvirb(3,3)
-      real*8, allocatable :: depae(:,:)
-      real*8, allocatable :: depbe(:,:)
-      real*8, allocatable :: depa(:,:)
-      real*8, allocatable :: depb(:,:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (depae(3,n))
-      allocate (depbe(3,n))
-      allocate (depa(3,n))
-      allocate (depb(3,n))
-c
-c     ligand A coupled to environment, group B fully decoupled
-c
-      if (use_pol4f) then
-         call altpolrsub (.true.,.false.,.true.)
-         call epolar1calc
-         epae = ep
-         do i = 1, n
-            do j = 1, 3
-               depae(j,i) = dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvirae(j,i) = epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     ligand B coupled to environment, group A fully decoupled
-c
-      if (use_pol4i) then
-         call altpolrsub (.false.,.true.,.true.)
-         call epolar1calc
-         epbe = ep
-         do i = 1, n
-            do j = 1, 3
-               depbe(j,i) = dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvirbe(j,i) = epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     ligand A alone, giving its intramolecular polarization energy
-c
-      if (use_pol4i) then
-         call altpolrsub (.true.,.false.,.false.)
-         call epolar1calc
-         epa = ep
-         do i = 1, n
-            do j = 1, 3
-               depa(j,i) = dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvira(j,i) = epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     ligand B alone, giving its intramolecular polarization energy
-c
-      if (use_pol4f) then
-         call altpolrsub (.false.,.true.,.false.)
-         call epolar1calc
-         epb = ep
-         do i = 1, n
-            do j = 1, 3
-               depb(j,i) = dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvirb(j,i) = epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     alias the omitted composite endpoint to the computed endpoint
-c
-      if (use_pol4i .and. .not.use_pol4f) then
-         epae = epbe
-         epb = epa
-         do i = 1, n
-            do j = 1, 3
-               depae(j,i) = depbe(j,i)
-               depb(j,i) = depa(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvirae(j,i) = epvirbe(j,i)
-               epvirb(j,i) = epvira(j,i)
-            end do
-         end do
-      else if (.not.use_pol4i .and. use_pol4f) then
-         epbe = epae
-         epa = epb
-         do i = 1, n
-            do j = 1, 3
-               depbe(j,i) = depae(j,i)
-               depa(j,i) = depb(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvirbe(j,i) = epvirae(j,i)
-               epvira(j,i) = epvirb(j,i)
-            end do
-         end do
-      end if
-c
-c     restore full system and interpolate the dual topology result
-c
-      call altpolrsub (.true.,.true.,.true.)
-      plambdaexp = plambda**epdtexp
-      plambdaex0 = 1.0d0 - plambdaexp
-      ep1 = epae + epb
-      ep0 = epbe + epa
-      ep = plambdaexp*ep1 + plambdaex0*ep0
-      do i = 1, n
-         do j = 1, 3
-            dep(j,i) = plambdaexp*(depae(j,i)+depb(j,i))
-     &               + plambdaex0*(depbe(j,i)+depa(j,i))
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvir(j,i) = plambdaexp*(epvirae(j,i)+epvirb(j,i))
-     &                 + plambdaex0*(epvirbe(j,i)+epvira(j,i))
-         end do
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (depae)
-      deallocate (depbe)
-      deallocate (depa)
-      deallocate (depb)
-      return
-      end
-c
-c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  subroutine epolar1frs  --  staged rel dual topo pol  ##
-c     ##                                                       ##
-c     ###########################################################
-c
-c
-c     "epolar1frs" calculates the polarization energy and Cartesian
-c     first derivatives for a two-ligand relative dual topology
-c     calculation run on the staged schedule, where the two ligands are
-c     discharged and recharged one at a time, so at most one of them is
-c     coupled to the environment at any main lambda value,
-c
-c        E0 = E(env) + E(A) + E(B)
-c        E1 = E(A+env) + E(B)   on the ligand 1 leg
-c        E1 = E(B+env) + E(A)   on the ligand 0 leg
-c        E  = plambda*E1 + (1-plambda)*E0
-c
-c     each state is a complete induced dipole solve, so the environment
-c     never responds to both ligands at once; the interpolation weight
-c     is the staged taper itself, so no further exponent is applied here
-c     and the main lambda chain rule is carried by "lmdachain"
-c
-c
-      subroutine epolar1frs
-      use atoms
-      use deriv
-      use dlmda
-      use energi
-      use mutant
-      use virial
-      implicit none
-      integer i,j
+      real*8 weight1,dweight1,d2weight1
+      integer i,j,k
       real*8 ep0,ep1
-      real*8 weight1,weight0
       real*8 epvir0(3,3),epvir1(3,3)
-      logical lig1,domix,dovdwm,needref
+      logical la,lb,le
+      logical in0,in1
+      logical need0,need1
       real*8, allocatable :: dep0(:,:)
       real*8, allocatable :: dep1(:,:)
 c
@@ -10104,12 +9916,11 @@ c
       allocate (dep0(3,n))
       allocate (dep1(3,n))
 c
-c     decide which leg of the staged schedule is active
+c     an endpoint is live when it carries weight or a lambda derivative
 c
-      lig1 = (relstage .eq. 'LIG1')
-      dovdwm = (relstage .eq. 'VDWM')
-      domix = relstagemix
-      needref = (dovdwm .or. domix)
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 dpldlmda,d2pldlmda2,need0,need1)
 c
 c     zero out the two endpoint accumulators
 c
@@ -10128,30 +9939,16 @@ c
          end do
       end do
 c
-c     environment alone, part of the decoupled reference
+c     build each subsystem once, add to the endpoints
 c
-      if (needref) then
-         call altpolrsub (.false.,.false.,.true.)
+      do k = 1, nrelsub
+         call relslot (k,prelst0,prelst1,la,lb,le,in0,in1)
+         in0 = in0 .and. need0
+         in1 = in1 .and. need1
+         if (.not. (in0 .or. in1))  cycle
+         call altpolrsub (la,lb,le)
          call epolar1calc
-         ep0 = ep0 + ep
-         do i = 1, n
-            do j = 1, 3
-               dep0(j,i) = dep0(j,i) + dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir0(j,i) = epvir0(j,i) + epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     ligand A alone, in the reference and in the ligand 0 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
-         call altpolrsub (.true.,.false.,.false.)
-         call epolar1calc
-         if (needref) then
+         if (in0) then
             ep0 = ep0 + ep
             do i = 1, n
                do j = 1, 3
@@ -10164,7 +9961,7 @@ c
                end do
             end do
          end if
-         if (.not.dovdwm .and. .not.lig1) then
+         if (in1) then
             ep1 = ep1 + ep
             do i = 1, n
                do j = 1, 3
@@ -10177,108 +9974,54 @@ c
                end do
             end do
          end if
-      end if
-c
-c     ligand B alone, in the reference and in the ligand 1 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. lig1)) then
-         call altpolrsub (.false.,.true.,.false.)
-         call epolar1calc
-         if (needref) then
-            ep0 = ep0 + ep
-            do i = 1, n
-               do j = 1, 3
-                  dep0(j,i) = dep0(j,i) + dep(j,i)
-               end do
-            end do
-            do i = 1, 3
-               do j = 1, 3
-                  epvir0(j,i) = epvir0(j,i) + epvir(j,i)
-               end do
-            end do
-         end if
-         if (.not.dovdwm .and. lig1) then
-            ep1 = ep1 + ep
-            do i = 1, n
-               do j = 1, 3
-                  dep1(j,i) = dep1(j,i) + dep(j,i)
-               end do
-            end do
-            do i = 1, 3
-               do j = 1, 3
-                  epvir1(j,i) = epvir1(j,i) + epvir(j,i)
-               end do
-            end do
-         end if
-      end if
-c
-c     the active ligand coupled to the environment
-c
-      if (.not. dovdwm) then
-         if (lig1) then
-            call altpolrsub (.true.,.false.,.true.)
-         else
-            call altpolrsub (.false.,.true.,.true.)
-         end if
-         call epolar1calc
-         ep1 = ep1 + ep
-         do i = 1, n
-            do j = 1, 3
-               dep1(j,i) = dep1(j,i) + dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir1(j,i) = epvir1(j,i) + epvir(j,i)
-            end do
-         end do
-      end if
+      end do
 c
 c     restore the original full system parameters
 c
       call altpolrsub (.true.,.true.,.true.)
 c
-c     interpolate the active leg, or take the reference in the middle
+c     copy energy if only one endpoint state is computed
 c
-      if (dovdwm) then
-         ep = ep0
+      if (.not. need0) then
+         ep0 = ep1
          do i = 1, n
             do j = 1, 3
-               dep(j,i) = dep0(j,i)
+               dep0(j,i) = dep1(j,i)
             end do
          end do
          do i = 1, 3
             do j = 1, 3
-               epvir(j,i) = epvir0(j,i)
+               epvir0(j,i) = epvir1(j,i)
             end do
          end do
-      else if (domix) then
-         weight1 = plambda
-         weight0 = 1.0d0 - weight1
-         ep = weight1*ep1 + weight0*ep0
+      else if (.not. need1) then
+         ep1 = ep0
          do i = 1, n
             do j = 1, 3
-               dep(j,i) = weight1*dep1(j,i) + weight0*dep0(j,i)
+               dep1(j,i) = dep0(j,i)
             end do
          end do
          do i = 1, 3
             do j = 1, 3
-               epvir(j,i) = weight1*epvir1(j,i) + weight0*epvir0(j,i)
-            end do
-         end do
-      else
-         ep = ep1
-         do i = 1, n
-            do j = 1, 3
-               dep(j,i) = dep1(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir(j,i) = epvir1(j,i)
+               epvir1(j,i) = epvir0(j,i)
             end do
          end do
       end if
+c
+c     interpolate between the two endpoint states
+c
+      ep = weight1*ep1 + (1.0d0-weight1)*ep0
+      do i = 1, n
+         do j = 1, 3
+            dep(j,i) = weight1*dep1(j,i) + (1.0d0-weight1)*dep0(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            epvir(j,i) = weight1*epvir1(j,i)
+     &                + (1.0d0-weight1)*epvir0(j,i)
+         end do
+      end do
 c
 c     perform deallocation of some local arrays
 c

@@ -29,11 +29,7 @@ c     choose the method to sum over multipole interactions
 c
       if (use_emdt) then
          if (use_rel) then
-            if (use_relstage) then
-               call empole3ers
-            else
-               call empole3er
-            end if
+            call empole3er
          else
             call empole3e
          end if
@@ -2335,11 +2331,11 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine empole3e  --  dual topology multipole analysis  ##
-c     ##                                                              ##
-c     ##################################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine empole3e  --  dual topo multipole analysis  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
 c     "empole3e" calculates the electrostatic energy due to atomic
@@ -2361,11 +2357,13 @@ c
       use limits
       use mutant
       implicit none
+      real*8 weight1,dweight1,d2weight1
+      logical need0,need1
       integer i
       integer nem1
       real*8 em1,em0
       real*8 elambdaorig
-      real*8 weight1,weight0
+      real*8 weight0
       real*8 einterorig
       real*8 einter1,einter0
       real*8 exfe1,exfe0
@@ -2382,7 +2380,13 @@ c     compute energy and analysis of the elambda = 1 state
 c
       elambdaorig = elambda
       einterorig = einter
-      if (use_ele4f) then
+c
+c     an endpoint is live when it carries weight or a lambda derivative
+c
+      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 deldlmda,d2eldlmda2,need0,need1)
+      if (need1) then
          call altemdt (1.0d0)
          call empole3calc
          em1 = em
@@ -2401,7 +2405,7 @@ c
 c
 c     compute energy and analysis of the elambda = 0 state
 c
-      if (use_ele4i) then
+      if (need0) then
          call altemdt (0.0d0)
          call empole3calc
          em0 = em
@@ -2415,7 +2419,7 @@ c
 c     retain the historical analysis count from the fully coupled
 c     endpoint even when its energy and analysis are not needed
 c
-      if (.not.use_ele4f) then
+      if (.not.need1) then
          call altemdt (1.0d0)
          call empole3calc
          nem1 = nem
@@ -2424,14 +2428,14 @@ c
 c
 c     copy results if only one endpoint state is computed
 c
-      if (use_ele4i .and. .not.use_ele4f) then
+      if (need0 .and. .not.need1) then
          em1 = em0
          exfe1 = exfe0
          einter1 = einter0
          do i = 1, n
             aem1(i) = aem0(i)
          end do
-      else if (.not.use_ele4i .and. use_ele4f) then
+      else if (.not.need0 .and. need1) then
          em0 = em1
          exfe0 = exfe1
          einter0 = einter1
@@ -2446,7 +2450,6 @@ c
 c
 c     interpolate the dual topology energy and analysis
 c
-      weight1 = elambda**emdtexp
       weight0 = 1.0d0 - weight1
       em = weight1*em1 + weight0*em0
       nem = nem1
@@ -2507,8 +2510,6 @@ c
       end if
       return
       end
-c
-c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine empole3er  --  relative dual topo mpole analys  ##
@@ -2516,10 +2517,11 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "empole3er" calculates the multipole energy and analysis for a
-c     two-ligand relative dual topology calculation by combining four
-c     parameter-zeroed subsystem states, E1 = E(A+env) + E(B) and
-c     E0 = E(B+env) + E(A)
+c     "empole3er" interpolates between the two coupling states of a
+c     two-ligand relative dual topology calculation, accumulating the
+c     partitioned energy of each parameter-zeroed subsystem,
+c
+c        E = weight1*E(erelst1) + (1-weight1)*E(erelst0)
 c
 c
       subroutine empole3er
@@ -2533,190 +2535,17 @@ c
       use limits
       use mutant
       implicit none
-      integer i
-      integer nemae
-      real*8 emae,embe
-      real*8 ema,emb
-      real*8 em1,em0
-      real*8 weight1,weight0
-      real*8 einterorig
-      real*8 einterae,einterbe
-      real*8 eintera,einterb
-      real*8 exfeae,exfebe
-      real*8 exfea,exfeb
-      real*8, allocatable :: aemae(:)
-      real*8, allocatable :: aembe(:)
-      real*8, allocatable :: aema(:)
-      real*8, allocatable :: aemb(:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aemae(n))
-      allocate (aembe(n))
-      allocate (aema(n))
-      allocate (aemb(n))
-      einterorig = einter
-c
-c     ligand A coupled to environment, group B fully decoupled
-c
-      if (use_ele4f) then
-         call altemdtsub (.true.,.false.,.true.)
-         call empole3calc
-         emae = em
-         nemae = nem
-         exfeae = exfe
-         do i = 1, n
-            aemae(i) = aem(i)
-         end do
-         einterae = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     ligand B coupled to environment, group A fully decoupled
-c
-      if (use_ele4i) then
-         call altemdtsub (.false.,.true.,.true.)
-         call empole3calc
-         embe = em
-         exfebe = exfe
-         do i = 1, n
-            aembe(i) = aem(i)
-         end do
-         einterbe = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     ligand A alone, giving its intramolecular multipole energy
-c
-      if (use_ele4i) then
-         call altemdtsub (.true.,.false.,.false.)
-         call empole3calc
-         ema = em
-         exfea = exfe
-         do i = 1, n
-            aema(i) = aem(i)
-         end do
-         eintera = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     ligand B alone, giving its intramolecular multipole energy
-c
-      if (use_ele4f) then
-         call altemdtsub (.false.,.true.,.false.)
-         call empole3calc
-         emb = em
-         exfeb = exfe
-         do i = 1, n
-            aemb(i) = aem(i)
-         end do
-         einterb = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     retain the historical analysis count from the ligand A coupled
-c     endpoint even when its energy and analysis are not needed
-c
-      if (.not.use_ele4f) then
-         call altemdtsub (.true.,.false.,.true.)
-         call empole3calc
-         nemae = nem
-         einter = einterorig
-      end if
-c
-c     alias the omitted composite endpoint to the computed endpoint
-c
-      if (use_ele4i .and. .not.use_ele4f) then
-         emae = embe
-         emb = ema
-         exfeae = exfebe
-         exfeb = exfea
-         einterae = einterbe
-         einterb = eintera
-         do i = 1, n
-            aemae(i) = aembe(i)
-            aemb(i) = aema(i)
-         end do
-      else if (.not.use_ele4i .and. use_ele4f) then
-         embe = emae
-         ema = emb
-         exfebe = exfeae
-         exfea = exfeb
-         einterbe = einterae
-         eintera = einterb
-         do i = 1, n
-            aembe(i) = aemae(i)
-            aema(i) = aemb(i)
-         end do
-      end if
-c
-c     restore the original full system parameters
-c
-      call altemdtsub (.true.,.true.,.true.)
-c
-c     assemble the two dual topology endpoints and interpolate
-c
-      weight1 = elambda**emdtexp
-      weight0 = 1.0d0 - weight1
-      em1 = emae + emb
-      em0 = embe + ema
-      em = weight1*em1 + weight0*em0
-      nem = nemae
-      einter = einterorig + weight1*(einterae+einterb)
-     &                    + weight0*(einterbe+eintera)
-      exfe = weight1*(exfeae+exfeb) + weight0*(exfebe+exfea)
-      do i = 1, n
-         aem(i) = weight1*(aemae(i)+aemb(i))
-     &          + weight0*(aembe(i)+aema(i))
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aemae)
-      deallocate (aembe)
-      deallocate (aema)
-      deallocate (aemb)
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine empole3ers  --  staged rel dual topo mpole anal  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "empole3ers" calculates the multipole energy and partitions the
-c     energy among the atoms for a two-ligand relative dual topology
-c     calculation run on the staged schedule, combining the same
-c     subsystem states as "empole1ers",
-c
-c        E0 = E(env) + E(A) + E(B)
-c        E1 = E(A+env) + E(B)  or  E(B+env) + E(A)
-c        E  = elambda*E1 + (1-elambda)*E0
-c
-c
-      subroutine empole3ers
-      use action
-      use analyz
-      use atoms
-      use dlmda
-      use energi
-      use extfld
-      use inter
-      use limits
-      use mutant
-      implicit none
-      integer i
+      real*8 weight1,dweight1,d2weight1
+      integer i,k
       integer nem0,nem1
+      integer ncpl0,ncpl1
       real*8 em0,em1
-      real*8 weight1,weight0
+      real*8 exfe0,exfe1
       real*8 einterorig
       real*8 einter0,einter1
-      real*8 exfe0,exfe1
-      logical lig1,domix,dovdwm,needref
+      logical la,lb,le
+      logical in0,in1
+      logical need0,need1
       real*8, allocatable :: aem0(:)
       real*8, allocatable :: aem1(:)
 c
@@ -2727,12 +2556,11 @@ c
       allocate (aem1(n))
       einterorig = einter
 c
-c     decide which leg of the staged schedule is active
+c     an endpoint is live when it carries weight or a lambda derivative
 c
-      lig1 = (relstage .eq. 'LIG1')
-      dovdwm = (relstage .eq. 'VDWM')
-      domix = relstagemix
-      needref = (dovdwm .or. domix)
+      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
+      call relneed (weight1,dweight1,d2weight1,
+     &                 deldlmda,d2eldlmda2,need0,need1)
 c
 c     zero out the two endpoint accumulators
 c
@@ -2740,131 +2568,90 @@ c
       em1 = 0.0d0
       nem0 = 0
       nem1 = 0
-      einter0 = 0.0d0
-      einter1 = 0.0d0
+      ncpl0 = -1
+      ncpl1 = -1
       exfe0 = 0.0d0
       exfe1 = 0.0d0
+      einter0 = 0.0d0
+      einter1 = 0.0d0
       do i = 1, n
          aem0(i) = 0.0d0
          aem1(i) = 0.0d0
       end do
 c
-c     environment alone, part of the decoupled reference
+c     build each subsystem once, add to the endpoints
 c
-      if (needref) then
-         call altemdtsub (.false.,.false.,.true.)
+      do k = 1, nrelsub
+         call relslot (k,erelst0,erelst1,la,lb,le,in0,in1)
+         in0 = in0 .and. need0
+         in1 = in1 .and. need1
+         if (.not. (in0 .or. in1))  cycle
+         call altemdtsub (la,lb,le)
          call empole3calc
-         em0 = em0 + em
-         nem0 = nem0 + nem
-         exfe0 = exfe0 + exfe
-         einter0 = einter0 + einter - einterorig
-         einter = einterorig
-         do i = 1, n
-            aem0(i) = aem0(i) + aem(i)
-         end do
-      end if
-c
-c     ligand A alone, in the reference and in the ligand 0 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. .not.lig1)) then
-         call altemdtsub (.true.,.false.,.false.)
-         call empole3calc
-         if (needref) then
+         if (in0) then
             em0 = em0 + em
             nem0 = nem0 + nem
+            if (le .and. (la .or. lb))  ncpl0 = nem
             exfe0 = exfe0 + exfe
             einter0 = einter0 + einter - einterorig
             do i = 1, n
                aem0(i) = aem0(i) + aem(i)
             end do
          end if
-         if (.not.dovdwm .and. .not.lig1) then
+         if (in1) then
             em1 = em1 + em
             exfe1 = exfe1 + exfe
             einter1 = einter1 + einter - einterorig
             do i = 1, n
                aem1(i) = aem1(i) + aem(i)
             end do
+            nem1 = nem1 + nem
+            if (le .and. (la .or. lb))  ncpl1 = nem
          end if
          einter = einterorig
-      end if
-c
-c     ligand B alone, in the reference and in the ligand 1 endpoint
-c
-      if (needref .or. (.not.dovdwm .and. lig1)) then
-         call altemdtsub (.false.,.true.,.false.)
-         call empole3calc
-         if (needref) then
-            em0 = em0 + em
-            nem0 = nem0 + nem
-            exfe0 = exfe0 + exfe
-            einter0 = einter0 + einter - einterorig
-            do i = 1, n
-               aem0(i) = aem0(i) + aem(i)
-            end do
-         end if
-         if (.not.dovdwm .and. lig1) then
-            em1 = em1 + em
-            exfe1 = exfe1 + exfe
-            einter1 = einter1 + einter - einterorig
-            do i = 1, n
-               aem1(i) = aem1(i) + aem(i)
-            end do
-         end if
-         einter = einterorig
-      end if
-c
-c     the active ligand coupled to the environment
-c
-      if (.not. dovdwm) then
-         if (lig1) then
-            call altemdtsub (.true.,.false.,.true.)
-         else
-            call altemdtsub (.false.,.true.,.true.)
-         end if
-         call empole3calc
-         em1 = em1 + em
-         nem1 = nem1 + nem
-         exfe1 = exfe1 + exfe
-         einter1 = einter1 + einter - einterorig
-         einter = einterorig
-         do i = 1, n
-            aem1(i) = aem1(i) + aem(i)
-         end do
-      end if
+      end do
 c
 c     restore the original full system parameters
 c
       call altemdtsub (.true.,.true.,.true.)
 c
-c     interpolate the active leg, or take the reference in the middle
+c     copy energy if only one endpoint state is computed
 c
-      if (dovdwm) then
-         em = em0
-         nem = nem0
-         exfe = exfe0
-         einter = einterorig + einter0
+      if (.not. need0) then
+         em0 = em1
+         exfe0 = exfe1
+         einter0 = einter1
          do i = 1, n
-            aem(i) = aem0(i)
+            aem0(i) = aem1(i)
          end do
-      else if (domix) then
-         weight1 = elambda
-         weight0 = 1.0d0 - weight1
-         em = weight1*em1 + weight0*em0
+      else if (.not. need1) then
+         em1 = em0
+         exfe1 = exfe0
+         einter1 = einter0
+         do i = 1, n
+            aem1(i) = aem0(i)
+         end do
+      end if
+c
+c     interpolate between the two endpoint states
+c
+      em = weight1*em1 + (1.0d0-weight1)*em0
+      exfe = weight1*exfe1 + (1.0d0-weight1)*exfe0
+      einter = einterorig + weight1*einter1
+     &                    + (1.0d0-weight1)*einter0
+      do i = 1, n
+         aem(i) = weight1*aem1(i) + (1.0d0-weight1)*aem0(i)
+      end do
+c
+c     the count comes from the coupled subsystem while an endpoint
+c     holding one is live, and from the decoupled reference otherwise
+c
+      if (ncpl0 .ge. 0)  nem0 = ncpl0
+      if (ncpl1 .ge. 0)  nem1 = ncpl1
+      if (need1) then
          nem = nem1
-         exfe = weight1*exfe1 + weight0*exfe0
-         einter = einterorig + weight1*einter1 + weight0*einter0
-         do i = 1, n
-            aem(i) = weight1*aem1(i) + weight0*aem0(i)
-         end do
       else
-         em = em1
-         nem = nem1
-         exfe = exfe1
-         einter = einterorig + einter1
-         do i = 1, n
-            aem(i) = aem1(i)
-         end do
+         nem = nem0
       end if
 c
 c     perform deallocation of some local arrays

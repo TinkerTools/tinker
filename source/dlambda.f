@@ -55,9 +55,6 @@ c
       use mutant
       implicit none
       real*8 lmda
-      real*8 taper
-      real*8 dtaper
-      real*8 d2taper
 c
 c
 c     the staged relative schedule maps the sublambdas its own way
@@ -67,68 +64,60 @@ c
          return
       end if
 c
-c     map from lambda to sublambdas
+c     map the main lambda onto each sublambda a map drives
 c
       if (use_plmdamap) then
-         if (plmdamap .eq. 'EXP') then
-            call sublmdaexp (lmda,plmdaexp,plambda,
-     &                       dpldlmda,d2pldlmda2)
-         else if (plmdamap .eq. 'INV') then
-            call sublmdainvpower (lmda,plmdainvn,plmdainveps,plambda,
-     &                            dpldlmda,d2pldlmda2)
-         else
-            call quintaper (lmda,qntplmda0,qntplmda1,
-     &                      taper,dtaper,d2taper)
-            plambda = 1.0d0 - taper
-            dpldlmda = -dtaper
-            d2pldlmda2 = -d2taper
-         end if
+         call sublmdamap (lmda,plmdamap,plmdaexp,plmdainvn,plmdainveps,
+     &                    qntplmda0,qntplmda1,plambda,dpldlmda,
+     &                    d2pldlmda2)
       end if
       if (use_elmdamap) then
-         if (elmdamap .eq. 'EXP') then
-            call sublmdaexp (lmda,elmdaexp,elambda,
-     &                       deldlmda,d2eldlmda2)
-         else if (elmdamap .eq. 'INV') then
-            call sublmdainvpower (lmda,elmdainvn,elmdainveps,elambda,
-     &                            deldlmda,d2eldlmda2)
-         else
-            call quintaper (lmda,qntelmda0,qntelmda1,
-     &                      taper,dtaper,d2taper)
-            elambda = 1.0d0 - taper
-            deldlmda = -dtaper
-            d2eldlmda2 = -d2taper
-         end if
+         call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
+     &                    qntelmda0,qntelmda1,elambda,deldlmda,
+     &                    d2eldlmda2)
       end if
       if (use_vlmdamap) then
-         if (vlmdamap .eq. 'EXP') then
-            call sublmdaexp (lmda,vlmdaexp,vlambda,
-     &                       dvldlmda,d2vldlmda2)
-         else if (vlmdamap .eq. 'INV') then
-            call sublmdainvpower (lmda,vlmdainvn,vlmdainveps,vlambda,
-     &                            dvldlmda,d2vldlmda2)
-         else
-            call quintaper (lmda,qntvlmda0,qntvlmda1,
-     &                      taper,dtaper,d2taper)
-            vlambda = 1.0d0 - taper
-            dvldlmda = -dtaper
-            d2vldlmda2 = -d2taper
-         end if
+         call sublmdamap (lmda,vlmdamap,vlmdaexp,vlmdainvn,vlmdainveps,
+     &                    qntvlmda0,qntvlmda1,vlambda,dvldlmda,
+     &                    d2vldlmda2)
       end if
+      return
+      end
 c
-c     select the dual topology endpoints needed by QNT maps; both
-c     endpoints remain active on and within each switching window
 c
-      if (use_elmdamap .and. elmdamap.eq.'QNT') then
-         use_ele4i = (lmda .le. qntelmda1)
-         use_ele4f = (lmda .ge. qntelmda0)
-      end if
-      if (use_plmdamap .and. plmdamap.eq.'QNT') then
-         use_pol4i = (lmda .le. qntplmda1)
-         use_pol4f = (lmda .ge. qntplmda0)
-      end if
-      if (use_vlmdamap .and. vlmdamap.eq.'QNT') then
-         use_vdw4i = (lmda .le. qntvlmda1)
-         use_vdw4f = (lmda .ge. qntvlmda0)
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine sublmdamap -- map one sublambda from lambda  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "sublmdamap" maps the main lambda "lmda" onto the sublambda of a
+c     single term, taking the exponential, inverse power or quintic
+c     taper form named by "map", and returning that sublambda with its
+c     first two derivatives with respect to the main lambda
+c
+c
+      subroutine sublmdamap (lmda,map,nexp,invn,inveps,qnt0,qnt1,
+     &                       sub,dsub,d2sub)
+      implicit none
+      integer nexp,invn
+      real*8 lmda,inveps
+      real*8 qnt0,qnt1
+      real*8 sub,dsub,d2sub
+      real*8 taper,dtaper,d2taper
+      character*3 map
+c
+c
+      if (map .eq. 'EXP') then
+         call sublmdaexp (lmda,nexp,sub,dsub,d2sub)
+      else if (map .eq. 'INV') then
+         call sublmdainvpower (lmda,invn,inveps,sub,dsub,d2sub)
+      else
+         call quintaper (lmda,qnt0,qnt1,taper,dtaper,d2taper)
+         sub = 1.0d0 - taper
+         dsub = -dtaper
+         d2sub = -d2taper
       end if
       return
       end
@@ -141,19 +130,15 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "maprelstage" maps the main lambda "lmda" onto the sublambdas for
-c     the staged relative free energy schedule, in which the two ligands
-c     are discharged and recharged one at a time while the van der Waals
-c     terms morph between them in the middle window
+c     "maprelstage" maps the main lambda "lmda" onto the sublambdas of
+c     the one staged relative leg with the following configuration:
 c
-c        lmda > relstg2lmda0    ligand 1 electrostatics, weight 0 -> 1
-c        lmda < relstg1lmda1    ligand 0 electrostatics, weight 1 -> 0
-c        otherwise              both ligands electrostatically decoupled
-c
-c     the electrostatic weight is the quintic taper, so the mixing
-c     exponent used by the energy routines is one and the whole main
-c     lambda chain rule is carried by "deldlmda"; polarization stages
-c     with the multipoles while van der Waals morphs over its own window
+c        LIG2   charge ligand 2 against the decoupled reference, its
+c                 weight rising with the main lambda
+c        VDWM   both ligands electrostatically decoupled while van der
+c                 Waals morphs from ligand 2 onto ligand 1
+c        LIG1   charge ligand 1 against the decoupled reference, its
+c                 weight rising with the main lambda
 c
 c
       subroutine maprelstage (lmda)
@@ -161,64 +146,137 @@ c
       use mutant
       implicit none
       real*8 lmda
-      real*8 w
       real*8 taper
       real*8 dtaper
       real*8 d2taper
 c
 c
-c     find the leg the main lambda sits in and its weight
+c     van der Waals interpolates between the two coupled states on every
+c     leg, morphing over its own window in the middle and held at one
+c     end or the other while a ligand is being charged
 c
-      if (lmda .gt. relstg2lmda0) then
-         call quintaper (lmda,relstg2lmda0,relstg2lmda1,
-     &                   taper,dtaper,d2taper)
-         relstage = 'LIG1'
-         w = 1.0d0 - taper
-         deldlmda = -dtaper
-         d2eldlmda2 = -d2taper
-      else if (lmda .lt. relstg1lmda1) then
-         call quintaper (lmda,relstg1lmda0,relstg1lmda1,
-     &                   taper,dtaper,d2taper)
-         relstage = 'LIG0'
-         w = taper
-         deldlmda = dtaper
-         d2eldlmda2 = d2taper
-      else
-         relstage = 'VDWM'
-         w = 0.0d0
+      vrelst0 = rellig2
+      vrelst1 = rellig1
+c
+c     the middle leg holds both ligands decoupled, so electrostatics
+c     and polarization sit at the reference state and leave the chain
+c     rule while van der Waals morphs across its window
+c
+      if (relstage .eq. 'VDWM') then
+         erelst0 = relnone
+         erelst1 = relnone
+         elambda = 0.0d0
          deldlmda = 0.0d0
          d2eldlmda2 = 0.0d0
+         call quintaper (lmda,qntvlmda0,qntvlmda1,
+     &                   taper,dtaper,d2taper)
+         vlambda = 1.0d0 - taper
+         dvldlmda = -dtaper
+         d2vldlmda2 = -d2taper
+c
+c     the ligand 1 leg charges ligand 1 against the decoupled reference
+c     with van der Waals already morphed onto it
+c
+      else if (relstage .eq. 'LIG1') then
+         erelst0 = relnone
+         erelst1 = rellig1
+         call quintaper (lmda,qntelmda0,qntelmda1,
+     &                   taper,dtaper,d2taper)
+         elambda = 1.0d0 - taper
+         deldlmda = -dtaper
+         d2eldlmda2 = -d2taper
+         vlambda = 1.0d0
+         dvldlmda = 0.0d0
+         d2vldlmda2 = 0.0d0
+c
+c     the ligand 2 leg discharges ligand 2 as the main lambda rises, so
+c     its weight is the taper itself, with van der Waals still on it
+c
+      else
+         erelst0 = relnone
+         erelst1 = rellig2
+         call quintaper (lmda,qntelmda0,qntelmda1,
+     &                   taper,dtaper,d2taper)
+         elambda = taper
+         deldlmda = dtaper
+         d2eldlmda2 = d2taper
+         vlambda = 0.0d0
+         dvldlmda = 0.0d0
+         d2vldlmda2 = 0.0d0
       end if
 c
-c     numerical guard for w = 1.0d0 - taper
+c     numerical guard on the taper complement
 c
-      elambda = min(1.0d0,max(0.0d0,w))
-      if (elambda .eq. 0.0d0)  relstage = 'VDWM'
-      relstagemix = (elambda .gt. 0.0d0 .and. elambda .lt. 1.0d0)
+      elambda = min(1.0d0,max(0.0d0,elambda))
 c
 c     polarization stages with the multipoles, same states same weight
 c
+      prelst0 = erelst0
+      prelst1 = erelst1
       plambda = elambda
       dpldlmda = deldlmda
       d2pldlmda2 = d2eldlmda2
+      return
+      end
 c
-c     van der Waals morphs between the two ligands
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine relpowerwt -- power law weight and derivs  ##
+c     ##                                                        ##
+c     ############################################################
 c
-      call quintaper (lmda,qntvlmda0,qntvlmda1,
-     &                taper,dtaper,d2taper)
-      vlambda = 1.0d0 - taper
-      dvldlmda = -dtaper
-      d2vldlmda2 = -d2taper
 c
-c     the staged routines branch on "relstagemix" instead of the
-c     quantized endpoint flags, so leave the flags fully open
+c     "relpowerwt" evaluates the power law interpolation weight "x" to
+c     the "nexp" and its first two derivatives, the linear case being
+c     taken separately so that a zero sublambda never reaches a zero
+c     power
 c
-      use_ele4i = .true.
-      use_ele4f = .true.
-      use_pol4i = .true.
-      use_pol4f = .true.
-      use_vdw4i = .true.
-      use_vdw4f = .true.
+c
+      subroutine relpowerwt (x,nexp,w,dw,d2w)
+      implicit none
+      integer nexp
+      real*8 x,w,dw,d2w
+c
+c
+      w = x**nexp
+      dw = 0.0d0
+      d2w = 0.0d0
+      if (nexp .eq. 1) then
+         dw = 1.0d0
+      else if (nexp .ge. 2) then
+         dw = dble(nexp) * x**(nexp-1)
+         d2w = dble(nexp) * dble(nexp-1) * x**(nexp-2)
+      end if
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine relneed -- live dual topology endpoint test  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "relneed" decides which of the two dual topology endpoint states
+c     a term has to build, given its interpolation weight "w", the first
+c     and second derivatives "dw" and "d2w" of that weight with respect
+c     to its sublambda, and the chain rule factors "chain" and "d2chain"
+c     carrying the sublambda back to the main lambda
+c
+c
+      subroutine relneed (w,dw,d2w,chain,d2chain,need0,need1)
+      implicit none
+      real*8 w,dw,d2w
+      real*8 chain,d2chain
+      real*8 c1,c2
+      logical need0,need1
+c
+c
+      c1 = dw * chain
+      c2 = d2w*chain*chain + dw*d2chain
+      need1 = (w .ne. 0.0d0) .or. (c1 .ne. 0.0d0) .or. (c2 .ne. 0.0d0)
+      need0 = (w .ne. 1.0d0) .or. (c1 .ne. 0.0d0) .or. (c2 .ne. 0.0d0)
       return
       end
 c

@@ -1,6 +1,6 @@
  Total Potential Energy :                -11.4261 Kcal/mole
 
- EngCnt  Van der Waals                            10.5539              277
+ EngCnt  Van der Waals                            10.5539              288
  EngCnt  Atomic Multipoles                       -16.4132              318
  EngCnt  Polarization                             -5.5668              318
 

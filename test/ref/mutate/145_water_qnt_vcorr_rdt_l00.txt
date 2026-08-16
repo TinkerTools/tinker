@@ -1,6 +1,6 @@
  Total Potential Energy :                 10.5278 Kcal/mole
 
- EngCnt  Van der Waals                            10.5278              277
+ EngCnt  Van der Waals                            10.5278              288
 
  Internal Virial Tensor :                 -42.083       12.747      -14.719
                                            12.747      -35.966       -6.482
