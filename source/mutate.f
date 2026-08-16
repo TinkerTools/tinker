@@ -363,6 +363,7 @@ c
       integer i,j,k
       integer next
       real*8 temp
+      logical setpolmap
       logical setpolrng
       character*4 legword
       character*20 keyword
@@ -411,6 +412,7 @@ c     set defaults for the staged relative free energy schedule
 c
       use_relstage = .false.
       relstage = 'VDWM'
+      setpolmap = .false.
       setpolrng = .false.
 c
 c     set default mapping from main lambda to sublambda
@@ -503,6 +505,7 @@ c
             call upcase (elmdamap)
          else if (keyword(1:13) .eq. 'POL-LMDA-MAP ') then
             use_plmdamap = .true.
+            setpolmap = .true.
             call getword (record,plmdamap,next)
             call upcase (plmdamap)
          else if (keyword(1:13) .eq. 'VDW-LMDA-MAP ') then
@@ -656,8 +659,9 @@ c
          qntvlmda1 = temp
       end if
 c
-c     a staged run drives one leg, so the leg must be named and the
-c     window it walks must carry the quintic map
+c     a staged run drives one leg, so the leg must be named; the map it
+c     walks, the window of that map and the dual topology exponent of
+c     the term it drives are all free, as on any other relative leg
 c
       if (use_relstage) then
          if (relstage.ne.'LIG1' .and. relstage.ne.'LIG2'
@@ -669,38 +673,17 @@ c
      &                 ' charge ligand 1')
             call fatal
          end if
-         if (relstage.eq.'VDWM' .and. vlmdamap.ne.'QNT') then
+c
+c     polarization stages with the multipoles on its own map, so a map
+c     or a window given for it would be silently ignored
+c
+         if (setpolrng .or. setpolmap) then
             write (iout,40)
-   40       format (/,' MUTATE_DLMDA  --  The VDWM leg of REL-STAGE',
-     &                 ' requires the QNT van der Waals lambda map;',
-     &                 ' set VDW-LMDA-MAP to QNT')
-            call fatal
-         end if
-         if (relstage.ne.'VDWM' .and. elmdamap.ne.'QNT') then
-            write (iout,50)
-   50       format (/,' MUTATE_DLMDA  --  A ligand leg of REL-STAGE',
-     &                 ' requires the QNT electrostatic lambda map;',
-     &                 ' set ELE-LMDA-MAP to QNT')
-            call fatal
-         end if
-c
-c     polarization stages with the multipoles on its own window, so a
-c     window given for it would be silently ignored
-c
-         if (setpolrng) then
-            write (iout,60)
-   60       format (/,' MUTATE_DLMDA  --  REL-STAGE stages',
+   40       format (/,' MUTATE_DLMDA  --  REL-STAGE stages',
      &                 ' polarization with the multipoles; remove the',
-     &                 ' POL-LMDA-RANGE keyword')
+     &                 ' POL-LMDA-MAP and POL-LMDA-RANGE keywords')
             call fatal
          end if
-c
-c     each staged weight is the quintic taper of its own window, so the
-c     dual topology exponents are already spent and stay at one
-c
-         emdtexp = 1
-         epdtexp = 1
-         evdtexp = 1
       end if
 c
 c     enable use_plmda rescale if ele and pol are decoupled

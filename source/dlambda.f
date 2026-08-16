@@ -146,13 +146,10 @@ c
       use mutant
       implicit none
       real*8 lmda
-      real*8 taper
-      real*8 dtaper
-      real*8 d2taper
 c
 c
 c     van der Waals interpolates between the two coupled states on every
-c     leg, morphing over its own window in the middle and held at one
+c     leg, morphing over its own map in the middle and held at one
 c     end or the other while a ligand is being charged
 c
       vrelst0 = rellig2
@@ -160,7 +157,7 @@ c
 c
 c     the middle leg holds both ligands decoupled, so electrostatics
 c     and polarization sit at the reference state and leave the chain
-c     rule while van der Waals morphs across its window
+c     rule while van der Waals morphs across its map
 c
       if (relstage .eq. 'VDWM') then
          erelst0 = relnone
@@ -168,11 +165,9 @@ c
          elambda = 0.0d0
          deldlmda = 0.0d0
          d2eldlmda2 = 0.0d0
-         call quintaper (lmda,qntvlmda0,qntvlmda1,
-     &                   taper,dtaper,d2taper)
-         vlambda = 1.0d0 - taper
-         dvldlmda = -dtaper
-         d2vldlmda2 = -d2taper
+         call sublmdamap (lmda,vlmdamap,vlmdaexp,vlmdainvn,vlmdainveps,
+     &                    qntvlmda0,qntvlmda1,vlambda,dvldlmda,
+     &                    d2vldlmda2)
 c
 c     the ligand 1 leg charges ligand 1 against the decoupled reference
 c     with van der Waals already morphed onto it
@@ -180,32 +175,32 @@ c
       else if (relstage .eq. 'LIG1') then
          erelst0 = relnone
          erelst1 = rellig1
-         call quintaper (lmda,qntelmda0,qntelmda1,
-     &                   taper,dtaper,d2taper)
-         elambda = 1.0d0 - taper
-         deldlmda = -dtaper
-         d2eldlmda2 = -d2taper
+         call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
+     &                    qntelmda0,qntelmda1,elambda,deldlmda,
+     &                    d2eldlmda2)
          vlambda = 1.0d0
          dvldlmda = 0.0d0
          d2vldlmda2 = 0.0d0
 c
 c     the ligand 2 leg discharges ligand 2 as the main lambda rises, so
-c     its weight is the taper itself, with van der Waals still on it
+c     its weight is the complement of the map, with van der Waals still
+c     on it
 c
       else
          erelst0 = relnone
          erelst1 = rellig2
-         call quintaper (lmda,qntelmda0,qntelmda1,
-     &                   taper,dtaper,d2taper)
-         elambda = taper
-         deldlmda = dtaper
-         d2eldlmda2 = d2taper
+         call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
+     &                    qntelmda0,qntelmda1,elambda,deldlmda,
+     &                    d2eldlmda2)
+         elambda = 1.0d0 - elambda
+         deldlmda = -deldlmda
+         d2eldlmda2 = -d2eldlmda2
          vlambda = 0.0d0
          dvldlmda = 0.0d0
          d2vldlmda2 = 0.0d0
       end if
 c
-c     numerical guard on the taper complement
+c     numerical guard on the map complement
 c
       elambda = min(1.0d0,max(0.0d0,elambda))
 c

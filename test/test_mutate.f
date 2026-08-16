@@ -38,6 +38,7 @@ c
       call test_mutate_lmdafix
       call test_mutate_lmdadrv
       call test_mutate_lmdapin
+      call test_mutate_relsmap
       return
       end
 c
@@ -1336,6 +1337,77 @@ c
       call test_mutate_calc ('water2','175_water_lmda_rdt_vpin_l07.key',
      &   '175_water_lmda_rdt_vpin_l07.txt',
      &   '175_water_lmda_rdt_vpin_l07',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_relsmap  --  staged leg map forms  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_relsmap" runs the six water fixtures 176-181 that
+c     drive a staged relative leg with a map form and a dual topology
+c     exponent that the staged schedule once refused, every leg now
+c     walking the map named for the one term it drives and honoring the
+c     exponent of that term as any other relative leg does
+c
+c     176 to 178 name a map other than the quintic, taking the VDWM leg
+c     on the exponential, the LIG2 leg on the exponential through the
+c     complement that discharges ligand 2, and the LIG1 leg on the
+c     inverse power; the exponential and inverse power maps carry no
+c     window, so these three walk the whole main lambda range rather
+c     than a slice of it and are each a run of their own
+c
+c     179 to 181 exercise the dual topology exponents, 179 and 180 on
+c     the quintic windows of 138 and 136 and 181 on the inverse power,
+c     so each is the state of an existing fixture reached with a
+c     different endpoint weight; the exponent is placed on the term the
+c     leg drives, since a ligand leg pins the van der Waals endpoint and
+c     the VDWM leg holds both electrostatic endpoints at the same
+c     decoupled state, leaving the other exponents with nothing to scale
+c
+c     every fixture names the "lambda-deriv" keyword and runs the level
+c     4 checks, all three nonbonded terms stay active, and all six use
+c     Ewald and support a neighbor list
+c
+c
+      subroutine test_mutate_relsmap
+      implicit none
+c
+c
+      call test_mutate_calc ('water2',
+     &   '176_water_rels_ye_vdwm_exp_l050.key',
+     &   '176_water_rels_ye_vdwm_exp_l050.txt',
+     &   '176_water_rels_ye_vdwm_exp_l050',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '177_water_rels_ye_lig2_exp_l030.key',
+     &   '177_water_rels_ye_lig2_exp_l030.txt',
+     &   '177_water_rels_ye_lig2_exp_l030',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '178_water_rels_ye_lig1_inv_l070.key',
+     &   '178_water_rels_ye_lig1_inv_l070.txt',
+     &   '178_water_rels_ye_lig1_inv_l070',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '179_water_rels_ye_vdwm_vx3_l050.key',
+     &   '179_water_rels_ye_vdwm_vx3_l050.txt',
+     &   '179_water_rels_ye_vdwm_vx3_l050',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '180_water_rels_ye_lig1_ex3_l085.key',
+     &   '180_water_rels_ye_lig1_ex3_l085.txt',
+     &   '180_water_rels_ye_lig1_ex3_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '181_water_rels_ye_lig2_ix2_l015.key',
+     &   '181_water_rels_ye_lig2_ix2_l015.txt',
+     &   '181_water_rels_ye_lig2_ix2_l015',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
