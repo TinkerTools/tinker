@@ -1,6 +1,6 @@
  Total Potential Energy :                15.7278 Kcal/mole
 
- EngCnt  Atomic Multipoles                       15.7278               36
+ EngCnt  Atomic Multipoles                       15.7278               35
 
  Internal Virial Tensor :                  16.524       -1.716       19.635
                                            -1.716      -12.998       -6.776

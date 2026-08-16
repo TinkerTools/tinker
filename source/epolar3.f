@@ -569,7 +569,7 @@ c
                e = e - f*uind(j,i)*texfld(j)
             end do
             ep = ep + e
-            nep = nep + 1
+            if (e .ne. 0.0d0)  nep = nep + 1
             aep(i) = aep(i) + e
          end do
       end if
@@ -910,7 +910,7 @@ c
                e = e - f*uind(j,i)*texfld(j)
             end do
             ep = ep + e
-            nep = nep + 1
+            if (e .ne. 0.0d0)  nep = nep + 1
             aep(i) = aep(i) + e
          end do
 !$OMP    END DO
@@ -1042,7 +1042,8 @@ c
             zu = zu + uind(3,i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
-         ep = ep + term*(xd*xu+yd*yu+zd*zu)
+         e = term * (xd*xu+yd*yu+zd*zu)
+         ep = ep + e
          nep = nep + 1
          do ii = 1, npole
             i = ipole(ii)
@@ -1601,7 +1602,7 @@ c
                e = e - f*uind(j,i)*texfld(j)
             end do
             ep = ep + e
-            nep = nep + 1
+            if (e .ne. 0.0d0)  nep = nep + 1
             aep(i) = aep(i) + e
          end do
       end if
@@ -1728,7 +1729,8 @@ c
             zu = zu + uind(3,i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
-         ep = ep + term*(xd*xu+yd*yu+zd*zu)
+         e = term * (xd*xu+yd*yu+zd*zu)
+         ep = ep + e
          nep = nep + 1
          do ii = 1, npole
             i = ipole(ii)
@@ -2075,7 +2077,7 @@ c
                e = e - f*uind(j,i)*texfld(j)
             end do
             ep = ep + e
-            nep = nep + 1
+            if (e .ne. 0.0d0)  nep = nep + 1
             aep(i) = aep(i) + e
          end do
 !$OMP    END DO

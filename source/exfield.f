@@ -333,7 +333,7 @@ c
                phi = xi*texfld(1) + yi*texfld(2) + zi*texfld(3)
                e = -f * ci * phi
                exf = exf + e
-               nec = nec + 1
+               if (e .ne. 0.0d0)  nec = nec + 1
                aec(i) = aec(i) + e
             end if
          end do
@@ -361,7 +361,7 @@ c
                e = -f * (ci*phi + dix*texfld(1)
      &                      + diy*texfld(2) + diz*texfld(3))
                exf = exf + e
-               nem = nem + 1
+               if (e .ne. 0.0d0)  nem = nem + 1
                aem(i) = aem(i) + e
             end if
          end do
