@@ -486,15 +486,16 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_ast" runs the eleven absolute single topology water
-c     fixtures 030-040, each carrying the "lambda-deriv" keyword, and
-c     drives them through "test_mutate_calc" with the level 4 lambda
-c     derivative checks enabled; cases 030-035 keep only the multipole
-c     term at three ele-lambda values with Ewald on and off, cases
-c     036-038 keep only the van der Waals term at three vdw-lambda
+c     "test_mutate_ast" runs the twelve absolute single topology water
+c     fixtures 030-040 and 182, each carrying the "lambda-deriv"
+c     keyword, and drives them through "test_mutate_calc" with the level
+c     4 lambda derivative checks enabled; cases 030-035 keep only the
+c     multipole term at three ele-lambda values with Ewald on and off;
+c     cases 036-038 keep only the van der Waals term at three vdw-lambda
 c     values, and cases 039-040 leave the multipole and polarization
-c     terms active with Ewald on and off; the no-Ewald cases cannot use
-c     a pairwise neighbor list
+c     terms active with Ewald on and off; case 182 leaves all three
+c     nonbonded terms active and annihilates van der Waals interactions;
+c     the no-Ewald cases cannot use a pairwise neighbor list
 c
 c
       subroutine test_mutate_ast
@@ -534,6 +535,11 @@ c
       call test_mutate_calc ('water2','040_water_ast_ne_mp05.key',
      &   '040_water_ast_ne_mp05.txt','040_water_ast_ne_mp05',
      &   .true.,  .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2',
+     &   '182_water_ast_v05_annihilate.key',
+     &   '182_water_ast_v05_annihilate.txt',
+     &   '182_water_ast_v05_annihilate',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c
@@ -545,15 +551,17 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_mutate_adt" runs the seventeen absolute dual topology water
-c     fixtures 041-057, each carrying the "lambda-deriv" keyword and a
-c     dual topology keyword, and drives them through "test_mutate_calc"
-c     with the level 4 lambda derivative checks enabled; cases 041-046
-c     keep only the multipole term at three ele-lambda values with Ewald
-c     on and off, cases 047-052 keep only the polarization term at three
-c     pol-lambda values, cases 053-055 keep only the van der Waals term
-c     at three vdw-lambda values, and cases 056-057 leave the multipole
-c     and polarization terms active with Ewald on and off; the no-Ewald
+c     "test_mutate_adt" runs the eighteen absolute dual topology water
+c     fixtures 041-057 and 183, each carrying the "lambda-deriv" keyword
+c     and a dual topology keyword, and drives them through
+c     "test_mutate_calc" with the level 4 lambda derivative checks
+c     enabled; cases 041-046 keep only the multipole term at three
+c     ele-lambda values with Ewald on and off, cases 047-052 keep only
+c     the polarization term at three pol-lambda values, cases 053-055
+c     keep only the van der Waals term at three vdw-lambda values, and
+c     cases 056-057 leave the multipole and polarization terms active
+c     with Ewald on and off; case 183 leaves all three nonbonded terms
+c     active and annihilates van der Waals interactions; the no-Ewald
 c     cases cannot use a pairwise neighbor list
 c
 c
@@ -612,6 +620,11 @@ c
       call test_mutate_calc ('water2','057_water_adt_ne_mp05.key',
      &   '057_water_adt_ne_mp05.txt','057_water_adt_ne_mp05',
      &   .true.,  .true.,  .false., .false., .true.)
+      call test_mutate_calc ('water2',
+     &   '183_water_adt_v05_annihilate.key',
+     &   '183_water_adt_v05_annihilate.txt',
+     &   '183_water_adt_v05_annihilate',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c

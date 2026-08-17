@@ -1373,6 +1373,19 @@ c
      &              ' ligand group; add the LIGAND2 keyword')
          call fatal
       end if
+c
+c     relative free energy requires the isolated ligand van der Waals
+c     terms that annihilation would remove from the thermodynamic cycle
+c
+      if (use_rel .and. vcouple.eq.1) then
+         write (iout,90)
+   90    format (/,' MUTATE_CHECK  --  VDW-ANNIHILATE is not',
+     &              ' compatible with relative free energy; the',
+     &              ' isolated-ligand van der Waals terms are needed',
+     &              ' to preserve the relative thermodynamic cycle;',
+     &              ' remove the VDW-ANNIHILATE keyword')
+         call fatal
+      end if
       return
       end
 c
