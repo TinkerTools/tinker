@@ -418,11 +418,11 @@ c
 c
 c     set default mapping from main lambda to sublambda
 c
-      qntelmda1 = 0.8d0
-      qntelmda0 = 0.3d0
+      qntelmda1 = 1.0d0
+      qntelmda0 = 0.0d0
       qntplmda1 = 1.0d0
-      qntplmda0 = 0.5d0
-      qntvlmda1 = 0.5d0
+      qntplmda0 = 0.0d0
+      qntvlmda1 = 1.0d0
       qntvlmda0 = 0.0d0
       elmdamap = 'QNT'
       plmdamap = 'QNT'
