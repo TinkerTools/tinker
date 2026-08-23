@@ -29,9 +29,11 @@ c     plambda     state weighting value for polarization potentials
 c     tlambda     state weighting value for torsional potential
 c     scexp       scale factor for soft core buffered 14-7 potential
 c     scalpha     scale factor for soft core buffered 14-7 potential
+c     mutfield    flag restricting dfield to the mpoles by mut atoms
 c     setelambda  flag that elambda was set by its own keyword
 c     setplambda  flag that plambda was set by its own keyword
 c     setvlambda  flag that vlambda was set by its own keyword
+c     use_past    flag for absolute single topology polarization
 c     use_rel     flag to use two-ligand relative dual topology
 c     use_subsys  flag that a parameter-zeroed subsystem is active
 c     mut         true if an atom is to be mutated, false otherwise
@@ -57,9 +59,11 @@ c
       real*8 tlambda
       real*8 scexp
       real*8 scalpha
+      logical mutfield
       logical setelambda
       logical setplambda
       logical setvlambda
+      logical use_past
       logical use_rel
       logical use_subsys
       logical, allocatable :: mut(:)

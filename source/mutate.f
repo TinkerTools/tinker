@@ -105,6 +105,7 @@ c
       nmut = 0
       nmutb = 0
       use_rel = .false.
+      use_past = .false.
       use_subsys = .false.
       do i = 1, n
          mut(i) = .false.
@@ -686,10 +687,12 @@ c
          end if
       end if
 c
-c     enable use_plmda rescale if ele and pol are decoupled
+c     absolute single topology evaluates polarization from one parameter
+c     state at plambda, independently of the electrostatic lambda state
 c
-      use_plmda = (use_mutate .and. .not.use_rel .and. .not.use_epdt
-     &                .and. .not.use_pdlmda .and. use_polar)
+      use_past = (use_mutate .and. .not.use_rel .and. .not.use_epdt
+     &                .and. use_polar)
+      use_plmda = use_past
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -1287,8 +1290,12 @@ c
 c
       subroutine mutate_check
       use dlmda
+      use extfld
       use iounit
+      use limits
+      use mplpot
       use mutant
+      use polpot
       use potent
       implicit none
 c
@@ -1303,23 +1310,37 @@ c
          call fatal
       end if
 c
-c     "epolar4" carries the polarization lambda derivative only through
-c     its dual topology routines, so single topology cannot supply one
+c     absolute single topology currently supports the scalar derivative
+c     for mutual Thole polarization via a direct double loop only
 c
-      if (use_pdlmda .and. use_polar .and. .not.use_epdt) then
-         write (iout,20)
-   20    format (/,' MUTATE_CHECK  --  The Polarization Lambda',
-     &              ' Derivative is Available only for Dual Topology;',
-     &              ' add the POL-DUALTOPO keyword')
-         call fatal
+      if (use_pdlmda .and. use_past) then
+         if (use_ewald .or. use_mlist .or. use_ulist) then
+            write (iout,20)
+   20       format (/,' MUTATE_CHECK  --  Absolute Single Topology',
+     &                 ' Polarization dU/dLambda currently requires',
+     &                 ' direct double-loop electrostatics; remove',
+     &                 ' EWALD and NEIGHBOR-LIST, or add POL-DUALTOPO')
+            call fatal
+         end if
+         if (poltyp.ne.'MUTUAL' .or. .not.use_thole .or. use_chgpen
+     &          .or. use_expol .or. use_exfld .or. use_solv) then
+            write (iout,30)
+   30       format (/,' MUTATE_CHECK  --  Absolute Single Topology',
+     &                 ' Polarization dU/dLambda currently supports',
+     &                 ' gas-phase MUTUAL Thole polarization only;',
+     &                 ' use POLARIZATION MUTUAL without charge',
+     &                 ' penetration, exchange polarization, an',
+     &                 ' external field or implicit solvent')
+            call fatal
+         end if
       end if
 c
 c     every sublambda is mapped from the main lambda, so a lambda
 c     derivative has nothing to differentiate without one
 c
       if (use_dlmda .and. .not.use_mainlmda) then
-         write (iout,30)
-   30    format (/,' MUTATE_CHECK  --  A Lambda Derivative requires',
+         write (iout,50)
+   50    format (/,' MUTATE_CHECK  --  A Lambda Derivative requires',
      &              ' a main lambda; add the LAMBDA keyword and a map',
      &              ' for each driven sublambda')
          call fatal
@@ -1330,8 +1351,8 @@ c     so a sublambda set by its own keyword would be overwritten
 c
       if (use_relstage .and.
      &    (setelambda .or. setplambda .or. setvlambda)) then
-         write (iout,40)
-   40    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
+         write (iout,60)
+   60    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
      &              ' from its own schedule; remove the ELE-LAMBDA,',
      &              ' POL-LAMBDA and VDW-LAMBDA keywords')
          call fatal
@@ -1344,22 +1365,22 @@ c     how a leg holds a term at a fixed coupling state while the main
 c     lambda morphs another term
 c
       if (use_mainlmda .and. use_elmdamap .and. setelambda) then
-         write (iout,50)
-   50    format (/,' MUTATE_CHECK  --  LAMBDA drives elambda through',
+         write (iout,70)
+   70    format (/,' MUTATE_CHECK  --  LAMBDA drives elambda through',
      &              ' a lambda map; remove the ELE-LAMBDA keyword, or',
      &              ' name a map only for the sublambdas LAMBDA drives')
          call fatal
       end if
       if (use_mainlmda .and. use_plmdamap .and. setplambda) then
-         write (iout,60)
-   60    format (/,' MUTATE_CHECK  --  LAMBDA drives plambda through',
+         write (iout,80)
+   80    format (/,' MUTATE_CHECK  --  LAMBDA drives plambda through',
      &              ' a lambda map; remove the POL-LAMBDA keyword, or',
      &              ' name a map only for the sublambdas LAMBDA drives')
          call fatal
       end if
       if (use_mainlmda .and. use_vlmdamap .and. setvlambda) then
-         write (iout,70)
-   70    format (/,' MUTATE_CHECK  --  LAMBDA drives vlambda through',
+         write (iout,90)
+   90    format (/,' MUTATE_CHECK  --  LAMBDA drives vlambda through',
      &              ' a lambda map; remove the VDW-LAMBDA keyword, or',
      &              ' name a map only for the sublambdas LAMBDA drives')
          call fatal
@@ -1368,8 +1389,8 @@ c
 c     the staged relative schedule morphs one ligand into another
 c
       if (use_relstage .and. nmutb.eq.0) then
-         write (iout,80)
-   80    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
+         write (iout,100)
+  100    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
      &              ' ligand group; add the LIGAND2 keyword')
          call fatal
       end if
@@ -1378,8 +1399,8 @@ c     relative free energy requires the isolated ligand van der Waals
 c     terms that annihilation would remove from the thermodynamic cycle
 c
       if (use_rel .and. vcouple.eq.1) then
-         write (iout,90)
-   90    format (/,' MUTATE_CHECK  --  VDW-ANNIHILATE is not',
+         write (iout,110)
+  110    format (/,' MUTATE_CHECK  --  VDW-ANNIHILATE is not',
      &              ' compatible with relative free energy; the',
      &              ' isolated-ligand van der Waals terms are needed',
      &              ' to preserve the relative thermodynamic cycle;',

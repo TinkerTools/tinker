@@ -196,6 +196,7 @@ c
 c     flag for use of lambda derivative
 c
       osttrial = .false.
+      mutfield = .false.
       use_dlmda = .false.
       use_edlmda = .false.
       use_elmdamap = .false.
@@ -208,6 +209,7 @@ c
       use_ost = .false.
       use_ostdyn = .false.
       use_pdlmda = .false.
+      use_past = .false.
       use_plmda = .false.
       use_plmdamap = .false.
       use_relstage = .false.

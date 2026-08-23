@@ -41,6 +41,8 @@ c     compute polarization interactions
 c
       if (use_rel) then
          call epolar4fr
+      else if (use_past) then
+         call epolar4s
       else
          call epolar4f
       end if
@@ -58,6 +60,140 @@ c
             vir(j,i) = vir(j,i) + epvir(j,i)
          end do
       end do
+      return
+      end
+c
+c
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine epolar4s  --  single topology polar dU/dl  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "epolar4s" calculates the absolute single topology polarization
+c     energy and Cartesian derivatives together with the first energy
+c     derivative with respect to polarization lambda; second lambda,
+c     force lambda and virial lambda derivatives are not computed
+c
+c
+      subroutine epolar4s
+      use bound
+      use iounit
+      use mutant
+      implicit none
+      real*8 plambdaorig
+c
+c
+c     add the scalar derivative with respect to plambda
+c
+      plambdaorig = plambda
+      call altepdt (plambdaorig)
+      call epolar1calc
+      call epolar4d (plambdaorig)
+c
+c     restore the electrostatic parameter state for subsequent terms
+c
+      call alteprst
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine epolar4d  --  single topology polar dU/dl  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "epolar4d" evaluates the explicit plambda derivative of the
+c     stationary mutual polarization functional.  The permanent field
+c     derivative is exact because "altpolr" scales every mutated
+c     permanent electrostatic parameter linearly, so it is just the
+c     field of the mutated multipoles held at their unscaled values.
+c     The inverse-polarizability derivative is evaluated from the local
+c     total fields, which remains finite at plambda equal to zero.
+c
+c
+      subroutine epolar4d (plmda)
+      use atoms
+      use chgpot
+      use dlmda
+      use mpole
+      use mutant
+      use polar
+      implicit none
+      integer i,j,ii
+      real*8 plmda
+      real*8 fldd,fldp
+      real*8 term
+      real*8, allocatable :: dfldd(:,:)
+      real*8, allocatable :: dfldp(:,:)
+      real*8, allocatable :: field0(:,:)
+      real*8, allocatable :: fieldp0(:,:)
+      real*8, allocatable :: ufield(:,:)
+      real*8, allocatable :: ufieldp(:,:)
+      logical atzero
+c
+c
+c     derivative is the field of the mutated multipoles at the endpoint
+c
+      atzero = (plmda .eq. 0.0d0)
+      allocate (dfldd(3,n))
+      allocate (dfldp(3,n))
+      allocate (ufield(3,n))
+      allocate (ufieldp(3,n))
+      call altepdt (1.0d0)
+      mutfield = .true.
+      call dfield0a (dfldd,dfldp)
+      mutfield = .false.
+      call altepdt (plmda)
+c
+c     get the mutual fields from the converged dipoles
+c
+      call ufield0a (ufield,ufieldp)
+c
+c     pol vanishes at plmda=0, so compute the permanent field
+c
+      if (atzero) then
+         allocate (field0(3,n))
+         allocate (fieldp0(3,n))
+         call dfield0a (field0,fieldp0)
+      end if
+c
+c     differentiate the polarization function
+c
+      term = 0.0d0
+      do ii = 1, npole
+         i = ipole(ii)
+         do j = 1, 3
+            term = term + uinp(j,i)*dfldd(j,i) + uind(j,i)*dfldp(j,i)
+            if (mut(i) .and. douindorig(i)) then
+               if (atzero) then
+                  fldd = field0(j,i) + ufield(j,i)
+                  fldp = fieldp0(j,i) + ufieldp(j,i)
+               else
+                  fldd = udir(j,i)/polarity(i) + ufield(j,i)
+                  fldp = udirp(j,i)/polarity(i) + ufieldp(j,i)
+               end if
+               term = term + polarityorig(i)*fldd*fldp
+            end if
+         end do
+      end do
+      depdl = -0.5d0 * (electric/dielec) * term
+c
+c     perform deallocation of local arrays
+c
+      deallocate (dfldd)
+      deallocate (dfldp)
+      deallocate (ufield)
+      deallocate (ufieldp)
+      if (atzero) then
+         deallocate (field0)
+         deallocate (fieldp0)
+      end if
       return
       end
 c

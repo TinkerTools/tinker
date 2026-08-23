@@ -1312,6 +1312,10 @@ void epolar3fr_();
 // epolar4.f
 void epolar4_();
 #define tinker_f_epolar4 epolar4_
+void epolar4s_();
+#define tinker_f_epolar4s epolar4s_
+void epolar4d_(double* plmda);
+#define tinker_f_epolar4d epolar4d_
 void epolar4f_();
 #define tinker_f_epolar4f epolar4f_
 void epolar4fr_();

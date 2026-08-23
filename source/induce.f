@@ -666,6 +666,7 @@ c
       use couple
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpot
@@ -698,6 +699,7 @@ c
       real*8, allocatable :: pscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
+      logical muti,mutk,dopr
       character*6 mode
 c
 c
@@ -746,6 +748,8 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = .true.
+         if (mutfield)  muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -834,7 +838,13 @@ c
             zr = z(k) - z(i)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            mutk = .true.
+            dopr = (r2 .le. off2)
+            if (mutfield) then
+               mutk = mut(k)
+               if (dopr)  dopr = (muti .or. mutk)
+            end if
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -918,12 +928,18 @@ c
 c
 c     increment the direct electrostatic field components
 c
-               do j = 1, 3
-                  field(j,i) = field(j,i) + fid(j)*dscale(k)
-                  field(j,k) = field(j,k) + fkd(j)*dscale(k)
-                  fieldp(j,i) = fieldp(j,i) + fid(j)*pscale(k)
-                  fieldp(j,k) = fieldp(j,k) + fkd(j)*pscale(k)
-               end do
+               if (mutk) then
+                  do j = 1, 3
+                     field(j,i) = field(j,i) + fid(j)*dscale(k)
+                     fieldp(j,i) = fieldp(j,i) + fid(j)*pscale(k)
+                  end do
+               end if
+               if (muti) then
+                  do j = 1, 3
+                     field(j,k) = field(j,k) + fkd(j)*dscale(k)
+                     fieldp(j,k) = fieldp(j,k) + fkd(j)*pscale(k)
+                  end do
+               end if
             end if
          end do
 c
@@ -994,6 +1010,8 @@ c
                vali = pval(i)
                alphai = palpha(i)
             end if
+            muti = .true.
+            if (mutfield)  muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1077,6 +1095,8 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
+               mutk = .true.
+               if (mutfield)  mutk = mut(k)
                ck = rpole(1,k)
                dkx = rpole(2,k)
                dky = rpole(3,k)
@@ -1180,9 +1200,11 @@ c
                         end do
                      end if
                      do j = 1, 3
-                        field(j,i) = field(j,i) + fid(j)
-                        fieldp(j,i) = fieldp(j,i) + fip(j)
-                        if (i .ne. k) then
+                        if (mutk) then
+                           field(j,i) = field(j,i) + fid(j)
+                           fieldp(j,i) = fieldp(j,i) + fip(j)
+                        end if
+                        if (muti .and. i.ne.k) then
                            field(j,k) = field(j,k) + fkd(j)
                            fieldp(j,k) = fieldp(j,k) + fkp(j)
                         end if

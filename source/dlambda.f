@@ -433,6 +433,7 @@ c
       subroutine lmdachain
       use atoms
       use dlmda
+      use mutant
       implicit none
       integer i,j
 c
@@ -474,6 +475,31 @@ c
             dvirdl(j,i) = devvirdl(j,i) + demvirdl(j,i) + depvirdl(j,i)
          end do
       end do
+c
+c     zero d2edl2 and dfdl if ast polarization is used
+c
+      if (use_pdlmda .and. use_past) then
+         d2evdl2 = 0.0d0
+         d2emdl2 = 0.0d0
+         d2epdl2 = 0.0d0
+         d2edl2 = 0.0d0
+         do i = 1, n
+            do j = 1, 3
+               dfvdl(j,i) = 0.0d0
+               dfmdl(j,i) = 0.0d0
+               dfpdl(j,i) = 0.0d0
+               dfsumdl(j,i) = 0.0d0
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               devvirdl(j,i) = 0.0d0
+               demvirdl(j,i) = 0.0d0
+               depvirdl(j,i) = 0.0d0
+               dvirdl(j,i) = 0.0d0
+            end do
+         end do
+      end if
       return
       end
 c

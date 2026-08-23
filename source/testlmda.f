@@ -69,6 +69,7 @@ c
       logical exist,query
       logical doanalyt,donumer
       logical keylmda
+      logical astpolar
       character*1 answer
       character*240 xyzfile
       character*240 record
@@ -81,6 +82,7 @@ c
       call getxyz
       call mechanic
       keylmda = use_dlmda
+      astpolar = use_pdlmda .and. use_past
 c
 c     decide whether to do an analytical derivative calculation
 c
@@ -362,6 +364,31 @@ c
                      ndevvirdl(j,i) = ndevvirdl(j,i) * dvldlmda
                      ndvirdl(j,i) = ndepvirdl(j,i) + ndemvirdl(j,i)
      &                            + ndevvirdl(j,i)
+                  end do
+               end do
+            end if
+c
+c     zero d2edl2 and dfdl if ast polarization is used
+c
+            if (astpolar) then
+               nd2evdl2 = 0.0d0
+               nd2emdl2 = 0.0d0
+               nd2epdl2 = 0.0d0
+               nd2edl2 = 0.0d0
+               do i = 1, n
+                  do j = 1, 3
+                     ndfvdl(j,i) = 0.0d0
+                     ndfmdl(j,i) = 0.0d0
+                     ndfpdl(j,i) = 0.0d0
+                     ndfsumdl(j,i) = 0.0d0
+                  end do
+               end do
+               do i = 1, 3
+                  do j = 1, 3
+                     ndevvirdl(j,i) = 0.0d0
+                     ndemvirdl(j,i) = 0.0d0
+                     ndepvirdl(j,i) = 0.0d0
+                     ndvirdl(j,i) = 0.0d0
                   end do
                end do
             end if
