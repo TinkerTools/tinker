@@ -80,8 +80,6 @@ c     force lambda and virial lambda derivatives are not computed
 c
 c
       subroutine epolar4s
-      use bound
-      use iounit
       use mutant
       implicit none
       real*8 plambdaorig
@@ -121,6 +119,8 @@ c
       use atoms
       use chgpot
       use dlmda
+      use extfld
+      use limits
       use mpole
       use mutant
       use polar
@@ -147,20 +147,47 @@ c
       allocate (ufieldp(3,n))
       call altepdt (1.0d0)
       mutfield = .true.
-      call dfield0a (dfldd,dfldp)
+      if (use_ewald) then
+         call dfield0c (dfldd,dfldp)
+      else if (use_mlist) then
+         call dfield0b (dfldd,dfldp)
+      else
+         call dfield0a (dfldd,dfldp)
+      end if
       mutfield = .false.
       call altepdt (plmda)
 c
 c     get the mutual fields from the converged dipoles
 c
-      call ufield0a (ufield,ufieldp)
+      if (use_ewald) then
+         call ufield0c (ufield,ufieldp)
+      else if (use_mlist) then
+         call ufield0b (ufield,ufieldp)
+      else
+         call ufield0a (ufield,ufieldp)
+      end if
 c
 c     pol vanishes at plmda=0, so compute the permanent field
 c
       if (atzero) then
          allocate (field0(3,n))
          allocate (fieldp0(3,n))
-         call dfield0a (field0,fieldp0)
+         if (use_ewald) then
+            call dfield0c (field0,fieldp0)
+         else if (use_mlist) then
+            call dfield0b (field0,fieldp0)
+         else
+            call dfield0a (field0,fieldp0)
+         end if
+         if (use_exfld) then
+            do ii = 1, npole
+               i = ipole(ii)
+               do j = 1, 3
+                  field0(j,i) = field0(j,i) + texfld(j)
+                  fieldp0(j,i) = fieldp0(j,i) + texfld(j)
+               end do
+            end do
+         end if
       end if
 c
 c     differentiate the polarization function

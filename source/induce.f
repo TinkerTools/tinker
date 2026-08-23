@@ -1663,6 +1663,7 @@ c
       use mplpot
       use mpole
       use neigh
+      use mutant
       use polar
       use polgrp
       use polpot
@@ -1696,6 +1697,7 @@ c
       real*8 fieldp(3,*)
       real*8, allocatable :: fieldt(:,:)
       real*8, allocatable :: fieldtp(:,:)
+      logical muti,mutk,dopr
       character*6 mode
 c
 c
@@ -1734,7 +1736,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,nelst,elst,dpequal,
-!$OMP& use_thole,use_chgpen,use_bounds,off2,field,fieldp)
+!$OMP& use_thole,use_chgpen,use_bounds,off2,mut,mutfield,field,fieldp)
 !$OMP& firstprivate(dscale,pscale) shared (fieldt,fieldtp)
 !$OMP DO reduction(+:fieldt,fieldtp)
 c
@@ -1757,6 +1759,8 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = .true.
+         if (mutfield)  muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1845,7 +1849,13 @@ c
             zr = z(k) - z(i)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            mutk = .true.
+            dopr = (r2 .le. off2)
+            if (mutfield) then
+               mutk = mut(k)
+               if (dopr)  dopr = (muti .or. mutk)
+            end if
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -1929,12 +1939,18 @@ c
 c
 c     increment the direct electrostatic field components
 c
-               do j = 1, 3
-                  fieldt(j,i) = fieldt(j,i) + fid(j)*dscale(k)
-                  fieldt(j,k) = fieldt(j,k) + fkd(j)*dscale(k)
-                  fieldtp(j,i) = fieldtp(j,i) + fid(j)*pscale(k)
-                  fieldtp(j,k) = fieldtp(j,k) + fkd(j)*pscale(k)
-               end do
+               if (mutk) then
+                  do j = 1, 3
+                     fieldt(j,i) = fieldt(j,i) + fid(j)*dscale(k)
+                     fieldtp(j,i) = fieldtp(j,i) + fid(j)*pscale(k)
+                  end do
+               end if
+               if (muti) then
+                  do j = 1, 3
+                     fieldt(j,k) = fieldt(j,k) + fkd(j)*dscale(k)
+                     fieldtp(j,k) = fieldtp(j,k) + fkd(j)*pscale(k)
+                  end do
+               end if
             end if
          end do
 c
@@ -2277,6 +2293,7 @@ c
       use limits
       use math
       use mpole
+      use mutant
       use pme
       use polar
       implicit none
@@ -2285,6 +2302,7 @@ c
       real*8 ucell(3)
       real*8 field(3,*)
       real*8 fieldp(3,*)
+      logical domut
 c
 c
 c     zero out the value of the field at each site
@@ -2327,10 +2345,14 @@ c
       term = (4.0d0/3.0d0) * aewald**3 / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         do j = 1, 3
-            field(j,i) = field(j,i) + term*rpole(j+1,i)
-            fieldp(j,i) = fieldp(j,i) + term*rpole(j+1,i)
-         end do
+         domut = .true.
+         if (mutfield)  domut = mut(i)
+         if (domut) then
+            do j = 1, 3
+               field(j,i) = field(j,i) + term*rpole(j+1,i)
+               fieldp(j,i) = fieldp(j,i) + term*rpole(j+1,i)
+            end do
+         end if
       end do
 c
 c     compute the cell dipole boundary correction to field
@@ -2341,9 +2363,13 @@ c
          end do
          do ii = 1, npole
             i = ipole(ii)
-            ucell(1) = ucell(1) + rpole(2,i) + rpole(1,i)*x(i)
-            ucell(2) = ucell(2) + rpole(3,i) + rpole(1,i)*y(i)
-            ucell(3) = ucell(3) + rpole(4,i) + rpole(1,i)*z(i)
+            domut = .true.
+            if (mutfield)  domut = mut(i)
+            if (domut) then
+               ucell(1) = ucell(1) + rpole(2,i) + rpole(1,i)*x(i)
+               ucell(2) = ucell(2) + rpole(3,i) + rpole(1,i)*y(i)
+               ucell(3) = ucell(3) + rpole(4,i) + rpole(1,i)*z(i)
+            end if
          end do
          term = (4.0d0/3.0d0) * pi/volbox
          do ii = 1, npole
@@ -2379,6 +2405,7 @@ c
       use ewald
       use math
       use mpole
+      use mutant
       use pme
       use polpot
       implicit none
@@ -2397,6 +2424,7 @@ c
       real*8, allocatable :: fmp(:,:)
       real*8, allocatable :: cphi(:,:)
       real*8, allocatable :: fphi(:,:)
+      logical domut
 c
 c
 c     return if the Ewald coefficient is zero
@@ -2431,18 +2459,29 @@ c
 c
 c     copy the multipole moments into local storage areas
 c
+      if (mutfield) then
+         do i = 1, n
+            do j = 1, 10
+               cmp(j,i) = 0.0d0
+            end do
+         end do
+      end if
       do ii = 1, npole
          i = ipole(ii)
-         cmp(1,i) = rpole(1,i)
-         cmp(2,i) = rpole(2,i)
-         cmp(3,i) = rpole(3,i)
-         cmp(4,i) = rpole(4,i)
-         cmp(5,i) = rpole(5,i)
-         cmp(6,i) = rpole(9,i)
-         cmp(7,i) = rpole(13,i)
-         cmp(8,i) = 2.0d0 * rpole(6,i)
-         cmp(9,i) = 2.0d0 * rpole(7,i)
-         cmp(10,i) = 2.0d0 * rpole(10,i)
+         domut = .true.
+         if (mutfield)  domut = mut(i)
+         if (domut) then
+            cmp(1,i) = rpole(1,i)
+            cmp(2,i) = rpole(2,i)
+            cmp(3,i) = rpole(3,i)
+            cmp(4,i) = rpole(4,i)
+            cmp(5,i) = rpole(5,i)
+            cmp(6,i) = rpole(9,i)
+            cmp(7,i) = rpole(13,i)
+            cmp(8,i) = 2.0d0 * rpole(6,i)
+            cmp(9,i) = 2.0d0 * rpole(7,i)
+            cmp(10,i) = 2.0d0 * rpole(10,i)
+         end if
       end do
 c
 c     convert Cartesian multipoles to fractional coordinates
@@ -2558,6 +2597,7 @@ c
       use math
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpot
@@ -2595,6 +2635,7 @@ c
       real*8, allocatable :: dscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
+      logical muti,mutk,dopr
       character*6 mode
 c
 c
@@ -2635,6 +2676,8 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = .true.
+         if (mutfield)  muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2718,12 +2761,18 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
+            mutk = .true.
+            if (mutfield)  mutk = mut(k)
             xr = x(k) - x(i)
             yr = y(k) - y(i)
             zr = z(k) - z(i)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (mutfield) then
+               if (dopr)  dopr = (muti .or. mutk)
+            end if
+            if (dopr) then
                r = sqrt(r2)
                rr1 = 1.0d0 / r
                rr2 = rr1 * rr1
@@ -2859,12 +2908,18 @@ c
 c
 c     increment the field at each site due to this interaction
 c
-               do j = 1, 3
-                  field(j,i) = field(j,i) + fid(j)
-                  field(j,k) = field(j,k) + fkd(j)
-                  fieldp(j,i) = fieldp(j,i) + fip(j)
-                  fieldp(j,k) = fieldp(j,k) + fkp(j)
-               end do
+               if (mutk) then
+                  do j = 1, 3
+                     field(j,i) = field(j,i) + fid(j)
+                     fieldp(j,i) = fieldp(j,i) + fip(j)
+                  end do
+               end if
+               if (muti) then
+                  do j = 1, 3
+                     field(j,k) = field(j,k) + fkd(j)
+                     fieldp(j,k) = fieldp(j,k) + fkp(j)
+                  end do
+               end if
             end if
          end do
 c
@@ -2935,6 +2990,8 @@ c
                vali = pval(i)
                alphai = palpha(i)
             end if
+            muti = .true.
+            if (mutfield)  muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -3018,6 +3075,8 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
+               mutk = .true.
+               if (mutfield)  mutk = mut(k)
                ck = rpole(1,k)
                dkx = rpole(2,k)
                dky = rpole(3,k)
@@ -3034,10 +3093,14 @@ c
                   zr = z(k) - z(i)
                   call imager (xr,yr,zr,m)
                   r2 = xr*xr + yr* yr + zr*zr
+                  dopr = (r2 .le. off2)
+                  if (mutfield) then
+                     if (dopr)  dopr = (muti .or. mutk)
+                  end if
 c
 c     calculate the error function damping factors
 c
-                  if (r2 .le. off2) then
+                  if (dopr) then
                      r = sqrt(r2)
                      rr1 = 1.0d0 / r
                      rr2 = rr1 * rr1
@@ -3187,14 +3250,18 @@ c
 c
 c     increment the field at each site due to this interaction
 c
-                     do j = 1, 3
-                        field(j,i) = field(j,i) + fid(j)
-                        fieldp(j,i) = fieldp(j,i) + fid(j)
-                        if (i .ne. k) then
-                           field(j,k) = field(j,k) + fkp(j)
+                     if (mutk) then
+                        do j = 1, 3
+                           field(j,i) = field(j,i) + fid(j)
+                           fieldp(j,i) = fieldp(j,i) + fip(j)
+                        end do
+                     end if
+                     if (muti .and. i.ne.k) then
+                        do j = 1, 3
+                           field(j,k) = field(j,k) + fkd(j)
                            fieldp(j,k) = fieldp(j,k) + fkp(j)
-                        end if
-                     end do
+                        end do
+                     end if
                   end if
                end do
             end do
@@ -3276,6 +3343,7 @@ c
       use mplpot
       use mpole
       use neigh
+      use mutant
       use openmp
       use polar
       use polgrp
@@ -3324,6 +3392,7 @@ c
       real*8, allocatable :: fieldt(:,:)
       real*8, allocatable :: fieldtp(:,:)
       real*8, allocatable :: dlocal(:,:)
+      logical muti,mutk,dopr
       character*6 mode
 c
 c
@@ -3338,7 +3407,12 @@ c
       nslice = int(0.5d0*dble(n)/dble(nthread)) + 1
       maxlocal = int(dble(n)*dble(maxelst)/dble(nthread))
       nlocal = 0
-      ntpair = 0
+c
+c     a source-masked pass reruns after "induce" has already built the
+c     mutual polarization table, and that table has no lambda
+c     dependence, so leave it and its pair count untouched
+c
+      if (.not. mutfield)  ntpair = 0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -3380,7 +3454,8 @@ c
 !$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& nelst,elst,dpequal,use_thole,use_chgpen,use_bounds,off2,poltyp,
-!$OMP& nslice,ntpair,tindex,tdipdip,toffset,field,fieldp,fieldt,fieldtp)
+!$OMP& mut,mutfield,nslice,ntpair,tindex,tdipdip,toffset,field,fieldp,
+!$OMP& fieldt,fieldtp)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale,nlocal)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nslice)
 c
@@ -3403,6 +3478,8 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
+         muti = .true.
+         if (mutfield)  muti = mut(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -3510,12 +3587,18 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = 1, nelst(i)
             k = elst(kk,i)
+            mutk = .true.
+            if (mutfield)  mutk = mut(k)
             xr = x(k) - x(i)
             yr = y(k) - y(i)
             zr = z(k) - z(i)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (mutfield) then
+               if (dopr)  dopr = (muti .or. mutk)
+            end if
+            if (dopr) then
                r = sqrt(r2)
                rr1 = 1.0d0 / r
                rr2 = rr1 * rr1
@@ -3668,7 +3751,7 @@ c
 c
 c     find terms needed later to compute mutual polarization
 c
-                  if (poltyp .ne. 'DIRECT') then
+                  if (poltyp.ne.'DIRECT' .and. .not.mutfield) then
                      call dampmut (r,alphai,alphak,dmpik)
                      scalek = wscale(k)
                      rr3 = rr2 * rr1
@@ -3688,12 +3771,18 @@ c
 c
 c     increment the field at each site due to this interaction
 c
-               do j = 1, 3
-                  fieldt(j,i) = fieldt(j,i) + fid(j)
-                  fieldt(j,k) = fieldt(j,k) + fkd(j)
-                  fieldtp(j,i) = fieldtp(j,i) + fip(j)
-                  fieldtp(j,k) = fieldtp(j,k) + fkp(j)
-               end do
+               if (mutk) then
+                  do j = 1, 3
+                     fieldt(j,i) = fieldt(j,i) + fid(j)
+                     fieldtp(j,i) = fieldtp(j,i) + fip(j)
+                  end do
+               end if
+               if (muti) then
+                  do j = 1, 3
+                     fieldt(j,k) = fieldt(j,k) + fkd(j)
+                     fieldtp(j,k) = fieldtp(j,k) + fkp(j)
+                  end do
+               end if
             end if
          end do
 c

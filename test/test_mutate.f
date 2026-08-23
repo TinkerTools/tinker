@@ -874,10 +874,10 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_exf" runs the seventeen water fixtures 102-118 that
-c     apply an external electric field to a mutated system, each
-c     carrying the "lambda-deriv" keyword so the level 4 lambda
-c     derivative checks are enabled; cases 102-110 keep only the
+c     "test_mutate_exf" runs the twenty water fixtures 102-118 and
+c     184-186 that apply an external electric field to a mutated
+c     system, each carrying the "lambda-deriv" keyword so the level 4
+c     lambda derivative checks are enabled; cases 102-110 keep only the
 c     multipole term, with 102-104 single topology, 105-107 absolute
 c     dual topology and 108-110 relative dual topology, each at
 c     ele-lambda values 1.0, 0.5 and 0.0; cases 111-116 keep only the
@@ -887,11 +887,15 @@ c     induced dipoles respond to the applied field through the direct
 c     field; cases 117-118 leave the multipole and polarization terms
 c     active together, under absolute and relative dual topology, and
 c     use unequal interpolation exponents of three and four so the two
-c     terms cannot mask an error in each other; the remaining dual
-c     topology cases use an exponent of two, since with the default
-c     exponent of one the dual topology weighting of the external
-c     field term cannot be distinguished from a linear scaling; all
-c     fixtures use Ewald and support a pairwise neighbor list
+c     terms cannot mask an error in each other; cases 184-186 leave all
+c     three nonbonded terms active under absolute dual topology at
+c     matched ele-lambda and pol-lambda values 1.0, 0.5 and 0.0, so the
+c     unscaled van der Waals term is carried alongside the field-driven
+c     multipole and polarization terms; the remaining dual topology
+c     cases use an exponent of two, since with the default exponent of
+c     one the dual topology weighting of the external field term cannot
+c     be distinguished from a linear scaling; all fixtures use Ewald
+c     and support a pairwise neighbor list
 c
 c
       subroutine test_mutate_exf
@@ -949,6 +953,15 @@ c
       call test_mutate_calc ('water2','118_water_exf_rdt_m05p05.key',
      &   '118_water_exf_rdt_m05p05.txt','118_water_exf_rdt_m05p05',
      &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2','184_water_exf_adt_l10.key',
+     &   '184_water_exf_adt_l10.txt','184_water_exf_adt_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','185_water_exf_adt_l05.key',
+     &   '185_water_exf_adt_l05.txt','185_water_exf_adt_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','186_water_exf_adt_l00.key',
+     &   '186_water_exf_adt_l00.txt','186_water_exf_adt_l00',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c

@@ -599,9 +599,9 @@ c
          use_evdt = .true.
       end if
 c
-c     ost and meta require second and force lambda derivatives
+c     ost requires second and force lambda derivatives
 c
-      if (use_ost .or. use_meta)  use_epdt = .true.
+      if (use_meta)  use_epdt = .true.
 c
 c     validate mapping schemes from main lambda to sublambdas
 c
@@ -1290,7 +1290,6 @@ c
 c
       subroutine mutate_check
       use dlmda
-      use extfld
       use iounit
       use limits
       use mplpot
@@ -1310,27 +1309,30 @@ c
          call fatal
       end if
 c
+c     ost requires polarization lambda derivatives not yet available
+c     for absolute single topology
+c
+      if (use_ost .and. use_past) then
+         write (iout,20)
+   20    format (/,' MUTATE_CHECK  --  OST cannot be used with',
+     &              ' absolute single topology polarization; add',
+     &              ' POL-DUALTOPO or remove OST')
+         call fatal
+      end if
+c
 c     absolute single topology currently supports the scalar derivative
-c     for mutual Thole polarization via a direct double loop only
+c     for mutual Thole polarization in direct and Ewald modes
 c
       if (use_pdlmda .and. use_past) then
-         if (use_ewald .or. use_mlist .or. use_ulist) then
-            write (iout,20)
-   20       format (/,' MUTATE_CHECK  --  Absolute Single Topology',
-     &                 ' Polarization dU/dLambda currently requires',
-     &                 ' direct double-loop electrostatics; remove',
-     &                 ' EWALD and NEIGHBOR-LIST, or add POL-DUALTOPO')
-            call fatal
-         end if
          if (poltyp.ne.'MUTUAL' .or. .not.use_thole .or. use_chgpen
-     &          .or. use_expol .or. use_exfld .or. use_solv) then
+     &          .or. use_expol .or. use_solv) then
             write (iout,30)
    30       format (/,' MUTATE_CHECK  --  Absolute Single Topology',
-     &                 ' Polarization dU/dLambda currently supports',
-     &                 ' gas-phase MUTUAL Thole polarization only;',
-     &                 ' use POLARIZATION MUTUAL without charge',
-     &                 ' penetration, exchange polarization, an',
-     &                 ' external field or implicit solvent')
+     &                 ' Polarization dU/dLambda supports MUTUAL Thole',
+     &                 ' polarization only, in either direct or Ewald',
+     &                 ' mode; use POLARIZATION MUTUAL without charge',
+     &                 ' penetration, exchange polarization or',
+     &                 ' implicit solvent')
             call fatal
          end if
       end if
