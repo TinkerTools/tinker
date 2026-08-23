@@ -161,7 +161,7 @@ c
       integer ii,iter
       integer miniter
       integer maxiter
-      real*8 polmin
+c      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 udsum,upsum
@@ -323,7 +323,7 @@ c
          miniter = min(3,n)
          maxiter = 100
          iter = 0
-         polmin = 0.00000001d0
+c         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimate induced dipoles using a polynomial predictor
@@ -384,7 +384,8 @@ c
          do ii = 1, npole
             i = ipole(ii)
             if (douind(i)) then
-               poli(i) = max(polmin,polarity(i))
+c               poli(i) = max(polmin,polarity(i))
+               poli(i) = polarity(i)
                do j = 1, 3
                   if (pcgguess) then
                      if (use_expol) then
@@ -3672,7 +3673,7 @@ c
 c
 c     find terms needed later to compute mutual polarization
 c
-                  if (poltyp .ne. 'DIRECT') then
+                  if (poltyp.ne.'DIRECT' .and. .not.mutfield) then
                      call dampthole (i,k,5,r,dmpik)
                      scalek = uscale(k)
                      dmp3 = dmpe(3) - (1.0d0-scalek*dmpik(3))*rr3
@@ -4672,7 +4673,7 @@ c
       integer ii,iter
       integer miniter
       integer maxiter
-      real*8 polmin
+c      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 epsds,epsps
@@ -4853,7 +4854,7 @@ c
          miniter = min(3,npole)
          maxiter = 100
          iter = 0
-         polmin = 0.00000001d0
+c         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimated induced dipoles from polynomial predictor
@@ -4906,7 +4907,8 @@ c
          do ii = 1, npole
             i = ipole(ii)
             if (douind(i)) then
-               poli(i) = max(polmin,polarity(i))
+c               poli(i) = max(polmin,polarity(i))
+               poli(i) = polarity(i)
                do j = 1, 3
                   rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
      &                          + field(j,i)
@@ -6043,7 +6045,7 @@ c
       integer ii,iter
       integer miniter
       integer maxiter
-      real*8 polmin
+c      real*8 polmin
       real*8 eps,epsold
       real*8 epsd,epsp
       real*8 epsds,epsps
@@ -6224,7 +6226,7 @@ c
          miniter = min(3,npole)
          maxiter = 100
          iter = 0
-         polmin = 0.00000001d0
+c         polmin = 0.00000001d0
          eps = 100.0d0
 c
 c     estimated induced dipoles from polynomial predictor
@@ -6277,7 +6279,8 @@ c
          do ii = 1, npole
             i = ipole(ii)
             if (douind(i)) then
-               poli(i) = max(polmin,polarity(i))
+c               poli(i) = max(polmin,polarity(i))
+               poli(i) = polarity(i)
                do j = 1, 3
                   rsd(j,i) = (udir(j,i)-uind(j,i))/poli(i)
      &                          + field(j,i)
@@ -7229,7 +7232,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
-      real*8 polmin
+c      real*8 polmin
       real*8 poli,polik
       real*8 alphai,alphak
       real*8 off2
@@ -7251,10 +7254,11 @@ c
 c
 c     use diagonal preconditioner elements as first approximation
 c
-         polmin = 0.00000001d0
+c         polmin = 0.00000001d0
          do ii = 1, npole
             i = ipole(ii)
-            poli = uaccel * max(polmin,polarity(i))
+c            poli = uaccel * max(polmin,polarity(i))
+            poli = uaccel * polarity(i)
             do j = 1, 3
                zrsd(j,i) = poli * rsd(j,i)
                zrsdp(j,i) = poli * rsdp(j,i)
@@ -7465,7 +7469,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr3,rr5
-      real*8 polmin
+c      real*8 polmin
       real*8 poli,polik
       real*8 alphai,alphak
       real*8 m1,m2,m3
@@ -7493,10 +7497,11 @@ c
 c
 c     use diagonal preconditioner elements as first approximation
 c
-         polmin = 0.00000001d0
+c         polmin = 0.00000001d0
          do ii = 1, npole
             i = ipole(ii)
-            poli = uaccel * max(polmin,polarity(i))
+c            poli = uaccel * max(polmin,polarity(i))
+            poli = uaccel * polarity(i)
             do j = 1, 3
                zrsd(j,i) = poli * rsd(j,i)
                zrsdp(j,i) = poli * rsdp(j,i)

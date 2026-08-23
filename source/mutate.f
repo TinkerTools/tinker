@@ -601,7 +601,7 @@ c
 c
 c     ost requires second and force lambda derivatives
 c
-      if (use_meta)  use_epdt = .true.
+      if (use_ost)  use_epdt = .true.
 c
 c     validate mapping schemes from main lambda to sublambdas
 c

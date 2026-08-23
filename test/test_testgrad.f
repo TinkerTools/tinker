@@ -24,6 +24,9 @@ c
       call test_testgrad_case ('01_water_ye_m10v10')
       call test_testgrad_case ('02_water_ye_m05v05')
       call test_testgrad_case ('03_water_ye_m00v00')
+      call test_testgrad_case ('04_water_ast_ye_l10')
+      call test_testgrad_case ('05_water_ast_ye_l05')
+      call test_testgrad_case ('06_water_ast_ye_l00')
       return
       end
 c
