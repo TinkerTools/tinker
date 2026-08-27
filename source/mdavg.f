@@ -82,7 +82,7 @@ c
 c
 c     ask for the user specified dynamics log filename
 c
-      if (.not. exist)  call promo
+      if (.not. exist)  call promo (iout)
       nask = 0
       do while (.not.exist .and. nask.lt.maxask)
          doinfo = .true.

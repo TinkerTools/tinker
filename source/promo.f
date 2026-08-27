@@ -16,14 +16,14 @@ c     "promo" writes a banner message containing information
 c     about the Tinker version, release date and copyright notice
 c
 c
-      subroutine promo
-      use iounit
+      subroutine promo (iunit)
       implicit none
+      integer iunit
 c
 c
 c     print out the informational header message
 c
-      write (iout,10)
+      write (iunit,10)
    10 format (/,5x,70('#'),
      &        /,3x,74('#'),
      &        /,2x,'###',70x,'###',
@@ -38,6 +38,6 @@ c
      &        /,2x,'###',70x,'###',
      &        /,3x,74('#'),
      &        /,5x,70('#'),/)
-      flush (iout)
+      flush (iunit)
       return
       end

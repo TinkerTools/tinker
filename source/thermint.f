@@ -320,8 +320,8 @@ c
 c
 c     "prttihead" creates the external file that collects the block
 c     averaged lambda derivatives and writes the fixed header that
-c     describes the window layout and the lambda schedule; the block
-c     averages themselves are appended later by "saveti"
+c     describes the window and block layout; the block averages
+c     themselves are appended later by "saveti"
 c
 c
       subroutine prttihead
@@ -329,7 +329,6 @@ c
       use iounit
       use thrmint
       implicit none
-      integer w
       integer iti
       integer freeunit
       integer trimtext
@@ -342,24 +341,28 @@ c
       call version (tifile,'new')
       open (unit=iti,file=tifile,status='new')
 c
+c     start the file with the standard Tinker banner message
+c
+      call promo (iti)
+c
 c     write a header describing the window and block layout
 c
       write (iti,10)
-   10 format ('# tinker thermodynamic integration')
+   10 format (/,' Thermodynamic Integration Parameters :')
       write (iti,20)  tinbin,tinstepavg,tieqratio,tiwinend(tinbin),
      &                tinbtot
-   20 format ('# tinbin ',i0,' tinstepavg ',i0,' tieqratio ',f12.6,
-     &           ' nstep ',i0,' tinbtot ',i0)
+   20 format (/,' Number of Lambda Windows',9x,i10,
+     &        /,' Steps per Block Average',10x,i10,
+     &        /,' Equilibration Ratio Value',10x,f8.3,
+     &        /,' Number of Dynamics Steps',9x,i10,
+     &        /,' Total Number of Block Averages',3x,i10)
 c
-c     record the full schedule, so the file still describes every
-c     window when an interrupted run leaves some of them empty
+c     label the columns of the block averages appended by "saveti"
 c
-      do w = 1, tinbin
-         write (iti,30)  w,tilmdalist(w),tifraclist(w),tiwinend(w)
-   30    format ('# schedule ',i0,1x,f12.8,1x,f12.8,1x,i0)
-      end do
+      write (iti,30)
+   30 format (/,' Block Averaged Lambda Derivatives :')
       write (iti,40)
-   40 format ('# index lambda dedl dedlstd')
+   40 format (/,4x,'Index',8x,'Lambda',15x,'dE/dL',15x,'StDev',/)
       close (unit=iti)
 c
 c     report the name of the file holding the block averages
@@ -500,7 +503,7 @@ c
       do i = tinbsave+1, tinbcount
          write (iti,10)  i,tilmdahist(i),tilmdadedl(i),
      &                   tilmdadedlstd(i)
-   10    format (i6,1x,f12.8,1p,1x,e20.10,1x,e20.10)
+   10    format (i9,f14.8,1p,e20.10,e20.10)
       end do
       tinbsave = tinbcount
       close (unit=iti)

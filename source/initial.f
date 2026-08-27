@@ -65,7 +65,7 @@ c
 c
 c     display program banner and copyright notice
 c
-      if (first)  call promo
+      if (first)  call promo (iout)
 c
 c     command line arguments to the program
 c

@@ -1098,8 +1098,9 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "ticount" returns the number of records in a block average
-c     file that are not commented out with a leading hash
+c     "ticount" returns the number of data records in a block average
+c     file, counting only the nonblank records that follow the line
+c     labeling the columns of the block averages
 c
 c
       subroutine ticount (fname,nrow)
@@ -1107,17 +1108,23 @@ c
       integer nrow
       integer iti
       integer freeunit
+      logical header
       character*(*) fname
       character*240 record
 c
 c
       nrow = 0
+      header = .false.
       iti = freeunit ()
       open (unit=iti,file=fname,status='old')
    10 continue
       read (iti,20,end=30)  record
    20 format (a240)
-      if (record(1:1) .ne. '#')  nrow = nrow + 1
+      if (.not. header) then
+         if (index(record,'Index') .ne. 0)  header = .true.
+      else if (record .ne. ' ') then
+         nrow = nrow + 1
+      end if
       goto 10
    30 continue
       close (unit=iti)
@@ -1133,8 +1140,8 @@ c     ###########################################################
 c
 c
 c     "tirowlmda" returns the lambda recorded in the requested data
-c     record of a block average file, counting only the rows that
-c     are not commented out with a leading hash
+c     record of a block average file, counting only the nonblank
+c     rows that follow the line labeling the columns
 c
 c
       subroutine tirowlmda (fname,irow,lam)
@@ -1143,6 +1150,7 @@ c
       integer nrow,idx
       integer iti
       integer freeunit
+      logical header
       real*8 lam
       character*(*) fname
       character*240 record
@@ -1150,12 +1158,15 @@ c
 c
       lam = -1.0d0
       nrow = 0
+      header = .false.
       iti = freeunit ()
       open (unit=iti,file=fname,status='old')
    10 continue
       read (iti,20,end=30)  record
    20 format (a240)
-      if (record(1:1) .ne. '#') then
+      if (.not. header) then
+         if (index(record,'Index') .ne. 0)  header = .true.
+      else if (record .ne. ' ') then
          nrow = nrow + 1
          if (nrow .eq. irow) then
             read (record,*,err=30,end=30)  idx,lam

@@ -2498,7 +2498,7 @@ void nbondoff_();
 #define tinker_f_nbondoff nbondoff_
 
 // promo.f
-void promo_();
+void promo_(int* iunit);
 #define tinker_f_promo promo_
 
 // prtarc.f

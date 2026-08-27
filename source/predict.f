@@ -63,7 +63,7 @@ c
 c
 c     disable dipole prediction during adaptive lambda simulations
 c
-      if (use_ost .or. use_meta) then
+      if (use_epdt) then
          use_pred = .false.
          use_ielscf = .false.
          polpred = '    '
