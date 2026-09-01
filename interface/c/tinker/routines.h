@@ -308,9 +308,9 @@ void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
 void mapsublmda_(double* lmda);
 #define tinker_f_mapsublmda mapsublmda_
-void sublmdamap_(double* lmda, char* map, int* nexp, int* invn, double* inveps, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub, tinker_fchar_len_t map_cap);
-inline void tinker_f_sublmdamap(double* lmda, tinker_fchars map, int* nexp, int* invn, double* inveps, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub) {
-    return sublmdamap_(lmda, map.string, nexp, invn, inveps, qnt0, qnt1, sub, dsub, d2sub, map.capacity);
+void sublmdamap_(double* lmda, char* map, int* nexp, int* invn, double* inveps, int* apmn, double* apmrho, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub, tinker_fchar_len_t map_cap);
+inline void tinker_f_sublmdamap(double* lmda, tinker_fchars map, int* nexp, int* invn, double* inveps, int* apmn, double* apmrho, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub) {
+    return sublmdamap_(lmda, map.string, nexp, invn, inveps, apmn, apmrho, qnt0, qnt1, sub, dsub, d2sub, map.capacity);
 }
 void maprelstage_(double* lmda);
 #define tinker_f_maprelstage maprelstage_
@@ -324,6 +324,8 @@ void sublmdaexp_(double* x, int* exponent, double* lmda, double* dlmda, double* 
 #define tinker_f_sublmdaexp sublmdaexp_
 void sublmdainvpower_(double* x, int* n, double* eps, double* lmda, double* dlmda, double* d2lmda);
 #define tinker_f_sublmdainvpower sublmdainvpower_
+void sublmdaapm_(double* x, int* n, double* rho, double* lmda, double* dlmda, double* d2lmda);
+#define tinker_f_sublmdaapm sublmdaapm_
 void lmdachain_();
 #define tinker_f_lmdachain lmdachain_
 void avgstd_(double* list, int* begin, int* count, double* avg, double* std);

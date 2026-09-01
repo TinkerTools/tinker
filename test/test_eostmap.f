@@ -126,7 +126,7 @@ c     #####################################################
 c
 c
 c     "test_eostmap_mapsub" checks mapsublmda for exponential,
-c     inverse-power and quintic lambda maps
+c     inverse-power, asymmetric power and quintic lambda maps
 c
 c
       subroutine test_eostmap_mapsub
@@ -218,8 +218,46 @@ c
       call assert_real (d2vldlmda2,-2.94247262960432d0,1.0d-12,
      &                  'mapsublmda invpower d2vldlmda2')
 c
-c     any map other than EXP or INV falls back to the quintic taper,
-c     where the sublambda is the complement of the taper
+c     test asymmetric power sublambda maps and derivatives, the three
+c     terms taking different powers and slope ratios so that a crossed
+c     argument would land the wrong shape on the wrong sublambda
+c
+      call resetost (5,5,1)
+      lambda = 0.25d0
+      use_plmdamap = .true.
+      use_elmdamap = .true.
+      use_vlmdamap = .true.
+      plmdamap = 'APM'
+      elmdamap = 'APM'
+      vlmdamap = 'APM'
+      plmdaapmn = 2
+      elmdaapmn = 3
+      vlmdaapmn = 4
+      plmdaapmrho = 1.5d0
+      elmdaapmrho = 2.0d0
+      vlmdaapmrho = 2.5d0
+      call mapsublmda (lambda)
+      call assert_real (plambda,0.3203125d0,1.0d-12,
+     &                  'mapsublmda asympower plambda')
+      call assert_real (dpldlmda,1.09375d0,1.0d-12,
+     &                  'mapsublmda asympower dpldlmda')
+      call assert_real (d2pldlmda2,-1.25d0,1.0d-12,
+     &                  'mapsublmda asympower d2pldlmda2')
+      call assert_real (elambda,0.3818359375d0,1.0d-12,
+     &                  'mapsublmda asympower elambda')
+      call assert_real (deldlmda,1.140625d0,1.0d-12,
+     &                  'mapsublmda asympower deldlmda')
+      call assert_real (d2eldlmda2,-2.4375d0,1.0d-12,
+     &                  'mapsublmda asympower d2eldlmda2')
+      call assert_real (vlambda,0.43017578125d0,1.0d-12,
+     &                  'mapsublmda asympower vlambda')
+      call assert_real (dvldlmda,1.134765625d0,1.0d-12,
+     &                  'mapsublmda asympower dvldlmda')
+      call assert_real (d2vldlmda2,-3.34375d0,1.0d-12,
+     &                  'mapsublmda asympower d2vldlmda2')
+c
+c     any map other than EXP, INV or APM falls back to the quintic
+c     taper, where the sublambda is the complement of the taper
 c
       use_bounds = .false.
       call resetost (5,5,1)
@@ -587,6 +625,63 @@ c
      &                  'sublmdainvpower negative eps lmda')
       call assert_real (dlmda,dlmda0,1.0d-12,
      &                  'sublmdainvpower negative eps dlmda')
+c
+c     the asymmetric power map pins both endpoint values, and carries
+c     the slope ratio at the decoupled end against a unit slope at the
+c     coupled end, which is what the normalization exists to enforce
+c
+      call sublmdaapm (0.0d0,12,4.0d0,lmda,dlmda,d2lmda)
+      call assert_real (lmda,0.0d0,1.0d-12,
+     &                  'sublmdaapm x=0 lmda')
+      call assert_real (dlmda,4.0d0,1.0d-12,
+     &                  'sublmdaapm x=0 dlmda')
+      call assert_real (d2lmda,-39.272727272727273d0,1.0d-12,
+     &                  'sublmdaapm x=0 d2lmda')
+      call sublmdaapm (1.0d0,12,4.0d0,lmda,dlmda,d2lmda)
+      call assert_real (lmda,1.0d0,1.0d-12,
+     &                  'sublmdaapm x=1 lmda')
+      call assert_real (dlmda,1.0d0,1.0d-12,
+     &                  'sublmdaapm x=1 dlmda')
+      call assert_real (d2lmda,3.272727272727273d0,1.0d-12,
+     &                  'sublmdaapm x=1 d2lmda')
+c
+c     the interior map runs ahead of the linear schedule, its slope
+c     having already fallen below one by the midpoint
+c
+      call sublmdaapm (0.5d0,12,4.0d0,lmda,dlmda,d2lmda)
+      call assert_real (lmda,0.6153564453125d0,1.0d-12,
+     &                  'sublmdaapm interior lmda')
+      call assert_real (dlmda,0.728138316761364d0,1.0d-12,
+     &                  'sublmdaapm interior dlmda')
+      call assert_real (d2lmda,-0.017578125d0,1.0d-12,
+     &                  'sublmdaapm interior d2lmda')
+c
+c     a power below two or a slope ratio of one or less leaves no
+c     asymmetry to impose, so the map degenerates to the identity
+c
+      call sublmdaapm (0.4d0,1,4.0d0,lmda,dlmda,d2lmda)
+      call assert_real (lmda,0.4d0,1.0d-12,
+     &                  'sublmdaapm n=1 lmda')
+      call assert_real (dlmda,1.0d0,1.0d-12,
+     &                  'sublmdaapm n=1 dlmda')
+      call assert_real (d2lmda,0.0d0,1.0d-12,
+     &                  'sublmdaapm n=1 d2lmda')
+      call sublmdaapm (0.4d0,12,1.0d0,lmda,dlmda,d2lmda)
+      call assert_real (lmda,0.4d0,1.0d-12,
+     &                  'sublmdaapm rho=1 lmda')
+      call assert_real (dlmda,1.0d0,1.0d-12,
+     &                  'sublmdaapm rho=1 dlmda')
+      call assert_real (d2lmda,0.0d0,1.0d-12,
+     &                  'sublmdaapm rho=1 d2lmda')
+c
+c     a slope ratio at or above the power sits on the pole of the
+c     normalization, and falls back to the identity rather than it
+c
+      call sublmdaapm (0.4d0,4,4.0d0,lmda,dlmda,d2lmda)
+      call assert_real (lmda,0.4d0,1.0d-12,
+     &                  'sublmdaapm rho=n lmda')
+      call assert_real (dlmda,1.0d0,1.0d-12,
+     &                  'sublmdaapm rho=n dlmda')
       return
       end
 c

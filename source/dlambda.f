@@ -68,18 +68,18 @@ c     map the main lambda onto each sublambda a map drives
 c
       if (use_plmdamap) then
          call sublmdamap (lmda,plmdamap,plmdaexp,plmdainvn,plmdainveps,
-     &                    qntplmda0,qntplmda1,plambda,dpldlmda,
-     &                    d2pldlmda2)
+     &                    plmdaapmn,plmdaapmrho,qntplmda0,qntplmda1,
+     &                    plambda,dpldlmda,d2pldlmda2)
       end if
       if (use_elmdamap) then
          call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
-     &                    qntelmda0,qntelmda1,elambda,deldlmda,
-     &                    d2eldlmda2)
+     &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
+     &                    elambda,deldlmda,d2eldlmda2)
       end if
       if (use_vlmdamap) then
          call sublmdamap (lmda,vlmdamap,vlmdaexp,vlmdainvn,vlmdainveps,
-     &                    qntvlmda0,qntvlmda1,vlambda,dvldlmda,
-     &                    d2vldlmda2)
+     &                    vlmdaapmn,vlmdaapmrho,qntvlmda0,qntvlmda1,
+     &                    vlambda,dvldlmda,d2vldlmda2)
       end if
       return
       end
@@ -93,16 +93,19 @@ c     ##############################################################
 c
 c
 c     "sublmdamap" maps the main lambda "lmda" onto the sublambda of a
-c     single term, taking the exponential, inverse power or quintic
-c     taper form named by "map", and returning that sublambda with its
-c     first two derivatives with respect to the main lambda
+c     single term, taking the exponential, inverse power, asymmetric
+c     power or quintic taper form named by "map", and returning that
+c     sublambda with its first two derivatives with respect to the
+c     main lambda
 c
 c
-      subroutine sublmdamap (lmda,map,nexp,invn,inveps,qnt0,qnt1,
-     &                       sub,dsub,d2sub)
+      subroutine sublmdamap (lmda,map,nexp,invn,inveps,apmn,apmrho,
+     &                       qnt0,qnt1,sub,dsub,d2sub)
       implicit none
       integer nexp,invn
+      integer apmn
       real*8 lmda,inveps
+      real*8 apmrho
       real*8 qnt0,qnt1
       real*8 sub,dsub,d2sub
       real*8 taper,dtaper,d2taper
@@ -113,6 +116,8 @@ c
          call sublmdaexp (lmda,nexp,sub,dsub,d2sub)
       else if (map .eq. 'INV') then
          call sublmdainvpower (lmda,invn,inveps,sub,dsub,d2sub)
+      else if (map .eq. 'APM') then
+         call sublmdaapm (lmda,apmn,apmrho,sub,dsub,d2sub)
       else
          call quintaper (lmda,qnt0,qnt1,taper,dtaper,d2taper)
          sub = 1.0d0 - taper
@@ -166,8 +171,8 @@ c
          deldlmda = 0.0d0
          d2eldlmda2 = 0.0d0
          call sublmdamap (lmda,vlmdamap,vlmdaexp,vlmdainvn,vlmdainveps,
-     &                    qntvlmda0,qntvlmda1,vlambda,dvldlmda,
-     &                    d2vldlmda2)
+     &                    vlmdaapmn,vlmdaapmrho,qntvlmda0,qntvlmda1,
+     &                    vlambda,dvldlmda,d2vldlmda2)
 c
 c     the ligand 1 leg charges ligand 1 against the decoupled reference
 c     with van der Waals already morphed onto it
@@ -176,8 +181,8 @@ c
          erelst0 = relnone
          erelst1 = rellig1
          call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
-     &                    qntelmda0,qntelmda1,elambda,deldlmda,
-     &                    d2eldlmda2)
+     &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
+     &                    elambda,deldlmda,d2eldlmda2)
          vlambda = 1.0d0
          dvldlmda = 0.0d0
          d2vldlmda2 = 0.0d0
@@ -190,8 +195,8 @@ c
          erelst0 = relnone
          erelst1 = rellig2
          call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
-     &                    qntelmda0,qntelmda1,elambda,deldlmda,
-     &                    d2eldlmda2)
+     &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
+     &                    elambda,deldlmda,d2eldlmda2)
          elambda = 1.0d0 - elambda
          deldlmda = -deldlmda
          d2eldlmda2 = -d2eldlmda2
@@ -414,6 +419,64 @@ c
       dlmda = power * base**(power-1.0d0) / denom
       d2lmda = power * (power-1.0d0)
      &           * base**(power-2.0d0) / denom
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine sublmdaapm -- asymmetric power law mapping  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "sublmdaapm" maps from main lambda to sublambda using a
+c     normalized asymmetric power law and returns first and second
+c     lambda derivatives; the map runs from zero to one over the unit
+c     interval with a slope of "rho" at the decoupled end and a slope
+c     of one at the coupled end, so that "rho" sets how much faster
+c     the sublambda leaves the decoupled end than it arrives at the
+c     coupled end, while "n" sets how quickly that head start decays
+c
+c
+      subroutine sublmdaapm (x,n,rho,lmda,dlmda,d2lmda)
+      implicit none
+      integer n
+      real*8 x
+      real*8 rho
+      real*8 lmda
+      real*8 dlmda
+      real*8 d2lmda
+      real*8 xval
+      real*8 omx
+      real*8 rn
+      real*8 left
+      real*8 right
+      real*8 denom
+c
+c
+c     a flat slope ratio or a degenerate power gives the identity map,
+c     the upper bound holding the normalization off of its pole
+c
+      xval = x
+      if (n.lt.2 .or. rho.le.1.0d0 .or. rho.ge.dble(n)) then
+         lmda = xval
+         dlmda = 1.0d0
+         d2lmda = 0.0d0
+         return
+      end if
+c
+c     compute the normalized asymmetric power map
+c
+      rn = dble(n)
+      left = rn * (rho-1.0d0) / (rn-rho)
+      right = left / rn
+      denom = 1.0d0 + right
+      omx = 1.0d0 - xval
+      lmda = (xval + left*(1.0d0-omx**(n+1))/(rn+1.0d0)
+     &           + right*xval**(n+1)/(rn+1.0d0)) / denom
+      dlmda = (1.0d0 + left*omx**n + right*xval**n) / denom
+      d2lmda = rn * (right*xval**(n-1)-left*omx**(n-1)) / denom
       return
       end
 c

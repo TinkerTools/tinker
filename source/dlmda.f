@@ -12,6 +12,7 @@ c     ##                                                  ##
 c     ######################################################
 c
 c
+c     elmdaapmn     power exponent for electrostatic asymmetric map
 c     elmdaexp      exponent for electrostatic exponential mapping
 c     elmdainvn     inverse-power exponent for electrostatic mapping
 c     emdtexp       multipole exponent for dual topology interpolation
@@ -20,6 +21,7 @@ c     erelst0       multipole coupling state at the lower endpoint
 c     erelst1       multipole coupling state at the upper endpoint
 c     evdtexp       van der Waals exponent for dual topo interpolation
 c     nrelsub       number of parameter-zeroed subsystems, always five
+c     plmdaapmn     power exponent for polarization asymmetric map
 c     plmdaexp      exponent for polarization exponential mapping
 c     plmdainvn     inverse-power exponent for polarization mapping
 c     prelst0       polarization coupling state at the lower endpoint
@@ -27,6 +29,7 @@ c     prelst1       polarization coupling state at the upper endpoint
 c     rellig1       coupling state id with ligand 1 bound to environment
 c     rellig2       coupling state id with ligand 2 bound to environment
 c     relnone       coupling state id with neither ligand bound
+c     vlmdaapmn     power exponent for van der Waals asymmetric map
 c     vlmdaexp      exponent for van der Waals exponential mapping
 c     vlmdainvn     inverse-power exponent for van der Waals mapping
 c     vrelst0       van der Waals coupling state at the lower endpoint
@@ -45,7 +48,9 @@ c     depdl         polarization lambda derivative
 c     devdl         van der Waals lambda derivative
 c     dpldlmda      derivative of plambda wrt main lambda
 c     dvldlmda      derivative of vlambda wrt main lambda
+c     elmdaapmrho   endpoint slope ratio for electrostatic asym map
 c     elmdainveps   shift for electrostatic inverse-power mapping
+c     plmdaapmrho   endpoint slope ratio for polarization asym map
 c     plmdainveps   shift for polarization inverse-power mapping
 c     qntelmda0     sublambda lower bound for electrostatics
 c     qntelmda1     sublambda upper bound for electrostatics
@@ -53,6 +58,7 @@ c     qntplmda0     sublambda lower bound for polarization
 c     qntplmda1     sublambda upper bound for polarization
 c     qntvlmda0     sublambda lower bound for van der Waals
 c     qntvlmda1     sublambda upper bound for van der Waals
+c     vlmdaapmrho   endpoint slope ratio for van der Waals asym map
 c     vlmdainveps   shift for van der Waals inverse-power mapping
 c     demvirdl      multipole virial lambda derivative
 c     depvirdl      polarization virial lambda derivative
@@ -107,6 +113,7 @@ c
 c
       module dlmda
       implicit none
+      integer elmdaapmn
       integer elmdaexp
       integer elmdainvn
       integer emdtexp
@@ -115,6 +122,7 @@ c
       integer erelst1
       integer evdtexp
       integer nrelsub
+      integer plmdaapmn
       integer plmdaexp
       integer plmdainvn
       integer prelst0
@@ -122,6 +130,7 @@ c
       integer rellig1
       integer rellig2
       integer relnone
+      integer vlmdaapmn
       integer vlmdaexp
       integer vlmdainvn
       integer vrelst0
@@ -144,7 +153,9 @@ c
       real*8 devdl
       real*8 dpldlmda
       real*8 dvldlmda
+      real*8 elmdaapmrho
       real*8 elmdainveps
+      real*8 plmdaapmrho
       real*8 plmdainveps
       real*8 qntelmda0
       real*8 qntelmda1
@@ -152,6 +163,7 @@ c
       real*8 qntplmda1
       real*8 qntvlmda0
       real*8 qntvlmda1
+      real*8 vlmdaapmrho
       real*8 vlmdainveps
       real*8 demvirdl(3,3)
       real*8 depvirdl(3,3)

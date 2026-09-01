@@ -5,6 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
+extern int TINKER_MOD(dlmda, elmdaapmn);
 extern int TINKER_MOD(dlmda, elmdaexp);
 extern int TINKER_MOD(dlmda, elmdainvn);
 extern int TINKER_MOD(dlmda, emdtexp);
@@ -13,6 +14,7 @@ extern int TINKER_MOD(dlmda, erelst0);
 extern int TINKER_MOD(dlmda, erelst1);
 extern int TINKER_MOD(dlmda, evdtexp);
 #define TINKER_MOD__nrelsub 5
+extern int TINKER_MOD(dlmda, plmdaapmn);
 extern int TINKER_MOD(dlmda, plmdaexp);
 extern int TINKER_MOD(dlmda, plmdainvn);
 extern int TINKER_MOD(dlmda, prelst0);
@@ -20,6 +22,7 @@ extern int TINKER_MOD(dlmda, prelst1);
 #define TINKER_MOD__rellig1 1
 #define TINKER_MOD__rellig2 2
 #define TINKER_MOD__relnone 3
+extern int TINKER_MOD(dlmda, vlmdaapmn);
 extern int TINKER_MOD(dlmda, vlmdaexp);
 extern int TINKER_MOD(dlmda, vlmdainvn);
 extern int TINKER_MOD(dlmda, vrelst0);
@@ -38,7 +41,9 @@ extern double TINKER_MOD(dlmda, depdl);
 extern double TINKER_MOD(dlmda, devdl);
 extern double TINKER_MOD(dlmda, dpldlmda);
 extern double TINKER_MOD(dlmda, dvldlmda);
+extern double TINKER_MOD(dlmda, elmdaapmrho);
 extern double TINKER_MOD(dlmda, elmdainveps);
+extern double TINKER_MOD(dlmda, plmdaapmrho);
 extern double TINKER_MOD(dlmda, plmdainveps);
 extern double TINKER_MOD(dlmda, qntelmda0);
 extern double TINKER_MOD(dlmda, qntelmda1);
@@ -46,6 +51,7 @@ extern double TINKER_MOD(dlmda, qntplmda0);
 extern double TINKER_MOD(dlmda, qntplmda1);
 extern double TINKER_MOD(dlmda, qntvlmda0);
 extern double TINKER_MOD(dlmda, qntvlmda1);
+extern double TINKER_MOD(dlmda, vlmdaapmrho);
 extern double TINKER_MOD(dlmda, vlmdainveps);
 extern double TINKER_MOD(dlmda, demvirdl)[3][3];
 extern double TINKER_MOD(dlmda, depvirdl)[3][3];

@@ -39,6 +39,7 @@ c
       call test_mutate_lmdadrv
       call test_mutate_lmdapin
       call test_mutate_relsmap
+      call test_mutate_apm
       return
       end
 c
@@ -1467,6 +1468,64 @@ c
      &   '181_water_rels_ye_lig2_ix2_l015.key',
      &   '181_water_rels_ye_lig2_ix2_l015.txt',
      &   '181_water_rels_ye_lig2_ix2_l015',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_apm  --  asymmetric power map legs  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_apm" runs the four water fixtures 196-199 that map
+c     the main lambda onto a sublambda with the asymmetric power "apm"
+c     scheme, whose shape is compiled into "mutate_dlmda" rather than
+c     read from the keyfile, so a fixture names the map and nothing
+c     else; each carries the "lambda-deriv" keyword and drives
+c     "test_mutate_calc" with the level 4 lambda derivative checks
+c     enabled, which is where the map earns its keep, since its chain
+c     rule factor is neither the unit slope of the linear map nor the
+c     vanishing endpoint slope of the quintic taper
+c
+c     the fixtures pin one set of terms and drive the rest the way the
+c     170-175 pair does; 196 copies 170, pinning electrostatics and
+c     polarization decoupled by their own keywords and driving van der
+c     Waals across the map at a main lambda of 0.5, while 197-199 copy
+c     171, pinning van der Waals decoupled and driving electrostatics
+c     and polarization at main lambda values of 0.0, 0.5 and 1.0; the
+c     three walk the whole interval, so they cover both endpoints of
+c     the map, where the slope ratio it normalizes to is defined, as
+c     well as the interior; 197-199 carry POL-DUALTOPO for the same
+c     reason 171 does, "epolar4" supplying the polarization lambda
+c     derivative only through dual topology
+c
+c     all four use Ewald and support a pairwise neighbor list, and all
+c     three nonbonded terms stay active, so a pinned term is still
+c     present in the energy rather than switched off
+c
+c
+      subroutine test_mutate_apm
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','196_water_apm_ast_vpin_l05.key',
+     &   '196_water_apm_ast_vpin_l05.txt',
+     &   '196_water_apm_ast_vpin_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','197_water_apm_ast_epin_l00.key',
+     &   '197_water_apm_ast_epin_l00.txt',
+     &   '197_water_apm_ast_epin_l00',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','198_water_apm_ast_epin_l05.key',
+     &   '198_water_apm_ast_epin_l05.txt',
+     &   '198_water_apm_ast_epin_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','199_water_apm_ast_epin_l10.key',
+     &   '199_water_apm_ast_epin_l10.txt',
+     &   '199_water_apm_ast_epin_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end

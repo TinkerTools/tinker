@@ -436,6 +436,12 @@ c
       elmdainveps = 0.3d0
       plmdainveps = 0.3d0
       vlmdainveps = 0.3d0
+      elmdaapmn = 12
+      plmdaapmn = 12
+      vlmdaapmn = 12
+      elmdaapmrho = 4.0d0
+      plmdaapmrho = 4.0d0
+      vlmdaapmrho = 4.0d0
 c
 c     a sublambda not driven by the main lambda has an identity chain
 c
@@ -606,15 +612,18 @@ c
 c     validate mapping schemes from main lambda to sublambdas
 c
       if (elmdamap.ne.'QNT' .and. elmdamap.ne.'EXP'
-     &       .and. elmdamap.ne.'INV') then
+     &       .and. elmdamap.ne.'INV'
+     &       .and. elmdamap.ne.'APM') then
          elmdamap = 'QNT'
       end if
       if (plmdamap.ne.'QNT' .and. plmdamap.ne.'EXP'
-     &       .and. plmdamap.ne.'INV') then
+     &       .and. plmdamap.ne.'INV'
+     &       .and. plmdamap.ne.'APM') then
          plmdamap = 'QNT'
       end if
       if (vlmdamap.ne.'QNT' .and. vlmdamap.ne.'EXP'
-     &       .and. vlmdamap.ne.'INV') then
+     &       .and. vlmdamap.ne.'INV'
+     &       .and. vlmdamap.ne.'APM') then
          vlmdamap = 'QNT'
       end if
       if (emdtexp .lt. 1)  emdtexp = 1
@@ -629,6 +638,15 @@ c
       if (elmdainveps .lt. 0.0d0)  elmdainveps = -elmdainveps
       if (plmdainveps .lt. 0.0d0)  plmdainveps = -plmdainveps
       if (vlmdainveps .lt. 0.0d0)  vlmdainveps = -vlmdainveps
+      if (elmdaapmn .lt. 2)  elmdaapmn = 2
+      if (plmdaapmn .lt. 2)  plmdaapmn = 2
+      if (vlmdaapmn .lt. 2)  vlmdaapmn = 2
+      if (elmdaapmrho .lt. 1.0d0)  elmdaapmrho = 1.0d0
+      if (plmdaapmrho .lt. 1.0d0)  plmdaapmrho = 1.0d0
+      if (vlmdaapmrho .lt. 1.0d0)  vlmdaapmrho = 1.0d0
+      elmdaapmrho = min(elmdaapmrho,dble(elmdaapmn)-0.001d0)
+      plmdaapmrho = min(plmdaapmrho,dble(plmdaapmn)-0.001d0)
+      vlmdaapmrho = min(vlmdaapmrho,dble(vlmdaapmn)-0.001d0)
 c
 c     check sublambda intervals are in [0,1] and ordered
 c
