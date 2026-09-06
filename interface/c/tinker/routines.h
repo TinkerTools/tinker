@@ -1136,6 +1136,8 @@ void resizemeta_();
 #define tinker_f_resizemeta resizemeta_
 void ostlangevin_();
 #define tinker_f_ostlangevin ostlangevin_
+void setostphase_();
+#define tinker_f_setostphase setostphase_
 void ensureflambda_(double* dudl);
 #define tinker_f_ensureflambda ensureflambda_
 void egkernel_(double* egbias, double* dgdl, double* dgdfl);

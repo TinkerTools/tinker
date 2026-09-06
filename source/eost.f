@@ -176,9 +176,9 @@ c
          end if
       end if
 c
-c     propagate the lambda particle for the next dynamics step
+c     propagate the lambda particle
 c
-      call ostlangevin
+      if (isamp .le. ostnpa)  call ostlangevin
       return
       end
 c
@@ -267,6 +267,7 @@ c
       integer i0
       integer nper,nbin
       integer ibegin
+      integer nskip
       real*8 avg,std,slp
       real*8 fitslope
       real*8 k,d
@@ -278,14 +279,16 @@ c
       real*8 slpbin(*)
 c
 c
-c     split the averaging slice into equal convergence sub-bins,
-c     leaving any leading remainder samples outside the sub-bins
+c     the propagation and equilibration phases are skipped, leaving
+c     the averaging phase to be split into equal convergence sub-bins,
+c     with any leading remainder samples outside the sub-bins
 c
+      nskip = ostnpa + ostnpb
       nper = 0
-      if (ostcvbin .gt. 0)  nper = ostnavg / ostcvbin
+      if (ostcvbin .gt. 0)  nper = ostnpc / ostcvbin
       nbin = 0
       if (nper .gt. 0)  nbin = ostcvbin
-      ibegin = ostnequil + ostnavg - nper*nbin + 1
+      ibegin = nskip + ostnpc - nper*nbin + 1
       do b = 1, ostcvbin
          avgbin(b) = 0.0d0
          stdbin(b) = 0.0d0
@@ -295,13 +298,13 @@ c
 c     accumulate the drift sums about a shifted origin, so that a
 c     small drift on top of a large offset is not lost to roundoff
 c
-      k = list(ostnequil+1)
+      k = list(nskip+1)
       total = 0.0d0
       tdot = 0.0d0
-      do i = ostnequil+1, ibegin-1
+      do i = nskip+1, ibegin-1
          d = list(i) - k
          total = total + d
-         tdot = tdot + dble(i-ostnequil-1)*d
+         tdot = tdot + dble(i-nskip-1)*d
       end do
 c
 c     accumulate each sub-bin and fold it into the whole-slice sums
@@ -316,15 +319,15 @@ c
             tloc = tloc + dble(i-i0)*d
          end do
          total = total + a
-         tdot = tdot + tloc + dble(i0-1-ostnequil)*a
+         tdot = tdot + tloc + dble(i0-1-nskip)*a
          call avgstd (list,i0,nper,avgbin(b),stdbin(b))
          slpbin(b) = fitslope (tloc,a,nper)
       end do
 c
 c     average and deviation come from the whole averaging slice
 c
-      call avgstd (list,ostnequil+1,ostnavg,avg,std)
-      slp = fitslope (tdot,total,ostnavg)
+      call avgstd (list,nskip+1,ostnpc,avg,std)
+      slp = fitslope (tdot,total,ostnpc)
       return
       end
 c
@@ -827,6 +830,48 @@ c     map theta back to the main lambda
 c
       sinth = sin(osttheta)
       lambda = sinth * sinth
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine setostphase -- split the deposit interval  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "setostphase" divides the gaussian deposit interval into the
+c     phase that propagates the lambda particle, the phase that
+c     equilibrates at the frozen lambda and the phase that averages
+c     dU/dlambda at that same fixed lambda; the phase counts are the
+c     authoritative split, while ostpcratio is only the nominal
+c     fraction left over before truncation to whole samples
+c
+c
+      subroutine setostphase
+      use ost
+      implicit none
+c
+c
+c     divide the interval, keeping at least one propagation step and
+c     at least two samples to average
+c
+      if (iosthist .lt. 1)  iosthist = 1
+      ostpcratio = 1.0d0 - (ostparatio+ostpbratio)
+      ostnpa = int(ostparatio*dble(iosthist))
+      ostnpb = int(ostpbratio*dble(iosthist))
+      ostnpa = max(1,min(ostnpa,iosthist-1))
+      ostnpb = max(0,min(ostnpb,iosthist-ostnpa))
+      ostnpc = iosthist - ostnpa - ostnpb
+      do while (ostnpc.lt.2 .and. ostnpb.gt.0)
+         ostnpb = ostnpb - 1
+         ostnpc = ostnpc + 1
+      end do
+      do while (ostnpc.lt.2 .and. ostnpa.gt.1)
+         ostnpa = ostnpa - 1
+         ostnpc = ostnpc + 1
+      end do
       return
       end
 c
@@ -2144,9 +2189,7 @@ c     set scalar ost state from the history file
 c
       iost = iost0
       iosthist = iosthist0
-      ostnequil = int(osteqratio*dble(iosthist))
-      ostnequil = max(0,min(ostnequil,iosthist-1))
-      ostnavg = iosthist - ostnequil
+      call setostphase
       nlmda = nlmda0
       nflmda = nflmda0
       fli0 = fli00
@@ -2581,9 +2624,7 @@ c     bin width is stored, so recover the bin count that goes with it
 c
       iost = iost0
       iosthist = iosthist0
-      ostnequil = int(osteqratio*dble(iosthist))
-      ostnequil = max(0,min(ostnequil,iosthist-1))
-      ostnavg = iosthist - ostnequil
+      call setostphase
       nmetahist = nmetahist0
       sizemetahist = sizemetahist0
       wlmda = wlmda0

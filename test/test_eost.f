@@ -44,6 +44,8 @@ c
       call test_eost_vkernelmax
       call test_eost_tempering
       call test_eost_ostdyn
+      call test_eost_ostphase
+      call test_eost_ostgate
       call test_eost_save
       call test_eost_meta
       call test_eost_metaimage
@@ -890,15 +892,16 @@ c     average all saved interval samples after equilibration prefix
 c
       call resetost (5,5,1)
       iosthist = 6
-      ostnequil = 2
-      ostnavg = 4
+      ostnpa = 1
+      ostnpb = 1
+      ostnpc = 4
       do i = 1, iosthist
          ostllist(i) = dble(i)
          ostflist(i) = 2.0d0*dble(i)
       end do
-      call avgstd (ostllist,ostnequil+1,ostnavg,
+      call avgstd (ostllist,ostnpa+ostnpb+1,ostnpc,
      &             ostlambdaavg,ostlambdastd)
-      call avgstd (ostflist,ostnequil+1,ostnavg,
+      call avgstd (ostflist,ostnpa+ostnpb+1,ostnpc,
      &             ostdedlavg,ostdedlstd)
       stdref = sqrt(1.25d0)
       call assert_real (ostlambdaavg,4.5d0,1.0d-12,
@@ -1184,8 +1187,9 @@ c     average the samples following the equilibration prefix
 c
       call resetost (5,5,1)
       iosthist = 6
-      ostnequil = 2
-      ostnavg = 4
+      ostnpa = 1
+      ostnpb = 1
+      ostnpc = 4
       do i = 1, iosthist
          ostllist(i) = dble(i)
          ostflist(i) = 2.0d0*dble(i)
@@ -1308,8 +1312,9 @@ c     a flat series has no drift
 c
       call resetost (5,5,1)
       iosthist = 8
-      ostnequil = 0
-      ostnavg = 8
+      ostnpa = 0
+      ostnpb = 0
+      ostnpc = 8
       ostcvbin = 2
       do i = 1, iosthist
          ostllist(i) = 7.0d0
@@ -1685,8 +1690,9 @@ c
       call resetost (5,5,1)
       call resetmeta (2)
       iosthist = 4
-      ostnequil = 2
-      ostnavg = 2
+      ostnpa = 1
+      ostnpb = 1
+      ostnpc = 2
       hbias = 2.0d0
       wlmda = 0.25d0
       dedl = 0.0d0
@@ -1703,7 +1709,7 @@ c
 c
 c     only the samples after the equilibration prefix are averaged
 c
-      avgref = (lam(3)+lam(4)) / dble(ostnavg)
+      avgref = (lam(3)+lam(4)) / dble(ostnpc)
       call assert_int (nmetahist,1,'emetadyn deposits one gaussian')
       call assert_real (metalhist(1),avgref,1.0d-12,
      &                  'emetadyn gaussian center')
@@ -1750,8 +1756,9 @@ c
       call resetost (5,5,1)
       call resetmeta (8)
       iosthist = 4
-      ostnequil = 2
-      ostnavg = 2
+      ostnpa = 1
+      ostnpb = 1
+      ostnpc = 2
       hbias = 2.0d0
       dedl = 0.0d0
       ostdt = 0.0d0
@@ -1881,8 +1888,9 @@ c
       kelvin = 300.0d0
       call resetost (5,5,4)
       iosthist = 4
-      ostnequil = 0
-      ostnavg = 4
+      ostnpa = 0
+      ostnpb = 0
+      ostnpc = 4
       ostcvbin = 0
       ostcvstd = 1.0d0
       ostcvrat = 0.0d0
@@ -1931,6 +1939,157 @@ c
      &                 'interval')
       call assert_real (eosttot,eostsave,1.0d-12,
      &                  'eostdyn rejection leaves the free energy')
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eost_ostphase  --  phase split tests     ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eost_ostphase" checks that setostphase divides the deposit
+c     interval into propagation, equilibration and averaging phases,
+c     and that the clamps keep a propagation step and enough samples
+c     to average without ever losing a sample from the interval
+c
+c
+      subroutine test_eost_ostphase
+      use ost
+      implicit none
+c
+c
+c     the requested ratios divide the interval by truncation
+c
+      iosthist = 10
+      ostparatio = 0.3d0
+      ostpbratio = 0.3d0
+      call setostphase
+      call assert_int (ostnpa,3,'setostphase propagation phase')
+      call assert_int (ostnpb,3,'setostphase equilibration phase')
+      call assert_int (ostnpc,4,'setostphase averaging phase')
+      call assert_real (ostpcratio,0.4d0,1.0d-12,
+     &                  'setostphase leftover ratio')
+      call assert_int (ostnpa+ostnpb+ostnpc,iosthist,
+     &                 'setostphase spans the whole interval')
+c
+c     a zero propagation ratio still keeps one propagation step
+c
+      iosthist = 10
+      ostparatio = 0.0d0
+      ostpbratio = 0.3d0
+      call setostphase
+      call assert_int (ostnpa,1,'setostphase keeps one propagation')
+      call assert_int (ostnpa+ostnpb+ostnpc,iosthist,
+     &                 'setostphase spans a clamped interval')
+c
+c     a crowded interval gives back samples to the averaging phase,
+c     taking them from the equilibration phase first
+c
+      iosthist = 10
+      ostparatio = 0.4d0
+      ostpbratio = 0.5d0
+      call setostphase
+      call assert_int (ostnpc,2,'setostphase restores the average')
+      call assert_int (ostnpa,4,'setostphase spares the propagation')
+      call assert_int (ostnpb,4,'setostphase trims the equilibration')
+      call assert_int (ostnpa+ostnpb+ostnpc,iosthist,
+     &                 'setostphase spans a crowded interval')
+c
+c     the shortest usable interval still holds all three phases
+c
+      iosthist = 3
+      ostparatio = 0.4d0
+      ostpbratio = 0.4d0
+      call setostphase
+      call assert_int (ostnpa,1,'setostphase minimum propagation')
+      call assert_int (ostnpc,2,'setostphase minimum average')
+      call assert_int (ostnpa+ostnpb+ostnpc,iosthist,
+     &                 'setostphase spans the minimum interval')
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eost_ostgate  --  lambda freezing tests  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eost_ostgate" drives eostdyn over one deposit interval and
+c     checks that the lambda particle moves only during the leading
+c     propagation phase, that lambda is then held exactly fixed, and
+c     that the deposited gaussian sits on that frozen lambda
+c
+c
+      subroutine test_eost_ostgate
+      use bath
+      use dlmda
+      use mutant
+      use ost
+      implicit none
+      integer istep
+      real*8 lam(6)
+      real*8 frozen
+c
+c
+c     drive an interval with a deterministic frictionless lambda
+c     particle, so that any lambda motion comes from the gate alone
+c
+      kelvin = 300.0d0
+      call resetost (5,5,4)
+      iosthist = 6
+      ostnpa = 2
+      ostnpb = 2
+      ostnpc = 2
+      ostcvbin = 0
+      ostcvstd = 1.0d0
+      ostcvrat = 0.0d0
+      hbias = 1.0d0
+      ostdt = 0.1d0
+      ostmass = 1.0d0
+      ostfriction = 0.0d0
+      osttheta = 0.25d0 * 3.14159265358979323846d0
+      ostvtheta = 0.0d0
+      lambda = 0.5d0
+      fastkernel = .true.
+      d2edl2 = 0.0d0
+      ostbdgdl = 0.0d0
+      ostbdgdfl = 0.0d0
+      ostbdfdl = 0.0d0
+      iost = 0
+      do istep = 1, iosthist
+         dedl = 1.0d0
+         call eostdyn
+         lam(istep) = lambda
+      end do
+c
+c     the particle moves while the interval is in its first phase
+c
+      call assert_logical (lam(1).ne.lam(2),.true.,
+     &                     'eostdyn propagates during phase a')
+c
+c     lambda is then bit identical for the rest of the interval
+c
+      frozen = lam(2)
+      do istep = 3, iosthist
+         call assert_real (lam(istep),frozen,0.0d0,
+     &                     'eostdyn holds lambda after phase a')
+      end do
+c
+c     the averaged lambda is the frozen value, not a smear, so the
+c     gaussian is deposited exactly on it
+c
+      call assert_int (nosthist,1,'eostdyn deposits a frozen interval')
+      call assert_real (ostlambdaavg,frozen,0.0d0,
+     &                  'eostdyn averages the frozen lambda')
+      call assert_real (ostlhist(1),frozen,0.0d0,
+     &                  'eostdyn centers the gaussian on frozen lambda')
+      call assert_real (ostfhist(1),1.0d0,1.0d-12,
+     &                  'eostdyn centers the gaussian on flambda')
       return
       end
 c
@@ -2005,8 +2164,9 @@ c
       nosthistsave = 0
       sizeosthist = nhist
       iosthist = 10
-      ostnequil = 5
-      ostnavg = 5
+      ostnpa = 3
+      ostnpb = 3
+      ostnpc = 4
       lambda = 0.0d0
       ostlambdaavg = 0.0d0
       ostlambdastd = 0.0d0
@@ -2036,7 +2196,9 @@ c
       plmdainveps = 0.0d0
       elmdainveps = 0.0d0
       vlmdainveps = 0.0d0
-      osteqratio = 0.5d0
+      ostparatio = 0.3d0
+      ostpbratio = 0.3d0
+      ostpcratio = 0.4d0
       hbias = 0.0d0
       eosttot = 0.0d0
       oststdev = 1.0d0

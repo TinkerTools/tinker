@@ -22,8 +22,9 @@ c     nmethistsave   number of metadynamics gaussians written to file
 c     nosthist       total number of histograms
 c     nosthistsave   number of histograms written to the history file
 c     ostcvbin       convergence sub-bins per gaussian deposit interval
-c     ostnavg        samples averaged between hist updates
-c     ostnequil      samples skipped before hist averaging
+c     ostnpa         samples propagating the lambda particle
+c     ostnpb         samples equilibrating at the frozen lambda
+c     ostnpc         samples averaged at the frozen lambda
 c     sizemetahist   current allocation size for metadynamics gaussians
 c     sizeosthist    current allocation size for saved histograms
 c     metaihist      iost step at which each gaussian was added
@@ -50,12 +51,14 @@ c     ostdedlslp     fitted dU/dL change per sample over an interval
 c     ostdedlstd     standard deviation of dU/dL between updates
 c     ostdgdl        current dg/dlambda value
 c     ostdt          time step for theta lambda propagation
-c     osteqratio     fraction of hist interval to equilibrate
 c     ostfriction    friction coefficient for theta lambda coordinate
 c     ostlambdaavg   average main lambda value between hist updates
 c     ostlambdaslp   fitted lambda change per sample over an interval
 c     ostlambdastd   standard deviation of lambda between hist updates
 c     ostmass        fictitious mass of theta lambda coordinate
+c     ostparatio     fraction interval propagating lambda
+c     ostpbratio     fraction interval equilibrating dedl at fixed lmda
+c     ostpcratio     fraction interval averaging dedl at fixed lmda
 c     oststdev       gaussian cutoff distance in standard deviations
 c     osttheta       theta coordinate used to propagate lambda
 c     ostvtheta      velocity of the theta lambda coordinate
@@ -113,8 +116,9 @@ c
       integer nosthist
       integer nosthistsave
       integer ostcvbin
-      integer ostnavg
-      integer ostnequil
+      integer ostnpa
+      integer ostnpb
+      integer ostnpc
       integer sizemetahist
       integer sizeosthist
       integer, allocatable :: metaihist(:)
@@ -141,12 +145,14 @@ c
       real*8 ostdedlstd
       real*8 ostdgdl
       real*8 ostdt
-      real*8 osteqratio
       real*8 ostfriction
       real*8 ostlambdaavg
       real*8 ostlambdaslp
       real*8 ostlambdastd
       real*8 ostmass
+      real*8 ostparatio
+      real*8 ostpbratio
+      real*8 ostpcratio
       real*8 oststdev
       real*8 osttheta
       real*8 ostvtheta

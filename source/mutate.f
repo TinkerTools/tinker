@@ -861,11 +861,10 @@ c     set default ost update intervals
 c
       iost = 0
       iosthist = 10
-      ostnequil = 5
-      ostnavg = 5
       ostddgdl = 0.0d0
       ostdgdl = 0.0d0
-      osteqratio = 0.5d0
+      ostparatio = 0.3d0
+      ostpbratio = 0.3d0
       nosthistsave = 0
 c
 c     set default criteria for judging convergence of a deposit
@@ -919,9 +918,12 @@ c
          if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
             string = record(next:240)
             read (string,*,err=10)  iosthist
-         else if (keyword(1:15) .eq. 'OSTEQUIL-RATIO ') then
+         else if (keyword(1:12) .eq. 'OSTPA-RATIO ') then
             string = record(next:240)
-            read (string,*,err=10)  osteqratio
+            read (string,*,err=10)  ostparatio
+         else if (keyword(1:12) .eq. 'OSTPB-RATIO ') then
+            string = record(next:240)
+            read (string,*,err=10)  ostpbratio
          else if (keyword(1:8) .eq. 'OST-DT ') then
             string = record(next:240)
             read (string,*,err=10)  ostdt
@@ -1000,17 +1002,13 @@ c
       maxwlhist = wlhist
       maxwfhist = wfhist
 c
-c     bound ost equilibration ratio to leave at least one sample
+c     split the deposit interval into its propagation, equilibration
+c     and averaging phases
 c
       if (iosthist .lt. 1)  iosthist = 1
-      if (osteqratio .lt. 0.0d0) then
-         osteqratio = 0.0d0
-      else if (osteqratio .ge. 1.0d0) then
-         osteqratio = 1.0d0 - 1.0d0/dble(iosthist)
-      end if
-      ostnequil = int(osteqratio*dble(iosthist))
-      ostnequil = max(0,min(ostnequil,iosthist-1))
-      ostnavg = iosthist - ostnequil
+      if (ostparatio .lt. 0.0d0)  ostparatio = 0.0d0
+      if (ostpbratio .lt. 0.0d0)  ostpbratio = 0.0d0
+      call setostphase
 c
 c     start the lambda particle from the current main lambda
 c
@@ -1312,6 +1310,7 @@ c
       use limits
       use mplpot
       use mutant
+      use ost
       use polpot
       use potent
       implicit none
@@ -1425,6 +1424,24 @@ c
      &              ' isolated-ligand van der Waals terms are needed',
      &              ' to preserve the relative thermodynamic cycle;',
      &              ' remove the VDW-ANNIHILATE keyword')
+         call fatal
+      end if
+c
+c     the ost deposit interval must keep a propagation phase, an
+c     equilibration phase and samples to average at the fixed lambda
+c
+      if (use_ost .and. ostparatio+ostpbratio.ge.0.9d0) then
+         write (iout,120)
+  120    format (/,' MUTATE_CHECK  --  OSTPA-RATIO plus OSTPB-RATIO',
+     &              ' must be less than 0.9 to leave samples for the',
+     &              ' fixed lambda average')
+         call fatal
+      end if
+      if (use_ost .and. iosthist.lt.3) then
+         write (iout,130)
+  130    format (/,' MUTATE_CHECK  --  OSTHIST-INTERVAL must be at',
+     &              ' least 3 to hold a propagation, equilibration',
+     &              ' and averaging phase')
          call fatal
       end if
       return
