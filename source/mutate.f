@@ -147,6 +147,9 @@ c
             string = record(next:240)
             read (string,*,err=30)  vlambda
             setvlambda = .true.
+         else if (keyword(1:13) .eq. 'VDW-SOFTCORE ') then
+            string = record(next:240)
+            read (string,*,err=30,end=30)  scalphav,scexp
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  tlambda
@@ -1341,6 +1344,22 @@ c
       use polpot
       use potent
       implicit none
+c
+c
+c     enforce the allowed soft core van der Waals parameters
+c
+      if (scalphav .lt. 0.0d0) then
+         write (iout,5)
+    5    format (/,' MUTATE_CHECK  --  VDW-SOFTCORE alpha must be',
+     &              ' greater than or equal to zero')
+         call fatal
+      end if
+      if (scexp .lt. 2.0d0) then
+         write (iout,6)
+    6    format (/,' MUTATE_CHECK  --  VDW-SOFTCORE exponent must be',
+     &              ' greater than or equal to two')
+         call fatal
+      end if
 c
 c
 c     only one method can sample the main lambda at a time

@@ -278,6 +278,9 @@ c
       call assert_real (elambda,1.0d0,0.0d0,'lmda endpoint elambda')
       call assert_real (plambda,1.0d0,0.0d0,'lmda endpoint plambda')
       call assert_real (vlambda,1.0d0,0.0d0,'lmda endpoint vlambda')
+      call assert_real (scalphav,0.0d0,0.0d0,
+     &                  'lmda endpoint scalphav')
+      call assert_real (scexp,2.0d0,0.0d0,'lmda endpoint scexp')
       e = energy ()
       call final
       call loadfix ('water2','149_water_lmda_ast_none.key')

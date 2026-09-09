@@ -740,6 +740,10 @@ FREE ENERGY PERTURBATION KEYWORDS
      - MUTATE
      - VDW-ANNIHILATE
      - VDW-LAMBDA
+   * -
+     - VDW-SOFTCORE
+     -
+     -
 
 POTENTIAL SMOOTHING KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -3379,6 +3383,12 @@ VDW-LAMBDA [real]
 
 VDW-LIST
    Turns on pairwise neighbor lists for any of the van der Waals potentials. This method will yield identical energetic results to the standard double loop method.
+
+.. index:: VDW-SOFTCORE
+.. _KEY-VDW-SOFTCORE:
+
+VDW-SOFTCORE [2 reals]
+   Sets the alpha offset and lambda exponent used by the soft-core buffered 14-7 van der Waals potential during free energy calculations. The first real-number modifier is the nonnegative soft-core alpha value, and the second is the lambda exponent, which must be at least 2.0. The default values in the absence of the VDW-SOFTCORE keyword are 0.7 and 5.0, respectively.
 
 .. index:: VDW-TAPER
 .. _KEY-VDW-TAPER:
