@@ -87,6 +87,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use potent
       use shunt
       use usage
@@ -99,6 +100,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
+      real*8 rsc,rsc2,escoff
       real*8 rr5,rr7,rr9
       real*8 rr1i,rr3i,rr5i
       real*8 rr1k,rr3k,rr5k
@@ -164,6 +166,13 @@ c
       f = electric / dielec
       mode = 'MPOLE'
       call switch (mode)
+c
+c     set the softcore offset for real space electrostatics
+c
+      escoff = 0.0d0
+      if (use_esoft .and. .not.use_subsys) then
+         escoff = scalpham * (1.0d0-elambda)**2
+      end if
 c
 c     print header information if debug output was requested
 c
@@ -268,13 +277,24 @@ c
                   qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                      + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
+c     apply softcore shift to the electrostatic separation distance
+c
+                  rsc2 = r2
+                  rsc = r
+                  if (escoff .ne. 0.0d0) then
+                     if (mut(i) .or. mut(k)) then
+                        rsc2 = r2 + escoff
+                        rsc = sqrt(rsc2)
+                     end if
+                  end if
+c
 c     get reciprocal distance terms for this interaction
 c
-                  rr1 = f * mscale(k) / r
-                  rr3 = rr1 / r2
-                  rr5 = 3.0d0 * rr3 / r2
-                  rr7 = 5.0d0 * rr5 / r2
-                  rr9 = 7.0d0 * rr7 / r2
+                  rr1 = f * mscale(k) / rsc
+                  rr3 = rr1 / rsc2
+                  rr5 = 3.0d0 * rr3 / rsc2
+                  rr7 = 5.0d0 * rr5 / rsc2
+                  rr9 = 7.0d0 * rr7 / rsc2
 c
 c     find damped multipole intermediates and energy value
 c
@@ -477,13 +497,24 @@ c
                         qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                            + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
+c     apply softcore shift to the electrostatic separation distance
+c
+                        rsc2 = r2
+                        rsc = r
+                        if (escoff .ne. 0.0d0) then
+                           if (mut(i) .or. mut(k)) then
+                              rsc2 = r2 + escoff
+                              rsc = sqrt(rsc2)
+                           end if
+                        end if
+c
 c     get reciprocal distance terms for this interaction
 c
-                        rr1 = f * mscale(k) / r
-                        rr3 = rr1 / r2
-                        rr5 = 3.0d0 * rr3 / r2
-                        rr7 = 5.0d0 * rr5 / r2
-                        rr9 = 7.0d0 * rr7 / r2
+                        rr1 = f * mscale(k) / rsc
+                        rr3 = rr1 / rsc2
+                        rr5 = 3.0d0 * rr3 / rsc2
+                        rr7 = 5.0d0 * rr5 / rsc2
+                        rr9 = 7.0d0 * rr7 / rsc2
 c
 c     find damped multipole intermediates and energy value
 c
@@ -624,6 +655,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use neigh
       use potent
       use shunt
@@ -637,6 +669,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
+      real*8 rsc,rsc2,escoff
       real*8 rr5,rr7,rr9
       real*8 rr1i,rr3i,rr5i
       real*8 rr1k,rr3k,rr5k
@@ -702,6 +735,13 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
+c     set the softcore offset for real space electrostatics
+c
+      escoff = 0.0d0
+      if (use_esoft .and. .not.use_subsys) then
+         escoff = scalpham * (1.0d0-elambda)**2
+      end if
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -719,7 +759,8 @@ c
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,pval,
 !$OMP& palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,
 !$OMP& m4scale,m5scale,f,nelst,elst,use_chgpen,use_group,use_intra,
-!$OMP& use_bounds,off2,molcule,name,verbose,debug,header,iout)
+!$OMP& use_bounds,off2,molcule,name,verbose,debug,header,
+!$OMP& iout,mut,escoff)
 !$OMP& firstprivate(mscale) shared (em,nem,aem,einter)
 !$OMP DO reduction(+:em,nem,aem,einter)
 c
@@ -815,13 +856,24 @@ c
                   qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                      + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
+c     apply softcore shift to the electrostatic separation distance
+c
+                  rsc2 = r2
+                  rsc = r
+                  if (escoff .ne. 0.0d0) then
+                     if (mut(i) .or. mut(k)) then
+                        rsc2 = r2 + escoff
+                        rsc = sqrt(rsc2)
+                     end if
+                  end if
+c
 c     get reciprocal distance terms for this interaction
 c
-                  rr1 = f * mscale(k) / r
-                  rr3 = rr1 / r2
-                  rr5 = 3.0d0 * rr3 / r2
-                  rr7 = 5.0d0 * rr5 / r2
-                  rr9 = 7.0d0 * rr7 / r2
+                  rr1 = f * mscale(k) / rsc
+                  rr3 = rr1 / rsc2
+                  rr5 = 3.0d0 * rr3 / rsc2
+                  rr7 = 5.0d0 * rr5 / rsc2
+                  rr9 = 7.0d0 * rr7 / rsc2
 c
 c     find damped multipole intermediates and energy value
 c
@@ -1116,6 +1168,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use potent
       use shunt
       implicit none
@@ -1127,6 +1180,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
+      real*8 rsc,rsc2,escoff
       real*8 rr5,rr7,rr9
       real*8 rr1i,rr3i,rr5i
       real*8 rr1k,rr3k,rr5k
@@ -1173,6 +1227,13 @@ c
       f = electric / dielec
       mode = 'EWALD'
       call switch (mode)
+c
+c     set the softcore offset for real space electrostatics
+c
+      escoff = 0.0d0
+      if (use_esoft .and. .not.use_subsys) then
+         escoff = scalpham * (1.0d0-elambda)**2
+      end if
 c
 c     print header information if debug output was requested
 c
@@ -1264,17 +1325,28 @@ c
                qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                   + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
+c     apply softcore shift to the electrostatic separation distance
+c
+               rsc2 = r2
+               rsc = r
+               if (escoff .ne. 0.0d0) then
+                  if (mut(i) .or. mut(k)) then
+                     rsc2 = r2 + escoff
+                     rsc = sqrt(rsc2)
+                  end if
+               end if
+c
 c     get reciprocal distance terms for this interaction
 c
-               rr1 = f / r
-               rr3 = rr1 / r2
-               rr5 = 3.0d0 * rr3 / r2
-               rr7 = 5.0d0 * rr5 / r2
-               rr9 = 7.0d0 * rr7 / r2
+               rr1 = f / rsc
+               rr3 = rr1 / rsc2
+               rr5 = 3.0d0 * rr3 / rsc2
+               rr7 = 5.0d0 * rr5 / rsc2
+               rr9 = 7.0d0 * rr7 / rsc2
 c
 c     calculate real space Ewald error function damping
 c
-               call dampewald (9,r,r2,f,dmpe)
+               call dampewald (9,rsc,rsc2,f,dmpe)
 c
 c     find damped multipole intermediates and energy value
 c
@@ -1496,17 +1568,28 @@ c
                      qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                         + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
+c     apply softcore shift to the electrostatic separation distance
+c
+                     rsc2 = r2
+                     rsc = r
+                     if (escoff .ne. 0.0d0) then
+                        if (mut(i) .or. mut(k)) then
+                           rsc2 = r2 + escoff
+                           rsc = sqrt(rsc2)
+                        end if
+                     end if
+c
 c     get reciprocal distance terms for this interaction
 c
-                     rr1 = f / r
-                     rr3 = rr1 / r2
-                     rr5 = 3.0d0 * rr3 / r2
-                     rr7 = 5.0d0 * rr5 / r2
-                     rr9 = 7.0d0 * rr7 / r2
+                     rr1 = f / rsc
+                     rr3 = rr1 / rsc2
+                     rr5 = 3.0d0 * rr3 / rsc2
+                     rr7 = 5.0d0 * rr5 / rsc2
+                     rr9 = 7.0d0 * rr7 / rsc2
 c
 c     calculate real space Ewald error function damping
 c
-                     call dampewald (9,r,r2,f,dmpe)
+                     call dampewald (9,rsc,rsc2,f,dmpe)
 c
 c     find damped multipole intermediates and energy value
 c
@@ -1831,6 +1914,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use neigh
       use potent
       use shunt
@@ -1842,6 +1926,7 @@ c
       real*8 xi,yi,zi
       real*8 xr,yr,zr
       real*8 r,r2,rr1,rr3
+      real*8 rsc,rsc2,escoff
       real*8 rr5,rr7,rr9
       real*8 rr1i,rr3i,rr5i
       real*8 rr1k,rr3k,rr5k
@@ -1889,6 +1974,13 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     set the softcore offset for real space electrostatics
+c
+      escoff = 0.0d0
+      if (use_esoft .and. .not.use_subsys) then
+         escoff = scalpham * (1.0d0-elambda)**2
+      end if
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -1906,7 +1998,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_bounds,f,off2,molcule,name,
-!$OMP& verbose,debug,header,iout)
+!$OMP& verbose,debug,header,iout,mut,escoff)
 !$OMP& firstprivate(mscale) shared (em,nem,aem,einter)
 !$OMP DO reduction(+:em,nem,aem,einter)
 c
@@ -1989,17 +2081,28 @@ c
                qiqk = 2.0d0*(qixy*qkxy+qixz*qkxz+qiyz*qkyz)
      &                   + qixx*qkxx + qiyy*qkyy + qizz*qkzz
 c
+c     apply softcore shift to the electrostatic separation distance
+c
+               rsc2 = r2
+               rsc = r
+               if (escoff .ne. 0.0d0) then
+                  if (mut(i) .or. mut(k)) then
+                     rsc2 = r2 + escoff
+                     rsc = sqrt(rsc2)
+                  end if
+               end if
+c
 c     get reciprocal distance terms for this interaction
 c
-               rr1 = f / r
-               rr3 = rr1 / r2
-               rr5 = 3.0d0 * rr3 / r2
-               rr7 = 5.0d0 * rr5 / r2
-               rr9 = 7.0d0 * rr7 / r2
+               rr1 = f / rsc
+               rr3 = rr1 / rsc2
+               rr5 = 3.0d0 * rr3 / rsc2
+               rr7 = 5.0d0 * rr5 / rsc2
+               rr9 = 7.0d0 * rr7 / rsc2
 c
 c     calculate real space Ewald error function damping
 c
-               call dampewald (9,r,r2,f,dmpe)
+               call dampewald (9,rsc,rsc2,f,dmpe)
 c
 c     find damped multipole intermediates and energy value
 c

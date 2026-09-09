@@ -210,7 +210,7 @@ c
                   if (mutik) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
-                     scal = scalpha * (1.0d0-vlambda)**2
+                     scal = scalphav * (1.0d0-vlambda)**2
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)
@@ -350,7 +350,7 @@ c
                      if (mutik) then
                         rho = rik / rv
                         eps = eps * vlambda**scexp
-                        scal = scalpha * (1.0d0-vlambda)**2
+                        scal = scalphav * (1.0d0-vlambda)**2
                         t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                         t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                         e = eps * t1 * (t2-2.0d0)
@@ -632,7 +632,7 @@ c
                   if (mutik) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
-                     scal = scalpha * (1.0d0-vlambda)**2
+                     scal = scalphav * (1.0d0-vlambda)**2
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)
@@ -784,7 +784,7 @@ c
 !$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,i13,
 !$OMP& i14,i15,v2scale,v3scale,v4scale,v5scale,use_group,
 !$OMP& off2,radmin,epsilon,radmin4,epsilon4,ghal,dhal,vcouple,
-!$OMP& vlambda,mut,scexp,scalpha,cut2,c0,c1,c2,c3,c4,c5)
+!$OMP& vlambda,mut,scexp,scalphav,cut2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(ev)
 !$OMP DO reduction(+:ev)
 c
@@ -867,7 +867,7 @@ c
                   if (mutik) then
                      rho = rik / rv
                      eps = eps * vlambda**scexp
-                     scal = scalpha * (1.0d0-vlambda)**2
+                     scal = scalphav * (1.0d0-vlambda)**2
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)

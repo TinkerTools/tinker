@@ -270,7 +270,7 @@ c
                      rhopdhal7 = rhopdhal6 * rhopdhal
                      eps0 = eps
                      eps = eps * vlambda**scexp
-                     scal = scalpha * (1.0d0-vlambda)**2
+                     scal = scalphav * (1.0d0-vlambda)**2
                      s1 = 1.0d0 / (scal+rhopdhal7)
                      s2 = 1.0d0 / (scal+rho7+ghal)
                      dhal17 = (1.0d0+dhal)**7
@@ -284,7 +284,7 @@ c
                      de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
                      t0 = eps
                      dt0dl = eps0 * scexp * vlambda**(scexp-1)
-                     dscaldl = 2.0d0 * scalpha * (1.0d0-vlambda)
+                     dscaldl = 2.0d0 * scalphav * (1.0d0-vlambda)
                      ds1dl = dscaldl * s1 * s1
                      ds2dl = dscaldl * s2 * s2
                      dt1dl = dhal17 * ds1dl
@@ -293,9 +293,9 @@ c
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
                      d2t0dl2 = eps0*scexp*(scexp-1) * vlambda**(scexp-2)
-                     d2t1dl2 = dhal17 * (-2.0d0*scalpha*s1*s1 
+                     d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
      &                         + 2.0d0*dscaldl*s1*ds1dl)
-                     d2t2dl2 = ghal1 * (-2.0d0*scalpha*s2*s2 
+                     d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
      &                         + 2.0d0*dscaldl*s2*ds2dl)
                      dlambda2 = d2t0dl2*t1*t2m2
      &                          + t0*d2t1dl2*t2m2
@@ -576,7 +576,7 @@ c
                         rhopdhal7 = rhopdhal6 * rhopdhal
                         eps0 = eps
                         eps = eps * vlambda**scexp
-                        scal = scalpha * (1.0d0-vlambda)**2
+                        scal = scalphav * (1.0d0-vlambda)**2
                         s1 = 1.0d0 / (scal+rhopdhal7)
                         s2 = 1.0d0 / (scal+rho7+ghal)
                         dhal17 = (1.0d0+dhal)**7
@@ -590,7 +590,7 @@ c
                         de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
                         t0 = eps
                         dt0dl = eps0 * scexp * vlambda**(scexp-1)
-                        dscaldl = 2.0d0 * scalpha * (1.0d0-vlambda)
+                        dscaldl = 2.0d0 * scalphav * (1.0d0-vlambda)
                         ds1dl = dscaldl * s1 * s1
                         ds2dl = dscaldl * s2 * s2
                         dt1dl = dhal17 * ds1dl
@@ -600,9 +600,9 @@ c
      &                            + t0 * t1 * dt2dl
                         d2t0dl2 = eps0*scexp*(scexp-1)
      &                            * vlambda**(scexp-2)
-                        d2t1dl2 = dhal17 * (-2.0d0*scalpha*s1*s1 
+                        d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
      &                            + 2.0d0*dscaldl*s1*ds1dl)
-                        d2t2dl2 = ghal1 * (-2.0d0*scalpha*s2*s2 
+                        d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
      &                            + 2.0d0*dscaldl*s2*ds2dl)
                         dlambda2 = d2t0dl2*t1*t2m2
      &                             + t0*d2t1dl2*t2m2
@@ -1070,7 +1070,7 @@ c
                      rhopdhal7 = rhopdhal6 * rhopdhal
                      eps0 = eps
                      eps = eps * vlambda**scexp
-                     scal = scalpha * (1.0d0-vlambda)**2
+                     scal = scalphav * (1.0d0-vlambda)**2
                      s1 = 1.0d0 / (scal+rhopdhal7)
                      s2 = 1.0d0 / (scal+rho7+ghal)
                      dhal17 = (1.0d0+dhal)**7
@@ -1084,7 +1084,7 @@ c
                      de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
                      t0 = eps
                      dt0dl = eps0 * scexp * vlambda**(scexp-1)
-                     dscaldl = 2.0d0 * scalpha * (1.0d0-vlambda)
+                     dscaldl = 2.0d0 * scalphav * (1.0d0-vlambda)
                      ds1dl = dscaldl * s1 * s1
                      ds2dl = dscaldl * s2 * s2
                      dt1dl = dhal17 * ds1dl
@@ -1093,9 +1093,9 @@ c
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
                      d2t0dl2 = eps0*scexp*(scexp-1) * vlambda**(scexp-2)
-                     d2t1dl2 = dhal17 * (-2.0d0*scalpha*s1*s1 
+                     d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
      &                         + 2.0d0*dscaldl*s1*ds1dl)
-                     d2t2dl2 = ghal1 * (-2.0d0*scalpha*s2*s2 
+                     d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
      &                         + 2.0d0*dscaldl*s2*ds2dl)
                      dlambda2 = d2t0dl2*t1*t2m2
      &                          + t0*d2t1dl2*t2m2
@@ -1422,7 +1422,7 @@ c
 !$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
-!$OMP& dhal,cut2,vcouple,vlambda,mut,scexp,scalpha,
+!$OMP& dhal,cut2,vcouple,vlambda,mut,scexp,scalphav,
 !$OMP& c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfvdl,devdl,d2evdl2,
 !$OMP& evvir,devvirdl)
@@ -1512,7 +1512,7 @@ c
                      rhopdhal7 = rhopdhal6 * rhopdhal
                      eps0 = eps
                      eps = eps * vlambda**scexp
-                     scal = scalpha * (1.0d0-vlambda)**2
+                     scal = scalphav * (1.0d0-vlambda)**2
                      s1 = 1.0d0 / (scal+rhopdhal7)
                      s2 = 1.0d0 / (scal+rho7+ghal)
                      dhal17 = (1.0d0+dhal)**7
@@ -1526,7 +1526,7 @@ c
                      de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
                      t0 = eps
                      dt0dl = eps0 * scexp * vlambda**(scexp-1)
-                     dscaldl = 2.0d0 * scalpha * (1.0d0-vlambda)
+                     dscaldl = 2.0d0 * scalphav * (1.0d0-vlambda)
                      ds1dl = dscaldl * s1 * s1
                      ds2dl = dscaldl * s2 * s2
                      dt1dl = dhal17 * ds1dl
@@ -1535,9 +1535,9 @@ c
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
                      d2t0dl2 = eps0*scexp*(scexp-1) * vlambda**(scexp-2)
-                     d2t1dl2 = dhal17 * (-2.0d0*scalpha*s1*s1 
+                     d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
      &                         + 2.0d0*dscaldl*s1*ds1dl)
-                     d2t2dl2 = ghal1 * (-2.0d0*scalpha*s2*s2 
+                     d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
      &                         + 2.0d0*dscaldl*s2*ds2dl)
                      dlambda2 = d2t0dl2*t1*t2m2
      &                          + t0*d2t1dl2*t2m2

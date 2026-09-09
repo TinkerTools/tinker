@@ -493,7 +493,7 @@ struct {
    double vlambda;
    double elambda;
    double scexp;
-   double scalpha;
+   double scalphav;
    int* mut;
 } mutant__;
 
@@ -1409,7 +1409,7 @@ void set_mpole_data_ (int* maxpole, int* npole, int* ipole, int* polsiz,
 void set_mutant_data_ (int* nmut, int* vcouple, int* imut, int* type0,
                        int* class0, int* type1, int* class1, double* lambda,
                        double* tlambda, double* vlambda, double* elambda,
-                       double* scexp, double* scalpha, int* mut) {
+                       double* scexp, double* scalphav, int* mut) {
 
    mutant__.nmut = *nmut;
    mutant__.vcouple = *vcouple;
@@ -1423,7 +1423,7 @@ void set_mutant_data_ (int* nmut, int* vcouple, int* imut, int* type0,
    mutant__.vlambda = *vlambda;
    mutant__.elambda = *elambda;
    mutant__.scexp = *scexp;
-   mutant__.scalpha = *scalpha;
+   mutant__.scalphav = *scalphav;
    mutant__.mut = mut;
 }
 

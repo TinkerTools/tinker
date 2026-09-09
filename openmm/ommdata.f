@@ -143,7 +143,7 @@ c
      &                     xaxis,yaxis,pole,rpole,mono0,polaxe)
       call set_mutant_data (nmut,vcouple,imut,type0,class0,type1,
      &                      class1,lambda,tlambda,vlambda,elambda,
-     &                      scexp,scalpha,mut)
+     &                      scexp,scalphav,mut)
       call set_nonpol_data (epso,epsh,rmino,rminh,awater,slevy,
      &                      solvprs,surften,spcut,spoff,stcut,
      &                      stoff,rcav,rdisp,cdisp)

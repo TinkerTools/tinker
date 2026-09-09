@@ -39,6 +39,7 @@ c
       use iounit
       use katoms
       use keys
+      use mplpot
       use mutant
       use potent
       implicit none
@@ -98,7 +99,12 @@ c     set defaults for vdw coupling type and soft core vdw
 c
       vcouple = 0
       scexp = 5.0d0
-      scalpha = 0.7d0
+      scalphav = 0.7d0
+c
+c     set defaults for soft core real space electrostatics
+c
+      setesoft = .false.
+      scalpham = 2.0d0
 c
 c     zero out number of hybrid atoms and mutated torsions
 c
@@ -146,6 +152,10 @@ c
             read (string,*,err=30)  tlambda
          else if (keyword(1:15) .eq. 'VDW-ANNIHILATE ') then
             vcouple = 1
+         else if (keyword(1:13) .eq. 'ELE-SOFTCORE ') then
+            setesoft = .true.
+            string = record(next:240)
+            read (string,*,err=30,end=30)  scalpham
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:240)
             read (string,*,err=30)  ihyb,it0,it1
@@ -263,6 +273,10 @@ c
      &           /,' Electrostatics Lambda Value',8x,f8.3,
      &           /,' Polarization Lambda Value',10x,f8.3,
      &           /,' Torsion Angle Lambda Value',9x,f8.3)
+         if (use_esoft) then
+            write (iout,55)  scalpham
+   55       format (' Electrostatic Softcore Alpha',7x,f8.3)
+         end if
 c
 c     report the mode chosen along each axis of the calculation
 c
@@ -711,6 +725,19 @@ c
       use_past = (use_mutate .and. .not.use_rel .and. .not.use_epdt
      &                .and. use_polar)
       use_plmda = use_past
+c
+c     soft core real space electrostatics shifts the separation used
+c     by the radial functions of mutated multipole pairs; the charge
+c     penetration model is excluded because its lambda derivatives are
+c     not soft cored, which would silently corrupt OST and TI
+c
+      use_esoft = (use_mutate .and. use_mpole .and. .not.use_chgpen
+     &                .and. setesoft .and. scalpham .gt. 0.0d0)
+      if (use_mutate .and. use_chgpen .and. setesoft) then
+         write (iout,35)
+   35    format (/,' MUTATE  --  ELE-SOFTCORE is not supported with',
+     &              ' charge penetration and will be ignored')
+      end if
 c
 c     perform dynamic allocation of some global arrays
 c

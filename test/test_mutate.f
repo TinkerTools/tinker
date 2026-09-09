@@ -40,6 +40,7 @@ c
       call test_mutate_lmdapin
       call test_mutate_relsmap
       call test_mutate_apm
+      call test_mutate_esoft
       return
       end
 c
@@ -1526,6 +1527,36 @@ c
       call test_mutate_calc ('water2','199_water_apm_ast_epin_l10.key',
      &   '199_water_apm_ast_epin_l10.txt',
      &   '199_water_apm_ast_epin_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_esoft  --  electrostatic softcore  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_esoft" runs the three water fixtures 200-202 that
+c     scan the main lambda from one to zero with electrostatic softcore
+c     enabled; all three nonbonded terms and lambda derivative checks
+c     are active, and Ewald permits testing with a neighbor list
+c
+c
+      subroutine test_mutate_esoft
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','200_water_esoft_l10.key',
+     &   '200_water_esoft_l10.txt','200_water_esoft_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','201_water_esoft_l05.key',
+     &   '201_water_esoft_l05.txt','201_water_esoft_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','202_water_esoft_l00.key',
+     &   '202_water_esoft_l00.txt','202_water_esoft_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end

@@ -26,7 +26,7 @@ c
       real*8 bfac,erfc
       real*8 aesq2,afac
       real*8 expterm,ra
-      real*8 bn(0:5)
+      real*8 bn(0:6)
       real*8 dmpe(*)
       external erfc
 c

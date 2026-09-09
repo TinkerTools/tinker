@@ -1418,7 +1418,7 @@ The Fortran modules found in the Tinker package are listed below along with a br
  elambda         state weighting value for electrostatic potentials
  tlambda         state weighting value for torsional potential
  scexp           scale factor for soft core buffered 14-7 potential
- scalpha         scale factor for soft core buffered 14-7 potential
+ scalphav        scale factor for soft core buffered 14-7 potential
  mut             true if an atom is to be mutated, false otherwise
 
 **NEIGH Module        pairwise neighbor list indices & storage**
