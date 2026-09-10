@@ -25,17 +25,14 @@ c     type1       atom type of each atom in the final state system
 c     elambda     state weighting value for electrostatic potentials
 c     lambda      generic weighting between initial and final states
 c     plambda     state weighting value for polarization potentials
-c     scalpham    offset factor for soft core electrostatics
 c     scalphav    scale factor for soft core buffered 14-7 potential
 c     scexp       scale factor for soft core buffered 14-7 potential
 c     tlambda     state weighting value for torsional potential
 c     vlambda     state weighting value for van der Waals potentials
 c     mutfield    flag restricting dfield to the mpoles by mut atoms
 c     setelambda  flag that elambda was set by its own keyword
-c     setesoft    flag that the ELE-SOFTCORE keyword was given
 c     setplambda  flag that plambda was set by its own keyword
 c     setvlambda  flag that vlambda was set by its own keyword
-c     use_esoft   flag to soft core real space multipole interactions
 c     use_past    flag for absolute single topology polarization
 c     use_rel     flag to use two-ligand relative dual topology
 c     use_subsys  flag that a parameter-zeroed subsystem is active
@@ -58,17 +55,14 @@ c
       real*8 elambda
       real*8 lambda
       real*8 plambda
-      real*8 scalpham
       real*8 scalphav
       real*8 scexp
       real*8 tlambda
       real*8 vlambda
       logical mutfield
       logical setelambda
-      logical setesoft
       logical setplambda
       logical setvlambda
-      logical use_esoft
       logical use_past
       logical use_rel
       logical use_subsys

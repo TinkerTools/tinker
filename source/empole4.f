@@ -108,12 +108,6 @@ c
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
       real*8 r,r2,rr1,rr3
-      real*8 rsc,rsc2,escoff
-      real*8 esckap,escal,rr13,deup
-      real*8 term1up,term2up,term3up
-      real*8 term4up,term5up,term6up
-      real*8 frcxup,frcyup,frczup
-      real*8 pl,pl1,pl2,plk
       real*8 rr5,rr7,rr9,rr11
       real*8 rr1i,rr3i,rr5i,rr7i
       real*8 rr1k,rr3k,rr5k,rr7k
@@ -164,7 +158,6 @@ c
       real*8 dlambda,dlambda2
       real*8 scalelmda
       real*8 ttmi(3),ttmk(3)
-      real*8 ttmiup(3),ttmkup(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 dlfix(3),dlfiy(3),dlfiz(3)
@@ -179,7 +172,6 @@ c
       real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
       logical muti,mutk
-      logical dosoft
       character*6 mode
 c
 c
@@ -236,18 +228,6 @@ c
       f = electric / dielec
       mode = 'MPOLE'
       call switch (mode)
-c
-c     set the softcore offset for real space electrostatics
-c
-      escoff = 0.0d0
-      esckap = 0.0d0
-      escal = 0.0d0
-      dosoft = (use_esoft .and. .not.use_subsys)
-      if (dosoft) then
-         escoff = scalpham * (1.0d0-elambda)**2
-         esckap = scalpham * (1.0d0-elambda)
-         escal = scalpham
-      end if
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -397,27 +377,14 @@ c
      &                 - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                         -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     apply softcore shift to the electrostatic separation distance
-c
-               rsc2 = r2
-               rsc = r
-               if (escoff .ne. 0.0d0) then
-                  if (mut(i) .or. mut(k)) then
-                     rsc2 = r2 + escoff
-                     rsc = sqrt(rsc2)
-                  end if
-               end if
-c
 c     get reciprocal distance terms for this interaction
 c
-               rr1 = f * mscale(k) / rsc
-               rr3 = rr1 / rsc2
-               rr5 = 3.0d0 * rr3 / rsc2
-               rr7 = 5.0d0 * rr5 / rsc2
-               rr9 = 7.0d0 * rr7 / rsc2
-               rr11 = 9.0d0 * rr9 / rsc2
-               rr13 = 0.0d0
-               if (dosoft)  rr13 = 11.0d0 * rr11 / rsc2
+               rr1 = f * mscale(k) / r
+               rr3 = rr1 / r2
+               rr5 = 3.0d0 * rr3 / r2
+               rr7 = 5.0d0 * rr5 / r2
+               rr9 = 7.0d0 * rr7 / r2
+               rr11 = 9.0d0 * rr9 / r2
 c
 c     find damped multipole intermediates and energy value
 c
@@ -492,24 +459,12 @@ c     find standard multipole intermediates for force and torque
 c
                   de = term1*rr3 + term2*rr5 + term3*rr7
      &                    + term4*rr9 + term5*rr11
-                  if (dosoft) then
-                     deup = term1*rr5 + term2*rr7 + term3*rr9
-     &               + term4*rr11 + term5*rr13
-                  end if
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
                   term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
                   term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
-                  if (dosoft) then
-                     term1up = -ck*rr5 + dkr*rr7 - qkr*rr9
-                     term2up = ci*rr5 + dir*rr7 + qir*rr9
-                     term3up = 2.0d0 * rr7
-                     term4up = -2.0d0 * (ck*rr7-dkr*rr9+qkr*rr11)
-                     term5up = -2.0d0 * (ci*rr7+dir*rr9+qir*rr11)
-                     term6up = 4.0d0 * rr9
-                  end if
                end if
 c
 c     store the potential at each site for use in charge flux
@@ -543,17 +498,6 @@ c
                frcz = de*zr + term1*diz + term2*dkz
      &                   + term3*(diqkz-dkqiz) + term4*qiz
      &                   + term5*qkz + term6*(qizk+qkzi)
-               if (dosoft) then
-                  frcxup = deup*xr + term1up*dix + term2up*dkx
-     &                   + term3up*(diqkx-dkqix) + term4up*qix
-     &                   + term5up*qkx + term6up*(qixk+qkxi)
-                  frcyup = deup*yr + term1up*diy + term2up*dky
-     &                   + term3up*(diqky-dkqiy) + term4up*qiy
-     &                   + term5up*qky + term6up*(qiyk+qkyi)
-                  frczup = deup*zr + term1up*diz + term2up*dkz
-     &                   + term3up*(diqkz-dkqiz) + term4up*qiz
-     &                   + term5up*qkz + term6up*(qizk+qkzi)
-               end if
 c
 c     compute the torque components for this interaction
 c
@@ -576,94 +520,51 @@ c
                ttmk(3) = rr3*dikz + term2*dkrz
      &                      - term3*(dqikz+diqkrz)
      &                      - term5*qkrz - term6*(qkirz-qikz)
-               if (dosoft) then
-                  ttmiup(1) = -rr5*dikx + term1up*dirx
-     &                      + term3up*(dqikx+dkqirx)
-     &                      - term4up*qirx - term6up*(qikrx+qikx)
-                  ttmiup(2) = -rr5*diky + term1up*diry
-     &                      + term3up*(dqiky+dkqiry)
-     &                      - term4up*qiry - term6up*(qikry+qiky)
-                  ttmiup(3) = -rr5*dikz + term1up*dirz
-     &                      + term3up*(dqikz+dkqirz)
-     &                      - term4up*qirz - term6up*(qikrz+qikz)
-                  ttmkup(1) = rr5*dikx + term2up*dkrx
-     &                      - term3up*(dqikx+diqkrx)
-     &                      - term5up*qkrx - term6up*(qkirx-qikx)
-                  ttmkup(2) = rr5*diky + term2up*dkry
-     &                      - term3up*(dqiky+diqkry)
-     &                      - term5up*qkry - term6up*(qkiry-qiky)
-                  ttmkup(3) = rr5*dikz + term2up*dkrz
-     &                      - term3up*(dqikz+diqkrz)
-     &                      - term5up*qkrz - term6up*(qkirz-qikz)
-               end if
 c
 c     energy, force and torque scaled by group membership
 c
                if (use_group) then
                   e = fgrp * e
-                  if (dosoft) then
-                     de = fgrp * de
-                     deup = fgrp * deup
-                     frcxup = fgrp * frcxup
-                     frcyup = fgrp * frcyup
-                     frczup = fgrp * frczup
-                  end if
                   frcx = fgrp * frcx
                   frcy = fgrp * frcy
                   frcz = fgrp * frcz
                   do j = 1, 3
                      ttmi(j) = fgrp * ttmi(j)
                      ttmk(j) = fgrp * ttmk(j)
-                     if (dosoft) then
-                        ttmiup(j) = fgrp * ttmiup(j)
-                        ttmkup(j) = fgrp * ttmkup(j)
-                     end if
                   end do
                end if
 c
 c     compute lambda derivative
 c
                scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
                if (muti .or. mutk) then
-                  if (muti .and. mutk) then
-                     pl = elambda * elambda
-                     pl1 = 2.0d0 * elambda
-                     pl2 = 2.0d0
-                  else
-                     pl = elambda
-                     pl1 = 1.0d0
-                     pl2 = 0.0d0
-                  end if
-                  dlambda = pl1*e
-                  dlambda2 = pl2*e
-                  dlfrcx = pl1*frcx
-                  dlfrcy = pl1*frcy
-                  dlfrcz = pl1*frcz
-                  dlttmi(1) = pl1*ttmi(1)
-                  dlttmi(2) = pl1*ttmi(2)
-                  dlttmi(3) = pl1*ttmi(3)
-                  dlttmk(1) = pl1*ttmk(1)
-                  dlttmk(2) = pl1*ttmk(2)
-                  dlttmk(3) = pl1*ttmk(3)
-c
-c     add the soft core contribution to the lambda derivatives
-c
-                  if (dosoft) then
-                     plk = pl * esckap
-                     dlambda = dlambda + plk*de
-                     dlambda2 = dlambda2 + 2.0d0*pl1*esckap*de
-     &                             + pl*(esckap*esckap*deup-escal*de)
-                     dlfrcx = dlfrcx + plk*frcxup
-                     dlfrcy = dlfrcy + plk*frcyup
-                     dlfrcz = dlfrcz + plk*frczup
-                     dlttmi(1) = dlttmi(1) + plk*ttmiup(1)
-                     dlttmi(2) = dlttmi(2) + plk*ttmiup(2)
-                     dlttmi(3) = dlttmi(3) + plk*ttmiup(3)
-                     dlttmk(1) = dlttmk(1) + plk*ttmkup(1)
-                     dlttmk(2) = dlttmk(2) + plk*ttmkup(2)
-                     dlttmk(3) = dlttmk(3) + plk*ttmkup(3)
-                  end if
-                  scalelmda = pl
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
                end if
@@ -929,27 +830,14 @@ c
      &                 - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                         -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     apply softcore shift to the electrostatic separation distance
-c
-               rsc2 = r2
-               rsc = r
-               if (escoff .ne. 0.0d0) then
-                  if (mut(i) .or. mut(k)) then
-                     rsc2 = r2 + escoff
-                     rsc = sqrt(rsc2)
-                  end if
-               end if
-c
 c     get reciprocal distance terms for this interaction
 c
-               rr1 = f * mscale(k) / rsc
-               rr3 = rr1 / rsc2
-               rr5 = 3.0d0 * rr3 / rsc2
-               rr7 = 5.0d0 * rr5 / rsc2
-               rr9 = 7.0d0 * rr7 / rsc2
-               rr11 = 9.0d0 * rr9 / rsc2
-               rr13 = 0.0d0
-               if (dosoft)  rr13 = 11.0d0 * rr11 / rsc2
+               rr1 = f * mscale(k) / r
+               rr3 = rr1 / r2
+               rr5 = 3.0d0 * rr3 / r2
+               rr7 = 5.0d0 * rr5 / r2
+               rr9 = 7.0d0 * rr7 / r2
+               rr11 = 9.0d0 * rr9 / r2
 c
 c     find damped multipole intermediates and energy value
 c
@@ -1024,24 +912,12 @@ c     find standard multipole intermediates for force and torque
 c
                   de = term1*rr3 + term2*rr5 + term3*rr7
      &                    + term4*rr9 + term5*rr11
-                  if (dosoft) then
-                     deup = term1*rr5 + term2*rr7 + term3*rr9
-     &               + term4*rr11 + term5*rr13
-                  end if
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
                   term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
                   term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
-                  if (dosoft) then
-                     term1up = -ck*rr5 + dkr*rr7 - qkr*rr9
-                     term2up = ci*rr5 + dir*rr7 + qir*rr9
-                     term3up = 2.0d0 * rr7
-                     term4up = -2.0d0 * (ck*rr7-dkr*rr9+qkr*rr11)
-                     term5up = -2.0d0 * (ci*rr7+dir*rr9+qir*rr11)
-                     term6up = 4.0d0 * rr9
-                  end if
                end if
 c
 c     store the potential at each site for use in charge flux
@@ -1075,17 +951,6 @@ c
                frcz = de*zr + term1*diz + term2*dkz
      &                   + term3*(diqkz-dkqiz) + term4*qiz
      &                   + term5*qkz + term6*(qizk+qkzi)
-               if (dosoft) then
-                  frcxup = deup*xr + term1up*dix + term2up*dkx
-     &                   + term3up*(diqkx-dkqix) + term4up*qix
-     &                   + term5up*qkx + term6up*(qixk+qkxi)
-                  frcyup = deup*yr + term1up*diy + term2up*dky
-     &                   + term3up*(diqky-dkqiy) + term4up*qiy
-     &                   + term5up*qky + term6up*(qiyk+qkyi)
-                  frczup = deup*zr + term1up*diz + term2up*dkz
-     &                   + term3up*(diqkz-dkqiz) + term4up*qiz
-     &                   + term5up*qkz + term6up*(qizk+qkzi)
-               end if
 c
 c     compute the torque components for this interaction
 c
@@ -1108,26 +973,6 @@ c
                ttmk(3) = rr3*dikz + term2*dkrz
      &                      - term3*(dqikz+diqkrz)
      &                      - term5*qkrz - term6*(qkirz-qikz)
-               if (dosoft) then
-                  ttmiup(1) = -rr5*dikx + term1up*dirx
-     &                      + term3up*(dqikx+dkqirx)
-     &                      - term4up*qirx - term6up*(qikrx+qikx)
-                  ttmiup(2) = -rr5*diky + term1up*diry
-     &                      + term3up*(dqiky+dkqiry)
-     &                      - term4up*qiry - term6up*(qikry+qiky)
-                  ttmiup(3) = -rr5*dikz + term1up*dirz
-     &                      + term3up*(dqikz+dkqirz)
-     &                      - term4up*qirz - term6up*(qikrz+qikz)
-                  ttmkup(1) = rr5*dikx + term2up*dkrx
-     &                      - term3up*(dqikx+diqkrx)
-     &                      - term5up*qkrx - term6up*(qkirx-qikx)
-                  ttmkup(2) = rr5*diky + term2up*dkry
-     &                      - term3up*(dqiky+diqkry)
-     &                      - term5up*qkry - term6up*(qkiry-qiky)
-                  ttmkup(3) = rr5*dikz + term2up*dkrz
-     &                      - term3up*(dqikz+diqkrz)
-     &                      - term5up*qkrz - term6up*(qkirz-qikz)
-               end if
 c
 c     energy, force and torque scaled by group membership
 c
@@ -1143,69 +988,50 @@ c
                end if
                if (use_group) then
                   e = fgrp * e
-                  if (dosoft) then
-                     de = fgrp * de
-                     deup = fgrp * deup
-                     frcxup = fgrp * frcxup
-                     frcyup = fgrp * frcyup
-                     frczup = fgrp * frczup
-                  end if
                   frcx = fgrp * frcx
                   frcy = fgrp * frcy
                   frcz = fgrp * frcz
                   do j = 1, 3
                      ttmi(j) = fgrp * ttmi(j)
                      ttmk(j) = fgrp * ttmk(j)
-                     if (dosoft) then
-                        ttmiup(j) = fgrp * ttmiup(j)
-                        ttmkup(j) = fgrp * ttmkup(j)
-                     end if
                   end do
                end if
 c
 c     compute lambda derivative
 c
                scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
                if (muti .or. mutk) then
-                  if (muti .and. mutk) then
-                     pl = elambda * elambda
-                     pl1 = 2.0d0 * elambda
-                     pl2 = 2.0d0
-                  else
-                     pl = elambda
-                     pl1 = 1.0d0
-                     pl2 = 0.0d0
+                  if (i .eq. k) then
+                     dlambda = 0.5d0 * dlambda
+                     dlambda2 = 0.5d0 * dlambda2
                   end if
-                  dlambda = pl1*e
-                  dlambda2 = pl2*e
-                  dlfrcx = pl1*frcx
-                  dlfrcy = pl1*frcy
-                  dlfrcz = pl1*frcz
-                  dlttmi(1) = pl1*ttmi(1)
-                  dlttmi(2) = pl1*ttmi(2)
-                  dlttmi(3) = pl1*ttmi(3)
-                  dlttmk(1) = pl1*ttmk(1)
-                  dlttmk(2) = pl1*ttmk(2)
-                  dlttmk(3) = pl1*ttmk(3)
-c
-c     add the soft core contribution to the lambda derivatives
-c
-                  if (dosoft) then
-                     plk = pl * esckap
-                     dlambda = dlambda + plk*de
-                     dlambda2 = dlambda2 + 2.0d0*pl1*esckap*de
-     &                             + pl*(esckap*esckap*deup-escal*de)
-                     dlfrcx = dlfrcx + plk*frcxup
-                     dlfrcy = dlfrcy + plk*frcyup
-                     dlfrcz = dlfrcz + plk*frczup
-                     dlttmi(1) = dlttmi(1) + plk*ttmiup(1)
-                     dlttmi(2) = dlttmi(2) + plk*ttmiup(2)
-                     dlttmi(3) = dlttmi(3) + plk*ttmiup(3)
-                     dlttmk(1) = dlttmk(1) + plk*ttmkup(1)
-                     dlttmk(2) = dlttmk(2) + plk*ttmkup(2)
-                     dlttmk(3) = dlttmk(3) + plk*ttmkup(3)
-                  end if
-                  scalelmda = pl
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
                end if
@@ -1464,12 +1290,6 @@ c
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
       real*8 r,r2,rr1,rr3
-      real*8 rsc,rsc2,escoff
-      real*8 esckap,escal,rr13,deup
-      real*8 term1up,term2up,term3up
-      real*8 term4up,term5up,term6up
-      real*8 frcxup,frcyup,frczup
-      real*8 pl,pl1,pl2,plk
       real*8 rr5,rr7,rr9,rr11
       real*8 rr1i,rr3i,rr5i,rr7i
       real*8 rr1k,rr3k,rr5k,rr7k
@@ -1520,7 +1340,6 @@ c
       real*8 dlambda,dlambda2
       real*8 scalelmda
       real*8 ttmi(3),ttmk(3)
-      real*8 ttmiup(3),ttmkup(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 dlfix(3),dlfiy(3),dlfiz(3)
@@ -1535,7 +1354,6 @@ c
       real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
       logical muti,mutk
-      logical dosoft
       character*6 mode
 c
 c
@@ -1593,26 +1411,13 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
-c     set the softcore offset for real space electrostatics
-c
-      escoff = 0.0d0
-      esckap = 0.0d0
-      escal = 0.0d0
-      dosoft = (use_esoft .and. .not.use_subsys)
-      if (dosoft) then
-         escoff = scalpham * (1.0d0-elambda)**2
-         esckap = scalpham * (1.0d0-elambda)
-         escal = scalpham
-      end if
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
-!$OMP& use_group,use_intra,use_bounds,off2,f,mut,elambda,escoff,
-!$OMP& esckap,escal,dosoft)
+!$OMP& use_group,use_intra,use_bounds,off2,f,mut,elambda)
 !$OMP& firstprivate(mscale) shared (em,dem,dfmdl,tem,dltem,pot,emvir,
 !$OMP& demvirdl,demdl,d2emdl2)
 !$OMP DO reduction(+:em,dem,dfmdl,tem,dltem,pot,emvir,demvirdl,
@@ -1767,27 +1572,14 @@ c
      &                 - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                         -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     apply softcore shift to the electrostatic separation distance
-c
-               rsc2 = r2
-               rsc = r
-               if (escoff .ne. 0.0d0) then
-                  if (mut(i) .or. mut(k)) then
-                     rsc2 = r2 + escoff
-                     rsc = sqrt(rsc2)
-                  end if
-               end if
-c
 c     get reciprocal distance terms for this interaction
 c
-               rr1 = f * mscale(k) / rsc
-               rr3 = rr1 / rsc2
-               rr5 = 3.0d0 * rr3 / rsc2
-               rr7 = 5.0d0 * rr5 / rsc2
-               rr9 = 7.0d0 * rr7 / rsc2
-               rr11 = 9.0d0 * rr9 / rsc2
-               rr13 = 0.0d0
-               if (dosoft)  rr13 = 11.0d0 * rr11 / rsc2
+               rr1 = f * mscale(k) / r
+               rr3 = rr1 / r2
+               rr5 = 3.0d0 * rr3 / r2
+               rr7 = 5.0d0 * rr5 / r2
+               rr9 = 7.0d0 * rr7 / r2
+               rr11 = 9.0d0 * rr9 / r2
 c
 c     find damped multipole intermediates and energy value
 c
@@ -1862,24 +1654,12 @@ c     find standard multipole intermediates for force and torque
 c
                   de = term1*rr3 + term2*rr5 + term3*rr7
      &                    + term4*rr9 + term5*rr11
-                  if (dosoft) then
-                     deup = term1*rr5 + term2*rr7 + term3*rr9
-     &               + term4*rr11 + term5*rr13
-                  end if
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
                   term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
                   term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
-                  if (dosoft) then
-                     term1up = -ck*rr5 + dkr*rr7 - qkr*rr9
-                     term2up = ci*rr5 + dir*rr7 + qir*rr9
-                     term3up = 2.0d0 * rr7
-                     term4up = -2.0d0 * (ck*rr7-dkr*rr9+qkr*rr11)
-                     term5up = -2.0d0 * (ci*rr7+dir*rr9+qir*rr11)
-                     term6up = 4.0d0 * rr9
-                  end if
                end if
 c
 c     store the potential at each site for use in charge flux
@@ -1913,17 +1693,6 @@ c
                frcz = de*zr + term1*diz + term2*dkz
      &                   + term3*(diqkz-dkqiz) + term4*qiz
      &                   + term5*qkz + term6*(qizk+qkzi)
-               if (dosoft) then
-                  frcxup = deup*xr + term1up*dix + term2up*dkx
-     &                   + term3up*(diqkx-dkqix) + term4up*qix
-     &                   + term5up*qkx + term6up*(qixk+qkxi)
-                  frcyup = deup*yr + term1up*diy + term2up*dky
-     &                   + term3up*(diqky-dkqiy) + term4up*qiy
-     &                   + term5up*qky + term6up*(qiyk+qkyi)
-                  frczup = deup*zr + term1up*diz + term2up*dkz
-     &                   + term3up*(diqkz-dkqiz) + term4up*qiz
-     &                   + term5up*qkz + term6up*(qizk+qkzi)
-               end if
 c
 c     compute the torque components for this interaction
 c
@@ -1946,94 +1715,51 @@ c
                ttmk(3) = rr3*dikz + term2*dkrz
      &                      - term3*(dqikz+diqkrz)
      &                      - term5*qkrz - term6*(qkirz-qikz)
-               if (dosoft) then
-                  ttmiup(1) = -rr5*dikx + term1up*dirx
-     &                      + term3up*(dqikx+dkqirx)
-     &                      - term4up*qirx - term6up*(qikrx+qikx)
-                  ttmiup(2) = -rr5*diky + term1up*diry
-     &                      + term3up*(dqiky+dkqiry)
-     &                      - term4up*qiry - term6up*(qikry+qiky)
-                  ttmiup(3) = -rr5*dikz + term1up*dirz
-     &                      + term3up*(dqikz+dkqirz)
-     &                      - term4up*qirz - term6up*(qikrz+qikz)
-                  ttmkup(1) = rr5*dikx + term2up*dkrx
-     &                      - term3up*(dqikx+diqkrx)
-     &                      - term5up*qkrx - term6up*(qkirx-qikx)
-                  ttmkup(2) = rr5*diky + term2up*dkry
-     &                      - term3up*(dqiky+diqkry)
-     &                      - term5up*qkry - term6up*(qkiry-qiky)
-                  ttmkup(3) = rr5*dikz + term2up*dkrz
-     &                      - term3up*(dqikz+diqkrz)
-     &                      - term5up*qkrz - term6up*(qkirz-qikz)
-               end if
 c
 c     energy, force and torque scaled by group membership
 c
                if (use_group) then
                   e = fgrp * e
-                  if (dosoft) then
-                     de = fgrp * de
-                     deup = fgrp * deup
-                     frcxup = fgrp * frcxup
-                     frcyup = fgrp * frcyup
-                     frczup = fgrp * frczup
-                  end if
                   frcx = fgrp * frcx
                   frcy = fgrp * frcy
                   frcz = fgrp * frcz
                   do j = 1, 3
                      ttmi(j) = fgrp * ttmi(j)
                      ttmk(j) = fgrp * ttmk(j)
-                     if (dosoft) then
-                        ttmiup(j) = fgrp * ttmiup(j)
-                        ttmkup(j) = fgrp * ttmkup(j)
-                     end if
                   end do
                end if
 c
 c     compute lambda derivative
 c
                scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
                if (muti .or. mutk) then
-                  if (muti .and. mutk) then
-                     pl = elambda * elambda
-                     pl1 = 2.0d0 * elambda
-                     pl2 = 2.0d0
-                  else
-                     pl = elambda
-                     pl1 = 1.0d0
-                     pl2 = 0.0d0
-                  end if
-                  dlambda = pl1*e
-                  dlambda2 = pl2*e
-                  dlfrcx = pl1*frcx
-                  dlfrcy = pl1*frcy
-                  dlfrcz = pl1*frcz
-                  dlttmi(1) = pl1*ttmi(1)
-                  dlttmi(2) = pl1*ttmi(2)
-                  dlttmi(3) = pl1*ttmi(3)
-                  dlttmk(1) = pl1*ttmk(1)
-                  dlttmk(2) = pl1*ttmk(2)
-                  dlttmk(3) = pl1*ttmk(3)
-c
-c     add the soft core contribution to the lambda derivatives
-c
-                  if (dosoft) then
-                     plk = pl * esckap
-                     dlambda = dlambda + plk*de
-                     dlambda2 = dlambda2 + 2.0d0*pl1*esckap*de
-     &                             + pl*(esckap*esckap*deup-escal*de)
-                     dlfrcx = dlfrcx + plk*frcxup
-                     dlfrcy = dlfrcy + plk*frcyup
-                     dlfrcz = dlfrcz + plk*frczup
-                     dlttmi(1) = dlttmi(1) + plk*ttmiup(1)
-                     dlttmi(2) = dlttmi(2) + plk*ttmiup(2)
-                     dlttmi(3) = dlttmi(3) + plk*ttmiup(3)
-                     dlttmk(1) = dlttmk(1) + plk*ttmkup(1)
-                     dlttmk(2) = dlttmk(2) + plk*ttmkup(2)
-                     dlttmk(3) = dlttmk(3) + plk*ttmkup(3)
-                  end if
-                  scalelmda = pl
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
                end if
@@ -2691,12 +2417,6 @@ c
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
       real*8 r,r2,rr1,rr3
-      real*8 rsc,rsc2,escoff
-      real*8 esckap,escal,rr13,deup
-      real*8 term1up,term2up,term3up
-      real*8 term4up,term5up,term6up
-      real*8 frcxup,frcyup,frczup
-      real*8 pl,pl1,pl2,plk
       real*8 rr5,rr7,rr9,rr11
       real*8 rr1i,rr3i,rr5i,rr7i
       real*8 rr1k,rr3k,rr5k,rr7k
@@ -2747,12 +2467,11 @@ c
       real*8 dlambda,dlambda2
       real*8 scalelmda
       real*8 ttmi(3),ttmk(3)
-      real*8 ttmiup(3),ttmkup(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 dmpi(9),dmpk(9)
-      real*8 dmpik(11),dmpe(13)
+      real*8 dmpik(11),dmpe(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
       real*8, allocatable :: dltem(:,:)
@@ -2761,7 +2480,6 @@ c
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
       logical muti,mutk
-      logical dosoft
       character*6 mode
 c
 c
@@ -2791,18 +2509,6 @@ c
       f = electric / dielec
       mode = 'EWALD'
       call switch (mode)
-c
-c     set the softcore offset for real space electrostatics
-c
-      escoff = 0.0d0
-      esckap = 0.0d0
-      escal = 0.0d0
-      dosoft = (use_esoft .and. .not.use_subsys)
-      if (dosoft) then
-         escoff = scalpham * (1.0d0-elambda)**2
-         esckap = scalpham * (1.0d0-elambda)
-         escal = scalpham
-      end if
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -2939,35 +2645,18 @@ c
      &                 - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                         -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     apply softcore shift to the electrostatic separation distance
-c
-               rsc2 = r2
-               rsc = r
-               if (escoff .ne. 0.0d0) then
-                  if (mut(i) .or. mut(k)) then
-                     rsc2 = r2 + escoff
-                     rsc = sqrt(rsc2)
-                  end if
-               end if
-c
 c     get reciprocal distance terms for this interaction
 c
-               rr1 = f / rsc
-               rr3 = rr1 / rsc2
-               rr5 = 3.0d0 * rr3 / rsc2
-               rr7 = 5.0d0 * rr5 / rsc2
-               rr9 = 7.0d0 * rr7 / rsc2
-               rr11 = 9.0d0 * rr9 / rsc2
-               rr13 = 0.0d0
-               if (dosoft)  rr13 = 11.0d0 * rr11 / rsc2
+               rr1 = f / r
+               rr3 = rr1 / r2
+               rr5 = 3.0d0 * rr3 / r2
+               rr7 = 5.0d0 * rr5 / r2
+               rr9 = 7.0d0 * rr7 / r2
+               rr11 = 9.0d0 * rr9 / r2
 c
 c     calculate real space Ewald error function damping
 c
-               if (dosoft) then
-                  call dampewald (13,rsc,rsc2,f,dmpe)
-               else
-                  call dampewald (11,rsc,rsc2,f,dmpe)
-               end if
+               call dampewald (11,r,r2,f,dmpe)
 c
 c     find damped multipole intermediates and energy value
 c
@@ -3045,7 +2734,6 @@ c
                   rr7 = dmpe(7) - scalek*rr7
                   rr9 = dmpe(9) - scalek*rr9
                   rr11 = dmpe(11) - scalek*rr11
-                  if (dosoft)  rr13 = dmpe(13) - scalek*rr13
                   e = term1*rr1 + term2*rr3 + term3*rr5
      &                   + term4*rr7 + term5*rr9
 c
@@ -3053,24 +2741,12 @@ c     find standard multipole intermediates for force and torque
 c
                   de = term1*rr3 + term2*rr5 + term3*rr7
      &                    + term4*rr9 + term5*rr11
-                  if (dosoft) then
-                     deup = term1*rr5 + term2*rr7 + term3*rr9
-     &               + term4*rr11 + term5*rr13
-                  end if
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
                   term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
                   term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
-                  if (dosoft) then
-                     term1up = -ck*rr5 + dkr*rr7 - qkr*rr9
-                     term2up = ci*rr5 + dir*rr7 + qir*rr9
-                     term3up = 2.0d0 * rr7
-                     term4up = -2.0d0 * (ck*rr7-dkr*rr9+qkr*rr11)
-                     term5up = -2.0d0 * (ci*rr7+dir*rr9+qir*rr11)
-                     term6up = 4.0d0 * rr9
-                  end if
                end if
 c
 c     store the potential at each site for use in charge flux
@@ -3104,17 +2780,6 @@ c
                frcz = de*zr + term1*diz + term2*dkz
      &                   + term3*(diqkz-dkqiz) + term4*qiz
      &                   + term5*qkz + term6*(qizk+qkzi)
-               if (dosoft) then
-                  frcxup = deup*xr + term1up*dix + term2up*dkx
-     &                   + term3up*(diqkx-dkqix) + term4up*qix
-     &                   + term5up*qkx + term6up*(qixk+qkxi)
-                  frcyup = deup*yr + term1up*diy + term2up*dky
-     &                   + term3up*(diqky-dkqiy) + term4up*qiy
-     &                   + term5up*qky + term6up*(qiyk+qkyi)
-                  frczup = deup*zr + term1up*diz + term2up*dkz
-     &                   + term3up*(diqkz-dkqiz) + term4up*qiz
-     &                   + term5up*qkz + term6up*(qizk+qkzi)
-               end if
 c
 c     compute the torque components for this interaction
 c
@@ -3137,70 +2802,38 @@ c
                ttmk(3) = rr3*dikz + term2*dkrz
      &                      - term3*(dqikz+diqkrz)
      &                      - term5*qkrz - term6*(qkirz-qikz)
-               if (dosoft) then
-                  ttmiup(1) = -rr5*dikx + term1up*dirx
-     &                      + term3up*(dqikx+dkqirx)
-     &                      - term4up*qirx - term6up*(qikrx+qikx)
-                  ttmiup(2) = -rr5*diky + term1up*diry
-     &                      + term3up*(dqiky+dkqiry)
-     &                      - term4up*qiry - term6up*(qikry+qiky)
-                  ttmiup(3) = -rr5*dikz + term1up*dirz
-     &                      + term3up*(dqikz+dkqirz)
-     &                      - term4up*qirz - term6up*(qikrz+qikz)
-                  ttmkup(1) = rr5*dikx + term2up*dkrx
-     &                      - term3up*(dqikx+diqkrx)
-     &                      - term5up*qkrx - term6up*(qkirx-qikx)
-                  ttmkup(2) = rr5*diky + term2up*dkry
-     &                      - term3up*(dqiky+diqkry)
-     &                      - term5up*qkry - term6up*(qkiry-qiky)
-                  ttmkup(3) = rr5*dikz + term2up*dkrz
-     &                      - term3up*(dqikz+diqkrz)
-     &                      - term5up*qkrz - term6up*(qkirz-qikz)
-               end if
 c
 c     compute lambda derivative
 c
                scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
                if (muti .or. mutk) then
-                  if (muti .and. mutk) then
-                     pl = elambda * elambda
-                     pl1 = 2.0d0 * elambda
-                     pl2 = 2.0d0
-                  else
-                     pl = elambda
-                     pl1 = 1.0d0
-                     pl2 = 0.0d0
-                  end if
-                  dlambda = pl1*e
-                  dlambda2 = pl2*e
-                  dlfrcx = pl1*frcx
-                  dlfrcy = pl1*frcy
-                  dlfrcz = pl1*frcz
-                  dlttmi(1) = pl1*ttmi(1)
-                  dlttmi(2) = pl1*ttmi(2)
-                  dlttmi(3) = pl1*ttmi(3)
-                  dlttmk(1) = pl1*ttmk(1)
-                  dlttmk(2) = pl1*ttmk(2)
-                  dlttmk(3) = pl1*ttmk(3)
-c
-c     add the soft core contribution to the lambda derivatives
-c
-                  if (dosoft) then
-                     plk = pl * esckap
-                     dlambda = dlambda + plk*de
-                     dlambda2 = dlambda2 + 2.0d0*pl1*esckap*de
-     &                             + pl*(esckap*esckap*deup-escal*de)
-                     dlfrcx = dlfrcx + plk*frcxup
-                     dlfrcy = dlfrcy + plk*frcyup
-                     dlfrcz = dlfrcz + plk*frczup
-                     dlttmi(1) = dlttmi(1) + plk*ttmiup(1)
-                     dlttmi(2) = dlttmi(2) + plk*ttmiup(2)
-                     dlttmi(3) = dlttmi(3) + plk*ttmiup(3)
-                     dlttmk(1) = dlttmk(1) + plk*ttmkup(1)
-                     dlttmk(2) = dlttmk(2) + plk*ttmkup(2)
-                     dlttmk(3) = dlttmk(3) + plk*ttmkup(3)
-                  end if
-                  scalelmda = pl
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
                end if
@@ -3453,35 +3086,18 @@ c
      &                 - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                         -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     apply softcore shift to the electrostatic separation distance
-c
-               rsc2 = r2
-               rsc = r
-               if (escoff .ne. 0.0d0) then
-                  if (mut(i) .or. mut(k)) then
-                     rsc2 = r2 + escoff
-                     rsc = sqrt(rsc2)
-                  end if
-               end if
-c
 c     get reciprocal distance terms for this interaction
 c
-               rr1 = f / rsc
-               rr3 = rr1 / rsc2
-               rr5 = 3.0d0 * rr3 / rsc2
-               rr7 = 5.0d0 * rr5 / rsc2
-               rr9 = 7.0d0 * rr7 / rsc2
-               rr11 = 9.0d0 * rr9 / rsc2
-               rr13 = 0.0d0
-               if (dosoft)  rr13 = 11.0d0 * rr11 / rsc2
+               rr1 = f / r
+               rr3 = rr1 / r2
+               rr5 = 3.0d0 * rr3 / r2
+               rr7 = 5.0d0 * rr5 / r2
+               rr9 = 7.0d0 * rr7 / r2
+               rr11 = 9.0d0 * rr9 / r2
 c
 c     calculate real space Ewald error function damping
 c
-               if (dosoft) then
-                  call dampewald (13,rsc,rsc2,f,dmpe)
-               else
-                  call dampewald (11,rsc,rsc2,f,dmpe)
-               end if
+               call dampewald (11,r,r2,f,dmpe)
 c
 c     find damped multipole intermediates and energy value
 c
@@ -3559,7 +3175,6 @@ c
                   rr7 = dmpe(7) - scalek*rr7
                   rr9 = dmpe(9) - scalek*rr9
                   rr11 = dmpe(11) - scalek*rr11
-                  if (dosoft)  rr13 = dmpe(13) - scalek*rr13
                   e = term1*rr1 + term2*rr3 + term3*rr5
      &                   + term4*rr7 + term5*rr9
 c
@@ -3567,24 +3182,12 @@ c     find standard multipole intermediates for force and torque
 c
                   de = term1*rr3 + term2*rr5 + term3*rr7
      &                    + term4*rr9 + term5*rr11
-                  if (dosoft) then
-                     deup = term1*rr5 + term2*rr7 + term3*rr9
-     &               + term4*rr11 + term5*rr13
-                  end if
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
                   term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
                   term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
-                  if (dosoft) then
-                     term1up = -ck*rr5 + dkr*rr7 - qkr*rr9
-                     term2up = ci*rr5 + dir*rr7 + qir*rr9
-                     term3up = 2.0d0 * rr7
-                     term4up = -2.0d0 * (ck*rr7-dkr*rr9+qkr*rr11)
-                     term5up = -2.0d0 * (ci*rr7+dir*rr9+qir*rr11)
-                     term6up = 4.0d0 * rr9
-                  end if
                end if
 c
 c     store the potential at each site for use in charge flux
@@ -3618,17 +3221,6 @@ c
                frcz = de*zr + term1*diz + term2*dkz
      &                   + term3*(diqkz-dkqiz) + term4*qiz
      &                   + term5*qkz + term6*(qizk+qkzi)
-               if (dosoft) then
-                  frcxup = deup*xr + term1up*dix + term2up*dkx
-     &                   + term3up*(diqkx-dkqix) + term4up*qix
-     &                   + term5up*qkx + term6up*(qixk+qkxi)
-                  frcyup = deup*yr + term1up*diy + term2up*dky
-     &                   + term3up*(diqky-dkqiy) + term4up*qiy
-     &                   + term5up*qky + term6up*(qiyk+qkyi)
-                  frczup = deup*zr + term1up*diz + term2up*dkz
-     &                   + term3up*(diqkz-dkqiz) + term4up*qiz
-     &                   + term5up*qkz + term6up*(qizk+qkzi)
-               end if
 c
 c     compute the torque components for this interaction
 c
@@ -3651,26 +3243,6 @@ c
                ttmk(3) = rr3*dikz + term2*dkrz
      &                      - term3*(dqikz+diqkrz)
      &                      - term5*qkrz - term6*(qkirz-qikz)
-               if (dosoft) then
-                  ttmiup(1) = -rr5*dikx + term1up*dirx
-     &                      + term3up*(dqikx+dkqirx)
-     &                      - term4up*qirx - term6up*(qikrx+qikx)
-                  ttmiup(2) = -rr5*diky + term1up*diry
-     &                      + term3up*(dqiky+dkqiry)
-     &                      - term4up*qiry - term6up*(qikry+qiky)
-                  ttmiup(3) = -rr5*dikz + term1up*dirz
-     &                      + term3up*(dqikz+dkqirz)
-     &                      - term4up*qirz - term6up*(qikrz+qikz)
-                  ttmkup(1) = rr5*dikx + term2up*dkrx
-     &                      - term3up*(dqikx+diqkrx)
-     &                      - term5up*qkrx - term6up*(qkirx-qikx)
-                  ttmkup(2) = rr5*diky + term2up*dkry
-     &                      - term3up*(dqiky+diqkry)
-     &                      - term5up*qkry - term6up*(qkiry-qiky)
-                  ttmkup(3) = rr5*dikz + term2up*dkrz
-     &                      - term3up*(dqikz+diqkrz)
-     &                      - term5up*qkrz - term6up*(qkirz-qikz)
-               end if
 c
 c     energy, force and torque scaled for self-interactions
 c
@@ -3688,46 +3260,34 @@ c
 c     compute lambda derivative
 c
                scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
                if (muti .or. mutk) then
-                  if (muti .and. mutk) then
-                     pl = elambda * elambda
-                     pl1 = 2.0d0 * elambda
-                     pl2 = 2.0d0
-                  else
-                     pl = elambda
-                     pl1 = 1.0d0
-                     pl2 = 0.0d0
-                  end if
-                  dlambda = pl1*e
-                  dlambda2 = pl2*e
-                  dlfrcx = pl1*frcx
-                  dlfrcy = pl1*frcy
-                  dlfrcz = pl1*frcz
-                  dlttmi(1) = pl1*ttmi(1)
-                  dlttmi(2) = pl1*ttmi(2)
-                  dlttmi(3) = pl1*ttmi(3)
-                  dlttmk(1) = pl1*ttmk(1)
-                  dlttmk(2) = pl1*ttmk(2)
-                  dlttmk(3) = pl1*ttmk(3)
-c
-c     add the soft core contribution to the lambda derivatives
-c
-                  if (dosoft) then
-                     plk = pl * esckap
-                     dlambda = dlambda + plk*de
-                     dlambda2 = dlambda2 + 2.0d0*pl1*esckap*de
-     &                             + pl*(esckap*esckap*deup-escal*de)
-                     dlfrcx = dlfrcx + plk*frcxup
-                     dlfrcy = dlfrcy + plk*frcyup
-                     dlfrcz = dlfrcz + plk*frczup
-                     dlttmi(1) = dlttmi(1) + plk*ttmiup(1)
-                     dlttmi(2) = dlttmi(2) + plk*ttmiup(2)
-                     dlttmi(3) = dlttmi(3) + plk*ttmiup(3)
-                     dlttmk(1) = dlttmk(1) + plk*ttmkup(1)
-                     dlttmk(2) = dlttmk(2) + plk*ttmkup(2)
-                     dlttmk(3) = dlttmk(3) + plk*ttmkup(3)
-                  end if
-                  scalelmda = pl
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
                end if
@@ -4371,12 +3931,6 @@ c
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
       real*8 r,r2,rr1,rr3
-      real*8 rsc,rsc2,escoff
-      real*8 esckap,escal,rr13,deup
-      real*8 term1up,term2up,term3up
-      real*8 term4up,term5up,term6up
-      real*8 frcxup,frcyup,frczup
-      real*8 pl,pl1,pl2,plk
       real*8 rr5,rr7,rr9,rr11
       real*8 rr1i,rr3i,rr5i,rr7i
       real*8 rr1k,rr3k,rr5k,rr7k
@@ -4427,12 +3981,11 @@ c
       real*8 dlambda,dlambda2
       real*8 scalelmda
       real*8 ttmi(3),ttmk(3)
-      real*8 ttmiup(3),ttmkup(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
       real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 dmpi(9),dmpk(9)
-      real*8 dmpik(11),dmpe(13)
+      real*8 dmpik(11),dmpe(11)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
       real*8, allocatable :: dltem(:,:)
@@ -4441,7 +3994,6 @@ c
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
       logical muti,mutk
-      logical dosoft
       character*6 mode
 c
 c
@@ -4472,25 +4024,13 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
-c     set the softcore offset for real space electrostatics
-c
-      escoff = 0.0d0
-      esckap = 0.0d0
-      escal = 0.0d0
-      dosoft = (use_esoft .and. .not.use_subsys)
-      if (dosoft) then
-         escoff = scalpham * (1.0d0-elambda)**2
-         esckap = scalpham * (1.0d0-elambda)
-         escal = scalpham
-      end if
-c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
-!$OMP& yaxis,zaxis,elambda,mut,escoff,esckap,escal,dosoft)
+!$OMP& yaxis,zaxis,elambda,mut)
 !$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir,demvirdl,
 !$OMP& demdl,d2emdl2,dfmdl,dltem)
 !$OMP DO reduction(+:em,dem,tem,pot,emvir,demvirdl,demdl,d2emdl2,
@@ -4632,35 +4172,18 @@ c
      &                 - 2.0d0*(qixx*qkxy+qixy*qkyy+qixz*qkyz
      &                         -qixy*qkxx-qiyy*qkxy-qiyz*qkxz)
 c
-c     apply softcore shift to the electrostatic separation distance
-c
-               rsc2 = r2
-               rsc = r
-               if (escoff .ne. 0.0d0) then
-                  if (mut(i) .or. mut(k)) then
-                     rsc2 = r2 + escoff
-                     rsc = sqrt(rsc2)
-                  end if
-               end if
-c
 c     get reciprocal distance terms for this interaction
 c
-               rr1 = f / rsc
-               rr3 = rr1 / rsc2
-               rr5 = 3.0d0 * rr3 / rsc2
-               rr7 = 5.0d0 * rr5 / rsc2
-               rr9 = 7.0d0 * rr7 / rsc2
-               rr11 = 9.0d0 * rr9 / rsc2
-               rr13 = 0.0d0
-               if (dosoft)  rr13 = 11.0d0 * rr11 / rsc2
+               rr1 = f / r
+               rr3 = rr1 / r2
+               rr5 = 3.0d0 * rr3 / r2
+               rr7 = 5.0d0 * rr5 / r2
+               rr9 = 7.0d0 * rr7 / r2
+               rr11 = 9.0d0 * rr9 / r2
 c
 c     calculate real space Ewald error function damping
 c
-               if (dosoft) then
-                  call dampewald (13,rsc,rsc2,f,dmpe)
-               else
-                  call dampewald (11,rsc,rsc2,f,dmpe)
-               end if
+               call dampewald (11,r,r2,f,dmpe)
 c
 c     find damped multipole intermediates and energy value
 c
@@ -4738,7 +4261,6 @@ c
                   rr7 = dmpe(7) - scalek*rr7
                   rr9 = dmpe(9) - scalek*rr9
                   rr11 = dmpe(11) - scalek*rr11
-                  if (dosoft)  rr13 = dmpe(13) - scalek*rr13
                   e = term1*rr1 + term2*rr3 + term3*rr5
      &                   + term4*rr7 + term5*rr9
 c
@@ -4746,24 +4268,12 @@ c     find standard multipole intermediates for force and torque
 c
                   de = term1*rr3 + term2*rr5 + term3*rr7
      &                    + term4*rr9 + term5*rr11
-                  if (dosoft) then
-                     deup = term1*rr5 + term2*rr7 + term3*rr9
-     &               + term4*rr11 + term5*rr13
-                  end if
                   term1 = -ck*rr3 + dkr*rr5 - qkr*rr7
                   term2 = ci*rr3 + dir*rr5 + qir*rr7
                   term3 = 2.0d0 * rr5
                   term4 = -2.0d0 * (ck*rr5-dkr*rr7+qkr*rr9)
                   term5 = -2.0d0 * (ci*rr5+dir*rr7+qir*rr9)
                   term6 = 4.0d0 * rr7
-                  if (dosoft) then
-                     term1up = -ck*rr5 + dkr*rr7 - qkr*rr9
-                     term2up = ci*rr5 + dir*rr7 + qir*rr9
-                     term3up = 2.0d0 * rr7
-                     term4up = -2.0d0 * (ck*rr7-dkr*rr9+qkr*rr11)
-                     term5up = -2.0d0 * (ci*rr7+dir*rr9+qir*rr11)
-                     term6up = 4.0d0 * rr9
-                  end if
                end if
 c
 c     store the potential at each site for use in charge flux
@@ -4797,17 +4307,6 @@ c
                frcz = de*zr + term1*diz + term2*dkz
      &                   + term3*(diqkz-dkqiz) + term4*qiz
      &                   + term5*qkz + term6*(qizk+qkzi)
-               if (dosoft) then
-                  frcxup = deup*xr + term1up*dix + term2up*dkx
-     &                   + term3up*(diqkx-dkqix) + term4up*qix
-     &                   + term5up*qkx + term6up*(qixk+qkxi)
-                  frcyup = deup*yr + term1up*diy + term2up*dky
-     &                   + term3up*(diqky-dkqiy) + term4up*qiy
-     &                   + term5up*qky + term6up*(qiyk+qkyi)
-                  frczup = deup*zr + term1up*diz + term2up*dkz
-     &                   + term3up*(diqkz-dkqiz) + term4up*qiz
-     &                   + term5up*qkz + term6up*(qizk+qkzi)
-               end if
 c
 c     compute the torque components for this interaction
 c
@@ -4830,70 +4329,38 @@ c
                ttmk(3) = rr3*dikz + term2*dkrz
      &                      - term3*(dqikz+diqkrz)
      &                      - term5*qkrz - term6*(qkirz-qikz)
-               if (dosoft) then
-                  ttmiup(1) = -rr5*dikx + term1up*dirx
-     &                      + term3up*(dqikx+dkqirx)
-     &                      - term4up*qirx - term6up*(qikrx+qikx)
-                  ttmiup(2) = -rr5*diky + term1up*diry
-     &                      + term3up*(dqiky+dkqiry)
-     &                      - term4up*qiry - term6up*(qikry+qiky)
-                  ttmiup(3) = -rr5*dikz + term1up*dirz
-     &                      + term3up*(dqikz+dkqirz)
-     &                      - term4up*qirz - term6up*(qikrz+qikz)
-                  ttmkup(1) = rr5*dikx + term2up*dkrx
-     &                      - term3up*(dqikx+diqkrx)
-     &                      - term5up*qkrx - term6up*(qkirx-qikx)
-                  ttmkup(2) = rr5*diky + term2up*dkry
-     &                      - term3up*(dqiky+diqkry)
-     &                      - term5up*qkry - term6up*(qkiry-qiky)
-                  ttmkup(3) = rr5*dikz + term2up*dkrz
-     &                      - term3up*(dqikz+diqkrz)
-     &                      - term5up*qkrz - term6up*(qkirz-qikz)
-               end if
 c
 c     compute lambda derivative
 c
                scalelmda = 1.0d0
+               if (muti .and. mutk) then
+                  dlambda = 2.0d0 * elambda * e
+                  dlambda2 = 2.0d0 * e
+                  dlfrcx = 2.0d0 * elambda * frcx
+                  dlfrcy = 2.0d0 * elambda * frcy
+                  dlfrcz = 2.0d0 * elambda * frcz
+                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
+                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
+                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
+                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
+                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
+                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
+                  scalelmda = elambda * elambda
+               else if (muti .or. mutk) then
+                  dlambda = e
+                  dlambda2 = 0.0d0
+                  dlfrcx = frcx
+                  dlfrcy = frcy
+                  dlfrcz = frcz
+                  dlttmi(1) = ttmi(1)
+                  dlttmi(2) = ttmi(2)
+                  dlttmi(3) = ttmi(3)
+                  dlttmk(1) = ttmk(1)
+                  dlttmk(2) = ttmk(2)
+                  dlttmk(3) = ttmk(3)
+                  scalelmda = elambda
+               end if
                if (muti .or. mutk) then
-                  if (muti .and. mutk) then
-                     pl = elambda * elambda
-                     pl1 = 2.0d0 * elambda
-                     pl2 = 2.0d0
-                  else
-                     pl = elambda
-                     pl1 = 1.0d0
-                     pl2 = 0.0d0
-                  end if
-                  dlambda = pl1*e
-                  dlambda2 = pl2*e
-                  dlfrcx = pl1*frcx
-                  dlfrcy = pl1*frcy
-                  dlfrcz = pl1*frcz
-                  dlttmi(1) = pl1*ttmi(1)
-                  dlttmi(2) = pl1*ttmi(2)
-                  dlttmi(3) = pl1*ttmi(3)
-                  dlttmk(1) = pl1*ttmk(1)
-                  dlttmk(2) = pl1*ttmk(2)
-                  dlttmk(3) = pl1*ttmk(3)
-c
-c     add the soft core contribution to the lambda derivatives
-c
-                  if (dosoft) then
-                     plk = pl * esckap
-                     dlambda = dlambda + plk*de
-                     dlambda2 = dlambda2 + 2.0d0*pl1*esckap*de
-     &                             + pl*(esckap*esckap*deup-escal*de)
-                     dlfrcx = dlfrcx + plk*frcxup
-                     dlfrcy = dlfrcy + plk*frcyup
-                     dlfrcz = dlfrcz + plk*frczup
-                     dlttmi(1) = dlttmi(1) + plk*ttmiup(1)
-                     dlttmi(2) = dlttmi(2) + plk*ttmiup(2)
-                     dlttmi(3) = dlttmi(3) + plk*ttmiup(3)
-                     dlttmk(1) = dlttmk(1) + plk*ttmkup(1)
-                     dlttmk(2) = dlttmk(2) + plk*ttmkup(2)
-                     dlttmk(3) = dlttmk(3) + plk*ttmkup(3)
-                  end if
-                  scalelmda = pl
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
                end if
