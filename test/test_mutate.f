@@ -40,6 +40,7 @@ c
       call test_mutate_lmdapin
       call test_mutate_relsmap
       call test_mutate_apm
+      call test_mutate_vsoft
       return
       end
 c
@@ -1529,6 +1530,39 @@ c
       call test_mutate_calc ('water2','199_water_apm_ast_epin_l10.key',
      &   '199_water_apm_ast_epin_l10.txt',
      &   '199_water_apm_ast_epin_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_mutate_vsoft  --  softcore vdw settings  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_mutate_vsoft" runs the three water fixtures 200-202 that
+c     scan an exponential van der Waals lambda map using a small
+c     softcore alpha and a cubic softcore exponent; electrostatics and
+c     polarization are pinned decoupled while van der Waals is checked
+c     at both endpoints and the midpoint; each fixture carries the
+c     "lambda-deriv" keyword and runs the level 4 lambda derivative
+c     checks, and all three use Ewald and support a neighbor list
+c
+c
+      subroutine test_mutate_vsoft
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','200_water_vsoft_l10.key',
+     &   '200_water_vsoft_l10.txt','200_water_vsoft_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','201_water_vsoft_l05.key',
+     &   '201_water_vsoft_l05.txt','201_water_vsoft_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','202_water_vsoft_l00.key',
+     &   '202_water_vsoft_l00.txt','202_water_vsoft_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
