@@ -301,13 +301,13 @@ c
 c     write a column header for the history table
 c
       nsave = nosthist
-      write (iout,10)
+      write (iout,10)  kelvin
    10 format (/,' OST Time Series :',
-     &        //,3x,'Hist',8x,'Step',9x,'Lambda',11x,'dU/dLambda',
-     &           10x,'Free Energy',10x,'Height',
-     &           8x,'Width-Lambda',7x,'Width-dU/dL',/)
-      write (iout,15)  kelvin
-   15 format (3x,'Temperature Used',6x,d20.10,' K',/)
+     &        //,3x,'Temperature Used',6x,1p,d20.10,' K')
+      write (iout,20)
+   20 format (/,3x,'Hist',8x,'Step',4x,'Lambda',14x,'dU/dLambda',
+     &           10x,'Free Energy',9x,'Height',
+     &           14x,'Width-Lambda',8x,'Width-dU/dL',/)
 c
 c     rebuild the kernels cumulatively over the saved history
 c
@@ -335,9 +335,9 @@ c
          end if
          freeeng = etotfkernel()
          step = ostihist(ihist)
-         write (iout,20)  ihist,step,ostlhist(ihist),ostfhist(ihist),
+         write (iout,30)  ihist,step,ostlhist(ihist),ostfhist(ihist),
      &      freeeng,osthhist(ihist),ostwlhist(ihist),ostwfhist(ihist)
-   20    format (i7,i12,6d20.10)
+   30    format (i7,i12,1p,6d20.10)
       end do
 c
 c     restore the full saved history free energy
@@ -355,7 +355,8 @@ c     #################################################################
 c
 c
 c     "ostfreeenergy" prints the final free energy estimate from the
-c     f kernel rebuilt from the full saved OST history
+c     f kernel rebuilt from the full saved OST history, followed by
+c     the cumulative free energy at each lambda bin
 c
 c
       subroutine ostfreeenergy
@@ -363,6 +364,8 @@ c
       use iounit
       use ost
       implicit none
+      integer ilmda
+      real*8 lambda,dgl
       real*8 etotfkernel
 c
 c
@@ -375,12 +378,27 @@ c
          call buildfkernel
       end if
       eosttot = etotfkernel()
-      write (iout,10)  nosthist,eosttot
+      write (iout,10)  nosthist,eosttot,kelvin
    10 format (/,' OST Free Energy Estimate :',
-     &        //,4x,'Number of Gaussians',8x,i12,
-     &         /,4x,'Delta G',20x,d20.10)
-      write (iout,20)  kelvin
-   20 format (4x,'Temperature Used',11x,d20.10,' K')
+     &        //,1x,'Number of Gaussians',i16,
+     &         /,1x,'Delta G',20x,1p,d20.10,
+     &         /,1x,'Temperature Used',11x,d20.10,' K')
+c
+c     print the cumulative free energy by trapezoid integration
+c     of the f kernel, matching the summation in etotfkernel
+c
+      write (iout,20)
+   20 format (/,' OST Free Energy dG(L) :',
+     &        //,1x,'Lambda',10x,'dG(Lambda)',/)
+      dgl = 0.0d0
+      do ilmda = 1, nlmda
+         if (ilmda .gt. 1) then
+            dgl = dgl + 0.5d0*(fkernel(ilmda-1)+fkernel(ilmda))*wlmda
+         end if
+         lambda = dble(ilmda-1) * wlmda
+         write (iout,30)  lambda,dgl
+   30    format (1x,1p,d10.4,d16.4)
+      end do
       return
       end
 c
@@ -415,25 +433,29 @@ c
          call buildgkernel
       end if
       flstart = dble(1-fli0) * wflmda
-      write (iout,10)  nlmda,nflmda
-      write (iout,20)  0.0d0,wlmda
-      write (iout,30)  flstart,wflmda
-      write (iout,40)
-   10 format ('# OST gkernel grid',/,
-     &        '# nlmda ',i12,' nflmda ',i12)
-   20 format ('# lambda_start ',d20.10,' lambda_width ',d20.10)
-   30 format ('# flambda_start',d20.10,' flambda_width',d20.10)
-   40 format ('# ilmda iflmda lambda flambda gkernel')
+c
+c     print the grid dimensions, spacings and flambda origin
+c
+      write (iout,10)
+   10 format (/,' OST g Kernel Setting :',
+     &        //,1x,'nLambda',3x,'nFLambda',2x,'wLambda',
+     &           15x,'wFLambda',14x,'sFLambda',/)
+      write (iout,20)  nlmda,nflmda,wlmda,wflmda,flstart
+   20 format (i8,i11,1p,d20.12,2d22.12)
 c
 c     print all grid values as one row per lambda/flambda point
 c
+      write (iout,30)
+   30 format (/,' OST g Kernel Grid :',
+     &        //,1x,'iLambda',7x,'iFLambda',6x,'Lambda',
+     &           16x,'FLambda',15x,'gKernel',/)
       do ilmda = 1, nlmda
          lambda = dble(ilmda-1) * wlmda
          do iflmda = 1, nflmda
             flmda = dble(iflmda-fli0) * wflmda
-            write (iout,50)  ilmda,iflmda,lambda,flmda,
+            write (iout,40)  ilmda,iflmda,lambda,flmda,
      &                       gkernel(ilmda,iflmda)
-   50       format (2i8,3d22.12)
+   40       format (i8,i15,1p,d24.12,2d22.12)
          end do
       end do
       return
