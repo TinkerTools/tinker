@@ -48,9 +48,9 @@ c
       call basefile (ostfile)
       ostsavefile = ostfile
 c
-c     use room temperature if no simulation temperature is available
+c     set default temperature
 c
-      if (kelvin .le. 0.0d0)  kelvin = 298.0d0
+      kelvin = 298.0d0
 c
 c     get the requested analysis mode
 c

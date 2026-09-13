@@ -2102,6 +2102,7 @@ c     kernels; used for analysis, not to restart a simulation
 c
 c
       subroutine rdost
+      use bath
       use dlmda
       use files
       use inform
@@ -2122,6 +2123,7 @@ c
       real*8 osttheta0,ostvtheta0
       real*8 ostmass0,ostfriction0,ostdt0
       real*8 eosttot0,oststdev0
+      real*8 kelvin0
       real*8 etotfkernel
       logical exist
       character*240 ostfile
@@ -2146,7 +2148,8 @@ c
      &   nlmda0,nflmda0,fli00,nosthist0,sizeosthist0
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  wlmda0,wflmda0,oststdev0
+      read (record,*,err=90,end=90)  wlmda0,wflmda0,oststdev0,
+     &   kelvin0
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
       read (record,*,err=90,end=90)  lambda0,osttheta0,ostvtheta0,
@@ -2159,6 +2162,7 @@ c
       if (nflmda0 .lt. 1)  goto 90
       if (fli00 .lt. 1 .or. fli00 .gt. nflmda0)  goto 90
       if (iosthist0 .lt. 1)  goto 90
+      if (kelvin0 .le. 0.0d0)  goto 90
       if (nosthist0 .lt. 0)  goto 90
       if (sizeosthist0 .lt. nosthist0)  sizeosthist0 = nosthist0
       if (sizeosthist0 .lt. 1)  sizeosthist0 = 1
@@ -2232,6 +2236,7 @@ c
       ostdt = ostdt0
       eosttot = eosttot0
       oststdev = oststdev0
+      kelvin = kelvin0
 c
 c     initialize ost arrays
 c
@@ -2339,6 +2344,7 @@ c     "prtosthead" writes the fixed-size current ost history header
 c
 c
       subroutine prtosthead (ihis)
+      use bath
       use mutant
       use ost
       implicit none
@@ -2352,7 +2358,7 @@ c
       write (ihis,30)  iost,iosthist,nlmda,nflmda,
      &                 fli0,nosthist,sizeosthist
       write (ihis,40)
-      write (ihis,50)  wlmda,wflmda,oststdev
+      write (ihis,50)  wlmda,wflmda,oststdev,kelvin
       write (ihis,60)
       write (ihis,70)  lambda,osttheta,ostvtheta,
      &                 ostmass,ostfriction,ostdt,eosttot
@@ -2361,7 +2367,7 @@ c
    20 format (' Integer State :')
    30 format (7i12)
    40 format (' Grid State :')
-   50 format (3d26.16)
+   50 format (4d26.16)
    60 format (' Lambda State :')
    70 format (7d26.16)
    80 format (' Gaussian History :')
@@ -2381,6 +2387,7 @@ c     unformatted stream output avoids truncating the appended history
 c
 c
       subroutine updosthead (ihis)
+      use bath
       use mutant
       use ost
       implicit none
@@ -2414,7 +2421,7 @@ c
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,40)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,50)  wlmda,wflmda,oststdev
+      write (record,50)  wlmda,wflmda,oststdev,kelvin
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,60)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
@@ -2427,7 +2434,7 @@ c
    20 format (' Integer State :')
    30 format (7i12)
    40 format (' Grid State :')
-   50 format (3d26.16)
+   50 format (4d26.16)
    60 format (' Lambda State :')
    70 format (7d26.16)
    80 format (' Gaussian History :')

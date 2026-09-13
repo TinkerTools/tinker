@@ -68,6 +68,7 @@ c     histories while updating the fixed-size restart header in place
 c
 c
       subroutine test_eost_save
+      use bath
       use dlmda
       use files
       use ost
@@ -80,6 +81,7 @@ c
       integer size1,size2,size3
       integer freeunit
       real*8 brutevkmax
+      real*8 kelvin0
       logical exist
       character*240 filename0
       character*240 ostfile
@@ -89,6 +91,8 @@ c     create a small deterministic history and a temporary restart
 c
       filename0 = filename
       leng0 = leng
+      kelvin0 = kelvin
+      kelvin = 321.0d0
       filename = 'tinkertest-saveost'
       leng = len_trim(filename)
       ostfile = filename(1:leng)//'.ost'
@@ -134,7 +138,10 @@ c
 c     the per-gaussian heights survive a round trip, and the derived
 c     running maxima are rebuilt from the restored history
 c
+      kelvin = 111.0d0
       call rdost
+      call assert_real (kelvin,321.0d0,1.0d-12,
+     &                  'rdost restores the temperature')
       call assert_int (nosthist,3,'rdost restores the history count')
       call assert_real (osthhist(1),2.0d0,1.0d-12,
      &                  'rdost restores height 1')
@@ -169,6 +176,7 @@ c
       call assert_int (nline,3,'saveost history record count')
       filename = filename0
       leng = leng0
+      kelvin = kelvin0
       return
       end
 c
