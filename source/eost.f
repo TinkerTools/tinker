@@ -471,6 +471,7 @@ c     tempering threshold, decaying on a scale of kT*tempergamma
 c
 c
       function temperedheight (vminimax)
+      use bath
       use ost
       use units
       implicit none
@@ -483,7 +484,7 @@ c     an untempered run always deposits at the full height
 c
       temperedheight = hbias
       if (.not. ostemper)  return
-      denom = gasconst * lmdakelvin * tempergamma
+      denom = gasconst * kelvin * tempergamma
       if (denom .le. 0.0d0)  return
       excess = max(0.0d0,vminimax-temperthresh)
       temperedheight = hbias * exp(-excess/denom)
@@ -776,6 +777,7 @@ c     theta space, where lambda = sin(theta)**2
 c
 c
       subroutine ostlangevin
+      use bath
       use math
       use mutant
       use ost
@@ -805,7 +807,7 @@ c
       gamma = max(0.0d0,ostfriction)
       if (gamma .gt. 0.0d0) then
          c = exp(-gamma*ostdt)
-         ktm = boltzmann * lmdakelvin / ostmass
+         ktm = boltzmann * kelvin / ostmass
          sigma = sqrt(ktm*(1.0d0-c*c))
          ostvtheta = c*ostvtheta
      &                 + (1.0d0-c)*force/(gamma*ostmass)
@@ -1778,6 +1780,7 @@ c
 c
       subroutine addkernelpoint (ilmda,iflmda,e,ldelta,
      &                           fldelta,sigl2,sigf2)
+      use bath
       use ost
       use units
       implicit none
@@ -1803,7 +1806,7 @@ c     factor, so they are rescaled whenever this point raises it
 c
       vmax = vkernelmax(ilmda)
       if (newg .gt. vmax) then
-         scale = exp((vmax-newg)/(gasconst*lmdakelvin))
+         scale = exp((vmax-newg)/(gasconst*kelvin))
          fsumkernel(ilmda) = fsumkernel(ilmda) * scale
          pfkernel(ilmda) = pfkernel(ilmda) * scale
          vmax = newg
@@ -1811,9 +1814,9 @@ c
       if (oldg .eq. 0.0d0) then
          oldweight = 0.0d0
       else
-         oldweight = exp((oldg-vmax)/(gasconst*lmdakelvin))
+         oldweight = exp((oldg-vmax)/(gasconst*kelvin))
       end if
-      newweight = exp((newg-vmax)/(gasconst*lmdakelvin))
+      newweight = exp((newg-vmax)/(gasconst*kelvin))
       delweight = newweight - oldweight
       flmda = dble(iflmda-fli0) * wflmda
       dgdl = -ldelta * e / sigl2
@@ -1847,6 +1850,7 @@ c     biased ensemble average of dE/dlambda at each lambda bin
 c
 c
       subroutine buildfkernel
+      use bath
       use ost
       use units
       implicit none
@@ -1875,7 +1879,7 @@ c
             if (gkernel(ilmda,iflmda) .ne. 0.0d0) then
                flmda = dble(iflmda-fli0) * wflmda
                weight = exp((gkernel(ilmda,iflmda)-vmax)
-     &                         /(gasconst*lmdakelvin))
+     &                         /(gasconst*kelvin))
                avgflambda = avgflambda + flmda*weight
                partfunc = partfunc + weight
             end if

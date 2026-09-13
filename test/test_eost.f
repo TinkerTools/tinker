@@ -17,7 +17,7 @@ c     deterministic inputs and expected outputs
 c
 c
       subroutine test_eost
-      use ost
+      use bath
       use units
       implicit none
       logical skiptest
@@ -27,7 +27,7 @@ c
 c
       if (skiptest(tname,'ost'))  return
       call initial
-      lmdakelvin = 300.0d0
+      kelvin = 300.0d0
       call test_eost_index
       call test_eost_resize
       call test_eost_buildindex
@@ -656,6 +656,7 @@ c     construction from gaussian history data
 c
 c
       subroutine test_eost_fkernel
+      use bath
       use math
       use ost
       use units
@@ -669,7 +670,7 @@ c
 c     two nonzero gkernel weights at flambda=-1 and +1
 c
       call resetost (5,5,1)
-      rt = gasconst * lmdakelvin
+      rt = gasconst * kelvin
       gkernel(3,2) = log(2.0d0) * rt
       gkernel(3,4) = log(4.0d0) * rt
       vkernelmax(3) = log(4.0d0) * rt
@@ -684,7 +685,7 @@ c     build gkernel incrementally from multiple gaussians using
 c     updategkernel, then construct the f kernel
 c
       call resetost (5,5,4)
-      rt = gasconst * lmdakelvin
+      rt = gasconst * kelvin
       height = 2.0d0 * pi * wlmda * wflmda
 c
       nosthist = 1
@@ -721,7 +722,7 @@ c     a deeply filled bin overflows exp(g/kT) unless the largest bias
 c     in the row is factored out; unshifted this returns a NaN
 c
       call resetost (5,5,1)
-      rt = gasconst * lmdakelvin
+      rt = gasconst * kelvin
       gkernel(3,2) = 500.0d0
       gkernel(3,4) = 499.0d0
       vkernelmax(3) = 500.0d0
@@ -746,6 +747,7 @@ c     and incremental updates against reference arrays
 c
 c
       subroutine test_eost_kernelbuilds
+      use bath
       use math
       use ost
       use units
@@ -771,7 +773,7 @@ c     build a mixed history with overlapping gaussians, endpoint
 c     mirror images, and multiple gaussian widths
 c
       call resetost (9,9,8)
-      rt = gasconst * lmdakelvin
+      rt = gasconst * kelvin
       nhist = 6
       nosthist = nhist
       height = 2.0d0 * pi * wlmda * wflmda
@@ -1450,6 +1452,7 @@ c     from it, over every path that fills the kernel
 c
 c
       subroutine test_eost_vkernelmax
+      use bath
       use ost
       implicit none
       integer i
@@ -1461,7 +1464,7 @@ c
 c
 c     two saved sources spread over the whole kernel
 c
-      lmdakelvin = 300.0d0
+      kelvin = 300.0d0
       call resetost (5,5,4)
       nosthist = 2
       call sethist (1,0.25d0,0.0d0,1.0d0,0.25d0,1.0d0)
@@ -1545,6 +1548,7 @@ c     tempering threshold
 c
 c
       subroutine test_eost_tempering
+      use bath
       use ost
       use units
       implicit none
@@ -1559,10 +1563,10 @@ c
 c
 c     an untempered run deposits at the full height
 c
-      lmdakelvin = 300.0d0
+      kelvin = 300.0d0
       call resetost (5,5,1)
       hbias = 1.0d-5
-      rt = gasconst * lmdakelvin
+      rt = gasconst * kelvin
       ostemper = .false.
       temperthresh = 1.0d0
       tempergamma = 1.0d0
@@ -1758,6 +1762,7 @@ c     accumulated metadynamics grid
 c
 c
       subroutine test_eost_metatemper
+      use bath
       use dlmda
       use mutant
       use ost
@@ -1773,7 +1778,7 @@ c
 c
 c     deposit repeatedly at a fixed lambda with tempering on
 c
-      lmdakelvin = 300.0d0
+      kelvin = 300.0d0
       call resetost (5,5,1)
       call resetmeta (8)
       iosthist = 4
@@ -1895,6 +1900,7 @@ c     one is rejected
 c
 c
       subroutine test_eost_ostdyn
+      use bath
       use dlmda
       use mutant
       use ost
@@ -1905,7 +1911,7 @@ c
 c
 c     a settled interval deposits one gaussian at the interval end
 c
-      lmdakelvin = 300.0d0
+      kelvin = 300.0d0
       call resetost (5,5,4)
       iosthist = 4
       ostnpa = 0
@@ -2046,6 +2052,7 @@ c     that the deposited gaussian sits on that frozen lambda
 c
 c
       subroutine test_eost_ostgate
+      use bath
       use dlmda
       use mutant
       use ost
@@ -2058,7 +2065,7 @@ c
 c     drive an interval with a deterministic frictionless lambda
 c     particle, so that any lambda motion comes from the gate alone
 c
-      lmdakelvin = 300.0d0
+      kelvin = 300.0d0
       call resetost (5,5,4)
       iosthist = 6
       ostnpa = 2
