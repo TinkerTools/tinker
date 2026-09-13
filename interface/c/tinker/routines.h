@@ -1122,7 +1122,7 @@ double ostvminimax_();
 #define tinker_f_ostvminimax ostvminimax_
 double metavminimax_();
 #define tinker_f_metavminimax metavminimax_
-double temperedheight_(double* vminimax);
+double temperedheight_(double* vglobal, double* vlocal);
 #define tinker_f_temperedheight temperedheight_
 void emetabias_(double* lambda, double* vbias, double* dvdl);
 #define tinker_f_emetabias emetabias_

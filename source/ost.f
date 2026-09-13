@@ -52,9 +52,13 @@ c     ostdedlstd     standard deviation of dU/dL between updates
 c     ostdgdl        current dg/dlambda value
 c     ostdt          time step for theta lambda propagation
 c     ostfriction    friction coefficient for theta lambda coordinate
+c     ostgtempgamma  global tempering factor scaling height decay by kT
+c     ostgthresh     global bias threshold for untempered heights
 c     ostlambdaavg   average main lambda value between hist updates
 c     ostlambdaslp   fitted lambda change per sample over an interval
 c     ostlambdastd   standard deviation of lambda between hist updates
+c     ostltempgamma  local tempering factor scaling height decay by kT
+c     ostlthresh     local bias threshold for untempered heights
 c     ostmass        fictitious mass of theta lambda coordinate
 c     ostparatio     fraction interval propagating lambda
 c     ostpbratio     fraction interval equilibrating dedl at fixed lmda
@@ -62,8 +66,6 @@ c     ostpcratio     fraction interval averaging dedl at fixed lmda
 c     oststdev       gaussian cutoff distance in standard deviations
 c     osttheta       theta coordinate used to propagate lambda
 c     ostvtheta      velocity of the theta lambda coordinate
-c     tempergamma    tempering factor scaling the height decay by kT
-c     temperthresh   bias level below which heights are untempered
 c     wfhist         flambda width of new histogram gaussians
 c     wflmda         width of flambda bins
 c     wflmda2        half width of flambda bins
@@ -97,9 +99,10 @@ c     gkernel        ost bias potential on the lambda/flambda grid
 c     glfkernel      mixed derivative of gkernel on grid
 c     glkernel       d(gkernel)/dlambda values on grid
 c     fastkernel     flag to use fused g and f kernel updates
-c     ostemper       flag to temper the deposited gaussian heights
 c     ostinterpol    flag to interpolate ost g kernel from grid
 c     osttrial       flag to evaluate ost bias w/o depositing gaussians
+c     use_ostgtemp   flag to temper heights by the global bias level
+c     use_ostltemp   flag to temper heights by the lambda bin excess
 c     metasavefile   name of the file holding the metadynamics history
 c     ostsavefile    name of the file holding the ost history
 c
@@ -146,9 +149,13 @@ c
       real*8 ostdgdl
       real*8 ostdt
       real*8 ostfriction
+      real*8 ostgtempgamma
+      real*8 ostgthresh
       real*8 ostlambdaavg
       real*8 ostlambdaslp
       real*8 ostlambdastd
+      real*8 ostltempgamma
+      real*8 ostlthresh
       real*8 ostmass
       real*8 ostparatio
       real*8 ostpbratio
@@ -156,8 +163,6 @@ c
       real*8 oststdev
       real*8 osttheta
       real*8 ostvtheta
-      real*8 tempergamma
-      real*8 temperthresh
       real*8 wfhist
       real*8 wflmda
       real*8 wflmda2
@@ -191,9 +196,10 @@ c
       real*8, allocatable :: glfkernel(:,:)
       real*8, allocatable :: glkernel(:,:)
       logical fastkernel
-      logical ostemper
       logical ostinterpol
       logical osttrial
+      logical use_ostgtemp
+      logical use_ostltemp
       character*240 metasavefile
       character*240 ostsavefile
       save

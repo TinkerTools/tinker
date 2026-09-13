@@ -880,9 +880,12 @@ c
 c
 c     set defaults for tempering of the deposited gaussian heights
 c
-      ostemper = .false.
-      tempergamma = 1.0d0
-      temperthresh = 1.0d0
+      use_ostgtemp = .false.
+      use_ostltemp = .false.
+      ostgthresh = 1.0d0
+      ostgtempgamma = 1.0d0
+      ostlthresh = 1.0d0
+      ostltempgamma = 1.0d0
 c
 c     set defaults for the lambda particle propagation
 c
@@ -972,14 +975,14 @@ c
          else if (keyword(1:16) .eq. 'OST-CONVCRI-STD ') then
             string = record(next:240)
             read (string,*,err=10)  ostcvstd
-         else if (keyword(1:11) .eq. 'OST-TEMPER ') then
-            ostemper = .true.
-         else if (keyword(1:17) .eq. 'OST-TEMPER-GAMMA ') then
+         else if (keyword(1:18) .eq. 'OST-TEMPER-GLOBAL ') then
+            use_ostgtemp = .true.
             string = record(next:240)
-            read (string,*,err=10)  tempergamma
-         else if (keyword(1:18) .eq. 'OST-TEMPER-THRESH ') then
+            read (string,*,err=10,end=10)  ostgthresh,ostgtempgamma
+         else if (keyword(1:17) .eq. 'OST-TEMPER-LOCAL ') then
+            use_ostltemp = .true.
             string = record(next:240)
-            read (string,*,err=10)  temperthresh
+            read (string,*,err=10,end=10)  ostlthresh,ostltempgamma
          end if
    10    continue
       end do
@@ -1003,6 +1006,26 @@ c
          wfhist = 1.0d0
       end if
       if (hbias .lt. 0.0d0)  hbias = -hbias
+      if (ostgthresh .lt. 0.0d0) then
+         ostgthresh = -ostgthresh
+      else if (ostgthresh .eq. 0.0d0) then
+         ostgthresh = 1.0d0
+      end if
+      if (ostgtempgamma .lt. 0.0d0) then
+         ostgtempgamma = -ostgtempgamma
+      else if (ostgtempgamma .eq. 0.0d0) then
+         ostgtempgamma = 1.0d0
+      end if
+      if (ostlthresh .lt. 0.0d0) then
+         ostlthresh = -ostlthresh
+      else if (ostlthresh .eq. 0.0d0) then
+         ostlthresh = 1.0d0
+      end if
+      if (ostltempgamma .lt. 0.0d0) then
+         ostltempgamma = -ostltempgamma
+      else if (ostltempgamma .eq. 0.0d0) then
+         ostltempgamma = 1.0d0
+      end if
       maxwlhist = wlhist
       maxwfhist = wfhist
 c

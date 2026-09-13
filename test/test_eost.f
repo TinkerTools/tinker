@@ -44,6 +44,7 @@ c
       call test_eost_vkernelmax
       call test_eost_tempering
       call test_eost_ostdyn
+      call test_eost_ostlocal
       call test_eost_ostphase
       call test_eost_ostgate
       call test_eost_save
@@ -51,6 +52,7 @@ c
       call test_eost_metaimage
       call test_eost_metadyn
       call test_eost_metatemper
+      call test_eost_temperkeys
       call final
       return
       end
@@ -1550,9 +1552,10 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "test_eost_tempering" checks that the deposited gaussian
-c     height decays once the global path bias level passes the
-c     tempering threshold
+c     "test_eost_tempering" checks the deposited gaussian height with
+c     the global and local tempering factors disabled, below their
+c     thresholds, active alone and active together, and that the
+c     height stays positive and never exceeds the full height
 c
 c
       subroutine test_eost_tempering
@@ -1560,13 +1563,24 @@ c
       use ost
       use units
       implicit none
-      integer i
+      integer i,j,k
       real*8 rt
       real*8 h,prev
       real*8 h1,h2
+      real*8 hg,hl
+      real*8 vg,dl
       real*8 temperedheight
       real*8 vstar(4)
+      real*8 delta(5)
+      real*8 vgrid(6)
+      real*8 dgrid(6)
+      real*8 gpair(2,3)
+      real*8 hgrid(6,6)
       data vstar / 1.5d0,2.0d0,3.0d0,5.0d0 /
+      data delta / 0.0d0,1.0d0,1.5d0,3.0d0,5.0d0 /
+      data vgrid / 0.0d0,0.5d0,1.0d0,2.0d0,5.0d0,20.0d0 /
+      data dgrid / 0.0d0,0.5d0,1.0d0,2.0d0,5.0d0,20.0d0 /
+      data gpair / 1.0d0,1.0d0,2.0d0,0.5d0,0.5d0,2.0d0 /
 c
 c
 c     an untempered run deposits at the full height
@@ -1575,53 +1589,130 @@ c
       call resetost (5,5,1)
       hbias = 1.0d-5
       rt = gasconst * kelvin
-      ostemper = .false.
-      temperthresh = 1.0d0
-      tempergamma = 1.0d0
-      call assert_real (temperedheight(0.0d0),hbias,1.0d-18,
+      use_ostgtemp = .false.
+      use_ostltemp = .false.
+      ostgthresh = 1.0d0
+      ostgtempgamma = 1.0d0
+      ostlthresh = 1.0d0
+      ostltempgamma = 1.0d0
+      call assert_real (temperedheight(0.0d0,0.0d0),hbias,1.0d-18,
      &                  'temperedheight disabled empty path')
-      call assert_real (temperedheight(50.0d0),hbias,1.0d-18,
+      call assert_real (temperedheight(50.0d0,50.0d0),hbias,1.0d-18,
      &                  'temperedheight disabled filled path')
+      call assert_real (temperedheight(50.0d0,500.0d0),hbias,1.0d-18,
+     &                  'temperedheight disabled uneven path')
 c
-c     at or below the threshold the height is still untempered
+c     at or below both thresholds the height is still untempered
 c
-      ostemper = .true.
-      call assert_real (temperedheight(0.0d0),hbias,1.0d-18,
-     &                  'temperedheight below threshold')
-      call assert_real (temperedheight(1.0d0),hbias,1.0d-18,
-     &                  'temperedheight at threshold')
+      use_ostgtemp = .true.
+      use_ostltemp = .true.
+      call assert_real (temperedheight(0.0d0,0.0d0),hbias,1.0d-18,
+     &                  'temperedheight below both thresholds')
+      call assert_real (temperedheight(1.0d0,1.0d0),hbias,1.0d-18,
+     &                  'temperedheight at global threshold')
+      call assert_real (temperedheight(1.0d0,2.0d0),hbias,1.0d-18,
+     &                  'temperedheight at both thresholds')
+      call assert_real (temperedheight(0.5d0,1.5d0),hbias,1.0d-18,
+     &                  'temperedheight at local threshold')
 c
-c     above the threshold the height decays exponentially
+c     the global factor alone decays with the path bias level and
+c     ignores how far the deposit bin is ahead of that level
 c
+      use_ostltemp = .false.
       prev = hbias
       do i = 1, 4
-         h = temperedheight(vstar(i))
+         h = temperedheight(vstar(i),vstar(i))
          call assert_real (h,hbias*exp(-(vstar(i)-1.0d0)/rt),1.0d-18,
-     &                     'temperedheight above threshold')
+     &                     'temperedheight global above threshold')
+         call assert_real (temperedheight(vstar(i),vstar(i)+50.0d0),
+     &                     h,1.0d-18,'temperedheight global ignores '//
+     &                     'the local excess')
          call assert_logical (h.lt.prev,.true.,
-     &                        'temperedheight decays monotonically')
+     &                        'temperedheight global decays')
          prev = h
       end do
 c
-c     a larger tempering factor decays more slowly
+c     a larger global tempering factor decays more slowly
 c
-      tempergamma = 1.0d0
-      h1 = temperedheight(3.0d0)
-      tempergamma = 2.0d0
-      h2 = temperedheight(3.0d0)
+      ostgtempgamma = 1.0d0
+      h1 = temperedheight(3.0d0,3.0d0)
+      ostgtempgamma = 2.0d0
+      h2 = temperedheight(3.0d0,3.0d0)
       call assert_logical (h2.gt.h1,.true.,
      &                     'temperedheight larger gamma decays slower')
       call assert_real (h2,hbias*exp(-2.0d0/(2.0d0*rt)),1.0d-18,
      &                  'temperedheight gamma scaling')
 c
-c     a non-positive tempering factor disables the decay
+c     the local factor alone depends only on the excess of the
+c     deposit bin over the path bias level
 c
-      tempergamma = 0.0d0
-      call assert_real (temperedheight(50.0d0),hbias,1.0d-18,
-     &                  'temperedheight zero gamma')
-      tempergamma = -1.0d0
-      call assert_real (temperedheight(50.0d0),hbias,1.0d-18,
-     &                  'temperedheight negative gamma')
+      use_ostgtemp = .false.
+      use_ostltemp = .true.
+      ostgtempgamma = 1.0d0
+      prev = hbias
+      do i = 1, 5
+         h = temperedheight(50.0d0,50.0d0+delta(i))
+         hl = hbias * exp(-max(0.0d0,delta(i)-1.0d0)/rt)
+         call assert_real (h,hl,1.0d-18,
+     &                     'temperedheight local excess')
+         call assert_real (temperedheight(0.0d0,delta(i)),h,1.0d-18,
+     &                     'temperedheight local shift invariance')
+         call assert_logical (h.le.prev,.true.,
+     &                        'temperedheight local decays')
+         prev = h
+      end do
+      call assert_real (temperedheight(50.0d0,50.0d0),hbias,1.0d-18,
+     &                  'temperedheight least filled bin untempered')
+c
+c     both factors multiply, so with equal settings the path bias
+c     level cancels and only the deposit bin bias level remains
+c
+      use_ostgtemp = .true.
+      use_ostltemp = .true.
+      ostgthresh = 1.0d0
+      ostlthresh = 1.0d0
+      ostgtempgamma = 2.0d0
+      ostltempgamma = 2.0d0
+      h = temperedheight(3.0d0,6.0d0)
+      hg = exp(-2.0d0/(2.0d0*rt))
+      hl = exp(-2.0d0/(2.0d0*rt))
+      call assert_real (h,hbias*hg*hl,1.0d-18,
+     &                  'temperedheight factors multiply')
+      call assert_real (h,hbias*exp((2.0d0-6.0d0)/(2.0d0*rt)),1.0d-18,
+     &                  'temperedheight equal settings')
+      ostltempgamma = 0.5d0
+      hg = exp(-2.0d0/(2.0d0*rt))
+      hl = exp(-2.0d0/(0.5d0*rt))
+      call assert_real (temperedheight(3.0d0,6.0d0),hbias*hg*hl,
+     &                  1.0d-18,'temperedheight unequal gammas')
+c
+c     over a sweep of levels the height stays positive, never exceeds
+c     the full height, and never grows with either level
+c
+      ostgthresh = 1.0d0
+      ostlthresh = 1.0d0
+      do k = 1, 3
+         ostgtempgamma = gpair(1,k)
+         ostltempgamma = gpair(2,k)
+         do i = 1, 6
+            do j = 1, 6
+               vg = vgrid(i)
+               dl = dgrid(j)
+               h = temperedheight(vg,vg+dl)
+               hgrid(i,j) = h
+               call assert_logical (h.gt.0.0d0 .and. h.le.hbias,.true.,
+     &                              'temperedheight bounded height')
+               if (i .gt. 1) then
+                  call assert_logical (h.le.hgrid(i-1,j),.true.,
+     &                        'temperedheight nonincreasing in path')
+               end if
+               if (j .gt. 1) then
+                  call assert_logical (h.le.hgrid(i,j-1),.true.,
+     &                        'temperedheight nonincreasing in bin')
+               end if
+            end do
+         end do
+      end do
       return
       end
 c
@@ -1796,9 +1887,9 @@ c
       hbias = 2.0d0
       dedl = 0.0d0
       ostdt = 0.0d0
-      ostemper = .true.
-      temperthresh = 0.5d0
-      tempergamma = 1.0d0
+      use_ostgtemp = .true.
+      ostgthresh = 0.5d0
+      ostgtempgamma = 1.0d0
       iost = 0
       do istep = 1, ndep*iosthist
          lambda = 0.5d0
@@ -1810,13 +1901,14 @@ c     the first deposit sees an empty bias, so it is untempered
 c
       call assert_real (metahhist(1),hbias,1.0d-12,
      &                  'emetadyn first height untempered')
-      call assert_logical (refvstar(1).gt.temperthresh,.true.,
+      call assert_logical (refvstar(1).gt.ostgthresh,.true.,
      &                     'emetadyn crosses the threshold')
 c
 c     every later height follows the pre-deposit bias level
 c
       do k = 2, ndep
-         call assert_real (metahhist(k),temperedheight(refvstar(k-1)),
+         call assert_real (metahhist(k),
+     &                     temperedheight(refvstar(k-1),refvstar(k-1)),
      &                     1.0d-12,'emetadyn tempered height')
          call assert_logical (metahhist(k).lt.metahhist(k-1),.true.,
      &                        'emetadyn heights decay')
@@ -1973,6 +2065,222 @@ c
      &                 'interval')
       call assert_real (eosttot,eostsave,1.0d-12,
      &                  'eostdyn rejection leaves the free energy')
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eost_ostlocal  --  local tempering test  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eost_ostlocal" deposits into an unevenly filled kernel
+c     with both tempering factors on, and checks that eostdyn takes
+c     the height from the pre-deposit bias levels, that the least
+c     filled lambda bin deposits at the global height alone, and
+c     that growing the flambda grid keeps the bin bias levels
+c
+c
+      subroutine test_eost_ostlocal
+      use bath
+      use dlmda
+      use mutant
+      use ost
+      use units
+      implicit none
+      integer i,istep
+      integer imax,imin
+      real*8 rt,gmin,gl
+      real*8 hglobal
+      real*8 brutevkmax
+      real*8 ostvminimax
+      real*8 temperedheight
+c
+c
+c     fill the kernel much higher near lambda of zero
+c
+      kelvin = 300.0d0
+      rt = gasconst * kelvin
+      call resetost (5,5,8)
+      oststdev = 4.0d0
+      nosthist = 2
+      call sethist (1,0.0d0,0.0d0,5.0d0,0.25d0,1.0d0)
+      call sethist (2,0.75d0,0.0d0,1.0d0,0.25d0,1.0d0)
+      call buildostindex
+      call buildkernels
+c
+c     settle each deposit interval with both tempering factors on
+c
+      iosthist = 4
+      ostnpa = 0
+      ostnpb = 0
+      ostnpc = 4
+      ostcvbin = 0
+      ostcvstd = 1.0d0
+      ostcvrat = 0.0d0
+      hbias = 1.0d0
+      ostdt = 0.0d0
+      fastkernel = .true.
+      d2edl2 = 0.0d0
+      ostbdgdl = 0.0d0
+      ostbdgdfl = 0.0d0
+      ostbdfdl = 0.0d0
+      use_ostgtemp = .true.
+      use_ostltemp = .true.
+      ostgthresh = 0.1d0
+      ostlthresh = 0.1d0
+      ostgtempgamma = 1.0d0
+      ostltempgamma = 1.0d0
+c
+c     a deposit in the most filled bin is tempered by both factors
+c
+      imax = 1
+      do i = 2, nlmda
+         if (brutevkmax(i) .gt. brutevkmax(imax))  imax = i
+      end do
+      gmin = ostvminimax ()
+      gl = vkernelmax(imax)
+      call assert_logical (gmin.gt.ostgthresh,.true.,
+     &                     'eostdyn global factor active')
+      call assert_logical (gl-gmin.gt.ostlthresh,.true.,
+     &                     'eostdyn local factor active')
+      iost = 0
+      do istep = 1, iosthist
+         lambda = dble(imax-1) * wlmda
+         dedl = 0.0d0
+         call eostdyn
+      end do
+      hglobal = hbias * exp(-(gmin-ostgthresh)/rt)
+      call assert_int (nosthist,3,'eostdyn deposits in the full bin')
+      call assert_real (osthhist(3),temperedheight(gmin,gl),1.0d-12,
+     &                  'eostdyn height from pre-deposit levels')
+      call assert_logical (osthhist(3).lt.hglobal,.true.,
+     &                     'eostdyn full bin below global height')
+c
+c     a deposit in the least filled bin sees no local excess
+c
+      imin = 1
+      do i = 2, nlmda
+         if (vkernelmax(i) .lt. vkernelmax(imin))  imin = i
+      end do
+      gmin = ostvminimax ()
+      do istep = 1, iosthist
+         lambda = dble(imin-1) * wlmda
+         dedl = 0.0d0
+         call eostdyn
+      end do
+      hglobal = hbias * exp(-max(0.0d0,gmin-ostgthresh)/rt)
+      call assert_int (nosthist,4,'eostdyn deposits in the least bin')
+      call assert_real (osthhist(4),hglobal,1.0d-12,
+     &                  'eostdyn least filled bin global height')
+c
+c     growing the flambda grid keeps the running bin maxima
+c
+      call ensureflambda (500.0d0)
+      do i = 1, nlmda
+         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+     &                     'ensureflambda keeps bin bias levels')
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eost_temperkeys  --  tempering keywords  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eost_temperkeys" checks that the tempering keywords set
+c     their flags, thresholds and tempering factors, fill a missing
+c     value with its default, replace a zero by the default and a
+c     negative value by its magnitude
+c
+c
+      subroutine test_eost_temperkeys
+      use dlmda
+      use keys
+      use mutant
+      use ost
+      implicit none
+c
+c
+c     both keywords set their flags and both values
+c
+      use_ost = .false.
+      use_meta = .false.
+      lambda = 0.5d0
+      if (allocated(keyline))  deallocate (keyline)
+      allocate (keyline(2))
+      nkey = 2
+      keyline(1) = 'OST-TEMPER-GLOBAL 2.0 3.0'
+      keyline(2) = 'ost-temper-local 0.5 0.25'
+      call mutate_ost
+      call assert_logical (use_ostgtemp,.true.,
+     &                     'OST-TEMPER-GLOBAL sets its flag')
+      call assert_logical (use_ostltemp,.true.,
+     &                     'OST-TEMPER-LOCAL sets its flag')
+      call assert_real (ostgthresh,2.0d0,1.0d-12,
+     &                  'OST-TEMPER-GLOBAL threshold')
+      call assert_real (ostgtempgamma,3.0d0,1.0d-12,
+     &                  'OST-TEMPER-GLOBAL tempering factor')
+      call assert_real (ostlthresh,0.5d0,1.0d-12,
+     &                  'OST-TEMPER-LOCAL threshold')
+      call assert_real (ostltempgamma,0.25d0,1.0d-12,
+     &                  'OST-TEMPER-LOCAL tempering factor')
+c
+c     a missing tempering factor keeps its default
+c
+      nkey = 1
+      keyline(1) = 'OST-TEMPER-LOCAL 0.5'
+      call mutate_ost
+      call assert_logical (use_ostgtemp,.false.,
+     &                     'OST-TEMPER-LOCAL leaves global off')
+      call assert_logical (use_ostltemp,.true.,
+     &                     'OST-TEMPER-LOCAL one value sets its flag')
+      call assert_real (ostlthresh,0.5d0,1.0d-12,
+     &                  'OST-TEMPER-LOCAL one value threshold')
+      call assert_real (ostltempgamma,1.0d0,1.0d-12,
+     &                  'OST-TEMPER-LOCAL default tempering factor')
+c
+c     zero values take the defaults
+c
+      keyline(1) = 'OST-TEMPER-GLOBAL 0 0'
+      call mutate_ost
+      call assert_real (ostgthresh,1.0d0,1.0d-12,
+     &                  'OST-TEMPER-GLOBAL zero threshold')
+      call assert_real (ostgtempgamma,1.0d0,1.0d-12,
+     &                  'OST-TEMPER-GLOBAL zero tempering factor')
+c
+c     negative values take their magnitude
+c
+      keyline(1) = 'OST-TEMPER-LOCAL -2.0 -0.5'
+      call mutate_ost
+      call assert_real (ostlthresh,2.0d0,1.0d-12,
+     &                  'OST-TEMPER-LOCAL negative threshold')
+      call assert_real (ostltempgamma,0.5d0,1.0d-12,
+     &                  'OST-TEMPER-LOCAL negative tempering factor')
+c
+c     no keywords and the removed keyword leave tempering off
+c
+      nkey = 0
+      call mutate_ost
+      call assert_logical (use_ostgtemp .or. use_ostltemp,.false.,
+     &                     'tempering off without keywords')
+      nkey = 1
+      keyline(1) = 'OST-TEMPER'
+      call mutate_ost
+      call assert_logical (use_ostgtemp,.false.,
+     &                     'OST-TEMPER no longer enables tempering')
+c
+c     restore an empty keyword list and a clean OST state
+c
+      nkey = 0
+      deallocate (keyline)
+      call resetost (5,5,1)
       return
       end
 c
@@ -2215,9 +2523,12 @@ c
       ostcvrat = 0.0d0
       ostcvslp = 0.0d0
       ostcvstd = 0.0d0
-      ostemper = .false.
-      tempergamma = 1.0d0
-      temperthresh = 0.0d0
+      use_ostgtemp = .false.
+      use_ostltemp = .false.
+      ostgthresh = 0.0d0
+      ostgtempgamma = 1.0d0
+      ostlthresh = 0.0d0
+      ostltempgamma = 1.0d0
       plmdamap = 'QNT'
       elmdamap = 'QNT'
       vlmdamap = 'QNT'

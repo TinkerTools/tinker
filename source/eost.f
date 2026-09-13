@@ -161,7 +161,8 @@ c
             ostihist(nosthist) = iost
             ostlhist(nosthist) = ostlambdaavg
             ostfhist(nosthist) = ostdedlavg
-            osthhist(nosthist) = temperedheight(ostvminimax())
+            osthhist(nosthist) = temperedheight(ostvminimax(),
+     &                                          vkernelmax(ilmda))
             ostwlhist(nosthist) = wlhist
             ostwfhist(nosthist) = wfhist
             ostnext(nosthist) = osthead(ilmda,iflmda)
@@ -233,7 +234,8 @@ c
          nmetahist = nmetahist + 1
          if (nmetahist .gt. sizemetahist)  call resizemeta
          metalhist(nmetahist) = ostlambdaavg
-         metahhist(nmetahist) = temperedheight(metavminimax())
+         metahhist(nmetahist) = temperedheight(metavminimax(),
+     &                                         metavminimax())
          metawhist(nmetahist) = wlmda
          metaihist(nmetahist) = iost
          call addmetagrid (nmetahist)
@@ -466,28 +468,44 @@ c     ###########################################################
 c
 c
 c     "temperedheight" scales down the height of a new biasing
-c     gaussian once the global path bias level has passed the
-c     tempering threshold, decaying on a scale of kT*tempergamma
+c     gaussian by a global factor once the path bias level passes
+c     its threshold, and by a local factor once the bias level at
+c     the deposit lambda bin exceeds the path bias level by more
+c     than the local threshold, each decaying on a scale of kT
+c     times its own tempering factor
 c
 c
-      function temperedheight (vminimax)
+      function temperedheight (vglobal,vlocal)
       use bath
       use ost
       use units
       implicit none
       real*8 temperedheight
-      real*8 vminimax
-      real*8 denom,excess
+      real*8 vglobal,vlocal
+      real*8 rt,expo,excess
 c
 c
 c     an untempered run always deposits at the full height
 c
       temperedheight = hbias
-      if (.not. ostemper)  return
-      denom = gasconst * kelvin * tempergamma
-      if (denom .le. 0.0d0)  return
-      excess = max(0.0d0,vminimax-temperthresh)
-      temperedheight = hbias * exp(-excess/denom)
+      rt = gasconst * kelvin
+      if (rt .le. 0.0d0)  return
+      expo = 0.0d0
+c
+c     the global factor follows the path bias level
+c
+      if (use_ostgtemp .and. ostgtempgamma.gt.0.0d0) then
+         excess = max(0.0d0,vglobal-ostgthresh)
+         expo = expo - excess/(rt*ostgtempgamma)
+      end if
+c
+c     the local factor follows the excess of the deposit bin
+c
+      if (use_ostltemp .and. ostltempgamma.gt.0.0d0) then
+         excess = max(0.0d0,vlocal-vglobal-ostlthresh)
+         expo = expo - excess/(rt*ostltempgamma)
+      end if
+      temperedheight = hbias * exp(expo)
       return
       end
 c
