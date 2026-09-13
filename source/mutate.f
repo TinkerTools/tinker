@@ -896,6 +896,7 @@ c
       ostmass = 25.0d0
       ostfriction = 0.01d0
       ostdt = 0.001d0
+      lmdakelvin = 298.0d0
 c
 c     set default ost lambda bin values
 c
@@ -980,6 +981,9 @@ c
          else if (keyword(1:18) .eq. 'OST-TEMPER-THRESH ') then
             string = record(next:240)
             read (string,*,err=10)  temperthresh
+         else if (keyword(1:16) .eq. 'OST-TEMPERATURE ') then
+            string = record(next:240)
+            read (string,*,err=10)  lmdakelvin
          end if
    10    continue
       end do
@@ -1001,6 +1005,12 @@ c
          wfhist = -wfhist
       else if (wfhist .eq. 0.0d0) then
          wfhist = 1.0d0
+      end if
+      if (hbias .lt. 0.0d0)  hbias = -hbias
+      if (lmdakelvin .lt. 0.0d0) then
+         lmdakelvin = -lmdakelvin
+      else if (lmdakelvin .eq. 0.0d0) then
+         lmdakelvin = 298.0d0
       end if
       maxwlhist = wlhist
       maxwfhist = wfhist

@@ -28,6 +28,7 @@ extern int* TINKER_MOD(ost, osthead);
 extern double TINKER_MOD(ost, deffdl);
 extern double TINKER_MOD(ost, eosttot);
 extern double TINKER_MOD(ost, hbias);
+extern double TINKER_MOD(ost, lmdakelvin);
 extern double TINKER_MOD(ost, maxwfhist);
 extern double TINKER_MOD(ost, maxwlhist);
 extern double TINKER_MOD(ost, ostbdfdl);

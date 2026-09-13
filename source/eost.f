@@ -471,7 +471,6 @@ c     tempering threshold, decaying on a scale of kT*tempergamma
 c
 c
       function temperedheight (vminimax)
-      use bath
       use ost
       use units
       implicit none
@@ -484,7 +483,7 @@ c     an untempered run always deposits at the full height
 c
       temperedheight = hbias
       if (.not. ostemper)  return
-      denom = gasconst * kelvin * tempergamma
+      denom = gasconst * lmdakelvin * tempergamma
       if (denom .le. 0.0d0)  return
       excess = max(0.0d0,vminimax-temperthresh)
       temperedheight = hbias * exp(-excess/denom)
@@ -777,7 +776,6 @@ c     theta space, where lambda = sin(theta)**2
 c
 c
       subroutine ostlangevin
-      use bath
       use math
       use mutant
       use ost
@@ -807,7 +805,7 @@ c
       gamma = max(0.0d0,ostfriction)
       if (gamma .gt. 0.0d0) then
          c = exp(-gamma*ostdt)
-         ktm = boltzmann * kelvin / ostmass
+         ktm = boltzmann * lmdakelvin / ostmass
          sigma = sqrt(ktm*(1.0d0-c*c))
          ostvtheta = c*ostvtheta
      &                 + (1.0d0-c)*force/(gamma*ostmass)
@@ -1780,7 +1778,6 @@ c
 c
       subroutine addkernelpoint (ilmda,iflmda,e,ldelta,
      &                           fldelta,sigl2,sigf2)
-      use bath
       use ost
       use units
       implicit none
@@ -1792,19 +1789,31 @@ c
       real*8 oldg,newg
       real*8 oldweight,newweight
       real*8 delweight
+      real*8 scale,vmax
       real*8 dgdl,dgdfl,d2gdlfl
 c
 c
 c     update the g kernel and adjust the f kernel accumulators
 c
       oldg = gkernel(ilmda,iflmda)
+      newg = oldg + e
+c
+c     the accumulators carry the largest bias in the row as a common
+c     factor, so they are rescaled whenever this point raises it
+c
+      vmax = vkernelmax(ilmda)
+      if (newg .gt. vmax) then
+         scale = exp((vmax-newg)/(gasconst*lmdakelvin))
+         fsumkernel(ilmda) = fsumkernel(ilmda) * scale
+         pfkernel(ilmda) = pfkernel(ilmda) * scale
+         vmax = newg
+      end if
       if (oldg .eq. 0.0d0) then
          oldweight = 0.0d0
       else
-         oldweight = exp(oldg/(gasconst*kelvin))
+         oldweight = exp((oldg-vmax)/(gasconst*lmdakelvin))
       end if
-      newg = oldg + e
-      newweight = exp(newg/(gasconst*kelvin))
+      newweight = exp((newg-vmax)/(gasconst*lmdakelvin))
       delweight = newweight - oldweight
       flmda = dble(iflmda-fli0) * wflmda
       dgdl = -ldelta * e / sigl2
@@ -1838,7 +1847,6 @@ c     biased ensemble average of dE/dlambda at each lambda bin
 c
 c
       subroutine buildfkernel
-      use bath
       use ost
       use units
       implicit none
@@ -1846,6 +1854,7 @@ c
       real*8 avgflambda
       real*8 partfunc
       real*8 flmda
+      real*8 vmax
       real*8 weight
 c
 c
@@ -1855,12 +1864,18 @@ c
          avgflambda = 0.0d0
          partfunc = 0.0d0
 c
+c     the largest bias in the row is factored out of both sums, where
+c     it cancels exactly, to keep the exponential from overflowing
+c
+         vmax = vkernelmax(ilmda)
+c
 c     loop over flambda bins with nonzero g kernel support
 c
          do iflmda = 1, nflmda
             if (gkernel(ilmda,iflmda) .ne. 0.0d0) then
                flmda = dble(iflmda-fli0) * wflmda
-               weight = exp(gkernel(ilmda,iflmda)/(gasconst*kelvin))
+               weight = exp((gkernel(ilmda,iflmda)-vmax)
+     &                         /(gasconst*lmdakelvin))
                avgflambda = avgflambda + flmda*weight
                partfunc = partfunc + weight
             end if

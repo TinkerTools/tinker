@@ -35,6 +35,7 @@ c     osthead        first histogram index for each lambda/flambda bin
 c     deffdl         effective lambda derivative for propagation
 c     eosttot        total ost free energy
 c     hbias          height of biasing gaussian
+c     lmdakelvin     temperature of the ost lambda dynamics
 c     maxwfhist      maximum flambda width of histogram gaussians
 c     maxwlhist      maximum lambda width of histogram gaussians
 c     ostbdfdl       saved bias df/dlambda from eostbias for eostdyn
@@ -129,6 +130,7 @@ c
       real*8 deffdl
       real*8 eosttot
       real*8 hbias
+      real*8 lmdakelvin
       real*8 maxwfhist
       real*8 maxwlhist
       real*8 ostbdfdl

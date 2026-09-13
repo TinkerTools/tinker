@@ -17,7 +17,7 @@ c     deterministic inputs and expected outputs
 c
 c
       subroutine test_eost
-      use bath
+      use ost
       use units
       implicit none
       logical skiptest
@@ -27,7 +27,7 @@ c
 c
       if (skiptest(tname,'ost'))  return
       call initial
-      kelvin = 300.0d0
+      lmdakelvin = 300.0d0
       call test_eost_index
       call test_eost_resize
       call test_eost_buildindex
@@ -656,7 +656,6 @@ c     construction from gaussian history data
 c
 c
       subroutine test_eost_fkernel
-      use bath
       use math
       use ost
       use units
@@ -664,14 +663,16 @@ c
       real*8 rt
       real*8 expected
       real*8 height
+      real*8 wratio
       real*8 w1,w2,w3,w4,w5
 c
 c     two nonzero gkernel weights at flambda=-1 and +1
 c
       call resetost (5,5,1)
-      rt = gasconst * kelvin
+      rt = gasconst * lmdakelvin
       gkernel(3,2) = log(2.0d0) * rt
       gkernel(3,4) = log(4.0d0) * rt
+      vkernelmax(3) = log(4.0d0) * rt
       call buildfkernel
       expected = 1.0d0 / 3.0d0
       call assert_real (fkernel(3),expected,1.0d-12,
@@ -683,7 +684,7 @@ c     build gkernel incrementally from multiple gaussians using
 c     updategkernel, then construct the f kernel
 c
       call resetost (5,5,4)
-      rt = gasconst * kelvin
+      rt = gasconst * lmdakelvin
       height = 2.0d0 * pi * wlmda * wflmda
 c
       nosthist = 1
@@ -715,6 +716,20 @@ c
      &     /(w1+w2+w3+w4+w5)
       call assert_real (fkernel(3),expected,1.0d-12,
      &                  'buildfkernel from updated gkernel')
+c
+c     a deeply filled bin overflows exp(g/kT) unless the largest bias
+c     in the row is factored out; unshifted this returns a NaN
+c
+      call resetost (5,5,1)
+      rt = gasconst * lmdakelvin
+      gkernel(3,2) = 500.0d0
+      gkernel(3,4) = 499.0d0
+      vkernelmax(3) = 500.0d0
+      call buildfkernel
+      wratio = exp((499.0d0-500.0d0)/rt)
+      expected = (-1.0d0 + wratio) / (1.0d0 + wratio)
+      call assert_real (fkernel(3),expected,1.0d-12,
+     &                  'buildfkernel large bias no overflow')
       return
       end
 c
@@ -731,7 +746,6 @@ c     and incremental updates against reference arrays
 c
 c
       subroutine test_eost_kernelbuilds
-      use bath
       use math
       use ost
       use units
@@ -744,6 +758,7 @@ c
       real*8 partfunc
       real*8 fsum
       real*8 weight
+      real*8 vmaxref
       real*8 height
       real*8 fmanual(9)
       real*8 fref(9)
@@ -756,7 +771,7 @@ c     build a mixed history with overlapping gaussians, endpoint
 c     mirror images, and multiple gaussian widths
 c
       call resetost (9,9,8)
-      rt = gasconst * kelvin
+      rt = gasconst * lmdakelvin
       nhist = 6
       nosthist = nhist
       height = 2.0d0 * pi * wlmda * wflmda
@@ -793,10 +808,19 @@ c
       do i = 1, nlmda
          partfunc = 0.0d0
          fsum = 0.0d0
+c
+c     the accumulators factor out the largest bias in the row, so the
+c     reference has to be built with the same vkernelmax shift
+c
+         vmaxref = 0.0d0
+         do j = 1, nflmda
+            if (gref(i,j) .ne. 0.0d0)
+     &         vmaxref = max(vmaxref,gref(i,j))
+         end do
          do j = 1, nflmda
             if (gref(i,j) .ne. 0.0d0) then
                flmda = dble(j-fli0) * wflmda
-               weight = exp(gref(i,j)/rt)
+               weight = exp((gref(i,j)-vmaxref)/rt)
                fsum = fsum + flmda*weight
                partfunc = partfunc + weight
             end if
@@ -1426,7 +1450,6 @@ c     from it, over every path that fills the kernel
 c
 c
       subroutine test_eost_vkernelmax
-      use bath
       use ost
       implicit none
       integer i
@@ -1438,7 +1461,7 @@ c
 c
 c     two saved sources spread over the whole kernel
 c
-      kelvin = 300.0d0
+      lmdakelvin = 300.0d0
       call resetost (5,5,4)
       nosthist = 2
       call sethist (1,0.25d0,0.0d0,1.0d0,0.25d0,1.0d0)
@@ -1522,7 +1545,6 @@ c     tempering threshold
 c
 c
       subroutine test_eost_tempering
-      use bath
       use ost
       use units
       implicit none
@@ -1537,10 +1559,10 @@ c
 c
 c     an untempered run deposits at the full height
 c
-      kelvin = 300.0d0
+      lmdakelvin = 300.0d0
       call resetost (5,5,1)
       hbias = 1.0d-5
-      rt = gasconst * kelvin
+      rt = gasconst * lmdakelvin
       ostemper = .false.
       temperthresh = 1.0d0
       tempergamma = 1.0d0
@@ -1736,7 +1758,6 @@ c     accumulated metadynamics grid
 c
 c
       subroutine test_eost_metatemper
-      use bath
       use dlmda
       use mutant
       use ost
@@ -1752,7 +1773,7 @@ c
 c
 c     deposit repeatedly at a fixed lambda with tempering on
 c
-      kelvin = 300.0d0
+      lmdakelvin = 300.0d0
       call resetost (5,5,1)
       call resetmeta (8)
       iosthist = 4
@@ -1874,7 +1895,6 @@ c     one is rejected
 c
 c
       subroutine test_eost_ostdyn
-      use bath
       use dlmda
       use mutant
       use ost
@@ -1885,7 +1905,7 @@ c
 c
 c     a settled interval deposits one gaussian at the interval end
 c
-      kelvin = 300.0d0
+      lmdakelvin = 300.0d0
       call resetost (5,5,4)
       iosthist = 4
       ostnpa = 0
@@ -2026,7 +2046,6 @@ c     that the deposited gaussian sits on that frozen lambda
 c
 c
       subroutine test_eost_ostgate
-      use bath
       use dlmda
       use mutant
       use ost
@@ -2039,7 +2058,7 @@ c
 c     drive an interval with a deterministic frictionless lambda
 c     particle, so that any lambda motion comes from the gate alone
 c
-      kelvin = 300.0d0
+      lmdakelvin = 300.0d0
       call resetost (5,5,4)
       iosthist = 6
       ostnpa = 2

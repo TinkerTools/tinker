@@ -17,7 +17,6 @@ c     and prints saved history, final free energy, or the g kernel
 c
 c
       program analyzeost
-      use bath
       use files
       use iounit
       use keys
@@ -48,9 +47,9 @@ c
       call basefile (ostfile)
       ostsavefile = ostfile
 c
-c     use room temperature if no simulation temperature is available
+c     use room temperature until the keyfile is read
 c
-      if (kelvin .le. 0.0d0)  kelvin = 298.0d0
+      lmdakelvin = 298.0d0
 c
 c     get the requested analysis mode
 c
@@ -75,7 +74,7 @@ c
    40    format (/,' ANALYZEOST  --  Unable to Read OST File :  ',a)
          call fatal
       end if
-      call ostgridkey
+      call ostkey
 c
 c     perform the requested analysis
 c
@@ -97,18 +96,20 @@ c
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine ostgridkey  --  override ost analysis grid  ##
-c     ##                                                         ##
-c     #############################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine ostkey  --  apply the ost analysis keys  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
-c     "ostgridkey" checks the keyfile for requested analysis grid
-c     settings and rebuilds the ost kernels on the requested grid
+c     "ostkey" reads every ost keyword used by analyzeost in a single
+c     pass over the keyfile, since this program never runs the setup
+c     that reads these keywords for dynamics, and rebuilds the kernels
+c     on the requested grid when it differs from the restart grid
 c
 c
-      subroutine ostgridkey
+      subroutine ostkey
       use keys
       use ost
       implicit none
@@ -121,7 +122,8 @@ c
       character*240 string
 c
 c
-c     get requested analysis grid settings from the keyfile
+c     get the requested settings from the keyfile, keeping the grid
+c     the restart was read with as the default
 c
       setnlmda = .false.
       setwflmda = .false.
@@ -139,9 +141,20 @@ c
          else if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
             read (string,*,err=10,end=10)  wflmda1
             setwflmda = .true.
+         else if (keyword(1:16) .eq. 'OST-TEMPERATURE ') then
+            read (string,*,err=10,end=10)  lmdakelvin
          end if
    10    continue
       end do
+c
+c     a negative request is taken as its magnitude, and a zero would
+c     divide by zero in every kernel weight
+c
+      if (lmdakelvin .lt. 0.0d0) then
+         lmdakelvin = -lmdakelvin
+      else if (lmdakelvin .eq. 0.0d0) then
+         lmdakelvin = 298.0d0
+      end if
 c
 c     normalize the requested lambda grid to the standard convention
 c
@@ -283,7 +296,6 @@ c     the cumulative free energy estimate after each deposited bias
 c
 c
       subroutine ostseries
-      use bath
       use iounit
       use ost
       implicit none
@@ -303,7 +315,7 @@ c
      &        //,3x,'Hist',8x,'Step',9x,'Lambda',11x,'dU/dLambda',
      &           10x,'Free Energy',10x,'Height',
      &           8x,'Width-Lambda',7x,'Width-dU/dL',/)
-      write (iout,15)  kelvin
+      write (iout,15)  lmdakelvin
    15 format (3x,'Temperature Used',6x,d20.10,' K',/)
 c
 c     rebuild the kernels cumulatively over the saved history
@@ -356,7 +368,6 @@ c     f kernel rebuilt from the full saved OST history
 c
 c
       subroutine ostfreeenergy
-      use bath
       use iounit
       use ost
       implicit none
@@ -376,7 +387,7 @@ c
    10 format (/,' OST Free Energy Estimate :',
      &        //,4x,'Number of Gaussians',8x,i12,
      &         /,4x,'Delta G',20x,d20.10)
-      write (iout,20)  kelvin
+      write (iout,20)  lmdakelvin
    20 format (4x,'Temperature Used',11x,d20.10,' K')
       return
       end
