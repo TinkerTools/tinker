@@ -286,7 +286,7 @@ c
          if (nlmda.ne.nlmda0 .or. lmdaintv.ne.lmdaintv0) then
             write (iout,10)  lmdasavefile(1:trimtext(lmdasavefile))
    10       format (/,' INITABFFILE  --  LAMBDA-NBIN and',
-     &                 ' OSTHIST-INTERVAL must match the ABF',
+     &                 ' LAMBDA-INTERVAL must match the ABF',
      &                 ' history being continued',
      &              /,'                  File Name :  ',a)
             call fatal

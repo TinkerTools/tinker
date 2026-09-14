@@ -466,6 +466,32 @@ c
       dedl = 0.0d0
       d2edl2 = 0.0d0
 c
+c     set default lambda sample interval and its phase ratios
+c
+      lmdastep = 0
+      lmdaintv = 10
+      lmdaparatio = 0.3d0
+      lmdapbratio = 0.3d0
+      nlmdasave = 0
+c
+c     set defaults for the lambda particle propagation
+c
+      lmdaavg = 0.0d0
+      lmdastd = 0.0d0
+      dedlavg = 0.0d0
+      dedlstd = 0.0d0
+      deffdl = 0.0d0
+      lmdavtheta = 0.0d0
+      lmdamass = 25.0d0
+      lmdafric = 0.01d0
+      lmdadt = 0.001d0
+c
+c     set default lambda bins and lambda bias free energy
+c
+      nlmda = 201
+      lmdaddgdl = 0.0d0
+      lmdadeltag = 0.0d0
+c
 c     search keywords for lambda derivative options
 c
       do i = 1, nkey
@@ -478,6 +504,24 @@ c
          else if (keyword(1:12) .eq. 'LAMBDA-MODE ') then
             call getword (record,lmdasampmode,next)
             call upcase (lmdasampmode)
+         else if (keyword(1:16) .eq. 'LAMBDA-INTERVAL ') then
+            string = record(next:240)
+            read (string,*,err=10)  lmdaintv
+         else if (keyword(1:15) .eq. 'LAMBDA-EQRATIO ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  lmdaparatio,lmdapbratio
+         else if (keyword(1:10) .eq. 'LAMBDA-DT ') then
+            string = record(next:240)
+            read (string,*,err=10)  lmdadt
+         else if (keyword(1:12) .eq. 'LAMBDA-MASS ') then
+            string = record(next:240)
+            read (string,*,err=10)  lmdamass
+         else if (keyword(1:16) .eq. 'LAMBDA-FRICTION ') then
+            string = record(next:240)
+            read (string,*,err=10)  lmdafric
+         else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
+            string = record(next:240)
+            read (string,*,err=10)  nlmda
          else if (keyword(1:13) .eq. 'ELE-DUALTOPO ') then
             use_emdt = .true.
          else if (keyword(1:17) .eq. 'ELE-DUALTOPO-EXP ') then
@@ -552,6 +596,25 @@ c
          end if
    10    continue
       end do
+c
+c     keep an odd lambda grid and define the lambda bin width
+c
+      if (nlmda .lt. 3)  nlmda = 3
+      if (mod(nlmda,2) .eq. 0)  nlmda = nlmda + 1
+      wlmda = 1.0d0 / dble(nlmda-1)
+      wlmda2 = 0.5d0 * wlmda
+c
+c     split the sample interval into its propagation, equilibration
+c     and averaging phases
+c
+      if (lmdaintv .lt. 1)  lmdaintv = 1
+      if (lmdaparatio .lt. 0.0d0)  lmdaparatio = 0.0d0
+      if (lmdapbratio .lt. 0.0d0)  lmdapbratio = 0.0d0
+      call setlmdaphase
+c
+c     start the lambda particle from the current main lambda
+c
+      lmdatheta = asin(sqrt(lambda))
 c
 c     the lambda sampling mode sets its method flag, and every
 c     sampling method moves a main lambda by its derivative
@@ -846,17 +909,16 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "mutate_ost" sets the lambda grid, the gaussian deposit interval,
-c     the convergence criteria and the lambda particle parameters used
-c     by orthogonal space tempering, then allocates the histogram and
-c     the bias kernels when the method is active
+c     "mutate_ost" sets the flambda grid, the gaussian widths, heights
+c     and tempering, and the convergence criteria used by orthogonal
+c     space tempering, then allocates the histogram and the bias kernels
+c     when the method is active; the lambda grid, sample interval and
+c     lambda particle parameters are set by "mutate_dlmda"
 c
 c
       subroutine mutate_ost
       use dlmda
       use keys
-      use math
-      use mutant
       use ost
       implicit none
       integer i,k
@@ -866,15 +928,9 @@ c
       character*240 string
 c
 c
-c     set default ost update intervals
+c     set default ost bias derivative
 c
-      lmdastep = 0
-      lmdaintv = 10
-      lmdaddgdl = 0.0d0
       ostdgdl = 0.0d0
-      lmdaparatio = 0.3d0
-      lmdapbratio = 0.3d0
-      nlmdasave = 0
 c
 c     set default criteria for judging convergence of a deposit
 c
@@ -892,22 +948,8 @@ c
       ostlthresh = 1.0d0
       ostltempgamma = 1.0d0
 c
-c     set defaults for the lambda particle propagation
+c     set default ost flambda bin values
 c
-      lmdaavg = 0.0d0
-      lmdastd = 0.0d0
-      dedlavg = 0.0d0
-      dedlstd = 0.0d0
-      deffdl = 0.0d0
-      lmdatheta = pi / 2.0d0
-      lmdavtheta = 0.0d0
-      lmdamass = 25.0d0
-      lmdafric = 0.01d0
-      lmdadt = 0.001d0
-c
-c     set default ost lambda bin values
-c
-      nlmda = 201
       nflmda = 1001
       wflmda = 1.0d0
       wlhist = 0.005d0
@@ -915,7 +957,6 @@ c
       fli0 = (nflmda + 1) / 2 + (nflmda - 1) / 4
       hbias = 0.00001d0
       oststdev = 4.0d0
-      lmdadeltag = 0.0d0
       fastkernel = .true.
       ostinterpol = .false.
 c
@@ -926,28 +967,7 @@ c
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
-            string = record(next:240)
-            read (string,*,err=10)  lmdaintv
-         else if (keyword(1:12) .eq. 'OSTPA-RATIO ') then
-            string = record(next:240)
-            read (string,*,err=10)  lmdaparatio
-         else if (keyword(1:12) .eq. 'OSTPB-RATIO ') then
-            string = record(next:240)
-            read (string,*,err=10)  lmdapbratio
-         else if (keyword(1:8) .eq. 'OST-DT ') then
-            string = record(next:240)
-            read (string,*,err=10)  lmdadt
-         else if (keyword(1:9) .eq. 'OST-MASS ') then
-            string = record(next:240)
-            read (string,*,err=10)  lmdamass
-         else if (keyword(1:13) .eq. 'OST-FRICTION ') then
-            string = record(next:240)
-            read (string,*,err=10)  lmdafric
-         else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
-            string = record(next:240)
-            read (string,*,err=10)  nlmda
-         else if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
+         if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
             string = record(next:240)
             read (string,*,err=10)  wflmda
          else if (keyword(1:7) .eq. 'WLHIST ') then
@@ -989,12 +1009,8 @@ c
    10    continue
       end do
 c
-c     define lambda width and flambda range
+c     define flambda width and range
 c
-      if (nlmda .lt. 3)  nlmda = 3
-      if (mod(nlmda,2) .eq. 0)  nlmda = nlmda + 1
-      wlmda = 1.0d0 / dble(nlmda-1)
-      wlmda2 = 0.5d0 * wlmda
       wflmda2 = 0.5d0 * wflmda
       fli0 = (nflmda + 1) / 2 + (nflmda - 1) / 4
       if (wlhist .lt. 0.0d0) then
@@ -1030,18 +1046,6 @@ c
       end if
       maxwlhist = wlhist
       maxwfhist = wfhist
-c
-c     split the deposit interval into its propagation, equilibration
-c     and averaging phases
-c
-      if (lmdaintv .lt. 1)  lmdaintv = 1
-      if (lmdaparatio .lt. 0.0d0)  lmdaparatio = 0.0d0
-      if (lmdapbratio .lt. 0.0d0)  lmdapbratio = 0.0d0
-      call setlmdaphase
-c
-c     start the lambda particle from the current main lambda
-c
-      lmdatheta = asin(sqrt(lambda))
 c
 c     free the histogram and kernel arrays of any earlier setup,
 c     so that only the arrays of the chosen method remain
@@ -1500,14 +1504,14 @@ c
       if ((use_ost .or. use_abf) .and.
      &    lmdaparatio+lmdapbratio.ge.0.9d0) then
          write (iout,120)
-  120    format (/,' MUTATE_CHECK  --  OSTPA-RATIO plus OSTPB-RATIO',
-     &              ' must be less than 0.9 to leave samples for the',
-     &              ' fixed lambda average')
+  120    format (/,' MUTATE_CHECK  --  The two LAMBDA-EQRATIO values',
+     &              ' must sum to less than 0.9 to leave samples for',
+     &              ' the fixed lambda average')
          call fatal
       end if
       if ((use_ost .or. use_abf) .and. lmdaintv.lt.3) then
          write (iout,130)
-  130    format (/,' MUTATE_CHECK  --  OSTHIST-INTERVAL must be at',
+  130    format (/,' MUTATE_CHECK  --  LAMBDA-INTERVAL must be at',
      &              ' least 3 to hold a propagation, equilibration',
      &              ' and averaging phase')
          call fatal
