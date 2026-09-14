@@ -50,8 +50,6 @@ extern int& fastkernel;
 extern int& ostinterpol;
 extern int& use_ostgtemp;
 extern int& use_ostltemp;
-extern char (&ostlabel)[40];
-extern char (&osttitle)[40];
 extern char (&metasavefile)[240];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -102,8 +100,6 @@ extern "C" int TINKER_MOD(ost, fastkernel);
 extern "C" int TINKER_MOD(ost, ostinterpol);
 extern "C" int TINKER_MOD(ost, use_ostgtemp);
 extern "C" int TINKER_MOD(ost, use_ostltemp);
-extern "C" char TINKER_MOD(ost, ostlabel)[40];
-extern "C" char TINKER_MOD(ost, osttitle)[40];
 extern "C" char TINKER_MOD(ost, metasavefile)[240];
 
 int& fli0 = TINKER_MOD(ost, fli0);
@@ -153,8 +149,6 @@ int& fastkernel = TINKER_MOD(ost, fastkernel);
 int& ostinterpol = TINKER_MOD(ost, ostinterpol);
 int& use_ostgtemp = TINKER_MOD(ost, use_ostgtemp);
 int& use_ostltemp = TINKER_MOD(ost, use_ostltemp);
-char (&ostlabel)[40] = TINKER_MOD(ost, ostlabel);
-char (&osttitle)[40] = TINKER_MOD(ost, osttitle);
 char (&metasavefile)[240] = TINKER_MOD(ost, metasavefile);
 #endif
 } }

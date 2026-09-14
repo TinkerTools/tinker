@@ -116,5 +116,7 @@ c
       character*40 ostlabel
       character*40 osttitle
       character*240 metasavefile
+      parameter (ostlabel=' Gaussian History :')
+      parameter (osttitle=' Orthogonal Space Tempering History :')
       save
       end

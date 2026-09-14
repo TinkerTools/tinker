@@ -298,5 +298,7 @@ c
       character*40 abflabel
       character*40 abftitle
       character*240 lmdasavefile
+      parameter (abflabel=' Sample History :')
+      parameter (abftitle=' Adaptive Biasing Force History :')
       save
       end

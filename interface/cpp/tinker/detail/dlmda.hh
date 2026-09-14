@@ -139,8 +139,6 @@ extern char (&vlmdamap)[3];
 extern char (&lmdaengymode)[4];
 extern char (&lmdasampmode)[4];
 extern char (&relstage)[4];
-extern char (&abflabel)[40];
-extern char (&abftitle)[40];
 extern char (&lmdasavefile)[240];
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -276,8 +274,6 @@ extern "C" char TINKER_MOD(dlmda, vlmdamap)[3];
 extern "C" char TINKER_MOD(dlmda, lmdaengymode)[4];
 extern "C" char TINKER_MOD(dlmda, lmdasampmode)[4];
 extern "C" char TINKER_MOD(dlmda, relstage)[4];
-extern "C" char TINKER_MOD(dlmda, abflabel)[40];
-extern "C" char TINKER_MOD(dlmda, abftitle)[40];
 extern "C" char TINKER_MOD(dlmda, lmdasavefile)[240];
 
 int& elmdaapmn = TINKER_MOD(dlmda, elmdaapmn);
@@ -412,8 +408,6 @@ char (&vlmdamap)[3] = TINKER_MOD(dlmda, vlmdamap);
 char (&lmdaengymode)[4] = TINKER_MOD(dlmda, lmdaengymode);
 char (&lmdasampmode)[4] = TINKER_MOD(dlmda, lmdasampmode);
 char (&relstage)[4] = TINKER_MOD(dlmda, relstage);
-char (&abflabel)[40] = TINKER_MOD(dlmda, abflabel);
-char (&abftitle)[40] = TINKER_MOD(dlmda, abftitle);
 char (&lmdasavefile)[240] = TINKER_MOD(dlmda, lmdasavefile);
 #endif
 } }

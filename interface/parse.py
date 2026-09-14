@@ -377,15 +377,20 @@ class Variable:
         if local_symbol in CppKeywords():
             local_symbol = local_symbol + '_'
         if self.is_const:
-            # sizes.f: integer maxatm
-            if op == FileType.t9_extern_ref:
-                # const int a = 100;
-                line = 'const {} {} = {};'.format(self.type, local_symbol, self.value)
-            elif macro_const and op == FileType.t9_extern_c:
-                # #define a 100
-                line = '#define {}__{} {}'.format(MacroTinkerMod, self.symbol, self.value)
-            else:
+            if self.type == 'char':
+                # Fortran character parameters are compile-time constants
+                # and do not provide linker symbols for C or C++.
                 line = ''
+            else:
+                # sizes.f: integer maxatm
+                if op == FileType.t9_extern_ref:
+                    # const int a = 100;
+                    line = 'const {} {} = {};'.format(self.type, local_symbol, self.value)
+                elif macro_const and op == FileType.t9_extern_c:
+                    # #define a 100
+                    line = '#define {}__{} {}'.format(MacroTinkerMod, self.symbol, self.value)
+                else:
+                    line = ''
         elif len(self.dimension):
             if ':' not in self.dimension:
                 # angpot.f: character*8 opbtyp

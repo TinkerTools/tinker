@@ -193,13 +193,6 @@ c     flag for use of internal virial
 c
       use_virial = .true.
 c
-c     title and history label records of the lambda bias files
-c
-      osttitle = ' Orthogonal Space Tempering History :'
-      ostlabel = ' Gaussian History :'
-      abftitle = ' Adaptive Biasing Force History :'
-      abflabel = ' Sample History :'
-c
 c     flag for use of lambda derivative
 c
       lmdatrial = .false.

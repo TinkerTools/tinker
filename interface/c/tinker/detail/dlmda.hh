@@ -141,8 +141,6 @@ extern char TINKER_MOD(dlmda, vlmdamap)[3];
 extern char TINKER_MOD(dlmda, lmdaengymode)[4];
 extern char TINKER_MOD(dlmda, lmdasampmode)[4];
 extern char TINKER_MOD(dlmda, relstage)[4];
-extern char TINKER_MOD(dlmda, abflabel)[40];
-extern char TINKER_MOD(dlmda, abftitle)[40];
 extern char TINKER_MOD(dlmda, lmdasavefile)[240];
 #ifdef __cplusplus
 }

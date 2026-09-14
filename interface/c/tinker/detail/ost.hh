@@ -52,8 +52,6 @@ extern int TINKER_MOD(ost, fastkernel);
 extern int TINKER_MOD(ost, ostinterpol);
 extern int TINKER_MOD(ost, use_ostgtemp);
 extern int TINKER_MOD(ost, use_ostltemp);
-extern char TINKER_MOD(ost, ostlabel)[40];
-extern char TINKER_MOD(ost, osttitle)[40];
 extern char TINKER_MOD(ost, metasavefile)[240];
 #ifdef __cplusplus
 }
