@@ -66,6 +66,7 @@ c
       call test_chglj
       call test_chgtrn
       call test_disp
+      call test_eabf
       call test_eost
       call test_eostmap
       call test_emhippo

@@ -106,13 +106,13 @@ c
       end if
       call resetost (3,5,3)
       use_ost = .true.
-      nosthistsave = 0
-      iost = 10
-      osttheta = 0.0d0
-      ostvtheta = 0.0d0
-      ostmass = 1.0d0
-      ostfriction = 1.0d0
-      ostdt = 0.001d0
+      nlmdasave = 0
+      lmdastep = 10
+      lmdatheta = 0.0d0
+      lmdavtheta = 0.0d0
+      lmdamass = 1.0d0
+      lmdafric = 1.0d0
+      lmdadt = 0.001d0
       call sethist (1,0.1d0,1.0d0,2.0d0,0.01d0,1.0d0)
       call sethist (2,0.2d0,2.0d0,3.0d0,0.01d0,1.0d0)
       call sethist (3,0.3d0,3.0d0,4.0d0,0.01d0,1.0d0)
@@ -123,14 +123,14 @@ c
 c
 c     append two histories, then save again without adding history
 c
-      nosthist = 1
+      nlmdahist = 1
       call saveost
       inquire (file=ostfile,size=size1)
-      nosthist = 3
-      iost = 30
+      nlmdahist = 3
+      lmdastep = 30
       call saveost
       inquire (file=ostfile,size=size2)
-      iost = 31
+      lmdastep = 31
       call saveost
       inquire (file=ostfile,size=size3)
       call assert_logical (size2.gt.size1,.true.,
@@ -144,7 +144,7 @@ c
       call rdost
       call assert_real (kelvin,321.0d0,1.0d-12,
      &                  'rdost restores the temperature')
-      call assert_int (nosthist,3,'rdost restores the history count')
+      call assert_int (nlmdahist,3,'rdost restores the history count')
       call assert_real (osthhist(1),2.0d0,1.0d-12,
      &                  'rdost restores height 1')
       call assert_real (osthhist(2),3.0d0,1.0d-12,
@@ -225,6 +225,7 @@ c     old entries and initializes new storage
 c
 c
       subroutine test_eost_resize
+      use dlmda
       use ost
       implicit none
       integer i
@@ -233,12 +234,12 @@ c
 c     set small history arrays and resize them
 c
       call resetost (5,5,2)
-      nosthist = 2
+      nlmdahist = 2
       do i = 1, 2
          osthist(i) = 10 + i
          ostnext(i) = i - 1
-         ostlhist(i) = 0.25d0 * dble(i)
-         ostfhist(i) = -3.0d0 + 2.0d0*dble(i)
+         lmdalhist(i) = 0.25d0 * dble(i)
+         lmdafhist(i) = -3.0d0 + 2.0d0*dble(i)
          osthhist(i) = 1.0d0 + dble(i)
          ostwlhist(i) = 0.25d0
          ostwfhist(i) = 1.0d0
@@ -247,7 +248,7 @@ c
 c
 c     check old data are preserved and new slots are initialized
 c
-      call assert_int (sizeosthist,4,
+      call assert_int (sizelmdahist,4,
      &                 'resizeosthist size input size=2')
       do i = 1, 4
          if (i .le. 2) then
@@ -255,10 +256,10 @@ c
      &                 'resizeosthist preserve osthist')
       call assert_int (ostnext(i),i-1,
      &                 'resizeosthist preserve ostnext')
-      call assert_real (ostlhist(i),0.25d0*dble(i),1.0d-12,
-     &                  'resizeosthist preserve ostlhist')
-      call assert_real (ostfhist(i),-3.0d0+2.0d0*dble(i),1.0d-12,
-     &                  'resizeosthist preserve ostfhist')
+      call assert_real (lmdalhist(i),0.25d0*dble(i),1.0d-12,
+     &                  'resizeosthist preserve lmdalhist')
+      call assert_real (lmdafhist(i),-3.0d0+2.0d0*dble(i),1.0d-12,
+     &                  'resizeosthist preserve lmdafhist')
       call assert_real (osthhist(i),1.0d0+dble(i),1.0d-12,
      &                  'resizeosthist preserve osthhist')
       call assert_real (ostwlhist(i),0.25d0,1.0d-12,
@@ -270,10 +271,10 @@ c
      &                 'resizeosthist init osthist')
       call assert_int (ostnext(i),0,
      &                 'resizeosthist init ostnext')
-      call assert_real (ostlhist(i),0.0d0,1.0d-12,
-     &                  'resizeosthist init ostlhist')
-      call assert_real (ostfhist(i),0.0d0,1.0d-12,
-     &                  'resizeosthist init ostfhist')
+      call assert_real (lmdalhist(i),0.0d0,1.0d-12,
+     &                  'resizeosthist init lmdalhist')
+      call assert_real (lmdafhist(i),0.0d0,1.0d-12,
+     &                  'resizeosthist init lmdafhist')
       call assert_real (osthhist(i),0.0d0,1.0d-12,
      &                  'resizeosthist init osthhist')
       call assert_real (ostwlhist(i),0.0d0,1.0d-12,
@@ -298,6 +299,7 @@ c     for gaussian history bins
 c
 c
       subroutine test_eost_buildindex
+      use dlmda
       use ost
       implicit none
       integer k,ilmda,iflmda
@@ -306,7 +308,7 @@ c
 c     put two gaussians in the same bin and one in another bin
 c
       call resetost (5,5,3)
-      nosthist = 3
+      nlmdahist = 3
       call sethist (1,0.50d0,0.0d0,1.0d0,wlmda,wflmda)
       call sethist (2,0.50d0,0.0d0,2.0d0,wlmda,wflmda)
       call sethist (3,0.75d0,1.0d0,3.0d0,wlmda,wflmda)
@@ -341,6 +343,7 @@ c     kernel preservation and index rebuilding
 c
 c
       subroutine test_eost_ensure
+      use dlmda
       use ost
       implicit none
       integer k
@@ -376,7 +379,7 @@ c
 c     low-side expansion also rebuilds osthead, ostnext and osthist
 c
       call resetost (3,5,2)
-      nosthist = 2
+      nlmdahist = 2
       call sethist (1,0.50d0,0.0d0,1.0d0,wlmda,wflmda)
       call sethist (2,0.50d0,0.0d0,2.0d0,wlmda,wflmda)
       call buildostindex
@@ -446,7 +449,7 @@ c     choose height so the normalized gaussian prefactor is one
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
 c
@@ -463,7 +466,7 @@ c     addgkernelhist includes left-boundary mirror image
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,0.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       call addgkernelhist (1)
@@ -477,7 +480,7 @@ c     addgkernelhist includes right-boundary mirror image
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,1.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       call addgkernelhist (1)
@@ -491,7 +494,7 @@ c     rebuild the original interior gaussian for later checks
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
 c
@@ -513,7 +516,7 @@ c
 c
 c     adding a taller gaussian updates only from the new history entry
 c
-      nosthist = 2
+      nlmdahist = 2
       call sethist (2,0.75d0,1.0d0,2.0d0*height,wlmda,wflmda)
       call buildostindex
       call updategkernel
@@ -541,7 +544,7 @@ c     two gaussians in the same bin are both followed by ostnext
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 2
+      nlmdahist = 2
       call sethist (1,0.50d0,0.0d0,height,wlmda,wflmda)
       call sethist (2,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
@@ -560,7 +563,7 @@ c     two gaussians in one bin and one gaussian in another bin
 c
       call resetost (5,5,4)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 3
+      nlmdahist = 3
       call sethist (1,0.50d0,0.0d0,1.0d0*height,wlmda,wflmda)
       call sethist (2,0.50d0,0.0d0,2.0d0*height,wlmda,wflmda)
       call sethist (3,0.75d0,1.0d0,3.0d0*height,wlmda,wflmda)
@@ -580,7 +583,7 @@ c     left endpoint includes both real and mirror gaussian images
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,0.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       lambda = 0.0d0
@@ -595,7 +598,7 @@ c     right endpoint includes both real and mirror gaussian images
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,1.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       lambda = 1.0d0
@@ -616,7 +619,7 @@ c
       height = 2.0d0 * pi * wlhist * wfhist
       targetl = 0.525d0
       targetf = 5.0d0
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,0.50d0,0.0d0,height,wlhist,wfhist)
       call buildostindex
       call buildgkernel
@@ -638,7 +641,7 @@ c     egkernel returns zero
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
       lambda = 0.50d0
@@ -667,6 +670,7 @@ c
 c
       subroutine test_eost_fkernel
       use bath
+      use dlmda
       use math
       use ost
       use units
@@ -686,9 +690,9 @@ c
       vkernelmax(3) = log(4.0d0) * rt
       call buildfkernel
       expected = 1.0d0 / 3.0d0
-      call assert_real (fkernel(3),expected,1.0d-12,
+      call assert_real (lmdafmean(3),expected,1.0d-12,
      &                  'buildfkernel weighted mean force')
-      call assert_real (fkernel(1),0.0d0,1.0d-12,
+      call assert_real (lmdafmean(1),0.0d0,1.0d-12,
      &                  'buildfkernel empty row')
 c
 c     build gkernel incrementally from multiple gaussians using
@@ -698,17 +702,17 @@ c
       rt = gasconst * kelvin
       height = 2.0d0 * pi * wlmda * wflmda
 c
-      nosthist = 1
+      nlmdahist = 1
       call sethist (1,0.25d0,-1.0d0,1.0d0*height,wlmda,wflmda)
       call buildostindex
       call updategkernel
 c
-      nosthist = 2
+      nlmdahist = 2
       call sethist (2,0.50d0, 0.0d0,2.0d0*height,wlmda,wflmda)
       call buildostindex
       call updategkernel
 c
-      nosthist = 3
+      nlmdahist = 3
       call sethist (3,0.75d0, 1.0d0,3.0d0*height,wlmda,wflmda)
       call buildostindex
       call updategkernel
@@ -725,7 +729,7 @@ c
       
       expected = (-2.d0*w1 - w2 + w4 + 2.d0*w5)
      &     /(w1+w2+w3+w4+w5)
-      call assert_real (fkernel(3),expected,1.0d-12,
+      call assert_real (lmdafmean(3),expected,1.0d-12,
      &                  'buildfkernel from updated gkernel')
 c
 c     a deeply filled bin overflows exp(g/kT) unless the largest bias
@@ -739,7 +743,7 @@ c
       call buildfkernel
       wratio = exp((499.0d0-500.0d0)/rt)
       expected = (-1.0d0 + wratio) / (1.0d0 + wratio)
-      call assert_real (fkernel(3),expected,1.0d-12,
+      call assert_real (lmdafmean(3),expected,1.0d-12,
      &                  'buildfkernel large bias no overflow')
       return
       end
@@ -758,6 +762,7 @@ c
 c
       subroutine test_eost_kernelbuilds
       use bath
+      use dlmda
       use math
       use ost
       use units
@@ -785,7 +790,7 @@ c
       call resetost (9,9,8)
       rt = gasconst * kelvin
       nhist = 6
-      nosthist = nhist
+      nlmdahist = nhist
       height = 2.0d0 * pi * wlmda * wflmda
       call sethist (1,0.00d0, 0.0d0,0.7d0*height,wlmda,wflmda)
       call sethist (2,0.25d0,-1.0d0,1.1d0*height,wlmda,wflmda)
@@ -807,7 +812,7 @@ c
       call buildgkernel
       call buildfkernel
       do i = 1, nlmda
-         fref(i) = fkernel(i)
+         fref(i) = lmdafmean(i)
          do j = 1, nflmda
             gref(i,j) = gkernel(i,j)
          end do
@@ -845,16 +850,16 @@ c
          fsumref(i) = fsum
          pfref(i) = partfunc
       end do
-      call assert_array1 (fkernel,fmanual,nlmda,1.0d-12,
+      call assert_array1 (lmdafmean,fmanual,nlmda,1.0d-12,
      &                    'buildfkernel all-row weighted mean')
 c
-c     buildkernels must produce the same gkernel, fkernel and
+c     buildkernels must produce the same gkernel, lmdafmean and
 c     free energy accumulators as the old full rebuild path
 c
       do i = 1, nlmda
-         fkernel(i) = -123.0d0
-         fsumkernel(i) = -123.0d0
-         pfkernel(i) = -123.0d0
+         lmdafmean(i) = -123.0d0
+         lmdafsum(i) = -123.0d0
+         lmdafwt(i) = -123.0d0
          do j = 1, nflmda
             gkernel(i,j) = -123.0d0
          end do
@@ -862,11 +867,11 @@ c
       call buildkernels
       call assert_array2 (gkernel,gref,nlmda,nflmda,1.0d-12,
      &                    'buildkernels gkernel reference')
-      call assert_array1 (fkernel,fref,nlmda,1.0d-12,
-     &                    'buildkernels fkernel reference')
-      call assert_array1 (fsumkernel,fsumref,nlmda,1.0d-12,
+      call assert_array1 (lmdafmean,fref,nlmda,1.0d-12,
+     &                    'buildkernels lmdafmean reference')
+      call assert_array1 (lmdafsum,fsumref,nlmda,1.0d-12,
      &                    'buildkernels fsum reference')
-      call assert_array1 (pfkernel,pfref,nlmda,1.0d-12,
+      call assert_array1 (lmdafwt,pfref,nlmda,1.0d-12,
      &                    'buildkernels partfunc reference')
 c
 c     incrementally updating kernels one history at a time must match
@@ -875,7 +880,7 @@ c
       call resetost (9,9,8)
       height = 2.0d0 * pi * wlmda * wflmda
       do ihist = 1, nhist
-         nosthist = ihist
+         nlmdahist = ihist
          if (ihist .eq. 1) then
             call sethist (ihist,0.00d0,0.0d0,0.7d0*height,wlmda,wflmda)
          else if (ihist .eq. 2) then
@@ -896,11 +901,11 @@ c
       end do
       call assert_array2 (gkernel,gref,nlmda,nflmda,1.0d-12,
      &                    'updatekernels gkernel reference')
-      call assert_array1 (fkernel,fref,nlmda,1.0d-12,
-     &                    'updatekernels fkernel reference')
-      call assert_array1 (fsumkernel,fsumref,nlmda,1.0d-12,
+      call assert_array1 (lmdafmean,fref,nlmda,1.0d-12,
+     &                    'updatekernels lmdafmean reference')
+      call assert_array1 (lmdafsum,fsumref,nlmda,1.0d-12,
      &                    'updatekernels fsum reference')
-      call assert_array1 (pfkernel,pfref,nlmda,1.0d-12,
+      call assert_array1 (lmdafwt,pfref,nlmda,1.0d-12,
      &                    'updatekernels partfunc reference')
       return
       end
@@ -918,7 +923,7 @@ c     standard deviations for sampled lambda values
 c
 c
       subroutine test_eost_avgstd
-      use ost
+      use dlmda
       implicit none
       integer i
       real*8 stdref
@@ -927,26 +932,26 @@ c
 c     average all saved interval samples after equilibration prefix
 c
       call resetost (5,5,1)
-      iosthist = 6
-      ostnpa = 1
-      ostnpb = 1
-      ostnpc = 4
-      do i = 1, iosthist
-         ostllist(i) = dble(i)
-         ostflist(i) = 2.0d0*dble(i)
+      lmdaintv = 6
+      lmdanpa = 1
+      lmdanpb = 1
+      lmdanpc = 4
+      do i = 1, lmdaintv
+         lmdallist(i) = dble(i)
+         lmdaflist(i) = 2.0d0*dble(i)
       end do
-      call avgstd (ostllist,ostnpa+ostnpb+1,ostnpc,
-     &             ostlambdaavg,ostlambdastd)
-      call avgstd (ostflist,ostnpa+ostnpb+1,ostnpc,
-     &             ostdedlavg,ostdedlstd)
+      call avgstd (lmdallist,lmdanpa+lmdanpb+1,lmdanpc,
+     &             lmdaavg,lmdastd)
+      call avgstd (lmdaflist,lmdanpa+lmdanpb+1,lmdanpc,
+     &             dedlavg,dedlstd)
       stdref = sqrt(1.25d0)
-      call assert_real (ostlambdaavg,4.5d0,1.0d-12,
+      call assert_real (lmdaavg,4.5d0,1.0d-12,
      &                  'avgstd configurable lambda average')
-      call assert_real (ostdedlavg,9.0d0,1.0d-12,
+      call assert_real (dedlavg,9.0d0,1.0d-12,
      &                  'avgstd configurable dE/dl average')
-      call assert_real (ostlambdastd,stdref,1.0d-12,
+      call assert_real (lmdastd,stdref,1.0d-12,
      &                  'avgstd configurable lambda std')
-      call assert_real (ostdedlstd,2.0d0*stdref,1.0d-12,
+      call assert_real (dedlstd,2.0d0*stdref,1.0d-12,
      &                  'avgstd configurable dE/dl std')
       return
       end
@@ -983,7 +988,7 @@ c
       sigf = 2.0d0 * wflmda
       height = 2.0d0 * pi * sigl * sigf
       oststdev = 4.0d0
-      nosthist = 3
+      nlmdahist = 3
       call sethist (1,0.25d0,-1.0d0,1.1d0*height,sigl,sigf)
       call sethist (2,0.50d0, 0.0d0,1.6d0*height,sigl,sigf)
       call sethist (3,0.75d0, 1.0d0,2.3d0*height,sigl,sigf)
@@ -1009,7 +1014,7 @@ c
       sigf = 4.0d0 * wflmda
       height = 2.0d0 * pi * sigl * sigf
       oststdev = 4.0d0
-      nosthist = 3
+      nlmdahist = 3
       call sethist (1,0.25d0,-2.0d0,0.8d0*height,sigl,sigf)
       call sethist (2,0.50d0, 0.0d0,1.2d0*height,sigl,sigf)
       call sethist (3,0.75d0, 2.0d0,1.6d0*height,sigl,sigf)
@@ -1042,90 +1047,90 @@ c     total free-energy integration from f kernels
 c
 c
       subroutine test_eost_efkernel
+      use dlmda
       use mutant
-      use ost
       implicit none
       integer i
       real*8 eostlmda,dfdl
       real*8 expected
-      real*8 etotfkernel
+      real*8 efreetot
 c
 c
-c     use fkernel(lambda)=lambda and integrate to lambda=0.375
+c     use lmdafmean(lambda)=lambda and integrate to lambda=0.375
 c
       call resetost (5,5,1)
       do i = 1, nlmda
-         fkernel(i) = dble(i-1) * wlmda
+         lmdafmean(i) = dble(i-1) * wlmda
       end do
       lambda = 0.375d0
-      call efkernel (eostlmda,dfdl)
+      call efreelmda (eostlmda,dfdl)
       expected = 0.5d0 * lambda * lambda
       call assert_real (eostlmda,expected,1.0d-12,
-     &                  'efkernel DeltaG lambda=.375')
+     &                  'efreelmda DeltaG lambda=.375')
       call assert_real (dfdl,lambda,1.0d-12,
-     &                  'efkernel dDeltaG/dlambda')
+     &                  'efreelmda dDeltaG/dlambda')
 c
-c     use fkernel(lambda)=1+lambda so the endpoint mean forces are
+c     use lmdafmean(lambda)=1+lambda so the endpoint mean forces are
 c     nonzero and distinct from each other
 c
       call resetost (5,5,1)
       do i = 1, nlmda
-         fkernel(i) = 1.0d0 + dble(i-1)*wlmda
+         lmdafmean(i) = 1.0d0 + dble(i-1)*wlmda
       end do
 c
 c     at and below lambda = 0 the free energy is zero and the
 c     derivative comes from the first lambda bin
 c
       lambda = 0.0d0
-      call efkernel (eostlmda,dfdl)
+      call efreelmda (eostlmda,dfdl)
       call assert_real (eostlmda,0.0d0,1.0d-12,
-     &                  'efkernel DeltaG lambda=0')
+     &                  'efreelmda DeltaG lambda=0')
       call assert_real (dfdl,1.0d0,1.0d-12,
-     &                  'efkernel dDeltaG/dlambda lambda=0')
+     &                  'efreelmda dDeltaG/dlambda lambda=0')
       lambda = -0.25d0
-      call efkernel (eostlmda,dfdl)
+      call efreelmda (eostlmda,dfdl)
       call assert_real (eostlmda,0.0d0,1.0d-12,
-     &                  'efkernel DeltaG lambda below 0')
+     &                  'efreelmda DeltaG lambda below 0')
       call assert_real (dfdl,1.0d0,1.0d-12,
-     &                  'efkernel dDeltaG/dlambda below 0')
+     &                  'efreelmda dDeltaG/dlambda below 0')
 c
 c     at lambda = 1 the last interval is integrated in full, and
 c     beyond lambda = 1 the loop falls through to the same result
 c
       lambda = 1.0d0
-      call efkernel (eostlmda,dfdl)
+      call efreelmda (eostlmda,dfdl)
       call assert_real (eostlmda,1.5d0,1.0d-12,
-     &                  'efkernel DeltaG lambda=1')
+     &                  'efreelmda DeltaG lambda=1')
       call assert_real (dfdl,2.0d0,1.0d-12,
-     &                  'efkernel dDeltaG/dlambda lambda=1')
+     &                  'efreelmda dDeltaG/dlambda lambda=1')
       lambda = 1.25d0
-      call efkernel (eostlmda,dfdl)
+      call efreelmda (eostlmda,dfdl)
       call assert_real (eostlmda,1.5d0,1.0d-12,
-     &                  'efkernel DeltaG lambda above 1')
+     &                  'efreelmda DeltaG lambda above 1')
       call assert_real (dfdl,2.0d0,1.0d-12,
-     &                  'efkernel dDeltaG/dlambda above 1')
+     &                  'efreelmda dDeltaG/dlambda above 1')
 c
 c     the trapezoid rule is exact for a linear mean force, so the
-c     total must match the efkernel value at lambda = 1
+c     total must match the efreelmda value at lambda = 1
 c
-      call assert_real (etotfkernel(),1.5d0,1.0d-12,
-     &                  'etotfkernel linear fkernel')
+      call assert_real (efreetot(),1.5d0,1.0d-12,
+     &                  'efreetot linear lmdafmean')
 c
 c     a constant mean force integrates to itself over unit lambda
 c
       do i = 1, nlmda
-         fkernel(i) = 2.5d0
+         lmdafmean(i) = 2.5d0
       end do
-      call assert_real (etotfkernel(),2.5d0,1.0d-12,
-     &                  'etotfkernel constant fkernel')
+      call assert_real (efreetot(),2.5d0,1.0d-12,
+     &                  'efreetot constant lmdafmean')
 c
 c     an all-zero mean force gives no free energy change
 c
       do i = 1, nlmda
-         fkernel(i) = 0.0d0
+         lmdafmean(i) = 0.0d0
       end do
-      call assert_real (etotfkernel(),0.0d0,1.0d-12,
-     &                  'etotfkernel zero fkernel')
+      call assert_real (efreetot(),0.0d0,1.0d-12,
+     &                  'efreetot zero lmdafmean')
       return
       end
 c
@@ -1213,6 +1218,7 @@ c     sub-bin statistics gathered over a deposit interval
 c
 c
       subroutine test_eost_histstat
+      use dlmda
       use ost
       implicit none
       integer i
@@ -1222,30 +1228,30 @@ c
 c     average the samples following the equilibration prefix
 c
       call resetost (5,5,1)
-      iosthist = 6
-      ostnpa = 1
-      ostnpb = 1
-      ostnpc = 4
-      do i = 1, iosthist
-         ostllist(i) = dble(i)
-         ostflist(i) = 2.0d0*dble(i)
+      lmdaintv = 6
+      lmdanpa = 1
+      lmdanpb = 1
+      lmdanpc = 4
+      do i = 1, lmdaintv
+         lmdallist(i) = dble(i)
+         lmdaflist(i) = 2.0d0*dble(i)
       end do
 c
 c     four samples split evenly into two sub-bins
 c
       ostcvbin = 2
-      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
      &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
-      call histstat (ostflist,ostdedlavg,ostdedlstd,ostdedlslp,
+      call histstat (lmdaflist,dedlavg,dedlstd,ostdedlslp,
      &               ostdedlavgbin,ostdedlstdbin,ostdedlslpbin)
       stdref = sqrt(1.25d0)
-      call assert_real (ostlambdaavg,4.5d0,1.0d-12,
+      call assert_real (lmdaavg,4.5d0,1.0d-12,
      &                  'histstat lambda average')
-      call assert_real (ostdedlavg,9.0d0,1.0d-12,
+      call assert_real (dedlavg,9.0d0,1.0d-12,
      &                  'histstat dE/dl average')
-      call assert_real (ostlambdastd,stdref,1.0d-12,
+      call assert_real (lmdastd,stdref,1.0d-12,
      &                  'histstat lambda deviation')
-      call assert_real (ostdedlstd,2.0d0*stdref,1.0d-12,
+      call assert_real (dedlstd,2.0d0*stdref,1.0d-12,
      &                  'histstat dE/dl deviation')
 c
 c     the fitted drift keeps the scale of each ramp
@@ -1282,7 +1288,7 @@ c     four samples in three sub-bins keeps one per bin and drops
 c     the leading sample from the sub-bins but not from the slice
 c
       ostcvbin = 3
-      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
      &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
       call assert_real (ostlmdaavgbin(1),4.0d0,1.0d-12,
      &                  'histstat uneven split bin 1')
@@ -1308,11 +1314,11 @@ c
          ostlmdastdbin(i) = -7.0d0
          ostlmdaslpbin(i) = -7.0d0
       end do
-      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
      &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
-      call assert_real (ostlambdaavg,4.5d0,1.0d-12,
+      call assert_real (lmdaavg,4.5d0,1.0d-12,
      &                  'histstat no bins average')
-      call assert_real (ostlambdastd,stdref,1.0d-12,
+      call assert_real (lmdastd,stdref,1.0d-12,
      &                  'histstat no bins deviation')
       call assert_real (ostlambdaslp,1.0d0,1.0d-12,
      &                  'histstat no bins slope')
@@ -1337,6 +1343,7 @@ c     large constant offset
 c
 c
       subroutine test_eost_drift
+      use dlmda
       use ost
       implicit none
       integer i
@@ -1347,17 +1354,17 @@ c
 c     a flat series has no drift
 c
       call resetost (5,5,1)
-      iosthist = 8
-      ostnpa = 0
-      ostnpb = 0
-      ostnpc = 8
+      lmdaintv = 8
+      lmdanpa = 0
+      lmdanpb = 0
+      lmdanpc = 8
       ostcvbin = 2
-      do i = 1, iosthist
-         ostllist(i) = 7.0d0
+      do i = 1, lmdaintv
+         lmdallist(i) = 7.0d0
       end do
-      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
      &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
-      call assert_real (ostlambdaavg,7.0d0,1.0d-12,
+      call assert_real (lmdaavg,7.0d0,1.0d-12,
      &                  'histstat flat average')
       call assert_real (ostlambdaslp,0.0d0,1.0d-12,
      &                  'histstat flat slope')
@@ -1366,10 +1373,10 @@ c
 c
 c     a decreasing ramp keeps its change per sample
 c
-      do i = 1, iosthist
-         ostllist(i) = -0.5d0*dble(i-1)
+      do i = 1, lmdaintv
+         lmdallist(i) = -0.5d0*dble(i-1)
       end do
-      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
      &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
       call assert_real (ostlambdaslp,-0.5d0,1.0d-12,
      &                  'histstat ramp slope')
@@ -1380,10 +1387,10 @@ c
 c
 c     a folded series has no net drift, but each half drifts fully
 c
-      do i = 1, iosthist
-         ostllist(i) = v(i)
+      do i = 1, lmdaintv
+         lmdallist(i) = v(i)
       end do
-      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
      &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
       call assert_real (ostlambdaslp,0.0d0,1.0d-12,
      &                  'histstat folded slope')
@@ -1394,10 +1401,10 @@ c
 c
 c     a large offset must not swamp a small drift
 c
-      do i = 1, iosthist
-         ostllist(i) = 5000.0d0 + 1.0d-6*dble(i-1)
+      do i = 1, lmdaintv
+         lmdallist(i) = 5000.0d0 + 1.0d-6*dble(i-1)
       end do
-      call histstat (ostllist,ostlambdaavg,ostlambdastd,ostlambdaslp,
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
      &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
       call assert_real (ostlambdaslp,1.0d-6,1.0d-9,
      &                  'histstat offset slope')
@@ -1463,6 +1470,7 @@ c
 c
       subroutine test_eost_vkernelmax
       use bath
+      use dlmda
       use ost
       implicit none
       integer i
@@ -1476,7 +1484,7 @@ c     two saved sources spread over the whole kernel
 c
       kelvin = 300.0d0
       call resetost (5,5,4)
-      nosthist = 2
+      nlmdahist = 2
       call sethist (1,0.25d0,0.0d0,1.0d0,0.25d0,1.0d0)
       call sethist (2,0.75d0,1.0d0,2.0d0,0.25d0,1.0d0)
       call buildostindex
@@ -1494,7 +1502,7 @@ c
 c
 c     the incremental update path stays exact
 c
-      nosthist = 3
+      nlmdahist = 3
       call sethist (3,0.5d0,-1.0d0,1.5d0,0.25d0,1.0d0)
       call buildostindex
       call updatekernels
@@ -1814,19 +1822,19 @@ c     a frozen lambda particle keeps the sampled values controlled
 c
       call resetost (5,5,1)
       call resetmeta (2)
-      iosthist = 4
-      ostnpa = 1
-      ostnpb = 1
-      ostnpc = 2
+      lmdaintv = 4
+      lmdanpa = 1
+      lmdanpb = 1
+      lmdanpc = 2
       hbias = 2.0d0
       wlmda = 0.25d0
       dedl = 0.0d0
-      ostdt = 0.0d0
-      iost = 0
-      do istep = 1, iosthist
+      lmdadt = 0.0d0
+      lmdastep = 0
+      do istep = 1, lmdaintv
          lambda = lam(istep)
          call emetadyn
-         if (istep .lt. iosthist) then
+         if (istep .lt. lmdaintv) then
             call assert_int (nmetahist,0,
      &                       'emetadyn waits for the interval end')
          end if
@@ -1834,7 +1842,7 @@ c
 c
 c     only the samples after the equilibration prefix are averaged
 c
-      avgref = (lam(3)+lam(4)) / dble(ostnpc)
+      avgref = (lam(3)+lam(4)) / dble(lmdanpc)
       call assert_int (nmetahist,1,'emetadyn deposits one gaussian')
       call assert_real (metalhist(1),avgref,1.0d-12,
      &                  'emetadyn gaussian center')
@@ -1842,7 +1850,7 @@ c
      &                  'emetadyn gaussian height')
       call assert_real (metawhist(1),wlmda,1.0d-12,
      &                  'emetadyn gaussian width')
-      call assert_int (metaihist(1),iosthist,
+      call assert_int (metaihist(1),lmdaintv,
      &                 'emetadyn gaussian step stamp')
       return
       end
@@ -1880,18 +1888,18 @@ c
       kelvin = 300.0d0
       call resetost (5,5,1)
       call resetmeta (8)
-      iosthist = 4
-      ostnpa = 1
-      ostnpb = 1
-      ostnpc = 2
+      lmdaintv = 4
+      lmdanpa = 1
+      lmdanpb = 1
+      lmdanpc = 2
       hbias = 2.0d0
       dedl = 0.0d0
-      ostdt = 0.0d0
+      lmdadt = 0.0d0
       use_ostgtemp = .true.
       ostgthresh = 0.5d0
       ostgtempgamma = 1.0d0
-      iost = 0
-      do istep = 1, ndep*iosthist
+      lmdastep = 0
+      do istep = 1, ndep*lmdaintv
          lambda = 0.5d0
          call emetadyn
       end do
@@ -1949,6 +1957,7 @@ c     directly and returns the smallest bias over the lambda bins
 c
 c
       function refvstar (upto)
+      use dlmda
       use math
       use ost
       implicit none
@@ -2013,35 +2022,36 @@ c     a settled interval deposits one gaussian at the interval end
 c
       kelvin = 300.0d0
       call resetost (5,5,4)
-      iosthist = 4
-      ostnpa = 0
-      ostnpb = 0
-      ostnpc = 4
+      lmdaintv = 4
+      lmdanpa = 0
+      lmdanpb = 0
+      lmdanpc = 4
       ostcvbin = 0
       ostcvstd = 1.0d0
       ostcvrat = 0.0d0
       hbias = 1.0d0
-      ostdt = 0.0d0
+      lmdadt = 0.0d0
       fastkernel = .true.
       d2edl2 = 0.0d0
       ostbdgdl = 0.0d0
       ostbdgdfl = 0.0d0
-      ostbdfdl = 0.0d0
-      iost = 0
-      do istep = 1, iosthist
+      lmdadfdl = 0.0d0
+      lmdastep = 0
+      do istep = 1, lmdaintv
          lambda = 0.5d0
          dedl = 1.0d0
          call eostdyn
-         if (istep .lt. iosthist) then
-            call assert_int (nosthist,0,
+         if (istep .lt. lmdaintv) then
+            call assert_int (nlmdahist,0,
      &                       'eostdyn waits for the interval end')
          end if
       end do
-      call assert_int (nosthist,1,'eostdyn deposits a settled interval')
-      call assert_int (ostihist(1),iosthist,'eostdyn stamps the step')
-      call assert_real (ostlhist(1),0.5d0,1.0d-12,
+      call assert_int (nlmdahist,1,
+     &                 'eostdyn deposits a settled interval')
+      call assert_int (lmdaihist(1),lmdaintv,'eostdyn stamps the step')
+      call assert_real (lmdalhist(1),0.5d0,1.0d-12,
      &                  'eostdyn gaussian lambda center')
-      call assert_real (ostfhist(1),1.0d0,1.0d-12,
+      call assert_real (lmdafhist(1),1.0d0,1.0d-12,
      &                  'eostdyn gaussian flambda center')
       call assert_real (osthhist(1),hbias,1.0d-12,
      &                  'eostdyn untempered gaussian height')
@@ -2050,20 +2060,20 @@ c
 c
 c     an unsettled interval is rejected and changes nothing
 c
-      eostsave = eosttot
-      do istep = 1, iosthist
+      eostsave = lmdadeltag
+      do istep = 1, lmdaintv
          lambda = 0.5d0
          dedl = 1.0d0
          if (mod(istep,2) .eq. 0)  dedl = 11.0d0
          call eostdyn
       end do
-      call assert_real (ostdedlavg,6.0d0,1.0d-12,
+      call assert_real (dedlavg,6.0d0,1.0d-12,
      &                  'eostdyn unsettled interval average')
-      call assert_real (ostdedlstd,5.0d0,1.0d-12,
+      call assert_real (dedlstd,5.0d0,1.0d-12,
      &                  'eostdyn unsettled interval deviation')
-      call assert_int (nosthist,1,'eostdyn rejects an unsettled '//
+      call assert_int (nlmdahist,1,'eostdyn rejects an unsettled '//
      &                 'interval')
-      call assert_real (eosttot,eostsave,1.0d-12,
+      call assert_real (lmdadeltag,eostsave,1.0d-12,
      &                  'eostdyn rejection leaves the free energy')
       return
       end
@@ -2105,7 +2115,7 @@ c
       rt = gasconst * kelvin
       call resetost (5,5,8)
       oststdev = 4.0d0
-      nosthist = 2
+      nlmdahist = 2
       call sethist (1,0.0d0,0.0d0,5.0d0,0.25d0,1.0d0)
       call sethist (2,0.75d0,0.0d0,1.0d0,0.25d0,1.0d0)
       call buildostindex
@@ -2113,20 +2123,20 @@ c
 c
 c     settle each deposit interval with both tempering factors on
 c
-      iosthist = 4
-      ostnpa = 0
-      ostnpb = 0
-      ostnpc = 4
+      lmdaintv = 4
+      lmdanpa = 0
+      lmdanpb = 0
+      lmdanpc = 4
       ostcvbin = 0
       ostcvstd = 1.0d0
       ostcvrat = 0.0d0
       hbias = 1.0d0
-      ostdt = 0.0d0
+      lmdadt = 0.0d0
       fastkernel = .true.
       d2edl2 = 0.0d0
       ostbdgdl = 0.0d0
       ostbdgdfl = 0.0d0
-      ostbdfdl = 0.0d0
+      lmdadfdl = 0.0d0
       use_ostgtemp = .true.
       use_ostltemp = .true.
       ostgthresh = 0.1d0
@@ -2146,14 +2156,14 @@ c
      &                     'eostdyn global factor active')
       call assert_logical (gl-gmin.gt.ostlthresh,.true.,
      &                     'eostdyn local factor active')
-      iost = 0
-      do istep = 1, iosthist
+      lmdastep = 0
+      do istep = 1, lmdaintv
          lambda = dble(imax-1) * wlmda
          dedl = 0.0d0
          call eostdyn
       end do
       hglobal = hbias * exp(-(gmin-ostgthresh)/rt)
-      call assert_int (nosthist,3,'eostdyn deposits in the full bin')
+      call assert_int (nlmdahist,3,'eostdyn deposits in the full bin')
       call assert_real (osthhist(3),temperedheight(gmin,gl),1.0d-12,
      &                  'eostdyn height from pre-deposit levels')
       call assert_logical (osthhist(3).lt.hglobal,.true.,
@@ -2166,13 +2176,13 @@ c
          if (vkernelmax(i) .lt. vkernelmax(imin))  imin = i
       end do
       gmin = ostvminimax ()
-      do istep = 1, iosthist
+      do istep = 1, lmdaintv
          lambda = dble(imin-1) * wlmda
          dedl = 0.0d0
          call eostdyn
       end do
       hglobal = hbias * exp(-max(0.0d0,gmin-ostgthresh)/rt)
-      call assert_int (nosthist,4,'eostdyn deposits in the least bin')
+      call assert_int (nlmdahist,4,'eostdyn deposits in the least bin')
       call assert_real (osthhist(4),hglobal,1.0d-12,
      &                  'eostdyn least filled bin global height')
 c
@@ -2292,64 +2302,64 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "test_eost_ostphase" checks that setostphase divides the deposit
+c     "test_eost_ostphase" checks that setlmdaphase divides the deposit
 c     interval into propagation, equilibration and averaging phases,
 c     and that the clamps keep a propagation step and enough samples
 c     to average without ever losing a sample from the interval
 c
 c
       subroutine test_eost_ostphase
-      use ost
+      use dlmda
       implicit none
 c
 c
 c     the requested ratios divide the interval by truncation
 c
-      iosthist = 10
-      ostparatio = 0.3d0
-      ostpbratio = 0.3d0
-      call setostphase
-      call assert_int (ostnpa,3,'setostphase propagation phase')
-      call assert_int (ostnpb,3,'setostphase equilibration phase')
-      call assert_int (ostnpc,4,'setostphase averaging phase')
-      call assert_real (ostpcratio,0.4d0,1.0d-12,
-     &                  'setostphase leftover ratio')
-      call assert_int (ostnpa+ostnpb+ostnpc,iosthist,
-     &                 'setostphase spans the whole interval')
+      lmdaintv = 10
+      lmdaparatio = 0.3d0
+      lmdapbratio = 0.3d0
+      call setlmdaphase
+      call assert_int (lmdanpa,3,'setlmdaphase propagation phase')
+      call assert_int (lmdanpb,3,'setlmdaphase equilibration phase')
+      call assert_int (lmdanpc,4,'setlmdaphase averaging phase')
+      call assert_real (lmdapcratio,0.4d0,1.0d-12,
+     &                  'setlmdaphase leftover ratio')
+      call assert_int (lmdanpa+lmdanpb+lmdanpc,lmdaintv,
+     &                 'setlmdaphase spans the whole interval')
 c
 c     a zero propagation ratio still keeps one propagation step
 c
-      iosthist = 10
-      ostparatio = 0.0d0
-      ostpbratio = 0.3d0
-      call setostphase
-      call assert_int (ostnpa,1,'setostphase keeps one propagation')
-      call assert_int (ostnpa+ostnpb+ostnpc,iosthist,
-     &                 'setostphase spans a clamped interval')
+      lmdaintv = 10
+      lmdaparatio = 0.0d0
+      lmdapbratio = 0.3d0
+      call setlmdaphase
+      call assert_int (lmdanpa,1,'setlmdaphase keeps one propagation')
+      call assert_int (lmdanpa+lmdanpb+lmdanpc,lmdaintv,
+     &                 'setlmdaphase spans a clamped interval')
 c
 c     a crowded interval gives back samples to the averaging phase,
 c     taking them from the equilibration phase first
 c
-      iosthist = 10
-      ostparatio = 0.4d0
-      ostpbratio = 0.5d0
-      call setostphase
-      call assert_int (ostnpc,2,'setostphase restores the average')
-      call assert_int (ostnpa,4,'setostphase spares the propagation')
-      call assert_int (ostnpb,4,'setostphase trims the equilibration')
-      call assert_int (ostnpa+ostnpb+ostnpc,iosthist,
-     &                 'setostphase spans a crowded interval')
+      lmdaintv = 10
+      lmdaparatio = 0.4d0
+      lmdapbratio = 0.5d0
+      call setlmdaphase
+      call assert_int (lmdanpc,2,'setlmdaphase restores the average')
+      call assert_int (lmdanpa,4,'setlmdaphase spares the propagation')
+      call assert_int (lmdanpb,4,'setlmdaphase trims the equilibration')
+      call assert_int (lmdanpa+lmdanpb+lmdanpc,lmdaintv,
+     &                 'setlmdaphase spans a crowded interval')
 c
 c     the shortest usable interval still holds all three phases
 c
-      iosthist = 3
-      ostparatio = 0.4d0
-      ostpbratio = 0.4d0
-      call setostphase
-      call assert_int (ostnpa,1,'setostphase minimum propagation')
-      call assert_int (ostnpc,2,'setostphase minimum average')
-      call assert_int (ostnpa+ostnpb+ostnpc,iosthist,
-     &                 'setostphase spans the minimum interval')
+      lmdaintv = 3
+      lmdaparatio = 0.4d0
+      lmdapbratio = 0.4d0
+      call setlmdaphase
+      call assert_int (lmdanpa,1,'setlmdaphase minimum propagation')
+      call assert_int (lmdanpc,2,'setlmdaphase minimum average')
+      call assert_int (lmdanpa+lmdanpb+lmdanpc,lmdaintv,
+     &                 'setlmdaphase spans the minimum interval')
       return
       end
 c
@@ -2383,27 +2393,27 @@ c     particle, so that any lambda motion comes from the gate alone
 c
       kelvin = 300.0d0
       call resetost (5,5,4)
-      iosthist = 6
-      ostnpa = 2
-      ostnpb = 2
-      ostnpc = 2
+      lmdaintv = 6
+      lmdanpa = 2
+      lmdanpb = 2
+      lmdanpc = 2
       ostcvbin = 0
       ostcvstd = 1.0d0
       ostcvrat = 0.0d0
       hbias = 1.0d0
-      ostdt = 0.1d0
-      ostmass = 1.0d0
-      ostfriction = 0.0d0
-      osttheta = 0.25d0 * 3.14159265358979323846d0
-      ostvtheta = 0.0d0
+      lmdadt = 0.1d0
+      lmdamass = 1.0d0
+      lmdafric = 0.0d0
+      lmdatheta = 0.25d0 * 3.14159265358979323846d0
+      lmdavtheta = 0.0d0
       lambda = 0.5d0
       fastkernel = .true.
       d2edl2 = 0.0d0
       ostbdgdl = 0.0d0
       ostbdgdfl = 0.0d0
-      ostbdfdl = 0.0d0
-      iost = 0
-      do istep = 1, iosthist
+      lmdadfdl = 0.0d0
+      lmdastep = 0
+      do istep = 1, lmdaintv
          dedl = 1.0d0
          call eostdyn
          lam(istep) = lambda
@@ -2417,7 +2427,7 @@ c
 c     lambda is then bit identical for the rest of the interval
 c
       frozen = lam(2)
-      do istep = 3, iosthist
+      do istep = 3, lmdaintv
          call assert_real (lam(istep),frozen,0.0d0,
      &                     'eostdyn holds lambda after phase a')
       end do
@@ -2425,12 +2435,12 @@ c
 c     the averaged lambda is the frozen value, not a smear, so the
 c     gaussian is deposited exactly on it
 c
-      call assert_int (nosthist,1,'eostdyn deposits a frozen interval')
-      call assert_real (ostlambdaavg,frozen,0.0d0,
+      call assert_int (nlmdahist,1,'eostdyn deposits a frozen interval')
+      call assert_real (lmdaavg,frozen,0.0d0,
      &                  'eostdyn averages the frozen lambda')
-      call assert_real (ostlhist(1),frozen,0.0d0,
+      call assert_real (lmdalhist(1),frozen,0.0d0,
      &                  'eostdyn centers the gaussian on frozen lambda')
-      call assert_real (ostfhist(1),1.0d0,1.0d-12,
+      call assert_real (lmdafhist(1),1.0d0,1.0d-12,
      &                  'eostdyn centers the gaussian on flambda')
       return
       end
@@ -2462,22 +2472,22 @@ c     clear any previous allocation
 c
       if (allocated(osthhist))  deallocate (osthhist)
       if (allocated(osthist))  deallocate (osthist)
-      if (allocated(ostihist))  deallocate (ostihist)
+      if (allocated(lmdaihist))  deallocate (lmdaihist)
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(ostnext))  deallocate (ostnext)
-      if (allocated(ostllist))  deallocate (ostllist)
-      if (allocated(ostflist))  deallocate (ostflist)
-      if (allocated(ostlhist))  deallocate (ostlhist)
-      if (allocated(ostfhist))  deallocate (ostfhist)
+      if (allocated(lmdallist))  deallocate (lmdallist)
+      if (allocated(lmdaflist))  deallocate (lmdaflist)
+      if (allocated(lmdalhist))  deallocate (lmdalhist)
+      if (allocated(lmdafhist))  deallocate (lmdafhist)
       if (allocated(ostwlhist))  deallocate (ostwlhist)
       if (allocated(ostwfhist))  deallocate (ostwfhist)
-      if (allocated(fkernel))  deallocate (fkernel)
-      if (allocated(fsumkernel))  deallocate (fsumkernel)
+      if (allocated(lmdafmean))  deallocate (lmdafmean)
+      if (allocated(lmdafsum))  deallocate (lmdafsum)
       if (allocated(gfkernel))  deallocate (gfkernel)
       if (allocated(gkernel))  deallocate (gkernel)
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
-      if (allocated(pfkernel))  deallocate (pfkernel)
+      if (allocated(lmdafwt))  deallocate (lmdafwt)
       if (allocated(vkernelmax))  deallocate (vkernelmax)
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
@@ -2502,20 +2512,20 @@ c
       wfhist = 1.0d0
       maxwlhist = wlhist
       maxwfhist = wfhist
-      nosthist = 0
-      nosthistsave = 0
-      sizeosthist = nhist
-      iosthist = 10
-      ostnpa = 3
-      ostnpb = 3
-      ostnpc = 4
+      nlmdahist = 0
+      nlmdasave = 0
+      sizelmdahist = nhist
+      lmdaintv = 10
+      lmdanpa = 3
+      lmdanpb = 3
+      lmdanpc = 4
       lambda = 0.0d0
-      ostlambdaavg = 0.0d0
-      ostlambdastd = 0.0d0
+      lmdaavg = 0.0d0
+      lmdastd = 0.0d0
       ostlambdaslp = 0.0d0
       dedl = 0.0d0
-      ostdedlavg = 0.0d0
-      ostdedlstd = 0.0d0
+      dedlavg = 0.0d0
+      dedlstd = 0.0d0
       ostdedlslp = 0.0d0
       deffdl = 0.0d0
       ostcvbin = 0
@@ -2541,35 +2551,35 @@ c
       plmdainveps = 0.0d0
       elmdainveps = 0.0d0
       vlmdainveps = 0.0d0
-      ostparatio = 0.3d0
-      ostpbratio = 0.3d0
-      ostpcratio = 0.4d0
+      lmdaparatio = 0.3d0
+      lmdapbratio = 0.3d0
+      lmdapcratio = 0.4d0
       hbias = 0.0d0
-      eosttot = 0.0d0
+      lmdadeltag = 0.0d0
       oststdev = 1.0d0
       ostinterpol = .false.
       fastkernel = .false.
 c
 c     allocate arrays
 c
-      allocate (osthist(sizeosthist))
-      allocate (ostihist(sizeosthist))
+      allocate (osthist(sizelmdahist))
+      allocate (lmdaihist(sizelmdahist))
       allocate (osthead(nlmda,nflmda))
-      allocate (ostnext(sizeosthist))
-      allocate (ostllist(iosthist))
-      allocate (ostflist(iosthist))
-      allocate (ostlhist(sizeosthist))
-      allocate (ostfhist(sizeosthist))
-      allocate (osthhist(sizeosthist))
-      allocate (ostwlhist(sizeosthist))
-      allocate (ostwfhist(sizeosthist))
-      allocate (fkernel(nlmda))
-      allocate (fsumkernel(nlmda))
+      allocate (ostnext(sizelmdahist))
+      allocate (lmdallist(lmdaintv))
+      allocate (lmdaflist(lmdaintv))
+      allocate (lmdalhist(sizelmdahist))
+      allocate (lmdafhist(sizelmdahist))
+      allocate (osthhist(sizelmdahist))
+      allocate (ostwlhist(sizelmdahist))
+      allocate (ostwfhist(sizelmdahist))
+      allocate (lmdafmean(nlmda))
+      allocate (lmdafsum(nlmda))
       allocate (gfkernel(nlmda,nflmda))
       allocate (gkernel(nlmda,nflmda))
       allocate (glfkernel(nlmda,nflmda))
       allocate (glkernel(nlmda,nflmda))
-      allocate (pfkernel(nlmda))
+      allocate (lmdafwt(nlmda))
       allocate (vkernelmax(nlmda))
 c
 c     the sub-bin arrays are sized generously so that a test may
@@ -2592,24 +2602,24 @@ c
 c
 c     initialize arrays
 c
-      do i = 1, sizeosthist
+      do i = 1, sizelmdahist
          osthist(i) = 0
-         ostihist(i) = 0
+         lmdaihist(i) = 0
          ostnext(i) = 0
-         ostlhist(i) = 0.0d0
-         ostfhist(i) = 0.0d0
+         lmdalhist(i) = 0.0d0
+         lmdafhist(i) = 0.0d0
          osthhist(i) = 0.0d0
          ostwlhist(i) = 0.0d0
          ostwfhist(i) = 0.0d0
       end do
-      do i = 1, iosthist
-         ostllist(i) = 0.0d0
-         ostflist(i) = 0.0d0
+      do i = 1, lmdaintv
+         lmdallist(i) = 0.0d0
+         lmdaflist(i) = 0.0d0
       end do
       do i = 1, nlmda
-         fkernel(i) = 0.0d0
-         fsumkernel(i) = 0.0d0
-         pfkernel(i) = 0.0d0
+         lmdafmean(i) = 0.0d0
+         lmdafsum(i) = 0.0d0
+         lmdafwt(i) = 0.0d0
          vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             osthead(i,j) = 0
@@ -2635,6 +2645,7 @@ c     and clears their contents for a test case
 c
 c
       subroutine resetmeta (nhist)
+      use dlmda
       use ost
       implicit none
       integer nhist
@@ -2683,6 +2694,7 @@ c     with values that encode its array and bin indices
 c
 c
       subroutine seedkernels
+      use dlmda
       use ost
       implicit none
       integer i,j
@@ -2735,6 +2747,7 @@ c     arrays whose seeded block has shifted by offset bins
 c
 c
       subroutine checkkernels (label,nold,offset)
+      use dlmda
       use ost
       implicit none
       integer i,j
@@ -2800,23 +2813,24 @@ c     packed lookup bin in the OST arrays
 c
 c
       subroutine sethist (ihist,lambda,flmda,height,sigl,sigf)
+      use dlmda
       use ost
       implicit none
       integer ihist
       integer ilmda,iflmda,k
-      integer lambdabin,flambdabin
+      integer lmdabin,flambdabin
       real*8 lambda,flmda
       real*8 height,sigl,sigf
 c
 c
 c     save real gaussian center, parameters and packed lookup bin
 c
-      ilmda = lambdabin(lambda)
+      ilmda = lmdabin(lambda)
       iflmda = flambdabin(flmda)
       call ij_to_k (ilmda,iflmda,nlmda,k)
       osthist(ihist) = k
-      ostlhist(ihist) = lambda
-      ostfhist(ihist) = flmda
+      lmdalhist(ihist) = lambda
+      lmdafhist(ihist) = flmda
       osthhist(ihist) = height
       ostwlhist(ihist) = sigl
       ostwfhist(ihist) = sigf

@@ -42,7 +42,7 @@ c
       if (use_metadyn) then
          call emetabias (lambda,vbias,dvdl)
          esum = esum + vbias
-         ostbvbias = vbias
+         lmdavbias = vbias
          ostbdgdl = dvdl
          return
       end if
@@ -54,12 +54,12 @@ c
       else
          call egkernel (egbias,dgdl,dgdfl)
       end if
-      call efkernel (eostlmda,dfdl)
+      call efreelmda (eostlmda,dfdl)
       esum = esum + egbias - eostlmda
-      ostbvbias = egbias - eostlmda
+      lmdavbias = egbias - eostlmda
       ostbdgdl = dgdl
       ostbdgdfl = dgdfl
-      ostbdfdl = dfdl
+      lmdadfdl = dfdl
 c
 c     add the second order lambda force and virial from the bias
 c
@@ -96,90 +96,90 @@ c
       integer k
       integer isamp,istep
       integer ilmda,iflmda
-      integer lambdabin,flambdabin
-      real*8 etotfkernel
+      integer lmdabin,flambdabin
+      real*8 efreetot
       real*8 ostvminimax
       real*8 temperedheight
       logical depcriteria
 c
 c
-c     increment iost step counter
+c     increment lmdastep step counter
 c
-      iost = iost + 1
+      lmdastep = lmdastep + 1
 c
 c     build the effective lambda derivative from the unbiased value
 c     summed by lmdachain and the bias terms evaluated this step by
 c     eostbias
 c
       ostdgdl = ostbdgdl + ostbdgdfl*d2edl2
-      ostddgdl = ostbdfdl
-      deffdl = dedl + ostdgdl - ostddgdl
+      lmdaddgdl = lmdadfdl
+      deffdl = dedl + ostdgdl - lmdaddgdl
 c
 c     save all values in the hist interval, but average only after
 c     the requested equilibration fraction
 c
-      istep = mod(iost,iosthist)
+      istep = mod(lmdastep,lmdaintv)
       if (istep .eq. 0) then
-         isamp = iosthist
+         isamp = lmdaintv
       else
          isamp = istep
       end if
-      ostllist(isamp) = lambda
-      ostflist(isamp) = dedl
+      lmdallist(isamp) = lambda
+      lmdaflist(isamp) = dedl
 c
-c     add a new histogram count every iosthist steps
+c     add a new histogram count every lmdaintv steps
 c
       if (istep .eq. 0) then
-         call histstat (ostllist,ostlambdaavg,ostlambdastd,
+         call histstat (lmdallist,lmdaavg,lmdastd,
      &                  ostlambdaslp,ostlmdaavgbin,ostlmdastdbin,
      &                  ostlmdaslpbin)
-         call histstat (ostflist,ostdedlavg,ostdedlstd,
+         call histstat (lmdaflist,dedlavg,dedlstd,
      &                  ostdedlslp,ostdedlavgbin,ostdedlstdbin,
      &                  ostdedlslpbin)
 c
 c     deposit only when the interval samples are converged enough
 c
-         if (depcriteria(ostdedlavg,ostdedlstd)) then
-            ilmda = lambdabin(ostlambdaavg)
+         if (depcriteria(dedlavg,dedlstd)) then
+            ilmda = lmdabin(lmdaavg)
 c
 c     ensure histogram contains the unbiased dU/dlambda value
 c
             maxwlhist = max(maxwlhist,wlhist)
             maxwfhist = max(maxwfhist,wfhist)
-            call ensureflambda (ostdedlavg)
-            iflmda = flambdabin(ostdedlavg)
+            call ensureflambda (dedlavg)
+            iflmda = flambdabin(dedlavg)
 c
 c     ensure histogram array is sufficiently large
 c
-            nosthist = nosthist + 1
-            if (nosthist .gt. sizeosthist)  call resizeosthist
+            nlmdahist = nlmdahist + 1
+            if (nlmdahist .gt. sizelmdahist)  call resizeosthist
             call ij_to_k(ilmda,iflmda,nlmda,k)
 c
 c     save histogram information
 c
-            osthist(nosthist) = k
-            ostihist(nosthist) = iost
-            ostlhist(nosthist) = ostlambdaavg
-            ostfhist(nosthist) = ostdedlavg
-            osthhist(nosthist) = temperedheight(ostvminimax(),
+            osthist(nlmdahist) = k
+            lmdaihist(nlmdahist) = lmdastep
+            lmdalhist(nlmdahist) = lmdaavg
+            lmdafhist(nlmdahist) = dedlavg
+            osthhist(nlmdahist) = temperedheight(ostvminimax(),
      &                                          vkernelmax(ilmda))
-            ostwlhist(nosthist) = wlhist
-            ostwfhist(nosthist) = wfhist
-            ostnext(nosthist) = osthead(ilmda,iflmda)
-            osthead(ilmda,iflmda) = nosthist
+            ostwlhist(nlmdahist) = wlhist
+            ostwfhist(nlmdahist) = wfhist
+            ostnext(nlmdahist) = osthead(ilmda,iflmda)
+            osthead(ilmda,iflmda) = nlmdahist
             if (fastkernel) then
                call updatekernels
             else
                call updategkernel
                call buildfkernel
             end if
-            eosttot = etotfkernel()
+            lmdadeltag = efreetot()
          end if
       end if
 c
 c     propagate the lambda particle
 c
-      if (isamp .le. ostnpa)  call ostlangevin
+      if (isamp .le. lmdanpa)  call lmdalangevin
       return
       end
 c
@@ -208,7 +208,7 @@ c
 c
 c     increment adaptive-bias step counter
 c
-      iost = iost + 1
+      lmdastep = lmdastep + 1
 c
 c     effective lambda derivative from the unbiased value summed by
 c     lmdachain and the bias evaluated this step by eostbias
@@ -217,34 +217,34 @@ c
 c
 c     save all lambda values in the hist interval
 c
-      istep = mod(iost,iosthist)
+      istep = mod(lmdastep,lmdaintv)
       if (istep .eq. 0) then
-         isamp = iosthist
+         isamp = lmdaintv
       else
          isamp = istep
       end if
-      ostllist(isamp) = lambda
+      lmdallist(isamp) = lambda
 c
-c     add a new metadynamics gaussian every iosthist steps
+c     add a new metadynamics gaussian every lmdaintv steps
 c
       if (istep .eq. 0) then
-         call histstat (ostllist,ostlambdaavg,ostlambdastd,
+         call histstat (lmdallist,lmdaavg,lmdastd,
      &                  ostlambdaslp,ostlmdaavgbin,ostlmdastdbin,
      &                  ostlmdaslpbin)
          nmetahist = nmetahist + 1
          if (nmetahist .gt. sizemetahist)  call resizemeta
-         metalhist(nmetahist) = ostlambdaavg
+         metalhist(nmetahist) = lmdaavg
          metahhist(nmetahist) = temperedheight(metavminimax(),
      &                                         metavminimax())
          metawhist(nmetahist) = wlmda
-         metaihist(nmetahist) = iost
+         metaihist(nmetahist) = lmdastep
          call addmetagrid (nmetahist)
-         eosttot = metadeltag()
+         lmdadeltag = metadeltag()
       end if
 c
 c     propagate the lambda particle for the next dynamics step
 c
-      call ostlangevin
+      call lmdalangevin
       return
       end
 c
@@ -263,6 +263,7 @@ c     the ostcvbin convergence sub-bins
 c
 c
       subroutine histstat (list,avg,std,slp,avgbin,stdbin,slpbin)
+      use dlmda
       use ost
       implicit none
       integer i,b
@@ -285,12 +286,12 @@ c     the propagation and equilibration phases are skipped, leaving
 c     the averaging phase to be split into equal convergence sub-bins,
 c     with any leading remainder samples outside the sub-bins
 c
-      nskip = ostnpa + ostnpb
+      nskip = lmdanpa + lmdanpb
       nper = 0
-      if (ostcvbin .gt. 0)  nper = ostnpc / ostcvbin
+      if (ostcvbin .gt. 0)  nper = lmdanpc / ostcvbin
       nbin = 0
       if (nper .gt. 0)  nbin = ostcvbin
-      ibegin = nskip + ostnpc - nper*nbin + 1
+      ibegin = nskip + lmdanpc - nper*nbin + 1
       do b = 1, ostcvbin
          avgbin(b) = 0.0d0
          stdbin(b) = 0.0d0
@@ -328,8 +329,8 @@ c
 c
 c     average and deviation come from the whole averaging slice
 c
-      call avgstd (list,nskip+1,ostnpc,avg,std)
-      slp = fitslope (tdot,total,ostnpc)
+      call avgstd (list,nskip+1,lmdanpc,avg,std)
+      slp = fitslope (tdot,total,lmdanpc)
       return
       end
 c
@@ -410,6 +411,7 @@ c     across the lambda range has to have been filled to
 c
 c
       function ostvminimax ()
+      use dlmda
       use ost
       implicit none
       integer i
@@ -441,6 +443,7 @@ c     metadynamics bias, the level any path across lambda is filled to
 c
 c
       function metavminimax ()
+      use dlmda
       use ost
       implicit none
       integer i
@@ -583,6 +586,7 @@ c     accumulated at the lambda bin centers
 c
 c
       subroutine emetabiasinterpolate (lambda,vbias,dvdl)
+      use dlmda
       use ost
       implicit none
       integer i,ia
@@ -654,6 +658,7 @@ c     at the lambda bin centers
 c
 c
       subroutine addmetagrid (ihist)
+      use dlmda
       use math
       use ost
       implicit none
@@ -783,117 +788,6 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ostlangevin -- propagate ost lambda particle  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "ostlangevin" propagates the auxiliary lambda particle in
-c     theta space, where lambda = sin(theta)**2
-c
-c
-      subroutine ostlangevin
-      use bath
-      use math
-      use mutant
-      use ost
-      use units
-      implicit none
-      real*8 c
-      real*8 force
-      real*8 gamma
-      real*8 normal
-      real*8 sigma
-      real*8 sinth
-      real*8 ktm
-      external normal
-c
-c
-c     return if lambda dynamics parameters are invalid
-c
-      if (ostdt .le. 0.0d0)  return
-      if (ostmass .le. 0.0d0)  return
-c
-c     force on theta from dU/dlambda and lambda = sin(theta)**2
-c
-      force = -deffdl * sin(2.0d0*osttheta)
-c
-c     propagate theta velocity with Langevin friction and noise
-c
-      gamma = max(0.0d0,ostfriction)
-      if (gamma .gt. 0.0d0) then
-         c = exp(-gamma*ostdt)
-         ktm = boltzmann * kelvin / ostmass
-         sigma = sqrt(ktm*(1.0d0-c*c))
-         ostvtheta = c*ostvtheta
-     &                 + (1.0d0-c)*force/(gamma*ostmass)
-     &                 + sigma*normal()
-      else
-         ostvtheta = ostvtheta + ostdt*force/ostmass
-      end if
-c
-c     update theta and wrap it into the principal periodic interval
-c
-      osttheta = osttheta + ostdt*ostvtheta
-      do while (osttheta .gt. pi)
-         osttheta = osttheta - 2.0d0*pi
-      end do
-      do while (osttheta .le. -pi)
-         osttheta = osttheta + 2.0d0*pi
-      end do
-c
-c     map theta back to the main lambda
-c
-      sinth = sin(osttheta)
-      lambda = sinth * sinth
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine setostphase -- split the deposit interval  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "setostphase" divides the gaussian deposit interval into the
-c     phase that propagates the lambda particle, the phase that
-c     equilibrates at the frozen lambda and the phase that averages
-c     dU/dlambda at that same fixed lambda; the phase counts are the
-c     authoritative split, while ostpcratio is only the nominal
-c     fraction left over before truncation to whole samples
-c
-c
-      subroutine setostphase
-      use ost
-      implicit none
-c
-c
-c     divide the interval, keeping at least one propagation step and
-c     at least two samples to average
-c
-      if (iosthist .lt. 1)  iosthist = 1
-      ostpcratio = 1.0d0 - (ostparatio+ostpbratio)
-      ostnpa = int(ostparatio*dble(iosthist))
-      ostnpb = int(ostpbratio*dble(iosthist))
-      ostnpa = max(1,min(ostnpa,iosthist-1))
-      ostnpb = max(0,min(ostnpb,iosthist-ostnpa))
-      ostnpc = iosthist - ostnpa - ostnpb
-      do while (ostnpc.lt.2 .and. ostnpb.gt.0)
-         ostnpb = ostnpb - 1
-         ostnpc = ostnpc + 1
-      end do
-      do while (ostnpc.lt.2 .and. ostnpa.gt.1)
-         ostnpa = ostnpa - 1
-         ostnpc = ostnpc + 1
-      end do
-      return
-      end
-c
-c
 c     ############################################################
 c     ##                                                        ##
 c     ##  subroutine ensureflambda -- resize flambda histogram  ##
@@ -906,6 +800,7 @@ c     dE/dlambda value falls outside the saved histogram range
 c
 c
       subroutine ensureflambda (dudl)
+      use dlmda
       use ost
       implicit none
       integer i
@@ -1038,7 +933,7 @@ c
       integer flcenter
       integer nlcut,nfcut
       integer img,nimg
-      integer lambdabin,flambdabin
+      integer lmdabin,flambdabin
       real*8 egbias,dgdl,dgdfl
       real*8 sigl,sigf
       real*8 sigl2,sigf2
@@ -1058,7 +953,7 @@ c
 c
 c     get the current lambda and flambda bin indices
 c
-      ilmda = lambdabin(lambda)
+      ilmda = lmdabin(lambda)
       iflmda = nint(dedl / wflmda) + fli0
       if (iflmda .lt. 1 .or. iflmda .gt. nflmda)  return
 c
@@ -1094,7 +989,7 @@ c
                   do while (ihist .ne. 0)
                      sigl = ostwlhist(ihist)
                      sigf = ostwfhist(ihist)
-                     sourcefl = ostfhist(ihist)
+                     sourcefl = lmdafhist(ihist)
                      fldelta = dedl - sourcefl
                      if (abs(fldelta) .le. oststdev*sigf) then
                         sigl2 = sigl * sigl
@@ -1110,17 +1005,17 @@ c
      &                      lcenter .eq. nlmda)  nimg = 2
                         do img = 1, nimg
                            if (lcenter .lt. 1) then
-                              sourcel = -ostlhist(ihist)
+                              sourcel = -lmdalhist(ihist)
                            else if (lcenter .gt. nlmda) then
-                              sourcel = 2.0d0 - ostlhist(ihist)
+                              sourcel = 2.0d0 - lmdalhist(ihist)
                            else if (img .eq. 2 .and.
      &                              lcenter .eq. 1) then
-                              sourcel = -ostlhist(ihist)
+                              sourcel = -lmdalhist(ihist)
                            else if (img .eq. 2 .and.
      &                              lcenter .eq. nlmda) then
-                              sourcel = 2.0d0 - ostlhist(ihist)
+                              sourcel = 2.0d0 - lmdalhist(ihist)
                            else
-                              sourcel = ostlhist(ihist)
+                              sourcel = lmdalhist(ihist)
                            end if
                            ldelta = lambda - sourcel
                            if (abs(ldelta) .le. oststdev*sigl) then
@@ -1259,32 +1154,6 @@ c
       end
 c
 c
-c     ######################################################
-c     ##                                                  ##
-c     ##  function lambdabin -- get bin index for lambda  ##
-c     ##                                                  ##
-c     ######################################################
-c
-c
-c     "lambdabin" computes the bin index for lambda
-c
-c
-      function lambdabin (lambda)
-      use ost
-      implicit none
-      integer lambdabin
-      real*8 lambda
-c
-c
-c     set lambdabin value
-c
-      lambdabin = nint(lambda / wlmda) + 1
-      if (lambdabin .lt. 1)  lambdabin = 1
-      if (lambdabin .gt. nlmda)  lambdabin = nlmda
-      return
-      end
-c
-c
 c     ########################################################
 c     ##                                                    ##
 c     ##  function flambdabin -- get bin index for flambda  ##
@@ -1323,16 +1192,17 @@ c     entries while preserving the previously saved data
 c
 c
       subroutine resizeosthist
+      use dlmda
       use ost
       implicit none
       integer i
       integer oldsize
       integer newsize
       integer, allocatable :: osthist0(:)
-      integer, allocatable :: ostihist0(:)
+      integer, allocatable :: lmdaihist0(:)
       integer, allocatable :: ostnext0(:)
-      real*8, allocatable :: ostlhist0(:)
-      real*8, allocatable :: ostfhist0(:)
+      real*8, allocatable :: lmdalhist0(:)
+      real*8, allocatable :: lmdafhist0(:)
       real*8, allocatable :: osthhist0(:)
       real*8, allocatable :: ostwlhist0(:)
       real*8, allocatable :: ostwfhist0(:)
@@ -1340,22 +1210,22 @@ c
 c
 c     save the old histogram data and set the new size
 c
-      oldsize = sizeosthist
+      oldsize = sizelmdahist
       newsize = 2 * oldsize
       allocate (osthist0(oldsize))
-      allocate (ostihist0(oldsize))
+      allocate (lmdaihist0(oldsize))
       allocate (ostnext0(oldsize))
-      allocate (ostlhist0(oldsize))
-      allocate (ostfhist0(oldsize))
+      allocate (lmdalhist0(oldsize))
+      allocate (lmdafhist0(oldsize))
       allocate (osthhist0(oldsize))
       allocate (ostwlhist0(oldsize))
       allocate (ostwfhist0(oldsize))
       do i = 1, oldsize
          osthist0(i) = osthist(i)
-         ostihist0(i) = ostihist(i)
+         lmdaihist0(i) = lmdaihist(i)
          ostnext0(i) = ostnext(i)
-         ostlhist0(i) = ostlhist(i)
-         ostfhist0(i) = ostfhist(i)
+         lmdalhist0(i) = lmdalhist(i)
+         lmdafhist0(i) = lmdafhist(i)
          osthhist0(i) = osthhist(i)
          ostwlhist0(i) = ostwlhist(i)
          ostwfhist0(i) = ostwfhist(i)
@@ -1364,50 +1234,50 @@ c
 c     allocate and initialize the resized histogram arrays
 c
       deallocate (osthist)
-      deallocate (ostihist)
+      deallocate (lmdaihist)
       deallocate (ostnext)
-      deallocate (ostlhist)
-      deallocate (ostfhist)
+      deallocate (lmdalhist)
+      deallocate (lmdafhist)
       deallocate (osthhist)
       deallocate (ostwlhist)
       deallocate (ostwfhist)
-      sizeosthist = newsize
-      allocate (osthist(sizeosthist))
-      allocate (ostihist(sizeosthist))
-      allocate (ostnext(sizeosthist))
-      allocate (ostlhist(sizeosthist))
-      allocate (ostfhist(sizeosthist))
-      allocate (osthhist(sizeosthist))
-      allocate (ostwlhist(sizeosthist))
-      allocate (ostwfhist(sizeosthist))
+      sizelmdahist = newsize
+      allocate (osthist(sizelmdahist))
+      allocate (lmdaihist(sizelmdahist))
+      allocate (ostnext(sizelmdahist))
+      allocate (lmdalhist(sizelmdahist))
+      allocate (lmdafhist(sizelmdahist))
+      allocate (osthhist(sizelmdahist))
+      allocate (ostwlhist(sizelmdahist))
+      allocate (ostwfhist(sizelmdahist))
 c
 c     restore old histogram data into the resized arrays
 c
       do i = 1, oldsize
          osthist(i) = osthist0(i)
-         ostihist(i) = ostihist0(i)
+         lmdaihist(i) = lmdaihist0(i)
          ostnext(i) = ostnext0(i)
-         ostlhist(i) = ostlhist0(i)
-         ostfhist(i) = ostfhist0(i)
+         lmdalhist(i) = lmdalhist0(i)
+         lmdafhist(i) = lmdafhist0(i)
          osthhist(i) = osthhist0(i)
          ostwlhist(i) = ostwlhist0(i)
          ostwfhist(i) = ostwfhist0(i)
       end do
       do i = oldsize+1, newsize
          osthist(i) = 0
-         ostihist(i) = 0
+         lmdaihist(i) = 0
          ostnext(i) = 0
-         ostlhist(i) = 0.0d0
-         ostfhist(i) = 0.0d0
+         lmdalhist(i) = 0.0d0
+         lmdafhist(i) = 0.0d0
          osthhist(i) = 0.0d0
          ostwlhist(i) = 0.0d0
          ostwfhist(i) = 0.0d0
       end do
       deallocate (osthist0)
-      deallocate (ostihist0)
+      deallocate (lmdaihist0)
       deallocate (ostnext0)
-      deallocate (ostlhist0)
-      deallocate (ostfhist0)
+      deallocate (lmdalhist0)
+      deallocate (lmdafhist0)
       deallocate (osthhist0)
       deallocate (ostwlhist0)
       deallocate (ostwfhist0)
@@ -1427,13 +1297,14 @@ c     linked-list lookup table from the saved real centers
 c
 c
       subroutine buildostindex
+      use dlmda
       use ost
       implicit none
       integer i,j
       integer ihist
       integer k
       integer ilmda,iflmda
-      integer lambdabin,flambdabin
+      integer lmdabin,flambdabin
 c
 c
 c     clear the bin heads and next links
@@ -1443,15 +1314,15 @@ c
             osthead(i,j) = 0
          end do
       end do
-      do i = 1, sizeosthist
+      do i = 1, sizelmdahist
          ostnext(i) = 0
       end do
 c
 c     insert each saved histogram entry into its lambda/flambda bin
 c
-      do ihist = 1, nosthist
-         ilmda = lambdabin(ostlhist(ihist))
-         iflmda = flambdabin(ostfhist(ihist))
+      do ihist = 1, nlmdahist
+         ilmda = lmdabin(lmdalhist(ihist))
+         iflmda = flambdabin(lmdafhist(ihist))
          call ij_to_k (ilmda,iflmda,nlmda,k)
          osthist(ihist) = k
          ostnext(ihist) = osthead(ilmda,iflmda)
@@ -1474,6 +1345,7 @@ c     gaussian contribution to nearby target bins
 c
 c
       subroutine buildgkernel
+      use dlmda
       use ost
       implicit none
       integer i,j
@@ -1491,7 +1363,7 @@ c
 c
 c     loop over saved histogram sources
 c
-      do ihist = 1, nosthist
+      do ihist = 1, nlmdahist
          call addgkernelhist (ihist)
       end do
       return
@@ -1510,6 +1382,7 @@ c     histogram sources and updating the f kernel accumulators
 c
 c
       subroutine buildkernels
+      use dlmda
       use ost
       implicit none
       integer i,j
@@ -1519,9 +1392,9 @@ c
 c     zero out kernels and free energy accumulators
 c
       do i = 1, nlmda
-         fkernel(i) = 0.0d0
-         fsumkernel(i) = 0.0d0
-         pfkernel(i) = 0.0d0
+         lmdafmean(i) = 0.0d0
+         lmdafsum(i) = 0.0d0
+         lmdafwt(i) = 0.0d0
          vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             gfkernel(i,j) = 0.0d0
@@ -1533,7 +1406,7 @@ c
 c
 c     loop over saved histogram sources
 c
-      do ihist = 1, nosthist
+      do ihist = 1, nlmdahist
          call addkernelhist (ihist)
       end do
       return
@@ -1552,13 +1425,13 @@ c     the most recently saved histogram source to nearby target bins
 c
 c
       subroutine updategkernel
-      use ost
+      use dlmda
       implicit none
 c
 c
 c     add the most recently saved histogram source
 c
-      if (nosthist .gt. 0)  call addgkernelhist (nosthist)
+      if (nlmdahist .gt. 0)  call addgkernelhist (nlmdahist)
       return
       end
 c
@@ -1575,13 +1448,13 @@ c     recently saved histogram source and updating f accumulators
 c
 c
       subroutine updatekernels
-      use ost
+      use dlmda
       implicit none
 c
 c
 c     add the most recently saved histogram source
 c
-      if (nosthist .gt. 0)  call addkernelhist (nosthist)
+      if (nlmdahist .gt. 0)  call addkernelhist (nlmdahist)
       return
       end
 c
@@ -1598,6 +1471,7 @@ c     ost g kernel using normalized gaussian biasing functions
 c
 c
       subroutine addgkernelhist (ihist)
+      use dlmda
       use ost
       use math
       implicit none
@@ -1628,7 +1502,7 @@ c
       sigl2 = sigl * sigl
       sigf2 = sigf * sigf
       pref = osthhist(ihist) / (2.0d0*pi*sigl*sigf)
-      sourcefl = ostfhist(ihist)
+      sourcefl = lmdafhist(ihist)
 c
 c     include target bins out to the requested gaussian cutoff
 c
@@ -1646,13 +1520,13 @@ c
       do img = 1, 3
          if (img .eq. 1) then
             llog = lsrc
-            sourcel = ostlhist(ihist)
+            sourcel = lmdalhist(ihist)
          else if (img .eq. 2) then
             llog = 2 - lsrc
-            sourcel = -ostlhist(ihist)
+            sourcel = -lmdalhist(ihist)
          else
             llog = 2*nlmda - lsrc
-            sourcel = 2.0d0 - ostlhist(ihist)
+            sourcel = 2.0d0 - lmdalhist(ihist)
          end if
 c
 c     only target bins within the gaussian cutoff receive a contribution
@@ -1698,6 +1572,7 @@ c     ost g kernel and updates the f kernel accumulators
 c
 c
       subroutine addkernelhist (ihist)
+      use dlmda
       use ost
       use math
       implicit none
@@ -1728,7 +1603,7 @@ c
       sigl2 = sigl * sigl
       sigf2 = sigf * sigf
       pref = osthhist(ihist) / (2.0d0*pi*sigl*sigf)
-      sourcefl = ostfhist(ihist)
+      sourcefl = lmdafhist(ihist)
 c
 c     include target bins out to the requested gaussian cutoff
 c
@@ -1746,13 +1621,13 @@ c
       do img = 1, 3
          if (img .eq. 1) then
             llog = lsrc
-            sourcel = ostlhist(ihist)
+            sourcel = lmdalhist(ihist)
          else if (img .eq. 2) then
             llog = 2 - lsrc
-            sourcel = -ostlhist(ihist)
+            sourcel = -lmdalhist(ihist)
          else
             llog = 2*nlmda - lsrc
-            sourcel = 2.0d0 - ostlhist(ihist)
+            sourcel = 2.0d0 - lmdalhist(ihist)
          end if
 c
 c     only target bins within the gaussian cutoff receive a contribution
@@ -1799,6 +1674,7 @@ c
       subroutine addkernelpoint (ilmda,iflmda,e,ldelta,
      &                           fldelta,sigl2,sigf2)
       use bath
+      use dlmda
       use ost
       use units
       implicit none
@@ -1825,8 +1701,8 @@ c
       vmax = vkernelmax(ilmda)
       if (newg .gt. vmax) then
          scale = exp((vmax-newg)/(gasconst*kelvin))
-         fsumkernel(ilmda) = fsumkernel(ilmda) * scale
-         pfkernel(ilmda) = pfkernel(ilmda) * scale
+         lmdafsum(ilmda) = lmdafsum(ilmda) * scale
+         lmdafwt(ilmda) = lmdafwt(ilmda) * scale
          vmax = newg
       end if
       if (oldg .eq. 0.0d0) then
@@ -1845,12 +1721,12 @@ c
       vkernelmax(ilmda) = max(vkernelmax(ilmda),newg)
       glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda) + d2gdlfl
       glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
-      fsumkernel(ilmda) = fsumkernel(ilmda) + flmda*delweight
-      pfkernel(ilmda) = pfkernel(ilmda) + delweight
-      if (pfkernel(ilmda) .eq. 0.0d0) then
-         fkernel(ilmda) = 0.0d0
+      lmdafsum(ilmda) = lmdafsum(ilmda) + flmda*delweight
+      lmdafwt(ilmda) = lmdafwt(ilmda) + delweight
+      if (lmdafwt(ilmda) .eq. 0.0d0) then
+         lmdafmean(ilmda) = 0.0d0
       else
-         fkernel(ilmda) = fsumkernel(ilmda) / pfkernel(ilmda)
+         lmdafmean(ilmda) = lmdafsum(ilmda) / lmdafwt(ilmda)
       end if
       return
       end
@@ -1869,6 +1745,7 @@ c
 c
       subroutine buildfkernel
       use bath
+      use dlmda
       use ost
       use units
       implicit none
@@ -1906,112 +1783,11 @@ c
 c     set mean force for this lambda bin
 c
          if (partfunc .eq. 0.0d0) then
-            fkernel(ilmda) = 0.0d0
+            lmdafmean(ilmda) = 0.0d0
          else
-            fkernel(ilmda) = avgflambda / partfunc
+            lmdafmean(ilmda) = avgflambda / partfunc
          end if
       end do
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  function etotfkernel -- compute free energy from fkernel  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "etotfkernel" computes the total free energy change by
-c     integrating the f kernel over lambda bins using the trapezoid
-c     rule, with dDeltaG/dlambda = fkernel
-c
-c
-      function etotfkernel ()
-      use ost
-      implicit none
-      integer ilmda
-      real*8 etotfkernel
-c
-c
-c     initialize free energy
-c
-      etotfkernel = 0.0d0
-c
-c     integrate over lambda bins
-c
-      do ilmda = 1, nlmda-1
-         etotfkernel = etotfkernel
-     &                + 0.5d0*(fkernel(ilmda)+fkernel(ilmda+1))*wlmda
-      end do
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine efkernel -- free energy and derivative from f  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "efkernel" computes DeltaG at the current lambda by
-c     integrating the f kernel using linear interpolation, and also
-c     returns dDeltaG/dlambda at the current lambda
-c
-c
-      subroutine efkernel (eostlmda,dfdl)
-      use mutant
-      use ost
-      implicit none
-      integer ilmda0,ilmda1
-      real*8 eostlmda,dfdl
-      real*8 fl0,fl1
-      real*8 lmda0,lmda1
-      real*8 slope
-      real*8 x
-c
-c
-c     initialize free energy and derivative
-c
-      eostlmda = 0.0d0
-      dfdl = 0.0d0
-c
-c     handle endpoint at lambda = 0
-c
-      if (lambda .le. 0.0d0) then
-         dfdl = fkernel(1)
-         return
-      end if
-c
-c     integrate over lambda intervals
-c
-      do ilmda0 = 1, nlmda-1
-         ilmda1 = ilmda0 + 1
-         lmda0 = dble(ilmda0-1) * wlmda
-         lmda1 = dble(ilmda1-1) * wlmda
-         fl0 = fkernel(ilmda0)
-         fl1 = fkernel(ilmda1)
-         slope = (fl1-fl0) / wlmda
-c
-c     integrate only to lambda if it lies in this interval
-c
-         if (lambda .le. lmda1) then
-            x = lambda - lmda0
-            eostlmda = eostlmda + fl0*x + 0.5d0*slope*x*x
-            dfdl = fl0 + slope*x
-            return
-         end if
-c
-c     otherwise integrate the full interval
-c
-         eostlmda = eostlmda
-     &              + 0.5d0*(fl0+fl1)*wlmda
-      end do
-c
-c     handle endpoint at lambda = 1
-c
-      dfdl = fkernel(nlmda)
       return
       end
 c
@@ -2032,7 +1808,6 @@ c
       use dlmda
       use files
       use iounit
-      use ost
       implicit none
       integer ihis
       integer freeunit
@@ -2046,17 +1821,17 @@ c
 c     open a new file, keeping any output from a previous run
 c
       ihis = freeunit ()
-      ostsavefile = filename(1:leng)//'.ost'
-      call version (ostsavefile,'new')
-      open (unit=ihis,file=ostsavefile,status='new',
+      lmdasavefile = filename(1:leng)//'.ost'
+      call version (lmdasavefile,'new')
+      open (unit=ihis,file=lmdasavefile,status='new',
      &      access='stream',form='formatted')
       call prtost (ihis)
       close (unit=ihis)
-      nosthistsave = nosthist
+      nlmdasave = nlmdahist
 c
 c     report the name of the file holding the bias history
 c
-      write (iout,10)  ostsavefile(1:trimtext(ostsavefile))
+      write (iout,10)  lmdasavefile(1:trimtext(lmdasavefile))
    10 format (/,' OST  --  Bias History Written To  ',a)
       return
       end
@@ -2092,17 +1867,17 @@ c     updating the header, so an interrupted write leaves the
 c     previous history count as the last complete checkpoint
 c
       ihis = freeunit ()
-      if (nosthist .gt. nosthistsave) then
-         open (unit=ihis,file=ostsavefile,status='old',
+      if (nlmdahist .gt. nlmdasave) then
+         open (unit=ihis,file=lmdasavefile,status='old',
      &         access='stream',form='formatted',position='append')
-         call prtosthist (ihis,nosthistsave+1,nosthist)
+         call prtosthist (ihis,nlmdasave+1,nlmdahist)
          close (unit=ihis)
       end if
-      open (unit=ihis,file=ostsavefile,status='old',
+      open (unit=ihis,file=lmdasavefile,status='old',
      &      access='stream',form='unformatted',position='rewind')
       call updosthead (ihis)
       close (unit=ihis)
-      nosthistsave = nosthist
+      nlmdasave = nlmdahist
       return
       end
 c
@@ -2120,148 +1895,119 @@ c     kernels; used for analysis, not to restart a simulation
 c
 c
       subroutine rdost
-      use bath
       use dlmda
-      use files
-      use inform
       use iounit
-      use mutant
       use ost
       implicit none
-      integer i,ihis
-      integer ihist
+      integer ihis
       integer freeunit
       integer trimtext
-      integer iost0,iosthist0
-      integer nlmda0,nflmda0,fli00
-      integer nosthist0,sizeosthist0
-      integer osthist0
-      real*8 wlmda0,wflmda0
-      real*8 lambda0
-      real*8 osttheta0,ostvtheta0
-      real*8 ostmass0,ostfriction0,ostdt0
-      real*8 eosttot0,oststdev0
-      real*8 kelvin0
-      real*8 etotfkernel
       logical exist
       character*240 ostfile
-      character*240 record
+      character*240 title
 c
 c
 c     return unless an ost history file is present
 c
-      ostfile = ostsavefile
+      ostfile = lmdasavefile
       inquire (file=ostfile,exist=exist)
       if (.not. exist)  return
       ihis = freeunit ()
       open (unit=ihis,file=ostfile,status='old')
       rewind (unit=ihis)
 c
-c     read scalar ost state
+c     read the header, which must be that of an ost history
 c
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  iost0,iosthist0,
-     &   nlmda0,nflmda0,fli00,nosthist0,sizeosthist0
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  wlmda0,wflmda0,oststdev0,
-     &   kelvin0
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  lambda0,osttheta0,ostvtheta0,
-     &   ostmass0,ostfriction0,ostdt0,eosttot0
-   10 format (a240)
+      call rdbiashead (ihis,ostfile,title)
+      if (index(title,osttitle(1:trimtext(osttitle))) .eq. 0) then
+         close (unit=ihis)
+         write (iout,10)  ostfile(1:trimtext(ostfile))
+   10    format (/,' RDOST  --  File is not an OST History File',
+     &           /,'           File Name :  ',a)
+         call fatal
+      end if
 c
-c     validate the stored dimensions
+c     read the gaussian history entries and rebuild the kernels
 c
-      if (nlmda0 .lt. 2)  goto 90
-      if (nflmda0 .lt. 1)  goto 90
-      if (fli00 .lt. 1 .or. fli00 .gt. nflmda0)  goto 90
-      if (iosthist0 .lt. 1)  goto 90
-      if (kelvin0 .le. 0.0d0)  goto 90
-      if (nosthist0 .lt. 0)  goto 90
-      if (sizeosthist0 .lt. nosthist0)  sizeosthist0 = nosthist0
-      if (sizeosthist0 .lt. 1)  sizeosthist0 = 1
+      call rdosthist (ihis,ostfile)
+      return
+      end
+c
+c
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine rdosthist -- input ost history entries  ##
+c     ##                                                     ##
+c     #########################################################
+c
+c
+c     "rdosthist" reads the gaussian history entries that follow the
+c     header of an open .ost file, then closes the file and rebuilds
+c     the histogram lookup and bias kernels
+c
+c
+      subroutine rdosthist (ihis,ostfile)
+      use dlmda
+      use inform
+      use iounit
+      use ost
+      implicit none
+      integer i,ihis
+      integer ihist
+      integer osthist0
+      integer trimtext
+      real*8 efreetot
+      character*240 record
+      character*(*) ostfile
+c
 c
 c     reallocate ost arrays to match the history file
 c
       if (allocated(osthhist))  deallocate (osthhist)
       if (allocated(osthist))  deallocate (osthist)
-      if (allocated(ostihist))  deallocate (ostihist)
+      if (allocated(lmdaihist))  deallocate (lmdaihist)
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(ostnext))  deallocate (ostnext)
-      if (allocated(ostllist))  deallocate (ostllist)
-      if (allocated(ostflist))  deallocate (ostflist)
-      if (allocated(ostlhist))  deallocate (ostlhist)
-      if (allocated(ostfhist))  deallocate (ostfhist)
+      if (allocated(lmdallist))  deallocate (lmdallist)
+      if (allocated(lmdaflist))  deallocate (lmdaflist)
+      if (allocated(lmdalhist))  deallocate (lmdalhist)
+      if (allocated(lmdafhist))  deallocate (lmdafhist)
       if (allocated(ostwlhist))  deallocate (ostwlhist)
       if (allocated(ostwfhist))  deallocate (ostwfhist)
-      if (allocated(fkernel))  deallocate (fkernel)
-      if (allocated(fsumkernel))  deallocate (fsumkernel)
+      if (allocated(lmdafmean))  deallocate (lmdafmean)
+      if (allocated(lmdafsum))  deallocate (lmdafsum)
       if (allocated(gfkernel))  deallocate (gfkernel)
       if (allocated(gkernel))  deallocate (gkernel)
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
-      if (allocated(pfkernel))  deallocate (pfkernel)
+      if (allocated(lmdafwt))  deallocate (lmdafwt)
       if (allocated(vkernelmax))  deallocate (vkernelmax)
-      allocate (osthhist(sizeosthist0))
-      allocate (osthist(sizeosthist0))
-      allocate (ostihist(sizeosthist0))
-      allocate (osthead(nlmda0,nflmda0))
-      allocate (ostnext(sizeosthist0))
-      allocate (ostllist(iosthist0))
-      allocate (ostflist(iosthist0))
-      allocate (ostlhist(sizeosthist0))
-      allocate (ostfhist(sizeosthist0))
-      allocate (ostwlhist(sizeosthist0))
-      allocate (ostwfhist(sizeosthist0))
-      allocate (fkernel(nlmda0))
-      allocate (fsumkernel(nlmda0))
-      allocate (gfkernel(nlmda0,nflmda0))
-      allocate (gkernel(nlmda0,nflmda0))
-      allocate (glfkernel(nlmda0,nflmda0))
-      allocate (glkernel(nlmda0,nflmda0))
-      allocate (pfkernel(nlmda0))
-      allocate (vkernelmax(nlmda0))
-c
-c     set scalar ost state from the history file
-c
-      iost = iost0
-      iosthist = iosthist0
-      call setostphase
-      nlmda = nlmda0
-      nflmda = nflmda0
-      fli0 = fli00
-      nosthist = nosthist0
-      sizeosthist = sizeosthist0
-      wlmda = wlmda0
-      wflmda = wflmda0
-      wlmda2 = 0.5d0 * wlmda
-      wflmda2 = 0.5d0 * wflmda
-      maxwlhist = wlhist
-      maxwfhist = wfhist
-      lambda = lambda0
-      ostlambdaavg = 0.0d0
-      ostlambdastd = 0.0d0
-      ostdedlavg = 0.0d0
-      ostdedlstd = 0.0d0
-      osttheta = osttheta0
-      ostvtheta = ostvtheta0
-      ostmass = ostmass0
-      ostfriction = ostfriction0
-      ostdt = ostdt0
-      eosttot = eosttot0
-      oststdev = oststdev0
-      kelvin = kelvin0
+      allocate (osthhist(sizelmdahist))
+      allocate (osthist(sizelmdahist))
+      allocate (lmdaihist(sizelmdahist))
+      allocate (osthead(nlmda,nflmda))
+      allocate (ostnext(sizelmdahist))
+      allocate (lmdallist(lmdaintv))
+      allocate (lmdaflist(lmdaintv))
+      allocate (lmdalhist(sizelmdahist))
+      allocate (lmdafhist(sizelmdahist))
+      allocate (ostwlhist(sizelmdahist))
+      allocate (ostwfhist(sizelmdahist))
+      allocate (lmdafmean(nlmda))
+      allocate (lmdafsum(nlmda))
+      allocate (gfkernel(nlmda,nflmda))
+      allocate (gkernel(nlmda,nflmda))
+      allocate (glfkernel(nlmda,nflmda))
+      allocate (glkernel(nlmda,nflmda))
+      allocate (lmdafwt(nlmda))
+      allocate (vkernelmax(nlmda))
 c
 c     initialize ost arrays
 c
       do i = 1, nlmda
-         fkernel(i) = 0.0d0
-         fsumkernel(i) = 0.0d0
-         pfkernel(i) = 0.0d0
+         lmdafmean(i) = 0.0d0
+         lmdafsum(i) = 0.0d0
+         lmdafwt(i) = 0.0d0
          vkernelmax(i) = 0.0d0
          do ihist = 1, nflmda
             gfkernel(i,ihist) = 0.0d0
@@ -2271,32 +2017,38 @@ c
             osthead(i,ihist) = 0
          end do
       end do
-      do i = 1, iosthist
-         ostllist(i) = 0.0d0
-         ostflist(i) = 0.0d0
+      do i = 1, lmdaintv
+         lmdallist(i) = 0.0d0
+         lmdaflist(i) = 0.0d0
       end do
-      do i = 1, sizeosthist
+      do i = 1, sizelmdahist
          osthist(i) = 0
-         ostihist(i) = 0
+         lmdaihist(i) = 0
          ostnext(i) = 0
-         ostlhist(i) = 0.0d0
-         ostfhist(i) = 0.0d0
+         lmdalhist(i) = 0.0d0
+         lmdafhist(i) = 0.0d0
          osthhist(i) = 0.0d0
          ostwlhist(i) = 0.0d0
          ostwfhist(i) = 0.0d0
       end do
+c
+c     start the gaussian width maxima from the keyfile widths
+c
+      maxwlhist = wlhist
+      maxwfhist = wfhist
+c
 c     read saved gaussian histogram entries
 c
-      read (ihis,10,err=90,end=90)  record
-      do ihist = 1, nosthist
+      do ihist = 1, nlmdahist
          read (ihis,10,err=90,end=90)  record
-         read (record,*,err=90,end=90)  ostihist(ihist),osthist0,
-     &      ostlhist(ihist),ostfhist(ihist),osthhist(ihist),
+         read (record,*,err=90,end=90)  lmdaihist(ihist),osthist0,
+     &      lmdalhist(ihist),lmdafhist(ihist),osthhist(ihist),
      &      ostwlhist(ihist),ostwfhist(ihist)
          osthist(ihist) = osthist0
          maxwlhist = max(maxwlhist,ostwlhist(ihist))
          maxwfhist = max(maxwfhist,ostwfhist(ihist))
       end do
+   10 format (a240)
       close (unit=ihis)
 c
 c     rebuild lookup table and kernels from the saved gaussians
@@ -2308,8 +2060,8 @@ c
          call buildgkernel
          call buildfkernel
       end if
-      eosttot = etotfkernel()
-      nosthistsave = nosthist
+      lmdadeltag = efreetot()
+      nlmdasave = nlmdahist
       if (debug) then
          write (iout,20)  ostfile(1:trimtext(ostfile))
    20    format (/,' Reading OST Bias from :  ',a)
@@ -2323,7 +2075,6 @@ c
       write (iout,30)  ostfile(1:trimtext(ostfile))
    30 format (/,' RDOST  --  Error while Reading OST History File',
      &        /,'            File Name :  ',a)
-      use_ost = .false.
       call fatal
       end
 c
@@ -2339,14 +2090,14 @@ c     "prtost" writes current ost history state
 c
 c
       subroutine prtost (ihis)
-      use ost
+      use dlmda
       implicit none
       integer ihis
 c
 c     write the header followed by all current history entries
 c
       call prtosthead (ihis)
-      call prtosthist (ihis,1,nosthist)
+      call prtosthist (ihis,1,nlmdahist)
       return
       end
 c
@@ -2362,33 +2113,14 @@ c     "prtosthead" writes the fixed-size current ost history header
 c
 c
       subroutine prtosthead (ihis)
-      use bath
-      use mutant
       use ost
       implicit none
       integer ihis
 c
 c
-c     write scalar ost state
+c     write the header under the ost title
 c
-      write (ihis,10)
-      write (ihis,20)
-      write (ihis,30)  iost,iosthist,nlmda,nflmda,
-     &                 fli0,nosthist,sizeosthist
-      write (ihis,40)
-      write (ihis,50)  wlmda,wflmda,oststdev,kelvin
-      write (ihis,60)
-      write (ihis,70)  lambda,osttheta,ostvtheta,
-     &                 ostmass,ostfriction,ostdt,eosttot
-      write (ihis,80)
-   10 format (' Orthogonal Space Tempering History :')
-   20 format (' Integer State :')
-   30 format (7i12)
-   40 format (' Grid State :')
-   50 format (4d26.16)
-   60 format (' Lambda State :')
-   70 format (7d26.16)
-   80 format (' Gaussian History :')
+      call prtbiashead (ihis,osttitle,ostlabel)
       return
       end
 c
@@ -2405,57 +2137,14 @@ c     unformatted stream output avoids truncating the appended history
 c
 c
       subroutine updosthead (ihis)
-      use bath
-      use mutant
       use ost
       implicit none
       integer ihis
-      integer ieol
-      integer leol
-      character*240 record
-      character*2 newline
 c
-c     preserve the file's existing line-ending convention
 c
-      read (ihis,pos=1)  record
-      ieol = index(record,achar(10))
-      newline = achar(10)//' '
-      leol = 1
-      if (ieol .gt. 1) then
-         if (record(ieol-1:ieol-1) .eq. achar(13)) then
-            newline = achar(13)//achar(10)
-            leol = 2
-         end if
-      end if
+c     update the header under the ost title
 c
-c     format each header record internally and write its raw bytes
-c
-      write (record,10)
-      write (ihis,pos=1)  record(1:len_trim(record)),newline(1:leol)
-      write (record,20)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,30)  iost,iosthist,nlmda,nflmda,
-     &                   fli0,nosthist,sizeosthist
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,40)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,50)  wlmda,wflmda,oststdev,kelvin
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,60)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,70)  lambda,osttheta,ostvtheta,
-     &                   ostmass,ostfriction,ostdt,eosttot
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,80)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-   10 format (' Orthogonal Space Tempering History :')
-   20 format (' Integer State :')
-   30 format (7i12)
-   40 format (' Grid State :')
-   50 format (4d26.16)
-   60 format (' Lambda State :')
-   70 format (7d26.16)
-   80 format (' Gaussian History :')
+      call updbiashead (ihis,osttitle,ostlabel)
       return
       end
 c
@@ -2471,6 +2160,7 @@ c     "prtosthist" writes a requested range of gaussian histories
 c
 c
       subroutine prtosthist (ihis,ifirst,ilast)
+      use dlmda
       use ost
       implicit none
       integer ihis
@@ -2481,8 +2171,8 @@ c
 c     write saved gaussian histogram entries
 c
       do ihist = ifirst, ilast
-         write (ihis,10)  ostihist(ihist),osthist(ihist),
-     &      ostlhist(ihist),ostfhist(ihist),osthhist(ihist),
+         write (ihis,10)  lmdaihist(ihist),osthist(ihist),
+     &      lmdalhist(ihist),lmdafhist(ihist),osthhist(ihist),
      &      ostwlhist(ihist),ostwfhist(ihist)
       end do
    10 format (2i12,5d26.16)
@@ -2604,13 +2294,13 @@ c
       integer ihist
       integer freeunit
       integer trimtext
-      integer iost0,iosthist0
+      integer lmdastep0,lmdaintv0
       integer nmetahist0,sizemetahist0
       real*8 wlmda0
       real*8 lambda0
-      real*8 osttheta0,ostvtheta0
-      real*8 ostmass0,ostfriction0,ostdt0
-      real*8 eosttot0
+      real*8 lmdatheta0,lmdavtheta0
+      real*8 lmdamass0,lmdafric0,lmdadt0
+      real*8 lmdadeltag0
       real*8 metadeltag
       logical exist
       character*240 metafile
@@ -2631,20 +2321,20 @@ c
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  iost0,iosthist0,
+      read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
      &   nmetahist0,sizemetahist0
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
       read (record,*,err=90,end=90)  wlmda0
       read (ihis,10,err=90,end=90)  record
       read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  lambda0,osttheta0,ostvtheta0,
-     &   ostmass0,ostfriction0,ostdt0,eosttot0
+      read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0,
+     &   lmdamass0,lmdafric0,lmdadt0,lmdadeltag0
    10 format (a240)
 c
 c     validate the stored dimensions
 c
-      if (iosthist0 .lt. 1)  goto 90
+      if (lmdaintv0 .lt. 1)  goto 90
       if (nmetahist0 .lt. 0)  goto 90
       if (sizemetahist0 .lt. nmetahist0)
      &   sizemetahist0 = nmetahist0
@@ -2656,19 +2346,19 @@ c
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
       if (allocated(metaihist))  deallocate (metaihist)
-      if (allocated(ostllist))  deallocate (ostllist)
+      if (allocated(lmdallist))  deallocate (lmdallist)
       allocate (metalhist(sizemetahist0))
       allocate (metahhist(sizemetahist0))
       allocate (metawhist(sizemetahist0))
       allocate (metaihist(sizemetahist0))
-      allocate (ostllist(iosthist0))
+      allocate (lmdallist(lmdaintv0))
 c
 c     set scalar metadynamics state from the history file; only the
 c     bin width is stored, so recover the bin count that goes with it
 c
-      iost = iost0
-      iosthist = iosthist0
-      call setostphase
+      lmdastep = lmdastep0
+      lmdaintv = lmdaintv0
+      call setlmdaphase
       nmetahist = nmetahist0
       sizemetahist = sizemetahist0
       wlmda = wlmda0
@@ -2687,13 +2377,13 @@ c
          dvmetagrid(i) = 0.0d0
       end do
       lambda = lambda0
-      ostlambdaavg = 0.0d0
-      osttheta = osttheta0
-      ostvtheta = ostvtheta0
-      ostmass = ostmass0
-      ostfriction = ostfriction0
-      ostdt = ostdt0
-      eosttot = eosttot0
+      lmdaavg = 0.0d0
+      lmdatheta = lmdatheta0
+      lmdavtheta = lmdavtheta0
+      lmdamass = lmdamass0
+      lmdafric = lmdafric0
+      lmdadt = lmdadt0
+      lmdadeltag = lmdadeltag0
 c
 c     initialize metadynamics arrays
 c
@@ -2703,8 +2393,8 @@ c
          metawhist(i) = 0.0d0
          metaihist(i) = 0
       end do
-      do i = 1, iosthist
-         ostllist(i) = 0.0d0
+      do i = 1, lmdaintv
+         lmdallist(i) = 0.0d0
       end do
 c
 c     read saved metadynamics gaussian entries
@@ -2722,7 +2412,7 @@ c
       do ihist = 1, nmetahist
          call addmetagrid (ihist)
       end do
-      eosttot = metadeltag()
+      lmdadeltag = metadeltag()
       nmethistsave = nmetahist
       if (debug) then
          write (iout,20)  metafile(1:trimtext(metafile))
@@ -2777,6 +2467,7 @@ c     "prtmetahead" writes the fixed-size metadynamics history header
 c
 c
       subroutine prtmetahead (ihis)
+      use dlmda
       use mutant
       use ost
       implicit none
@@ -2787,12 +2478,12 @@ c     write scalar metadynamics state
 c
       write (ihis,10)
       write (ihis,20)
-      write (ihis,30)  iost,iosthist,nmetahist,sizemetahist
+      write (ihis,30)  lmdastep,lmdaintv,nmetahist,sizemetahist
       write (ihis,40)
       write (ihis,50)  wlmda
       write (ihis,60)
-      write (ihis,70)  lambda,osttheta,ostvtheta,
-     &                 ostmass,ostfriction,ostdt,eosttot
+      write (ihis,70)  lambda,lmdatheta,lmdavtheta,
+     &                 lmdamass,lmdafric,lmdadt,lmdadeltag
       write (ihis,80)
    10 format (' Metadynamics History :')
    20 format (' Integer State :')
@@ -2818,6 +2509,7 @@ c     place; unformatted stream output avoids truncating the history
 c
 c
       subroutine updmetahead (ihis)
+      use dlmda
       use mutant
       use ost
       implicit none
@@ -2846,7 +2538,7 @@ c
       write (ihis,pos=1)  record(1:len_trim(record)),newline(1:leol)
       write (record,20)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,30)  iost,iosthist,nmetahist,sizemetahist
+      write (record,30)  lmdastep,lmdaintv,nmetahist,sizemetahist
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,40)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
@@ -2854,8 +2546,8 @@ c
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,60)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,70)  lambda,osttheta,ostvtheta,
-     &                   ostmass,ostfriction,ostdt,eosttot
+      write (record,70)  lambda,lmdatheta,lmdavtheta,
+     &                   lmdamass,lmdafric,lmdadt,lmdadeltag
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,80)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)

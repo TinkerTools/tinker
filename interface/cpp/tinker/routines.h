@@ -330,6 +330,54 @@ void lmdachain_();
 #define tinker_f_lmdachain lmdachain_
 void avgstd_(double* list, int* begin, int* count, double* avg, double* std);
 #define tinker_f_avgstd avgstd_
+void rdbiashead_(int* ihis, char* histfile, char* title, tinker_fchar_len_t histfile_cap, tinker_fchar_len_t title_cap);
+inline void tinker_f_rdbiashead(int* ihis, tinker_fchars histfile, tinker_fchars title) {
+    return rdbiashead_(ihis, histfile.string, title.string, histfile.capacity, title.capacity);
+}
+void prtbiashead_(int* ihis, char* title, char* label, tinker_fchar_len_t title_cap, tinker_fchar_len_t label_cap);
+inline void tinker_f_prtbiashead(int* ihis, tinker_fchars title, tinker_fchars label) {
+    return prtbiashead_(ihis, title.string, label.string, title.capacity, label.capacity);
+}
+void updbiashead_(int* ihis, char* title, char* label, tinker_fchar_len_t title_cap, tinker_fchar_len_t label_cap);
+inline void tinker_f_updbiashead(int* ihis, tinker_fchars title, tinker_fchars label) {
+    return updbiashead_(ihis, title.string, label.string, title.capacity, label.capacity);
+}
+int lmdabin_(double* lambda);
+#define tinker_f_lmdabin lmdabin_
+void setlmdaphase_();
+#define tinker_f_setlmdaphase setlmdaphase_
+void lmdalangevin_();
+#define tinker_f_lmdalangevin lmdalangevin_
+void efreelmda_(double* eflmda, double* dfdl);
+#define tinker_f_efreelmda efreelmda_
+double efreetot_();
+#define tinker_f_efreetot efreetot_
+
+// eabf.f
+void eabfbias_();
+#define tinker_f_eabfbias eabfbias_
+void eabfdyn_();
+#define tinker_f_eabfdyn eabfdyn_
+void addabfhist_(int* ihist);
+#define tinker_f_addabfhist addabfhist_
+void buildabfkernel_();
+#define tinker_f_buildabfkernel buildabfkernel_
+void resizeabfhist_();
+#define tinker_f_resizeabfhist resizeabfhist_
+void initabffile_();
+#define tinker_f_initabffile initabffile_
+void saveabf_();
+#define tinker_f_saveabf saveabf_
+void rdabf_();
+#define tinker_f_rdabf rdabf_
+void rdabfhist_(int* ihis, char* abffile, tinker_fchar_len_t abffile_cap);
+inline void tinker_f_rdabfhist(int* ihis, tinker_fchars abffile) {
+    return rdabfhist_(ihis, abffile.string, abffile.capacity);
+}
+void prtabf_(int* ihis);
+#define tinker_f_prtabf prtabf_
+void prtabfhist_(int* ihis, int* ifirst, int* ilast);
+#define tinker_f_prtabfhist prtabfhist_
 
 // eangang.f
 void eangang_();
@@ -1134,18 +1182,12 @@ double metadeltag_();
 #define tinker_f_metadeltag metadeltag_
 void resizemeta_();
 #define tinker_f_resizemeta resizemeta_
-void ostlangevin_();
-#define tinker_f_ostlangevin ostlangevin_
-void setostphase_();
-#define tinker_f_setostphase setostphase_
 void ensureflambda_(double* dudl);
 #define tinker_f_ensureflambda ensureflambda_
 void egkernel_(double* egbias, double* dgdl, double* dgdfl);
 #define tinker_f_egkernel egkernel_
 void egkernelinterpolate_(double* egbias, double* dgdl, double* dgdfl);
 #define tinker_f_egkernelinterpolate egkernelinterpolate_
-int lambdabin_(double* lambda);
-#define tinker_f_lambdabin lambdabin_
 int flambdabin_(double* dudl);
 #define tinker_f_flambdabin flambdabin_
 void resizeosthist_();
@@ -1168,16 +1210,16 @@ void addkernelpoint_(int* ilmda, int* iflmda, double* e, double* ldelta, double*
 #define tinker_f_addkernelpoint addkernelpoint_
 void buildfkernel_();
 #define tinker_f_buildfkernel buildfkernel_
-double etotfkernel_();
-#define tinker_f_etotfkernel etotfkernel_
-void efkernel_(double* eostlmda, double* dfdl);
-#define tinker_f_efkernel efkernel_
 void initostfile_();
 #define tinker_f_initostfile initostfile_
 void saveost_();
 #define tinker_f_saveost saveost_
 void rdost_();
 #define tinker_f_rdost rdost_
+void rdosthist_(int* ihis, char* ostfile, tinker_fchar_len_t ostfile_cap);
+inline void tinker_f_rdosthist(int* ihis, tinker_fchars ostfile) {
+    return rdosthist_(ihis, ostfile.string, ostfile.capacity);
+}
 void prtost_(int* ihis);
 #define tinker_f_prtost prtost_
 void prtosthead_(int* ihis);
@@ -1514,6 +1556,24 @@ void estrtor2_(int* i);
 // estrtor3.f
 void estrtor3_();
 #define tinker_f_estrtor3 estrtor3_
+
+// ethrmint.f
+void settisched_(int* ntiwin, int* tinbinset);
+#define tinker_f_settisched settisched_
+void inittidyn_(int* nstep);
+#define tinker_f_inittidyn inittidyn_
+void settiblocks_();
+#define tinker_f_settiblocks settiblocks_
+void settiwindow_();
+#define tinker_f_settiwindow settiwindow_
+void prttihead_();
+#define tinker_f_prttihead prttihead_
+void etidyn_(int* istep);
+#define tinker_f_etidyn etidyn_
+void tischedule_();
+#define tinker_f_tischedule tischedule_
+void saveti_();
+#define tinker_f_saveti saveti_
 
 // etors.f
 void etors_();
@@ -2226,6 +2286,8 @@ void setdlmdaterms_();
 #define tinker_f_setdlmdaterms setdlmdaterms_
 void mutate_ost_();
 #define tinker_f_mutate_ost mutate_ost_
+void mutate_abf_();
+#define tinker_f_mutate_abf mutate_abf_
 void mutate_meta_();
 #define tinker_f_mutate_meta mutate_meta_
 void mutate_ti_();
@@ -2956,24 +3018,6 @@ void temper2_(double* dt, double* temp);
 // tettors.f
 void tettors_();
 #define tinker_f_tettors tettors_
-
-// thermint.f
-void settisched_(int* ntiwin, int* tinbinset);
-#define tinker_f_settisched settisched_
-void inittidyn_(int* nstep);
-#define tinker_f_inittidyn inittidyn_
-void settiblocks_();
-#define tinker_f_settiblocks settiblocks_
-void settiwindow_();
-#define tinker_f_settiwindow settiwindow_
-void prttihead_();
-#define tinker_f_prttihead prttihead_
-void etidyn_(int* istep);
-#define tinker_f_etidyn etidyn_
-void tischedule_();
-#define tinker_f_tischedule tischedule_
-void saveti_();
-#define tinker_f_saveti saveti_
 
 // tncg.f
 void tncg_(char* mode, char* method, int* nvar, double* x0, double* minimum, double* grdmin, double (*fgvalue)(double*, double*), void (*hmatrix)(char*, double*, double*, int*, int*, int*, double*, tinker_fchar_len_t), void (*optsave)(int*, double*, double*), tinker_fchar_len_t mode_cap, tinker_fchar_len_t method_cap);

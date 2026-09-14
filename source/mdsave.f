@@ -125,9 +125,9 @@ c
   120       format (' Current dU/dLambda',2x,f19.8,' Kcal/mole')
             write (iout,130)  ostdgdl
   130       format (' Current dg/dLambda',2x,f19.8,' Kcal/mole')
-            write (iout,140)  -ostddgdl
+            write (iout,140)  -lmdaddgdl
   140       format (' Current -ddG/dLambda',f19.8,' Kcal/mole')
-            write (iout,150)  eosttot
+            write (iout,150)  lmdadeltag
   150       format (' Estimated Delta G',3x,f19.8,' Kcal/mole')
          else if (digits .ge. 6) then
             write (iout,160)  lambda
@@ -136,9 +136,9 @@ c
   170       format (' Current dU/dLambda',2x,f17.6,' Kcal/mole')
             write (iout,180)  ostdgdl
   180       format (' Current dg/dLambda',2x,f17.6,' Kcal/mole')
-            write (iout,190)  -ostddgdl
+            write (iout,190)  -lmdaddgdl
   190       format (' Current -ddG/dLambda',f17.6,' Kcal/mole')
-            write (iout,200)  eosttot
+            write (iout,200)  lmdadeltag
   200       format (' Estimated Delta G',3x,f17.6,' Kcal/mole')
          else
             write (iout,210)  lambda
@@ -147,21 +147,38 @@ c
   220       format (' Current dU/dLambda',2x,f15.4,' Kcal/mole')
             write (iout,230)  ostdgdl
   230       format (' Current dg/dLambda',2x,f15.4,' Kcal/mole')
-            write (iout,240)  -ostddgdl
+            write (iout,240)  -lmdaddgdl
   240       format (' Current -ddG/dLambda',f15.4,' Kcal/mole')
-            write (iout,250)  eosttot
+            write (iout,250)  lmdadeltag
   250       format (' Estimated Delta G',3x,f15.4,' Kcal/mole')
          end if
       else if (use_metadyn) then
          if (digits .ge. 8) then
             write (iout,110)  lambda
-            write (iout,150)  eosttot
+            write (iout,150)  lmdadeltag
          else if (digits .ge. 6) then
             write (iout,160)  lambda
-            write (iout,200)  eosttot
+            write (iout,200)  lmdadeltag
          else
             write (iout,210)  lambda
-            write (iout,250)  eosttot
+            write (iout,250)  lmdadeltag
+         end if
+      else if (use_abf) then
+         if (digits .ge. 8) then
+            write (iout,110)  lambda
+            write (iout,120)  dedl
+            write (iout,140)  -lmdaddgdl
+            write (iout,150)  lmdadeltag
+         else if (digits .ge. 6) then
+            write (iout,160)  lambda
+            write (iout,170)  dedl
+            write (iout,190)  -lmdaddgdl
+            write (iout,200)  lmdadeltag
+         else
+            write (iout,210)  lambda
+            write (iout,220)  dedl
+            write (iout,240)  -lmdaddgdl
+            write (iout,250)  lmdadeltag
          end if
 c
 c     print the lambda derivative of a run with no adaptive bias
@@ -342,6 +359,7 @@ c     update the information needed to restart the trajectory
 c
       if (use_ostdyn)  call saveost
       if (use_metadyn)  call savemeta
+      if (use_abf)  call saveabf
       if (use_ti)  call saveti
       if (dynsave)  call prtdyn
 c

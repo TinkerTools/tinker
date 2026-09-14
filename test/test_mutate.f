@@ -22,6 +22,7 @@ c
 c
       call test_mutate_refresh
       call test_mutate_lmda
+      call test_mutate_lmdamode
       call test_mutate_mv
       call test_mutate_mp
       call test_mutate_ast
@@ -62,7 +63,6 @@ c
       use dlmda
       use energi
       use mutant
-      use ost
       use thrmint
       implicit none
       real*8 energy
@@ -347,6 +347,91 @@ c
       call assert_real (vlambda,1.0d0,0.0d0,'lmda pair expl vlambda')
       eref = energy ()
       call assert_real (e,eref,1.0d-10,'lmda pair energy')
+      call final
+      call popdir
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_lmdamode  --  lambda sampling mode  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_lmdamode" checks that the "LAMBDA-MODE" keyword
+c     turns on the sampling method it names along with the lambda
+c     derivative and main lambda, and that an unknown mode leaves
+c     every sampling method off
+c
+c
+      subroutine test_mutate_lmdamode
+      use dlmda
+      use ost
+      implicit none
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_lmdamode','mutate'))  return
+      call pushdir ('file/mutate')
+c
+c     an abf mode turns on abf alone and drives the main lambda
+c
+      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+     &                     'LAMBDA-MODE abf')
+      call assert_logical (lmdasampmode.eq.'ABF',.true.,
+     &                     'lmdamode abf lmdasampmode')
+      call assert_logical (use_abf,.true.,'lmdamode abf use_abf')
+      call assert_logical (use_ost,.false.,'lmdamode abf use_ost')
+      call assert_logical (use_meta,.false.,'lmdamode abf use_meta')
+      call assert_logical (use_ti,.false.,'lmdamode abf use_ti')
+      call assert_logical (use_dlmda,.true.,'lmdamode abf use_dlmda')
+      call assert_logical (use_mainlmda,.true.,
+     &                     'lmdamode abf use_mainlmda')
+c
+c     abf allocates only its samples, interval lists and lambda bins
+c
+      call assert_logical (allocated(lmdaihist),.true.,
+     &                     'lmdamode abf allocates lmdaihist')
+      call assert_logical (allocated(lmdalhist),.true.,
+     &                     'lmdamode abf allocates lmdalhist')
+      call assert_logical (allocated(lmdafhist),.true.,
+     &                     'lmdamode abf allocates lmdafhist')
+      call assert_logical (allocated(lmdallist),.true.,
+     &                     'lmdamode abf allocates lmdallist')
+      call assert_logical (allocated(lmdaflist),.true.,
+     &                     'lmdamode abf allocates lmdaflist')
+      call assert_logical (allocated(lmdafmean),.true.,
+     &                     'lmdamode abf allocates lmdafmean')
+      call assert_logical (allocated(lmdafsum),.true.,
+     &                     'lmdamode abf allocates lmdafsum')
+      call assert_logical (allocated(lmdafwt),.true.,
+     &                     'lmdamode abf allocates lmdafwt')
+      call assert_logical (allocated(osthist),.false.,
+     &                     'lmdamode abf allocates no osthist')
+      call assert_logical (allocated(osthead),.false.,
+     &                     'lmdamode abf allocates no osthead')
+      call assert_logical (allocated(osthhist),.false.,
+     &                     'lmdamode abf allocates no osthhist')
+      call assert_logical (allocated(gkernel),.false.,
+     &                     'lmdamode abf allocates no gkernel')
+      call assert_logical (allocated(vkernelmax),.false.,
+     &                     'lmdamode abf allocates no vkernelmax')
+      call assert_logical (allocated(ostlmdaavgbin),.false.,
+     &                     'lmdamode abf allocates no ostlmdaavgbin')
+      call final
+c
+c     an unknown mode leaves every sampling method off
+c
+      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+     &                     'LAMBDA-MODE bogus')
+      call assert_logical (use_abf,.false.,'lmdamode bogus use_abf')
+      call assert_logical (use_ost,.false.,'lmdamode bogus use_ost')
+      call assert_logical (use_meta,.false.,'lmdamode bogus use_meta')
+      call assert_logical (use_ti,.false.,'lmdamode bogus use_ti')
+      call assert_logical (use_dlmda,.false.,
+     &                     'lmdamode bogus use_dlmda')
       call final
       call popdir
       return

@@ -783,6 +783,7 @@ c
       logical save_chgtrn,save_rxnfld
       logical save_solv,save_list
       logical save_dlmda,save_ostdyn,save_metadyn
+      logical save_abfdyn
 c
 c
 c     save the original state of slow-evolving potentials
@@ -802,6 +803,7 @@ c
       save_dlmda = use_dlmda
       save_ostdyn = use_ostdyn
       save_metadyn = use_metadyn
+      save_abfdyn = use_abfdyn
 c
 c     turn off slow-evolving nonbonded potentials and adaptive biases
 c
@@ -820,6 +822,7 @@ c
       use_dlmda = .false.
       use_ostdyn = .false.
       use_metadyn = .false.
+      use_abfdyn = .false.
 c
 c     get energy and gradient for fast-evolving potential terms
 c
@@ -842,6 +845,7 @@ c
       use_dlmda = save_dlmda
       use_ostdyn = save_ostdyn
       use_metadyn = save_metadyn
+      use_abfdyn = save_abfdyn
       return
       end
 c

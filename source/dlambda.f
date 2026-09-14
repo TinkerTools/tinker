@@ -614,3 +614,473 @@ c
       std = sqrt(std/dble(count))
       return
       end
+c
+c
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine rdbiashead -- input lambda bias header  ##
+c     ##                                                     ##
+c     #########################################################
+c
+c
+c     "rdbiashead" reads the fixed-size header of a lambda bias history
+c     file from an open unit into the scalar histogram and lambda
+c     particle state, setting the flambda grid only for ost; the title
+c     record is returned so the caller can tell which method wrote the
+c     file, and the caller reads the rows
+c
+c
+      subroutine rdbiashead (ihis,histfile,title)
+      use bath
+      use dlmda
+      use iounit
+      use mutant
+      use ost
+      implicit none
+      integer ihis
+      integer trimtext
+      integer lmdastep0,lmdaintv0
+      integer nlmda0,nflmda0,fli00
+      integer nlmdahist0,sizelmdahist0
+      real*8 wlmda0,wflmda0
+      real*8 lambda0
+      real*8 lmdatheta0,lmdavtheta0
+      real*8 lmdamass0,lmdafric0,lmdadt0
+      real*8 lmdadeltag0,oststdev0
+      real*8 kelvin0
+      character*240 record
+      character*(*) histfile
+      character*(*) title
+c
+c
+c     read the title, scalar state and history label records
+c
+      read (ihis,10,err=90,end=90)  record
+      title = record
+      read (ihis,10,err=90,end=90)  record
+      read (ihis,10,err=90,end=90)  record
+      read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
+     &   nlmda0,nflmda0,fli00,nlmdahist0,sizelmdahist0
+      read (ihis,10,err=90,end=90)  record
+      read (ihis,10,err=90,end=90)  record
+      read (record,*,err=90,end=90)  wlmda0,wflmda0,oststdev0,
+     &   kelvin0
+      read (ihis,10,err=90,end=90)  record
+      read (ihis,10,err=90,end=90)  record
+      read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0,
+     &   lmdamass0,lmdafric0,lmdadt0,lmdadeltag0
+      read (ihis,10,err=90,end=90)  record
+   10 format (a240)
+c
+c     validate the stored dimensions
+c
+      if (nlmda0 .lt. 2)  goto 90
+      if (lmdaintv0 .lt. 1)  goto 90
+      if (kelvin0 .le. 0.0d0)  goto 90
+      if (nlmdahist0 .lt. 0)  goto 90
+      if (sizelmdahist0 .lt. nlmdahist0)  sizelmdahist0 = nlmdahist0
+      if (sizelmdahist0 .lt. 1)  sizelmdahist0 = 1
+      if (use_ost) then
+         if (nflmda0 .lt. 1)  goto 90
+         if (fli00 .lt. 1 .or. fli00 .gt. nflmda0)  goto 90
+      end if
+c
+c     set scalar state from the history file
+c
+      lmdastep = lmdastep0
+      lmdaintv = lmdaintv0
+      call setlmdaphase
+      nlmda = nlmda0
+      nlmdahist = nlmdahist0
+      sizelmdahist = sizelmdahist0
+      wlmda = wlmda0
+      wlmda2 = 0.5d0 * wlmda
+      lambda = lambda0
+      lmdaavg = 0.0d0
+      lmdastd = 0.0d0
+      dedlavg = 0.0d0
+      dedlstd = 0.0d0
+      lmdatheta = lmdatheta0
+      lmdavtheta = lmdavtheta0
+      lmdamass = lmdamass0
+      lmdafric = lmdafric0
+      lmdadt = lmdadt0
+      lmdadeltag = lmdadeltag0
+      kelvin = kelvin0
+c
+c     set the flambda grid and gaussian cutoff used only by ost
+c
+      if (use_ost) then
+         nflmda = nflmda0
+         fli0 = fli00
+         wflmda = wflmda0
+         wflmda2 = 0.5d0 * wflmda
+         oststdev = oststdev0
+      end if
+      return
+c
+c     malformed history header
+c
+   90 continue
+      close (unit=ihis)
+      write (iout,20)  histfile(1:trimtext(histfile))
+   20 format (/,' RDBIASHEAD  --  Error while Reading Lambda Bias',
+     &           ' History Header',
+     &        /,'                File Name :  ',a)
+      call fatal
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine prtbiashead  --  output lambda bias header  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "prtbiashead" writes the fixed-size lambda bias history header
+c     under the given title and history label from the current ost
+c     histogram state
+c
+c
+      subroutine prtbiashead (ihis,title,label)
+      use bath
+      use dlmda
+      use mutant
+      use ost
+      implicit none
+      integer ihis
+      integer trimtext
+      character*(*) title
+      character*(*) label
+c
+c
+c     write the title and the scalar histogram state
+c
+      write (ihis,10)  title(1:trimtext(title))
+      write (ihis,20)
+      write (ihis,30)  lmdastep,lmdaintv,nlmda,nflmda,
+     &                 fli0,nlmdahist,sizelmdahist
+      write (ihis,40)
+      write (ihis,50)  wlmda,wflmda,oststdev,kelvin
+      write (ihis,60)
+      write (ihis,70)  lambda,lmdatheta,lmdavtheta,
+     &                 lmdamass,lmdafric,lmdadt,lmdadeltag
+      write (ihis,10)  label(1:trimtext(label))
+   10 format (a)
+   20 format (' Integer State :')
+   30 format (7i12)
+   40 format (' Grid State :')
+   50 format (4d26.16)
+   60 format (' Lambda State :')
+   70 format (7d26.16)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine updbiashead  --  update lambda bias header  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "updbiashead" overwrites the fixed-size lambda bias history
+c     header in place under the given title and history label;
+c     unformatted stream output avoids truncating the appended history
+c
+c
+      subroutine updbiashead (ihis,title,label)
+      use bath
+      use dlmda
+      use mutant
+      use ost
+      implicit none
+      integer ihis
+      integer ieol
+      integer leol
+      character*240 record
+      character*2 newline
+      character*(*) title
+      character*(*) label
+c
+c     preserve the file's existing line-ending convention
+c
+      read (ihis,pos=1)  record
+      ieol = index(record,achar(10))
+      newline = achar(10)//' '
+      leol = 1
+      if (ieol .gt. 1) then
+         if (record(ieol-1:ieol-1) .eq. achar(13)) then
+            newline = achar(13)//achar(10)
+            leol = 2
+         end if
+      end if
+c
+c     format each header record internally and write its raw bytes
+c
+      write (record,10)  title
+      write (ihis,pos=1)  record(1:len_trim(record)),newline(1:leol)
+      write (record,20)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,30)  lmdastep,lmdaintv,nlmda,nflmda,
+     &                   fli0,nlmdahist,sizelmdahist
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,40)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,50)  wlmda,wflmda,oststdev,kelvin
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,60)
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,70)  lambda,lmdatheta,lmdavtheta,
+     &                   lmdamass,lmdafric,lmdadt,lmdadeltag
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      write (record,10)  label
+      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+   10 format (a)
+   20 format (' Integer State :')
+   30 format (7i12)
+   40 format (' Grid State :')
+   50 format (4d26.16)
+   60 format (' Lambda State :')
+   70 format (7d26.16)
+      return
+      end
+c
+c
+c     ####################################################
+c     ##                                                ##
+c     ##  function lmdabin -- get bin index for lambda  ##
+c     ##                                                ##
+c     ####################################################
+c
+c
+c     "lmdabin" computes the lambda bin index for a lambda value
+c
+c
+      function lmdabin (lambda)
+      use dlmda
+      implicit none
+      integer lmdabin
+      real*8 lambda
+c
+c
+c     set lmdabin value
+c
+      lmdabin = nint(lambda / wlmda) + 1
+      if (lmdabin .lt. 1)  lmdabin = 1
+      if (lmdabin .gt. nlmda)  lmdabin = nlmda
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine setlmdaphase -- split the sample interval  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "setlmdaphase" divides the lambda sample interval into the
+c     phase that propagates the lambda particle, the phase that
+c     equilibrates at the frozen lambda and the phase that averages
+c     dU/dlambda at that same fixed lambda; the phase counts are the
+c     authoritative split, while lmdapcratio is only the nominal
+c     fraction left over before truncation to whole samples
+c
+c
+      subroutine setlmdaphase
+      use dlmda
+      implicit none
+c
+c
+c     divide the interval, keeping at least one propagation step and
+c     at least two samples to average
+c
+      if (lmdaintv .lt. 1)  lmdaintv = 1
+      lmdapcratio = 1.0d0 - (lmdaparatio+lmdapbratio)
+      lmdanpa = int(lmdaparatio*dble(lmdaintv))
+      lmdanpb = int(lmdapbratio*dble(lmdaintv))
+      lmdanpa = max(1,min(lmdanpa,lmdaintv-1))
+      lmdanpb = max(0,min(lmdanpb,lmdaintv-lmdanpa))
+      lmdanpc = lmdaintv - lmdanpa - lmdanpb
+      do while (lmdanpc.lt.2 .and. lmdanpb.gt.0)
+         lmdanpb = lmdanpb - 1
+         lmdanpc = lmdanpc + 1
+      end do
+      do while (lmdanpc.lt.2 .and. lmdanpa.gt.1)
+         lmdanpa = lmdanpa - 1
+         lmdanpc = lmdanpc + 1
+      end do
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine lmdalangevin -- propagate lambda particle  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "lmdalangevin" propagates the auxiliary lambda particle in
+c     theta space, where lambda = sin(theta)**2
+c
+c
+      subroutine lmdalangevin
+      use bath
+      use dlmda
+      use math
+      use mutant
+      use units
+      implicit none
+      real*8 c
+      real*8 force
+      real*8 gamma
+      real*8 normal
+      real*8 sigma
+      real*8 sinth
+      real*8 ktm
+      external normal
+c
+c
+c     return if lambda dynamics parameters are invalid
+c
+      if (lmdadt .le. 0.0d0)  return
+      if (lmdamass .le. 0.0d0)  return
+c
+c     force on theta from dU/dlambda and lambda = sin(theta)**2
+c
+      force = -deffdl * sin(2.0d0*lmdatheta)
+c
+c     propagate theta velocity with Langevin friction and noise
+c
+      gamma = max(0.0d0,lmdafric)
+      if (gamma .gt. 0.0d0) then
+         c = exp(-gamma*lmdadt)
+         ktm = boltzmann * kelvin / lmdamass
+         sigma = sqrt(ktm*(1.0d0-c*c))
+         lmdavtheta = c*lmdavtheta
+     &                 + (1.0d0-c)*force/(gamma*lmdamass)
+     &                 + sigma*normal()
+      else
+         lmdavtheta = lmdavtheta + lmdadt*force/lmdamass
+      end if
+c
+c     update theta and wrap it into the principal periodic interval
+c
+      lmdatheta = lmdatheta + lmdadt*lmdavtheta
+      do while (lmdatheta .gt. pi)
+         lmdatheta = lmdatheta - 2.0d0*pi
+      end do
+      do while (lmdatheta .le. -pi)
+         lmdatheta = lmdatheta + 2.0d0*pi
+      end do
+c
+c     map theta back to the main lambda
+c
+      sinth = sin(lmdatheta)
+      lambda = sinth * sinth
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine efreelmda -- free energy at current lambda  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "efreelmda" computes the free energy at the current lambda by
+c     integrating the mean force of the lambda bins with linear
+c     interpolation, and also returns its lambda derivative
+c
+c
+      subroutine efreelmda (eflmda,dfdl)
+      use dlmda
+      use mutant
+      implicit none
+      integer ilmda0,ilmda1
+      real*8 eflmda,dfdl
+      real*8 fl0,fl1
+      real*8 lmda0,lmda1
+      real*8 slope
+      real*8 x
+c
+c
+c     initialize free energy and derivative
+c
+      eflmda = 0.0d0
+      dfdl = 0.0d0
+c
+c     handle endpoint at lambda = 0
+c
+      if (lambda .le. 0.0d0) then
+         dfdl = lmdafmean(1)
+         return
+      end if
+c
+c     integrate over lambda intervals
+c
+      do ilmda0 = 1, nlmda-1
+         ilmda1 = ilmda0 + 1
+         lmda0 = dble(ilmda0-1) * wlmda
+         lmda1 = dble(ilmda1-1) * wlmda
+         fl0 = lmdafmean(ilmda0)
+         fl1 = lmdafmean(ilmda1)
+         slope = (fl1-fl0) / wlmda
+c
+c     integrate only to lambda if it lies in this interval
+c
+         if (lambda .le. lmda1) then
+            x = lambda - lmda0
+            eflmda = eflmda + fl0*x + 0.5d0*slope*x*x
+            dfdl = fl0 + slope*x
+            return
+         end if
+c
+c     otherwise integrate the full interval
+c
+         eflmda = eflmda
+     &            + 0.5d0*(fl0+fl1)*wlmda
+      end do
+c
+c     handle endpoint at lambda = 1
+c
+      dfdl = lmdafmean(nlmda)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  function efreetot -- total free energy from mean force  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "efreetot" computes the total free energy change by integrating
+c     the mean force of the lambda bins over lambda using the
+c     trapezoid rule
+c
+c
+      function efreetot ()
+      use dlmda
+      implicit none
+      integer ilmda
+      real*8 efreetot
+c
+c
+c     initialize free energy
+c
+      efreetot = 0.0d0
+c
+c     integrate over lambda bins
+c
+      do ilmda = 1, nlmda-1
+         efreetot = efreetot + 0.5d0
+     &                *(lmdafmean(ilmda)+lmdafmean(ilmda+1))*wlmda
+      end do
+      return
+      end

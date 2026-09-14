@@ -12,23 +12,28 @@ c     ##                                                       ##
 c     ###########################################################
 c
 c
-c     "analyzeost" reads an orthogonal space tempering restart file
-c     and prints saved history, final free energy, or the g kernel
+c     "analyzeost" reads an orthogonal space tempering or adaptive
+c     biasing force history file and prints the saved history, the
+c     final free energy, or the ost g kernel
 c
 c
       program analyzeost
       use bath
+      use dlmda
       use files
       use iounit
       use keys
       use ost
       implicit none
       integer next
+      integer ihis
+      integer freeunit
       integer trimtext
       logical exist
       character*12 mode
       character*240 ostfile
       character*240 string
+      character*240 title
 c
 c
 c     get the name of the OST history file
@@ -46,7 +51,7 @@ c     set the base filename and read the keyfile, then read
 c     exactly the file that was named on the command line
 c
       call basefile (ostfile)
-      ostsavefile = ostfile
+      lmdasavefile = ostfile
 c
 c     set default temperature
 c
@@ -67,23 +72,60 @@ c
       call upcase (mode)
       if (mode .eq. '    ')  mode = 'FREEENERGY'
 c
-c     read the OST file and rebuild its kernels
+c     read the history header once, keeping the ost header fields
+c     until the title shows an abf history, then read the rows of the
+c     method that wrote the file and rebuild its kernels
 c
-      call rdost
-      if (.not. allocated(osthist)) then
-         write (iout,40)  filename(1:leng)//'.ost'
-   40    format (/,' ANALYZEOST  --  Unable to Read OST File :  ',a)
+      inquire (file=lmdasavefile,exist=exist)
+      if (.not. exist) then
+         write (iout,40)  lmdasavefile(1:trimtext(lmdasavefile))
+   40    format (/,' ANALYZEOST  --  History File Not Found :  ',a)
          call fatal
       end if
-      call ostkey
+      ihis = freeunit ()
+      open (unit=ihis,file=lmdasavefile,status='old')
+      rewind (unit=ihis)
+      use_ost = .true.
+      call rdbiashead (ihis,lmdasavefile,title)
+      if (index(title,abftitle(1:trimtext(abftitle))) .gt. 0) then
+         use_ost = .false.
+         use_abf = .true.
+         call rdabfhist (ihis,lmdasavefile)
+      else if (index(title,osttitle(1:trimtext(osttitle))) .gt. 0) then
+         call rdosthist (ihis,lmdasavefile)
+      else
+         close (unit=ihis)
+         write (iout,42)  lmdasavefile(1:trimtext(lmdasavefile))
+   42    format (/,' ANALYZEOST  --  Unknown History File :  ',a)
+         call fatal
+      end if
+      if (use_abf) then
+         call abfkey
+      else
+         call ostkey
+      end if
 c
 c     perform the requested analysis
 c
       if (mode(1:1) .eq. 'S' .or. mode .eq. 'HISTORY') then
-         call ostseries
+         if (use_abf) then
+            call abfseries
+         else
+            call ostseries
+         end if
       else if (mode(1:1) .eq. 'F' .or. mode .eq. 'DG') then
-         call ostfreeenergy
+         if (use_abf) then
+            call abffreeenergy
+         else
+            call ostfreeenergy
+         end if
       else if (mode(1:1) .eq. 'G' .or. mode .eq. 'GRID') then
+         if (use_abf) then
+            write (iout,45)
+   45       format (/,' ANALYZEOST  --  GKERNEL is not available for',
+     &                 ' an ABF history')
+            call fatal
+         end if
          call ostgkernel
       else
          write (iout,50)  mode(1:trimtext(mode))
@@ -111,6 +153,7 @@ c     when it differs from the grid of the restart
 c
 c
       subroutine ostkey
+      use dlmda
       use keys
       use ost
       implicit none
@@ -178,6 +221,7 @@ c     saved gaussian centers, widths and heights from the restart
 c
 c
       subroutine remeshost (nlmda1,wflmda1)
+      use dlmda
       use ost
       implicit none
       integer i,j
@@ -188,7 +232,7 @@ c
       real*8 wflmda0
       real*8 flmin,flmax
       real*8 flow,fhigh
-      real*8 etotfkernel
+      real*8 efreetot
 c
 c
 c     save old flambda grid range before changing the grid spacing
@@ -209,9 +253,9 @@ c
 c
 c     preserve old flambda range and all saved gaussian cutoffs
 c
-      do i = 1, nosthist
-         flow = ostfhist(i) - oststdev*ostwfhist(i) - wflmda2
-         fhigh = ostfhist(i) + oststdev*ostwfhist(i) + wflmda2
+      do i = 1, nlmdahist
+         flow = lmdafhist(i) - oststdev*ostwfhist(i) - wflmda2
+         fhigh = lmdafhist(i) + oststdev*ostwfhist(i) + wflmda2
          flmin = min(flmin,flow)
          flmax = max(flmax,fhigh)
       end do
@@ -229,27 +273,27 @@ c
 c     reallocate grid-dependent arrays for the new analysis grid
 c
       if (allocated(osthead))  deallocate (osthead)
-      if (allocated(fkernel))  deallocate (fkernel)
-      if (allocated(fsumkernel))  deallocate (fsumkernel)
+      if (allocated(lmdafmean))  deallocate (lmdafmean)
+      if (allocated(lmdafsum))  deallocate (lmdafsum)
       if (allocated(gfkernel))  deallocate (gfkernel)
       if (allocated(gkernel))  deallocate (gkernel)
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
-      if (allocated(pfkernel))  deallocate (pfkernel)
+      if (allocated(lmdafwt))  deallocate (lmdafwt)
       if (allocated(vkernelmax))  deallocate (vkernelmax)
       allocate (osthead(nlmda,nflmda))
-      allocate (fkernel(nlmda))
-      allocate (fsumkernel(nlmda))
+      allocate (lmdafmean(nlmda))
+      allocate (lmdafsum(nlmda))
       allocate (gfkernel(nlmda,nflmda))
       allocate (gkernel(nlmda,nflmda))
       allocate (glfkernel(nlmda,nflmda))
       allocate (glkernel(nlmda,nflmda))
-      allocate (pfkernel(nlmda))
+      allocate (lmdafwt(nlmda))
       allocate (vkernelmax(nlmda))
       do i = 1, nlmda
-         fkernel(i) = 0.0d0
-         fsumkernel(i) = 0.0d0
-         pfkernel(i) = 0.0d0
+         lmdafmean(i) = 0.0d0
+         lmdafsum(i) = 0.0d0
+         lmdafwt(i) = 0.0d0
          vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             gfkernel(i,j) = 0.0d0
@@ -269,7 +313,7 @@ c
          call buildgkernel
          call buildfkernel
       end if
-      eosttot = etotfkernel()
+      lmdadeltag = efreetot()
       return
       end
 c
@@ -287,6 +331,7 @@ c
 c
       subroutine ostseries
       use bath
+      use dlmda
       use iounit
       use ost
       implicit none
@@ -294,13 +339,13 @@ c
       integer ihist
       integer nsave
       integer step
-      real*8 etotfkernel
+      real*8 efreetot
       real*8 freeeng
 c
 c
 c     write a column header for the history table
 c
-      nsave = nosthist
+      nsave = nlmdahist
       write (iout,10)  kelvin
    10 format (/,' OST Time Series :',
      &        //,3x,'Temperature Used',6x,1p,d20.10,' K')
@@ -312,11 +357,11 @@ c
 c     rebuild the kernels cumulatively over the saved history
 c
       freeeng = 0.0d0
-      nosthist = 0
+      nlmdahist = 0
       do i = 1, nlmda
-         fkernel(i) = 0.0d0
-         fsumkernel(i) = 0.0d0
-         pfkernel(i) = 0.0d0
+         lmdafmean(i) = 0.0d0
+         lmdafsum(i) = 0.0d0
+         lmdafwt(i) = 0.0d0
          vkernelmax(i) = 0.0d0
          do j = 1, nflmda
             gfkernel(i,j) = 0.0d0
@@ -326,23 +371,23 @@ c
          end do
       end do
       do ihist = 1, nsave
-         nosthist = ihist
+         nlmdahist = ihist
          if (fastkernel) then
             call updatekernels
          else
             call updategkernel
             call buildfkernel
          end if
-         freeeng = etotfkernel()
-         step = ostihist(ihist)
-         write (iout,30)  ihist,step,ostlhist(ihist),ostfhist(ihist),
+         freeeng = efreetot()
+         step = lmdaihist(ihist)
+         write (iout,30)  ihist,step,lmdalhist(ihist),lmdafhist(ihist),
      &      freeeng,osthhist(ihist),ostwlhist(ihist),ostwfhist(ihist)
    30    format (i7,i12,1p,6d20.10)
       end do
 c
 c     restore the full saved history free energy
 c
-      eosttot = freeeng
+      lmdadeltag = freeeng
       return
       end
 c
@@ -356,17 +401,18 @@ c
 c
 c     "ostfreeenergy" prints the final free energy estimate from the
 c     f kernel rebuilt from the full saved OST history, followed by
-c     the cumulative free energy at each lambda bin
+c     the f kernel mean force at each lambda bin
 c
 c
       subroutine ostfreeenergy
       use bath
+      use dlmda
       use iounit
       use ost
       implicit none
       integer ilmda
-      real*8 lambda,dgl
-      real*8 etotfkernel
+      real*8 lambda
+      real*8 efreetot
 c
 c
 c     recompute and print the total free energy estimate
@@ -377,26 +423,22 @@ c
          call buildgkernel
          call buildfkernel
       end if
-      eosttot = etotfkernel()
-      write (iout,10)  nosthist,eosttot,kelvin
+      lmdadeltag = efreetot()
+      write (iout,10)  nlmdahist,lmdadeltag,kelvin
    10 format (/,' OST Free Energy Estimate :',
      &        //,1x,'Number of Gaussians',i16,
      &         /,1x,'Delta G',20x,1p,d20.10,
      &         /,1x,'Temperature Used',11x,d20.10,' K')
 c
-c     print the cumulative free energy by trapezoid integration
-c     of the f kernel, matching the summation in etotfkernel
+c     print the f kernel mean force at each lambda bin, whose
+c     trapezoid integral is the free energy estimate
 c
       write (iout,20)
-   20 format (/,' OST Free Energy dG(L) :',
-     &        //,1x,'Lambda',10x,'dG(Lambda)',/)
-      dgl = 0.0d0
+   20 format (/,' OST Mean Force dU/dL(L) :',
+     &        //,1x,'Lambda',10x,'dU/dLambda',/)
       do ilmda = 1, nlmda
-         if (ilmda .gt. 1) then
-            dgl = dgl + 0.5d0*(fkernel(ilmda-1)+fkernel(ilmda))*wlmda
-         end if
          lambda = dble(ilmda-1) * wlmda
-         write (iout,30)  lambda,dgl
+         write (iout,30)  lambda,lmdafmean(ilmda)
    30    format (1x,1p,d10.4,d16.4)
       end do
       return
@@ -415,6 +457,7 @@ c     with header lines describing the grid origin and spacing
 c
 c
       subroutine ostgkernel
+      use dlmda
       use iounit
       use ost
       implicit none
@@ -457,6 +500,174 @@ c
      &                       gkernel(ilmda,iflmda)
    40       format (i8,i15,1p,d24.12,2d22.12)
          end do
+      end do
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine abfkey  --  apply the abf analysis keys  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "abfkey" checks the keyfile for a requested lambda grid, since
+c     this program never runs the setup that reads the keyword for
+c     dynamics, and rebuilds the abf mean force on that grid when it
+c     differs from the grid of the history file
+c
+c
+      subroutine abfkey
+      use dlmda
+      use keys
+      implicit none
+      integer i,next
+      integer nlmda1
+      real*8 efreetot
+      logical setnlmda
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     get the requested lambda grid, keeping that of the history file
+c     as the default
+c
+      setnlmda = .false.
+      nlmda1 = nlmda
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
+            read (string,*,err=10,end=10)  nlmda1
+            setnlmda = .true.
+         end if
+   10    continue
+      end do
+      if (setnlmda) then
+         if (nlmda1 .lt. 2)  nlmda1 = nlmda
+         if (mod(nlmda1,2) .eq. 0)  nlmda1 = nlmda1 + 1
+      end if
+c
+c     rebuild the lambda bins on the requested grid
+c
+      if (setnlmda .and. nlmda1.ne.nlmda) then
+         nlmda = nlmda1
+         wlmda = 1.0d0 / dble(nlmda-1)
+         wlmda2 = 0.5d0 * wlmda
+         if (allocated(lmdafmean))  deallocate (lmdafmean)
+         if (allocated(lmdafsum))  deallocate (lmdafsum)
+         if (allocated(lmdafwt))  deallocate (lmdafwt)
+         allocate (lmdafmean(nlmda))
+         allocate (lmdafsum(nlmda))
+         allocate (lmdafwt(nlmda))
+         call buildabfkernel
+         lmdadeltag = efreetot()
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine abfseries  --  print ABF time series data  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "abfseries" prints the saved ABF interval samples and recomputes
+c     the cumulative free energy estimate after each sample
+c
+c
+      subroutine abfseries
+      use bath
+      use dlmda
+      use iounit
+      implicit none
+      integer i
+      integer ihist
+      real*8 efreetot
+      real*8 freeeng
+c
+c
+c     write a column header for the sample table
+c
+      write (iout,10)  kelvin
+   10 format (/,' ABF Time Series :',
+     &        //,3x,'Temperature Used',6x,1p,d20.10,' K')
+      write (iout,20)
+   20 format (/,3x,'Hist',8x,'Step',4x,'Lambda',14x,'dU/dLambda',
+     &           10x,'Free Energy',/)
+c
+c     rebuild the mean force cumulatively over the saved samples
+c
+      freeeng = 0.0d0
+      do i = 1, nlmda
+         lmdafmean(i) = 0.0d0
+         lmdafsum(i) = 0.0d0
+         lmdafwt(i) = 0.0d0
+      end do
+      do ihist = 1, nlmdahist
+         call addabfhist (ihist)
+         freeeng = efreetot()
+         write (iout,30)  ihist,lmdaihist(ihist),lmdalhist(ihist),
+     &                    lmdafhist(ihist),freeeng
+   30    format (i7,i12,1p,3d20.10)
+      end do
+c
+c     keep the free energy of the full saved history
+c
+      lmdadeltag = freeeng
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine abffreeenergy  --  print final ABF free energy  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "abffreeenergy" prints the final free energy estimate from the
+c     mean force rebuilt from the full saved ABF history, followed by
+c     the mean force at each lambda bin
+c
+c
+      subroutine abffreeenergy
+      use bath
+      use dlmda
+      use iounit
+      implicit none
+      integer ilmda
+      real*8 lambda
+      real*8 efreetot
+c
+c
+c     recompute and print the total free energy estimate
+c
+      call buildabfkernel
+      lmdadeltag = efreetot()
+      write (iout,10)  nlmdahist,lmdadeltag,kelvin
+   10 format (/,' ABF Free Energy Estimate :',
+     &        //,1x,'Number of Samples',i18,
+     &         /,1x,'Delta G',20x,1p,d20.10,
+     &         /,1x,'Temperature Used',11x,d20.10,' K')
+c
+c     print the mean force at each lambda bin, whose trapezoid
+c     integral is the free energy estimate
+c
+      write (iout,20)
+   20 format (/,' ABF Mean Force dU/dL(L) :',
+     &        //,1x,'Lambda',10x,'dU/dLambda',/)
+      do ilmda = 1, nlmda
+         lambda = dble(ilmda-1) * wlmda
+         write (iout,30)  lambda,lmdafmean(ilmda)
+   30    format (1x,1p,d10.4,d16.4)
       end do
       return
       end

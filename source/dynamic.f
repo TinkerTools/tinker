@@ -61,6 +61,7 @@ c     propagate the lambda particle if set in mutate.f
 c
       use_ostdyn = use_ost
       use_metadyn = use_meta
+      use_abfdyn = use_abf
 c
 c     check for keywords containing any altered parameters
 c
@@ -240,6 +241,7 @@ c     open the file holding the adaptive bias history
 c
       if (use_ostdyn)  call initostfile
       if (use_metadyn)  call initmetafile
+      if (use_abf)  call initabffile
 c
 c     lay out the thermodynamic integration lambda windows
 c
@@ -354,6 +356,7 @@ c     save lambda dynamics information
 c
       if (use_ostdyn)  call saveost
       if (use_metadyn)  call savemeta
+      if (use_abf)  call saveabf
       if (use_ti)  call saveti
 c
 c     save dynamic at the end if it was not saved during simulation

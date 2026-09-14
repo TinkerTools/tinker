@@ -226,6 +226,7 @@ c     set the options for each flavor of the lambda calculation
 c
       call mutate_dlmda
       call mutate_ost
+      call mutate_abf
       call mutate_meta
       call mutate_ti
       call mutate_check
@@ -289,6 +290,9 @@ c
          else if (use_ti) then
             write (iout,110)
   110       format (' Sampling Mode',28x,'TI')
+         else if (use_abf) then
+            write (iout,115)
+  115       format (' Sampling Mode',27x,'ABF')
          else
             write (iout,120)
   120       format (' Sampling Mode',18x,'Fixed Lambda')
@@ -377,6 +381,8 @@ c
 c
 c     flag for use of lambda derivative
 c
+      use_abf = .false.
+      use_abfdyn = .false.
       use_dlmda = .false.
       use_elmdamap = .false.
       use_emdt = .false.
@@ -469,21 +475,9 @@ c
          call upcase (keyword)
          if (keyword(1:13) .eq. 'LAMBDA-DERIV ') then
             use_dlmda = .true.
-         else if (keyword(1:4) .eq. 'OST ') then
-            use_dlmda = .true.
-            use_ost = .true.
-            use_mainlmda = .true.
-            lmdasampmode = 'OST'
-         else if (keyword(1:8) .eq. 'METADYN ') then
-            use_dlmda = .true.
-            use_meta = .true.
-            use_mainlmda = .true.
-            lmdasampmode = 'META'
-         else if (keyword(1:11) .eq. 'THERM-INTG ') then
-            use_dlmda = .true.
-            use_ti = .true.
-            use_mainlmda = .true.
-            lmdasampmode = 'TI'
+         else if (keyword(1:12) .eq. 'LAMBDA-MODE ') then
+            call getword (record,lmdasampmode,next)
+            call upcase (lmdasampmode)
          else if (keyword(1:13) .eq. 'ELE-DUALTOPO ') then
             use_emdt = .true.
          else if (keyword(1:17) .eq. 'ELE-DUALTOPO-EXP ') then
@@ -558,6 +552,18 @@ c
          end if
    10    continue
       end do
+c
+c     the lambda sampling mode sets its method flag, and every
+c     sampling method moves a main lambda by its derivative
+c
+      if (lmdasampmode .eq. 'OST')  use_ost = .true.
+      if (lmdasampmode .eq. 'META')  use_meta = .true.
+      if (lmdasampmode .eq. 'TI')  use_ti = .true.
+      if (lmdasampmode .eq. 'ABF')  use_abf = .true.
+      if (use_ost .or. use_meta .or. use_ti .or. use_abf) then
+         use_dlmda = .true.
+         use_mainlmda = .true.
+      end if
 c
 c     a main lambda drives sublambdas that name a map
 c
@@ -862,13 +868,13 @@ c
 c
 c     set default ost update intervals
 c
-      iost = 0
-      iosthist = 10
-      ostddgdl = 0.0d0
+      lmdastep = 0
+      lmdaintv = 10
+      lmdaddgdl = 0.0d0
       ostdgdl = 0.0d0
-      ostparatio = 0.3d0
-      ostpbratio = 0.3d0
-      nosthistsave = 0
+      lmdaparatio = 0.3d0
+      lmdapbratio = 0.3d0
+      nlmdasave = 0
 c
 c     set default criteria for judging convergence of a deposit
 c
@@ -889,16 +895,16 @@ c
 c
 c     set defaults for the lambda particle propagation
 c
-      ostlambdaavg = 0.0d0
-      ostlambdastd = 0.0d0
-      ostdedlavg = 0.0d0
-      ostdedlstd = 0.0d0
+      lmdaavg = 0.0d0
+      lmdastd = 0.0d0
+      dedlavg = 0.0d0
+      dedlstd = 0.0d0
       deffdl = 0.0d0
-      osttheta = pi / 2.0d0
-      ostvtheta = 0.0d0
-      ostmass = 25.0d0
-      ostfriction = 0.01d0
-      ostdt = 0.001d0
+      lmdatheta = pi / 2.0d0
+      lmdavtheta = 0.0d0
+      lmdamass = 25.0d0
+      lmdafric = 0.01d0
+      lmdadt = 0.001d0
 c
 c     set default ost lambda bin values
 c
@@ -910,7 +916,7 @@ c
       fli0 = (nflmda + 1) / 2 + (nflmda - 1) / 4
       hbias = 0.00001d0
       oststdev = 4.0d0
-      eosttot = 0.0d0
+      lmdadeltag = 0.0d0
       fastkernel = .true.
       ostinterpol = .false.
 c
@@ -923,22 +929,22 @@ c
          call upcase (keyword)
          if (keyword(1:17) .eq. 'OSTHIST-INTERVAL ') then
             string = record(next:240)
-            read (string,*,err=10)  iosthist
+            read (string,*,err=10)  lmdaintv
          else if (keyword(1:12) .eq. 'OSTPA-RATIO ') then
             string = record(next:240)
-            read (string,*,err=10)  ostparatio
+            read (string,*,err=10)  lmdaparatio
          else if (keyword(1:12) .eq. 'OSTPB-RATIO ') then
             string = record(next:240)
-            read (string,*,err=10)  ostpbratio
+            read (string,*,err=10)  lmdapbratio
          else if (keyword(1:8) .eq. 'OST-DT ') then
             string = record(next:240)
-            read (string,*,err=10)  ostdt
+            read (string,*,err=10)  lmdadt
          else if (keyword(1:9) .eq. 'OST-MASS ') then
             string = record(next:240)
-            read (string,*,err=10)  ostmass
+            read (string,*,err=10)  lmdamass
          else if (keyword(1:13) .eq. 'OST-FRICTION ') then
             string = record(next:240)
-            read (string,*,err=10)  ostfriction
+            read (string,*,err=10)  lmdafric
          else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
             string = record(next:240)
             read (string,*,err=10)  nlmda
@@ -1032,25 +1038,48 @@ c
 c     split the deposit interval into its propagation, equilibration
 c     and averaging phases
 c
-      if (iosthist .lt. 1)  iosthist = 1
-      if (ostparatio .lt. 0.0d0)  ostparatio = 0.0d0
-      if (ostpbratio .lt. 0.0d0)  ostpbratio = 0.0d0
-      call setostphase
+      if (lmdaintv .lt. 1)  lmdaintv = 1
+      if (lmdaparatio .lt. 0.0d0)  lmdaparatio = 0.0d0
+      if (lmdapbratio .lt. 0.0d0)  lmdapbratio = 0.0d0
+      call setlmdaphase
 c
 c     start the lambda particle from the current main lambda
 c
-      osttheta = asin(sqrt(lambda))
+      lmdatheta = asin(sqrt(lambda))
 c
-c     allocate the convergence sub-bins
+c     free the histogram, kernel and sub-bin arrays of any earlier
+c     setup, so that only the arrays of the chosen method remain
+c
+      if (allocated(ostlmdaavgbin))  deallocate (ostlmdaavgbin)
+      if (allocated(ostlmdaslpbin))  deallocate (ostlmdaslpbin)
+      if (allocated(ostlmdastdbin))  deallocate (ostlmdastdbin)
+      if (allocated(ostdedlavgbin))  deallocate (ostdedlavgbin)
+      if (allocated(ostdedlslpbin))  deallocate (ostdedlslpbin)
+      if (allocated(ostdedlstdbin))  deallocate (ostdedlstdbin)
+      if (allocated(osthhist))  deallocate (osthhist)
+      if (allocated(osthist))  deallocate (osthist)
+      if (allocated(lmdaihist))  deallocate (lmdaihist)
+      if (allocated(osthead))  deallocate (osthead)
+      if (allocated(ostnext))  deallocate (ostnext)
+      if (allocated(lmdallist))  deallocate (lmdallist)
+      if (allocated(lmdaflist))  deallocate (lmdaflist)
+      if (allocated(lmdalhist))  deallocate (lmdalhist)
+      if (allocated(lmdafhist))  deallocate (lmdafhist)
+      if (allocated(ostwlhist))  deallocate (ostwlhist)
+      if (allocated(ostwfhist))  deallocate (ostwfhist)
+      if (allocated(lmdafmean))  deallocate (lmdafmean)
+      if (allocated(lmdafsum))  deallocate (lmdafsum)
+      if (allocated(gfkernel))  deallocate (gfkernel)
+      if (allocated(gkernel))  deallocate (gkernel)
+      if (allocated(glfkernel))  deallocate (glfkernel)
+      if (allocated(glkernel))  deallocate (glkernel)
+      if (allocated(lmdafwt))  deallocate (lmdafwt)
+      if (allocated(vkernelmax))  deallocate (vkernelmax)
+c
+c     allocate the convergence sub-bins used by ost and metadynamics
 c
       if (ostcvbin .lt. 0)  ostcvbin = 0
       if (use_ost .or. use_meta) then
-         if (allocated(ostlmdaavgbin))  deallocate (ostlmdaavgbin)
-         if (allocated(ostlmdaslpbin))  deallocate (ostlmdaslpbin)
-         if (allocated(ostlmdastdbin))  deallocate (ostlmdastdbin)
-         if (allocated(ostdedlavgbin))  deallocate (ostdedlavgbin)
-         if (allocated(ostdedlslpbin))  deallocate (ostdedlslpbin)
-         if (allocated(ostdedlstdbin))  deallocate (ostdedlstdbin)
          allocate (ostlmdaavgbin(max(ostcvbin,1)))
          allocate (ostlmdaslpbin(max(ostcvbin,1)))
          allocate (ostlmdastdbin(max(ostcvbin,1)))
@@ -1070,53 +1099,34 @@ c
 c     allocate ost histogram and kernels
 c
       if (use_ost) then
-         if (allocated(osthhist))  deallocate (osthhist)
-         if (allocated(osthist))  deallocate (osthist)
-         if (allocated(ostihist))  deallocate (ostihist)
-         if (allocated(osthead))  deallocate (osthead)
-         if (allocated(ostnext))  deallocate (ostnext)
-         if (allocated(ostllist))  deallocate (ostllist)
-         if (allocated(ostflist))  deallocate (ostflist)
-         if (allocated(ostlhist))  deallocate (ostlhist)
-         if (allocated(ostfhist))  deallocate (ostfhist)
-         if (allocated(ostwlhist))  deallocate (ostwlhist)
-         if (allocated(ostwfhist))  deallocate (ostwfhist)
-         if (allocated(fkernel))  deallocate (fkernel)
-         if (allocated(fsumkernel))  deallocate (fsumkernel)
-         if (allocated(gfkernel))  deallocate (gfkernel)
-         if (allocated(gkernel))  deallocate (gkernel)
-         if (allocated(glfkernel))  deallocate (glfkernel)
-         if (allocated(glkernel))  deallocate (glkernel)
-         if (allocated(pfkernel))  deallocate (pfkernel)
-         if (allocated(vkernelmax))  deallocate (vkernelmax)
-         sizeosthist = 10000
-         nosthist = 0
-         allocate (osthhist(sizeosthist))
-         allocate (osthist(sizeosthist))
-         allocate (ostihist(sizeosthist))
+         sizelmdahist = 10000
+         nlmdahist = 0
+         allocate (osthhist(sizelmdahist))
+         allocate (osthist(sizelmdahist))
+         allocate (lmdaihist(sizelmdahist))
          allocate (osthead(nlmda,nflmda))
-         allocate (ostnext(sizeosthist))
-         allocate (ostllist(iosthist))
-         allocate (ostflist(iosthist))
-         allocate (ostlhist(sizeosthist))
-         allocate (ostfhist(sizeosthist))
-         allocate (ostwlhist(sizeosthist))
-         allocate (ostwfhist(sizeosthist))
-         allocate (fkernel(nlmda))
-         allocate (fsumkernel(nlmda))
+         allocate (ostnext(sizelmdahist))
+         allocate (lmdallist(lmdaintv))
+         allocate (lmdaflist(lmdaintv))
+         allocate (lmdalhist(sizelmdahist))
+         allocate (lmdafhist(sizelmdahist))
+         allocate (ostwlhist(sizelmdahist))
+         allocate (ostwfhist(sizelmdahist))
+         allocate (lmdafmean(nlmda))
+         allocate (lmdafsum(nlmda))
          allocate (gfkernel(nlmda,nflmda))
          allocate (gkernel(nlmda,nflmda))
          allocate (glfkernel(nlmda,nflmda))
          allocate (glkernel(nlmda,nflmda))
-         allocate (pfkernel(nlmda))
+         allocate (lmdafwt(nlmda))
          allocate (vkernelmax(nlmda))
 c
 c     initialize ost histogram and kernels
 c
          do i = 1, nlmda
-            fkernel(i) = 0.0d0
-            fsumkernel(i) = 0.0d0
-            pfkernel(i) = 0.0d0
+            lmdafmean(i) = 0.0d0
+            lmdafsum(i) = 0.0d0
+            lmdafwt(i) = 0.0d0
             vkernelmax(i) = 0.0d0
             do k = 1, nflmda
                gfkernel(i,k) = 0.0d0
@@ -1126,19 +1136,77 @@ c
                osthead(i,k) = 0
             end do
          end do
-         do i = 1, iosthist
-            ostllist(i) = 0.0d0
-            ostflist(i) = 0.0d0
+         do i = 1, lmdaintv
+            lmdallist(i) = 0.0d0
+            lmdaflist(i) = 0.0d0
          end do
-         do i = 1, sizeosthist
+         do i = 1, sizelmdahist
             osthist(i) = 0
-            ostihist(i) = 0
+            lmdaihist(i) = 0
             ostnext(i) = 0
-            ostlhist(i) = 0.0d0
-            ostfhist(i) = 0.0d0
+            lmdalhist(i) = 0.0d0
+            lmdafhist(i) = 0.0d0
             osthhist(i) = 0.0d0
             ostwlhist(i) = 0.0d0
             ostwfhist(i) = 0.0d0
+         end do
+      end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine mutate_abf  --  adaptive biasing force arrays  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "mutate_abf" allocates the interval samples, the interval lists
+c     and the lambda bins, the only histogram arrays that the adaptive
+c     biasing force method uses
+c
+c
+      subroutine mutate_abf
+      use dlmda
+      implicit none
+      integer i
+c
+c
+c     allocate and zero the abf samples, interval lists and bins
+c
+      if (use_abf) then
+         if (allocated(lmdaihist))  deallocate (lmdaihist)
+         if (allocated(lmdalhist))  deallocate (lmdalhist)
+         if (allocated(lmdafhist))  deallocate (lmdafhist)
+         if (allocated(lmdallist))  deallocate (lmdallist)
+         if (allocated(lmdaflist))  deallocate (lmdaflist)
+         if (allocated(lmdafmean))  deallocate (lmdafmean)
+         if (allocated(lmdafsum))  deallocate (lmdafsum)
+         if (allocated(lmdafwt))  deallocate (lmdafwt)
+         sizelmdahist = 10000
+         nlmdahist = 0
+         allocate (lmdaihist(sizelmdahist))
+         allocate (lmdalhist(sizelmdahist))
+         allocate (lmdafhist(sizelmdahist))
+         allocate (lmdallist(lmdaintv))
+         allocate (lmdaflist(lmdaintv))
+         allocate (lmdafmean(nlmda))
+         allocate (lmdafsum(nlmda))
+         allocate (lmdafwt(nlmda))
+         do i = 1, sizelmdahist
+            lmdaihist(i) = 0
+            lmdalhist(i) = 0.0d0
+            lmdafhist(i) = 0.0d0
+         end do
+         do i = 1, lmdaintv
+            lmdallist(i) = 0.0d0
+            lmdaflist(i) = 0.0d0
+         end do
+         do i = 1, nlmda
+            lmdafmean(i) = 0.0d0
+            lmdafsum(i) = 0.0d0
+            lmdafwt(i) = 0.0d0
          end do
       end if
       return
@@ -1176,7 +1244,7 @@ c
          if (allocated(metahhist))  deallocate (metahhist)
          if (allocated(metawhist))  deallocate (metawhist)
          if (allocated(metaihist))  deallocate (metaihist)
-         if (allocated(ostllist))  deallocate (ostllist)
+         if (allocated(lmdallist))  deallocate (lmdallist)
          if (allocated(vmetagrid))  deallocate (vmetagrid)
          if (allocated(dvmetagrid))  deallocate (dvmetagrid)
          sizemetahist = 10000
@@ -1184,7 +1252,7 @@ c
          allocate (metahhist(sizemetahist))
          allocate (metawhist(sizemetahist))
          allocate (metaihist(sizemetahist))
-         allocate (ostllist(iosthist))
+         allocate (lmdallist(lmdaintv))
          allocate (vmetagrid(nlmda))
          allocate (dvmetagrid(nlmda))
          do i = 1, sizemetahist
@@ -1193,8 +1261,8 @@ c
             metawhist(i) = 0.0d0
             metaihist(i) = 0
          end do
-         do i = 1, iosthist
-            ostllist(i) = 0.0d0
+         do i = 1, lmdaintv
+            lmdallist(i) = 0.0d0
          end do
          do i = 1, nlmda
             vmetagrid(i) = 0.0d0
@@ -1337,7 +1405,6 @@ c
       use limits
       use mplpot
       use mutant
-      use ost
       use polpot
       use potent
       implicit none
@@ -1355,17 +1422,6 @@ c
          write (iout,6)
     6    format (/,' MUTATE_CHECK  --  VDW-SOFTCORE exponent must be',
      &              ' greater than or equal to two')
-         call fatal
-      end if
-c
-c
-c     only one method can sample the main lambda at a time
-c
-      if ((use_ost .and. use_meta) .or. (use_ost .and. use_ti)
-     &       .or. (use_meta .and. use_ti)) then
-         write (iout,10)
-   10    format (/,' MUTATE_CHECK  --  Only one of OST, METADYN and',
-     &              ' THERM-INTG can be active')
          call fatal
       end if
 c
@@ -1470,17 +1526,18 @@ c
          call fatal
       end if
 c
-c     the ost deposit interval must keep a propagation phase, an
-c     equilibration phase and samples to average at the fixed lambda
+c     the ost and abf sample interval must keep a propagation phase,
+c     an equilibration phase and samples to average at the fixed lambda
 c
-      if (use_ost .and. ostparatio+ostpbratio.ge.0.9d0) then
+      if ((use_ost .or. use_abf) .and.
+     &    lmdaparatio+lmdapbratio.ge.0.9d0) then
          write (iout,120)
   120    format (/,' MUTATE_CHECK  --  OSTPA-RATIO plus OSTPB-RATIO',
      &              ' must be less than 0.9 to leave samples for the',
      &              ' fixed lambda average')
          call fatal
       end if
-      if (use_ost .and. iosthist.lt.3) then
+      if ((use_ost .or. use_abf) .and. lmdaintv.lt.3) then
          write (iout,130)
   130    format (/,' MUTATE_CHECK  --  OSTHIST-INTERVAL must be at',
      &              ' least 3 to hold a propagation, equilibration',

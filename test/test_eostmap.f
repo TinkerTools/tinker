@@ -133,7 +133,6 @@ c
       use bound
       use dlmda
       use mutant
-      use ost
       implicit none
       real*8 tref,dtref,d2tref
       real*8 weight1,dweight1,d2weight1

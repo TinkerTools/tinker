@@ -551,7 +551,6 @@ c
       use mdstuf
       use molcul
       use moldyn
-      use ost
       use units
       use usage
       use virial
@@ -1028,16 +1027,18 @@ c
          if (use_ostdyn) then
             eostapprox = .true.
             if (eostapprox) then
-               epot = energy () + ostbvbias
+               epot = energy () + lmdavbias
             else
                virsave = vir
-               osttrial = .true.
+               lmdatrial = .true.
                call gradient (epot,dtrial)
-               osttrial = .false.
+               lmdatrial = .false.
                vir = virsave
             end if
          else if (use_metadyn) then
-            epot = energy () + ostbvbias
+            epot = energy () + lmdavbias
+         else if (use_abfdyn) then
+            epot = energy () + lmdavbias
          else
             epot = energy ()
          end if

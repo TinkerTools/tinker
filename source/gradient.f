@@ -26,7 +26,6 @@ c
       use inter
       use iounit
       use limits
-      use ost
       use potent
       use vdwpot
       use virial
@@ -347,7 +346,7 @@ c
          call lmdachain
          if (use_ostdyn .or. use_metadyn) then
             call eostbias
-            if (.not. osttrial) then
+            if (.not. lmdatrial) then
                if (use_ostdyn) then
                   call eostdyn
                else if (use_metadyn) then
@@ -360,6 +359,10 @@ c
                   derivs(j,i) = desum(j,i)
                end do
             end do
+         else if (use_abfdyn) then
+            call eabfbias
+            if (.not. lmdatrial)  call eabfdyn
+            energy = esum
          end if
       end if
 c
