@@ -130,12 +130,8 @@ c
 c     add a new histogram count every lmdaintv steps
 c
       if (istep .eq. 0) then
-         call histstat (lmdallist,lmdaavg,lmdastd,
-     &                  ostlambdaslp,ostlmdaavgbin,ostlmdastdbin,
-     &                  ostlmdaslpbin)
-         call histstat (lmdaflist,dedlavg,dedlstd,
-     &                  ostdedlslp,ostdedlavgbin,ostdedlstdbin,
-     &                  ostdedlslpbin)
+         call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
+         call histstat (lmdaflist,dedlavg,dedlstd,ostdedlslp)
 c
 c     deposit only when the interval samples are converged enough
 c
@@ -228,9 +224,7 @@ c
 c     add a new metadynamics gaussian every lmdaintv steps
 c
       if (istep .eq. 0) then
-         call histstat (lmdallist,lmdaavg,lmdastd,
-     &                  ostlambdaslp,ostlmdaavgbin,ostlmdastdbin,
-     &                  ostlmdaslpbin)
+         call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
          nmetahist = nmetahist + 1
          if (nmetahist .gt. sizemetahist)  call resizemeta
          metalhist(nmetahist) = lmdaavg
@@ -249,54 +243,33 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine histstat -- interval convergence statistics  ##
-c     ##                                                          ##
-c     ##############################################################
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine histstat -- interval sample statistics  ##
+c     ##                                                     ##
+c     #########################################################
 c
 c
 c     "histstat" computes the average, standard deviation and fitted
-c     drift of the samples collected since the last gaussian deposit,
-c     both over the whole post-equilibration slice and within each of
-c     the ostcvbin convergence sub-bins
+c     drift of the samples in the averaging phase of the interval
+c     collected since the last deposit
 c
 c
-      subroutine histstat (list,avg,std,slp,avgbin,stdbin,slpbin)
+      subroutine histstat (list,avg,std,slp)
       use dlmda
-      use ost
       implicit none
-      integer i,b
-      integer i0
-      integer nper,nbin
-      integer ibegin
+      integer i
       integer nskip
       real*8 avg,std,slp
       real*8 fitslope
       real*8 k,d
       real*8 total,tdot
-      real*8 a,tloc
       real*8 list(*)
-      real*8 avgbin(*)
-      real*8 stdbin(*)
-      real*8 slpbin(*)
 c
 c
-c     the propagation and equilibration phases are skipped, leaving
-c     the averaging phase to be split into equal convergence sub-bins,
-c     with any leading remainder samples outside the sub-bins
+c     skip the propagation and equilibration phases
 c
       nskip = lmdanpa + lmdanpb
-      nper = 0
-      if (ostcvbin .gt. 0)  nper = lmdanpc / ostcvbin
-      nbin = 0
-      if (nper .gt. 0)  nbin = ostcvbin
-      ibegin = nskip + lmdanpc - nper*nbin + 1
-      do b = 1, ostcvbin
-         avgbin(b) = 0.0d0
-         stdbin(b) = 0.0d0
-         slpbin(b) = 0.0d0
-      end do
 c
 c     accumulate the drift sums about a shifted origin, so that a
 c     small drift on top of a large offset is not lost to roundoff
@@ -304,30 +277,13 @@ c
       k = list(nskip+1)
       total = 0.0d0
       tdot = 0.0d0
-      do i = nskip+1, ibegin-1
+      do i = nskip+1, nskip+lmdanpc
          d = list(i) - k
          total = total + d
          tdot = tdot + dble(i-nskip-1)*d
       end do
 c
-c     accumulate each sub-bin and fold it into the whole-slice sums
-c
-      do b = 1, nbin
-         i0 = ibegin + (b-1)*nper
-         a = 0.0d0
-         tloc = 0.0d0
-         do i = i0, i0+nper-1
-            d = list(i) - k
-            a = a + d
-            tloc = tloc + dble(i-i0)*d
-         end do
-         total = total + a
-         tdot = tdot + tloc + dble(i0-1-nskip)*a
-         call avgstd (list,i0,nper,avgbin(b),stdbin(b))
-         slpbin(b) = fitslope (tloc,a,nper)
-      end do
-c
-c     average and deviation come from the whole averaging slice
+c     average, deviation and drift come from the averaging slice
 c
       call avgstd (list,nskip+1,lmdanpc,avg,std)
       slp = fitslope (tdot,total,lmdanpc)

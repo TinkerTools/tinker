@@ -368,6 +368,7 @@ c
 c
       subroutine test_mutate_lmdamode
       use dlmda
+      use mutant
       use ost
       implicit none
       logical skiptest
@@ -418,8 +419,31 @@ c
      &                     'lmdamode abf allocates no gkernel')
       call assert_logical (allocated(vkernelmax),.false.,
      &                     'lmdamode abf allocates no vkernelmax')
-      call assert_logical (allocated(ostlmdaavgbin),.false.,
-     &                     'lmdamode abf allocates no ostlmdaavgbin')
+      call final
+c
+c     ost leaves pinned polarization in absolute single topology
+c
+      call loadfix_keyadd ('water2','170_water_lmda_ast_epin_l05.key',
+     &                     'LAMBDA-MODE ost')
+      call assert_logical (use_ost,.true.,'lmdamode ost use_ost')
+      call assert_logical (use_pdlmda,.false.,
+     &                     'lmdamode ost pinned use_pdlmda')
+      call assert_logical (use_epdt,.false.,
+     &                     'lmdamode ost pinned use_epdt')
+      call assert_logical (use_past,.true.,
+     &                     'lmdamode ost pinned use_past')
+      call final
+c
+c     ost uses dual topology when polarization follows the main lambda
+c
+      call loadfix_keyadd ('water2','152_water_lmda_mp05.key',
+     &                     'LAMBDA-MODE ost')
+      call assert_logical (use_pdlmda,.true.,
+     &                     'lmdamode ost mapped use_pdlmda')
+      call assert_logical (use_epdt,.true.,
+     &                     'lmdamode ost mapped use_epdt')
+      call assert_logical (use_past,.false.,
+     &                     'lmdamode ost mapped use_past')
       call final
 c
 c     an unknown mode leaves every sampling method off

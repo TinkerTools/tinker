@@ -1213,8 +1213,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "test_eost_histstat" checks the whole-slice and convergence
-c     sub-bin statistics gathered over a deposit interval
+c     "test_eost_histstat" checks the average, deviation and fitted
+c     drift that histstat computes over the averaging phase
 c
 c
       subroutine test_eost_histstat
@@ -1236,14 +1236,8 @@ c
          lmdallist(i) = dble(i)
          lmdaflist(i) = 2.0d0*dble(i)
       end do
-c
-c     four samples split evenly into two sub-bins
-c
-      ostcvbin = 2
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
-     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
-      call histstat (lmdaflist,dedlavg,dedlstd,ostdedlslp,
-     &               ostdedlavgbin,ostdedlstdbin,ostdedlslpbin)
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
+      call histstat (lmdaflist,dedlavg,dedlstd,ostdedlslp)
       stdref = sqrt(1.25d0)
       call assert_real (lmdaavg,4.5d0,1.0d-12,
      &                  'histstat lambda average')
@@ -1260,72 +1254,6 @@ c
      &                  'histstat lambda slope')
       call assert_real (ostdedlslp,2.0d0,1.0d-12,
      &                  'histstat dE/dl slope')
-      call assert_real (ostlmdaslpbin(1),1.0d0,1.0d-12,
-     &                  'histstat lambda slope bin 1')
-      call assert_real (ostlmdaslpbin(2),1.0d0,1.0d-12,
-     &                  'histstat lambda slope bin 2')
-      call assert_real (ostdedlslpbin(1),2.0d0,1.0d-12,
-     &                  'histstat dE/dl slope bin 1')
-      call assert_real (ostdedlslpbin(2),2.0d0,1.0d-12,
-     &                  'histstat dE/dl slope bin 2')
-c
-c     each sub-bin holds two samples, {3,4} then {5,6}
-c
-      call assert_real (ostlmdaavgbin(1),3.5d0,1.0d-12,
-     &                  'histstat lambda average bin 1')
-      call assert_real (ostlmdaavgbin(2),5.5d0,1.0d-12,
-     &                  'histstat lambda average bin 2')
-      call assert_real (ostlmdastdbin(1),0.5d0,1.0d-12,
-     &                  'histstat lambda deviation bin 1')
-      call assert_real (ostlmdastdbin(2),0.5d0,1.0d-12,
-     &                  'histstat lambda deviation bin 2')
-      call assert_real (ostdedlavgbin(1),7.0d0,1.0d-12,
-     &                  'histstat dE/dl average bin 1')
-      call assert_real (ostdedlavgbin(2),11.0d0,1.0d-12,
-     &                  'histstat dE/dl average bin 2')
-c
-c     four samples in three sub-bins keeps one per bin and drops
-c     the leading sample from the sub-bins but not from the slice
-c
-      ostcvbin = 3
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
-     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
-      call assert_real (ostlmdaavgbin(1),4.0d0,1.0d-12,
-     &                  'histstat uneven split bin 1')
-      call assert_real (ostlmdaavgbin(2),5.0d0,1.0d-12,
-     &                  'histstat uneven split bin 2')
-      call assert_real (ostlmdaavgbin(3),6.0d0,1.0d-12,
-     &                  'histstat uneven split bin 3')
-      do i = 1, 3
-         call assert_real (ostlmdastdbin(i),0.0d0,1.0d-12,
-     &                     'histstat single sample deviation')
-         call assert_real (ostlmdaslpbin(i),0.0d0,1.0d-12,
-     &                     'histstat single sample slope')
-      end do
-      call assert_real (ostlambdaslp,1.0d0,1.0d-12,
-     &                  'histstat uneven split slope')
-c
-c     without sub-bins the slice statistics are unchanged and the
-c     sub-bin arrays are left alone
-c
-      ostcvbin = 0
-      do i = 1, 3
-         ostlmdaavgbin(i) = -7.0d0
-         ostlmdastdbin(i) = -7.0d0
-         ostlmdaslpbin(i) = -7.0d0
-      end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
-     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
-      call assert_real (lmdaavg,4.5d0,1.0d-12,
-     &                  'histstat no bins average')
-      call assert_real (lmdastd,stdref,1.0d-12,
-     &                  'histstat no bins deviation')
-      call assert_real (ostlambdaslp,1.0d0,1.0d-12,
-     &                  'histstat no bins slope')
-      do i = 1, 3
-         call assert_real (ostlmdaavgbin(i),-7.0d0,1.0d-12,
-     &                     'histstat no bins leaves sub-bins')
-      end do
       return
       end
 c
@@ -1337,9 +1265,8 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_eost_drift" checks the fitted sample drift for flat,
-c     ramped and folded series, and its conditioning against a
-c     large constant offset
+c     "test_eost_drift" checks the fitted drift of flat, ramped,
+c     folded and offset series over the averaging phase
 c
 c
       subroutine test_eost_drift
@@ -1358,54 +1285,39 @@ c
       lmdanpa = 0
       lmdanpb = 0
       lmdanpc = 8
-      ostcvbin = 2
       do i = 1, lmdaintv
          lmdallist(i) = 7.0d0
       end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
-     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
       call assert_real (lmdaavg,7.0d0,1.0d-12,
      &                  'histstat flat average')
       call assert_real (ostlambdaslp,0.0d0,1.0d-12,
      &                  'histstat flat slope')
-      call assert_real (ostlmdaslpbin(1),0.0d0,1.0d-12,
-     &                  'histstat flat slope bin 1')
 c
 c     a decreasing ramp keeps its change per sample
 c
       do i = 1, lmdaintv
          lmdallist(i) = -0.5d0*dble(i-1)
       end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
-     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
       call assert_real (ostlambdaslp,-0.5d0,1.0d-12,
      &                  'histstat ramp slope')
-      call assert_real (ostlmdaslpbin(1),-0.5d0,1.0d-12,
-     &                  'histstat ramp slope bin 1')
-      call assert_real (ostlmdaslpbin(2),-0.5d0,1.0d-12,
-     &                  'histstat ramp slope bin 2')
 c
-c     a folded series has no net drift, but each half drifts fully
+c     a folded series has no net drift
 c
       do i = 1, lmdaintv
          lmdallist(i) = v(i)
       end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
-     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
       call assert_real (ostlambdaslp,0.0d0,1.0d-12,
      &                  'histstat folded slope')
-      call assert_real (ostlmdaslpbin(1),-1.0d0,1.0d-12,
-     &                  'histstat folded slope bin 1')
-      call assert_real (ostlmdaslpbin(2),1.0d0,1.0d-12,
-     &                  'histstat folded slope bin 2')
 c
 c     a large offset must not swamp a small drift
 c
       do i = 1, lmdaintv
          lmdallist(i) = 5000.0d0 + 1.0d-6*dble(i-1)
       end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp,
-     &               ostlmdaavgbin,ostlmdastdbin,ostlmdaslpbin)
+      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
       call assert_real (ostlambdaslp,1.0d-6,1.0d-9,
      &                  'histstat offset slope')
       return
@@ -2026,7 +1938,6 @@ c
       lmdanpa = 0
       lmdanpb = 0
       lmdanpc = 4
-      ostcvbin = 0
       ostcvstd = 1.0d0
       ostcvrat = 0.0d0
       hbias = 1.0d0
@@ -2127,7 +2038,6 @@ c
       lmdanpa = 0
       lmdanpb = 0
       lmdanpc = 4
-      ostcvbin = 0
       ostcvstd = 1.0d0
       ostcvrat = 0.0d0
       hbias = 1.0d0
@@ -2397,7 +2307,6 @@ c
       lmdanpa = 2
       lmdanpb = 2
       lmdanpc = 2
-      ostcvbin = 0
       ostcvstd = 1.0d0
       ostcvrat = 0.0d0
       hbias = 1.0d0
@@ -2464,8 +2373,6 @@ c
       implicit none
       integer nl,nf,nhist
       integer i,j
-      integer maxcvbin
-      parameter (maxcvbin=16)
 c
 c
 c     clear any previous allocation
@@ -2492,12 +2399,6 @@ c
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
-      if (allocated(ostlmdaavgbin))  deallocate (ostlmdaavgbin)
-      if (allocated(ostlmdaslpbin))  deallocate (ostlmdaslpbin)
-      if (allocated(ostlmdastdbin))  deallocate (ostlmdastdbin)
-      if (allocated(ostdedlavgbin))  deallocate (ostdedlavgbin)
-      if (allocated(ostdedlslpbin))  deallocate (ostdedlslpbin)
-      if (allocated(ostdedlstdbin))  deallocate (ostdedlstdbin)
 c
 c     set scalar state
 c
@@ -2528,7 +2429,6 @@ c
       dedlstd = 0.0d0
       ostdedlslp = 0.0d0
       deffdl = 0.0d0
-      ostcvbin = 0
       ostcvdif = 0.0d0
       ostcvrat = 0.0d0
       ostcvslp = 0.0d0
@@ -2581,24 +2481,6 @@ c
       allocate (glkernel(nlmda,nflmda))
       allocate (lmdafwt(nlmda))
       allocate (vkernelmax(nlmda))
-c
-c     the sub-bin arrays are sized generously so that a test may
-c     vary ostcvbin without reallocating them
-c
-      allocate (ostlmdaavgbin(maxcvbin))
-      allocate (ostlmdaslpbin(maxcvbin))
-      allocate (ostlmdastdbin(maxcvbin))
-      allocate (ostdedlavgbin(maxcvbin))
-      allocate (ostdedlslpbin(maxcvbin))
-      allocate (ostdedlstdbin(maxcvbin))
-      do i = 1, maxcvbin
-         ostlmdaavgbin(i) = 0.0d0
-         ostlmdaslpbin(i) = 0.0d0
-         ostlmdastdbin(i) = 0.0d0
-         ostdedlavgbin(i) = 0.0d0
-         ostdedlslpbin(i) = 0.0d0
-         ostdedlstdbin(i) = 0.0d0
-      end do
 c
 c     initialize arrays
 c

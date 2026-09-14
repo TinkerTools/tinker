@@ -1160,7 +1160,7 @@ void eostdyn_();
 #define tinker_f_eostdyn eostdyn_
 void emetadyn_();
 #define tinker_f_emetadyn emetadyn_
-void histstat_(double* list, double* avg, double* std, double* slp, double* avgbin, double* stdbin, double* slpbin);
+void histstat_(double* list, double* avg, double* std, double* slp);
 #define tinker_f_histstat histstat_
 double fitslope_(double* tdot, double* total, int* n);
 #define tinker_f_fitslope fitslope_

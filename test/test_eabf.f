@@ -656,11 +656,5 @@ c
       deallocate (glfkernel)
       deallocate (glkernel)
       deallocate (vkernelmax)
-      deallocate (ostlmdaavgbin)
-      deallocate (ostlmdaslpbin)
-      deallocate (ostlmdastdbin)
-      deallocate (ostdedlavgbin)
-      deallocate (ostdedlslpbin)
-      deallocate (ostdedlstdbin)
       return
       end

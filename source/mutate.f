@@ -616,7 +616,7 @@ c
 c
 c     ost requires second and force lambda derivatives
 c
-      if (use_ost)  use_epdt = .true.
+      if (use_ost .and. use_pdlmda)  use_epdt = .true.
 c
 c     validate mapping schemes from main lambda to sublambdas
 c
@@ -878,7 +878,6 @@ c
 c
 c     set default criteria for judging convergence of a deposit
 c
-      ostcvbin = 2
       ostcvdif = 25.0d0
       ostcvrat = 0.1d0
       ostcvslp = 1.0d0
@@ -966,9 +965,6 @@ c
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
             read (string,*,err=10)  hbias
-         else if (keyword(1:13) .eq. 'OST-CONV-BIN ') then
-            string = record(next:240)
-            read (string,*,err=10)  ostcvbin
          else if (keyword(1:16) .eq. 'OST-CONVCRI-DIF ') then
             string = record(next:240)
             read (string,*,err=10)  ostcvdif
@@ -1047,15 +1043,9 @@ c     start the lambda particle from the current main lambda
 c
       lmdatheta = asin(sqrt(lambda))
 c
-c     free the histogram, kernel and sub-bin arrays of any earlier
-c     setup, so that only the arrays of the chosen method remain
+c     free the histogram and kernel arrays of any earlier setup,
+c     so that only the arrays of the chosen method remain
 c
-      if (allocated(ostlmdaavgbin))  deallocate (ostlmdaavgbin)
-      if (allocated(ostlmdaslpbin))  deallocate (ostlmdaslpbin)
-      if (allocated(ostlmdastdbin))  deallocate (ostlmdastdbin)
-      if (allocated(ostdedlavgbin))  deallocate (ostdedlavgbin)
-      if (allocated(ostdedlslpbin))  deallocate (ostdedlslpbin)
-      if (allocated(ostdedlstdbin))  deallocate (ostdedlstdbin)
       if (allocated(osthhist))  deallocate (osthhist)
       if (allocated(osthist))  deallocate (osthist)
       if (allocated(lmdaihist))  deallocate (lmdaihist)
@@ -1075,26 +1065,6 @@ c
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(lmdafwt))  deallocate (lmdafwt)
       if (allocated(vkernelmax))  deallocate (vkernelmax)
-c
-c     allocate the convergence sub-bins used by ost and metadynamics
-c
-      if (ostcvbin .lt. 0)  ostcvbin = 0
-      if (use_ost .or. use_meta) then
-         allocate (ostlmdaavgbin(max(ostcvbin,1)))
-         allocate (ostlmdaslpbin(max(ostcvbin,1)))
-         allocate (ostlmdastdbin(max(ostcvbin,1)))
-         allocate (ostdedlavgbin(max(ostcvbin,1)))
-         allocate (ostdedlslpbin(max(ostcvbin,1)))
-         allocate (ostdedlstdbin(max(ostcvbin,1)))
-         do i = 1, max(ostcvbin,1)
-            ostlmdaavgbin(i) = 0.0d0
-            ostlmdaslpbin(i) = 0.0d0
-            ostlmdastdbin(i) = 0.0d0
-            ostdedlavgbin(i) = 0.0d0
-            ostdedlslpbin(i) = 0.0d0
-            ostdedlstdbin(i) = 0.0d0
-         end do
-      end if
 c
 c     allocate ost histogram and kernels
 c
@@ -1425,10 +1395,8 @@ c
          call fatal
       end if
 c
-c     ost requires polarization lambda derivatives not yet available
-c     for absolute single topology
-c
-      if (use_ost .and. use_past) then
+c     ost requires polarization lambda derivatives
+      if (use_ost .and. use_pdlmda .and. use_past) then
          write (iout,20)
    20    format (/,' MUTATE_CHECK  --  OST cannot be used with',
      &              ' absolute single topology polarization; add',
