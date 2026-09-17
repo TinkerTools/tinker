@@ -485,6 +485,8 @@ c
       lmdamass = 25.0d0
       lmdafric = 0.01d0
       lmdadt = 0.001d0
+      lmdathmap = 'TRI'
+      lmdathalpha = 0.999999999d0
 c
 c     set default lambda bins and lambda bias free energy
 c
@@ -519,6 +521,12 @@ c
          else if (keyword(1:16) .eq. 'LAMBDA-FRICTION ') then
             string = record(next:240)
             read (string,*,err=10)  lmdafric
+         else if (keyword(1:17) .eq. 'LAMBDA-THETA-MAP ') then
+            call getword (record,lmdathmap,next)
+            call upcase (lmdathmap)
+         else if (keyword(1:19) .eq. 'LAMBDA-THETA-ALPHA ') then
+            string = record(next:240)
+            read (string,*,err=10)  lmdathalpha
          else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
             string = record(next:240)
             read (string,*,err=10)  nlmda
@@ -612,9 +620,18 @@ c
       if (lmdapbratio .lt. 0.0d0)  lmdapbratio = 0.0d0
       call setlmdaphase
 c
+c     validate the theta map of the lambda particle
+c
+      if (lmdathmap.ne.'SIN' .and. lmdathmap.ne.'TRI') then
+         lmdathmap = 'TRI'
+      end if
+      if (lmdathalpha.le.0.0d0 .or. lmdathalpha.ge.1.0d0) then
+         lmdathalpha = 0.999999999d0
+      end if
+c
 c     start the lambda particle from the current main lambda
 c
-      lmdatheta = asin(sqrt(lambda))
+      call lmdathetainv (lambda,lmdatheta)
 c
 c     the lambda sampling mode sets its method flag, and every
 c     sampling method moves a main lambda by its derivative

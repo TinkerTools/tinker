@@ -363,6 +363,7 @@ c
       real*8 pref(5)
       logical exist
       logical hastitle
+      logical haslmda
       logical haslabel
       character*240 filename0
       character*240 abffile
@@ -409,13 +410,19 @@ c
       read (ihis,10)  record
    10 format (a240)
       hastitle = (index(record,abftitle(1:trimtext(abftitle))) .gt. 0)
-      do iline = 2, 8
+      do iline = 2, 4
+         read (ihis,10)  record
+      end do
+      haslmda = (index(record,'Lambda State') .gt. 0)
+      do iline = 5, 6
          read (ihis,10)  record
       end do
       close (unit=ihis)
       haslabel = (index(record,abflabel(1:trimtext(abflabel))) .gt. 0)
       call assert_logical (hastitle,.true.,
      &                     'initabffile writes the abf title')
+      call assert_logical (haslmda,.true.,
+     &                     'initabffile writes no ost grid state')
       call assert_logical (haslabel,.true.,
      &                     'initabffile writes the sample label')
 c

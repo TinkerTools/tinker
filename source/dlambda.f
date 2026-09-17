@@ -625,9 +625,10 @@ c
 c
 c     "rdbiashead" reads the fixed-size header of a lambda bias history
 c     file from an open unit into the scalar histogram and lambda
-c     particle state, setting the flambda grid only for ost; the title
-c     record is returned so the caller can tell which method wrote the
-c     file, and the caller reads the rows
+c     particle state; an abf header holds only the sample and lambda
+c     particle state, while an ost header also sets the flambda grid;
+c     the title record is returned so the caller can tell which method
+c     wrote the file, and the caller reads the rows
 c
 c
       subroutine rdbiashead (ihis,histfile,title)
@@ -653,11 +654,49 @@ c
       character*(*) title
 c
 c
-c     read the title, scalar state and history label records
+c     read the title and the integer state label records
 c
       read (ihis,10,err=90,end=90)  record
       title = record
       read (ihis,10,err=90,end=90)  record
+c
+c     an abf history keeps only the sample and lambda particle state
+c
+      if (index(title,abftitle(1:trimtext(abftitle))) .gt. 0) then
+         read (ihis,10,err=90,end=90)  record
+         read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
+     &      nlmda0,nlmdahist0
+         read (ihis,10,err=90,end=90)  record
+         if (index(record,'Lambda State') .eq. 0)  goto 90
+         read (ihis,10,err=90,end=90)  record
+         read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0
+         read (ihis,10,err=90,end=90)  record
+         if (nlmda0 .lt. 2)  goto 90
+         if (lmdaintv0 .lt. 1)  goto 90
+         if (nlmdahist0 .lt. 0)  goto 90
+c
+c     set the abf scalar state, deriving the bin width and storage
+c
+         lmdastep = lmdastep0
+         lmdaintv = lmdaintv0
+         call setlmdaphase
+         nlmda = nlmda0
+         nlmdahist = nlmdahist0
+         sizelmdahist = max(1,nlmdahist)
+         wlmda = 1.0d0 / dble(nlmda-1)
+         wlmda2 = 0.5d0 * wlmda
+         lambda = lambda0
+         lmdaavg = 0.0d0
+         lmdastd = 0.0d0
+         dedlavg = 0.0d0
+         dedlstd = 0.0d0
+         lmdatheta = lmdatheta0
+         lmdavtheta = lmdavtheta0
+         return
+      end if
+c
+c     otherwise read the remaining records of an ost history
+c
       read (ihis,10,err=90,end=90)  record
       read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
      &   nlmda0,nflmda0,fli00,nlmdahist0,sizelmdahist0
@@ -739,8 +778,9 @@ c     #############################################################
 c
 c
 c     "prtbiashead" writes the fixed-size lambda bias history header
-c     under the given title and history label from the current ost
-c     histogram state
+c     under the given title and history label; an abf title writes
+c     only the sample and lambda particle state, otherwise the full
+c     ost histogram state is written
 c
 c
       subroutine prtbiashead (ihis,title,label)
@@ -759,13 +799,19 @@ c     write the title and the scalar histogram state
 c
       write (ihis,10)  title(1:trimtext(title))
       write (ihis,20)
-      write (ihis,30)  lmdastep,lmdaintv,nlmda,nflmda,
-     &                 fli0,nlmdahist,sizelmdahist
-      write (ihis,40)
-      write (ihis,50)  wlmda,wflmda,oststdev,kelvin
-      write (ihis,60)
-      write (ihis,70)  lambda,lmdatheta,lmdavtheta,
-     &                 lmdamass,lmdafric,lmdadt,lmdadeltag
+      if (index(title,abftitle(1:trimtext(abftitle))) .gt. 0) then
+         write (ihis,80)  lmdastep,lmdaintv,nlmda,nlmdahist
+         write (ihis,60)
+         write (ihis,90)  lambda,lmdatheta,lmdavtheta
+      else
+         write (ihis,30)  lmdastep,lmdaintv,nlmda,nflmda,
+     &                    fli0,nlmdahist,sizelmdahist
+         write (ihis,40)
+         write (ihis,50)  wlmda,wflmda,oststdev,kelvin
+         write (ihis,60)
+         write (ihis,70)  lambda,lmdatheta,lmdavtheta,
+     &                    lmdamass,lmdafric,lmdadt,lmdadeltag
+      end if
       write (ihis,10)  label(1:trimtext(label))
    10 format (a)
    20 format (' Integer State :')
@@ -774,6 +820,8 @@ c
    50 format (4d26.16)
    60 format (' Lambda State :')
    70 format (7d26.16)
+   80 format (4i12)
+   90 format (3d26.16)
       return
       end
 c
@@ -787,7 +835,8 @@ c
 c
 c     "updbiashead" overwrites the fixed-size lambda bias history
 c     header in place under the given title and history label;
-c     unformatted stream output avoids truncating the appended history
+c     unformatted stream output avoids truncating the appended history;
+c     an abf title keeps only the sample and lambda particle state
 c
 c
       subroutine updbiashead (ihis,title,label)
@@ -799,6 +848,8 @@ c
       integer ihis
       integer ieol
       integer leol
+      integer trimtext
+      logical abfhead
       character*240 record
       character*2 newline
       character*(*) title
@@ -819,21 +870,31 @@ c
 c
 c     format each header record internally and write its raw bytes
 c
+      abfhead = (index(title,abftitle(1:trimtext(abftitle))) .gt. 0)
       write (record,10)  title
       write (ihis,pos=1)  record(1:len_trim(record)),newline(1:leol)
       write (record,20)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,30)  lmdastep,lmdaintv,nlmda,nflmda,
-     &                   fli0,nlmdahist,sizelmdahist
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,40)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,50)  wlmda,wflmda,oststdev,kelvin
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      if (abfhead) then
+         write (record,80)  lmdastep,lmdaintv,nlmda,nlmdahist
+         write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      else
+         write (record,30)  lmdastep,lmdaintv,nlmda,nflmda,
+     &                      fli0,nlmdahist,sizelmdahist
+         write (ihis)  record(1:len_trim(record)),newline(1:leol)
+         write (record,40)
+         write (ihis)  record(1:len_trim(record)),newline(1:leol)
+         write (record,50)  wlmda,wflmda,oststdev,kelvin
+         write (ihis)  record(1:len_trim(record)),newline(1:leol)
+      end if
       write (record,60)
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,70)  lambda,lmdatheta,lmdavtheta,
-     &                   lmdamass,lmdafric,lmdadt,lmdadeltag
+      if (abfhead) then
+         write (record,90)  lambda,lmdatheta,lmdavtheta
+      else
+         write (record,70)  lambda,lmdatheta,lmdavtheta,
+     &                      lmdamass,lmdafric,lmdadt,lmdadeltag
+      end if
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
       write (record,10)  label
       write (ihis)  record(1:len_trim(record)),newline(1:leol)
@@ -844,6 +905,8 @@ c
    50 format (4d26.16)
    60 format (' Lambda State :')
    70 format (7d26.16)
+   80 format (4i12)
+   90 format (3d26.16)
       return
       end
 c
@@ -924,7 +987,7 @@ c     ############################################################
 c
 c
 c     "lmdalangevin" propagates the auxiliary lambda particle in
-c     theta space, where lambda = sin(theta)**2
+c     theta space, where lambda follows the theta map "lmdathmap"
 c
 c
       subroutine lmdalangevin
@@ -939,7 +1002,7 @@ c
       real*8 gamma
       real*8 normal
       real*8 sigma
-      real*8 sinth
+      real*8 dldth
       real*8 ktm
       external normal
 c
@@ -949,9 +1012,10 @@ c
       if (lmdadt .le. 0.0d0)  return
       if (lmdamass .le. 0.0d0)  return
 c
-c     force on theta from dU/dlambda and lambda = sin(theta)**2
+c     force on theta from dU/dlambda and the theta map derivative
 c
-      force = -deffdl * sin(2.0d0*lmdatheta)
+      call lmdathetamap (lmdatheta,lambda,dldth)
+      force = -deffdl * dldth
 c
 c     propagate theta velocity with Langevin friction and noise
 c
@@ -967,20 +1031,91 @@ c
          lmdavtheta = lmdavtheta + lmdadt*force/lmdamass
       end if
 c
-c     update theta and wrap it into the principal periodic interval
+c     update theta and wrap it into the periodic interval [0,pi)
 c
       lmdatheta = lmdatheta + lmdadt*lmdavtheta
-      do while (lmdatheta .gt. pi)
-         lmdatheta = lmdatheta - 2.0d0*pi
-      end do
-      do while (lmdatheta .le. -pi)
-         lmdatheta = lmdatheta + 2.0d0*pi
-      end do
+      lmdatheta = lmdatheta - pi*floor(lmdatheta/pi)
+      if (lmdatheta .ge. pi)  lmdatheta = 0.0d0
+      if (lmdatheta .lt. 0.0d0)  lmdatheta = 0.0d0
 c
 c     map theta back to the main lambda
 c
-      sinth = sin(lmdatheta)
-      lambda = sinth * sinth
+      call lmdathetamap (lmdatheta,lambda,dldth)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine lmdathetamap  --  map theta onto main lambda  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "lmdathetamap" maps the lambda particle coordinate "theta" onto
+c     the main lambda, taking the sine squared or smoothed triangle
+c     form named by "lmdathmap", and returns the derivative of lambda
+c     with respect to theta
+c
+c     the smoothed triangle map is lambda = 1/2 - asin(a*cos(2*theta))
+c     / (2*asin(a)), which becomes sin(theta)**2 as the sharpness "a"
+c     goes to zero and a triangle wave, flat in lambda, as "a" goes to
+c     one; both maps have period pi in theta
+c
+c
+      subroutine lmdathetamap (theta,lmda,dldth)
+      use dlmda
+      implicit none
+      real*8 theta,lmda,dldth
+      real*8 alpha,asina
+      real*8 sinth,costh
+c
+c
+      if (lmdathmap .eq. 'TRI') then
+         alpha = lmdathalpha
+         asina = asin(alpha)
+         costh = cos(2.0d0*theta)
+         lmda = 0.5d0 - asin(alpha*costh)/(2.0d0*asina)
+         dldth = alpha * sin(2.0d0*theta)
+     &              / (asina*sqrt(1.0d0-alpha*alpha*costh*costh))
+      else
+         sinth = sin(theta)
+         lmda = sinth * sinth
+         dldth = sin(2.0d0*theta)
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine lmdathetainv  --  map main lambda onto theta  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "lmdathetainv" inverts the theta map named by "lmdathmap",
+c     returning the theta in [0,pi/2] that gives the main lambda "lmda"
+c
+c
+      subroutine lmdathetainv (lmda,theta)
+      use dlmda
+      implicit none
+      real*8 lmda,theta
+      real*8 lclip,alpha,asina
+      real*8 arg
+c
+c
+      lclip = min(1.0d0,max(0.0d0,lmda))
+      if (lmdathmap .eq. 'TRI') then
+         alpha = lmdathalpha
+         asina = asin(alpha)
+         arg = sin((1.0d0-2.0d0*lclip)*asina) / alpha
+         arg = min(1.0d0,max(-1.0d0,arg))
+         theta = 0.5d0 * acos(arg)
+      else
+         theta = asin(sqrt(lclip))
+      end if
       return
       end
 c

@@ -249,7 +249,6 @@ c     taking precedence, while otherwise a new file is started
 c
 c
       subroutine initabffile
-      use bath
       use dlmda
       use files
       use iounit
@@ -259,10 +258,6 @@ c
       integer lmdaintv0
       integer freeunit
       integer trimtext
-      real*8 kelvin0
-      real*8 lmdamass0
-      real*8 lmdafric0
-      real*8 lmdadt0
       logical exist
 c
 c
@@ -278,10 +273,6 @@ c
       if (exist) then
          nlmda0 = nlmda
          lmdaintv0 = lmdaintv
-         kelvin0 = kelvin
-         lmdamass0 = lmdamass
-         lmdafric0 = lmdafric
-         lmdadt0 = lmdadt
          call rdabf
          if (nlmda.ne.nlmda0 .or. lmdaintv.ne.lmdaintv0) then
             write (iout,10)  lmdasavefile(1:trimtext(lmdasavefile))
@@ -291,13 +282,6 @@ c
      &              /,'                  File Name :  ',a)
             call fatal
          end if
-c
-c     the settings of the current run win over the stored ones
-c
-         kelvin = kelvin0
-         lmdamass = lmdamass0
-         lmdafric = lmdafric0
-         lmdadt = lmdadt0
 c
 c     resume at an interval boundary, since the samples of a partial
 c     interval are not saved in the history file

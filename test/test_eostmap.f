@@ -31,6 +31,7 @@ c
       call test_eostmap_taper
       call test_eostmap_lmdachain
       call test_eostmap_relstage
+      call test_eostmap_theta
       call final
       return
       end
@@ -1241,5 +1242,200 @@ c     the ordinary maps must be untouched when staging is off
 c
       use_relstage = .false.
       relstage = 'VDWM'
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eostmap_theta  --  lambda particle maps  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eostmap_theta" checks the sine squared and smoothed
+c     triangle maps from the lambda particle theta onto the main
+c     lambda, their theta derivatives and inverses, and a lambda
+c     particle step taken with the smoothed triangle map
+c
+c
+      subroutine test_eostmap_theta
+      use dlmda
+      use math
+      use mutant
+      implicit none
+      integer i,j
+      real*8 theta,lmda,dldth
+      real*8 lp,lm,dnum,h
+      real*8 alpha,asina
+      real*8 v0,th0,vref,thref
+      real*8 alist(2),llist(6)
+      logical inrange
+      character*3 maps(2)
+c
+c
+c     the sine squared map is lambda = sin(theta)**2
+c
+      lmdathmap = 'SIN'
+      call lmdathetamap (0.3d0,lmda,dldth)
+      call assert_real (lmda,sin(0.3d0)**2,1.0d-15,
+     &                  'lmdathetamap sin lambda')
+      call assert_real (dldth,sin(0.6d0),1.0d-15,
+     &                  'lmdathetamap sin derivative')
+c
+c     the smoothed triangle reaches both endpoints and the midpoint
+c
+      lmdathmap = 'TRI'
+      lmdathalpha = 0.999999999d0
+      call lmdathetamap (0.0d0,lmda,dldth)
+      call assert_real (lmda,0.0d0,1.0d-12,'lmdathetamap tri at zero')
+      call assert_real (dldth,0.0d0,1.0d-12,
+     &                  'lmdathetamap tri flat at zero')
+      call lmdathetamap (0.5d0*pi,lmda,dldth)
+      call assert_real (lmda,1.0d0,1.0d-12,'lmdathetamap tri at pi/2')
+      call lmdathetamap (-0.5d0*pi,lmda,dldth)
+      call assert_real (lmda,1.0d0,1.0d-12,'lmdathetamap tri at -pi/2')
+      call lmdathetamap (-0.25d0*pi,lmda,dldth)
+      call assert_real (lmda,0.5d0,1.0d-12,
+     &                  'lmdathetamap tri at -pi/4')
+c
+c     both maps close on themselves over a period of pi in theta
+c
+      maps(1) = 'SIN'
+      maps(2) = 'TRI'
+      alist(1) = 0.9d0
+      alist(2) = 0.999999999d0
+      do j = 1, 2
+         lmdathmap = maps(j)
+         lmdathalpha = alist(j)
+         do i = 0, 12
+            theta = -pi + pi*dble(i)/12.0d0
+            call lmdathetamap (theta,lmda,dldth)
+            call lmdathetamap (theta+pi,lp,dnum)
+            call assert_real (lp,lmda,1.0d-12,
+     &                        'lmdathetamap period pi lambda')
+            call assert_real (dnum,dldth,1.0d-9,
+     &                        'lmdathetamap period pi derivative')
+         end do
+      end do
+c
+c     a vanishing sharpness recovers the sine squared map
+c
+      do i = 0, 12
+         theta = -pi + 2.0d0*pi*dble(i)/12.0d0
+         lmdathmap = 'TRI'
+         lmdathalpha = 1.0d-6
+         call lmdathetamap (theta,lmda,dldth)
+         lmdathmap = 'SIN'
+         call lmdathetamap (theta,lp,dnum)
+         call assert_real (lmda,lp,1.0d-8,
+     &                     'lmdathetamap tri small alpha limit')
+         call assert_real (dldth,dnum,1.0d-8,
+     &                     'lmdathetamap tri small alpha slope')
+      end do
+c
+c     theta derivatives match central differences over a full period
+c
+      h = 1.0d-6
+      do j = 1, 2
+         lmdathmap = maps(j)
+         lmdathalpha = alist(j)
+         do i = 0, 40
+            theta = -pi + 2.0d0*pi*dble(i)/40.0d0
+            call lmdathetamap (theta+h,lp,dldth)
+            call lmdathetamap (theta-h,lm,dldth)
+            call lmdathetamap (theta,lmda,dldth)
+            dnum = (lp-lm) / (2.0d0*h)
+            call assert_real (dldth,dnum,1.0d-8,
+     &                        'lmdathetamap derivative')
+         end do
+      end do
+c
+c     the inverse maps round trip lambda through theta
+c
+      llist(1) = 0.0d0
+      llist(2) = 0.001d0
+      llist(3) = 0.25d0
+      llist(4) = 0.5d0
+      llist(5) = 0.9d0
+      llist(6) = 1.0d0
+      do j = 1, 2
+         lmdathmap = maps(j)
+         lmdathalpha = 0.999999999d0
+         do i = 1, 6
+            call lmdathetainv (llist(i),theta)
+            call lmdathetamap (theta,lmda,dldth)
+            call assert_real (lmda,llist(i),1.0d-12,
+     &                        'lmdathetainv round trip')
+            call assert_logical (theta.ge.0.0d0 .and.
+     &                           theta.le.0.5d0*pi,.true.,
+     &                           'lmdathetainv branch in [0,pi/2]')
+         end do
+      end do
+c
+c     a frictionless step with the smoothed triangle map
+c
+      lmdathmap = 'TRI'
+      alpha = 0.999999999d0
+      lmdathalpha = alpha
+      asina = asin(alpha)
+      lmdadt = 0.1d0
+      lmdamass = 2.0d0
+      lmdafric = 0.0d0
+      deffdl = 1.5d0
+      th0 = 0.7d0
+      v0 = 0.3d0
+      lmdatheta = th0
+      lmdavtheta = v0
+      call lmdalangevin
+      dldth = alpha * sin(2.0d0*th0)
+     &           / (asina*sqrt(1.0d0-(alpha*cos(2.0d0*th0))**2))
+      vref = v0 - lmdadt*deffdl*dldth/lmdamass
+      thref = th0 + lmdadt*vref
+      call assert_real (lmdavtheta,vref,1.0d-14,
+     &                  'lmdalangevin tri theta velocity')
+      call assert_real (lmdatheta,thref,1.0d-14,
+     &                  'lmdalangevin tri theta')
+      call assert_real (lambda,0.5d0-asin(alpha*cos(2.0d0*thref))
+     &                     /(2.0d0*asina),1.0d-14,
+     &                  'lmdalangevin tri lambda')
+c
+c     a step past the end of the period wraps theta into [0,pi)
+c
+      do j = 1, 2
+         lmdathmap = maps(j)
+         lmdathalpha = 0.9d0
+         deffdl = 0.0d0
+         lmdafric = 0.0d0
+         lmdadt = 0.1d0
+         lmdamass = 2.0d0
+         th0 = 2.0d0
+         v0 = 30.0d0
+         lmdatheta = th0
+         lmdavtheta = v0
+         call lmdalangevin
+         thref = th0 + lmdadt*v0
+         call assert_real (lmdatheta,thref-pi,1.0d-14,
+     &                     'lmdalangevin theta wrapped')
+         call lmdathetamap (thref,lmda,dldth)
+         call assert_real (lambda,lmda,1.0d-12,
+     &                     'lmdalangevin lambda across the wrap')
+c
+c     many steps of a fast particle stay inside the period
+c
+         inrange = .true.
+         do i = 1, 200
+            call lmdalangevin
+            if (lmdatheta.lt.0.0d0 .or. lmdatheta.ge.pi)
+     &         inrange = .false.
+         end do
+         call assert_logical (inrange,.true.,
+     &                        'lmdalangevin theta stays in [0,pi)')
+      end do
+c
+c     restore the default map for later tests
+c
+      lmdathmap = 'TRI'
+      lmdathalpha = 0.999999999d0
       return
       end

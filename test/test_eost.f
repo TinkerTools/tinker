@@ -2416,6 +2416,8 @@ c
       nlmdahist = 0
       nlmdasave = 0
       sizelmdahist = nhist
+      lmdathmap = 'SIN'
+      lmdathalpha = 0.999999999d0
       lmdaintv = 10
       lmdanpa = 3
       lmdanpb = 3

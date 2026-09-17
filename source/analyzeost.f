@@ -584,7 +584,6 @@ c     the cumulative free energy estimate after each sample
 c
 c
       subroutine abfseries
-      use bath
       use dlmda
       use iounit
       implicit none
@@ -596,9 +595,8 @@ c
 c
 c     write a column header for the sample table
 c
-      write (iout,10)  kelvin
-   10 format (/,' ABF Time Series :',
-     &        //,3x,'Temperature Used',6x,1p,d20.10,' K')
+      write (iout,10)
+   10 format (/,' ABF Time Series :')
       write (iout,20)
    20 format (/,3x,'Hist',8x,'Step',4x,'Lambda',14x,'dU/dLambda',
      &           10x,'Free Energy',/)
@@ -639,7 +637,6 @@ c     the mean force at each lambda bin
 c
 c
       subroutine abffreeenergy
-      use bath
       use dlmda
       use iounit
       implicit none
@@ -652,11 +649,10 @@ c     recompute and print the total free energy estimate
 c
       call buildabfkernel
       lmdadeltag = efreetot()
-      write (iout,10)  nlmdahist,lmdadeltag,kelvin
+      write (iout,10)  nlmdahist,lmdadeltag
    10 format (/,' ABF Free Energy Estimate :',
      &        //,1x,'Number of Samples',i18,
-     &         /,1x,'Delta G',20x,1p,d20.10,
-     &         /,1x,'Temperature Used',11x,d20.10,' K')
+     &         /,1x,'Delta G',20x,1p,d20.10)
 c
 c     print the mean force at each lambda bin, whose trapezoid
 c     integral is the free energy estimate

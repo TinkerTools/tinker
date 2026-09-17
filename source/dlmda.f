@@ -74,6 +74,7 @@ c     lmdaparatio   interval fraction propagating the lambda particle
 c     lmdapbratio   interval fraction equilibrating at fixed lambda
 c     lmdapcratio   interval fraction averaging at fixed lambda
 c     lmdastd       interval deviation of the main lambda
+c     lmdathalpha   sharpness of the smoothed triangle theta map
 c     lmdatheta     theta coordinate used to propagate lambda
 c     lmdavbias     saved lambda bias energy shift
 c     lmdavtheta    velocity of the theta lambda coordinate
@@ -145,6 +146,7 @@ c     douindorig    original douind
 c     elmdamap      mapping type from main to electrostatic lambda
 c     plmdamap      mapping type from main to polarization lambda
 c     vlmdamap      mapping type from main to van der Waals lambda
+c     lmdathmap     mapping type from theta to main lambda, SIN or TRI
 c     lmdaengymode  free energy being computed, ABS or REL
 c     lmdasampmode  lambda sampling method, OST, META, TI, ABF or NONE
 c     relstage      declared leg of the staged schedule
@@ -221,6 +223,7 @@ c
       real*8 lmdapbratio
       real*8 lmdapcratio
       real*8 lmdastd
+      real*8 lmdathalpha
       real*8 lmdatheta
       real*8 lmdavbias
       real*8 lmdavtheta
@@ -292,6 +295,7 @@ c
       character*3 elmdamap
       character*3 plmdamap
       character*3 vlmdamap
+      character*3 lmdathmap
       character*4 lmdaengymode
       character*4 lmdasampmode
       character*4 relstage

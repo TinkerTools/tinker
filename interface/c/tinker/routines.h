@@ -348,6 +348,10 @@ void setlmdaphase_();
 #define tinker_f_setlmdaphase setlmdaphase_
 void lmdalangevin_();
 #define tinker_f_lmdalangevin lmdalangevin_
+void lmdathetamap_(double* theta, double* lmda, double* dldth);
+#define tinker_f_lmdathetamap lmdathetamap_
+void lmdathetainv_(double* lmda, double* theta);
+#define tinker_f_lmdathetainv lmdathetainv_
 void efreelmda_(double* eflmda, double* dfdl);
 #define tinker_f_efreelmda efreelmda_
 double efreetot_();
