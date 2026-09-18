@@ -218,6 +218,7 @@ c
       integer i,j,k,m
       integer it,kt,bt
       integer ic,kc
+      integer nterm,koxo
       real*8, allocatable :: pbase(:)
       logical emprule
 c
@@ -227,7 +228,43 @@ c
       do i = 1, n
          it = type(i)
          pchg(i) = 0.0d0
-         if (it .eq. 107)  pchg(i) = -0.5d0
+         if (it .eq. 107) then
+            pchg(i) = -0.5d0
+            do j = 1, n12(i)
+               k = i12(j,i)
+               kt = type(k)
+c     the primary charge of a terminal oxygen follows the eq. (15)
+c     environment rule, q0 = -(n-k)/n: n is the number of terminal
+c     oxygens on the attached center, k counts the oxygens of the
+c     neutral parent oxyacid (1 for C, P and S(IV); 2 for N and
+c     tetracoordinate S(VI); 3 for Cl); neutral groups such as
+c     sulfones, nitro and phosphine oxides keep q0 = 0, their
+c     polarization living in the bond charge increments
+               koxo = -1
+               if (atomic(k) .eq. 6)  koxo = 1
+               if (atomic(k) .eq. 15)  koxo = 1
+               if (atomic(k) .eq. 7)  koxo = 2
+               if (atomic(k) .eq. 17)  koxo = 3
+               if (atomic(k) .eq. 16) then
+                  koxo = 1
+                  if (kt.eq.64 .or. kt.eq.65 .or. kt.eq.66 .or.
+     &                kt.eq.68 .or. kt.eq.69 .or. kt.eq.70)  koxo = 2
+               end if
+               if (koxo .gt. 0) then
+                  nterm = 0
+                  do m = 1, n12(k)
+                     if (n12(i12(m,k)) .eq. 1) then
+                        if (type(i12(m,k)).ge.107 .and.
+     &                      type(i12(m,k)).le.121)  nterm = nterm + 1
+                     end if
+                  end do
+                  pchg(i) = 0.0d0
+                  if (nterm .gt. koxo) then
+                     pchg(i) = -1.0d0*(nterm-koxo)/nterm
+                  end if
+               end if
+            end do
+         end if
          if (it .eq. 113) then
             pchg(i) = 0.0d0
             do j = 1, n12(i)
