@@ -616,6 +616,44 @@ c
       end
 c
 c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  function depcriteria -- interval sample acceptance  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "depcriteria" decides whether the samples collected over the
+c     last interval are converged enough to be added to the lambda
+c     bias, by comparing their deviation against a tolerance with
+c     both absolute and relative parts; every interval is accepted
+c     unless the convergence gate is turned on
+c
+c
+      function depcriteria (avg,std)
+      use dlmda
+      implicit none
+      logical depcriteria
+      real*8 avg,std
+      real*8 tolerance
+c
+c
+c     accept every interval when the gate is off
+c
+      depcriteria = .true.
+      if (.not. use_lmdacv)  return
+c
+c     accept only a deviation strictly inside the tolerance
+c
+      depcriteria = .false.
+      tolerance = lmdacvstd + lmdacvrat*abs(avg)
+      if (tolerance .gt. 0.0d0) then
+         if (std/tolerance .lt. 1.0d0)  depcriteria = .true.
+      end if
+      return
+      end
+c
+c
 c     #########################################################
 c     ##                                                     ##
 c     ##  subroutine rdbiashead -- input lambda bias header  ##
@@ -975,6 +1013,91 @@ c
          lmdanpa = lmdanpa - 1
          lmdanpc = lmdanpc + 1
       end do
+      return
+      end
+c
+c
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine elmdadyn -- adaptive lambda sampling  ##
+c     ##                                                   ##
+c     #######################################################
+c
+c
+c     "elmdadyn" advances the adaptive lambda bias by one dynamics
+c     step for orthogonal space tempering, metadynamics or adaptive
+c     biasing force; it builds the effective lambda derivative, saves
+c     the interval samples, deposits the interval average at the end
+c     of each interval and propagates the lambda particle
+c
+c
+      subroutine elmdadyn
+      use dlmda
+      use mutant
+      use ost
+      implicit none
+      integer isamp,istep
+      integer nskip
+      logical depcriteria
+c
+c
+c     increment lmdastep step counter
+c
+      lmdastep = lmdastep + 1
+c
+c     build the effective lambda derivative from the unbiased value
+c     summed by lmdachain and the bias saved this step by eostbias
+c     or eabfbias
+c
+      if (use_ost) then
+         ostdgdl = ostbdgdl + ostbdgdfl*d2edl2
+         lmdaddgdl = lmdadfdl
+         deffdl = dedl + ostdgdl - lmdaddgdl
+      else if (use_meta) then
+         deffdl = dedl + ostbdgdl
+      else if (use_abf) then
+         lmdaddgdl = lmdadfdl
+         deffdl = dedl - lmdaddgdl
+      end if
+c
+c     save all values in the interval, but average only after the
+c     propagation and equilibration phases; only ost and abf keep
+c     dU/dlambda, which they average at a fixed lambda
+c
+      istep = mod(lmdastep,lmdaintv)
+      if (istep .eq. 0) then
+         isamp = lmdaintv
+      else
+         isamp = istep
+      end if
+      lmdallist(isamp) = lambda
+      if (use_ost .or. use_abf)  lmdaflist(isamp) = dedl
+c
+c     deposit the interval average every lmdaintv steps; an ost or
+c     abf interval is kept only when its samples are converged
+c
+      if (istep .eq. 0) then
+         nskip = lmdanpa + lmdanpb
+         call avgstd (lmdallist,nskip+1,lmdanpc,lmdaavg,lmdastd)
+         if (use_ost .or. use_abf) then
+            call avgstd (lmdaflist,nskip+1,lmdanpc,dedlavg,dedlstd)
+            if (depcriteria(dedlavg,dedlstd)) then
+               if (use_ost)  call ostdeposit
+               if (use_abf)  call abfdeposit
+            end if
+         else if (use_meta) then
+            call metadeposit
+         end if
+      end if
+c
+c     propagate the lambda particle; ost and abf hold lambda fixed
+c     after the propagation phase
+c
+      if (use_ost .or. use_abf) then
+         if (isamp .le. lmdanpa)  call lmdalangevin
+      else
+         call lmdalangevin
+      end if
       return
       end
 c

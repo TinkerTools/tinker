@@ -24,17 +24,11 @@ c     osthead        first histogram index for each lambda/flambda bin
 c     hbias          height of biasing gaussian
 c     maxwfhist      maximum flambda width of histogram gaussians
 c     maxwlhist      maximum lambda width of histogram gaussians
-c     ostbdgdfl      saved bias dg/dflambda from eostbias for eostdyn
-c     ostbdgdl       saved bias dg/dlambda from eostbias for eostdyn
-c     ostcvdif       max drift between first and last convergence bin
-c     ostcvrat       max ratio of sample deviation to sample average
-c     ostcvslp       max fitted sample slope over a deposit interval
-c     ostcvstd       max sample deviation over a deposit interval
-c     ostdedlslp     fitted dU/dL change per sample over an interval
+c     ostbdgdfl      saved bias dg/dflambda from eostbias for elmdadyn
+c     ostbdgdl       saved bias dg/dlambda from eostbias for elmdadyn
 c     ostdgdl        current dg/dlambda value
 c     ostgtempgamma  global tempering factor scaling height decay by kT
 c     ostgthresh     global bias threshold for untempered heights
-c     ostlambdaslp   fitted lambda change per sample over an interval
 c     ostltempgamma  local tempering factor scaling height decay by kT
 c     ostlthresh     local bias threshold for untempered heights
 c     oststdev       gaussian cutoff distance in standard deviations
@@ -80,15 +74,9 @@ c
       real*8 maxwlhist
       real*8 ostbdgdfl
       real*8 ostbdgdl
-      real*8 ostcvdif
-      real*8 ostcvrat
-      real*8 ostcvslp
-      real*8 ostcvstd
-      real*8 ostdedlslp
       real*8 ostdgdl
       real*8 ostgtempgamma
       real*8 ostgthresh
-      real*8 ostlambdaslp
       real*8 ostltempgamma
       real*8 ostlthresh
       real*8 oststdev

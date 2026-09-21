@@ -37,8 +37,6 @@ c
       call test_eost_kernelbuilds
       call test_eost_eginterpolate
       call test_eost_avgstd
-      call test_eost_histstat
-      call test_eost_drift
       call test_eost_depcriteria
       call test_eost_efkernel
       call test_eost_vkernelmax
@@ -1206,124 +1204,6 @@ c
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine test_eost_histstat  --  interval stat test  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "test_eost_histstat" checks the average, deviation and fitted
-c     drift that histstat computes over the averaging phase
-c
-c
-      subroutine test_eost_histstat
-      use dlmda
-      use ost
-      implicit none
-      integer i
-      real*8 stdref
-c
-c
-c     average the samples following the equilibration prefix
-c
-      call resetost (5,5,1)
-      lmdaintv = 6
-      lmdanpa = 1
-      lmdanpb = 1
-      lmdanpc = 4
-      do i = 1, lmdaintv
-         lmdallist(i) = dble(i)
-         lmdaflist(i) = 2.0d0*dble(i)
-      end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
-      call histstat (lmdaflist,dedlavg,dedlstd,ostdedlslp)
-      stdref = sqrt(1.25d0)
-      call assert_real (lmdaavg,4.5d0,1.0d-12,
-     &                  'histstat lambda average')
-      call assert_real (dedlavg,9.0d0,1.0d-12,
-     &                  'histstat dE/dl average')
-      call assert_real (lmdastd,stdref,1.0d-12,
-     &                  'histstat lambda deviation')
-      call assert_real (dedlstd,2.0d0*stdref,1.0d-12,
-     &                  'histstat dE/dl deviation')
-c
-c     the fitted drift keeps the scale of each ramp
-c
-      call assert_real (ostlambdaslp,1.0d0,1.0d-12,
-     &                  'histstat lambda slope')
-      call assert_real (ostdedlslp,2.0d0,1.0d-12,
-     &                  'histstat dE/dl slope')
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine test_eost_drift  --  interval drift tests  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "test_eost_drift" checks the fitted drift of flat, ramped,
-c     folded and offset series over the averaging phase
-c
-c
-      subroutine test_eost_drift
-      use dlmda
-      use ost
-      implicit none
-      integer i
-      real*8 v(8)
-      data v / 4.0d0,3.0d0,2.0d0,1.0d0,1.0d0,2.0d0,3.0d0,4.0d0 /
-c
-c
-c     a flat series has no drift
-c
-      call resetost (5,5,1)
-      lmdaintv = 8
-      lmdanpa = 0
-      lmdanpb = 0
-      lmdanpc = 8
-      do i = 1, lmdaintv
-         lmdallist(i) = 7.0d0
-      end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
-      call assert_real (lmdaavg,7.0d0,1.0d-12,
-     &                  'histstat flat average')
-      call assert_real (ostlambdaslp,0.0d0,1.0d-12,
-     &                  'histstat flat slope')
-c
-c     a decreasing ramp keeps its change per sample
-c
-      do i = 1, lmdaintv
-         lmdallist(i) = -0.5d0*dble(i-1)
-      end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
-      call assert_real (ostlambdaslp,-0.5d0,1.0d-12,
-     &                  'histstat ramp slope')
-c
-c     a folded series has no net drift
-c
-      do i = 1, lmdaintv
-         lmdallist(i) = v(i)
-      end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
-      call assert_real (ostlambdaslp,0.0d0,1.0d-12,
-     &                  'histstat folded slope')
-c
-c     a large offset must not swamp a small drift
-c
-      do i = 1, lmdaintv
-         lmdallist(i) = 5000.0d0 + 1.0d-6*dble(i-1)
-      end do
-      call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
-      call assert_real (ostlambdaslp,1.0d-6,1.0d-9,
-     &                  'histstat offset slope')
-      return
-      end
-c
-c
 c     ################################################################
 c     ##                                                            ##
 c     ##  subroutine test_eost_depcriteria  --  deposit gate tests  ##
@@ -1336,15 +1216,24 @@ c     tolerance built from an absolute and a relative part
 c
 c
       subroutine test_eost_depcriteria
-      use ost
+      use dlmda
       implicit none
       logical depcriteria
 c
 c
-c     the tolerance is ostcvstd plus ostcvrat times the average
+c     with the gate off every interval is accepted
 c
-      ostcvstd = 10.0d0
-      ostcvrat = 0.2d0
+      use_lmdacv = .false.
+      lmdacvstd = 0.0d0
+      lmdacvrat = 0.0d0
+      call assert_logical (depcriteria(0.0d0,1.0d6),.true.,
+     &                     'depcriteria accepts with the gate off')
+c
+c     the tolerance is lmdacvstd plus lmdacvrat times the average
+c
+      use_lmdacv = .true.
+      lmdacvstd = 10.0d0
+      lmdacvrat = 0.2d0
       call assert_logical (depcriteria(0.0d0,9.9d0),.true.,
      &                     'depcriteria inside absolute tolerance')
       call assert_logical (depcriteria(0.0d0,10.0d0),.false.,
@@ -1360,10 +1249,11 @@ c
 c
 c     a vanishing tolerance rejects every interval
 c
-      ostcvstd = 0.0d0
-      ostcvrat = 0.0d0
+      lmdacvstd = 0.0d0
+      lmdacvrat = 0.0d0
       call assert_logical (depcriteria(1.0d0,0.0d0),.false.,
      &                     'depcriteria zero tolerance')
+      use_lmdacv = .false.
       return
       end
 c
@@ -1715,8 +1605,9 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_eost_metadyn" drives one full deposit interval and
-c     checks the gaussian that emetadyn stores
+c     "test_eost_metadyn" drives two deposit intervals and checks
+c     the gaussian that elmdadyn stores, and that metadynamics ignores
+c     the convergence gate and moves lambda on every step
 c
 c
       subroutine test_eost_metadyn
@@ -1727,12 +1618,14 @@ c
       integer istep
       real*8 avgref
       real*8 lam(4)
+      real*8 lmv(4)
       data lam / 0.1d0,0.2d0,0.4d0,0.6d0 /
 c
 c
 c     a frozen lambda particle keeps the sampled values controlled
 c
       call resetost (5,5,1)
+      use_meta = .true.
       call resetmeta (2)
       lmdaintv = 4
       lmdanpa = 1
@@ -1745,25 +1638,52 @@ c
       lmdastep = 0
       do istep = 1, lmdaintv
          lambda = lam(istep)
-         call emetadyn
+         call elmdadyn
          if (istep .lt. lmdaintv) then
             call assert_int (nmetahist,0,
-     &                       'emetadyn waits for the interval end')
+     &                       'elmdadyn meta waits for the interval end')
          end if
       end do
 c
 c     only the samples after the equilibration prefix are averaged
 c
       avgref = (lam(3)+lam(4)) / dble(lmdanpc)
-      call assert_int (nmetahist,1,'emetadyn deposits one gaussian')
+      call assert_int (nmetahist,1,
+     &                 'elmdadyn meta deposits one gaussian')
       call assert_real (metalhist(1),avgref,1.0d-12,
-     &                  'emetadyn gaussian center')
+     &                  'elmdadyn meta gaussian center')
       call assert_real (metahhist(1),hbias,1.0d-12,
-     &                  'emetadyn gaussian height')
+     &                  'elmdadyn meta gaussian height')
       call assert_real (metawhist(1),wlmda,1.0d-12,
-     &                  'emetadyn gaussian width')
+     &                  'elmdadyn meta gaussian width')
       call assert_int (metaihist(1),lmdaintv,
-     &                 'emetadyn gaussian step stamp')
+     &                 'elmdadyn meta gaussian step stamp')
+c
+c     meta ignores the convergence gate and moves a deterministic
+c     frictionless lambda particle on every step of the interval
+c
+      use_lmdacv = .true.
+      lmdacvstd = 1.0d0
+      lmdacvrat = 0.0d0
+      lmdadt = 0.1d0
+      lmdamass = 1.0d0
+      lmdafric = 0.0d0
+      lmdatheta = 0.25d0 * 3.14159265358979323846d0
+      lmdavtheta = 0.0d0
+      do istep = 1, lmdaintv
+         dedl = 1.0d0
+         if (mod(istep,2) .eq. 0)  dedl = 11.0d0
+         call elmdadyn
+         lmv(istep) = lambda
+      end do
+      call assert_int (nmetahist,2,
+     &                 'elmdadyn meta deposits a noisy interval')
+      do istep = 2, lmdaintv
+         call assert_logical (lmv(istep).ne.lmv(istep-1),.true.,
+     &                        'elmdadyn meta moves lambda each step')
+      end do
+      use_lmdacv = .false.
+      use_meta = .false.
       return
       end
 c
@@ -1799,6 +1719,7 @@ c     deposit repeatedly at a fixed lambda with tempering on
 c
       kelvin = 300.0d0
       call resetost (5,5,1)
+      use_meta = .true.
       call resetmeta (8)
       lmdaintv = 4
       lmdanpa = 1
@@ -1813,25 +1734,25 @@ c
       lmdastep = 0
       do istep = 1, ndep*lmdaintv
          lambda = 0.5d0
-         call emetadyn
+         call elmdadyn
       end do
-      call assert_int (nmetahist,ndep,'emetadyn deposit count')
+      call assert_int (nmetahist,ndep,'elmdadyn meta deposit count')
 c
 c     the first deposit sees an empty bias, so it is untempered
 c
       call assert_real (metahhist(1),hbias,1.0d-12,
-     &                  'emetadyn first height untempered')
+     &                  'elmdadyn meta first height untempered')
       call assert_logical (refvstar(1).gt.ostgthresh,.true.,
-     &                     'emetadyn crosses the threshold')
+     &                     'elmdadyn meta crosses the threshold')
 c
 c     every later height follows the pre-deposit bias level
 c
       do k = 2, ndep
          call assert_real (metahhist(k),
      &                     temperedheight(refvstar(k-1),refvstar(k-1)),
-     &                     1.0d-12,'emetadyn tempered height')
+     &                     1.0d-12,'elmdadyn meta tempered height')
          call assert_logical (metahhist(k).lt.metahhist(k-1),.true.,
-     &                        'emetadyn heights decay')
+     &                        'elmdadyn meta heights decay')
       end do
 c
 c     the grid matches the direct sum at each bin center, and the
@@ -1853,6 +1774,7 @@ c
      &                     'emetabiasinterpolate slope at a node')
       end do
       ostinterpol = .false.
+      use_meta = .false.
       return
       end
 c
@@ -1915,9 +1837,9 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "test_eost_ostdyn" drives eostdyn over two deposit intervals
-c     and checks that a settled interval deposits while an unsettled
-c     one is rejected
+c     "test_eost_ostdyn" drives elmdadyn over three deposit intervals
+c     and checks that a settled interval deposits, an unsettled one is
+c     rejected, and only the averaging phase samples are averaged
 c
 c
       subroutine test_eost_ostdyn
@@ -1934,12 +1856,14 @@ c     a settled interval deposits one gaussian at the interval end
 c
       kelvin = 300.0d0
       call resetost (5,5,4)
+      use_ost = .true.
       lmdaintv = 4
       lmdanpa = 0
       lmdanpb = 0
       lmdanpc = 4
-      ostcvstd = 1.0d0
-      ostcvrat = 0.0d0
+      use_lmdacv = .true.
+      lmdacvstd = 1.0d0
+      lmdacvrat = 0.0d0
       hbias = 1.0d0
       lmdadt = 0.0d0
       fastkernel = .true.
@@ -1951,23 +1875,24 @@ c
       do istep = 1, lmdaintv
          lambda = 0.5d0
          dedl = 1.0d0
-         call eostdyn
+         call elmdadyn
          if (istep .lt. lmdaintv) then
             call assert_int (nlmdahist,0,
-     &                       'eostdyn waits for the interval end')
+     &                       'elmdadyn ost waits for the interval end')
          end if
       end do
       call assert_int (nlmdahist,1,
-     &                 'eostdyn deposits a settled interval')
-      call assert_int (lmdaihist(1),lmdaintv,'eostdyn stamps the step')
+     &                 'elmdadyn ost deposits a settled interval')
+      call assert_int (lmdaihist(1),lmdaintv,
+     &                 'elmdadyn ost stamps the step')
       call assert_real (lmdalhist(1),0.5d0,1.0d-12,
-     &                  'eostdyn gaussian lambda center')
+     &                  'elmdadyn ost gaussian lambda center')
       call assert_real (lmdafhist(1),1.0d0,1.0d-12,
-     &                  'eostdyn gaussian flambda center')
+     &                  'elmdadyn ost gaussian flambda center')
       call assert_real (osthhist(1),hbias,1.0d-12,
-     &                  'eostdyn untempered gaussian height')
+     &                  'elmdadyn ost untempered gaussian height')
       call assert_real (ostwlhist(1),wlhist,1.0d-12,
-     &                  'eostdyn gaussian lambda width')
+     &                  'elmdadyn ost gaussian lambda width')
 c
 c     an unsettled interval is rejected and changes nothing
 c
@@ -1976,16 +1901,39 @@ c
          lambda = 0.5d0
          dedl = 1.0d0
          if (mod(istep,2) .eq. 0)  dedl = 11.0d0
-         call eostdyn
+         call elmdadyn
       end do
       call assert_real (dedlavg,6.0d0,1.0d-12,
-     &                  'eostdyn unsettled interval average')
+     &                  'elmdadyn ost unsettled interval average')
       call assert_real (dedlstd,5.0d0,1.0d-12,
-     &                  'eostdyn unsettled interval deviation')
-      call assert_int (nlmdahist,1,'eostdyn rejects an unsettled '//
-     &                 'interval')
+     &                  'elmdadyn ost unsettled interval deviation')
+      call assert_int (nlmdahist,1,
+     &                 'elmdadyn ost rejects an unsettled interval')
       call assert_real (lmdadeltag,eostsave,1.0d-12,
-     &                  'eostdyn rejection leaves the free energy')
+     &                  'elmdadyn ost rejection leaves the free energy')
+c
+c     only the samples after the equilibration prefix are averaged
+c
+      lmdanpa = 1
+      lmdanpb = 1
+      lmdanpc = 2
+      do istep = 1, lmdaintv
+         lambda = 0.1d0
+         dedl = 50.0d0
+         if (istep .gt. lmdanpa+lmdanpb) then
+            lambda = 0.5d0
+            dedl = 2.0d0
+         end if
+         call elmdadyn
+      end do
+      call assert_int (nlmdahist,2,
+     &                 'elmdadyn ost deposits the average phase')
+      call assert_real (lmdalhist(2),0.5d0,1.0d-12,
+     &                  'elmdadyn ost skips the prefix lambda')
+      call assert_real (lmdafhist(2),2.0d0,1.0d-12,
+     &                  'elmdadyn ost skips the prefix dU/dlambda')
+      use_lmdacv = .false.
+      use_ost = .false.
       return
       end
 c
@@ -1998,7 +1946,7 @@ c     ###############################################################
 c
 c
 c     "test_eost_ostlocal" deposits into an unevenly filled kernel
-c     with both tempering factors on, and checks that eostdyn takes
+c     with both tempering factors on, and checks that elmdadyn takes
 c     the height from the pre-deposit bias levels, that the least
 c     filled lambda bin deposits at the global height alone, and
 c     that growing the flambda grid keeps the bin bias levels
@@ -2025,6 +1973,7 @@ c
       kelvin = 300.0d0
       rt = gasconst * kelvin
       call resetost (5,5,8)
+      use_ost = .true.
       oststdev = 4.0d0
       nlmdahist = 2
       call sethist (1,0.0d0,0.0d0,5.0d0,0.25d0,1.0d0)
@@ -2038,8 +1987,9 @@ c
       lmdanpa = 0
       lmdanpb = 0
       lmdanpc = 4
-      ostcvstd = 1.0d0
-      ostcvrat = 0.0d0
+      use_lmdacv = .true.
+      lmdacvstd = 1.0d0
+      lmdacvrat = 0.0d0
       hbias = 1.0d0
       lmdadt = 0.0d0
       fastkernel = .true.
@@ -2063,21 +2013,22 @@ c
       gmin = ostvminimax ()
       gl = vkernelmax(imax)
       call assert_logical (gmin.gt.ostgthresh,.true.,
-     &                     'eostdyn global factor active')
+     &                     'elmdadyn ost global factor active')
       call assert_logical (gl-gmin.gt.ostlthresh,.true.,
-     &                     'eostdyn local factor active')
+     &                     'elmdadyn ost local factor active')
       lmdastep = 0
       do istep = 1, lmdaintv
          lambda = dble(imax-1) * wlmda
          dedl = 0.0d0
-         call eostdyn
+         call elmdadyn
       end do
       hglobal = hbias * exp(-(gmin-ostgthresh)/rt)
-      call assert_int (nlmdahist,3,'eostdyn deposits in the full bin')
+      call assert_int (nlmdahist,3,
+     &                 'elmdadyn ost deposits in the full bin')
       call assert_real (osthhist(3),temperedheight(gmin,gl),1.0d-12,
-     &                  'eostdyn height from pre-deposit levels')
+     &                  'elmdadyn ost height from pre-deposit levels')
       call assert_logical (osthhist(3).lt.hglobal,.true.,
-     &                     'eostdyn full bin below global height')
+     &                     'elmdadyn ost full bin below global height')
 c
 c     a deposit in the least filled bin sees no local excess
 c
@@ -2089,12 +2040,13 @@ c
       do istep = 1, lmdaintv
          lambda = dble(imin-1) * wlmda
          dedl = 0.0d0
-         call eostdyn
+         call elmdadyn
       end do
       hglobal = hbias * exp(-max(0.0d0,gmin-ostgthresh)/rt)
-      call assert_int (nlmdahist,4,'eostdyn deposits in the least bin')
+      call assert_int (nlmdahist,4,
+     &                 'elmdadyn ost deposits in the least bin')
       call assert_real (osthhist(4),hglobal,1.0d-12,
-     &                  'eostdyn least filled bin global height')
+     &                  'elmdadyn ost least filled bin global height')
 c
 c     growing the flambda grid keeps the running bin maxima
 c
@@ -2103,6 +2055,8 @@ c
          call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
      &                     'ensureflambda keeps bin bias levels')
       end do
+      use_lmdacv = .false.
+      use_ost = .false.
       return
       end
 c
@@ -2281,7 +2235,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "test_eost_ostgate" drives eostdyn over one deposit interval and
+c     "test_eost_ostgate" drives elmdadyn over one deposit interval and
 c     checks that the lambda particle moves only during the leading
 c     propagation phase, that lambda is then held exactly fixed, and
 c     that the deposited gaussian sits on that frozen lambda
@@ -2303,12 +2257,14 @@ c     particle, so that any lambda motion comes from the gate alone
 c
       kelvin = 300.0d0
       call resetost (5,5,4)
+      use_ost = .true.
       lmdaintv = 6
       lmdanpa = 2
       lmdanpb = 2
       lmdanpc = 2
-      ostcvstd = 1.0d0
-      ostcvrat = 0.0d0
+      use_lmdacv = .true.
+      lmdacvstd = 1.0d0
+      lmdacvrat = 0.0d0
       hbias = 1.0d0
       lmdadt = 0.1d0
       lmdamass = 1.0d0
@@ -2324,33 +2280,36 @@ c
       lmdastep = 0
       do istep = 1, lmdaintv
          dedl = 1.0d0
-         call eostdyn
+         call elmdadyn
          lam(istep) = lambda
       end do
 c
 c     the particle moves while the interval is in its first phase
 c
       call assert_logical (lam(1).ne.lam(2),.true.,
-     &                     'eostdyn propagates during phase a')
+     &                     'elmdadyn ost propagates during phase a')
 c
 c     lambda is then bit identical for the rest of the interval
 c
       frozen = lam(2)
       do istep = 3, lmdaintv
          call assert_real (lam(istep),frozen,0.0d0,
-     &                     'eostdyn holds lambda after phase a')
+     &                     'elmdadyn ost holds lambda after phase a')
       end do
 c
 c     the averaged lambda is the frozen value, not a smear, so the
 c     gaussian is deposited exactly on it
 c
-      call assert_int (nlmdahist,1,'eostdyn deposits a frozen interval')
+      call assert_int (nlmdahist,1,
+     &                 'elmdadyn ost deposits a frozen interval')
       call assert_real (lmdaavg,frozen,0.0d0,
-     &                  'eostdyn averages the frozen lambda')
+     &                  'elmdadyn ost averages the frozen lambda')
       call assert_real (lmdalhist(1),frozen,0.0d0,
-     &                  'eostdyn centers the gaussian on frozen lambda')
+     &                  'elmdadyn ost gaussian on the frozen lambda')
       call assert_real (lmdafhist(1),1.0d0,1.0d-12,
-     &                  'eostdyn centers the gaussian on flambda')
+     &                  'elmdadyn ost centers the gaussian on flambda')
+      use_lmdacv = .false.
+      use_ost = .false.
       return
       end
 c
@@ -2425,16 +2384,16 @@ c
       lambda = 0.0d0
       lmdaavg = 0.0d0
       lmdastd = 0.0d0
-      ostlambdaslp = 0.0d0
       dedl = 0.0d0
       dedlavg = 0.0d0
       dedlstd = 0.0d0
-      ostdedlslp = 0.0d0
       deffdl = 0.0d0
-      ostcvdif = 0.0d0
-      ostcvrat = 0.0d0
-      ostcvslp = 0.0d0
-      ostcvstd = 0.0d0
+      use_lmdacv = .false.
+      lmdacvstd = 0.0d0
+      lmdacvrat = 0.0d0
+      use_ost = .false.
+      use_meta = .false.
+      use_abf = .false.
       use_ostgtemp = .false.
       use_ostltemp = .false.
       ostgthresh = 0.0d0

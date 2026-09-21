@@ -330,6 +330,8 @@ void lmdachain_();
 #define tinker_f_lmdachain lmdachain_
 void avgstd_(double* list, int* begin, int* count, double* avg, double* std);
 #define tinker_f_avgstd avgstd_
+int depcriteria_(double* avg, double* std);
+#define tinker_f_depcriteria depcriteria_
 void rdbiashead_(int* ihis, char* histfile, char* title, tinker_fchar_len_t histfile_cap, tinker_fchar_len_t title_cap);
 inline void tinker_f_rdbiashead(int* ihis, tinker_fchars histfile, tinker_fchars title) {
     return rdbiashead_(ihis, histfile.string, title.string, histfile.capacity, title.capacity);
@@ -346,6 +348,8 @@ int lmdabin_(double* lambda);
 #define tinker_f_lmdabin lmdabin_
 void setlmdaphase_();
 #define tinker_f_setlmdaphase setlmdaphase_
+void elmdadyn_();
+#define tinker_f_elmdadyn elmdadyn_
 void lmdalangevin_();
 #define tinker_f_lmdalangevin lmdalangevin_
 void lmdathetamap_(double* theta, double* lmda, double* dldth);
@@ -360,8 +364,8 @@ double efreetot_();
 // eabf.f
 void eabfbias_();
 #define tinker_f_eabfbias eabfbias_
-void eabfdyn_();
-#define tinker_f_eabfdyn eabfdyn_
+void abfdeposit_();
+#define tinker_f_abfdeposit abfdeposit_
 void addabfhist_(int* ihist);
 #define tinker_f_addabfhist addabfhist_
 void buildabfkernel_();
@@ -1160,16 +1164,10 @@ void eopdist3_();
 // eost.f
 void eostbias_();
 #define tinker_f_eostbias eostbias_
-void eostdyn_();
-#define tinker_f_eostdyn eostdyn_
-void emetadyn_();
-#define tinker_f_emetadyn emetadyn_
-void histstat_(double* list, double* avg, double* std, double* slp);
-#define tinker_f_histstat histstat_
-double fitslope_(double* tdot, double* total, int* n);
-#define tinker_f_fitslope fitslope_
-int depcriteria_(double* avg, double* std);
-#define tinker_f_depcriteria depcriteria_
+void ostdeposit_();
+#define tinker_f_ostdeposit ostdeposit_
+void metadeposit_();
+#define tinker_f_metadeposit metadeposit_
 double ostvminimax_();
 #define tinker_f_ostvminimax ostvminimax_
 double metavminimax_();

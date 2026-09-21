@@ -99,9 +99,10 @@ c     ##                                                       ##
 c     ###########################################################
 c
 c
-c     "test_eabf_dyn" drives eabfdyn over two sample intervals and
-c     checks the sample, bin accumulators and free energy of
-c     a settled interval, and that a noisy interval is still kept
+c     "test_eabf_dyn" drives elmdadyn over four sample intervals and
+c     checks the sample, bin accumulators and free energy of a settled
+c     interval, that a noisy interval is kept while the convergence
+c     gate is off, and that the gate rejects it once turned on
 c
 c
       subroutine test_eabf_dyn
@@ -109,6 +110,7 @@ c
       use mutant
       implicit none
       integer istep
+      real*8 egsave
 c
 c
 c     a settled interval records its lambda and dU/dlambda average
@@ -125,38 +127,77 @@ c
       do istep = 1, lmdaintv
          lambda = 0.5d0
          dedl = 3.0d0
-         call eabfdyn
+         call elmdadyn
          if (istep .lt. lmdaintv) then
             call assert_int (nlmdahist,0,
-     &                       'eabfdyn waits for the interval end')
+     &                       'elmdadyn abf waits for the interval end')
          end if
       end do
       call assert_real (deffdl,2.5d0,1.0d-12,
-     &                  'eabfdyn removes the mean force')
-      call assert_int (nlmdahist,1,'eabfdyn records one interval')
-      call assert_int (lmdaihist(1),lmdaintv,'eabfdyn stamps the step')
+     &                  'elmdadyn abf removes the mean force')
+      call assert_int (nlmdahist,1,'elmdadyn abf records one interval')
+      call assert_int (lmdaihist(1),lmdaintv,
+     &                 'elmdadyn abf stamps the step')
       call assert_real (lmdalhist(1),0.5d0,0.0d0,
-     &                  'eabfdyn sample lambda')
+     &                  'elmdadyn abf sample lambda')
       call assert_real (lmdafhist(1),3.0d0,1.0d-12,
-     &                  'eabfdyn sample dU/dlambda')
-      call assert_real (lmdafwt(3),1.0d0,0.0d0,'eabfdyn bin count')
-      call assert_real (lmdafmean(3),3.0d0,1.0d-12,'eabfdyn mean force')
+     &                  'elmdadyn abf sample dU/dlambda')
+      call assert_real (lmdafwt(3),1.0d0,0.0d0,'elmdadyn abf bin count')
+      call assert_real (lmdafmean(3),3.0d0,1.0d-12,
+     &                  'elmdadyn abf mean force')
       call assert_real (lmdadeltag,0.75d0,1.0d-12,
-     &                  'eabfdyn free energy estimate')
+     &                  'elmdadyn abf free energy estimate')
 c
-c     a noisy interval is still recorded, since abf has no gate
+c     a noisy interval is still recorded while the gate is off
 c
       do istep = 1, lmdaintv
          lambda = 0.5d0
          dedl = 1.0d0
          if (mod(istep,2) .eq. 0)  dedl = 11.0d0
-         call eabfdyn
+         call elmdadyn
       end do
-      call assert_int (nlmdahist,2,'eabfdyn keeps a noisy interval')
+      call assert_int (nlmdahist,2,
+     &                 'elmdadyn abf keeps a noisy interval')
       call assert_real (lmdafwt(3),2.0d0,0.0d0,
-     &                  'eabfdyn noisy bin count')
+     &                  'elmdadyn abf noisy bin count')
       call assert_real (lmdafmean(3),4.5d0,1.0d-12,
-     &                  'eabfdyn noisy mean force')
+     &                  'elmdadyn abf noisy mean force')
+c
+c     with the gate on a noisy interval leaves the history unchanged
+c
+      use_lmdacv = .true.
+      lmdacvstd = 1.0d0
+      lmdacvrat = 0.0d0
+      egsave = lmdadeltag
+      do istep = 1, lmdaintv
+         lambda = 0.5d0
+         dedl = 1.0d0
+         if (mod(istep,2) .eq. 0)  dedl = 11.0d0
+         call elmdadyn
+      end do
+      call assert_int (nlmdahist,2,
+     &                 'elmdadyn abf gate rejects a noisy one')
+      call assert_real (lmdafwt(3),2.0d0,0.0d0,
+     &                  'elmdadyn abf gated bin count')
+      call assert_real (lmdafmean(3),4.5d0,1.0d-12,
+     &                  'elmdadyn abf gated mean force')
+      call assert_real (lmdadeltag,egsave,1.0d-12,
+     &                  'elmdadyn abf gated free energy')
+c
+c     with the gate on a settled interval is still recorded
+c
+      do istep = 1, lmdaintv
+         lambda = 0.5d0
+         dedl = 3.0d0
+         call elmdadyn
+      end do
+      call assert_int (nlmdahist,3,
+     &                 'elmdadyn abf gate keeps a settled one')
+      call assert_real (lmdafwt(3),3.0d0,0.0d0,
+     &                  'elmdadyn abf gate settled bin count')
+      call assert_real (lmdafmean(3),4.0d0,1.0d-12,
+     &                  'elmdadyn abf gate settled mean force')
+      use_lmdacv = .false.
       use_abf = .false.
       return
       end
@@ -216,7 +257,7 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_eabf_gate" drives eabfdyn over one sample interval and
+c     "test_eabf_gate" drives elmdadyn over one sample interval and
 c     checks that the lambda particle moves only during the leading
 c     propagation phase and that the sample sits on the frozen lambda
 c
@@ -249,27 +290,28 @@ c
       lmdastep = 0
       do istep = 1, lmdaintv
          dedl = 1.0d0
-         call eabfdyn
+         call elmdadyn
          lam(istep) = lambda
       end do
 c
 c     the particle moves only while the interval is in phase a
 c
       call assert_logical (lam(1).ne.lam(2),.true.,
-     &                     'eabfdyn propagates during phase a')
+     &                     'elmdadyn abf propagates during phase a')
       frozen = lam(2)
       do istep = 3, lmdaintv
          call assert_real (lam(istep),frozen,0.0d0,
-     &                     'eabfdyn holds lambda after phase a')
+     &                     'elmdadyn abf holds lambda after phase a')
       end do
 c
 c     the sample is recorded exactly on the frozen lambda
 c
-      call assert_int (nlmdahist,1,'eabfdyn samples a frozen interval')
+      call assert_int (nlmdahist,1,
+     &                 'elmdadyn abf samples a frozen interval')
       call assert_real (lmdalhist(1),frozen,0.0d0,
-     &                  'eabfdyn sample on the frozen lambda')
+     &                  'elmdadyn abf sample on the frozen lambda')
       call assert_real (lmdafhist(1),1.0d0,1.0d-12,
-     &                  'eabfdyn sample dU/dlambda on the gate')
+     &                  'elmdadyn abf sample dU/dlambda on the gate')
       use_abf = .false.
       return
       end
@@ -308,7 +350,7 @@ c
       do istep = 1, 3*lmdaintv
          lambda = 0.25d0
          dedl = dble((istep-1)/lmdaintv + 1)
-         call eabfdyn
+         call elmdadyn
       end do
       call assert_int (nlmdahist,3,'resizeabfhist sample count')
       call assert_int (sizelmdahist,4,'resizeabfhist doubles the size')
@@ -435,7 +477,7 @@ c
             lambda = 0.75d0
             dedl = 5.0d0
          end if
-         call eabfdyn
+         call elmdadyn
       end do
       call saveabf
       inquire (file=abffile,size=size1)
@@ -448,14 +490,14 @@ c
       do istep = 1, lmdaintv+2
          lambda = 0.75d0
          dedl = 7.0d0
-         call eabfdyn
+         call elmdadyn
       end do
       call saveabf
       inquire (file=abffile,size=size3)
       call assert_logical (size3.gt.size2,.true.,
      &                     'saveabf appends new samples')
-      call assert_int (nlmdahist,3,'eabfdyn restart sample count')
-      call assert_int (lmdastep,14,'eabfdyn restart partial step')
+      call assert_int (nlmdahist,3,'elmdadyn abf restart sample count')
+      call assert_int (lmdastep,14,'elmdadyn abf restart partial step')
       do i = 1, 5
          fref(i) = lmdafmean(i)
          sref(i) = lmdafsum(i)
@@ -573,7 +615,7 @@ c
       do istep = 1, 2*lmdaintv
          lambda = 0.25d0
          dedl = 1.0d0
-         call eabfdyn
+         call elmdadyn
       end do
       call saveabf
 c
@@ -596,7 +638,7 @@ c
       do istep = 1, lmdaintv
          lambda = 0.75d0
          dedl = 5.0d0
-         call eabfdyn
+         call elmdadyn
       end do
       call saveabf
 c

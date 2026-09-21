@@ -456,6 +456,40 @@ c
       call assert_logical (use_ti,.false.,'lmdamode bogus use_ti')
       call assert_logical (use_dlmda,.false.,
      &                     'lmdamode bogus use_dlmda')
+      call assert_logical (use_lmdacv,.false.,
+     &                     'lmdamode convcri gate off by default')
+      call final
+c
+c     a meta mode turns on metadynamics alone
+c
+      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+     &                     'LAMBDA-MODE meta')
+      call assert_logical (use_meta,.true.,'lmdamode meta use_meta')
+      call assert_logical (use_ost,.false.,'lmdamode meta use_ost')
+      call final
+c
+c     the convergence gate reads the deviation then the ratio
+c
+      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+     &                     'LAMBDA-CONVCRI 5.0 0.2')
+      call assert_logical (use_lmdacv,.true.,
+     &                     'lmdamode convcri use_lmdacv')
+      call assert_real (lmdacvstd,5.0d0,0.0d0,
+     &                  'lmdamode convcri lmdacvstd')
+      call assert_real (lmdacvrat,0.2d0,0.0d0,
+     &                  'lmdamode convcri lmdacvrat')
+      call final
+c
+c     a bare convergence keyword keeps the default tolerances
+c
+      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+     &                     'LAMBDA-CONVCRI')
+      call assert_logical (use_lmdacv,.true.,
+     &                     'lmdamode bare convcri use_lmdacv')
+      call assert_real (lmdacvstd,50.0d0,0.0d0,
+     &                  'lmdamode bare convcri lmdacvstd')
+      call assert_real (lmdacvrat,0.5d0,0.0d0,
+     &                  'lmdamode bare convcri lmdacvrat')
       call final
       call popdir
       return

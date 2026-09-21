@@ -17,7 +17,7 @@ c     the current lambda and subtracts it from the energy; the bias
 c     depends on lambda alone, so the Cartesian gradient and virial
 c     are unchanged; it has no side effects on the history or the
 c     lambda particle, so it may be called from a Monte Carlo barostat
-c     trial, and it saves the bias derivative for a later "eabfdyn"
+c     trial, and it saves the bias derivative for a later "elmdadyn"
 c     call in the same step
 c
 c
@@ -38,73 +38,33 @@ c
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine eabfdyn -- adaptive biasing force sampling  ##
-c     ##                                                         ##
-c     #############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine abfdeposit -- add one abf interval sample  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "eabfdyn" propagates the lambda particle under the adaptive
-c     biasing force and records the lambda and dU/dlambda average of
-c     each sample interval, reusing the ost propagate, equilibrate and
-c     average phases
+c     "abfdeposit" records the lambda and dU/dlambda average of one
+c     accepted interval, adds it to the mean force of its lambda bin
+c     and updates the free energy estimate
 c
 c
-      subroutine eabfdyn
+      subroutine abfdeposit
       use dlmda
-      use mutant
       implicit none
-      integer isamp,istep
-      integer nskip
       real*8 efreetot
 c
 c
-c     increment lmdastep step counter
+c     save the interval sample and update the mean force
 c
-      lmdastep = lmdastep + 1
-c
-c     remove the running mean force saved by eabfbias from the
-c     unbiased lambda derivative summed by lmdachain
-c
-      lmdaddgdl = lmdadfdl
-      deffdl = dedl - lmdaddgdl
-c
-c     save all values in the interval, but average only after the
-c     propagation and equilibration phases
-c
-      istep = mod(lmdastep,lmdaintv)
-      if (istep .eq. 0) then
-         isamp = lmdaintv
-      else
-         isamp = istep
-      end if
-      lmdallist(isamp) = lambda
-      lmdaflist(isamp) = dedl
-c
-c     record the averaging phase mean every lmdaintv steps
-c
-      if (istep .eq. 0) then
-         nskip = lmdanpa + lmdanpb
-         call avgstd (lmdallist,nskip+1,lmdanpc,lmdaavg,
-     &                lmdastd)
-         call avgstd (lmdaflist,nskip+1,lmdanpc,dedlavg,dedlstd)
-c
-c     every interval is kept, since rejecting the noisy intervals
-c     would bias the conditional mean of dU/dlambda
-c
-         nlmdahist = nlmdahist + 1
-         if (nlmdahist .gt. sizelmdahist)  call resizeabfhist
-         lmdaihist(nlmdahist) = lmdastep
-         lmdalhist(nlmdahist) = lmdaavg
-         lmdafhist(nlmdahist) = dedlavg
-         call addabfhist (nlmdahist)
-         lmdadeltag = efreetot()
-      end if
-c
-c     propagate the lambda particle
-c
-      if (isamp .le. lmdanpa)  call lmdalangevin
+      nlmdahist = nlmdahist + 1
+      if (nlmdahist .gt. sizelmdahist)  call resizeabfhist
+      lmdaihist(nlmdahist) = lmdastep
+      lmdalhist(nlmdahist) = lmdaavg
+      lmdafhist(nlmdahist) = dedlavg
+      call addabfhist (nlmdahist)
+      lmdadeltag = efreetot()
       return
       end
 c

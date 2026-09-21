@@ -494,6 +494,12 @@ c
       lmdaddgdl = 0.0d0
       lmdadeltag = 0.0d0
 c
+c     set default convergence gate for accepting interval samples
+c
+      use_lmdacv = .false.
+      lmdacvstd = 50.0d0
+      lmdacvrat = 0.5d0
+c
 c     search keywords for lambda derivative options
 c
       do i = 1, nkey
@@ -530,6 +536,10 @@ c
          else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
             string = record(next:240)
             read (string,*,err=10)  nlmda
+         else if (keyword(1:15) .eq. 'LAMBDA-CONVCRI ') then
+            use_lmdacv = .true.
+            string = record(next:240)
+            read (string,*,err=10,end=10)  lmdacvstd,lmdacvrat
          else if (keyword(1:13) .eq. 'ELE-DUALTOPO ') then
             use_emdt = .true.
          else if (keyword(1:17) .eq. 'ELE-DUALTOPO-EXP ') then
@@ -611,6 +621,11 @@ c
       if (mod(nlmda,2) .eq. 0)  nlmda = nlmda + 1
       wlmda = 1.0d0 / dble(nlmda-1)
       wlmda2 = 0.5d0 * wlmda
+c
+c     keep the convergence tolerances nonnegative
+c
+      lmdacvstd = abs(lmdacvstd)
+      lmdacvrat = abs(lmdacvrat)
 c
 c     split the sample interval into its propagation, equilibration
 c     and averaging phases
@@ -926,10 +941,10 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "mutate_ost" sets the flambda grid, the gaussian widths, heights
-c     and tempering, and the convergence criteria used by orthogonal
-c     space tempering, then allocates the histogram and the bias kernels
-c     when the method is active; the lambda grid, sample interval and
+c     "mutate_ost" sets the flambda grid and the gaussian widths,
+c     heights and tempering used by orthogonal space tempering, then
+c     allocates the histogram and the bias kernels when the method is
+c     active; the lambda grid, sample interval, convergence gate and
 c     lambda particle parameters are set by "mutate_dlmda"
 c
 c
@@ -948,13 +963,6 @@ c
 c     set default ost bias derivative
 c
       ostdgdl = 0.0d0
-c
-c     set default criteria for judging convergence of a deposit
-c
-      ostcvdif = 25.0d0
-      ostcvrat = 0.1d0
-      ostcvslp = 1.0d0
-      ostcvstd = 10.0d0
 c
 c     set defaults for tempering of the deposited gaussian heights
 c
@@ -1002,18 +1010,6 @@ c
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
             read (string,*,err=10)  hbias
-         else if (keyword(1:16) .eq. 'OST-CONVCRI-DIF ') then
-            string = record(next:240)
-            read (string,*,err=10)  ostcvdif
-         else if (keyword(1:16) .eq. 'OST-CONVCRI-RAT ') then
-            string = record(next:240)
-            read (string,*,err=10)  ostcvrat
-         else if (keyword(1:16) .eq. 'OST-CONVCRI-SLP ') then
-            string = record(next:240)
-            read (string,*,err=10)  ostcvslp
-         else if (keyword(1:16) .eq. 'OST-CONVCRI-STD ') then
-            string = record(next:240)
-            read (string,*,err=10)  ostcvstd
          else if (keyword(1:18) .eq. 'OST-TEMPER-GLOBAL ') then
             use_ostgtemp = .true.
             string = record(next:240)

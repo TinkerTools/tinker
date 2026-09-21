@@ -344,25 +344,19 @@ c     sum up to get the total lambda derivative
 c
       if (use_dlmda) then
          call lmdachain
-         if (use_ostdyn .or. use_metadyn) then
-            call eostbias
-            if (.not. lmdatrial) then
-               if (use_ostdyn) then
-                  call eostdyn
-               else if (use_metadyn) then
-                  call emetadyn
-               end if
+         if (use_ostdyn .or. use_metadyn .or. use_abfdyn) then
+            if (use_abfdyn) then
+               call eabfbias
+            else
+               call eostbias
             end if
+            if (.not. lmdatrial)  call elmdadyn
             energy = esum
             do i = 1, n
                do j = 1, 3
                   derivs(j,i) = desum(j,i)
                end do
             end do
-         else if (use_abfdyn) then
-            call eabfbias
-            if (.not. lmdatrial)  call eabfdyn
-            energy = esum
          end if
       end if
 c

@@ -64,6 +64,8 @@ c     dvldlmda      derivative of vlambda wrt main lambda
 c     elmdaapmrho   endpoint slope ratio for electrostatic asym map
 c     elmdainveps   shift for electrostatic inverse-power mapping
 c     lmdaavg       interval average of the main lambda
+c     lmdacvrat     max ratio of interval deviation to its average
+c     lmdacvstd     max interval deviation of dU/dlambda
 c     lmdaddgdl     current dDeltaG/dlambda of the lambda bias
 c     lmdadeltag    current free energy estimate of the lambda bias
 c     lmdadfdl      saved bias free energy derivative for dynamics
@@ -130,6 +132,7 @@ c     use_elmdamap  flag that elambda follows the main lambda map
 c     use_emdt      flag governing use of multipole dual topology
 c     use_epdt      flag governing use of polarization dual topology
 c     use_evdt      flag governing use of van der Waals dual topology
+c     use_lmdacv    flag to gate interval samples by convergence
 c     use_mainlmda  flag that a main lambda value was specified
 c     use_meta      flag to use metadynamics
 c     use_metadyn   flag to propagate metadynamics lambda particle
@@ -213,6 +216,8 @@ c
       real*8 elmdaapmrho
       real*8 elmdainveps
       real*8 lmdaavg
+      real*8 lmdacvrat
+      real*8 lmdacvstd
       real*8 lmdaddgdl
       real*8 lmdadeltag
       real*8 lmdadfdl
@@ -279,6 +284,7 @@ c
       logical use_emdt
       logical use_epdt
       logical use_evdt
+      logical use_lmdacv
       logical use_mainlmda
       logical use_meta
       logical use_metadyn

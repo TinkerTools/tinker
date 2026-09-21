@@ -18,8 +18,8 @@ c     into the energy, Cartesian gradient, and virial.  It has no
 c     side effects on the histogram or the lambda particle, so it
 c     may be called from a Monte Carlo barostat trial as well as
 c     from a normal dynamics step.  The bias derivatives needed to
-c     propagate the lambda particle are saved for a later eostdyn
-c     or emetadyn call in the same step.
+c     propagate the lambda particle are saved for a later elmdadyn
+c     call in the same step.
 c
 c
       subroutine eostbias
@@ -77,279 +77,100 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine eostdyn -- orthogonal space tempering algorithm  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine ostdeposit -- add one ost bias gaussian  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
-c     "eostdyn" calculates free energies using the orthogonal space
-c     tempering algorithm using biasing gaussians
+c     "ostdeposit" records one accepted interval of orthogonal space
+c     tempering as a biasing gaussian centered on the interval lambda
+c     and dU/dlambda averages, then updates the bias kernels and the
+c     free energy estimate
 c
 c
-      subroutine eostdyn
+      subroutine ostdeposit
       use dlmda
-      use mutant
       use ost
       implicit none
       integer k
-      integer isamp,istep
       integer ilmda,iflmda
       integer lmdabin,flambdabin
       real*8 efreetot
       real*8 ostvminimax
       real*8 temperedheight
-      logical depcriteria
 c
-c
-c     increment lmdastep step counter
-c
-      lmdastep = lmdastep + 1
-c
-c     build the effective lambda derivative from the unbiased value
-c     summed by lmdachain and the bias terms evaluated this step by
-c     eostbias
-c
-      ostdgdl = ostbdgdl + ostbdgdfl*d2edl2
-      lmdaddgdl = lmdadfdl
-      deffdl = dedl + ostdgdl - lmdaddgdl
-c
-c     save all values in the hist interval, but average only after
-c     the requested equilibration fraction
-c
-      istep = mod(lmdastep,lmdaintv)
-      if (istep .eq. 0) then
-         isamp = lmdaintv
-      else
-         isamp = istep
-      end if
-      lmdallist(isamp) = lambda
-      lmdaflist(isamp) = dedl
-c
-c     add a new histogram count every lmdaintv steps
-c
-      if (istep .eq. 0) then
-         call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
-         call histstat (lmdaflist,dedlavg,dedlstd,ostdedlslp)
-c
-c     deposit only when the interval samples are converged enough
-c
-         if (depcriteria(dedlavg,dedlstd)) then
-            ilmda = lmdabin(lmdaavg)
 c
 c     ensure histogram contains the unbiased dU/dlambda value
 c
-            maxwlhist = max(maxwlhist,wlhist)
-            maxwfhist = max(maxwfhist,wfhist)
-            call ensureflambda (dedlavg)
-            iflmda = flambdabin(dedlavg)
+      ilmda = lmdabin(lmdaavg)
+      maxwlhist = max(maxwlhist,wlhist)
+      maxwfhist = max(maxwfhist,wfhist)
+      call ensureflambda (dedlavg)
+      iflmda = flambdabin(dedlavg)
 c
 c     ensure histogram array is sufficiently large
 c
-            nlmdahist = nlmdahist + 1
-            if (nlmdahist .gt. sizelmdahist)  call resizeosthist
-            call ij_to_k(ilmda,iflmda,nlmda,k)
+      nlmdahist = nlmdahist + 1
+      if (nlmdahist .gt. sizelmdahist)  call resizeosthist
+      call ij_to_k(ilmda,iflmda,nlmda,k)
 c
 c     save histogram information
 c
-            osthist(nlmdahist) = k
-            lmdaihist(nlmdahist) = lmdastep
-            lmdalhist(nlmdahist) = lmdaavg
-            lmdafhist(nlmdahist) = dedlavg
-            osthhist(nlmdahist) = temperedheight(ostvminimax(),
-     &                                          vkernelmax(ilmda))
-            ostwlhist(nlmdahist) = wlhist
-            ostwfhist(nlmdahist) = wfhist
-            ostnext(nlmdahist) = osthead(ilmda,iflmda)
-            osthead(ilmda,iflmda) = nlmdahist
-            if (fastkernel) then
-               call updatekernels
-            else
-               call updategkernel
-               call buildfkernel
-            end if
-            lmdadeltag = efreetot()
-         end if
+      osthist(nlmdahist) = k
+      lmdaihist(nlmdahist) = lmdastep
+      lmdalhist(nlmdahist) = lmdaavg
+      lmdafhist(nlmdahist) = dedlavg
+      osthhist(nlmdahist) = temperedheight(ostvminimax(),
+     &                                    vkernelmax(ilmda))
+      ostwlhist(nlmdahist) = wlhist
+      ostwfhist(nlmdahist) = wfhist
+      ostnext(nlmdahist) = osthead(ilmda,iflmda)
+      osthead(ilmda,iflmda) = nlmdahist
+      if (fastkernel) then
+         call updatekernels
+      else
+         call updategkernel
+         call buildfkernel
       end if
-c
-c     propagate the lambda particle
-c
-      if (isamp .le. lmdanpa)  call lmdalangevin
+      lmdadeltag = efreetot()
       return
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine emetadyn -- 1D lambda metadynamics method  ##
-c     ##                                                        ##
-c     ############################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine metadeposit -- add one metadynamics gaussian  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "emetadyn" applies a one-dimensional metadynamics bias along
-c     the main lambda coordinate and deposits lambda gaussians
+c     "metadeposit" records one interval of lambda metadynamics as a
+c     gaussian centered on the interval lambda average, then updates
+c     the bias grid and the free energy estimate
 c
 c
-      subroutine emetadyn
+      subroutine metadeposit
       use dlmda
-      use mutant
       use ost
       implicit none
-      integer istep,isamp
       real*8 metadeltag
       real*8 metavminimax
       real*8 temperedheight
 c
 c
-c     increment adaptive-bias step counter
+c     save the new gaussian and add it to the bias grid
 c
-      lmdastep = lmdastep + 1
-c
-c     effective lambda derivative from the unbiased value summed by
-c     lmdachain and the bias evaluated this step by eostbias
-c
-      deffdl = dedl + ostbdgdl
-c
-c     save all lambda values in the hist interval
-c
-      istep = mod(lmdastep,lmdaintv)
-      if (istep .eq. 0) then
-         isamp = lmdaintv
-      else
-         isamp = istep
-      end if
-      lmdallist(isamp) = lambda
-c
-c     add a new metadynamics gaussian every lmdaintv steps
-c
-      if (istep .eq. 0) then
-         call histstat (lmdallist,lmdaavg,lmdastd,ostlambdaslp)
-         nmetahist = nmetahist + 1
-         if (nmetahist .gt. sizemetahist)  call resizemeta
-         metalhist(nmetahist) = lmdaavg
-         metahhist(nmetahist) = temperedheight(metavminimax(),
-     &                                         metavminimax())
-         metawhist(nmetahist) = wlmda
-         metaihist(nmetahist) = lmdastep
-         call addmetagrid (nmetahist)
-         lmdadeltag = metadeltag()
-      end if
-c
-c     propagate the lambda particle for the next dynamics step
-c
-      call lmdalangevin
-      return
-      end
-c
-c
-c     #########################################################
-c     ##                                                     ##
-c     ##  subroutine histstat -- interval sample statistics  ##
-c     ##                                                     ##
-c     #########################################################
-c
-c
-c     "histstat" computes the average, standard deviation and fitted
-c     drift of the samples in the averaging phase of the interval
-c     collected since the last deposit
-c
-c
-      subroutine histstat (list,avg,std,slp)
-      use dlmda
-      implicit none
-      integer i
-      integer nskip
-      real*8 avg,std,slp
-      real*8 fitslope
-      real*8 k,d
-      real*8 total,tdot
-      real*8 list(*)
-c
-c
-c     skip the propagation and equilibration phases
-c
-      nskip = lmdanpa + lmdanpb
-c
-c     accumulate the drift sums about a shifted origin, so that a
-c     small drift on top of a large offset is not lost to roundoff
-c
-      k = list(nskip+1)
-      total = 0.0d0
-      tdot = 0.0d0
-      do i = nskip+1, nskip+lmdanpc
-         d = list(i) - k
-         total = total + d
-         tdot = tdot + dble(i-nskip-1)*d
-      end do
-c
-c     average, deviation and drift come from the averaging slice
-c
-      call avgstd (list,nskip+1,lmdanpc,avg,std)
-      slp = fitslope (tdot,total,lmdanpc)
-      return
-      end
-c
-c
-c     ###########################################################
-c     ##                                                       ##
-c     ##  function fitslope -- least squares drift per sample  ##
-c     ##                                                       ##
-c     ###########################################################
-c
-c
-c     "fitslope" returns the least squares slope per sample of a
-c     series whose shifted sum is "total" and whose sum weighted by
-c     the sample index is "tdot", for "n" evenly spaced samples
-c
-c
-      function fitslope (tdot,total,n)
-      implicit none
-      integer n
-      real*8 fitslope
-      real*8 tdot,total
-      real*8 sxx,sxy
-c
-c
-c     a single sample has no drift to fit
-c
-      fitslope = 0.0d0
-      if (n .lt. 2)  return
-      sxx = dble(n) * (dble(n)*dble(n)-1.0d0) / 12.0d0
-      sxy = tdot - 0.5d0*dble(n-1)*total
-      fitslope = sxy / sxx
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  function depcriteria -- gaussian deposition criterion  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "depcriteria" decides whether the samples collected over the
-c     last deposit interval are converged enough to deposit a new
-c     biasing gaussian, by comparing their deviation against a
-c     tolerance with both absolute and relative parts
-c
-c
-      function depcriteria (avg,std)
-      use ost
-      implicit none
-      logical depcriteria
-      real*8 avg,std
-      real*8 tolerance
-c
-c
-c     accept only a deviation strictly inside the tolerance
-c
-      depcriteria = .false.
-      tolerance = ostcvstd + ostcvrat*abs(avg)
-      if (tolerance .gt. 0.0d0) then
-         if (std/tolerance .lt. 1.0d0)  depcriteria = .true.
-      end if
+      nmetahist = nmetahist + 1
+      if (nmetahist .gt. sizemetahist)  call resizemeta
+      metalhist(nmetahist) = lmdaavg
+      metahhist(nmetahist) = temperedheight(metavminimax(),
+     &                                      metavminimax())
+      metawhist(nmetahist) = wlmda
+      metaihist(nmetahist) = lmdastep
+      call addmetagrid (nmetahist)
+      lmdadeltag = metadeltag()
       return
       end
 c
