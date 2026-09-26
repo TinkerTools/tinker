@@ -341,7 +341,7 @@ c
                do k = 1, n
                   rk = rdescr(k)
                   mixsn = 0.5d0 * (sneck(i)+sneck(k))
-                  if (mut(k))  mixsn = mixsn * elambda
+                  if (mutg(k) .ne. 0)  mixsn = mixsn * elambda
                   if (i.ne.k .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi
@@ -903,7 +903,7 @@ c
                do k = 1, n
                   rk = rdescr(k)
                   mixsn = 0.5d0 * (sneck(i)+sneck(k))
-                  if (mut(k))  mixsn = mixsn * elambda
+                  if (mutg(k) .ne. 0)  mixsn = mixsn * elambda
                   if (k.ne.i .and. rk.gt.0.0d0) then
                      xr = x(k) - xi
                      yr = y(k) - yi

@@ -34,12 +34,8 @@ c
 c
 c     choose the method for summing over pairwise interactions
 c
-      if (use_evdt) then
-         if (use_rel) then
-            call ehal3dr
-         else
-            call ehal3d
-         end if
+      if (use_rel) then
+         call ehal3dr
          return
       end if
       if (use_lights) then
@@ -186,7 +182,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -210,7 +206,7 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -353,7 +349,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -377,7 +373,7 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -656,7 +652,7 @@ c
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -703,7 +699,7 @@ c
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -981,7 +977,7 @@ c
 !$OMP& ired,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
-!$OMP& dhal,vcouple,vlambda,mut,scexp,scalphav,cut2,c0,c1,
+!$OMP& dhal,vcouple,vlambda,mutg,scexp,scalphav,cut2,c0,c1,
 !$OMP& c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter)
@@ -996,7 +992,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1020,7 +1016,7 @@ c
             k = vlst(kk,i)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -1156,133 +1152,6 @@ c     perform deallocation of some local arrays
 c
       deallocate (iv14)
       deallocate (vscale)
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine ehal3d  --  dual topology buffered 14-7 analysis ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "ehal3d" calculates the buffered 14-7 van der Waals energy, and
-c     partitions the energy among the atoms, with the dual topology
-c     method, in which the fully coupled (vlambda=1) and the fully
-c     decoupled (vlambda=0) states are each evaluated in full and
-c     combined by a power law interpolation in vlambda
-c
-c
-      subroutine ehal3d
-      use action
-      use analyz
-      use atoms
-      use dlmda
-      use energi
-      use inter
-      use mutant
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      logical need0,need1
-      integer i
-      integer nev1
-      real*8 ev1,ev0
-      real*8 vlambdaorig
-      real*8 weight0
-      real*8 einterorig
-      real*8 einter1,einter0
-      real*8, allocatable :: aev1(:)
-      real*8, allocatable :: aev0(:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aev1(n))
-      allocate (aev0(n))
-c
-c     compute energy and analysis of the vlambda = 1 state
-c
-      vlambdaorig = vlambda
-      einterorig = einter
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 dvldlmda,d2vldlmda2,need0,need1)
-      if (need1) then
-         vlambda = 1.0d0
-         call ehal3calc
-         ev1 = ev
-         nev1 = nev
-         do i = 1, n
-            aev1(i) = aev(i)
-         end do
-c
-c     the intermolecular energy accumulates across energy terms, so
-c     save and remove the contribution from the vlambda = 1 state
-c
-         einter1 = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     compute energy and analysis of the vlambda = 0 state
-c
-      if (need0) then
-         vlambda = 0.0d0
-         call ehal3calc
-         ev0 = ev
-         do i = 1, n
-            aev0(i) = aev(i)
-         end do
-         einter0 = einter - einterorig
-      end if
-c
-c     retain the historical analysis count from the fully coupled
-c     endpoint even when its energy and analysis are not needed
-c
-      if (.not.need1) then
-         vlambda = 1.0d0
-         call ehal3calc
-         nev1 = nev
-         einter = einterorig
-      end if
-c
-c     copy results if only one endpoint state is computed
-c
-      if (need0 .and. .not.need1) then
-         ev1 = ev0
-         einter1 = einter0
-         do i = 1, n
-            aev1(i) = aev0(i)
-         end do
-      else if (.not.need0 .and. need1) then
-         ev0 = ev1
-         einter0 = einter1
-         do i = 1, n
-            aev0(i) = aev1(i)
-         end do
-      end if
-c
-c     restore the original vlambda value
-c
-      vlambda = vlambdaorig
-c
-c     interpolate the dual topology energy and analysis
-c
-      weight0 = 1.0d0 - weight1
-      ev = weight1*ev1 + weight0*ev0
-      nev = nev1
-      einter = einterorig + weight1*einter1 + weight0*einter0
-      do i = 1, n
-         aev(i) = weight1*aev1(i) + weight0*aev0(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aev1)
-      deallocate (aev0)
       return
       end
 c

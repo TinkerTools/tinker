@@ -157,7 +157,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -181,7 +181,7 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -658,7 +658,7 @@ c
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -705,7 +705,7 @@ c
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -983,7 +983,7 @@ c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,kred,
 !$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,v2scale,v3scale,v4scale,v5scale,use_group,off2,radmin,
-!$OMP& epsilon,radmin4,epsilon4,vcouple,vlambda,mut,cut2,c0,c1,
+!$OMP& epsilon,radmin4,epsilon4,vcouple,vlambda,mutg,cut2,c0,c1,
 !$OMP& c2,c3,c4,c5) firstprivate(vscale,iv14)
 !$OMP& shared(ev,dev,vir)
 !$OMP DO reduction(+:ev,dev,vir)
@@ -1000,7 +1000,7 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1024,7 +1024,7 @@ c
             k = vlst(kk,i)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))

@@ -750,7 +750,7 @@ c
             alphai = palpha(i)
          end if
          muti = .true.
-         if (mutfield)  muti = mut(i)
+         if (mutfield)  muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -842,7 +842,7 @@ c
             mutk = .true.
             dopr = (r2 .le. off2)
             if (mutfield) then
-               mutk = mut(k)
+               mutk = (mutg(k) .ne. 0)
                if (dopr)  dopr = (muti .or. mutk)
             end if
             if (dopr) then
@@ -1012,7 +1012,7 @@ c
                alphai = palpha(i)
             end if
             muti = .true.
-            if (mutfield)  muti = mut(i)
+            if (mutfield)  muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1097,7 +1097,7 @@ c
             do kk = ii, npole
                k = ipole(kk)
                mutk = .true.
-               if (mutfield)  mutk = mut(k)
+               if (mutfield)  mutk = (mutg(k) .ne. 0)
                ck = rpole(1,k)
                dkx = rpole(2,k)
                dky = rpole(3,k)
@@ -1737,7 +1737,7 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,nelst,elst,dpequal,
-!$OMP& use_thole,use_chgpen,use_bounds,off2,mut,mutfield,field,fieldp)
+!$OMP& use_thole,use_chgpen,use_bounds,off2,mutg,mutfield,field,fieldp)
 !$OMP& firstprivate(dscale,pscale) shared (fieldt,fieldtp)
 !$OMP DO reduction(+:fieldt,fieldtp)
 c
@@ -1761,7 +1761,7 @@ c
             alphai = palpha(i)
          end if
          muti = .true.
-         if (mutfield)  muti = mut(i)
+         if (mutfield)  muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1853,7 +1853,7 @@ c
             mutk = .true.
             dopr = (r2 .le. off2)
             if (mutfield) then
-               mutk = mut(k)
+               mutk = (mutg(k) .ne. 0)
                if (dopr)  dopr = (muti .or. mutk)
             end if
             if (dopr) then
@@ -2347,7 +2347,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          domut = .true.
-         if (mutfield)  domut = mut(i)
+         if (mutfield)  domut = (mutg(i) .ne. 0)
          if (domut) then
             do j = 1, 3
                field(j,i) = field(j,i) + term*rpole(j+1,i)
@@ -2365,7 +2365,7 @@ c
          do ii = 1, npole
             i = ipole(ii)
             domut = .true.
-            if (mutfield)  domut = mut(i)
+            if (mutfield)  domut = (mutg(i) .ne. 0)
             if (domut) then
                ucell(1) = ucell(1) + rpole(2,i) + rpole(1,i)*x(i)
                ucell(2) = ucell(2) + rpole(3,i) + rpole(1,i)*y(i)
@@ -2470,7 +2470,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          domut = .true.
-         if (mutfield)  domut = mut(i)
+         if (mutfield)  domut = (mutg(i) .ne. 0)
          if (domut) then
             cmp(1,i) = rpole(1,i)
             cmp(2,i) = rpole(2,i)
@@ -2678,7 +2678,7 @@ c
             alphai = palpha(i)
          end if
          muti = .true.
-         if (mutfield)  muti = mut(i)
+         if (mutfield)  muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2763,7 +2763,7 @@ c
          do kk = ii+1, npole
             k = ipole(kk)
             mutk = .true.
-            if (mutfield)  mutk = mut(k)
+            if (mutfield)  mutk = (mutg(k) .ne. 0)
             xr = x(k) - x(i)
             yr = y(k) - y(i)
             zr = z(k) - z(i)
@@ -2992,7 +2992,7 @@ c
                alphai = palpha(i)
             end if
             muti = .true.
-            if (mutfield)  muti = mut(i)
+            if (mutfield)  muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -3077,7 +3077,7 @@ c
             do kk = ii, npole
                k = ipole(kk)
                mutk = .true.
-               if (mutfield)  mutk = mut(k)
+               if (mutfield)  mutk = (mutg(k) .ne. 0)
                ck = rpole(1,k)
                dkx = rpole(2,k)
                dky = rpole(3,k)
@@ -3455,7 +3455,7 @@ c
 !$OMP& d2scale,d3scale,d4scale,u1scale,u2scale,u3scale,u4scale,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
 !$OMP& nelst,elst,dpequal,use_thole,use_chgpen,use_bounds,off2,poltyp,
-!$OMP& mut,mutfield,nslice,ntpair,tindex,tdipdip,toffset,field,fieldp,
+!$OMP& mutg,mutfield,nslice,ntpair,tindex,tdipdip,toffset,field,fieldp,
 !$OMP& fieldt,fieldtp)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale,nlocal)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nslice)
@@ -3480,7 +3480,7 @@ c
             alphai = palpha(i)
          end if
          muti = .true.
-         if (mutfield)  muti = mut(i)
+         if (mutfield)  muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -3589,7 +3589,7 @@ c
          do kk = 1, nelst(i)
             k = elst(kk,i)
             mutk = .true.
-            if (mutfield)  mutk = mut(k)
+            if (mutfield)  mutk = (mutg(k) .ne. 0)
             xr = x(k) - x(i)
             yr = y(k) - y(i)
             zr = z(k) - z(i)

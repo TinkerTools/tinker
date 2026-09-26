@@ -61,7 +61,6 @@ c
       if (allocated(class0))  deallocate (class0)
       if (allocated(type1))  deallocate (type1)
       if (allocated(class1))  deallocate (class1)
-      if (allocated(mut))  deallocate (mut)
       if (allocated(mutg))  deallocate (mutg)
       if (allocated(subon))  deallocate (subon)
       allocate (imut(n))
@@ -69,7 +68,6 @@ c
       allocate (class0(n))
       allocate (type1(n))
       allocate (class1(n))
-      allocate (mut(n))
       allocate (mutg(n))
       allocate (subon(n))
 c
@@ -108,7 +106,6 @@ c
       use_past = .false.
       use_subsys = .false.
       do i = 1, n
-         mut(i) = .false.
          mutg(i) = 0
          subon(i) = .true.
       end do
@@ -154,7 +151,7 @@ c
             read (string,*,err=30)  ihyb,it0,it1
             nmut = nmut + 1
             imut(nmut) = ihyb
-            mut(ihyb) = .true.
+            mutg(ihyb) = 1
             type0(nmut) = it0
             type1(nmut) = it1
             class0(nmut) = atmcls(it0)
@@ -311,7 +308,7 @@ c
             write (iout,160)
   160       format (' Polarization Topology',16x,'Single')
          end if
-         if (use_evdt) then
+         if (use_rel) then
             write (iout,170)
   170       format (' van der Waals Topology',17x,'Dual')
          else
@@ -387,7 +384,6 @@ c
       use_elmdamap = .false.
       use_emdt = .false.
       use_epdt = .false.
-      use_evdt = .false.
       use_meta = .false.
       use_metadyn = .false.
       use_ost = .false.
@@ -550,8 +546,6 @@ c
          else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=10)  epdtexp
-         else if (keyword(1:13) .eq. 'VDW-DUALTOPO ') then
-            use_evdt = .true.
          else if (keyword(1:17) .eq. 'VDW-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=10)  evdtexp
@@ -706,7 +700,6 @@ c
          lmdaengymode = 'REL'
          use_emdt = .true.
          use_epdt = .true.
-         use_evdt = .true.
       end if
 c
 c     ost requires second and force lambda derivatives
@@ -1555,7 +1548,6 @@ c
 c
       nmut = nmut + 1
       imut(nmut) = j
-      mut(j) = .true.
       mutg(j) = igrp
       if (igrp .eq. 2) then
          type0(nmut) = type(j)
@@ -1613,7 +1605,7 @@ c
       if (use_charge) then
          do i = 1, nion
             k = iion(i)
-            if (mut(k)) then
+            if (mutg(k) .ne. 0) then
                pchg(k) = pchgorig(k) * elambda
             end if
             pchg0(k) = pchg(k)
@@ -1626,7 +1618,7 @@ c
          do i = 1, ndipole
             k1 = idpl(1,i)
             k2 = idpl(2,i)
-            if (mut(k1) .or. mut(k2)) then
+            if (mutg(k1).ne.0 .or. mutg(k2).ne.0) then
                bdpl(i) = bdplorig(i) * elambda
             end if
          end do
@@ -1637,7 +1629,7 @@ c
       if (use_mpole .or. use_polar) then
          do i = 1, npole
             k = ipole(i)
-            if (mut(k)) then
+            if (mutg(k) .ne. 0) then
                do j = 1, 13
                   pole(j,k) = poleorig(j,k) * elambda
                end do
@@ -1656,7 +1648,7 @@ c
       if (use_polar) then
          do i = 1, npole
             k = ipole(i)
-            if (mut(k)) then
+            if (mutg(k) .ne. 0) then
                polarity(k) = polarityorig(k) * elambda
                douind(k) = douindorig(k)
                if (elambda .eq. 0.0d0)  douind(k) = .false.
@@ -1670,7 +1662,7 @@ c
          do i = 1, nbond
             ia = ibnd(1,i)
             ib = ibnd(2,i)
-            if (mut(ia) .and. mut(ib)) then
+            if (mutg(ia).ne.0 .and. mutg(ib).ne.0) then
                bflx(i) = bflxorig(i) * elambda
             end if
          end do
@@ -1683,7 +1675,8 @@ c
             ia = iang(1,i)
             ib = iang(2,i)
             ic = iang(3,i)
-            if (mut(ia) .and. mut(ib) .and. mut(ic)) then
+            if (mutg(ia).ne.0 .and. mutg(ib).ne.0 .and.
+     &          mutg(ic).ne.0) then
                aflx(1,i) = aflxorig(1,i) * elambda
                aflx(2,i) = aflxorig(2,i) * elambda
                abflx(1,i) = abflxorig(1,i) * elambda
@@ -1766,7 +1759,7 @@ c
       if (use_polar) then
          do i = 1, npole
             k = ipole(i)
-            if (mut(k)) then
+            if (mutg(k) .ne. 0) then
                do j = 1, 13
                   pole(j,k) = poleorig(j,k) * plambda
                end do
@@ -1785,7 +1778,7 @@ c
       if (use_polar) then
          do i = 1, npole
             k = ipole(i)
-            if (mut(k)) then
+            if (mutg(k) .ne. 0) then
                polarity(k) = polarityorig(k) * plambda
                douind(k) = douindorig(k)
                if (plambda .eq. 0.0d0)  douind(k) = .false.
@@ -1799,7 +1792,7 @@ c
          do i = 1, nbond
             ia = ibnd(1,i)
             ib = ibnd(2,i)
-            if (mut(ia) .and. mut(ib)) then
+            if (mutg(ia).ne.0 .and. mutg(ib).ne.0) then
                bflx(i) = bflxorig(i) * plambda
             end if
          end do
@@ -1812,7 +1805,8 @@ c
             ia = iang(1,i)
             ib = iang(2,i)
             ic = iang(3,i)
-            if (mut(ia) .and. mut(ib) .and. mut(ic)) then
+            if (mutg(ia).ne.0 .and. mutg(ib).ne.0 .and.
+     &          mutg(ic).ne.0) then
                aflx(1,i) = aflxorig(1,i) * plambda
                aflx(2,i) = aflxorig(2,i) * plambda
                abflx(1,i) = abflxorig(1,i) * plambda
@@ -1912,7 +1906,7 @@ c
       if (use_polar) then
          do i = 1, npole
             k = ipole(i)
-            if (mut(k)) then
+            if (mutg(k) .ne. 0) then
                do j = 1, 13
                   pole(j,k) = poleorig(j,k)
                end do
@@ -1935,7 +1929,7 @@ c
          do i = 1, nbond
             ia = ibnd(1,i)
             ib = ibnd(2,i)
-            if (mut(ia) .and. mut(ib)) then
+            if (mutg(ia).ne.0 .and. mutg(ib).ne.0) then
                bflx(i) = bflxorig(i) * elambda
             end if
          end do
@@ -1948,7 +1942,8 @@ c
             ia = iang(1,i)
             ib = iang(2,i)
             ic = iang(3,i)
-            if (mut(ia) .and. mut(ib) .and. mut(ic)) then
+            if (mutg(ia).ne.0 .and. mutg(ib).ne.0 .and.
+     &          mutg(ic).ne.0) then
                aflx(1,i) = aflxorig(1,i) * elambda
                aflx(2,i) = aflxorig(2,i) * elambda
                abflx(1,i) = abflxorig(1,i) * elambda
@@ -1998,7 +1993,8 @@ c
             ib = itors(2,i)
             ic = itors(3,i)
             id = itors(4,i)
-            if (mut(ia) .and. mut(ib) .and. mut(ic) .and. mut(id)) then
+            if (mutg(ia).ne.0 .and. mutg(ib).ne.0 .and.
+     &          mutg(ic).ne.0 .and. mutg(id).ne.0) then
                do j = 1, ntbnd
                   kb = itbnd(1,j)
                   kc = itbnd(2,j)
@@ -2044,7 +2040,7 @@ c     set scaled parameters for implicit solvation models
 c
       if (use_solv) then
          do i = 1, n
-            if (mut(i)) then
+            if (mutg(i) .ne. 0) then
                shct(i) = shct(i) * elambda
                radcav(i) = radcav(i) * elambda
                raddsp(i) = raddsp(i) * elambda

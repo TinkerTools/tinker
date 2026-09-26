@@ -192,7 +192,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -215,7 +215,7 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -363,7 +363,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -386,7 +386,7 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -638,7 +638,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
-!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,cut2,c0,c1,
+!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,cut2,c0,c1,
 !$OMP& c2,c3,c4,c5,vcouple,vterm,eps,molcule,name,verbose,debug,
 !$OMP& header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
@@ -654,7 +654,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -677,7 +677,7 @@ c
             k = vlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -985,7 +985,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1008,7 +1008,7 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1151,7 +1151,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1174,7 +1174,7 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
@@ -1476,7 +1476,7 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
-!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mut,off2,aewald,
+!$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,aewald,
 !$OMP& molcule,vcouple,vterm,eps,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter)
@@ -1491,7 +1491,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1514,7 +1514,7 @@ c
             k = vlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))

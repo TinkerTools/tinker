@@ -204,7 +204,6 @@ c
       use_elmdamap = .false.
       use_emdt = .false.
       use_epdt = .false.
-      use_evdt = .false.
       use_mainlmda = .false.
       use_meta = .false.
       use_metadyn = .false.

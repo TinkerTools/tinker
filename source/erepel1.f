@@ -192,7 +192,7 @@ c
          qiyz = rrepole(10,i)
          qizz = rrepole(13,i)
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -213,7 +213,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, nrep
             k = irep(kk)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -552,7 +552,7 @@ c
             qiyz = rrepole(10,i)
             qizz = rrepole(13,i)
             usei = use(i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -573,7 +573,7 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, nrep
                k = irep(kk)
-               mutk = mut(k)
+               mutk = (mutg(k) .ne. 0)
                proceed = .true.
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
                if (.not. use_intra)  proceed = .true.
@@ -1086,7 +1086,7 @@ c
 !$OMP& shared(nrep,irep,x,y,z,sizpr,dmppr,elepr,rrepole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
 !$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,
-!$OMP& vlambda3,vlambda4,vlambda5,mut,cut2,off2,xaxis,yaxis,zaxis,
+!$OMP& vlambda3,vlambda4,vlambda5,mutg,cut2,off2,xaxis,yaxis,zaxis,
 !$OMP& c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale) shared (er,der,ter,vir)
 !$OMP DO reduction(+:er,der,ter,vir)
@@ -1112,7 +1112,7 @@ c
          qiyz = rrepole(10,i)
          qizz = rrepole(13,i)
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1134,7 +1134,7 @@ c
          do kkk = 1, nelst(ii)
             kk = elst(kkk,ii)
             k = irep(kk)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.

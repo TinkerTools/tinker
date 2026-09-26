@@ -197,7 +197,7 @@ c
          i = ipole(ii)
          do j = 1, 3
             term = term + uinp(j,i)*dfldd(j,i) + uind(j,i)*dfldp(j,i)
-            if (mut(i) .and. douindorig(i)) then
+            if (mutg(i).ne.0 .and. douindorig(i)) then
                if (atzero) then
                   fldd = field0(j,i) + ufield(j,i)
                   fldp = fieldp0(j,i) + ufieldp(j,i)

@@ -255,7 +255,7 @@ c
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -280,7 +280,7 @@ c
             kx = xaxis(k)
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -705,7 +705,7 @@ c
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -730,7 +730,7 @@ c
             kx = xaxis(k)
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
@@ -1417,7 +1417,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
-!$OMP& use_group,use_intra,use_bounds,off2,f,mut,elambda)
+!$OMP& use_group,use_intra,use_bounds,off2,f,mutg,elambda)
 !$OMP& firstprivate(mscale) shared (em,dem,dfmdl,tem,dltem,pot,emvir,
 !$OMP& demvirdl,demdl,d2emdl2)
 !$OMP DO reduction(+:em,dem,dfmdl,tem,dltem,pot,emvir,demvirdl,
@@ -1449,7 +1449,7 @@ c
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1475,7 +1475,7 @@ c
             kx = xaxis(k)
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -2117,7 +2117,7 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -2190,7 +2190,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          ci = rpole(1,i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
          if (muti) then
             dlsum = dlsum + ci
             ci = ci * elambda
@@ -2220,7 +2220,7 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             if (muti) then
                dlxd = dlxd + dix + ci*xi
                dlyd = dlyd + diy + ci*yi
@@ -2241,7 +2241,7 @@ c
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             if (muti) then
                dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
                dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
@@ -2267,7 +2267,7 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             if (muti) then
                dltem(1) = diy*(zdfield+elambda*dlzdfield)
      &                    - diz*(ydfield+elambda*dlydfield)
@@ -2310,7 +2310,7 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             if (muti) then
                dxd = dxd + dix
                dyd = dyd + diy
@@ -2532,7 +2532,7 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2556,7 +2556,7 @@ c
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -2969,7 +2969,7 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2994,7 +2994,7 @@ c
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             call imager (xr,yr,zr,jcell)
             r2 = xr*xr + yr*yr + zr*zr
             if (.not. (use_polymer .and. r2.le.polycut2)) then
@@ -3631,7 +3631,7 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -3704,7 +3704,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          ci = rpole(1,i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
          if (muti) then
             dlsum = dlsum + ci
             ci = ci * elambda
@@ -3734,7 +3734,7 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             if (muti) then
                dlxd = dlxd + dix + ci*xi
                dlyd = dlyd + diy + ci*yi
@@ -3755,7 +3755,7 @@ c
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             if (muti) then
                dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
                dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
@@ -3781,7 +3781,7 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             if (muti) then
                dltem(1) = diy*(zdfield+elambda*dlzdfield)
      &                    - diz*(ydfield+elambda*dlydfield)
@@ -3824,7 +3824,7 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             if (muti) then
                dxd = dxd + dix
                dyd = dyd + diy
@@ -4030,7 +4030,7 @@ c
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
-!$OMP& yaxis,zaxis,elambda,mut)
+!$OMP& yaxis,zaxis,elambda,mutg)
 !$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir,demvirdl,
 !$OMP& demdl,d2emdl2,dfmdl,dltem)
 !$OMP DO reduction(+:em,dem,tem,pot,emvir,demvirdl,demdl,d2emdl2,
@@ -4058,7 +4058,7 @@ c
             vali = pval(i)
             alphai = palpha(i)
          end if
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -4083,7 +4083,7 @@ c
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then
@@ -4745,7 +4745,7 @@ c     copy multipole moments and coordinates to local storage
 c
       do ii = 1, npole
          i = ipole(ii)
-         if (mut(i)) then
+         if (mutg(i) .ne. 0) then
             cmp(1,i)  = elambda * rpole(1,i)
             cmp(2,i)  = elambda * rpole(2,i)
             cmp(3,i)  = elambda * rpole(3,i)

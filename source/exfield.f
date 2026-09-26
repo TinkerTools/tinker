@@ -430,7 +430,7 @@ c
 c     calculate energy, derivatives and lambda derivatives over
 c     the atomic multipoles
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,use,mut,elambda,
+!$OMP PARALLEL default(private) shared(npole,ipole,use,mutg,elambda,
 !$OMP& x,y,z,xaxis,yaxis,zaxis,f,rpole,texfld,em,dem,emvir,
 !$OMP& demdl,dfmdl,demvirdl)
 !$OMP DO reduction(+:em,dem,emvir,demdl,dfmdl,demvirdl)
@@ -450,7 +450,7 @@ c
 c
 c     the mutated sites carry multipoles scaled by elambda
 c
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
             scalelmda = 1.0d0
             if (muti)  scalelmda = elambda
 c

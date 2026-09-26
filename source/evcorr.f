@@ -91,7 +91,7 @@ c
             do k = 1, nvt
                if (ivt(k) .eq. it) then
                   jvt(k) = jvt(k) + 1
-                  if (mut(i))  mvt(k) = mvt(k) + 1
+                  if (mutg(i) .ne. 0)  mvt(k) = mvt(k) + 1
                   goto 10
                end if
             end do
@@ -99,7 +99,7 @@ c
             ivt(nvt) = it
             jvt(nvt) = 1
             mvt(nvt) = 0
-            if (mut(i))  mvt(nvt) = 1
+            if (mutg(i) .ne. 0)  mvt(nvt) = 1
    10       continue
          end if
       end do
@@ -278,7 +278,7 @@ c
             do k = 1, nvt
                if (ivt(k) .eq. it) then
                   jvt(k) = jvt(k) + 1
-                  if (mut(i))  mvt(k) = mvt(k) + 1
+                  if (mutg(i) .ne. 0)  mvt(k) = mvt(k) + 1
                   goto 10
                end if
             end do
@@ -286,7 +286,7 @@ c
             ivt(nvt) = it
             jvt(nvt) = 1
             mvt(nvt) = 0
-            if (mut(i))  mvt(nvt) = 1
+            if (mutg(i) .ne. 0)  mvt(nvt) = 1
    10       continue
          end if
       end do

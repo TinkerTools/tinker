@@ -101,7 +101,7 @@ c
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          alphai2 = alphai * alphai
          usei = use(i)
-         muti = mut(i)
+         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -122,7 +122,7 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = 1, npole
             k = ipole(kk)
-            mutk = mut(k)
+            mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
@@ -258,7 +258,7 @@ c
             if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             alphai2 = alphai * alphai
             usei = use(i)
-            muti = mut(i)
+            muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -279,7 +279,7 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = 1, npole
                k = ipole(kk)
-               mutk = mut(k)
+               mutk = (mutg(k) .ne. 0)
                proceed = .true.
                if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
                if (.not. use_intra)  proceed = .true.
