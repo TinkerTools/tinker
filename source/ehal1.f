@@ -26,6 +26,7 @@ c
       implicit none
       integer i,j
       real*8 elrc,vlrc
+      real*8 delrc,dvlrc
       character*6 mode
 c
 c
@@ -50,7 +51,7 @@ c     apply the long range van der Waals correction if used
 c
          if (use_vcorr) then
             mode = 'VDW'
-            call evcorr1 (mode,elrc,vlrc)
+            call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
             ev = ev + elrc
             evvir(1,1) = evvir(1,1) + vlrc
             evvir(2,2) = evvir(2,2) + vlrc
@@ -1450,6 +1451,7 @@ c
       use virial
       implicit none
       real*8 elrc,vlrc
+      real*8 delrc,dvlrc
       character*6 mode
 c
 c
@@ -1462,7 +1464,7 @@ c
       end if
       if (use_vcorr) then
          mode = 'VDW'
-         call evcorr1 (mode,elrc,vlrc)
+         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
          ev = ev + elrc
          evvir(1,1) = evvir(1,1) + vlrc
          evvir(2,2) = evvir(2,2) + vlrc

@@ -30,6 +30,7 @@ c
       use virial
       implicit none
       real*8 elrc,vlrc
+      real*8 delrc,dvlrc
       character*6 mode
 c
 c
@@ -53,7 +54,7 @@ c     apply long range dispersion correction if desired
 c
       if (use_dcorr .and. .not.use_dewald) then
          mode = 'DISP'
-         call evcorr1 (mode,elrc,vlrc)
+         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
          edsp = edsp + elrc
          vir(1,1) = vir(1,1) + vlrc
          vir(2,2) = vir(2,2) + vlrc

@@ -27,6 +27,7 @@ c
       implicit none
       integer i,j
       real*8 elrc,vlrc
+      real*8 delrc,dvlrc
       character*6 mode
 c
 c
@@ -47,15 +48,18 @@ c
             call ehal4a
          end if
 c
-c     apply the long range van der Waals correction if used
+c     apply the long range van der Waals correction if used,
+c     along with its lambda derivative
 c
          if (use_vcorr) then
             mode = 'VDW'
-            call evcorr1 (mode,elrc,vlrc)
+            call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
             ev = ev + elrc
-            evvir(1,1) = evvir(1,1) + vlrc
-            evvir(2,2) = evvir(2,2) + vlrc
-            evvir(3,3) = evvir(3,3) + vlrc
+            devdl = devdl + delrc
+            do i = 1, 3
+               evvir(i,i) = evvir(i,i) + vlrc
+               devvirdl(i,i) = devvirdl(i,i) + dvlrc
+            end do
          end if
       end if
 c

@@ -30,6 +30,9 @@ c
       call test_testlmda_case ('07_water_ast_ye_l10')
       call test_testlmda_case ('08_water_ast_ye_l05')
       call test_testlmda_case ('09_water_ast_ye_l00')
+      call test_testlmda_case ('10_water_ast_vcorr_l05')
+      call test_testlmda_case ('11_water_ast_vcorr_annih_l05')
+      call test_testlmda_case ('12_water_ast_vcorr_l06exp')
       return
       end
 c

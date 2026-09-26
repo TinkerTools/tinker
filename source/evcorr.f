@@ -191,7 +191,8 @@ c     ###############################################################
 c
 c
 c     "evcorr1" computes a long range correction for van der Waals
-c     or dispersion energy and virial via numerical integration
+c     or dispersion energy and virial via numerical integration,
+c     along with the derivatives of both with respect to "vlambda"
 c
 c     literature reference:
 c
@@ -199,7 +200,7 @@ c     M. P. Allen and D. J. Tildesley, "Computer Simulation of
 c     Liquids, 2nd Ed.", Oxford University Press, 2017, Section 2.8
 c
 c
-      subroutine evcorr1 (mode,elrc,vlrc)
+      subroutine evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
       use atomid
       use atoms
       use bound
@@ -219,9 +220,11 @@ c
       integer, allocatable :: jvt(:)
       integer, allocatable :: mvt(:)
       real*8 elrc,vlrc
+      real*8 delrc,dvlrc
       real*8 etot,vtot
       real*8 range,rdelta
-      real*8 fi,fk,fim,fkm,fik
+      real*8 fi,fk,fim,fkm
+      real*8 fik,dfik
       real*8 e,de,eps
       real*8 offset,vlam1
       real*8 taper,dtaper
@@ -239,6 +242,8 @@ c     zero out the long range van der Waals corrections
 c
       elrc = 0.0d0
       vlrc = 0.0d0
+      delrc = 0.0d0
+      dvlrc = 0.0d0
 c
 c     only applicable if periodic boundaries are in use
 c
@@ -297,16 +302,23 @@ c
             fk = dble(jvt(k))
             fkm = dble(mvt(k))
 c
-c     set decoupling or annihilation for intraligand interactions
+c     set decoupling or annihilation for intraligand interactions,
+c     and the derivative of the pair weight with respect to lambda
 c
             if (use_subsys) then
                fik = fi * fk
+               dfik = 0.0d0
             else if (vcouple .eq. 0) then
                fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+               dfik = fim*(fk-fkm) + (fi-fim)*fkm
             else
                fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
+               dfik = fi*fk - (fi-fim)*(fk-fkm)
             end if
-            if (k .eq. i)  fik = 0.5d0 * fik
+            if (k .eq. i) then
+               fik = 0.5d0 * fik
+               dfik = 0.5d0 * dfik
+            end if
             if (use_disp) then
                cik = dspsix(it) * dspsix(kt)
             else
@@ -365,10 +377,14 @@ c
             end do
             elrc = elrc + fik*etot
             vlrc = vlrc + fik*vtot
+            delrc = delrc + dfik*etot
+            dvlrc = dvlrc + dfik*vtot
          end do
       end do
       elrc = elrc / volbox
       vlrc = vlrc / (3.0d0*volbox)
+      delrc = delrc / volbox
+      dvlrc = dvlrc / (3.0d0*volbox)
 c
 c     perform deallocation of some local arrays
 c
