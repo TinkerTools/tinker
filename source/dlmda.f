@@ -126,7 +126,6 @@ c     use_abfdyn    flag to propagate abf lambda particle
 c     use_dlmda     logical flag governing use of lambda derivative
 c     use_edlmda    flag that the multipole term has a lambda deriv
 c     use_elmdamap  flag that elambda follows the main lambda map
-c     use_emdt      flag governing use of multipole dual topology
 c     use_epdt      flag governing use of polarization dual topology
 c     use_lmdacv    flag to gate interval samples by convergence
 c     use_mainlmda  flag that a main lambda value was specified
@@ -274,7 +273,6 @@ c
       logical use_dlmda
       logical use_edlmda
       logical use_elmdamap
-      logical use_emdt
       logical use_epdt
       logical use_lmdacv
       logical use_mainlmda

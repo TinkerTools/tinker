@@ -2310,12 +2310,12 @@ c
       f = 0.5d0 * electric / dielec
 c
 c     perform dynamic allocation of some global arrays; the multipole
-c     PME grid cannot be reused with decoupled polarization lambda or
-c     multipole dual topology, since it belongs to a different set of
-c     multipoles than the current polarization state
+c     PME grid cannot be reused with decoupled polarization lambda,
+c     since it belongs to a different set of multipoles than the
+c     current polarization state
 c
       if (.not.use_mpole .or. aewald.ne.aeewald .or. use_epdt
-     &       .or. use_plmda .or. use_emdt) then
+     &       .or. use_plmda) then
          if (allocated(cmp)) then
             if (size(cmp) .lt. 10*n)  deallocate (cmp)
          end if

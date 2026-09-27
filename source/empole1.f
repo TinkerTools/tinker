@@ -26,12 +26,8 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt) then
-         if (use_rel) then
-            call empole1er
-         else
-            call empole1e
-         end if
+      if (use_rel) then
+         call empole1er
       else
          call empole1calc
       end if
@@ -4040,144 +4036,6 @@ c
       emvir(1,3) = emvir(1,3) + vxz
       emvir(2,3) = emvir(2,3) + vyz
       emvir(3,3) = emvir(3,3) + vzz
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine empole1e  --  dual topo multipole derivatives  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "empole1e" calculates the electrostatic energy and first
-c     derivatives with respect to Cartesian coordinates due to
-c     atomic multipole interactions with the dual topology method,
-c     in which the fully coupled (elambda=1) and fully decoupled
-c     (elambda=0) states are each evaluated in full and combined by
-c     a power law interpolation in elambda
-c
-c
-      subroutine empole1e
-      use atoms
-      use deriv
-      use dlmda
-      use energi
-      use limits
-      use mutant
-      use virial
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      logical need0,need1
-      integer i,j
-      real*8 em1,em0
-      real*8 elambdaorig
-      real*8 weight0
-      real*8 emvir1(3,3),emvir0(3,3)
-      real*8, allocatable :: dem1(:,:)
-      real*8, allocatable :: dem0(:,:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (dem1(3,n))
-      allocate (dem0(3,n))
-c
-c     compute energy and derivatives of the elambda = 1 state
-c
-      elambdaorig = elambda
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 deldlmda,d2eldlmda2,need0,need1)
-      if (need1) then
-         call altemdt (1.0d0)
-         call empole1calc
-         em1 = em
-         do i = 1, n
-            do j = 1, 3
-               dem1(j,i) = dem(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               emvir1(j,i) = emvir(j,i)
-            end do
-         end do
-      end if
-c
-c     compute energy and derivatives of the elambda = 0 state
-c
-      if (need0) then
-         call altemdt (0.0d0)
-         call empole1calc
-         em0 = em
-         do i = 1, n
-            do j = 1, 3
-               dem0(j,i) = dem(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               emvir0(j,i) = emvir(j,i)
-            end do
-         end do
-      end if
-c
-c     copy results if only one endpoint state is computed
-c
-      if (need0 .and. .not.need1) then
-         em1 = em0
-         do i = 1, n
-            do j = 1, 3
-               dem1(j,i) = dem0(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               emvir1(j,i) = emvir0(j,i)
-            end do
-         end do
-      else if (.not.need0 .and. need1) then
-         em0 = em1
-         do i = 1, n
-            do j = 1, 3
-               dem0(j,i) = dem1(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               emvir0(j,i) = emvir1(j,i)
-            end do
-         end do
-      end if
-c
-c     restore original elambda and dependent parameters
-c
-      call altemdt (elambdaorig)
-c
-c     interpolate the dual topology energy, derivatives and virial
-c
-      weight0 = 1.0d0 - weight1
-      em = weight1*em1 + weight0*em0
-      do i = 1, n
-         do j = 1, 3
-            dem(j,i) = weight1*dem1(j,i) + weight0*dem0(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir(j,i) = weight1*emvir1(j,i) + weight0*emvir0(j,i)
-         end do
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (dem1)
-      deallocate (dem0)
       return
       end
 c

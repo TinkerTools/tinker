@@ -24,12 +24,8 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt) then
-         if (use_rel) then
-            call empole0er
-         else
-            call empole0e
-         end if
+      if (use_rel) then
+         call empole0er
       else
          call empole0calc
       end if
@@ -1939,74 +1935,6 @@ c
          end do
       end do
       em = em + e
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine empole0e  --  dual topology multipole energy  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "empole0e" calculates the electrostatic energy due to atomic
-c     multipole interactions with the dual topology method, in which
-c     the fully coupled (elambda=1) and fully decoupled (elambda=0)
-c     states are each evaluated in full and combined by a power law
-c     interpolation in elambda
-c
-c
-      subroutine empole0e
-      use dlmda
-      use energi
-      use limits
-      use mutant
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      logical need0,need1
-      real*8 em1,em0
-      real*8 elambdaorig
-c
-c
-c     compute energy of the fully coupled elambda = 1 state
-c
-      elambdaorig = elambda
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 deldlmda,d2eldlmda2,need0,need1)
-      if (need1) then
-         call altemdt (1.0d0)
-         call empole0calc
-         em1 = em
-      end if
-c
-c     compute energy of the fully decoupled elambda = 0 state
-c
-      if (need0) then
-         call altemdt (0.0d0)
-         call empole0calc
-         em0 = em
-      end if
-c
-c     copy energy if only one endpoint state is computed
-c
-      if (need0 .and. .not.need1) then
-         em1 = em0
-      else if (.not.need0 .and. need1) then
-         em0 = em1
-      end if
-c
-c     restore original elambda and dependent parameters
-c
-      call altemdt (elambdaorig)
-c
-c     interpolate the dual topology energy
-c
-      em = weight1*em1 + (1.0d0-weight1)*em0
       return
       end
 c

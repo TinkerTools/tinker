@@ -720,40 +720,20 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_mutate_adt" runs the eighteen absolute dual topology water
-c     fixtures 041-052 and 056-057, each carrying the "lambda-deriv"
-c     keyword and a dual topology keyword, and drives them through
-c     "test_mutate_calc" with the level 4 lambda derivative checks
-c     enabled; cases 041-046 keep only the multipole term at three
-c     ele-lambda values with Ewald on and off, cases 047-052 keep only
-c     the polarization term at three pol-lambda values, and cases
-c     056-057 leave the multipole and polarization terms active with
-c     Ewald on and off; the no-Ewald cases cannot use a pairwise
-c     neighbor list
+c     "test_mutate_adt" runs the eight absolute polarization dual
+c     topology water fixtures 047-052 and 056-057, each carrying the
+c     "lambda-deriv" keyword and the POL-DUALTOPO keyword, and drives
+c     them through "test_mutate_calc" with the level 4 lambda derivative
+c     checks enabled; cases 047-052 keep only the polarization term at
+c     three pol-lambda values, and cases 056-057 also keep the multipole
+c     term, on its single topology path, with Ewald on and off; the
+c     no-Ewald cases cannot use a pairwise neighbor list
 c
 c
       subroutine test_mutate_adt
       implicit none
 c
 c
-      call test_mutate_calc ('water2','041_water_adt_ye_m10.key',
-     &   '041_water_adt_ye_m10.txt','041_water_adt_ye_m10',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','042_water_adt_ne_m10.key',
-     &   '042_water_adt_ne_m10.txt','042_water_adt_ne_m10',
-     &   .true.,  .false., .false., .false., .true.)
-      call test_mutate_calc ('water2','043_water_adt_ye_m05.key',
-     &   '043_water_adt_ye_m05.txt','043_water_adt_ye_m05',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','044_water_adt_ne_m05.key',
-     &   '044_water_adt_ne_m05.txt','044_water_adt_ne_m05',
-     &   .true.,  .false., .false., .false., .true.)
-      call test_mutate_calc ('water2','045_water_adt_ye_m00.key',
-     &   '045_water_adt_ye_m00.txt','045_water_adt_ye_m00',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','046_water_adt_ne_m00.key',
-     &   '046_water_adt_ne_m00.txt','046_water_adt_ne_m00',
-     &   .true.,  .false., .false., .false., .true.)
       call test_mutate_calc ('water2','047_water_adt_ye_p10.key',
      &   '047_water_adt_ye_p10.txt','047_water_adt_ye_p10',
      &   .false., .true.,  .false., .true.,  .true.)
@@ -876,8 +856,8 @@ c     lambda derivative checks enabled, verifying the multipole,
 c     polarization and van der Waals components together; cases 075-077
 c     use single topology, 078-080 absolute dual topology and 081-083
 c     relative dual topology, each at main lambda values 1.0, 0.5 and
-c     0.0; the absolute dual topology cases keep only the multipole
-c     and polarization terms, with van der Waals switched off; all
+c     0.0; the absolute cases use polarization dual topology with
+c     single topology multipoles and van der Waals switched off; all
 c     fixtures use Ewald and support a pairwise neighbor list
 c
 c
@@ -931,8 +911,8 @@ c     lambda derivative checks enabled, verifying the multipole,
 c     polarization and van der Waals components together; cases 084-086
 c     use single topology, 087-089 absolute dual topology and 090-092
 c     relative dual topology, each at main lambda values 1.0, 0.5 and
-c     0.0; the absolute dual topology cases keep only the multipole
-c     and polarization terms, with van der Waals switched off; all
+c     0.0; the absolute cases use polarization dual topology with
+c     single topology multipoles and van der Waals switched off; all
 c     fixtures use Ewald and support a pairwise neighbor list
 c
 c
@@ -986,8 +966,8 @@ c     lambda derivative checks enabled, verifying the multipole,
 c     polarization and van der Waals components together; cases 093-095
 c     use single topology, 096-098 absolute dual topology and 099-101
 c     relative dual topology, each at main lambda values 1.0, 0.5 and
-c     0.0; the absolute dual topology cases keep only the multipole
-c     and polarization terms, with van der Waals switched off; all
+c     0.0; the absolute cases use polarization dual topology with
+c     single topology multipoles and van der Waals switched off; all
 c     fixtures use Ewald and support a pairwise neighbor list
 c
 c
@@ -1033,21 +1013,23 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_exf" runs the twenty-three water fixtures 102-118,
+c     "test_mutate_exf" runs the twenty water fixtures 102-104, 108-118,
 c     184-186 and 193-195 that apply an external electric field to a
 c     mutated system, each carrying the "lambda-deriv" keyword so the
-c     level 4 lambda derivative checks are enabled; cases 102-110 keep
-c     only the multipole term, with 102-104 single topology, 105-107
-c     absolute dual topology and 108-110 relative dual topology, each at
-c     ele-lambda values 1.0, 0.5 and 0.0; cases 111-116 keep only the
+c     level 4 lambda derivative checks are enabled; cases 102-104 and
+c     108-110 keep only the multipole term, with 102-104 single topology
+c     and 108-110 relative dual topology, each at ele-lambda values
+c     1.0, 0.5 and 0.0; cases 111-116 keep only the
 c     polarization term, with 111-113 absolute and 114-116 relative
 c     dual topology at pol-lambda values 1.0, 0.5 and 0.0, since the
 c     induced dipoles respond to the applied field through the direct
 c     field; cases 117-118 leave the multipole and polarization terms
-c     active together, under absolute and relative dual topology, and
-c     use unequal interpolation exponents of three and four so the two
-c     terms cannot mask an error in each other; cases 184-186 leave all
-c     three nonbonded terms active under absolute dual topology at
+c     active together, 117 with absolute polarization dual topology and
+c     single topology multipoles and 118 under relative dual topology,
+c     where unequal interpolation exponents of three and four keep the
+c     two terms from masking an error in each other; cases 184-186
+c     leave all three nonbonded terms active under absolute polarization
+c     dual topology with single topology multipoles at
 c     matched ele-lambda and pol-lambda values 1.0, 0.5 and 0.0, so the
 c     unscaled van der Waals term is carried alongside the field-driven
 c     multipole and polarization terms; cases 193-195 repeat that
@@ -1072,15 +1054,6 @@ c
      &   .true.,  .false., .false., .true.,  .true.)
       call test_mutate_calc ('water2','104_water_exf_ast_m00.key',
      &   '104_water_exf_ast_m00.txt','104_water_exf_ast_m00',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','105_water_exf_adt_m10.key',
-     &   '105_water_exf_adt_m10.txt','105_water_exf_adt_m10',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','106_water_exf_adt_m05.key',
-     &   '106_water_exf_adt_m05.txt','106_water_exf_adt_m05',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','107_water_exf_adt_m00.key',
-     &   '107_water_exf_adt_m00.txt','107_water_exf_adt_m00',
      &   .true.,  .false., .false., .true.,  .true.)
       call test_mutate_calc ('water2','108_water_exf_rdt_m10.key',
      &   '108_water_exf_rdt_m10.txt','108_water_exf_rdt_m10',
@@ -1149,12 +1122,12 @@ c     keep the multipole and polarization terms active together at
 c     matched ele-lambda and pol-lambda values, each carrying the
 c     "lambda-deriv" keyword and a dual topology keyword, and drives
 c     them through "test_mutate_calc" with the level 4 lambda derivative
-c     checks enabled; cases 119-124 use absolute dual topology and cases
-c     125-130 relative dual topology, each at ele-/pol-lambda values
-c     1.0, 0.5, and 0.0 with Ewald on and off; both terms use dual
-c     topology interpolation exponents of three so neither term can
-c     mask an error in the other; the no-Ewald cases cannot use a
-c     pairwise neighbor list
+c     checks enabled; cases 119-124 use absolute polarization dual
+c     topology with single topology multipoles and cases 125-130
+c     relative dual topology, each at ele-/pol-lambda values 1.0, 0.5,
+c     and 0.0 with Ewald on and off; the dual topology terms use
+c     interpolation exponents of three so no term can mask an error in
+c     another; the no-Ewald cases cannot use a pairwise neighbor list
 c
 c
       subroutine test_mutate_emplar
@@ -1216,8 +1189,8 @@ c     now sit outside every window; there the quintic taper is on its
 c     flat plateau, so each sub-lambda is pinned fully coupled at 1.0
 c     and fully decoupled at 0.0 while every first and second lambda
 c     derivative vanishes, which the level 4 checks confirm; cases
-c     131-132 use absolute dual topology for the multipole and
-c     polarization terms only, with van der Waals switched off, and
+c     131-132 use absolute polarization dual topology with single
+c     topology multipoles and van der Waals switched off, and
 c     cases 133-134 relative dual topology, each at 1.0 and 0.0, with a
 c     different dual topology interpolation exponent for the multipole
 c     and polarization terms so neither can mask an error in the other;
@@ -1483,11 +1456,12 @@ c     van der Waals decoupled and drive the other two
 c
 c     the fixtures walk one topology and one map form each, 170 and
 c     171 absolute single topology on the exponential map at a main
-c     lambda of 0.5, 173 absolute dual topology on the quintic map at
-c     0.6, and 174 and 175 relative dual topology on the inverse power
-c     map at 0.7; 171 carries POL-DUALTOPO even though the rest
-c     of that pair is single topology, since "epolar4" supplies the
-c     polarization lambda derivative only through dual topology
+c     lambda of 0.5, 173 absolute polarization dual topology on the
+c     quintic map at 0.6, and 174 and 175 relative dual topology on the
+c     inverse power map at 0.7; 171 carries POL-DUALTOPO even though
+c     the rest of that pair is single topology, since "epolar4"
+c     supplies the polarization lambda derivative only through dual
+c     topology
 c
 c     a pinned sublambda is held at its own keyword value and leaves the
 c     chain rule, so every fixture names the "lambda-deriv" keyword and

@@ -8672,12 +8672,12 @@ c
       ntot = nff * nfft3
 c
 c     remove scalar sum virial from prior multipole FFT; the saved
-c     values cannot be reused with decoupled polarization lambda or
-c     multipole dual topology, since the prior FFT belongs to a
-c     different set of multipoles than the current polarization state
+c     values cannot be reused with decoupled polarization lambda,
+c     since the prior FFT belongs to a different set of multipoles
+c     than the current polarization state
 c
       if (use_mpole .and. aewald.eq.aeewald .and. .not.use_epdt
-     &       .and. .not.use_plmda .and. .not.use_emdt) then
+     &       .and. .not.use_plmda) then
          vxx = -vmxx
          vxy = -vmxy
          vxz = -vmxz

@@ -1018,8 +1018,6 @@ void emreal0d_();
 #define tinker_f_emreal0d emreal0d_
 void emrecip_();
 #define tinker_f_emrecip emrecip_
-void empole0e_();
-#define tinker_f_empole0e empole0e_
 void empole0calc_();
 #define tinker_f_empole0calc empole0calc_
 void empole0er_();
@@ -1042,8 +1040,6 @@ void emreal1d_();
 #define tinker_f_emreal1d emreal1d_
 void emrecip1_();
 #define tinker_f_emrecip1 emrecip1_
-void empole1e_();
-#define tinker_f_empole1e empole1e_
 void empole1calc_();
 #define tinker_f_empole1calc empole1calc_
 void empole1er_();
@@ -1072,8 +1068,6 @@ void emreal3d_();
 #define tinker_f_emreal3d emreal3d_
 void emrecip3_();
 #define tinker_f_emrecip3 emrecip3_
-void empole3e_();
-#define tinker_f_empole3e empole3e_
 void empole3calc_();
 #define tinker_f_empole3calc empole3calc_
 void empole3er_();
@@ -1096,8 +1090,6 @@ void emreal4d_();
 #define tinker_f_emreal4d emreal4d_
 void emrecip4_();
 #define tinker_f_emrecip4 emrecip4_
-void empole4e_();
-#define tinker_f_empole4e empole4e_
 void empole4er_();
 #define tinker_f_empole4er empole4er_
 

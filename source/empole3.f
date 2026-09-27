@@ -27,12 +27,8 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_emdt) then
-         if (use_rel) then
-            call empole3er
-         else
-            call empole3e
-         end if
+      if (use_rel) then
+         call empole3er
       else
          call empole3calc
       end if
@@ -2327,142 +2323,6 @@ c
          end do
       end do
       em = em + e
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine empole3e  --  dual topo multipole analysis  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "empole3e" calculates the electrostatic energy due to atomic
-c     multipole interactions, and partitions the energy among atoms,
-c     using the dual topology method, in which the fully coupled
-c     (elambda=1) and fully decoupled (elambda=0) states are each
-c     evaluated in full and combined by a power law interpolation
-c     in elambda
-c
-c
-      subroutine empole3e
-      use action
-      use analyz
-      use atoms
-      use dlmda
-      use energi
-      use extfld
-      use inter
-      use limits
-      use mutant
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      logical need0,need1
-      integer i
-      integer nem1
-      real*8 em1,em0
-      real*8 elambdaorig
-      real*8 weight0
-      real*8 einterorig
-      real*8 einter1,einter0
-      real*8 exfe1,exfe0
-      real*8, allocatable :: aem1(:)
-      real*8, allocatable :: aem0(:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aem1(n))
-      allocate (aem0(n))
-c
-c     compute energy and analysis of the elambda = 1 state
-c
-      elambdaorig = elambda
-      einterorig = einter
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 deldlmda,d2eldlmda2,need0,need1)
-      if (need1) then
-         call altemdt (1.0d0)
-         call empole3calc
-         em1 = em
-         nem1 = nem
-         exfe1 = exfe
-         do i = 1, n
-            aem1(i) = aem(i)
-         end do
-c
-c     the intermolecular energy accumulates across energy terms, so
-c     save and remove the contribution from the elambda = 1 state
-c
-         einter1 = einter - einterorig
-         einter = einterorig
-      end if
-c
-c     compute energy and analysis of the elambda = 0 state
-c
-      if (need0) then
-         call altemdt (0.0d0)
-         call empole3calc
-         em0 = em
-         exfe0 = exfe
-         do i = 1, n
-            aem0(i) = aem(i)
-         end do
-         einter0 = einter - einterorig
-      end if
-c
-c     retain the historical analysis count from the fully coupled
-c     endpoint even when its energy and analysis are not needed
-c
-      if (.not.need1) then
-         call altemdt (1.0d0)
-         call empole3calc
-         nem1 = nem
-         einter = einterorig
-      end if
-c
-c     copy results if only one endpoint state is computed
-c
-      if (need0 .and. .not.need1) then
-         em1 = em0
-         exfe1 = exfe0
-         einter1 = einter0
-         do i = 1, n
-            aem1(i) = aem0(i)
-         end do
-      else if (.not.need0 .and. need1) then
-         em0 = em1
-         exfe0 = exfe1
-         einter0 = einter1
-         do i = 1, n
-            aem0(i) = aem1(i)
-         end do
-      end if
-c
-c     restore original elambda and dependent parameters
-c
-      call altemdt (elambdaorig)
-c
-c     interpolate the dual topology energy and analysis
-c
-      weight0 = 1.0d0 - weight1
-      em = weight1*em1 + weight0*em0
-      nem = nem1
-      einter = einterorig + weight1*einter1 + weight0*einter0
-      exfe = weight1*exfe1 + weight0*exfe0
-      do i = 1, n
-         aem(i) = weight1*aem1(i) + weight0*aem0(i)
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aem1)
-      deallocate (aem0)
       return
       end
 c

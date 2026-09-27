@@ -293,13 +293,6 @@ c
             write (iout,120)
   120       format (' Sampling Mode',18x,'Fixed Lambda')
          end if
-         if (use_emdt) then
-            write (iout,130)
-  130       format (' Electrostatics Topology',16x,'Dual')
-         else
-            write (iout,140)
-  140       format (' Electrostatics Topology',14x,'Single')
-         end if
          if (use_epdt) then
             write (iout,150)
   150       format (' Polarization Topology',18x,'Dual')
@@ -374,7 +367,6 @@ c
       use_abfdyn = .false.
       use_dlmda = .false.
       use_elmdamap = .false.
-      use_emdt = .false.
       use_epdt = .false.
       use_meta = .false.
       use_metadyn = .false.
@@ -525,8 +517,6 @@ c
             use_lmdacv = .true.
             string = record(next:240)
             read (string,*,err=10,end=10)  lmdacvstd,lmdacvrat
-         else if (keyword(1:13) .eq. 'ELE-DUALTOPO ') then
-            use_emdt = .true.
          else if (keyword(1:17) .eq. 'ELE-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=10)  emdtexp
@@ -684,7 +674,6 @@ c     enable dual topology for relative free energy
 c
       if (use_rel) then
          lmdaengymode = 'REL'
-         use_emdt = .true.
          use_epdt = .true.
       end if
 c
