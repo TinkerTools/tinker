@@ -42,6 +42,7 @@ c
       call test_mutate_relsmap
       call test_mutate_apm
       call test_mutate_vsoft
+      call test_mutate_gate
       return
       end
 c
@@ -769,16 +770,15 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_mutate_rdt" runs the seventeen relative dual topology water
-c     fixtures 058-074, each carrying the "lambda-deriv" keyword, a dual
-c     topology keyword and a pair of "ligand1" and "ligand2" groups, and
-c     drives them through "test_mutate_calc" with the level 4 lambda
-c     derivative checks enabled; cases 058-063 keep only the multipole
-c     term at three ele-lambda values with Ewald on and off, cases
-c     064-069 keep only the polarization term at three pol-lambda
-c     values, cases 070-072 keep only the van der Waals term at three
-c     vdw-lambda values, and cases 073-074 leave the multipole and
-c     polarization terms active with Ewald on and off; the no-Ewald
+c     "test_mutate_rdt" runs the nine relative dual topology water
+c     fixtures 064-072, each carrying the "lambda-deriv" keyword and a
+c     pair of "ligand1" and "ligand2" groups, and drives them through
+c     "test_mutate_calc" with the level 4 lambda derivative checks
+c     enabled; cases 064-069 keep only the polarization term at three
+c     pol-lambda values with Ewald on and off, and cases 070-072 keep
+c     only the van der Waals term at three vdw-lambda values; relative
+c     electrostatics with the multipole term requires the staged
+c     schedule and is covered by "test_mutate_rels"; the no-Ewald
 c     cases cannot use a pairwise neighbor list
 c
 c
@@ -786,24 +786,6 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','058_water_rdt_ye_m10.key',
-     &   '058_water_rdt_ye_m10.txt','058_water_rdt_ye_m10',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','059_water_rdt_ne_m10.key',
-     &   '059_water_rdt_ne_m10.txt','059_water_rdt_ne_m10',
-     &   .true.,  .false., .false., .false., .true.)
-      call test_mutate_calc ('water2','060_water_rdt_ye_m05.key',
-     &   '060_water_rdt_ye_m05.txt','060_water_rdt_ye_m05',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','061_water_rdt_ne_m05.key',
-     &   '061_water_rdt_ne_m05.txt','061_water_rdt_ne_m05',
-     &   .true.,  .false., .false., .false., .true.)
-      call test_mutate_calc ('water2','062_water_rdt_ye_m00.key',
-     &   '062_water_rdt_ye_m00.txt','062_water_rdt_ye_m00',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','063_water_rdt_ne_m00.key',
-     &   '063_water_rdt_ne_m00.txt','063_water_rdt_ne_m00',
-     &   .true.,  .false., .false., .false., .true.)
       call test_mutate_calc ('water2','064_water_rdt_ye_p10.key',
      &   '064_water_rdt_ye_p10.txt','064_water_rdt_ye_p10',
      &   .false., .true.,  .false., .true.,  .true.)
@@ -831,12 +813,6 @@ c
       call test_mutate_calc ('water2','072_water_rdt_v00.key',
      &   '072_water_rdt_v00.txt','072_water_rdt_v00',
      &   .false., .false., .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','073_water_rdt_ye_mp05.key',
-     &   '073_water_rdt_ye_mp05.txt','073_water_rdt_ye_mp05',
-     &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','074_water_rdt_ne_mp05.key',
-     &   '074_water_rdt_ne_mp05.txt','074_water_rdt_ne_mp05',
-     &   .true.,  .true.,  .false., .false., .true.)
       return
       end
 c
@@ -848,17 +824,15 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "test_mutate_qnt" runs the nine water fixtures 075-083 that map
-c     the main lambda to the electrostatics, polarization and van der
-c     Waals sub-lambdas with the quintic "qnt" scheme; each carries the
-c     "ost" keyword and drives "test_mutate_calc" with the level 4
-c     lambda derivative checks enabled, verifying the multipole,
-c     polarization and van der Waals components together; cases 075-077
-c     use single topology, 078-080 absolute dual topology and 081-083
-c     relative dual topology, each at main lambda values 1.0, 0.5 and
-c     0.0; the absolute cases use polarization dual topology with
-c     single topology multipoles and van der Waals switched off; all
-c     fixtures use Ewald and support a pairwise neighbor list
+c     "test_mutate_qnt" runs the six water fixtures 075-080 that map the
+c     main lambda to the electrostatics, polarization and van der Waals
+c     sub-lambdas with the quintic "qnt" scheme; each carries the "ost"
+c     keyword and drives "test_mutate_calc" with the level 4 lambda
+c     derivative checks enabled; cases 075-077 use single topology and
+c     078-080 use polarization dual topology with single topology
+c     multipoles and van der Waals switched off, each at main lambda
+c     values 1.0, 0.5 and 0.0; all fixtures use Ewald and support a
+c     pairwise neighbor list
 c
 c
       subroutine test_mutate_qnt
@@ -883,15 +857,6 @@ c
       call test_mutate_calc ('water2','080_water_qnt_adt_l00.key',
      &   '080_water_qnt_adt_l00.txt','080_water_qnt_adt_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','081_water_qnt_rdt_l10.key',
-     &   '081_water_qnt_rdt_l10.txt','081_water_qnt_rdt_l10',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','082_water_qnt_rdt_l05.key',
-     &   '082_water_qnt_rdt_l05.txt','082_water_qnt_rdt_l05',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','083_water_qnt_rdt_l00.key',
-     &   '083_water_qnt_rdt_l00.txt','083_water_qnt_rdt_l00',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c
@@ -903,17 +868,15 @@ c     ##                                                  ##
 c     ######################################################
 c
 c
-c     "test_mutate_exp" runs the nine water fixtures 084-092 that map
-c     the main lambda to the electrostatics, polarization and van der
-c     Waals sub-lambdas with the exponential "exp" scheme; each carries
-c     the "ost" keyword and drives "test_mutate_calc" with the level 4
-c     lambda derivative checks enabled, verifying the multipole,
-c     polarization and van der Waals components together; cases 084-086
-c     use single topology, 087-089 absolute dual topology and 090-092
-c     relative dual topology, each at main lambda values 1.0, 0.5 and
-c     0.0; the absolute cases use polarization dual topology with
-c     single topology multipoles and van der Waals switched off; all
-c     fixtures use Ewald and support a pairwise neighbor list
+c     "test_mutate_exp" runs the six water fixtures 084-089 that map the
+c     main lambda to the electrostatics, polarization and van der Waals
+c     sub-lambdas with the exponential "exp" scheme; each carries the
+c     "ost" keyword and drives "test_mutate_calc" with the level 4
+c     lambda derivative checks enabled; cases 084-086 use single
+c     topology and 087-089 use polarization dual topology with single
+c     topology multipoles and van der Waals switched off, each at main
+c     lambda values 1.0, 0.5 and 0.0; all fixtures use Ewald and
+c     support a pairwise neighbor list
 c
 c
       subroutine test_mutate_exp
@@ -938,15 +901,6 @@ c
       call test_mutate_calc ('water2','089_water_exp_adt_l00.key',
      &   '089_water_exp_adt_l00.txt','089_water_exp_adt_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','090_water_exp_rdt_l10.key',
-     &   '090_water_exp_rdt_l10.txt','090_water_exp_rdt_l10',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','091_water_exp_rdt_l05.key',
-     &   '091_water_exp_rdt_l05.txt','091_water_exp_rdt_l05',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','092_water_exp_rdt_l00.key',
-     &   '092_water_exp_rdt_l00.txt','092_water_exp_rdt_l00',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c
@@ -958,17 +912,15 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "test_mutate_inv" runs the nine water fixtures 093-101 that map
-c     the main lambda to the electrostatics, polarization and van der
-c     Waals sub-lambdas with the inverse "inv" scheme; each carries the
-c     "ost" keyword and drives "test_mutate_calc" with the level 4
-c     lambda derivative checks enabled, verifying the multipole,
-c     polarization and van der Waals components together; cases 093-095
-c     use single topology, 096-098 absolute dual topology and 099-101
-c     relative dual topology, each at main lambda values 1.0, 0.5 and
-c     0.0; the absolute cases use polarization dual topology with
-c     single topology multipoles and van der Waals switched off; all
-c     fixtures use Ewald and support a pairwise neighbor list
+c     "test_mutate_inv" runs the six water fixtures 093-098 that map the
+c     main lambda to the electrostatics, polarization and van der Waals
+c     sub-lambdas with the inverse "inv" scheme; each carries the "ost"
+c     keyword and drives "test_mutate_calc" with the level 4 lambda
+c     derivative checks enabled; cases 093-095 use single topology and
+c     096-098 use polarization dual topology with single topology
+c     multipoles and van der Waals switched off, each at main lambda
+c     values 1.0, 0.5 and 0.0; all fixtures use Ewald and support a
+c     pairwise neighbor list
 c
 c
       subroutine test_mutate_inv
@@ -993,15 +945,6 @@ c
       call test_mutate_calc ('water2','098_water_inv_adt_l00.key',
      &   '098_water_inv_adt_l00.txt','098_water_inv_adt_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','099_water_inv_rdt_l10.key',
-     &   '099_water_inv_rdt_l10.txt','099_water_inv_rdt_l10',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','100_water_inv_rdt_l05.key',
-     &   '100_water_inv_rdt_l05.txt','100_water_inv_rdt_l05',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','101_water_inv_rdt_l00.key',
-     &   '101_water_inv_rdt_l00.txt','101_water_inv_rdt_l00',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c
@@ -1013,33 +956,28 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_exf" runs the twenty water fixtures 102-104, 108-118,
-c     184-186 and 193-195 that apply an external electric field to a
-c     mutated system, each carrying the "lambda-deriv" keyword so the
-c     level 4 lambda derivative checks are enabled; cases 102-104 and
-c     108-110 keep only the multipole term, with 102-104 single topology
-c     and 108-110 relative dual topology, each at ele-lambda values
-c     1.0, 0.5 and 0.0; cases 111-116 keep only the
+c     "test_mutate_exf" runs the sixteen water fixtures 102-104,
+c     111-117, 184-186 and 193-195 that apply an external electric
+c     field to a mutated system, each carrying the "lambda-deriv"
+c     keyword so the level 4 lambda derivative checks are enabled;
+c     cases 102-104 keep only the multipole term under single topology
+c     at ele-lambda values 1.0, 0.5 and 0.0; cases 111-116 keep only the
 c     polarization term, with 111-113 absolute and 114-116 relative
 c     dual topology at pol-lambda values 1.0, 0.5 and 0.0, since the
 c     induced dipoles respond to the applied field through the direct
-c     field; cases 117-118 leave the multipole and polarization terms
-c     active together, 117 with absolute polarization dual topology and
-c     single topology multipoles and 118 under relative dual topology,
-c     where unequal interpolation exponents of three and four keep the
-c     two terms from masking an error in each other; cases 184-186
-c     leave all three nonbonded terms active under absolute polarization
-c     dual topology with single topology multipoles at
-c     matched ele-lambda and pol-lambda values 1.0, 0.5 and 0.0, so the
-c     unscaled van der Waals term is carried alongside the field-driven
-c     multipole and polarization terms; cases 193-195 repeat that
-c     all-term case under single topology at matched vdw-lambda,
-c     ele-lambda and pol-lambda values 1.0, 0.5 and 0.0; the remaining
-c     dual topology cases use an exponent of two, since with the
-c     default exponent of one the dual topology weighting of the
-c     external field term cannot be distinguished from a linear
-c     scaling; all fixtures use Ewald and support a pairwise neighbor
-c     list
+c     field; case 117 leaves the multipole and polarization terms active
+c     together under absolute polarization dual topology with single
+c     topology multipoles; cases 184-186 leave all three nonbonded terms
+c     active under the same topology at matched ele-lambda and
+c     pol-lambda values 1.0, 0.5 and 0.0, so the unscaled van der Waals
+c     term is carried alongside the field-driven multipole and
+c     polarization terms; cases 193-195 repeat that all-term case under
+c     single topology at matched vdw-lambda, ele-lambda and pol-lambda
+c     values 1.0, 0.5 and 0.0; the dual topology cases use an exponent
+c     of two, since with the default exponent of one the dual topology
+c     weighting of the external field term cannot be distinguished from
+c     a linear scaling; all fixtures use Ewald and support a pairwise
+c     neighbor list
 c
 c
       subroutine test_mutate_exf
@@ -1054,15 +992,6 @@ c
      &   .true.,  .false., .false., .true.,  .true.)
       call test_mutate_calc ('water2','104_water_exf_ast_m00.key',
      &   '104_water_exf_ast_m00.txt','104_water_exf_ast_m00',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','108_water_exf_rdt_m10.key',
-     &   '108_water_exf_rdt_m10.txt','108_water_exf_rdt_m10',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','109_water_exf_rdt_m05.key',
-     &   '109_water_exf_rdt_m05.txt','109_water_exf_rdt_m05',
-     &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','110_water_exf_rdt_m00.key',
-     &   '110_water_exf_rdt_m00.txt','110_water_exf_rdt_m00',
      &   .true.,  .false., .false., .true.,  .true.)
       call test_mutate_calc ('water2','111_water_exf_adt_p10.key',
      &   '111_water_exf_adt_p10.txt','111_water_exf_adt_p10',
@@ -1084,9 +1013,6 @@ c
      &   .false., .true.,  .false., .true.,  .true.)
       call test_mutate_calc ('water2','117_water_exf_adt_mp05.key',
      &   '117_water_exf_adt_mp05.txt','117_water_exf_adt_mp05',
-     &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','118_water_exf_rdt_m05p05.key',
-     &   '118_water_exf_rdt_m05p05.txt','118_water_exf_rdt_m05p05',
      &   .true.,  .true.,  .false., .true.,  .true.)
       call test_mutate_calc ('water2','184_water_exf_adt_l10.key',
      &   '184_water_exf_adt_l10.txt','184_water_exf_adt_l10',
@@ -1117,17 +1043,15 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_emplar" runs the twelve water fixtures 119-130 that
+c     "test_mutate_emplar" runs the six water fixtures 119-124 that
 c     keep the multipole and polarization terms active together at
 c     matched ele-lambda and pol-lambda values, each carrying the
-c     "lambda-deriv" keyword and a dual topology keyword, and drives
+c     "lambda-deriv" keyword and the POL-DUALTOPO keyword, and drives
 c     them through "test_mutate_calc" with the level 4 lambda derivative
-c     checks enabled; cases 119-124 use absolute polarization dual
-c     topology with single topology multipoles and cases 125-130
-c     relative dual topology, each at ele-/pol-lambda values 1.0, 0.5,
-c     and 0.0 with Ewald on and off; the dual topology terms use
-c     interpolation exponents of three so no term can mask an error in
-c     another; the no-Ewald cases cannot use a pairwise neighbor list
+c     checks enabled; the multipoles use single topology, and each case
+c     sits at ele-/pol-lambda values 1.0, 0.5 and 0.0 with Ewald on and
+c     off; the polarization term uses an interpolation exponent of
+c     three; the no-Ewald cases cannot use a pairwise neighbor list
 c
 c
       subroutine test_mutate_emplar
@@ -1152,24 +1076,6 @@ c
       call test_mutate_calc ('water2','124_water_adt_ne_l00.key',
      &   '124_water_adt_ne_l00.txt','124_water_adt_ne_l00',
      &   .true.,  .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','125_water_rdt_ye_l10.key',
-     &   '125_water_rdt_ye_l10.txt','125_water_rdt_ye_l10',
-     &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','126_water_rdt_ne_l10.key',
-     &   '126_water_rdt_ne_l10.txt','126_water_rdt_ne_l10',
-     &   .true.,  .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','127_water_rdt_ye_l05.key',
-     &   '127_water_rdt_ye_l05.txt','127_water_rdt_ye_l05',
-     &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','128_water_rdt_ne_l05.key',
-     &   '128_water_rdt_ne_l05.txt','128_water_rdt_ne_l05',
-     &   .true.,  .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','129_water_rdt_ye_l00.key',
-     &   '129_water_rdt_ye_l00.txt','129_water_rdt_ye_l00',
-     &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','130_water_rdt_ne_l00.key',
-     &   '130_water_rdt_ne_l00.txt','130_water_rdt_ne_l00',
-     &   .true.,  .true.,  .false., .false., .true.)
       return
       end
 c
@@ -1181,20 +1087,17 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_qntrng" runs the four water fixtures 131-134 that
+c     "test_mutate_qntrng" runs the two water fixtures 131-132 that
 c     narrow the quintic sub-lambda windows to 0.1-0.9 with the
 c     "ele-lmda-range", "pol-lmda-range" and "vdw-lmda-range" keywords,
 c     then sample the main lambda at the 1.0 and 0.0 endpoints which
 c     now sit outside every window; there the quintic taper is on its
 c     flat plateau, so each sub-lambda is pinned fully coupled at 1.0
 c     and fully decoupled at 0.0 while every first and second lambda
-c     derivative vanishes, which the level 4 checks confirm; cases
-c     131-132 use absolute polarization dual topology with single
-c     topology multipoles and van der Waals switched off, and
-c     cases 133-134 relative dual topology, each at 1.0 and 0.0, with a
-c     different dual topology interpolation exponent for the multipole
-c     and polarization terms so neither can mask an error in the other;
-c     all four use Ewald and support a pairwise neighbor list
+c     derivative vanishes, which the level 4 checks confirm; both use
+c     polarization dual topology with single topology multipoles and
+c     van der Waals switched off, and both use Ewald and support a
+c     pairwise neighbor list
 c
 c
       subroutine test_mutate_qntrng
@@ -1207,12 +1110,6 @@ c
       call test_mutate_calc ('water2','132_water_qnt_adt_l00.key',
      &   '132_water_qnt_adt_l00.txt','132_water_qnt_adt_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','133_water_qnt_rdt_l10.key',
-     &   '133_water_qnt_rdt_l10.txt','133_water_qnt_rdt_l10',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','134_water_qnt_rdt_l00.key',
-     &   '134_water_qnt_rdt_l00.txt','134_water_qnt_rdt_l00',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c
@@ -1445,20 +1342,18 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_lmdapin" runs the five water fixtures 170-171 and
-c     173-175 that
-c     hold one term at a fixed coupling state while the main lambda
-c     morphs another, the way a leg of a two simulation free energy
-c     split is set up; the "epin" fixtures pin electrostatics and
+c     "test_mutate_lmdapin" runs the three water fixtures 170, 171 and
+c     173 that hold one term at a fixed coupling state while the main
+c     lambda morphs another, the way a leg of a two simulation free
+c     energy split is set up; the "epin" fixtures pin electrostatics and
 c     polarization decoupled by their own keywords and drive van der
 c     Waals from the "lambda" keyword, while the "vpin" fixtures pin
 c     van der Waals decoupled and drive the other two
 c
 c     the fixtures walk one topology and one map form each, 170 and
 c     171 absolute single topology on the exponential map at a main
-c     lambda of 0.5, 173 absolute polarization dual topology on the
-c     quintic map at 0.6, and 174 and 175 relative dual topology on the
-c     inverse power map at 0.7; 171 carries POL-DUALTOPO even though
+c     lambda of 0.5, and 173 absolute polarization dual topology on the
+c     quintic map at 0.6; 171 carries POL-DUALTOPO even though
 c     the rest of that pair is single topology, since "epolar4"
 c     supplies the polarization lambda derivative only through dual
 c     topology
@@ -1468,7 +1363,7 @@ c     chain rule, so every fixture names the "lambda-deriv" keyword and
 c     runs the level 4 checks, where the pinned terms report exact zeros
 c     and the driven ones carry the whole derivative; all three
 c     nonbonded terms stay active, so a pinned term is still present in
-c     the energy rather than switched off, and all five fixtures use
+c     the energy rather than switched off, and all three fixtures use
 c     Ewald and support a neighbor list
 c
 c
@@ -1487,14 +1382,6 @@ c
       call test_mutate_calc ('water2','173_water_lmda_adt_vpin_l06.key',
      &   '173_water_lmda_adt_vpin_l06.txt',
      &   '173_water_lmda_adt_vpin_l06',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','174_water_lmda_rdt_epin_l07.key',
-     &   '174_water_lmda_rdt_epin_l07.txt',
-     &   '174_water_lmda_rdt_epin_l07',
-     &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','175_water_lmda_rdt_vpin_l07.key',
-     &   '175_water_lmda_rdt_vpin_l07.txt',
-     &   '175_water_lmda_rdt_vpin_l07',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1658,6 +1545,88 @@ c
       call test_mutate_calc ('water2','202_water_vsoft_l00.key',
      &   '202_water_vsoft_l00.txt','202_water_vsoft_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_mutate_gate  --  lambda derivative gate  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_mutate_gate" runs the staged ligand 1 charging fixture 136,
+c     whose multipole second lambda derivative is nonzero, with and
+c     without the second, force and virial lambda derivatives; turning
+c     them off must leave the energy, gradient and first lambda
+c     derivatives unchanged and clear the multipole second, force and
+c     virial lambda derivatives
+c
+c
+      subroutine test_mutate_gate
+      use atoms
+      use dlmda
+      implicit none
+      integer i,j
+      real*8 e,e1,dedl1,demdl1
+      real*8 dfm,dvm
+      real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: g1(:,:)
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_gate','mutate'))  return
+      call pushdir ('file/mutate')
+      call loadfix ('water2','136_water_rels_ye_l085.key')
+      allocate (derivs(3,n))
+      allocate (g1(3,n))
+c
+c     full lambda derivatives as the LAMBDA-DERIV keyword requests
+c
+      call gradient (e,derivs)
+      e1 = e
+      dedl1 = dedl
+      demdl1 = demdl
+      do i = 1, n
+         do j = 1, 3
+            g1(j,i) = derivs(j,i)
+         end do
+      end do
+      call assert_logical (d2emdl2.ne.0.0d0,.true.,
+     &                     'test_mutate_gate d2EM/dL2 built')
+c
+c     only the first lambda derivative, as TI, META and ABF request
+c
+      use_d2lmda = .false.
+      call gradient (e,derivs)
+      call assert_real (e,e1,1.0d-10,'test_mutate_gate energy')
+      call assert_grad (derivs,g1,n,1.0d-10,'test_mutate_gate gradient')
+      call assert_real (dedl,dedl1,1.0d-10,'test_mutate_gate dE/dL')
+      call assert_real (demdl,demdl1,1.0d-10,'test_mutate_gate dEM/dL')
+      call assert_real (d2emdl2,0.0d0,0.0d0,
+     &                  'test_mutate_gate d2EM/dL2 cleared')
+      dfm = 0.0d0
+      do i = 1, n
+         do j = 1, 3
+            dfm = dfm + abs(dfmdl(j,i))
+         end do
+      end do
+      dvm = 0.0d0
+      do i = 1, 3
+         do j = 1, 3
+            dvm = dvm + abs(demvirdl(j,i))
+         end do
+      end do
+      call assert_real (dfm,0.0d0,0.0d0,
+     &                  'test_mutate_gate dFM/dL cleared')
+      call assert_real (dvm,0.0d0,0.0d0,
+     &                  'test_mutate_gate dVM/dL cleared')
+      use_d2lmda = .true.
+      deallocate (derivs)
+      deallocate (g1)
+      call popdir
+      call final
       return
       end
 c

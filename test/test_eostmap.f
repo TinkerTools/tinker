@@ -145,7 +145,6 @@ c     calculation takes them from "mutate_dlmda" while parsing keywords;
 c     these cases drive the lambda maps on their own, so they carry the
 c     exponents themselves as they do every other map parameter
 c
-      emdtexp = 1
       epdtexp = 1
 c
 c     test exponential sublambda maps and chain rule derivatives
@@ -409,45 +408,50 @@ c     to select the required endpoint states
 c
       lambda = 0.1d0
       call mapsublmda (lambda)
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need0,.true.,
      &                     'mapsublmda qnt ele need0 below window')
       call assert_logical (need1,.false.,
      &                     'mapsublmda qnt ele need1 below window')
       lambda = 0.5d0
       call mapsublmda (lambda)
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need0,.true.,
      &                     'mapsublmda qnt ele need0 mid window')
       call assert_logical (need1,.true.,
      &                     'mapsublmda qnt ele need1 mid window')
       lambda = 0.9d0
       call mapsublmda (lambda)
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need0,.false.,
      &                     'mapsublmda qnt ele need0 above window')
       call assert_logical (need1,.true.,
      &                     'mapsublmda qnt ele need1 above window')
       lambda = qntelmda0
       call mapsublmda (lambda)
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need0,.true.,
      &                     'mapsublmda qnt ele need0 at lower bound')
       call assert_logical (need1,.false.,
      &                     'mapsublmda qnt ele need1 at lower bound')
       lambda = qntelmda1
       call mapsublmda (lambda)
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need0,.false.,
      &                     'mapsublmda qnt ele need0 at upper bound')
       call assert_logical (need1,.true.,
@@ -492,9 +496,10 @@ c
       vlmdaexp = 2
       lambda = 0.5d0
       call mapsublmda (lambda)
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need0,.true.,
      &                     'mapsublmda exp ele need0')
       call assert_logical (need1,.true.,
@@ -942,7 +947,6 @@ c
 c     a staged leg spends its exponents on the taper, so the endpoint
 c     weight is linear in each sublambda
 c
-      emdtexp = 1
       epdtexp = 1
 c
 c     the ligand 1 leg charges ligand 1 over the upper window against
@@ -956,9 +960,9 @@ c     lambda of one, ligand 1 fully coupled and van der Waals with it,
 c     so only the coupled endpoint has to be built
 c
       call mapsublmda (1.0d0)
-      call assert_logical (erelst0.eq.relnone,.true.,
+      call assert_logical (prelst0.eq.relnone,.true.,
      &                     'maprelstage lig1 lower state at lambda one')
-      call assert_logical (erelst1.eq.rellig1,.true.,
+      call assert_logical (prelst1.eq.rellig1,.true.,
      &                     'maprelstage lig1 upper state at lambda one')
       call assert_real (elambda,1.0d0,1.0d-14,
      &                  'maprelstage lig1 elambda at lambda one')
@@ -966,9 +970,10 @@ c
      &                  'maprelstage lig1 vlambda at lambda one')
       call assert_real (deldlmda,0.0d0,1.0d-14,
      &                  'maprelstage lig1 deldlmda at lambda one')
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need0,.false.,
      &                     'maprelstage lig1 need0 at lambda one')
       call assert_logical (need1,.true.,
@@ -984,9 +989,10 @@ c
      &                     'maprelstage lig1 deldlmda sign on leg')
       call assert_real (vlambda,1.0d0,1.0d-14,
      &                  'maprelstage lig1 vlambda on leg')
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need0,.true.,
      &                     'maprelstage lig1 need0 on leg')
       call assert_logical (need1,.true.,
@@ -1006,9 +1012,10 @@ c
      &                  'maprelstage lig1 elambda at leg end')
       call assert_real (deldlmda,0.0d0,1.0d-14,
      &                  'maprelstage lig1 deldlmda at leg end')
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need1,.false.,
      &                     'maprelstage lig1 need1 at leg end')
 c
@@ -1019,7 +1026,7 @@ c
       qntelmda0 = 0.0d0
       qntelmda1 = 0.3d0
       call mapsublmda (0.0d0)
-      call assert_logical (erelst1.eq.rellig2,.true.,
+      call assert_logical (prelst1.eq.rellig2,.true.,
      &                     'maprelstage lig2 upper state at zero')
       call assert_real (elambda,1.0d0,1.0d-14,
      &                  'maprelstage lig2 elambda at lambda zero')
@@ -1044,9 +1051,9 @@ c
       probe(3) = 0.7d0
       do i = 1, 3
          call mapsublmda (probe(i))
-         call assert_logical (erelst0.eq.relnone,.true.,
+         call assert_logical (prelst0.eq.relnone,.true.,
      &                        'maprelstage vdwm lower state')
-         call assert_logical (erelst1.eq.relnone,.true.,
+         call assert_logical (prelst1.eq.relnone,.true.,
      &                        'maprelstage vdwm upper state')
          call assert_real (elambda,0.0d0,1.0d-14,
      &                     'maprelstage vdwm elambda')
@@ -1054,9 +1061,10 @@ c
      &                     'maprelstage vdwm deldlmda')
          call assert_real (d2eldlmda2,0.0d0,1.0d-14,
      &                     'maprelstage vdwm d2eldlmda2')
-         call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-         call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+         need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &            .or. d2eldlmda2.ne.0.0d0)
+         need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &            .or. d2eldlmda2.ne.0.0d0)
          call assert_logical (need1,.false.,
      &                       'maprelstage vdwm need1')
       end do
@@ -1123,9 +1131,10 @@ c
      &                     'maprelstage lig1 collapsed weight')
          call assert_logical (deldlmda.gt.0.0d0,.true.,
      &                        'maprelstage lig1 collapsed slope')
-         call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-         call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+         need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &            .or. d2eldlmda2.ne.0.0d0)
+         need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &            .or. d2eldlmda2.ne.0.0d0)
          call assert_logical (need1,.true.,
      &                        'maprelstage lig1 collapsed need1')
       end do
@@ -1136,9 +1145,10 @@ c
       call mapsublmda (0.7d0+1.0d-5)
       call assert_logical (elambda.gt.0.0d0,.true.,
      &                     'maprelstage lig1 revived weight')
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &              deldlmda,d2eldlmda2,need0,need1)
+      need1 = (elambda.ne.0.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
+      need0 = (elambda.ne.1.0d0 .or. deldlmda.ne.0.0d0
+     &         .or. d2eldlmda2.ne.0.0d0)
       call assert_logical (need1,.true.,
      &                     'maprelstage lig1 revived need1')
 c
@@ -1157,10 +1167,6 @@ c
      &                     'maprelstage dpldlmda tracks deldlmda')
          call assert_real (d2pldlmda2,d2eldlmda2,1.0d-15,
      &                     'maprelstage d2pldlmda2 tracks d2eldlmda2')
-         call assert_logical (prelst0.eq.erelst0,.true.,
-     &                        'maprelstage pol lower state tracks ele')
-         call assert_logical (prelst1.eq.erelst1,.true.,
-     &                        'maprelstage pol upper state tracks ele')
       end do
 c
 c     the staged weight of each leg is the quintic taper of its own

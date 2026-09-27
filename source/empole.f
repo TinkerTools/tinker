@@ -17,17 +17,36 @@ c     multipole interactions
 c
 c
       subroutine empole
-      use dlmda
-      use mutant
+      use energi
+      use extfld
+      use limits
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_rel) then
-         call empole0er
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole0d
+         else
+            call empole0c
+         end if
       else
-         call empole0calc
+         if (use_mlist) then
+            call empole0b
+         else
+            call empole0a
+         end if
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'MPOLE'
+         call exfield (mode,exf)
+         em = em + exf
       end if
       return
       end
@@ -1935,122 +1954,5 @@ c
          end do
       end do
       em = em + e
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine empole0calc  --  compute multipole energy  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "empole0calc" evaluates the multipole energy for the
-c     electrostatic parameter state currently installed
-c
-c
-      subroutine empole0calc
-      use energi
-      use extfld
-      use limits
-      implicit none
-      real*8 exf
-      character*6 mode
-c
-c
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole0d
-         else
-            call empole0c
-         end if
-      else
-         if (use_mlist) then
-            call empole0b
-         else
-            call empole0a
-         end if
-      end if
-c
-c     get contribution from external electric field if used
-c
-      if (use_exfld) then
-         mode = 'MPOLE'
-         call exfield (mode,exf)
-         em = em + exf
-      end if
-      return
-      end
-c     ##########################################################
-c     ##                                                      ##
-c     ##  subroutine empole0er  --  relative dual topo mpole  ##
-c     ##                                                      ##
-c     ##########################################################
-c
-c
-c     "empole0er" interpolates between the two coupling states of a
-c     two-ligand relative dual topology calculation, each state a sum
-c     of parameter-zeroed subsystem energies,
-c
-c        E = weight1*E(erelst1) + (1-weight1)*E(erelst0)
-c
-c
-      subroutine empole0er
-      use dlmda
-      use energi
-      use mutant
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      integer k
-      real*8 em0,em1
-      logical la,lb,le
-      logical in0,in1
-      logical need0,need1
-c
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 deldlmda,d2eldlmda2,need0,need1)
-c
-c     zero out the two endpoint accumulators
-c
-      em0 = 0.0d0
-      em1 = 0.0d0
-c
-c     build each subsystem once, add to the endpoints
-c
-      do k = 1, nrelsub
-         call relslot (k,erelst0,erelst1,la,lb,le,in0,in1)
-         in0 = in0 .and. need0
-         in1 = in1 .and. need1
-         if (.not. (in0 .or. in1))  cycle
-         call altemdtsub (la,lb,le)
-         call empole0calc
-         if (in0) then
-            em0 = em0 + em
-         end if
-         if (in1) then
-            em1 = em1 + em
-         end if
-      end do
-c
-c     restore the original full system parameters
-c
-      call altemdtsub (.true.,.true.,.true.)
-c
-c     copy energy if only one endpoint state is computed
-c
-      if (.not. need0) then
-         em0 = em1
-      else if (.not. need1) then
-         em1 = em0
-      end if
-c
-c     interpolate between the two endpoint states
-c
-      em = weight1*em1 + (1.0d0-weight1)*em0
       return
       end

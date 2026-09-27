@@ -23,7 +23,6 @@
 
  Free Energy Mode                   Absolute
  Sampling Mode                           OST
- Electrostatics Topology                Dual
  Polarization Topology                  Dual
  Main Lambda Value                     0.500
 
@@ -34,10 +33,10 @@
                                         -46.989755      0.000000    -35.411463    -11.578292
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                       -176.211586      0.000000   -132.792991    -43.418595
+                                        -40.359796      0.000000      3.058799    -43.418595
 
  Numerical 2nd Lambda Derivatives :        d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                       -176.211576      0.000000   -132.792983    -43.418593
+                                        -40.359780      0.000000      3.058813    -43.418593
 
  Lambda Gradient Breakdown over Individual Atoms :
 

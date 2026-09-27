@@ -23,7 +23,6 @@
 
  Free Energy Mode                   Absolute
  Sampling Mode                           OST
- Electrostatics Topology              Single
  Polarization Topology                  Dual
  Main Lambda Value                     0.500
 

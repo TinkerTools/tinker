@@ -8,10 +8,7 @@ extern "C" {
 extern int TINKER_MOD(dlmda, elmdaapmn);
 extern int TINKER_MOD(dlmda, elmdaexp);
 extern int TINKER_MOD(dlmda, elmdainvn);
-extern int TINKER_MOD(dlmda, emdtexp);
 extern int TINKER_MOD(dlmda, epdtexp);
-extern int TINKER_MOD(dlmda, erelst0);
-extern int TINKER_MOD(dlmda, erelst1);
 extern int TINKER_MOD(dlmda, lmdaintv);
 extern int TINKER_MOD(dlmda, lmdanpa);
 extern int TINKER_MOD(dlmda, lmdanpb);
@@ -116,6 +113,7 @@ extern double* TINKER_MOD(dlmda, lqgrid);
 extern int TINKER_MOD(dlmda, lmdatrial);
 extern int TINKER_MOD(dlmda, use_abf);
 extern int TINKER_MOD(dlmda, use_abfdyn);
+extern int TINKER_MOD(dlmda, use_d2lmda);
 extern int TINKER_MOD(dlmda, use_dlmda);
 extern int TINKER_MOD(dlmda, use_edlmda);
 extern int TINKER_MOD(dlmda, use_elmdamap);

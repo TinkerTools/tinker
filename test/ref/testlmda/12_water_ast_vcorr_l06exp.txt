@@ -23,7 +23,6 @@
 
  Free Energy Mode                   Absolute
  Sampling Mode                  Fixed Lambda
- Electrostatics Topology              Single
  Polarization Topology                Single
  Main Lambda Value                     0.600
 

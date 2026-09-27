@@ -17,19 +17,38 @@ c     derivatives with respect to Cartesian coordinates
 c
 c
       subroutine empole1
-      use dlmda
-      use mutant
+      use energi
+      use extfld
+      use limits
       use virial
       implicit none
       integer i,j
+      real*8 exf
+      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_rel) then
-         call empole1er
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole1d
+         else
+            call empole1c
+         end if
       else
-         call empole1calc
+         if (use_mlist) then
+            call empole1b
+         else
+            call empole1a
+         end if
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'MPOLE'
+         call exfield1 (mode,exf)
+         em = em + exf
       end if
 c
 c     add the electrostatic virial to main virial
@@ -4036,205 +4055,5 @@ c
       emvir(1,3) = emvir(1,3) + vxz
       emvir(2,3) = emvir(2,3) + vyz
       emvir(3,3) = emvir(3,3) + vzz
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine empole1calc  --  compute multipole derivatives  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "empole1calc" evaluates the multipole energy and derivatives for
-c     the electrostatic parameter state currently installed
-c
-c
-      subroutine empole1calc
-      use energi
-      use extfld
-      use limits
-      implicit none
-      real*8 exf
-      character*6 mode
-c
-c
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole1d
-         else
-            call empole1c
-         end if
-      else
-         if (use_mlist) then
-            call empole1b
-         else
-            call empole1a
-         end if
-      end if
-c
-c     get contribution from external electric field if used
-c
-      if (use_exfld) then
-         mode = 'MPOLE'
-         call exfield1 (mode,exf)
-         em = em + exf
-      end if
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine empole1er  --  relative dual topo mpole grad  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "empole1er" calculates the multipole energy and Cartesian first
-c     derivatives for a two-ligand relative dual topology calculation by
-c     interpolating between two coupling states, each of them a sum of
-c     parameter-zeroed subsystem energies,
-c
-c        E = weight1*E(erelst1) + (1-weight1)*E(erelst0)
-c
-c
-      subroutine empole1er
-      use atoms
-      use deriv
-      use dlmda
-      use energi
-      use limits
-      use mutant
-      use virial
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      integer i,j,k
-      real*8 em0,em1
-      real*8 emvir0(3,3),emvir1(3,3)
-      logical la,lb,le
-      logical in0,in1
-      logical need0,need1
-      real*8, allocatable :: dem0(:,:)
-      real*8, allocatable :: dem1(:,:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (dem0(3,n))
-      allocate (dem1(3,n))
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 deldlmda,d2eldlmda2,need0,need1)
-c
-c     zero out the two endpoint accumulators
-c
-      em0 = 0.0d0
-      em1 = 0.0d0
-      do i = 1, n
-         do j = 1, 3
-            dem0(j,i) = 0.0d0
-            dem1(j,i) = 0.0d0
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir0(j,i) = 0.0d0
-            emvir1(j,i) = 0.0d0
-         end do
-      end do
-c
-c     build each subsystem once, add to the endpoints
-c
-      do k = 1, nrelsub
-         call relslot (k,erelst0,erelst1,la,lb,le,in0,in1)
-         in0 = in0 .and. need0
-         in1 = in1 .and. need1
-         if (.not. (in0 .or. in1))  cycle
-         call altemdtsub (la,lb,le)
-         call empole1calc
-         if (in0) then
-            em0 = em0 + em
-            do i = 1, n
-               do j = 1, 3
-                  dem0(j,i) = dem0(j,i) + dem(j,i)
-               end do
-            end do
-            do i = 1, 3
-               do j = 1, 3
-                  emvir0(j,i) = emvir0(j,i) + emvir(j,i)
-               end do
-            end do
-         end if
-         if (in1) then
-            em1 = em1 + em
-            do i = 1, n
-               do j = 1, 3
-                  dem1(j,i) = dem1(j,i) + dem(j,i)
-               end do
-            end do
-            do i = 1, 3
-               do j = 1, 3
-                  emvir1(j,i) = emvir1(j,i) + emvir(j,i)
-               end do
-            end do
-         end if
-      end do
-c
-c     restore the original full system parameters
-c
-      call altemdtsub (.true.,.true.,.true.)
-c
-c     copy energy if only one endpoint state is computed
-c
-      if (.not. need0) then
-         em0 = em1
-         do i = 1, n
-            do j = 1, 3
-               dem0(j,i) = dem1(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               emvir0(j,i) = emvir1(j,i)
-            end do
-         end do
-      else if (.not. need1) then
-         em1 = em0
-         do i = 1, n
-            do j = 1, 3
-               dem1(j,i) = dem0(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               emvir1(j,i) = emvir0(j,i)
-            end do
-         end do
-      end if
-c
-c     interpolate between the two endpoint states
-c
-      em = weight1*em1 + (1.0d0-weight1)*em0
-      do i = 1, n
-         do j = 1, 3
-            dem(j,i) = weight1*dem1(j,i) + (1.0d0-weight1)*dem0(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir(j,i) = weight1*emvir1(j,i)
-     &                 + (1.0d0-weight1)*emvir0(j,i)
-         end do
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (dem0)
-      deallocate (dem1)
       return
       end

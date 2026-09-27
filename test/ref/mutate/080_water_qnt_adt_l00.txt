@@ -1,6 +1,6 @@
  Total Potential Energy :                 -9.5502 Kcal/mole
 
- EngCnt  Atomic Multipoles                        -6.8076              388
+ EngCnt  Atomic Multipoles                        -6.8076              246
  EngCnt  Polarization                             -2.7426              246
 
  Internal Virial Tensor :                  10.790       -2.299       15.230
@@ -43,7 +43,7 @@
  Anlyt        30             0.4034     -1.4736      0.7110        1.6852
 
  Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                          0.000000      0.000000     -0.000000     -0.000000
+                                          0.000000      0.000000      0.000000     -0.000000
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
                                           0.000000      0.000000      0.000000      0.000000

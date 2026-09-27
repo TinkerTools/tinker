@@ -1,22 +1,22 @@
- Total Potential Energy :                -19.3792 Kcal/mole
+ Total Potential Energy :                -19.4879 Kcal/mole
 
- EngCnt  Atomic Multipoles                       -16.2506              388
+ EngCnt  Atomic Multipoles                       -16.3594              388
  EngCnt  Polarization                             -3.1286              388
 
- Internal Virial Tensor :                  21.026       -2.386       16.058
-                                           -2.386       10.370        0.498
-                                           16.058        0.498       15.216
+ Internal Virial Tensor :                  21.120       -2.334       15.982
+                                           -2.334       10.414        0.623
+                                           15.982        0.623       15.159
 
  Cartesian Gradient Breakdown over Individual Atoms :
 
   Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
 
- Anlyt         1            -0.9366      2.0720      0.5537        2.3403
- Anlyt         2            -0.0717     -3.1404     -0.3221        3.1577
- Anlyt         3             0.4106     -0.1902     -0.2637        0.5237
- Anlyt         4            -0.8755      6.2259     -6.6667        9.1637
- Anlyt         5             3.3212      0.0110     10.1558       10.6850
- Anlyt         6             1.0919     -1.7598      1.2953        2.4427
+ Anlyt         1            -0.8319      1.8401      0.7808        2.1651
+ Anlyt         2            -0.0613     -2.9751     -0.5117        3.0194
+ Anlyt         3             0.2898     -0.0777     -0.3211        0.4395
+ Anlyt         4            -0.9070      6.4482     -6.8092        9.4217
+ Anlyt         5             3.2849     -0.1581     10.1636       10.6824
+ Anlyt         6             1.1559     -1.8526      1.4478        2.6200
  Anlyt         7            -0.9518     -0.3471      0.9041        1.3579
  Anlyt         8            -0.5093      1.8442      0.9021        2.1153
  Anlyt         9             2.0428     -3.8268      0.8414        4.4187
@@ -46,7 +46,7 @@
                                         -21.973659      0.000000    -18.886114     -3.087545
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                        -18.525267      0.000000     -0.000000    -18.525267
+                                        -17.655209      0.000000      0.870058    -18.525267
 
  Lambda Gradient Breakdown over Individual Atoms :
 

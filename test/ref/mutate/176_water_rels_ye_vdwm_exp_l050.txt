@@ -1,23 +1,23 @@
- Total Potential Energy :                 -3.8863 Kcal/mole
+ Total Potential Energy :                 -3.8599 Kcal/mole
 
  EngCnt  Van der Waals                             5.6903              349
- EngCnt  Atomic Multipoles                        -6.8340              306
+ EngCnt  Atomic Multipoles                        -6.8076              246
  EngCnt  Polarization                             -2.7426              306
 
- Internal Virial Tensor :                 -15.722        8.096        3.991
-                                            8.096      -21.475       -3.925
-                                            3.991       -3.925      -15.227
+ Internal Virial Tensor :                 -15.733        8.100        4.010
+                                            8.100      -21.480       -3.948
+                                            4.010       -3.948      -15.290
 
  Cartesian Gradient Breakdown over Individual Atoms :
 
   Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
 
- Anlyt         1             0.0443     -0.0051      0.0640        0.0781
- Anlyt         2             0.0004     -0.0022     -0.0204        0.0205
- Anlyt         3            -0.0112      0.0056     -0.0202        0.0238
- Anlyt         4            -2.3313     -3.1533      1.0452        4.0584
- Anlyt         5            -1.0906     -1.6259     -6.1470        6.4513
- Anlyt         6            -0.0447     -0.0135      0.0270        0.0539
+ Anlyt         1             0.0001     -0.0000      0.0001        0.0001
+ Anlyt         2            -0.0000     -0.0000     -0.0000        0.0000
+ Anlyt         3            -0.0000      0.0000     -0.0000        0.0000
+ Anlyt         4            -2.3354     -3.1591      1.0946        4.0783
+ Anlyt         5            -1.0915     -1.6152     -6.1579        6.4591
+ Anlyt         6            -0.0435      0.0055      0.0026        0.0440
  Anlyt         7            -0.0596     -0.4115      1.4166        1.4764
  Anlyt         8            -1.0462      1.6834      0.8305        2.1490
  Anlyt         9            -3.0125      0.3306     -2.1157        3.6960

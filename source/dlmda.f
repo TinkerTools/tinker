@@ -15,10 +15,7 @@ c
 c     elmdaapmn     power exponent for electrostatic asymmetric map
 c     elmdaexp      exponent for electrostatic exponential mapping
 c     elmdainvn     inverse-power exponent for electrostatic mapping
-c     emdtexp       multipole exponent for dual topology interpolation
 c     epdtexp       polarization lambda exponent for dual topology
-c     erelst0       multipole coupling state at the lower endpoint
-c     erelst1       multipole coupling state at the upper endpoint
 c     lmdaintv      steps in each adaptive bias sample interval
 c     lmdanpa       steps propagating the lambda particle
 c     lmdanpb       steps equilibrating at the frozen lambda
@@ -123,6 +120,8 @@ c     lqgrid        qgrid for lambda derivative
 c     lmdatrial     flag to evaluate lambda bias for a trial move
 c     use_abf       flag to use adaptive biasing force
 c     use_abfdyn    flag to propagate abf lambda particle
+c     use_d2lmda    flag that second, force and virial lambda derivs
+c                     are needed, beyond the first lambda derivative
 c     use_dlmda     logical flag governing use of lambda derivative
 c     use_edlmda    flag that the multipole term has a lambda deriv
 c     use_elmdamap  flag that elambda follows the main lambda map
@@ -158,10 +157,7 @@ c
       integer elmdaapmn
       integer elmdaexp
       integer elmdainvn
-      integer emdtexp
       integer epdtexp
-      integer erelst0
-      integer erelst1
       integer lmdaintv
       integer lmdanpa
       integer lmdanpb
@@ -270,6 +266,7 @@ c
       logical lmdatrial
       logical use_abf
       logical use_abfdyn
+      logical use_d2lmda
       logical use_dlmda
       logical use_edlmda
       logical use_elmdamap

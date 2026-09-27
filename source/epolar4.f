@@ -494,9 +494,10 @@ c
          end if
       end do
 c
-c     restore the original full system parameters
+c     restore the full atom mask and the installed electrostatic state
 c
-      call altpolrsub (.true.,.true.,.true.)
+      call submask (.true.,.true.,.true.)
+      call altemdt (elambda)
 c
 c     copy energy if only one endpoint state is computed
 c

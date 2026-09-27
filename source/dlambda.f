@@ -13,8 +13,7 @@ c     ################################################################
 c
 c
 c     "refreshsublmda" maps the main lambda onto the component
-c     sublambdas and installs the resulting absolute-topology
-c     electrostatic state
+c     sublambdas and installs the resulting electrostatic state
 c
 c
       subroutine refreshsublmda
@@ -31,11 +30,50 @@ c     update sublambdas, mapping derivatives and endpoint flags
 c
       call mapsublmda (lambda)
 c
-c     ordinary absolute-topology energy routines consume installed
-c     parameter arrays instead of applying elambda themselves; relative
-c     dual topology routines install their own subsystem endpoint states
+c     the ordinary energy routines consume the installed parameter
+c     arrays instead of applying elambda themselves
 c
-      if (.not. use_rel)  call altelec
+      call altelec
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine emscale  --  electrostatic scale per group  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "emscale" returns the scale applied to the electrostatic
+c     parameters of the environment and of each ligand group, along
+c     with its derivative with respect to "elambda"; the environment
+c     is unscaled, the charging ligand carries "elambda", and in a
+c     staged relative leg the other ligand is annihilated
+c
+c
+      subroutine emscale (emsc,demsc)
+      use dlmda
+      use mutant
+      implicit none
+      real*8 emsc(0:2)
+      real*8 demsc(0:2)
+c
+c
+c     the first ligand group charges unless the leg charges the second
+c
+      emsc(0) = 1.0d0
+      demsc(0) = 0.0d0
+      emsc(1) = elambda
+      demsc(1) = 1.0d0
+      emsc(2) = 0.0d0
+      demsc(2) = 0.0d0
+      if (use_relstage .and. relstage.eq.'LIG2') then
+         emsc(1) = 0.0d0
+         demsc(1) = 0.0d0
+         emsc(2) = elambda
+         demsc(2) = 1.0d0
+      end if
       return
       end
 c
@@ -153,13 +191,13 @@ c
       real*8 lmda
 c
 c
-c     the middle leg holds both ligands decoupled, so electrostatics
+c     the middle leg holds both ligands uncharged, so electrostatics
 c     and polarization sit at the reference state and leave the chain
 c     rule while van der Waals morphs across its map
 c
       if (relstage .eq. 'VDWM') then
-         erelst0 = relnone
-         erelst1 = relnone
+         prelst0 = relnone
+         prelst1 = relnone
          elambda = 0.0d0
          deldlmda = 0.0d0
          d2eldlmda2 = 0.0d0
@@ -171,8 +209,8 @@ c     the ligand 1 leg charges ligand 1 against the decoupled reference
 c     with van der Waals already morphed onto it
 c
       else if (relstage .eq. 'LIG1') then
-         erelst0 = relnone
-         erelst1 = rellig1
+         prelst0 = relnone
+         prelst1 = rellig1
          call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
      &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
      &                    elambda,deldlmda,d2eldlmda2)
@@ -185,8 +223,8 @@ c     its weight is the complement of the map, with van der Waals still
 c     on it
 c
       else
-         erelst0 = relnone
-         erelst1 = rellig2
+         prelst0 = relnone
+         prelst1 = rellig2
          call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
      &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
      &                    elambda,deldlmda,d2eldlmda2)
@@ -202,10 +240,8 @@ c     numerical guard on the map complement
 c
       elambda = min(1.0d0,max(0.0d0,elambda))
 c
-c     polarization stages with the multipoles, same states same weight
+c     polarization stages with the multipoles at the same weight
 c
-      prelst0 = erelst0
-      prelst1 = erelst1
       plambda = elambda
       dpldlmda = deldlmda
       d2pldlmda2 = d2eldlmda2

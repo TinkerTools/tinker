@@ -24,7 +24,6 @@
  Free Energy Mode            Staged Relative
  Staged Leg                             VDWM
  Sampling Mode                  Fixed Lambda
- Electrostatics Topology                Dual
  Polarization Topology                  Dual
  Main Lambda Value                     0.500
 

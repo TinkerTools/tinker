@@ -306,6 +306,8 @@ inline void tinker_f_gdastat(int* nstep, double* beta, double* xx, tinker_fchars
 // dlambda.f
 void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
+void emscale_(double* emsc, double* demsc);
+#define tinker_f_emscale emscale_
 void mapsublmda_(double* lmda);
 #define tinker_f_mapsublmda mapsublmda_
 void sublmdamap_(double* lmda, char* map, int* nexp, int* invn, double* inveps, int* apmn, double* apmrho, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub, tinker_fchar_len_t map_cap);
@@ -1018,10 +1020,6 @@ void emreal0d_();
 #define tinker_f_emreal0d emreal0d_
 void emrecip_();
 #define tinker_f_emrecip emrecip_
-void empole0calc_();
-#define tinker_f_empole0calc empole0calc_
-void empole0er_();
-#define tinker_f_empole0er empole0er_
 
 // empole1.f
 void empole1_();
@@ -1040,10 +1038,6 @@ void emreal1d_();
 #define tinker_f_emreal1d emreal1d_
 void emrecip1_();
 #define tinker_f_emrecip1 emrecip1_
-void empole1calc_();
-#define tinker_f_empole1calc empole1calc_
-void empole1er_();
-#define tinker_f_empole1er empole1er_
 
 // empole2.f
 void empole2_(int* i);
@@ -1068,10 +1062,6 @@ void emreal3d_();
 #define tinker_f_emreal3d emreal3d_
 void emrecip3_();
 #define tinker_f_emrecip3 emrecip3_
-void empole3calc_();
-#define tinker_f_empole3calc empole3calc_
-void empole3er_();
-#define tinker_f_empole3er empole3er_
 
 // empole4.f
 void empole4_();
@@ -1090,8 +1080,6 @@ void emreal4d_();
 #define tinker_f_emreal4d emreal4d_
 void emrecip4_();
 #define tinker_f_emrecip4 emrecip4_
-void empole4er_();
-#define tinker_f_empole4er empole4er_
 
 // energy.f
 double energy_();
@@ -2286,10 +2274,6 @@ void submask_(int* la, int* lb, int* le);
 #define tinker_f_submask submask_
 void relslot_(int* k, int* ist0, int* ist1, int* la, int* lb, int* le, int* in0, int* in1);
 #define tinker_f_relslot relslot_
-void setsubelec_();
-#define tinker_f_setsubelec setsubelec_
-void altemdtsub_(int* la, int* lb, int* le);
-#define tinker_f_altemdtsub altemdtsub_
 void altpolrsub_(int* la, int* lb, int* le);
 #define tinker_f_altpolrsub altpolrsub_
 

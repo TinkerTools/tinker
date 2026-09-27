@@ -1,23 +1,23 @@
- Total Potential Energy :                 -7.6061 Kcal/mole
+ Total Potential Energy :                 -7.5797 Kcal/mole
 
  EngCnt  Van der Waals                             1.9706              277
- EngCnt  Atomic Multipoles                        -6.8340              306
+ EngCnt  Atomic Multipoles                        -6.8076              246
  EngCnt  Polarization                             -2.7426              306
 
- Internal Virial Tensor :                  -4.130        6.574        5.995
-                                            6.574      -15.308       -1.742
-                                            5.995       -1.742        4.646
+ Internal Virial Tensor :                  -4.141        6.578        6.014
+                                            6.578      -15.312       -1.764
+                                            6.014       -1.764        4.583
 
  Cartesian Gradient Breakdown over Individual Atoms :
 
   Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
 
- Anlyt         1            -0.0419     -0.1464      0.0258        0.1544
- Anlyt         2            -0.0142     -0.0631     -0.0184        0.0673
- Anlyt         3            -0.0462      0.0357     -0.0316        0.0664
- Anlyt         4             0.0041      0.0059     -0.0495        0.0500
- Anlyt         5             0.0009     -0.0107      0.0109        0.0153
- Anlyt         6            -0.0011     -0.0191      0.0243        0.0309
+ Anlyt         1            -0.0862     -0.1413     -0.0382        0.1699
+ Anlyt         2            -0.0146     -0.0610      0.0020        0.0627
+ Anlyt         3            -0.0350      0.0302     -0.0114        0.0476
+ Anlyt         4             0.0000      0.0000     -0.0001        0.0001
+ Anlyt         5            -0.0000     -0.0000      0.0000        0.0000
+ Anlyt         6            -0.0000     -0.0000      0.0000        0.0000
  Anlyt         7             0.4317     -0.7773      1.7583        1.9703
  Anlyt         8            -1.0596      1.6889      0.8233        2.1571
  Anlyt         9            -1.3245     -1.0281     -0.9420        1.9231
@@ -44,7 +44,7 @@
  Anlyt        30             0.3173     -1.3177      0.6401        1.4989
 
  Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                          0.000000      0.000000      0.000000      0.000000
+                                          0.000000      0.000000      0.000000     -0.000000
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
                                           0.000000      0.000000      0.000000      0.000000

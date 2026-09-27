@@ -23,7 +23,6 @@
 
  Free Energy Mode                   Relative
  Sampling Mode                  Fixed Lambda
- Electrostatics Topology                Dual
  Polarization Topology                  Dual
  Main Lambda Value                     0.500
 

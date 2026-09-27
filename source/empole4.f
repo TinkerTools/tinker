@@ -18,10 +18,10 @@ c     and lambda derivatives
 c
 c
       subroutine empole4
+      use atoms
       use dlmda
       use extfld
       use limits
-      use mutant
       use virial
       implicit none
       integer i,j
@@ -29,26 +29,39 @@ c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_rel) then
-         call empole4er
-      else
-         if (use_ewald) then
-            if (use_mlist) then
-               call empole4d
-            else
-               call empole4c
-            end if
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole4d
          else
-            if (use_mlist) then
-               call empole4b
-            else
-               call empole4a
-            end if
+            call empole4c
          end if
+      else
+         if (use_mlist) then
+            call empole4b
+         else
+            call empole4a
+         end if
+      end if
 c
 c     get contribution from external electric field if used
 c
-         if (use_exfld)  call exfield4
+      if (use_exfld)  call exfield4
+c
+c     the second, force and virial lambda derivatives are only built
+c     when needed, so clear the partial values left otherwise
+c
+      if (.not. use_d2lmda) then
+         d2emdl2 = 0.0d0
+         do i = 1, n
+            do j = 1, 3
+               dfmdl(j,i) = 0.0d0
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               demvirdl(j,i) = 0.0d0
+            end do
+         end do
       end if
 c
 c     add the electrostatic virial to main virial
@@ -153,6 +166,8 @@ c
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
       real*8 scalelmda
+      real*8 esi,desi,esk,desk,dscal
+      real*8 emsc(0:2),demsc(0:2)
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
@@ -167,7 +182,7 @@ c
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
-      logical muti,mutk
+      logical muti,mutk,livepr
       character*6 mode
 c
 c
@@ -225,6 +240,10 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
+c     get the multipole scale and lambda derivative of each group
+c
+      call emscale (emsc,demsc)
+c
 c     compute the multipole interaction energy and gradient
 c
       do ii = 1, npole-1
@@ -252,6 +271,8 @@ c
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
          muti = (mutg(i) .ne. 0)
+         esi = emsc(mutg(i))
+         desi = demsc(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -277,10 +298,15 @@ c
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             mutk = (mutg(k) .ne. 0)
+            esk = emsc(mutg(k))
+            desk = demsc(mutg(k))
+            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
+     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
+            if (.not. livepr)  proceed = .false.
             if (.not. proceed)  goto 10
             xr = x(k) - xi
             yr = y(k) - yi
@@ -532,34 +558,19 @@ c
 c
 c     compute lambda derivative
 c
-               scalelmda = 1.0d0
-               if (muti .and. mutk) then
-                  dlambda = 2.0d0 * elambda * e
-                  dlambda2 = 2.0d0 * e
-                  dlfrcx = 2.0d0 * elambda * frcx
-                  dlfrcy = 2.0d0 * elambda * frcy
-                  dlfrcz = 2.0d0 * elambda * frcz
-                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
-                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
-                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
-                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
-                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
-                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
-                  scalelmda = elambda * elambda
-               else if (muti .or. mutk) then
-                  dlambda = e
-                  dlambda2 = 0.0d0
-                  dlfrcx = frcx
-                  dlfrcy = frcy
-                  dlfrcz = frcz
-                  dlttmi(1) = ttmi(1)
-                  dlttmi(2) = ttmi(2)
-                  dlttmi(3) = ttmi(3)
-                  dlttmk(1) = ttmk(1)
-                  dlttmk(2) = ttmk(2)
-                  dlttmk(3) = ttmk(3)
-                  scalelmda = elambda
-               end if
+               scalelmda = esi * esk
+               dscal = desi*esk + esi*desk
+               dlambda = dscal * e
+               dlambda2 = 2.0d0 * desi * desk * e
+               dlfrcx = dscal * frcx
+               dlfrcy = dscal * frcy
+               dlfrcz = dscal * frcz
+               dlttmi(1) = dscal * ttmi(1)
+               dlttmi(2) = dscal * ttmi(2)
+               dlttmi(3) = dscal * ttmi(3)
+               dlttmk(1) = dscal * ttmk(1)
+               dlttmk(2) = dscal * ttmk(2)
+               dlttmk(3) = dscal * ttmk(3)
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
@@ -702,6 +713,8 @@ c
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
          muti = (mutg(i) .ne. 0)
+         esi = emsc(mutg(i))
+         desi = demsc(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -727,9 +740,14 @@ c
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             mutk = (mutg(k) .ne. 0)
+            esk = emsc(mutg(k))
+            desk = demsc(mutg(k))
+            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
+     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
+            if (.not. livepr)  proceed = .false.
             if (.not. proceed)  goto 20
             do jcell = 2, ncell
             xr = x(k) - xi
@@ -995,34 +1013,19 @@ c
 c
 c     compute lambda derivative
 c
-               scalelmda = 1.0d0
-               if (muti .and. mutk) then
-                  dlambda = 2.0d0 * elambda * e
-                  dlambda2 = 2.0d0 * e
-                  dlfrcx = 2.0d0 * elambda * frcx
-                  dlfrcy = 2.0d0 * elambda * frcy
-                  dlfrcz = 2.0d0 * elambda * frcz
-                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
-                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
-                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
-                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
-                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
-                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
-                  scalelmda = elambda * elambda
-               else if (muti .or. mutk) then
-                  dlambda = e
-                  dlambda2 = 0.0d0
-                  dlfrcx = frcx
-                  dlfrcy = frcy
-                  dlfrcz = frcz
-                  dlttmi(1) = ttmi(1)
-                  dlttmi(2) = ttmi(2)
-                  dlttmi(3) = ttmi(3)
-                  dlttmk(1) = ttmk(1)
-                  dlttmk(2) = ttmk(2)
-                  dlttmk(3) = ttmk(3)
-                  scalelmda = elambda
-               end if
+               scalelmda = esi * esk
+               dscal = desi*esk + esi*desk
+               dlambda = dscal * e
+               dlambda2 = 2.0d0 * desi * desk * e
+               dlfrcx = dscal * frcx
+               dlfrcy = dscal * frcy
+               dlfrcz = dscal * frcz
+               dlttmi(1) = dscal * ttmi(1)
+               dlttmi(2) = dscal * ttmi(2)
+               dlttmi(3) = dscal * ttmi(3)
+               dlttmk(1) = dscal * ttmk(1)
+               dlttmk(2) = dscal * ttmk(2)
+               dlttmk(3) = dscal * ttmk(3)
                if (muti .or. mutk) then
                   if (i .eq. k) then
                      dlambda = 0.5d0 * dlambda
@@ -1335,6 +1338,8 @@ c
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
       real*8 scalelmda
+      real*8 esi,desi,esk,desk,dscal
+      real*8 emsc(0:2),demsc(0:2)
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
@@ -1349,7 +1354,7 @@ c
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
-      logical muti,mutk
+      logical muti,mutk,livepr
       character*6 mode
 c
 c
@@ -1409,11 +1414,15 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
+c
+c     get the multipole scale and lambda derivative of each group
+c
+      call emscale (emsc,demsc)
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
-!$OMP& use_group,use_intra,use_bounds,off2,f,mutg,elambda)
+!$OMP& use_group,use_intra,use_bounds,off2,f,mutg,emsc,demsc)
 !$OMP& firstprivate(mscale) shared (em,dem,dfmdl,tem,dltem,pot,emvir,
 !$OMP& demvirdl,demdl,d2emdl2)
 !$OMP DO reduction(+:em,dem,dfmdl,tem,dltem,pot,emvir,demvirdl,
@@ -1446,6 +1455,8 @@ c
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
          muti = (mutg(i) .ne. 0)
+         esi = emsc(mutg(i))
+         desi = demsc(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1472,10 +1483,15 @@ c
             ky = abs(yaxis(k))
             usek = (use(k) .or. use(kz) .or. use(kx) .or. use(ky))
             mutk = (mutg(k) .ne. 0)
+            esk = emsc(mutg(k))
+            desk = demsc(mutg(k))
+            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
+     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
+            if (.not. livepr)  proceed = .false.
             if (.not. proceed)  goto 10
             xr = x(k) - xi
             yr = y(k) - yi
@@ -1727,34 +1743,19 @@ c
 c
 c     compute lambda derivative
 c
-               scalelmda = 1.0d0
-               if (muti .and. mutk) then
-                  dlambda = 2.0d0 * elambda * e
-                  dlambda2 = 2.0d0 * e
-                  dlfrcx = 2.0d0 * elambda * frcx
-                  dlfrcy = 2.0d0 * elambda * frcy
-                  dlfrcz = 2.0d0 * elambda * frcz
-                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
-                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
-                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
-                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
-                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
-                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
-                  scalelmda = elambda * elambda
-               else if (muti .or. mutk) then
-                  dlambda = e
-                  dlambda2 = 0.0d0
-                  dlfrcx = frcx
-                  dlfrcy = frcy
-                  dlfrcz = frcz
-                  dlttmi(1) = ttmi(1)
-                  dlttmi(2) = ttmi(2)
-                  dlttmi(3) = ttmi(3)
-                  dlttmk(1) = ttmk(1)
-                  dlttmk(2) = ttmk(2)
-                  dlttmk(3) = ttmk(3)
-                  scalelmda = elambda
-               end if
+               scalelmda = esi * esk
+               dscal = desi*esk + esi*desk
+               dlambda = dscal * e
+               dlambda2 = 2.0d0 * desi * desk * e
+               dlfrcx = dscal * frcx
+               dlfrcy = dscal * frcy
+               dlfrcz = dscal * frcz
+               dlttmi(1) = dscal * ttmi(1)
+               dlttmi(2) = dscal * ttmi(2)
+               dlttmi(3) = dscal * ttmi(3)
+               dlttmk(1) = dscal * ttmk(1)
+               dlttmk(2) = dscal * ttmk(2)
+               dlttmk(3) = dscal * ttmk(3)
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
@@ -2044,7 +2045,8 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
-      logical muti
+      real*8 esi,desi
+      real*8 emsc(0:2),demsc(0:2)
 c
 c
 c     zero out the atomic multipole energy and derivatives
@@ -2094,6 +2096,10 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call emrecip4
 c
+c     get the multipole scale and lambda derivative of each group
+c
+      call emscale (emsc,demsc)
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pot(n))
@@ -2113,7 +2119,8 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         muti = (mutg(i) .ne. 0)
+         esi = emsc(mutg(i))
+         desi = demsc(mutg(i))
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -2129,11 +2136,9 @@ c
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
-         if (muti) then
-            demdl = demdl + 2.0d0 * elambda * e
-            d2emdl2 = d2emdl2 + 2.0d0 * e
-            e = e * elambda * elambda
-         end if
+         demdl = demdl + 2.0d0 * esi * desi * e
+         d2emdl2 = d2emdl2 + 2.0d0 * desi * desi * e
+         e = e * esi * esi
          em = em + e
          pot(i) = 2.0d0 * fterm * ci
       end do
@@ -2186,12 +2191,8 @@ c
       do ii = 1, npole
          i = ipole(ii)
          ci = rpole(1,i)
-         muti = (mutg(i) .ne. 0)
-         if (muti) then
-            dlsum = dlsum + ci
-            ci = ci * elambda
-         end if
-         sum = sum + ci
+         dlsum = dlsum + demsc(mutg(i))*ci
+         sum = sum + emsc(mutg(i))*ci
       end do
       e = fterm * sum**2
       em = em + e
@@ -2216,16 +2217,15 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = (mutg(i) .ne. 0)
-            if (muti) then
-               dlxd = dlxd + dix + ci*xi
-               dlyd = dlyd + diy + ci*yi
-               dlzd = dlzd + diz + ci*zi
-               ci = ci * elambda
-               dix = dix * elambda
-               diy = diy * elambda
-               diz = diz * elambda
-            end if
+            esi = emsc(mutg(i))
+            desi = demsc(mutg(i))
+            dlxd = dlxd + desi*(dix+ci*xi)
+            dlyd = dlyd + desi*(diy+ci*yi)
+            dlzd = dlzd + desi*(diz+ci*zi)
+            ci = ci * esi
+            dix = dix * esi
+            diy = diy * esi
+            diz = diz * esi
             xd = xd + dix + ci*xi
             yd = yd + diy + ci*yi
             zd = zd + diz + ci*zi
@@ -2237,17 +2237,12 @@ c
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
-            muti = (mutg(i) .ne. 0)
-            if (muti) then
-               dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
-               dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
-               dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*(zd+elambda*dlzd)
-               ci = ci * elambda
-            else
-               dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*dlxd
-               dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*dlyd
-               dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*dlzd
-            end if
+            esi = emsc(mutg(i))
+            desi = demsc(mutg(i))
+            dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*(desi*xd+esi*dlxd)
+            dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*(desi*yd+esi*dlyd)
+            dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*(desi*zd+esi*dlzd)
+            ci = ci * esi
             dem(1,i) = dem(1,i) + 2.0d0*term*ci*xd
             dem(2,i) = dem(2,i) + 2.0d0*term*ci*yd
             dem(3,i) = dem(3,i) + 2.0d0*term*ci*zd
@@ -2263,22 +2258,17 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = (mutg(i) .ne. 0)
-            if (muti) then
-               dltem(1) = diy*(zdfield+elambda*dlzdfield)
-     &                    - diz*(ydfield+elambda*dlydfield)
-               dltem(2) = diz*(xdfield+elambda*dlxdfield)
-     &                    - dix*(zdfield+elambda*dlzdfield)
-               dltem(3) = dix*(ydfield+elambda*dlydfield)
-     &                    - diy*(xdfield+elambda*dlxdfield)
-               dix = dix * elambda
-               diy = diy * elambda
-               diz = diz * elambda
-            else
-               dltem(1) = diy*dlzdfield - diz*dlydfield
-               dltem(2) = diz*dlxdfield - dix*dlzdfield
-               dltem(3) = dix*dlydfield - diy*dlxdfield
-            end if
+            esi = emsc(mutg(i))
+            desi = demsc(mutg(i))
+            dltem(1) = diy*(desi*zdfield+esi*dlzdfield)
+     &                 - diz*(desi*ydfield+esi*dlydfield)
+            dltem(2) = diz*(desi*xdfield+esi*dlxdfield)
+     &                 - dix*(desi*zdfield+esi*dlzdfield)
+            dltem(3) = dix*(desi*ydfield+esi*dlydfield)
+     &                 - diy*(desi*xdfield+esi*dlxdfield)
+            dix = dix * esi
+            diy = diy * esi
+            diz = diz * esi
             tem(1) = diy*zdfield - diz*ydfield
             tem(2) = diz*xdfield - dix*zdfield
             tem(3) = dix*ydfield - diy*xdfield
@@ -2306,19 +2296,18 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = (mutg(i) .ne. 0)
-            if (muti) then
-               dxd = dxd + dix
-               dyd = dyd + diy
-               dzd = dzd + diz
-               dxq = dxq + ci*x(i)
-               dyq = dyq + ci*y(i)
-               dzq = dzq + ci*z(i)
-               ci = ci * elambda
-               dix = dix * elambda
-               diy = diy * elambda
-               diz = diz * elambda
-            end if
+            esi = emsc(mutg(i))
+            desi = demsc(mutg(i))
+            dxd = dxd + desi*dix
+            dyd = dyd + desi*diy
+            dzd = dzd + desi*diz
+            dxq = dxq + desi*ci*x(i)
+            dyq = dyq + desi*ci*y(i)
+            dzq = dzq + desi*ci*z(i)
+            ci = ci * esi
+            dix = dix * esi
+            diy = diy * esi
+            diz = diz * esi
             xd = xd + dix
             yd = yd + diy
             zd = zd + diz
@@ -2462,6 +2451,8 @@ c
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
       real*8 scalelmda
+      real*8 esi,desi,esk,desk,dscal
+      real*8 emsc(0:2),demsc(0:2)
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
@@ -2475,7 +2466,7 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
-      logical muti,mutk
+      logical muti,mutk,livepr
       character*6 mode
 c
 c
@@ -2506,6 +2497,10 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     get the multipole scale and lambda derivative of each group
+c
+      call emscale (emsc,demsc)
+c
 c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole-1
@@ -2529,6 +2524,8 @@ c
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
+         esi = emsc(mutg(i))
+         desi = demsc(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2553,9 +2550,13 @@ c
             yr = y(k) - yi
             zr = z(k) - zi
             mutk = (mutg(k) .ne. 0)
+            esk = emsc(mutg(k))
+            desk = demsc(mutg(k))
+            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
+     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. off2) then
+            if (r2.le.off2 .and. livepr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -2801,34 +2802,19 @@ c
 c
 c     compute lambda derivative
 c
-               scalelmda = 1.0d0
-               if (muti .and. mutk) then
-                  dlambda = 2.0d0 * elambda * e
-                  dlambda2 = 2.0d0 * e
-                  dlfrcx = 2.0d0 * elambda * frcx
-                  dlfrcy = 2.0d0 * elambda * frcy
-                  dlfrcz = 2.0d0 * elambda * frcz
-                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
-                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
-                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
-                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
-                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
-                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
-                  scalelmda = elambda * elambda
-               else if (muti .or. mutk) then
-                  dlambda = e
-                  dlambda2 = 0.0d0
-                  dlfrcx = frcx
-                  dlfrcy = frcy
-                  dlfrcz = frcz
-                  dlttmi(1) = ttmi(1)
-                  dlttmi(2) = ttmi(2)
-                  dlttmi(3) = ttmi(3)
-                  dlttmk(1) = ttmk(1)
-                  dlttmk(2) = ttmk(2)
-                  dlttmk(3) = ttmk(3)
-                  scalelmda = elambda
-               end if
+               scalelmda = esi * esk
+               dscal = desi*esk + esi*desk
+               dlambda = dscal * e
+               dlambda2 = 2.0d0 * desi * desk * e
+               dlfrcx = dscal * frcx
+               dlfrcy = dscal * frcy
+               dlfrcz = dscal * frcz
+               dlttmi(1) = dscal * ttmi(1)
+               dlttmi(2) = dscal * ttmi(2)
+               dlttmi(3) = dscal * ttmi(3)
+               dlttmk(1) = dscal * ttmk(1)
+               dlttmk(2) = dscal * ttmk(2)
+               dlttmk(3) = dscal * ttmk(3)
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
@@ -2966,6 +2952,8 @@ c
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
+         esi = emsc(mutg(i))
+         desi = demsc(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2991,12 +2979,16 @@ c
             yr = y(k) - yi
             zr = z(k) - zi
             mutk = (mutg(k) .ne. 0)
+            esk = emsc(mutg(k))
+            desk = demsc(mutg(k))
+            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
+     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             call imager (xr,yr,zr,jcell)
             r2 = xr*xr + yr*yr + zr*zr
             if (.not. (use_polymer .and. r2.le.polycut2)) then
                mscale(k) = 1.0d0
             end if
-            if (r2 .le. off2) then
+            if (r2.le.off2 .and. livepr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -3255,34 +3247,19 @@ c
 c
 c     compute lambda derivative
 c
-               scalelmda = 1.0d0
-               if (muti .and. mutk) then
-                  dlambda = 2.0d0 * elambda * e
-                  dlambda2 = 2.0d0 * e
-                  dlfrcx = 2.0d0 * elambda * frcx
-                  dlfrcy = 2.0d0 * elambda * frcy
-                  dlfrcz = 2.0d0 * elambda * frcz
-                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
-                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
-                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
-                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
-                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
-                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
-                  scalelmda = elambda * elambda
-               else if (muti .or. mutk) then
-                  dlambda = e
-                  dlambda2 = 0.0d0
-                  dlfrcx = frcx
-                  dlfrcy = frcy
-                  dlfrcz = frcz
-                  dlttmi(1) = ttmi(1)
-                  dlttmi(2) = ttmi(2)
-                  dlttmi(3) = ttmi(3)
-                  dlttmk(1) = ttmk(1)
-                  dlttmk(2) = ttmk(2)
-                  dlttmk(3) = ttmk(3)
-                  scalelmda = elambda
-               end if
+               scalelmda = esi * esk
+               dscal = desi*esk + esi*desk
+               dlambda = dscal * e
+               dlambda2 = 2.0d0 * desi * desk * e
+               dlfrcx = dscal * frcx
+               dlfrcy = dscal * frcy
+               dlfrcz = dscal * frcz
+               dlttmi(1) = dscal * ttmi(1)
+               dlttmi(2) = dscal * ttmi(2)
+               dlttmi(3) = dscal * ttmi(3)
+               dlttmk(1) = dscal * ttmk(1)
+               dlttmk(2) = dscal * ttmk(2)
+               dlttmk(3) = dscal * ttmk(3)
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
@@ -3558,7 +3535,8 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
-      logical muti
+      real*8 esi,desi
+      real*8 emsc(0:2),demsc(0:2)
 c
 c
 c     zero out the atomic multipole energy and derivatives
@@ -3608,6 +3586,10 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call emrecip4
 c
+c     get the multipole scale and lambda derivative of each group
+c
+      call emscale (emsc,demsc)
+c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pot(n))
@@ -3627,7 +3609,8 @@ c
       fterm = -f * aewald / rootpi
       do ii = 1, npole
          i = ipole(ii)
-         muti = (mutg(i) .ne. 0)
+         esi = emsc(mutg(i))
+         desi = demsc(mutg(i))
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -3643,11 +3626,9 @@ c
          qii = 2.0d0*(qixy*qixy+qixz*qixz+qiyz*qiyz)
      &            + qixx*qixx + qiyy*qiyy + qizz*qizz
          e = fterm * (cii + term*(dii/3.0d0+2.0d0*term*qii/5.0d0))
-         if (muti) then
-            demdl = demdl + 2.0d0 * elambda * e
-            d2emdl2 = d2emdl2 + 2.0d0 * e
-            e = e * elambda * elambda
-         end if
+         demdl = demdl + 2.0d0 * esi * desi * e
+         d2emdl2 = d2emdl2 + 2.0d0 * desi * desi * e
+         e = e * esi * esi
          em = em + e
          pot(i) = 2.0d0 * fterm * ci
       end do
@@ -3700,12 +3681,8 @@ c
       do ii = 1, npole
          i = ipole(ii)
          ci = rpole(1,i)
-         muti = (mutg(i) .ne. 0)
-         if (muti) then
-            dlsum = dlsum + ci
-            ci = ci * elambda
-         end if
-         sum = sum + ci
+         dlsum = dlsum + demsc(mutg(i))*ci
+         sum = sum + emsc(mutg(i))*ci
       end do
       e = fterm * sum**2
       em = em + e
@@ -3730,16 +3707,15 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = (mutg(i) .ne. 0)
-            if (muti) then
-               dlxd = dlxd + dix + ci*xi
-               dlyd = dlyd + diy + ci*yi
-               dlzd = dlzd + diz + ci*zi
-               ci = ci * elambda
-               dix = dix * elambda
-               diy = diy * elambda
-               diz = diz * elambda
-            end if
+            esi = emsc(mutg(i))
+            desi = demsc(mutg(i))
+            dlxd = dlxd + desi*(dix+ci*xi)
+            dlyd = dlyd + desi*(diy+ci*yi)
+            dlzd = dlzd + desi*(diz+ci*zi)
+            ci = ci * esi
+            dix = dix * esi
+            diy = diy * esi
+            diz = diz * esi
             xd = xd + dix + ci*xi
             yd = yd + diy + ci*yi
             zd = zd + diz + ci*zi
@@ -3751,17 +3727,12 @@ c
          do ii = 1, npole
             i = ipole(ii)
             ci = rpole(1,i)
-            muti = (mutg(i) .ne. 0)
-            if (muti) then
-               dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*(xd+elambda*dlxd)
-               dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*(yd+elambda*dlyd)
-               dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*(zd+elambda*dlzd)
-               ci = ci * elambda
-            else
-               dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*dlxd
-               dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*dlyd
-               dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*dlzd
-            end if
+            esi = emsc(mutg(i))
+            desi = demsc(mutg(i))
+            dfmdl(1,i) = dfmdl(1,i) + 2.0d0*term*ci*(desi*xd+esi*dlxd)
+            dfmdl(2,i) = dfmdl(2,i) + 2.0d0*term*ci*(desi*yd+esi*dlyd)
+            dfmdl(3,i) = dfmdl(3,i) + 2.0d0*term*ci*(desi*zd+esi*dlzd)
+            ci = ci * esi
             dem(1,i) = dem(1,i) + 2.0d0*term*ci*xd
             dem(2,i) = dem(2,i) + 2.0d0*term*ci*yd
             dem(3,i) = dem(3,i) + 2.0d0*term*ci*zd
@@ -3777,22 +3748,17 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = (mutg(i) .ne. 0)
-            if (muti) then
-               dltem(1) = diy*(zdfield+elambda*dlzdfield)
-     &                    - diz*(ydfield+elambda*dlydfield)
-               dltem(2) = diz*(xdfield+elambda*dlxdfield)
-     &                    - dix*(zdfield+elambda*dlzdfield)
-               dltem(3) = dix*(ydfield+elambda*dlydfield)
-     &                    - diy*(xdfield+elambda*dlxdfield)
-               dix = dix * elambda
-               diy = diy * elambda
-               diz = diz * elambda
-            else
-               dltem(1) = diy*dlzdfield - diz*dlydfield
-               dltem(2) = diz*dlxdfield - dix*dlzdfield
-               dltem(3) = dix*dlydfield - diy*dlxdfield
-            end if
+            esi = emsc(mutg(i))
+            desi = demsc(mutg(i))
+            dltem(1) = diy*(desi*zdfield+esi*dlzdfield)
+     &                 - diz*(desi*ydfield+esi*dlydfield)
+            dltem(2) = diz*(desi*xdfield+esi*dlxdfield)
+     &                 - dix*(desi*zdfield+esi*dlzdfield)
+            dltem(3) = dix*(desi*ydfield+esi*dlydfield)
+     &                 - diy*(desi*xdfield+esi*dlxdfield)
+            dix = dix * esi
+            diy = diy * esi
+            diz = diz * esi
             tem(1) = diy*zdfield - diz*ydfield
             tem(2) = diz*xdfield - dix*zdfield
             tem(3) = dix*ydfield - diy*xdfield
@@ -3820,19 +3786,18 @@ c
             dix = rpole(2,i)
             diy = rpole(3,i)
             diz = rpole(4,i)
-            muti = (mutg(i) .ne. 0)
-            if (muti) then
-               dxd = dxd + dix
-               dyd = dyd + diy
-               dzd = dzd + diz
-               dxq = dxq + ci*x(i)
-               dyq = dyq + ci*y(i)
-               dzq = dzq + ci*z(i)
-               ci = ci * elambda
-               dix = dix * elambda
-               diy = diy * elambda
-               diz = diz * elambda
-            end if
+            esi = emsc(mutg(i))
+            desi = demsc(mutg(i))
+            dxd = dxd + desi*dix
+            dyd = dyd + desi*diy
+            dzd = dzd + desi*diz
+            dxq = dxq + desi*ci*x(i)
+            dyq = dyq + desi*ci*y(i)
+            dzq = dzq + desi*ci*z(i)
+            ci = ci * esi
+            dix = dix * esi
+            diy = diy * esi
+            diz = diz * esi
             xd = xd + dix
             yd = yd + diy
             zd = zd + diz
@@ -3976,6 +3941,8 @@ c
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
       real*8 scalelmda
+      real*8 esi,desi,esk,desk,dscal
+      real*8 emsc(0:2),demsc(0:2)
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
       real*8 fix(3),fiy(3),fiz(3)
@@ -3989,7 +3956,7 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
-      logical muti,mutk
+      logical muti,mutk,livepr
       character*6 mode
 c
 c
@@ -4022,11 +3989,15 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
+c
+c     get the multipole scale and lambda derivative of each group
+c
+      call emscale (emsc,demsc)
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
-!$OMP& yaxis,zaxis,elambda,mutg)
+!$OMP& yaxis,zaxis,emsc,demsc,mutg)
 !$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir,demvirdl,
 !$OMP& demdl,d2emdl2,dfmdl,dltem)
 !$OMP DO reduction(+:em,dem,tem,pot,emvir,demvirdl,demdl,d2emdl2,
@@ -4055,6 +4026,8 @@ c
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
+         esi = emsc(mutg(i))
+         desi = demsc(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -4080,9 +4053,13 @@ c
             yr = y(k) - yi
             zr = z(k) - zi
             mutk = (mutg(k) .ne. 0)
+            esk = emsc(mutg(k))
+            desk = demsc(mutg(k))
+            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
+     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. off2) then
+            if (r2.le.off2 .and. livepr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -4328,34 +4305,19 @@ c
 c
 c     compute lambda derivative
 c
-               scalelmda = 1.0d0
-               if (muti .and. mutk) then
-                  dlambda = 2.0d0 * elambda * e
-                  dlambda2 = 2.0d0 * e
-                  dlfrcx = 2.0d0 * elambda * frcx
-                  dlfrcy = 2.0d0 * elambda * frcy
-                  dlfrcz = 2.0d0 * elambda * frcz
-                  dlttmi(1) = 2.0d0 * elambda * ttmi(1)
-                  dlttmi(2) = 2.0d0 * elambda * ttmi(2)
-                  dlttmi(3) = 2.0d0 * elambda * ttmi(3)
-                  dlttmk(1) = 2.0d0 * elambda * ttmk(1)
-                  dlttmk(2) = 2.0d0 * elambda * ttmk(2)
-                  dlttmk(3) = 2.0d0 * elambda * ttmk(3)
-                  scalelmda = elambda * elambda
-               else if (muti .or. mutk) then
-                  dlambda = e
-                  dlambda2 = 0.0d0
-                  dlfrcx = frcx
-                  dlfrcy = frcy
-                  dlfrcz = frcz
-                  dlttmi(1) = ttmi(1)
-                  dlttmi(2) = ttmi(2)
-                  dlttmi(3) = ttmi(3)
-                  dlttmk(1) = ttmk(1)
-                  dlttmk(2) = ttmk(2)
-                  dlttmk(3) = ttmk(3)
-                  scalelmda = elambda
-               end if
+               scalelmda = esi * esk
+               dscal = desi*esk + esi*desk
+               dlambda = dscal * e
+               dlambda2 = 2.0d0 * desi * desk * e
+               dlfrcx = dscal * frcx
+               dlfrcy = dscal * frcy
+               dlfrcz = dscal * frcz
+               dlttmi(1) = dscal * ttmi(1)
+               dlttmi(2) = dscal * ttmi(2)
+               dlttmi(3) = dscal * ttmi(3)
+               dlttmk(1) = dscal * ttmk(1)
+               dlttmk(2) = dscal * ttmk(2)
+               dlttmk(3) = dscal * ttmk(3)
                if (muti .or. mutk) then
                   demdl = demdl + dlambda
                   d2emdl2 = d2emdl2 + dlambda2
@@ -4660,6 +4622,8 @@ c
       real*8 dldeterm,dldvterm
       real*8 dstruc2dl
       real*8 dlambda,dlambda2
+      real*8 sc,dsc
+      real*8 emsc(0:2),demsc(0:2)
       real*8 tem(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8 dlfix(3),dlfiy(3),dlfiz(3)
@@ -4739,51 +4703,31 @@ c
 c
 c     copy multipole moments and coordinates to local storage
 c
+      call emscale (emsc,demsc)
       do ii = 1, npole
          i = ipole(ii)
-         if (mutg(i) .ne. 0) then
-            cmp(1,i)  = elambda * rpole(1,i)
-            cmp(2,i)  = elambda * rpole(2,i)
-            cmp(3,i)  = elambda * rpole(3,i)
-            cmp(4,i)  = elambda * rpole(4,i)
-            cmp(5,i)  = elambda * rpole(5,i)
-            cmp(6,i)  = elambda * rpole(9,i)
-            cmp(7,i)  = elambda * rpole(13,i)
-            cmp(8,i)  = 2.0d0 * elambda * rpole(6,i)
-            cmp(9,i)  = 2.0d0 * elambda * rpole(7,i)
-            cmp(10,i) = 2.0d0 * elambda * rpole(10,i)
-            lcmp(1,i)  = rpole(1,i)
-            lcmp(2,i)  = rpole(2,i)
-            lcmp(3,i)  = rpole(3,i)
-            lcmp(4,i)  = rpole(4,i)
-            lcmp(5,i)  = rpole(5,i)
-            lcmp(6,i)  = rpole(9,i)
-            lcmp(7,i)  = rpole(13,i)
-            lcmp(8,i)  = 2.0d0 * rpole(6,i)
-            lcmp(9,i)  = 2.0d0 * rpole(7,i)
-            lcmp(10,i) = 2.0d0 * rpole(10,i)
-         else
-            cmp(1,i)  = rpole(1,i)
-            cmp(2,i)  = rpole(2,i)
-            cmp(3,i)  = rpole(3,i)
-            cmp(4,i)  = rpole(4,i)
-            cmp(5,i)  = rpole(5,i)
-            cmp(6,i)  = rpole(9,i)
-            cmp(7,i)  = rpole(13,i)
-            cmp(8,i)  = 2.0d0 * rpole(6,i)
-            cmp(9,i)  = 2.0d0 * rpole(7,i)
-            cmp(10,i) = 2.0d0 * rpole(10,i)
-            lcmp(1,i)  = 0.0d0
-            lcmp(2,i)  = 0.0d0
-            lcmp(3,i)  = 0.0d0
-            lcmp(4,i)  = 0.0d0
-            lcmp(5,i)  = 0.0d0
-            lcmp(6,i)  = 0.0d0
-            lcmp(7,i)  = 0.0d0
-            lcmp(8,i)  = 0.0d0
-            lcmp(9,i)  = 0.0d0
-            lcmp(10,i) = 0.0d0
-         end if
+         sc = emsc(mutg(i))
+         dsc = demsc(mutg(i))
+         cmp(1,i)  = sc * rpole(1,i)
+         cmp(2,i)  = sc * rpole(2,i)
+         cmp(3,i)  = sc * rpole(3,i)
+         cmp(4,i)  = sc * rpole(4,i)
+         cmp(5,i)  = sc * rpole(5,i)
+         cmp(6,i)  = sc * rpole(9,i)
+         cmp(7,i)  = sc * rpole(13,i)
+         cmp(8,i)  = 2.0d0 * sc * rpole(6,i)
+         cmp(9,i)  = 2.0d0 * sc * rpole(7,i)
+         cmp(10,i) = 2.0d0 * sc * rpole(10,i)
+         lcmp(1,i)  = dsc * rpole(1,i)
+         lcmp(2,i)  = dsc * rpole(2,i)
+         lcmp(3,i)  = dsc * rpole(3,i)
+         lcmp(4,i)  = dsc * rpole(4,i)
+         lcmp(5,i)  = dsc * rpole(5,i)
+         lcmp(6,i)  = dsc * rpole(9,i)
+         lcmp(7,i)  = dsc * rpole(13,i)
+         lcmp(8,i)  = 2.0d0 * dsc * rpole(6,i)
+         lcmp(9,i)  = 2.0d0 * dsc * rpole(7,i)
+         lcmp(10,i) = 2.0d0 * dsc * rpole(10,i)
       end do
 c
 c     convert Cartesian multipoles to fractional coordinates
@@ -4795,8 +4739,10 @@ c     assign PME grid and perform 3-D FFT forward transform
 c
       call grid_mpole (fmp,qgrid)
       call fftfront (qgrid)
-      call grid_mpole (lfmp,lqgrid)
-      call fftfront (lqgrid)
+      if (use_d2lmda) then
+         call grid_mpole (lfmp,lqgrid)
+         call fftfront (lqgrid)
+      end if
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -4852,31 +4798,35 @@ c
             end if
             q1 = qgrid(1,k1,k2,k3)
             q2 = qgrid(2,k1,k2,k3)
-            lq1 = lqgrid(1,k1,k2,k3)
-            lq2 = lqgrid(2,k1,k2,k3)
             struc2 = q1**2 + q2**2
             eterm = 0.5d0 * f * expterm * struc2
             vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
-            dstruc2dl = 2.0d0 * (q1*lq1 + q2*lq2)
-            dldeterm = 0.5d0 * f * expterm * dstruc2dl
-            dldvterm = (2.0d0/hsq) * (1.0d0-term) * dldeterm
             vxx = vxx + h1*h1*vterm - eterm
             vxy = vxy + h1*h2*vterm
             vxz = vxz + h1*h3*vterm
             vyy = vyy + h2*h2*vterm - eterm
             vyz = vyz + h2*h3*vterm
             vzz = vzz + h3*h3*vterm - eterm
-            dldvxx = dldvxx + h1*h1*dldvterm - dldeterm
-            dldvxy = dldvxy + h1*h2*dldvterm
-            dldvxz = dldvxz + h1*h3*dldvterm
-            dldvyy = dldvyy + h2*h2*dldvterm - dldeterm
-            dldvyz = dldvyz + h2*h3*dldvterm
-            dldvzz = dldvzz + h3*h3*dldvterm - dldeterm
+            if (use_d2lmda) then
+               lq1 = lqgrid(1,k1,k2,k3)
+               lq2 = lqgrid(2,k1,k2,k3)
+               dstruc2dl = 2.0d0 * (q1*lq1 + q2*lq2)
+               dldeterm = 0.5d0 * f * expterm * dstruc2dl
+               dldvterm = (2.0d0/hsq) * (1.0d0-term) * dldeterm
+               dldvxx = dldvxx + h1*h1*dldvterm - dldeterm
+               dldvxy = dldvxy + h1*h2*dldvterm
+               dldvxz = dldvxz + h1*h3*dldvterm
+               dldvyy = dldvyy + h2*h2*dldvterm - dldeterm
+               dldvyz = dldvyz + h2*h3*dldvterm
+               dldvzz = dldvzz + h3*h3*dldvterm - dldeterm
+            end if
          end if
          qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
          qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
-         lqgrid(1,k1,k2,k3) = expterm * lqgrid(1,k1,k2,k3)
-         lqgrid(2,k1,k2,k3) = expterm * lqgrid(2,k1,k2,k3)
+         if (use_d2lmda) then
+            lqgrid(1,k1,k2,k3) = expterm * lqgrid(1,k1,k2,k3)
+            lqgrid(2,k1,k2,k3) = expterm * lqgrid(2,k1,k2,k3)
+         end if
       end do
 c
 c     save the partial virial for the polarization computation
@@ -4892,22 +4842,29 @@ c     account for zeroth grid point for nonperiodic system
 c
       qgrid(1,1,1,1) = 0.0d0
       qgrid(2,1,1,1) = 0.0d0
-      lqgrid(1,1,1,1) = 0.0d0
-      lqgrid(2,1,1,1) = 0.0d0
       if (.not. use_bounds) then
          expterm = 0.5d0 * pi / xbox
          qgrid(1,1,1,1) = expterm * qgrid(1,1,1,1)
          qgrid(2,1,1,1) = expterm * qgrid(2,1,1,1)
-         lqgrid(1,1,1,1) = expterm * lqgrid(1,1,1,1)
-         lqgrid(2,1,1,1) = expterm * lqgrid(2,1,1,1)
       end if
 c
 c     perform 3-D FFT backward transform and get potential
 c
       call fftback (qgrid)
       call fphi_mpole (fphi,qgrid)
-      call fftback (lqgrid)
-      call fphi_mpole (lfphi,lqgrid)
+      if (use_d2lmda) then
+         lqgrid(1,1,1,1) = 0.0d0
+         lqgrid(2,1,1,1) = 0.0d0
+         call fftback (lqgrid)
+         call fphi_mpole (lfphi,lqgrid)
+      else
+         do ii = 1, npole
+            i = ipole(ii)
+            do j = 1, 20
+               lfphi(j,i) = 0.0d0
+            end do
+         end do
+      end if
       do ii = 1, npole
          i = ipole(ii)
          do j = 1, 20
@@ -5180,172 +5137,5 @@ c
       demvirdl(1,3) = demvirdl(1,3) + dldvxz
       demvirdl(2,3) = demvirdl(2,3) + dldvyz
       demvirdl(3,3) = demvirdl(3,3) + dldvzz
-      return
-      end
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine empole4er  --  relative dual topo mpole dlmda  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "empole4er" interpolates between the two coupling states of a
-c     two-ligand relative dual topology calculation, each state a sum
-c     of parameter-zeroed subsystem energies,
-c
-c        E = weight1*E(erelst1) + (1-weight1)*E(erelst0)
-c
-c
-      subroutine empole4er
-      use atoms
-      use deriv
-      use dlmda
-      use energi
-      use limits
-      use mutant
-      use virial
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      integer i,j,k
-      real*8 em0,em1
-      real*8 emvir0(3,3),emvir1(3,3)
-      logical la,lb,le
-      logical in0,in1
-      logical need0,need1
-      real*8, allocatable :: dem0(:,:)
-      real*8, allocatable :: dem1(:,:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (dem0(3,n))
-      allocate (dem1(3,n))
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 deldlmda,d2eldlmda2,need0,need1)
-c
-c     zero out the two endpoint accumulators
-c
-      em0 = 0.0d0
-      em1 = 0.0d0
-      do i = 1, n
-         do j = 1, 3
-            dem0(j,i) = 0.0d0
-            dem1(j,i) = 0.0d0
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir0(j,i) = 0.0d0
-            emvir1(j,i) = 0.0d0
-         end do
-      end do
-c
-c     build each subsystem once, add to the endpoints
-c
-      do k = 1, nrelsub
-         call relslot (k,erelst0,erelst1,la,lb,le,in0,in1)
-         in0 = in0 .and. need0
-         in1 = in1 .and. need1
-         if (.not. (in0 .or. in1))  cycle
-         call altemdtsub (la,lb,le)
-         call empole1calc
-         if (in0) then
-            em0 = em0 + em
-            do i = 1, n
-               do j = 1, 3
-                  dem0(j,i) = dem0(j,i) + dem(j,i)
-               end do
-            end do
-            do i = 1, 3
-               do j = 1, 3
-                  emvir0(j,i) = emvir0(j,i) + emvir(j,i)
-               end do
-            end do
-         end if
-         if (in1) then
-            em1 = em1 + em
-            do i = 1, n
-               do j = 1, 3
-                  dem1(j,i) = dem1(j,i) + dem(j,i)
-               end do
-            end do
-            do i = 1, 3
-               do j = 1, 3
-                  emvir1(j,i) = emvir1(j,i) + emvir(j,i)
-               end do
-            end do
-         end if
-      end do
-c
-c     restore the original full system parameters
-c
-      call altemdtsub (.true.,.true.,.true.)
-c
-c     copy energy if only one endpoint state is computed
-c
-      if (.not. need0) then
-         em0 = em1
-         do i = 1, n
-            do j = 1, 3
-               dem0(j,i) = dem1(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               emvir0(j,i) = emvir1(j,i)
-            end do
-         end do
-      else if (.not. need1) then
-         em1 = em0
-         do i = 1, n
-            do j = 1, 3
-               dem1(j,i) = dem0(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               emvir1(j,i) = emvir0(j,i)
-            end do
-         end do
-      end if
-c
-c     interpolate between the two endpoint states
-c
-      em = weight1*em1 + (1.0d0-weight1)*em0
-      do i = 1, n
-         do j = 1, 3
-            dem(j,i) = weight1*dem1(j,i) + (1.0d0-weight1)*dem0(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            emvir(j,i) = weight1*emvir1(j,i)
-     &                + (1.0d0-weight1)*emvir0(j,i)
-         end do
-      end do
-c
-c     interpolate the lambda derivative
-c
-      demdl = dweight1 * (em1-em0)
-      d2emdl2 = d2weight1 * (em1-em0)
-      do i = 1, 3
-         do j = 1, 3
-            demvirdl(j,i) = dweight1 * (emvir1(j,i)-emvir0(j,i))
-         end do
-      end do
-      do i = 1, n
-         do j = 1, 3
-            dfmdl(j,i) = dweight1 * (dem1(j,i)-dem0(j,i))
-         end do
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (dem0)
-      deallocate (dem1)
       return
       end

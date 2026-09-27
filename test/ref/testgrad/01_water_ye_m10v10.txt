@@ -23,7 +23,6 @@
 
  Free Energy Mode                   Absolute
  Sampling Mode                  Fixed Lambda
- Electrostatics Topology              Single
  Polarization Topology                Single
 
  Total Potential Energy :                -24.5512 Kcal/mole

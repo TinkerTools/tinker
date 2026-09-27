@@ -17,20 +17,38 @@ c     multipole interactions, and partitions the energy among atoms
 c
 c
       subroutine empole3
-      use dlmda
+      use energi
       use extfld
       use inform
       use iounit
-      use mutant
+      use limits
       implicit none
+      real*8 exf
+      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
 c
-      if (use_rel) then
-         call empole3er
+      if (use_ewald) then
+         if (use_mlist) then
+            call empole3d
+         else
+            call empole3c
+         end if
       else
-         call empole3calc
+         if (use_mlist) then
+            call empole3b
+         else
+            call empole3a
+         end if
+      end if
+c
+c     get contribution from external electric field if used
+c
+      if (use_exfld) then
+         mode = 'MPOLE'
+         call exfield3 (mode,exf)
+         em = em + exf
       end if
 c
 c     report the external electric field energy
@@ -2323,200 +2341,5 @@ c
          end do
       end do
       em = em + e
-      return
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine empole3calc  --  compute multipole analysis  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "empole3calc" evaluates the multipole energy and analysis for the
-c     the electrostatic parameter state currently installed
-c
-c
-      subroutine empole3calc
-      use energi
-      use extfld
-      use limits
-      implicit none
-      real*8 exf
-      character*6 mode
-c
-c
-      if (use_ewald) then
-         if (use_mlist) then
-            call empole3d
-         else
-            call empole3c
-         end if
-      else
-         if (use_mlist) then
-            call empole3b
-         else
-            call empole3a
-         end if
-      end if
-c
-c     get contribution from external electric field if used
-c
-      if (use_exfld) then
-         mode = 'MPOLE'
-         call exfield3 (mode,exf)
-         em = em + exf
-      end if
-      return
-      end
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine empole3er  --  relative dual topo mpole analys  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "empole3er" interpolates between the two coupling states of a
-c     two-ligand relative dual topology calculation, accumulating the
-c     partitioned energy of each parameter-zeroed subsystem,
-c
-c        E = weight1*E(erelst1) + (1-weight1)*E(erelst0)
-c
-c
-      subroutine empole3er
-      use action
-      use analyz
-      use atoms
-      use dlmda
-      use energi
-      use extfld
-      use inter
-      use limits
-      use mutant
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      integer i,k
-      integer nem0,nem1
-      integer ncpl0,ncpl1
-      real*8 em0,em1
-      real*8 exfe0,exfe1
-      real*8 einterorig
-      real*8 einter0,einter1
-      logical la,lb,le
-      logical in0,in1
-      logical need0,need1
-      real*8, allocatable :: aem0(:)
-      real*8, allocatable :: aem1(:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aem0(n))
-      allocate (aem1(n))
-      einterorig = einter
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (elambda,emdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 deldlmda,d2eldlmda2,need0,need1)
-c
-c     zero out the two endpoint accumulators
-c
-      em0 = 0.0d0
-      em1 = 0.0d0
-      nem0 = 0
-      nem1 = 0
-      ncpl0 = -1
-      ncpl1 = -1
-      exfe0 = 0.0d0
-      exfe1 = 0.0d0
-      einter0 = 0.0d0
-      einter1 = 0.0d0
-      do i = 1, n
-         aem0(i) = 0.0d0
-         aem1(i) = 0.0d0
-      end do
-c
-c     build each subsystem once, add to the endpoints
-c
-      do k = 1, nrelsub
-         call relslot (k,erelst0,erelst1,la,lb,le,in0,in1)
-         in0 = in0 .and. need0
-         in1 = in1 .and. need1
-         if (.not. (in0 .or. in1))  cycle
-         call altemdtsub (la,lb,le)
-         call empole3calc
-         if (in0) then
-            em0 = em0 + em
-            nem0 = nem0 + nem
-            if (le .and. (la .or. lb))  ncpl0 = nem
-            exfe0 = exfe0 + exfe
-            einter0 = einter0 + einter - einterorig
-            do i = 1, n
-               aem0(i) = aem0(i) + aem(i)
-            end do
-         end if
-         if (in1) then
-            em1 = em1 + em
-            exfe1 = exfe1 + exfe
-            einter1 = einter1 + einter - einterorig
-            do i = 1, n
-               aem1(i) = aem1(i) + aem(i)
-            end do
-            nem1 = nem1 + nem
-            if (le .and. (la .or. lb))  ncpl1 = nem
-         end if
-         einter = einterorig
-      end do
-c
-c     restore the original full system parameters
-c
-      call altemdtsub (.true.,.true.,.true.)
-c
-c     copy energy if only one endpoint state is computed
-c
-      if (.not. need0) then
-         em0 = em1
-         exfe0 = exfe1
-         einter0 = einter1
-         do i = 1, n
-            aem0(i) = aem1(i)
-         end do
-      else if (.not. need1) then
-         em1 = em0
-         exfe1 = exfe0
-         einter1 = einter0
-         do i = 1, n
-            aem1(i) = aem0(i)
-         end do
-      end if
-c
-c     interpolate between the two endpoint states
-c
-      em = weight1*em1 + (1.0d0-weight1)*em0
-      exfe = weight1*exfe1 + (1.0d0-weight1)*exfe0
-      einter = einterorig + weight1*einter1
-     &                    + (1.0d0-weight1)*einter0
-      do i = 1, n
-         aem(i) = weight1*aem1(i) + (1.0d0-weight1)*aem0(i)
-      end do
-c
-c     the count comes from the coupled subsystem while an endpoint
-c     holding one is live, and from the decoupled reference otherwise
-c
-      if (ncpl0 .ge. 0)  nem0 = ncpl0
-      if (ncpl1 .ge. 0)  nem1 = ncpl1
-      if (need1) then
-         nem = nem1
-      else
-         nem = nem0
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aem0)
-      deallocate (aem1)
       return
       end

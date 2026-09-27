@@ -414,6 +414,7 @@ c
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 scalelmda
+      real*8 emsc(0:2),demsc(0:2)
       real*8 fix(3),fiy(3)
       real*8 fiz(3),tem(3)
       real*8 dlfix(3),dlfiy(3)
@@ -430,7 +431,11 @@ c
 c     calculate energy, derivatives and lambda derivatives over
 c     the atomic multipoles
 c
-!$OMP PARALLEL default(private) shared(npole,ipole,use,mutg,elambda,
+c
+c     get the multipole scale and lambda derivative of each group
+c
+      call emscale (emsc,demsc)
+!$OMP PARALLEL default(private) shared(npole,ipole,use,mutg,emsc,demsc,
 !$OMP& x,y,z,xaxis,yaxis,zaxis,f,rpole,texfld,em,dem,emvir,
 !$OMP& demdl,dfmdl,demvirdl)
 !$OMP DO reduction(+:em,dem,emvir,demdl,dfmdl,demvirdl)
@@ -448,11 +453,11 @@ c
             e = -f * (ci*phi + dix*texfld(1)
      &                   + diy*texfld(2) + diz*texfld(3))
 c
-c     the mutated sites carry multipoles scaled by elambda
+c     each site carries multipoles scaled for its group, and has a
+c     lambda derivative when its group scale is lambda itself
 c
-            muti = (mutg(i) .ne. 0)
-            scalelmda = 1.0d0
-            if (muti)  scalelmda = elambda
+            muti = (demsc(mutg(i)) .ne. 0.0d0)
+            scalelmda = emsc(mutg(i))
 c
 c     unscaled force and torque from the external field
 c
