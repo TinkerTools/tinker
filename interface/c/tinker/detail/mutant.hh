@@ -25,7 +25,6 @@ extern int TINKER_MOD(mutant, mutfield);
 extern int TINKER_MOD(mutant, setelambda);
 extern int TINKER_MOD(mutant, setplambda);
 extern int TINKER_MOD(mutant, setvlambda);
-extern int TINKER_MOD(mutant, use_past);
 extern int TINKER_MOD(mutant, use_rel);
 #ifdef __cplusplus
 }

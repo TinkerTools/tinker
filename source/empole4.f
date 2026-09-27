@@ -162,7 +162,6 @@ c
       real*8 vxy,vxz,vyz
       real*8 dldvxx,dldvyy,dldvzz
       real*8 dldvxy,dldvxz,dldvyz
-      real*8 dlde
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
       real*8 scalelmda
@@ -1334,7 +1333,6 @@ c
       real*8 vxy,vxz,vyz
       real*8 dldvxx,dldvyy,dldvzz
       real*8 dldvxy,dldvxz,dldvyz
-      real*8 dlde
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
       real*8 scalelmda
@@ -2447,7 +2445,6 @@ c
       real*8 vxy,vxz,vyz
       real*8 dldvxx,dldvyy,dldvzz
       real*8 dldvxy,dldvxz,dldvyz
-      real*8 dlde
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
       real*8 scalelmda
@@ -3937,7 +3934,6 @@ c
       real*8 vxy,vxz,vyz
       real*8 dldvxx,dldvyy,dldvzz
       real*8 dldvxy,dldvxz,dldvyz
-      real*8 dlde
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlambda,dlambda2
       real*8 scalelmda

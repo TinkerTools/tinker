@@ -39,7 +39,7 @@ c
 c
 c     compute polarization interactions
 c
-      if (use_past) then
+      if (use_prst) then
          call epolar4s
       else
          call epolar4f
@@ -71,8 +71,8 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "epolar4s" calculates the absolute single topology polarization
-c     energy and Cartesian derivatives together with the first energy
+c     "epolar4s" calculates the single topology polarization energy
+c     and Cartesian derivatives together with the first energy
 c     derivative with respect to polarization lambda; second lambda,
 c     force lambda and virial lambda derivatives are not computed
 c
@@ -82,13 +82,14 @@ c
       use mutant
       implicit none
       real*8 plambdaorig
+      logical same
 c
 c
 c     add the scalar derivative with respect to plambda, which is
 c     skipped when polarization does not follow the main lambda
 c
       plambdaorig = plambda
-      call altepdt (plambdaorig)
+      call altepset (same)
       call epolar1calc
       if (use_pdlmda) then
          call epolar4d (plambdaorig)
@@ -96,9 +97,10 @@ c
          depdl = 0.0d0
       end if
 c
-c     restore the electrostatic parameter state for subsequent terms
+c     restore the electrostatic parameter state for subsequent terms,
+c     which "epolar4d" leaves at plambda
 c
-      call alteprst
+      if (.not. same)  call alteprst
       return
       end
 c
@@ -112,11 +114,13 @@ c
 c
 c     "epolar4d" evaluates the explicit plambda derivative of the
 c     stationary mutual polarization functional.  The permanent field
-c     derivative is exact because "altpolr" scales every mutated
-c     permanent electrostatic parameter linearly, so it is just the
-c     field of the mutated multipoles held at their unscaled values.
-c     The inverse-polarizability derivative is evaluated from the local
-c     total fields, which remains finite at plambda equal to zero.
+c     derivative is exact because "altpolr" scales the permanent
+c     electrostatic parameters of the charging ligand linearly, so it is
+c     just the field of those multipoles held at their unscaled values;
+c     the other ligand of a staged leg is annihilated and adds nothing.
+c     The inverse-polarizability derivative of the charging ligand is
+c     evaluated from the local total fields, which remains finite at
+c     plambda equal to zero.
 c
 c
       subroutine epolar4d (plmda)
@@ -264,18 +268,15 @@ c
       integer i,j
       real*8 ep1,ep0
       real*8 plambdaorig
-      real*8 elambdaorig
       real*8 epvir1(3,3)
       real*8 epvir0(3,3)
       real*8, allocatable :: dep1(:,:)
       real*8, allocatable :: dep0(:,:)
-      character*6 mode
 c
 c
 c     copy original plambda
 c
       plambdaorig = plambda
-      elambdaorig = elambda
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -361,11 +362,7 @@ c
 c     set original plambda
 c
       plambda = plambdaorig
-      if (use_mpole) then
-         call altemdt (elambdaorig)
-      else
-         call altepdt (plambdaorig)
-      end if
+      call alteprst
 c
 c     interpolate energy, force, and virial
 c

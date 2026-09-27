@@ -32,7 +32,6 @@ c
       integer i,j,ixyz
       integer next,frame
       integer freeunit
-      integer nask
       real*8 eval,energy
       real*8 eps,eps0
       real*8 lmda0

@@ -210,8 +210,7 @@ c
       use_ost = .false.
       use_ostdyn = .false.
       use_pdlmda = .false.
-      use_past = .false.
-      use_plmda = .false.
+      use_prst = .false.
       use_plmdamap = .false.
       use_rel = .false.
       use_ti = .false.

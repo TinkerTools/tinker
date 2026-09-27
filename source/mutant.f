@@ -33,7 +33,6 @@ c     mutfield    flag restricting dfield to the mpoles of mutated atoms
 c     setelambda  flag that elambda was set by its own keyword
 c     setplambda  flag that plambda was set by its own keyword
 c     setvlambda  flag that vlambda was set by its own keyword
-c     use_past    flag for absolute single topology polarization
 c     use_rel     flag to use the staged two-ligand relative schedule
 c                   being built for a relative dual topo energy
 c
@@ -60,7 +59,6 @@ c
       logical setelambda
       logical setplambda
       logical setvlambda
-      logical use_past
       logical use_rel
       save
       end

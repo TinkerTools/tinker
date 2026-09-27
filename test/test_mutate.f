@@ -41,6 +41,7 @@ c
       call test_mutate_apm
       call test_mutate_vsoft
       call test_mutate_gate
+      call test_mutate_chiral
       return
       end
 c
@@ -429,8 +430,8 @@ c
      &                     'lmdamode ost pinned use_pdlmda')
       call assert_logical (use_epdt,.false.,
      &                     'lmdamode ost pinned use_epdt')
-      call assert_logical (use_past,.true.,
-     &                     'lmdamode ost pinned use_past')
+      call assert_logical (use_prst,.true.,
+     &                     'lmdamode ost pinned use_prst')
       call final
 c
 c     ost uses dual topology when polarization follows the main lambda
@@ -441,8 +442,8 @@ c
      &                     'lmdamode ost mapped use_pdlmda')
       call assert_logical (use_epdt,.true.,
      &                     'lmdamode ost mapped use_epdt')
-      call assert_logical (use_past,.false.,
-     &                     'lmdamode ost mapped use_past')
+      call assert_logical (use_prst,.false.,
+     &                     'lmdamode ost mapped use_prst')
       call final
 c
 c     the first lambda derivative alone keeps polarization on one state
@@ -452,7 +453,7 @@ c
       call assert_logical (use_dlmda,.true.,'lmdaderiv use_dlmda')
       call assert_logical (use_d2lmda,.false.,'lmdaderiv use_d2lmda')
       call assert_logical (use_epdt,.false.,'lmdaderiv use_epdt')
-      call assert_logical (use_past,.true.,'lmdaderiv use_past')
+      call assert_logical (use_prst,.true.,'lmdaderiv use_prst')
       call final
 c
 c     second lambda derivatives need dual topology polarization
@@ -462,7 +463,7 @@ c
       call assert_logical (use_dlmda,.true.,'lmdaderiv2 use_dlmda')
       call assert_logical (use_d2lmda,.true.,'lmdaderiv2 use_d2lmda')
       call assert_logical (use_epdt,.true.,'lmdaderiv2 use_epdt')
-      call assert_logical (use_past,.false.,'lmdaderiv2 use_past')
+      call assert_logical (use_prst,.false.,'lmdaderiv2 use_prst')
       call final
 c
 c     the staged relative legs choose the polarization path the same way
@@ -470,12 +471,12 @@ c
       call loadfix ('water2','203_water_rels_st_l085.key')
       call assert_logical (use_rel,.true.,'rels deriv use_rel')
       call assert_logical (use_epdt,.false.,'rels deriv use_epdt')
-      call assert_logical (use_past,.true.,'rels deriv use_past')
+      call assert_logical (use_prst,.true.,'rels deriv use_prst')
       call final
       call loadfix ('water2','136_water_rels_ye_l085.key')
       call assert_logical (use_rel,.true.,'rels deriv2 use_rel')
       call assert_logical (use_epdt,.true.,'rels deriv2 use_epdt')
-      call assert_logical (use_past,.false.,'rels deriv2 use_past')
+      call assert_logical (use_prst,.false.,'rels deriv2 use_prst')
       call final
 c
 c     an unknown mode leaves every sampling method off
@@ -1090,8 +1091,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "test_mutate_rels" runs the eleven water fixtures 135-141, 168-169
-c     and 203-204 that drive the staged relative free energy schedule,
+c     "test_mutate_rels" runs the twelve water fixtures 135-141, 168-169
+c     and 203-205 that drive the staged relative free energy schedule,
 c     each of them
 c     naming the one leg it walks, so ligand 2 is discharged on the LIG2
 c     leg, van der Waals morphs between the ligands on the VDWM leg, and
@@ -1112,7 +1113,9 @@ c     the first nine carry the "lambda-deriv2" keyword, so polarization
 c     takes the dual topology path between the annihilated endpoints;
 c     203 and 204 repeat 136 and 177 with the "lambda-deriv" keyword, so
 c     polarization takes the single topology path and only the first
-c     lambda derivative is checked; all run the level 4 checks
+c     lambda derivative is checked; 205 drops the "lambda" keyword from
+c     135, so REL-STAGE must default the main lambda to one and match
+c     the 135 reference; all run the level 4 checks
 c
 c
       subroutine test_mutate_rels
@@ -1155,6 +1158,9 @@ c
      &   '204_water_rels_st_lig2_exp_l030.key',
      &   '204_water_rels_st_lig2_exp_l030.txt',
      &   '204_water_rels_st_lig2_exp_l030',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','205_water_rels_nolmda.key',
+     &   '135_water_rels_ye_l100.txt','205_water_rels_nolmda',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1493,6 +1499,64 @@ c
       call test_mutate_calc ('water2','202_water_vsoft_l00.key',
      &   '202_water_vsoft_l00.txt','202_water_vsoft_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_chiral  --  chiral frame refresh  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_chiral" mutates the first residues of trp-cage, whose
+c     alpha carbons carry chiral multipole frames, with the multipole
+c     term alone at a fixed electrostatic lambda; the shipped alpha
+c     carbon multipoles have no y components, so a y dipole is added at
+c     every chiral site to make the inversion visible; after the
+c     coordinates are mirrored, "chkpole" inverts the chiral multipoles,
+c     and a later reinstall of the scaled parameters by "altelec" must
+c     keep that inversion, so the mirrored energy equals the original
+c
+c
+      subroutine test_mutate_chiral
+      use atoms
+      use dlmda
+      use mpole
+      implicit none
+      integer i
+      real*8 e0,e1,e2
+      real*8 energy
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_chiral','mutate'))  return
+      call pushdir ('file/mutate')
+      call loadfix ('../angle/trpcage','206_trpcage_chiral_m05.key')
+      do i = 1, n
+         if (polaxe(i).eq.'Z-then-X' .and. yaxis(i).ne.0) then
+            poleorig(3,i) = 0.1d0
+         end if
+      end do
+      call altelec
+      e0 = energy ()
+c
+c     mirror the structure, which inverts every chiral frame
+c
+      do i = 1, n
+         x(i) = -x(i)
+      end do
+      e1 = energy ()
+      call assert_real (e1,e0,1.0d-8,'test_mutate_chiral mirrored')
+c
+c     reinstall the scaled parameters from their original values
+c
+      call altelec
+      e2 = energy ()
+      call assert_real (e2,e0,1.0d-8,'test_mutate_chiral reinstall')
+      call popdir
+      call final
       return
       end
 c

@@ -29,7 +29,7 @@ c
       pairwise = .true.
       if (use_epdt) then
          call epolar3f
-      else if (use_plmda) then
+      else if (use_prst) then
          call epolar3p
       else if (pairwise) then
          if (use_ewald) then
@@ -2281,6 +2281,7 @@ c
       use math
       use mpole
       use mrecip
+      use mutant
       use pme
       use polar
       use polpot
@@ -2306,12 +2307,12 @@ c
       f = 0.5d0 * electric / dielec
 c
 c     perform dynamic allocation of some global arrays; the multipole
-c     PME grid cannot be reused with decoupled polarization lambda,
-c     since it belongs to a different set of multipoles than the
-c     current polarization state
+c     PME grid is reused only when it belongs to the multipoles of the
+c     current polarization state, which rules out dual topology and a
+c     polarization lambda that differs from the electrostatic lambda
 c
       if (.not.use_mpole .or. aewald.ne.aeewald .or. use_epdt
-     &       .or. use_plmda) then
+     &       .or. abs(plambda-elambda).gt.1.0d-12) then
          if (allocated(cmp)) then
             if (size(cmp) .lt. 10*n)  deallocate (cmp)
          end if
@@ -2480,16 +2481,13 @@ c
       integer nep1,nep0
       real*8 ep1,ep0
       real*8 plambdaorig
-      real*8 elambdaorig
       real*8, allocatable :: aep1(:)
       real*8, allocatable :: aep0(:)
-      character*6 mode
 c
 c
 c     copy original plambda
 c
       plambdaorig = plambda
-      elambdaorig = elambda
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2551,11 +2549,7 @@ c
 c     set original plambda
 c
       plambda = plambdaorig
-      if (use_mpole) then
-         call altemdt (elambdaorig)
-      else
-         call altepdt (plambdaorig)
-      end if
+      call alteprst
 c
 c     interpolate energy
 c
@@ -2606,36 +2600,35 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine epolar3p  --  decoupled lambda pol analysis  ##
-c     ##                                                          ##
-c     ##############################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine epolar3p  --  single topology pol analysis  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
-c     "epolar3p" calculates the polarization energy and partitions
-c     the energy among the atoms with the electrostatic parameters
-c     scaled by the polarization lambda, then restores the parameters
-c     to the electrostatics lambda state left by "altelec"
+c     "epolar3p" calculates the single topology polarization energy
+c     and partitions it among the atoms with the electrostatic
+c     parameters scaled by the polarization lambda; the parameters are
+c     reinstalled and later restored to the electrostatics lambda state
+c     left by "altelec" only when the two lambdas differ
 c
 c
       subroutine epolar3p
-      use mutant
       implicit none
-      real*8 plmdaorig
+      logical same
 c
 c
-c     scale the parameters to the polarization lambda state
+c     ready the parameters of the polarization lambda state
 c
-      plmdaorig = plambda
-      call altepdt (plmdaorig)
+      call altepset (same)
 c
 c     compute and partition the polarization energy
 c
       call epolar3calc
 c
-c     restore the electrostatics lambda state
+c     restore the electrostatics lambda state if it was changed
 c
-      call alteprst
+      if (.not. same)  call alteprst
       return
       end

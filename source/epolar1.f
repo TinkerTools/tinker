@@ -41,7 +41,7 @@ c     choose the method to sum over polarization interactions
 c
       if (use_epdt) then
          call epolar1f
-      else if (use_plmda) then
+      else if (use_prst) then
          call epolar1p
       else
          if (use_ewald) then
@@ -8596,6 +8596,7 @@ c
       use math
       use mpole
       use mrecip
+      use mutant
       use pme
       use polar
       use polopt
@@ -8668,12 +8669,12 @@ c
       ntot = nff * nfft3
 c
 c     remove scalar sum virial from prior multipole FFT; the saved
-c     values cannot be reused with decoupled polarization lambda,
-c     since the prior FFT belongs to a different set of multipoles
-c     than the current polarization state
+c     values are reused only when that FFT belongs to the multipoles of
+c     the current polarization state, which rules out dual topology and
+c     a polarization lambda that differs from the electrostatic lambda
 c
       if (use_mpole .and. aewald.eq.aeewald .and. .not.use_epdt
-     &       .and. .not.use_plmda) then
+     &       .and. abs(plambda-elambda).le.1.0d-12) then
          vxx = -vmxx
          vxy = -vmxy
          vxz = -vmxz
@@ -9678,18 +9679,15 @@ c
       integer i,j
       real*8 ep1,ep0
       real*8 plambdaorig
-      real*8 elambdaorig
       real*8 epvir1(3,3)
       real*8 epvir0(3,3)
       real*8, allocatable :: dep1(:,:)
       real*8, allocatable :: dep0(:,:)
-      character*6 mode
 c
 c
 c     copy original plambda
 c
       plambdaorig = plambda
-      elambdaorig = elambda
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -9775,11 +9773,7 @@ c
 c     set original plambda
 c
       plambda = plambdaorig
-      if (use_mpole) then
-         call altemdt (elambdaorig)
-      else
-         call altepdt (plambdaorig)
-      end if
+      call alteprst
 c
 c     interpolate energy, force, and virial
 c
@@ -9841,36 +9835,35 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine epolar1p  --  decoupled lambda pol derivs  ##
-c     ##                                                        ##
-c     ############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine epolar1p  --  single topology pol derivs  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
-c     "epolar1p" calculates the polarization energy and first
-c     derivatives with the electrostatic parameters scaled by the
-c     polarization lambda, then restores the parameters to the
-c     electrostatics lambda state left by "altelec"
+c     "epolar1p" calculates the single topology polarization energy
+c     and first derivatives with the electrostatic parameters scaled by
+c     the polarization lambda; the parameters are reinstalled and later
+c     restored to the electrostatics lambda state left by "altelec"
+c     only when the two lambdas differ
 c
 c
       subroutine epolar1p
-      use mutant
       implicit none
-      real*8 plmdaorig
+      logical same
 c
 c
-c     scale the parameters to the polarization lambda state
+c     ready the parameters of the polarization lambda state
 c
-      plmdaorig = plambda
-      call altepdt (plmdaorig)
+      call altepset (same)
 c
 c     compute the polarization energy and first derivatives
 c
       call epolar1calc
 c
-c     restore the electrostatics lambda state
+c     restore the electrostatics lambda state if it was changed
 c
-      call alteprst
+      if (.not. same)  call alteprst
       return
       end

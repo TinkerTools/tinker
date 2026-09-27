@@ -2256,6 +2256,8 @@ void altpolr_();
 #define tinker_f_altpolr altpolr_
 void altepdt_(double* plmda);
 #define tinker_f_altepdt altepdt_
+void altepset_(int* same);
+#define tinker_f_altepset altepset_
 void alteprst_();
 #define tinker_f_alteprst alteprst_
 void alttors_(int* ntbnd, int* itbnd);

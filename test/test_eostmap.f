@@ -990,6 +990,7 @@ c     exercised here, the endpoint mixing needs a real system
 c
       use_rel = .true.
       elmdamap = 'QNT'
+      plmdamap = 'QNT'
       vlmdamap = 'QNT'
       qntvlmda0 = 0.3d0
       qntvlmda1 = 0.7d0
@@ -1192,10 +1193,11 @@ c
       call assert_logical (need1,.true.,
      &                     'maprelstage lig1 revived need1')
 c
-c     polarization tracks the multipoles exactly across the whole
-c     schedule, so the fused multipole plus polarization path stays
-c     usable and the two terms never see different states
+c     polarization given the same map and window as the multipoles
+c     tracks them exactly, so the two terms never see different states
 c
+      qntplmda0 = qntelmda0
+      qntplmda1 = qntelmda1
       probe(1) = 0.95d0
       probe(2) = 0.72d0
       probe(3) = 0.85d0
@@ -1252,6 +1254,36 @@ c
          call assert_real (d2eldlmda2,d2tref(i),1.0d-12,
      &                     'maprelstage lig2 leg d2eldlmda2')
       end do
+c
+c     polarization follows its own window on the charging legs, read
+c     the other way on the ligand 2 leg, and stays at zero on the
+c     middle leg
+c
+      qntplmda0 = 0.0d0
+      qntplmda1 = 0.2d0
+      call mapsublmda (0.1d0)
+      call assert_real (plambda,0.5d0,1.0d-12,
+     &                  'maprelstage lig2 own pol map weight')
+      call assert_real (dpldlmda,-9.375d0,1.0d-12,
+     &                  'maprelstage lig2 own pol map slope')
+      call assert_real (elambda,1.0d0-0.20987654320987653d0,1.0d-12,
+     &                  'maprelstage lig2 own pol map elambda')
+      relstage = 'LIG1'
+      qntplmda0 = 0.8d0
+      qntplmda1 = 1.0d0
+      call mapsublmda (0.9d0)
+      call assert_real (plambda,0.5d0,1.0d-12,
+     &                  'maprelstage lig1 own pol map weight')
+      call assert_real (dpldlmda,9.375d0,1.0d-12,
+     &                  'maprelstage lig1 own pol map slope')
+      relstage = 'VDWM'
+      call mapsublmda (0.5d0)
+      call assert_real (plambda,0.0d0,0.0d0,
+     &                  'maprelstage vdwm own pol map weight')
+      call assert_real (dpldlmda,0.0d0,0.0d0,
+     &                  'maprelstage vdwm own pol map slope')
+      qntplmda0 = 0.0d0
+      qntplmda1 = 1.0d0
 c
 c     the ordinary maps must be untouched when staging is off
 c

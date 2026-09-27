@@ -128,8 +128,8 @@ c     use_metadyn   flag to propagate metadynamics lambda particle
 c     use_ost       flag to use orthogonal space tempering
 c     use_ostdyn    flag to propagate lambda particle
 c     use_pdlmda    flag that the polarization term has a lambda deriv
-c     use_plmda     flag governing rescale to a decoupled plambda
 c     use_plmdamap  flag that plambda follows the main lambda map
+c     use_prst      flag for polarization single topology at plambda
 c     use_ti        flag to use thermodynamic integration
 c     use_vdlmda    flag that the van der Waals term has a lambda deriv
 c     use_vlmdamap  flag that vlambda follows the main lambda map
@@ -138,7 +138,6 @@ c     elmdamap      mapping type from main to electrostatic lambda
 c     plmdamap      mapping type from main to polarization lambda
 c     vlmdamap      mapping type from main to van der Waals lambda
 c     lmdathmap     mapping type from theta to main lambda, SIN or TRI
-c     lmdaengymode  free energy being computed, ABS or REL
 c     lmdasampmode  lambda sampling method, OST, META, TI, ABF or NONE
 c     relstage      declared leg of the staged schedule
 c     abflabel      history label record of the abf history file
@@ -262,8 +261,8 @@ c
       logical use_ost
       logical use_ostdyn
       logical use_pdlmda
-      logical use_plmda
       logical use_plmdamap
+      logical use_prst
       logical use_ti
       logical use_vdlmda
       logical use_vlmdamap
@@ -272,7 +271,6 @@ c
       character*3 plmdamap
       character*3 vlmdamap
       character*3 lmdathmap
-      character*4 lmdaengymode
       character*4 lmdasampmode
       character*4 relstage
       character*40 abflabel

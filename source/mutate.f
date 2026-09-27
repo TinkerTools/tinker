@@ -101,7 +101,6 @@ c
       nmut = 0
       nmutb = 0
       use_rel = .false.
-      use_past = .false.
       do i = 1, n
          mutg(i) = 0
       end do
@@ -343,8 +342,6 @@ c
       integer i,j,k
       integer next
       real*8 temp
-      logical setpolmap
-      logical setpolrng
       character*4 legword
       character*20 keyword
       character*240 record
@@ -363,14 +360,13 @@ c
       use_metadyn = .false.
       use_ost = .false.
       use_ostdyn = .false.
-      use_plmda = .false.
+      use_prst = .false.
       use_plmdamap = .false.
       use_ti = .false.
       use_vlmdamap = .false.
 c
 c     set defaults describing the flavor of the lambda calculation
 c
-      lmdaengymode = 'ABS'
       lmdasampmode = 'NONE'
 c
 c     set defaults for dual topology
@@ -380,8 +376,6 @@ c
 c     set defaults for the staged relative free energy schedule
 c
       relstage = 'VDWM'
-      setpolmap = .false.
-      setpolrng = .false.
 c
 c     set default mapping from main lambda to sublambda
 c
@@ -510,7 +504,6 @@ c
             string = record(next:240)
             read (string,*,err=10)  qntelmda0, qntelmda1
          else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
-            setpolrng = .true.
             string = record(next:240)
             read (string,*,err=10)  qntplmda0, qntplmda1
          else if (keyword(1:15) .eq. 'VDW-LMDA-RANGE ') then
@@ -522,7 +515,6 @@ c
             call upcase (elmdamap)
          else if (keyword(1:13) .eq. 'POL-LMDA-MAP ') then
             use_plmdamap = .true.
-            setpolmap = .true.
             call getword (record,plmdamap,next)
             call upcase (plmdamap)
          else if (keyword(1:13) .eq. 'VDW-LMDA-MAP ') then
@@ -558,6 +550,7 @@ c
             read (string,*,err=10)  vlmdainveps
          else if (keyword(1:10) .eq. 'REL-STAGE ') then
             use_rel = .true.
+            use_mainlmda = .true.
             call getword (record,legword,next)
             call upcase (legword)
             relstage = legword
@@ -655,10 +648,6 @@ c     set the terms that carry a lambda derivative
 c
       call setdlmdaterms
 c
-c     relative free energy uses the relative lambda energy mode
-c
-      if (use_rel)  lmdaengymode = 'REL'
-c
 c     second, force and virial lambda derivatives of polarization
 c     need the dual topology path; the first alone uses one state
 c
@@ -745,24 +734,12 @@ c
      &                 ' charge ligand 1')
             call fatal
          end if
-c
-c     polarization stages with the multipoles on its own map, so a map
-c     or a window given for it would be silently ignored
-c
-         if (setpolrng .or. setpolmap) then
-            write (iout,40)
-   40       format (/,' MUTATE_DLMDA  --  REL-STAGE stages',
-     &                 ' polarization with the multipoles; remove the',
-     &                 ' POL-LMDA-MAP and POL-LMDA-RANGE keywords')
-            call fatal
-         end if
       end if
 c
 c     single topology evaluates polarization from one parameter state
 c     at plambda, independently of the electrostatic lambda state
 c
-      use_past = (use_mutate .and. .not.use_epdt .and. use_polar)
-      use_plmda = use_past
+      use_prst = (use_mutate .and. .not.use_epdt .and. use_polar)
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -1365,7 +1342,7 @@ c
 c     single topology currently supports the scalar derivative for
 c     mutual Thole polarization in direct and Ewald modes
 c
-      if (use_pdlmda .and. use_past) then
+      if (use_pdlmda .and. use_prst) then
          if (poltyp.ne.'MUTUAL' .or. .not.use_thole .or. use_chgpen
      &          .or. use_expol .or. use_solv) then
             write (iout,30)
@@ -1481,6 +1458,24 @@ c
   112    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
      &              ' Available for HIPPO Repulsion, Dispersion,',
      &              ' Charge Transfer or Charge Penetration')
+         call fatal
+      end if
+c
+c     implicit solvation parameters are not scaled per ligand group
+c
+      if (use_rel .and. use_solv) then
+         write (iout,113)
+  113    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
+     &              ' Available with Implicit Solvation')
+         call fatal
+      end if
+c
+c     the charge flux potential and forces carry no lambda derivative
+c
+      if (use_chgflx .and. use_dlmda) then
+         write (iout,114)
+  114    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
+     &              ' Available with Charge Flux')
          call fatal
       end if
 c
@@ -1843,6 +1838,41 @@ c     get global frame multipoles for the requested lambda state
 c
       call chkpole
       call rotpole ('MPOLE')
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine altepset  --  polarization lambda state setup  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "altepset" readies the electrostatic parameters for polarization
+c     at "plambda"; when it matches "elambda", the state installed by
+c     "altelec" already holds them, so only the charge flux monopoles
+c     and the global frame multipoles are refreshed and "same" tells
+c     the caller that no restore is needed afterward
+c
+c
+      subroutine altepset (same)
+      use mutant
+      use potent
+      implicit none
+      logical same
+c
+c
+c     reinstall the parameters only when the two lambdas differ
+c
+      same = (abs(plambda-elambda) .le. 1.0d-12)
+      if (same) then
+         if (use_chgflx)  call alterchg
+         call chkpole
+         call rotpole ('MPOLE')
+      else
+         call altepdt (plambda)
+      end if
       return
       end
 c

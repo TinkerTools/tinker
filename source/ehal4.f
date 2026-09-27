@@ -50,7 +50,7 @@ c
          devdl = devdl + delrc
          do i = 1, 3
             evvir(i,i) = evvir(i,i) + vlrc
-            devvirdl(i,i) = devvirdl(i,i) + dvlrc
+            if (use_d2lmda)  devvirdl(i,i) = devvirdl(i,i) + dvlrc
          end do
       end if
 c
@@ -135,6 +135,7 @@ c
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical muti,mutk,mutik
+      logical mutd2
       character*6 mode
 c
 c
@@ -280,6 +281,7 @@ c
                         mutik = .true.
                      end if
                   end if
+                  mutd2 = mutik .and. use_d2lmda
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -316,27 +318,29 @@ c
                      dlambda = dt0dl * t1 * t2m2
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
-                     d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
-                     d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                         + 2.0d0*dscaldl*s1*ds1dl)
-                     d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                         + 2.0d0*dscaldl*s2*ds2dl)
-                     dlambda2 = d2t0dl2*t1*t2m2
-     &                          + t0*d2t1dl2*t2m2
-     &                          + t0*t1*d2t2dl2
-     &                          + 2.0d0*dt0dl*dt1dl*t2m2
-     &                          + 2.0d0*dt0dl*t1*dt2dl
-     &                          + 2.0d0*t0*dt1dl*dt2dl
-                     d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6 
-                     d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                     dlde = scexp*vlsc1(ig)
-     &                      * (dt1drho*t2m2 + t1*dt2drho)
-     &                      + vlsc(ig)
-     &                      * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &                      + dt1dl*dt2drho + dt1drho*dt2dl)
-                     dlde = eps0 / rv * dlde
                      dlambda = vsgn(ig) * dlambda
-                     dlde = vsgn(ig) * dlde
+                     if (use_d2lmda) then
+                        d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
+                        d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
+     &                            + 2.0d0*dscaldl*s1*ds1dl)
+                        d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
+     &                            + 2.0d0*dscaldl*s2*ds2dl)
+                        dlambda2 = d2t0dl2*t1*t2m2
+     &                             + t0*d2t1dl2*t2m2
+     &                             + t0*t1*d2t2dl2
+     &                             + 2.0d0*dt0dl*dt1dl*t2m2
+     &                             + 2.0d0*dt0dl*t1*dt2dl
+     &                             + 2.0d0*t0*dt1dl*dt2dl
+                        d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6
+                        d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
+                        dlde = scexp*vlsc1(ig)
+     &                         * (dt1drho*t2m2 + t1*dt2drho)
+     &                         + vlsc(ig)
+     &                         * (d2t1dldrho*t2m2 + t1*d2t2dldrho
+     &                         + dt1dl*dt2drho + dt1drho*dt2dl)
+                        dlde = eps0 / rv * dlde
+                        dlde = vsgn(ig) * dlde
+                     end if
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -362,11 +366,11 @@ c
      &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
                      de = e*dtaper + de*taper
                      e = e * taper
-                     if (mutik) then
+                     if (mutd2) then
                         dlde = dlambda * dtaper + dlde * taper
-                        dlambda = dlambda * taper
                         dlambda2 = dlambda2 * taper
                      end if
+                     if (mutik)  dlambda = dlambda * taper
                   end if
 c
 c     scale the interaction based on its group membership
@@ -374,8 +378,8 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
-                     if (mutik) then
-                        dlambda = dlambda * fgrp
+                     if (mutik)  dlambda = dlambda * fgrp
+                     if (mutd2) then
                         dlambda2 = dlambda2 * fgrp
                         dlde = dlde * fgrp
                      end if
@@ -391,7 +395,7 @@ c
 c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
-                  if (mutik) then
+                  if (mutd2) then
                      dlde = dlde / rik
                      dldedx = dlde * xr
                      dldedy = dlde * yr
@@ -401,7 +405,7 @@ c
                      dev(1,i) = dev(1,i) + dedx
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,i) = dfvdl(1,i) + dldedx
                         dfvdl(2,i) = dfvdl(2,i) + dldedy
                         dfvdl(3,i) = dfvdl(3,i) + dldedz
@@ -413,7 +417,7 @@ c
                      dev(1,iv) = dev(1,iv) + dedx*rediv
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
                         dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
                         dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
@@ -426,7 +430,7 @@ c
                      dev(1,k) = dev(1,k) - dedx
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,k) = dfvdl(1,k) - dldedx
                         dfvdl(2,k) = dfvdl(2,k) - dldedy
                         dfvdl(3,k) = dfvdl(3,k) - dldedz
@@ -440,7 +444,7 @@ c
                      dev(1,kv) = dev(1,kv) - dedx*redkv
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
                         dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
                         dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
@@ -449,10 +453,8 @@ c
                         dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
                      end if
                   end if
-                  if (mutik) then
-                     devdl = devdl + dlambda
-                     d2evdl2 = d2evdl2 + dlambda2
-                  end if
+                  if (mutik)  devdl = devdl + dlambda
+                  if (mutd2)  d2evdl2 = d2evdl2 + dlambda2
 c
 c     increment the internal virial tensor components
 c
@@ -471,7 +473,7 @@ c
                   evvir(1,3) = evvir(1,3) + vzx
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
-                  if (mutik) then
+                  if (mutd2) then
                      dldvxx = xr * dldedx
                      dldvyx = yr * dldedx
                      dldvzx = zr * dldedx
@@ -596,6 +598,7 @@ c
                            mutik = .true.
                         end if
                      end if
+                     mutd2 = mutik .and. use_d2lmda
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -632,28 +635,31 @@ c
                         dlambda = dt0dl * t1 * t2m2
      &                            + t0 * dt1dl * t2m2
      &                            + t0 * t1 * dt2dl
-                        d2t0dl2 = eps0*scexp*(scexp-1)
-     &                            * vlsc2(ig)
-                        d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                            + 2.0d0*dscaldl*s1*ds1dl)
-                        d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                            + 2.0d0*dscaldl*s2*ds2dl)
-                        dlambda2 = d2t0dl2*t1*t2m2
-     &                             + t0*d2t1dl2*t2m2
-     &                             + t0*t1*d2t2dl2
-     &                             + 2.0d0*dt0dl*dt1dl*t2m2
-     &                             + 2.0d0*dt0dl*t1*dt2dl
-     &                             + 2.0d0*t0*dt1dl*dt2dl
-                        d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6 
-                        d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                        dlde = scexp*vlsc1(ig)
-     &                         * (dt1drho*t2m2 + t1*dt2drho)
-     &                         + vlsc(ig)
-     &                         * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &                         + dt1dl*dt2drho + dt1drho*dt2dl)
-                        dlde = eps0 / rv * dlde
                         dlambda = vsgn(ig) * dlambda
-                        dlde = vsgn(ig) * dlde
+                        if (use_d2lmda) then
+                           d2t0dl2 = eps0*scexp*(scexp-1)
+     &                               * vlsc2(ig)
+                           d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
+     &                               + 2.0d0*dscaldl*s1*ds1dl)
+                           d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
+     &                               + 2.0d0*dscaldl*s2*ds2dl)
+                           dlambda2 = d2t0dl2*t1*t2m2
+     &                                + t0*d2t1dl2*t2m2
+     &                                + t0*t1*d2t2dl2
+     &                                + 2.0d0*dt0dl*dt1dl*t2m2
+     &                                + 2.0d0*dt0dl*t1*dt2dl
+     &                                + 2.0d0*t0*dt1dl*dt2dl
+                           d2t1dldrho = -14.0d0*dhal17*s1*ds1dl
+     &                                  * rhopdhal6
+                           d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
+                           dlde = scexp*vlsc1(ig)
+     &                            * (dt1drho*t2m2 + t1*dt2drho)
+     &                            + vlsc(ig)
+     &                            * (d2t1dldrho*t2m2 + t1*d2t2dldrho
+     &                            + dt1dl*dt2drho + dt1drho*dt2dl)
+                           dlde = eps0 / rv * dlde
+                           dlde = vsgn(ig) * dlde
+                        end if
                      else
                         rv7 = rv**7
                         rik6 = rik2**3
@@ -679,11 +685,11 @@ c
      &                              + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
                         de = e*dtaper + de*taper
                         e = e * taper
-                        if (mutik) then
+                        if (mutd2) then
                            dlde = dlambda * dtaper + dlde * taper
-                           dlambda = dlambda * taper
                            dlambda2 = dlambda2 * taper
                         end if
+                        if (mutik)  dlambda = dlambda * taper
                      end if
 c
 c     scale the interaction based on its group membership
@@ -691,8 +697,8 @@ c
                      if (use_group) then
                         e = e * fgrp
                         de = de * fgrp
-                        if (mutik) then
-                           dlambda = dlambda * fgrp
+                        if (mutik)  dlambda = dlambda * fgrp
+                        if (mutd2) then
                            dlambda2 = dlambda2 * fgrp
                            dlde = dlde * fgrp
                         end if
@@ -709,7 +715,7 @@ c     increment the total van der Waals energy and derivatives
 c
                      if (i .eq. k)  e = 0.5d0 * e
                      ev = ev + e
-                     if (mutik) then
+                     if (mutd2) then
                         dlde = dlde / rik
                         dldedx = dlde * xr
                         dldedy = dlde * yr
@@ -719,7 +725,7 @@ c
                         dev(1,i) = dev(1,i) + dedx
                         dev(2,i) = dev(2,i) + dedy
                         dev(3,i) = dev(3,i) + dedz
-                        if (mutik) then
+                        if (mutd2) then
                            dfvdl(1,i) = dfvdl(1,i) + dldedx
                            dfvdl(2,i) = dfvdl(2,i) + dldedy
                            dfvdl(3,i) = dfvdl(3,i) + dldedz
@@ -731,7 +737,7 @@ c
                         dev(1,iv) = dev(1,iv) + dedx*rediv
                         dev(2,iv) = dev(2,iv) + dedy*rediv
                         dev(3,iv) = dev(3,iv) + dedz*rediv
-                        if (mutik) then
+                        if (mutd2) then
                            dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
                            dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
                            dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
@@ -745,7 +751,7 @@ c
                            dev(1,k) = dev(1,k) - dedx
                            dev(2,k) = dev(2,k) - dedy
                            dev(3,k) = dev(3,k) - dedz
-                           if (mutik) then
+                           if (mutd2) then
                               dfvdl(1,k) = dfvdl(1,k) - dldedx
                               dfvdl(2,k) = dfvdl(2,k) - dldedy
                               dfvdl(3,k) = dfvdl(3,k) - dldedz
@@ -759,7 +765,7 @@ c
                            dev(1,kv) = dev(1,kv) - dedx*redkv
                            dev(2,kv) = dev(2,kv) - dedy*redkv
                            dev(3,kv) = dev(3,kv) - dedz*redkv
-                           if (mutik) then
+                           if (mutd2) then
                               dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
                               dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
                               dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
@@ -770,11 +776,11 @@ c
                         end if
                      end if
                      if (mutik) then
-                        if (i .eq. k) then
-                           dlambda = 0.5d0 * dlambda
-                           dlambda2 = 0.5d0 * dlambda2
-                        end if
+                        if (i .eq. k)  dlambda = 0.5d0 * dlambda
                         devdl = devdl + dlambda
+                     end if
+                     if (mutd2) then
+                        if (i .eq. k)  dlambda2 = 0.5d0 * dlambda2
                         d2evdl2 = d2evdl2 + dlambda2
                      end if
 c
@@ -795,7 +801,7 @@ c
                      evvir(1,3) = evvir(1,3) + vzx
                      evvir(2,3) = evvir(2,3) + vzy
                      evvir(3,3) = evvir(3,3) + vzz
-                     if (mutik) then
+                     if (mutd2) then
                         dldvxx = xr * dldedx
                         dldvyx = yr * dldedx
                         dldvzx = zr * dldedx
@@ -919,6 +925,7 @@ c
       logical proceed,usei,prime
       logical unique,repeat
       logical muti,mutk,mutik
+      logical mutd2
       character*6 mode
 c
 c
@@ -1121,6 +1128,7 @@ c
                         mutik = .true.
                      end if
                   end if
+                  mutd2 = mutik .and. use_d2lmda
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -1157,27 +1165,29 @@ c
                      dlambda = dt0dl * t1 * t2m2
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
-                     d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
-                     d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                         + 2.0d0*dscaldl*s1*ds1dl)
-                     d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                         + 2.0d0*dscaldl*s2*ds2dl)
-                     dlambda2 = d2t0dl2*t1*t2m2
-     &                          + t0*d2t1dl2*t2m2
-     &                          + t0*t1*d2t2dl2
-     &                          + 2.0d0*dt0dl*dt1dl*t2m2
-     &                          + 2.0d0*dt0dl*t1*dt2dl
-     &                          + 2.0d0*t0*dt1dl*dt2dl
-                     d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6 
-                     d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                     dlde = scexp*vlsc1(ig)
-     &                      * (dt1drho*t2m2 + t1*dt2drho)
-     &                      + vlsc(ig)
-     &                      * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &                      + dt1dl*dt2drho + dt1drho*dt2dl)
-                     dlde = eps0 / rv * dlde
                      dlambda = vsgn(ig) * dlambda
-                     dlde = vsgn(ig) * dlde
+                     if (use_d2lmda) then
+                        d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
+                        d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
+     &                            + 2.0d0*dscaldl*s1*ds1dl)
+                        d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
+     &                            + 2.0d0*dscaldl*s2*ds2dl)
+                        dlambda2 = d2t0dl2*t1*t2m2
+     &                             + t0*d2t1dl2*t2m2
+     &                             + t0*t1*d2t2dl2
+     &                             + 2.0d0*dt0dl*dt1dl*t2m2
+     &                             + 2.0d0*dt0dl*t1*dt2dl
+     &                             + 2.0d0*t0*dt1dl*dt2dl
+                        d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6
+                        d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
+                        dlde = scexp*vlsc1(ig)
+     &                         * (dt1drho*t2m2 + t1*dt2drho)
+     &                         + vlsc(ig)
+     &                         * (d2t1dldrho*t2m2 + t1*d2t2dldrho
+     &                         + dt1dl*dt2drho + dt1drho*dt2dl)
+                        dlde = eps0 / rv * dlde
+                        dlde = vsgn(ig) * dlde
+                     end if
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -1203,11 +1213,11 @@ c
      &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
                      de = e*dtaper + de*taper
                      e = e * taper
-                     if (mutik) then
+                     if (mutd2) then
                         dlde = dlambda * dtaper + dlde * taper
-                        dlambda = dlambda * taper
                         dlambda2 = dlambda2 * taper
                      end if
+                     if (mutik)  dlambda = dlambda * taper
                   end if
 c
 c     scale the interaction based on its group membership
@@ -1215,8 +1225,8 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
-                     if (mutik) then
-                        dlambda = dlambda * fgrp
+                     if (mutik)  dlambda = dlambda * fgrp
+                     if (mutd2) then
                         dlambda2 = dlambda2 * fgrp
                         dlde = dlde * fgrp
                      end if
@@ -1232,7 +1242,7 @@ c
 c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
-                  if (mutik) then
+                  if (mutd2) then
                      dlde = dlde / rik
                      dldedx = dlde * xr
                      dldedy = dlde * yr
@@ -1242,7 +1252,7 @@ c
                      dev(1,i) = dev(1,i) + dedx
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,i) = dfvdl(1,i) + dldedx
                         dfvdl(2,i) = dfvdl(2,i) + dldedy
                         dfvdl(3,i) = dfvdl(3,i) + dldedz
@@ -1254,7 +1264,7 @@ c
                      dev(1,iv) = dev(1,iv) + dedx*rediv
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
                         dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
                         dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
@@ -1267,7 +1277,7 @@ c
                      dev(1,k) = dev(1,k) - dedx
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,k) = dfvdl(1,k) - dldedx
                         dfvdl(2,k) = dfvdl(2,k) - dldedy
                         dfvdl(3,k) = dfvdl(3,k) - dldedz
@@ -1281,7 +1291,7 @@ c
                      dev(1,kv) = dev(1,kv) - dedx*redkv
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
                         dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
                         dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
@@ -1290,10 +1300,8 @@ c
                         dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
                      end if
                   end if
-                  if (mutik) then
-                     devdl = devdl + dlambda
-                     d2evdl2 = d2evdl2 + dlambda2
-                  end if
+                  if (mutik)  devdl = devdl + dlambda
+                  if (mutd2)  d2evdl2 = d2evdl2 + dlambda2
 c
 c     increment the internal virial tensor components
 c
@@ -1312,7 +1320,7 @@ c
                   evvir(1,3) = evvir(1,3) + vzx
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
-                  if (mutik) then
+                  if (mutd2) then
                      dldvxx = xr * dldedx
                      dldvyx = yr * dldedx
                      dldvzx = zr * dldedx
@@ -1437,6 +1445,7 @@ c
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical muti,mutk,mutik
+      logical mutd2
       character*6 mode
 c
 c
@@ -1511,7 +1520,8 @@ c
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
 !$OMP& dhal,cut2,vcouple,mutg,scexp,scalphav,vlsc,vlsc1,
-!$OMP& vlsc2,vscal,dvscal,vsgn,dhal17,ghal1,c0,c1,c2,c3,c4,c5)
+!$OMP& vlsc2,vscal,dvscal,vsgn,dhal17,ghal1,c0,c1,c2,c3,c4,c5,
+!$OMP& use_d2lmda)
 !$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfvdl,devdl,d2evdl2,
 !$OMP& evvir,devvirdl)
 !$OMP DO reduction(+:ev,dev,dfvdl,devdl,d2evdl2,evvir,devvirdl)
@@ -1594,6 +1604,7 @@ c
                         mutik = .true.
                      end if
                   end if
+                  mutd2 = mutik .and. use_d2lmda
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -1630,27 +1641,29 @@ c
                      dlambda = dt0dl * t1 * t2m2
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
-                     d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
-                     d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                         + 2.0d0*dscaldl*s1*ds1dl)
-                     d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                         + 2.0d0*dscaldl*s2*ds2dl)
-                     dlambda2 = d2t0dl2*t1*t2m2
-     &                          + t0*d2t1dl2*t2m2
-     &                          + t0*t1*d2t2dl2
-     &                          + 2.0d0*dt0dl*dt1dl*t2m2
-     &                          + 2.0d0*dt0dl*t1*dt2dl
-     &                          + 2.0d0*t0*dt1dl*dt2dl
-                     d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6 
-                     d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                     dlde = scexp*vlsc1(ig)
-     &                      * (dt1drho*t2m2 + t1*dt2drho)
-     &                      + vlsc(ig)
-     &                      * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &                      + dt1dl*dt2drho + dt1drho*dt2dl)
-                     dlde = eps0 / rv * dlde
                      dlambda = vsgn(ig) * dlambda
-                     dlde = vsgn(ig) * dlde
+                     if (use_d2lmda) then
+                        d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
+                        d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
+     &                            + 2.0d0*dscaldl*s1*ds1dl)
+                        d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
+     &                            + 2.0d0*dscaldl*s2*ds2dl)
+                        dlambda2 = d2t0dl2*t1*t2m2
+     &                             + t0*d2t1dl2*t2m2
+     &                             + t0*t1*d2t2dl2
+     &                             + 2.0d0*dt0dl*dt1dl*t2m2
+     &                             + 2.0d0*dt0dl*t1*dt2dl
+     &                             + 2.0d0*t0*dt1dl*dt2dl
+                        d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6
+                        d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
+                        dlde = scexp*vlsc1(ig)
+     &                         * (dt1drho*t2m2 + t1*dt2drho)
+     &                         + vlsc(ig)
+     &                         * (d2t1dldrho*t2m2 + t1*d2t2dldrho
+     &                         + dt1dl*dt2drho + dt1drho*dt2dl)
+                        dlde = eps0 / rv * dlde
+                        dlde = vsgn(ig) * dlde
+                     end if
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -1676,11 +1689,11 @@ c
      &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
                      de = e*dtaper + de*taper
                      e = e * taper
-                     if (mutik) then
+                     if (mutd2) then
                         dlde = dlambda * dtaper + dlde * taper
-                        dlambda = dlambda * taper
                         dlambda2 = dlambda2 * taper
                      end if
+                     if (mutik)  dlambda = dlambda * taper
                   end if
 c
 c     scale the interaction based on its group membership
@@ -1688,8 +1701,8 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
-                     if (mutik) then
-                        dlambda = dlambda * fgrp
+                     if (mutik)  dlambda = dlambda * fgrp
+                     if (mutd2) then
                         dlambda2 = dlambda2 * fgrp
                         dlde = dlde * fgrp
                      end if
@@ -1705,7 +1718,7 @@ c
 c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
-                  if (mutik) then
+                  if (mutd2) then
                      dlde = dlde / rik
                      dldedx = dlde * xr
                      dldedy = dlde * yr
@@ -1715,7 +1728,7 @@ c
                      dev(1,i) = dev(1,i) + dedx
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,i) = dfvdl(1,i) + dldedx
                         dfvdl(2,i) = dfvdl(2,i) + dldedy
                         dfvdl(3,i) = dfvdl(3,i) + dldedz
@@ -1727,7 +1740,7 @@ c
                      dev(1,iv) = dev(1,iv) + dedx*rediv
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
                         dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
                         dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
@@ -1740,7 +1753,7 @@ c
                      dev(1,k) = dev(1,k) - dedx
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,k) = dfvdl(1,k) - dldedx
                         dfvdl(2,k) = dfvdl(2,k) - dldedy
                         dfvdl(3,k) = dfvdl(3,k) - dldedz
@@ -1754,7 +1767,7 @@ c
                      dev(1,kv) = dev(1,kv) - dedx*redkv
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
-                     if (mutik) then
+                     if (mutd2) then
                         dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
                         dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
                         dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
@@ -1763,10 +1776,8 @@ c
                         dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
                      end if
                   end if
-                  if (mutik) then
-                     devdl = devdl + dlambda
-                     d2evdl2 = d2evdl2 + dlambda2
-                  end if
+                  if (mutik)  devdl = devdl + dlambda
+                  if (mutd2)  d2evdl2 = d2evdl2 + dlambda2
 c
 c     increment the internal virial tensor components
 c
@@ -1785,7 +1796,7 @@ c
                   evvir(1,3) = evvir(1,3) + vzx
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
-                  if (mutik) then
+                  if (mutd2) then
                      dldvxx = xr * dldedx
                      dldvyx = yr * dldedx
                      dldvzx = zr * dldedx

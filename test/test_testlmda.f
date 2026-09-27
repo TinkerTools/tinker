@@ -49,6 +49,9 @@ c
      &                         '1e-4')
       call test_testlmda_case ('26_water_rels_lig1_dt_polonly_l078',
      &                         '1e-4')
+      call test_testlmda_case ('27_water_rels_lig1_st_prng_l088','1e-4')
+      call test_testlmda_case ('28_water_rels_lig1_dt_prng_l088','1e-4')
+      call test_testlmda_case ('29_water_rels_lig2_st_pmap_l015','1e-4')
       return
       end
 c

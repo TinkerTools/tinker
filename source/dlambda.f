@@ -185,6 +185,9 @@ c                 der Waals morphs from ligand 2 onto ligand 1
 c        LIG1   charge ligand 1 with ligand 2 annihilated, its
 c                 weight rising with the main lambda
 c
+c     as in the absolute free energy, the electrostatic and polarization
+c     weights of a charging leg each follow their own map and window
+c
 c
       subroutine maprelstage (lmda)
       use dlmda
@@ -236,11 +239,25 @@ c     numerical guard on the map complement
 c
       elambda = min(1.0d0,max(0.0d0,elambda))
 c
-c     polarization stages with the multipoles at the same weight
+c     polarization follows its own map on a charging leg, just as the
+c     multipoles do, as the complement of that map on the ligand 2 leg;
+c     the middle leg holds it at zero with the multipoles
 c
-      plambda = elambda
-      dpldlmda = deldlmda
-      d2pldlmda2 = d2eldlmda2
+      if (relstage .eq. 'VDWM') then
+         plambda = 0.0d0
+         dpldlmda = 0.0d0
+         d2pldlmda2 = 0.0d0
+      else
+         call sublmdamap (lmda,plmdamap,plmdaexp,plmdainvn,plmdainveps,
+     &                    plmdaapmn,plmdaapmrho,qntplmda0,qntplmda1,
+     &                    plambda,dpldlmda,d2pldlmda2)
+         if (relstage .eq. 'LIG2') then
+            plambda = 1.0d0 - plambda
+            dpldlmda = -dpldlmda
+            d2pldlmda2 = -d2pldlmda2
+         end if
+         plambda = min(1.0d0,max(0.0d0,plambda))
+      end if
       return
       end
 c
