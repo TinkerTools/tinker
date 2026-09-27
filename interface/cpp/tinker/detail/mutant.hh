@@ -25,7 +25,6 @@ extern int& setplambda;
 extern int& setvlambda;
 extern int& use_past;
 extern int& use_rel;
-extern int*& subon;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" int TINKER_MOD(mutant, nmut);
@@ -50,7 +49,6 @@ extern "C" int TINKER_MOD(mutant, setplambda);
 extern "C" int TINKER_MOD(mutant, setvlambda);
 extern "C" int TINKER_MOD(mutant, use_past);
 extern "C" int TINKER_MOD(mutant, use_rel);
-extern "C" int* TINKER_MOD(mutant, subon);
 
 int& nmut = TINKER_MOD(mutant, nmut);
 int& nmutb = TINKER_MOD(mutant, nmutb);
@@ -74,6 +72,5 @@ int& setplambda = TINKER_MOD(mutant, setplambda);
 int& setvlambda = TINKER_MOD(mutant, setvlambda);
 int& use_past = TINKER_MOD(mutant, use_past);
 int& use_rel = TINKER_MOD(mutant, use_rel);
-int*& subon = TINKER_MOD(mutant, subon);
 #endif
 } }

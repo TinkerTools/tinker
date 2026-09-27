@@ -242,7 +242,7 @@ c
 c
 c     get the multipole scale and lambda derivative of each group
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
 c
 c     compute the multipole interaction energy and gradient
 c
@@ -1417,7 +1417,7 @@ c
 c
 c     get the multipole scale and lambda derivative of each group
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,
 !$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
@@ -2098,7 +2098,7 @@ c
 c
 c     get the multipole scale and lambda derivative of each group
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2499,7 +2499,7 @@ c
 c
 c     get the multipole scale and lambda derivative of each group
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -3588,7 +3588,7 @@ c
 c
 c     get the multipole scale and lambda derivative of each group
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -3992,7 +3992,7 @@ c
 c
 c     get the multipole scale and lambda derivative of each group
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
@@ -4703,7 +4703,7 @@ c
 c
 c     copy multipole moments and coordinates to local storage
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
       do ii = 1, npole
          i = ipole(ii)
          sc = emsc(mutg(i))

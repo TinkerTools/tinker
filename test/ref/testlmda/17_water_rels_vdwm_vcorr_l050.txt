@@ -24,7 +24,7 @@
  Free Energy Mode            Staged Relative
  Staged Leg                             VDWM
  Sampling Mode                  Fixed Lambda
- Polarization Topology                  Dual
+ Polarization Topology                Single
  Main Lambda Value                     0.500
 
  Relative Dual Topology Active :
@@ -35,13 +35,13 @@
                                          -1.401688     -1.401688      0.000000      0.000000
 
  Numerical Lambda Derivatives :              dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                         -1.401688     -1.401688      0.000000     -0.000000
+                                         -1.401688     -1.401688      0.000000      0.000000
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
                                          94.640678     94.640678      0.000000      0.000000
 
  Numerical 2nd Lambda Derivatives :        d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                         94.640686     94.640686      0.000000      0.000004
+                                         94.640678     94.640686      0.000000      0.000000
 
  Lambda Gradient Breakdown over Individual Atoms :
 

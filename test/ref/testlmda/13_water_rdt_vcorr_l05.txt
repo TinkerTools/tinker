@@ -23,7 +23,7 @@
 
  Free Energy Mode                   Relative
  Sampling Mode                  Fixed Lambda
- Polarization Topology                  Dual
+ Polarization Topology                Single
  Main Lambda Value                     0.500
 
  Relative Dual Topology Active :

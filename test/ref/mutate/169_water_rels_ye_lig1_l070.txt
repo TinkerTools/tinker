@@ -1,8 +1,8 @@
- Total Potential Energy :                 -7.5797 Kcal/mole
+ Total Potential Energy :                 -7.5796 Kcal/mole
 
  EngCnt  Van der Waals                             1.9706              277
  EngCnt  Atomic Multipoles                        -6.8076              246
- EngCnt  Polarization                             -2.7426              306
+ EngCnt  Polarization                             -2.7426              246
 
  Internal Virial Tensor :                  -4.141        6.578        6.014
                                             6.578      -15.312       -1.764
@@ -12,12 +12,12 @@
 
   Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
 
- Anlyt         1            -0.0862     -0.1413     -0.0382        0.1699
+ Anlyt         1            -0.0863     -0.1413     -0.0383        0.1699
  Anlyt         2            -0.0146     -0.0610      0.0020        0.0627
- Anlyt         3            -0.0350      0.0302     -0.0114        0.0476
- Anlyt         4             0.0000      0.0000     -0.0001        0.0001
- Anlyt         5            -0.0000     -0.0000      0.0000        0.0000
- Anlyt         6            -0.0000     -0.0000      0.0000        0.0000
+ Anlyt         3            -0.0350      0.0301     -0.0114        0.0476
+ Anlyt         4             0.0000      0.0000      0.0000        0.0000
+ Anlyt         5             0.0000      0.0000      0.0000        0.0000
+ Anlyt         6             0.0000      0.0000      0.0000        0.0000
  Anlyt         7             0.4317     -0.7773      1.7583        1.9703
  Anlyt         8            -1.0596      1.6889      0.8233        2.1571
  Anlyt         9            -1.3245     -1.0281     -0.9420        1.9231

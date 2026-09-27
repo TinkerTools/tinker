@@ -17,15 +17,9 @@ extern int TINKER_MOD(dlmda, lmdastep);
 extern int TINKER_MOD(dlmda, nlmda);
 extern int TINKER_MOD(dlmda, nlmdahist);
 extern int TINKER_MOD(dlmda, nlmdasave);
-#define TINKER_MOD__nrelsub 5
 extern int TINKER_MOD(dlmda, plmdaapmn);
 extern int TINKER_MOD(dlmda, plmdaexp);
 extern int TINKER_MOD(dlmda, plmdainvn);
-extern int TINKER_MOD(dlmda, prelst0);
-extern int TINKER_MOD(dlmda, prelst1);
-#define TINKER_MOD__rellig1 1
-#define TINKER_MOD__rellig2 2
-#define TINKER_MOD__relnone 3
 extern int TINKER_MOD(dlmda, sizelmdahist);
 extern int TINKER_MOD(dlmda, vlmdaapmn);
 extern int TINKER_MOD(dlmda, vlmdaexp);

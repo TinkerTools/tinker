@@ -42,6 +42,13 @@ c
       call test_testlmda_case ('20_water_rels_lig1_ne_l085','1e-4')
       call test_testlmda_case ('21_water_rels_lig1_nlist_exf_l085',
      &                         '1e-4')
+      call test_testlmda_case ('22_water_rels_lig1_st_l085','1e-4')
+      call test_testlmda_case ('23_water_rels_lig2_st_l015','1e-4')
+      call test_testlmda_case ('24_water_rels_lig1_st_ne_l085','1e-4')
+      call test_testlmda_case ('25_water_rels_lig1_st_polonly_l085',
+     &                         '1e-4')
+      call test_testlmda_case ('26_water_rels_lig1_dt_polonly_l078',
+     &                         '1e-4')
       return
       end
 c

@@ -32,16 +32,16 @@
  Number of Ligand2 Atoms                   3
 
  Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                        155.119103      0.000000    119.817605     35.301498
+                                        155.119170      0.000000    119.817605     35.301566
 
  Numerical Lambda Derivatives :              dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                        155.119057      0.000000    119.817569     35.301488
+                                        155.119124      0.000000    119.817569     35.301555
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
                                          -0.968483      0.000000     -0.968483      0.000000
 
  Numerical 2nd Lambda Derivatives :        d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                         -0.968487      0.000000     -0.968487      0.000000
+                                         -0.968487      0.000000     -0.968487     -0.000000
 
  Lambda Gradient Breakdown over Individual Atoms :
 
@@ -53,12 +53,12 @@
  Numer         2         0.000000      0.000000      0.000000      0.000000
  Anlyt         3         0.000000      0.000000      0.000000      0.000000
  Numer         3         0.000000      0.000000      0.000000      0.000000
- Anlyt         4        12.550841   -102.476418    112.064233    152.372347
- Numer         4        12.550838   -102.476388    112.064200    152.372302
- Anlyt         5       -48.401390     -4.879712   -166.423375    173.387560
- Numer         5       -48.401376     -4.879710   -166.423326    173.387508
- Anlyt         6       -14.160578     27.738586    -24.149640     39.410103
- Numer         6       -14.160574     27.738578    -24.149633     39.410092
+ Anlyt         4        12.550828   -102.476485    112.064684    152.372723
+ Numer         4        12.550824   -102.476455    112.064651    152.372678
+ Anlyt         5       -48.401386     -4.879650   -166.423423    173.387603
+ Numer         5       -48.401372     -4.879648   -166.423374    173.387552
+ Anlyt         6       -14.160562     27.738631    -24.149786     39.410219
+ Numer         6       -14.160557     27.738623    -24.149779     39.410207
  Anlyt         7        21.307908    -15.246637      9.004520     27.705022
  Numer         7        21.307901    -15.246633      9.004517     27.705014
  Anlyt         8        -9.558014     -0.721141     -2.620082      9.936826
@@ -110,16 +110,16 @@
 
  Total Gradient Norm and RMS Gradient per Atom :
 
- Anlyt      Total Gradient Norm Value              313.536059
- Numer      Total Gradient Norm Value              313.535966
+ Anlyt      Total Gradient Norm Value              313.536280
+ Numer      Total Gradient Norm Value              313.536187
 
- Anlyt      RMS Gradient over All Atoms             57.243591
- Numer      RMS Gradient over All Atoms             57.243574
+ Anlyt      RMS Gradient over All Atoms             57.243631
+ Numer      RMS Gradient over All Atoms             57.243614
 
  Analytical dV/dL :             -147.109        2.885      -27.874
                                    2.885      -81.678      -30.141
-                                 -27.874      -30.141     -149.363
+                                 -27.874      -30.141     -149.364
 
  Numerical dV/dL :              -147.109        2.885      -27.874
                                    2.885      -81.678      -30.141
-                                 -27.874      -30.141     -149.363
+                                 -27.874      -30.141     -149.364

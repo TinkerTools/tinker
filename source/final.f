@@ -883,7 +883,6 @@ c
       if (allocated(type1))  deallocate (type1)
       if (allocated(class1))  deallocate (class1)
       if (allocated(mutg))  deallocate (mutg)
-      if (allocated(subon))  deallocate (subon)
 c
 c     deallocation of global arrays from module neigh
 c

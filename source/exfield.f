@@ -434,7 +434,7 @@ c
 c
 c     get the multipole scale and lambda derivative of each group
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
 !$OMP PARALLEL default(private) shared(npole,ipole,use,mutg,emsc,demsc,
 !$OMP& x,y,z,xaxis,yaxis,zaxis,f,rpole,texfld,em,dem,emvir,
 !$OMP& demdl,dfmdl,demvirdl)

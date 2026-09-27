@@ -2,21 +2,21 @@
 
  EngCnt  Van der Waals                             2.3793              349
  EngCnt  Atomic Multipoles                        -6.8076              246
- EngCnt  Polarization                             -2.7426              306
+ EngCnt  Polarization                             -2.7426              246
 
  Internal Virial Tensor :                  -4.759        6.312        5.857
                                             6.312      -15.335       -1.840
-                                            5.857       -1.840        4.309
+                                            5.857       -1.840        4.308
 
  Cartesian Gradient Breakdown over Individual Atoms :
 
   Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
 
- Anlyt         1            -0.0041     -0.0003     -0.0025        0.0048
- Anlyt         2            -0.0010     -0.0004     -0.0006        0.0012
- Anlyt         3            -0.0011      0.0009     -0.0004        0.0015
- Anlyt         4            -0.0258     -0.0315     -0.0005        0.0407
- Anlyt         5            -0.0036     -0.0049     -0.0191        0.0200
+ Anlyt         1            -0.0041     -0.0003     -0.0025        0.0049
+ Anlyt         2            -0.0009     -0.0004     -0.0005        0.0011
+ Anlyt         3            -0.0011      0.0009     -0.0003        0.0014
+ Anlyt         4            -0.0258     -0.0315     -0.0004        0.0407
+ Anlyt         5            -0.0036     -0.0048     -0.0191        0.0200
  Anlyt         6            -0.0013      0.0014     -0.0004        0.0020
  Anlyt         7             0.4251     -0.7724      1.7535        1.9627
  Anlyt         8            -1.0587      1.6886      0.8237        2.1566

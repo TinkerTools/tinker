@@ -38,41 +38,42 @@ c
       end
 c
 c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine emscale  --  electrostatic scale per group  ##
-c     ##                                                         ##
-c     #############################################################
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine grpscale  --  coupling scale per group  ##
+c     ##                                                     ##
+c     #########################################################
 c
 c
-c     "emscale" returns the scale applied to the electrostatic
-c     parameters of the environment and of each ligand group, along
-c     with its derivative with respect to "elambda"; the environment
-c     is unscaled, the charging ligand carries "elambda", and in a
-c     staged relative leg the other ligand is annihilated
+c     "grpscale" returns the scale applied to the electrostatic and
+c     polarization parameters of the environment and of each ligand
+c     group at the coupling value "lmda", along with its derivative
+c     with respect to "lmda"; the environment is unscaled, the charging
+c     ligand carries "lmda", and in a staged relative leg the other
+c     ligand is annihilated
 c
 c
-      subroutine emscale (emsc,demsc)
+      subroutine grpscale (lmda,sc,dsc)
       use dlmda
-      use mutant
       implicit none
-      real*8 emsc(0:2)
-      real*8 demsc(0:2)
+      real*8 lmda
+      real*8 sc(0:2)
+      real*8 dsc(0:2)
 c
 c
 c     the first ligand group charges unless the leg charges the second
 c
-      emsc(0) = 1.0d0
-      demsc(0) = 0.0d0
-      emsc(1) = elambda
-      demsc(1) = 1.0d0
-      emsc(2) = 0.0d0
-      demsc(2) = 0.0d0
+      sc(0) = 1.0d0
+      dsc(0) = 0.0d0
+      sc(1) = lmda
+      dsc(1) = 1.0d0
+      sc(2) = 0.0d0
+      dsc(2) = 0.0d0
       if (use_relstage .and. relstage.eq.'LIG2') then
-         emsc(1) = 0.0d0
-         demsc(1) = 0.0d0
-         emsc(2) = elambda
-         demsc(2) = 1.0d0
+         sc(1) = 0.0d0
+         dsc(1) = 0.0d0
+         sc(2) = lmda
+         dsc(2) = 1.0d0
       end if
       return
       end
@@ -176,11 +177,11 @@ c
 c     "maprelstage" maps the main lambda "lmda" onto the sublambdas of
 c     the one staged relative leg with the following configuration:
 c
-c        LIG2   charge ligand 2 against the decoupled reference, its
-c                 weight rising with the main lambda
-c        VDWM   both ligands electrostatically decoupled while van der
-c                 Waals morphs from ligand 2 onto ligand 1
-c        LIG1   charge ligand 1 against the decoupled reference, its
+c        LIG2   charge ligand 2 with ligand 1 annihilated, its
+c                 weight falling as the main lambda rises
+c        VDWM   both ligands electrostatically annihilated while van
+c                 der Waals morphs from ligand 2 onto ligand 1
+c        LIG1   charge ligand 1 with ligand 2 annihilated, its
 c                 weight rising with the main lambda
 c
 c
@@ -196,8 +197,6 @@ c     and polarization sit at the reference state and leave the chain
 c     rule while van der Waals morphs across its map
 c
       if (relstage .eq. 'VDWM') then
-         prelst0 = relnone
-         prelst1 = relnone
          elambda = 0.0d0
          deldlmda = 0.0d0
          d2eldlmda2 = 0.0d0
@@ -205,12 +204,10 @@ c
      &                    vlmdaapmn,vlmdaapmrho,qntvlmda0,qntvlmda1,
      &                    vlambda,dvldlmda,d2vldlmda2)
 c
-c     the ligand 1 leg charges ligand 1 against the decoupled reference
-c     with van der Waals already morphed onto it
+c     the ligand 1 leg charges ligand 1 with ligand 2 annihilated and
+c     van der Waals already morphed onto ligand 1
 c
       else if (relstage .eq. 'LIG1') then
-         prelst0 = relnone
-         prelst1 = rellig1
          call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
      &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
      &                    elambda,deldlmda,d2eldlmda2)
@@ -223,8 +220,6 @@ c     its weight is the complement of the map, with van der Waals still
 c     on it
 c
       else
-         prelst0 = relnone
-         prelst1 = rellig2
          call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
      &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
      &                    elambda,deldlmda,d2eldlmda2)
@@ -568,9 +563,9 @@ c
          end do
       end do
 c
-c     zero d2edl2 and dfdl if ast polarization is used
+c     zero d2edl2 and dfdl unless second lambda derivs are requested
 c
-      if (use_pdlmda .and. use_past) then
+      if (.not. use_d2lmda) then
          d2evdl2 = 0.0d0
          d2emdl2 = 0.0d0
          d2epdl2 = 0.0d0

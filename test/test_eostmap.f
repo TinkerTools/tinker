@@ -803,6 +803,7 @@ c
       real*8 vpref(3,3)
       real*8 vmref(3,3)
       real*8 vvref(3,3)
+      logical d2save
 c
 c
 c     use distinct sublambda derivatives so a swapped polarization,
@@ -855,6 +856,8 @@ c
             vvref(j,i) = devvirdl(j,i) * dvldlmda
          end do
       end do
+      d2save = use_d2lmda
+      use_d2lmda = .true.
       call lmdachain
 c
 c     the second derivatives must use the old first derivatives,
@@ -903,6 +906,53 @@ c
      &                  'lmdachain identity depdl')
       call assert_real (d2epdl2,0.5d0,1.0d-12,
      &                  'lmdachain identity d2epdl2')
+c
+c     first lambda derivatives only clear every second, force and
+c     virial lambda derivative but keep the first derivatives
+c
+      use_d2lmda = .false.
+      depdl = 1.5d0
+      d2epdl2 = 0.5d0
+      d2emdl2 = 4.0d0
+      d2evdl2 = 1.5d0
+      do i = 1, n
+         do j = 1, 3
+            dfpdl(j,i) = 1.0d0
+            dfmdl(j,i) = 1.0d0
+            dfvdl(j,i) = 1.0d0
+            fpref(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            depvirdl(j,i) = 1.0d0
+            demvirdl(j,i) = 1.0d0
+            devvirdl(j,i) = 1.0d0
+            vpref(j,i) = 0.0d0
+         end do
+      end do
+      call lmdachain
+      call assert_real (depdl,1.5d0,1.0d-12,
+     &                  'lmdachain first only depdl')
+      call assert_real (d2epdl2+d2emdl2+d2evdl2+d2edl2,0.0d0,0.0d0,
+     &                  'lmdachain first only d2edl2')
+      call assert_array2 (dfpdl,fpref,3,n,0.0d0,
+     &                    'lmdachain first only dfpdl')
+      call assert_array2 (dfmdl,fpref,3,n,0.0d0,
+     &                    'lmdachain first only dfmdl')
+      call assert_array2 (dfvdl,fpref,3,n,0.0d0,
+     &                    'lmdachain first only dfvdl')
+      call assert_array2 (dfsumdl,fpref,3,n,0.0d0,
+     &                    'lmdachain first only dfsumdl')
+      call assert_array2 (depvirdl,vpref,3,3,0.0d0,
+     &                    'lmdachain first only depvirdl')
+      call assert_array2 (demvirdl,vpref,3,3,0.0d0,
+     &                    'lmdachain first only demvirdl')
+      call assert_array2 (devvirdl,vpref,3,3,0.0d0,
+     &                    'lmdachain first only devvirdl')
+      call assert_array2 (dvirdl,vpref,3,3,0.0d0,
+     &                    'lmdachain first only dvirdl')
+      use_d2lmda = d2save
       deallocate (dfpdl)
       deallocate (dfmdl)
       deallocate (dfvdl)
@@ -920,7 +970,7 @@ c     "test_eostmap_relstage" checks the staged relative free energy
 c     schedule, in which each run walks one declared leg, the LIG2 leg
 c     discharging ligand 2 over its electrostatic window, the VDWM leg
 c     morphing van der Waals between the two ligands while both stay
-c     electrostatically decoupled, and the LIG1 leg charging ligand 1
+c     electrostatically annihilated, and the LIG1 leg charging ligand 1
 c
 c
       subroutine test_eostmap_relstage
@@ -950,7 +1000,7 @@ c
       epdtexp = 1
 c
 c     the ligand 1 leg charges ligand 1 over the upper window against
-c     the decoupled reference, with van der Waals already morphed on
+c     the annihilated reference, with van der Waals already morphed on
 c
       relstage = 'LIG1'
       qntelmda0 = 0.7d0
@@ -960,10 +1010,6 @@ c     lambda of one, ligand 1 fully coupled and van der Waals with it,
 c     so only the coupled endpoint has to be built
 c
       call mapsublmda (1.0d0)
-      call assert_logical (prelst0.eq.relnone,.true.,
-     &                     'maprelstage lig1 lower state at lambda one')
-      call assert_logical (prelst1.eq.rellig1,.true.,
-     &                     'maprelstage lig1 upper state at lambda one')
       call assert_real (elambda,1.0d0,1.0d-14,
      &                  'maprelstage lig1 elambda at lambda one')
       call assert_real (vlambda,1.0d0,1.0d-14,
@@ -1005,7 +1051,7 @@ c
      &                  'maprelstage lig1 vdw slope on leg')
 c
 c     the flat end of the ligand 1 leg, where the weight has fallen to
-c     zero and only the decoupled reference has to be built
+c     zero and only the annihilated reference has to be built
 c
       call mapsublmda (0.7d0)
       call assert_real (elambda,0.0d0,1.0d-14,
@@ -1026,8 +1072,6 @@ c
       qntelmda0 = 0.0d0
       qntelmda1 = 0.3d0
       call mapsublmda (0.0d0)
-      call assert_logical (prelst1.eq.rellig2,.true.,
-     &                     'maprelstage lig2 upper state at zero')
       call assert_real (elambda,1.0d0,1.0d-14,
      &                  'maprelstage lig2 elambda at lambda zero')
       call assert_real (vlambda,0.0d0,1.0d-14,
@@ -1042,7 +1086,7 @@ c
       call assert_real (vlambda,0.0d0,1.0d-14,
      &                  'maprelstage lig2 vlambda on leg')
 c
-c     the middle leg holds both ligands decoupled, so electrostatics
+c     the middle leg holds both ligands annihilated, so electrostatics
 c     sit at the reference state and van der Waals morphs across
 c
       relstage = 'VDWM'
@@ -1051,10 +1095,6 @@ c
       probe(3) = 0.7d0
       do i = 1, 3
          call mapsublmda (probe(i))
-         call assert_logical (prelst0.eq.relnone,.true.,
-     &                        'maprelstage vdwm lower state')
-         call assert_logical (prelst1.eq.relnone,.true.,
-     &                        'maprelstage vdwm upper state')
          call assert_real (elambda,0.0d0,1.0d-14,
      &                     'maprelstage vdwm elambda')
          call assert_real (deldlmda,0.0d0,1.0d-14,

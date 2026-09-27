@@ -69,7 +69,6 @@ c
       logical exist,query
       logical doanalyt,donumer
       logical keylmda
-      logical astpolar
       character*1 answer
       character*240 xyzfile
       character*240 record
@@ -82,7 +81,6 @@ c
       call getxyz
       call mechanic
       keylmda = use_dlmda
-      astpolar = use_pdlmda .and. use_past
 c
 c     decide whether to do an analytical derivative calculation
 c
@@ -368,9 +366,9 @@ c
                end do
             end if
 c
-c     zero d2edl2 and dfdl if ast polarization is used
+c     zero d2edl2 and dfdl unless second lambda derivs are requested
 c
-            if (astpolar) then
+            if (.not. use_d2lmda) then
                nd2evdl2 = 0.0d0
                nd2emdl2 = 0.0d0
                nd2epdl2 = 0.0d0

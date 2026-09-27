@@ -24,15 +24,9 @@ c     lmdastep      dynamics step count of the adaptive lambda bias
 c     nlmda         number of lambda bins
 c     nlmdahist     number of saved lambda bias history entries
 c     nlmdasave     history entries already written to the file
-c     nrelsub       number of parameter-zeroed subsystems, always five
 c     plmdaapmn     power exponent for polarization asymmetric map
 c     plmdaexp      exponent for polarization exponential mapping
 c     plmdainvn     inverse-power exponent for polarization mapping
-c     prelst0       polarization coupling state at the lower endpoint
-c     prelst1       polarization coupling state at the upper endpoint
-c     rellig1       coupling state id with ligand 1 bound to environment
-c     rellig2       coupling state id with ligand 2 bound to environment
-c     relnone       coupling state id with neither ligand bound
 c     sizelmdahist  allocation size of the lambda bias history
 c     vlmdaapmn     power exponent for van der Waals asymmetric map
 c     vlmdaexp      exponent for van der Waals exponential mapping
@@ -121,7 +115,8 @@ c     lmdatrial     flag to evaluate lambda bias for a trial move
 c     use_abf       flag to use adaptive biasing force
 c     use_abfdyn    flag to propagate abf lambda particle
 c     use_d2lmda    flag that second, force and virial lambda derivs
-c                     are needed, beyond the first lambda derivative
+c                     are needed, beyond the first lambda derivative;
+c                     also selects dual topology polarization
 c     use_dlmda     logical flag governing use of lambda derivative
 c     use_edlmda    flag that the multipole term has a lambda deriv
 c     use_elmdamap  flag that elambda follows the main lambda map
@@ -166,24 +161,14 @@ c
       integer nlmda
       integer nlmdahist
       integer nlmdasave
-      integer nrelsub
       integer plmdaapmn
       integer plmdaexp
       integer plmdainvn
-      integer prelst0
-      integer prelst1
-      integer rellig1
-      integer rellig2
-      integer relnone
       integer sizelmdahist
       integer vlmdaapmn
       integer vlmdaexp
       integer vlmdainvn
       integer, allocatable :: lmdaihist(:)
-      parameter (nrelsub=5)
-      parameter (rellig1=1)
-      parameter (rellig2=2)
-      parameter (relnone=3)
       real*8 d2edl2
       real*8 d2eldlmda2
       real*8 d2emdl2

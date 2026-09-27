@@ -62,14 +62,12 @@ c
       if (allocated(type1))  deallocate (type1)
       if (allocated(class1))  deallocate (class1)
       if (allocated(mutg))  deallocate (mutg)
-      if (allocated(subon))  deallocate (subon)
       allocate (imut(n))
       allocate (type0(n))
       allocate (class0(n))
       allocate (type1(n))
       allocate (class1(n))
       allocate (mutg(n))
-      allocate (subon(n))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -106,7 +104,6 @@ c
       use_past = .false.
       do i = 1, n
          mutg(i) = 0
-         subon(i) = .true.
       end do
       ntbnd = 0
       do i = 1, nbond
@@ -387,12 +384,6 @@ c     set defaults for dual topology
 c
       epdtexp = 1
 c
-c     interpolate the polarization between the two coupled states
-c     unless a staged leg says otherwise
-c
-      prelst0 = rellig2
-      prelst1 = rellig1
-c
 c     set defaults for the staged relative free energy schedule
 c
       use_relstage = .false.
@@ -483,6 +474,8 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:13) .eq. 'LAMBDA-DERIV ') then
+            use_dlmda = .true.
+         else if (keyword(1:14) .eq. 'LAMBDA-DERIV2 ') then
             use_dlmda = .true.
             use_d2lmda = .true.
          else if (keyword(1:12) .eq. 'LAMBDA-MODE ') then
@@ -627,7 +620,7 @@ c
       end if
 c
 c     only orthogonal space tempering consumes the second, force and
-c     virial lambda derivatives, which the explicit keyword also asks for
+c     virial lambda derivatives, which LAMBDA-DERIV2 also asks for
 c
       if (use_ost)  use_d2lmda = .true.
 c
@@ -671,16 +664,14 @@ c     set the terms that carry a lambda derivative
 c
       call setdlmdaterms
 c
-c     enable dual topology for relative free energy
+c     relative free energy uses the relative lambda energy mode
 c
-      if (use_rel) then
-         lmdaengymode = 'REL'
-         use_epdt = .true.
-      end if
+      if (use_rel)  lmdaengymode = 'REL'
 c
-c     ost requires second and force lambda derivatives
+c     second, force and virial lambda derivatives of polarization
+c     need the dual topology path; the first alone uses one state
 c
-      if (use_ost .and. use_pdlmda)  use_epdt = .true.
+      if (use_d2lmda .and. use_pdlmda)  use_epdt = .true.
 c
 c     validate mapping schemes from main lambda to sublambdas
 c
@@ -776,11 +767,10 @@ c
          end if
       end if
 c
-c     absolute single topology evaluates polarization from one parameter
-c     state at plambda, independently of the electrostatic lambda state
+c     single topology evaluates polarization from one parameter state
+c     at plambda, independently of the electrostatic lambda state
 c
-      use_past = (use_mutate .and. .not.use_rel .and. .not.use_epdt
-     &                .and. use_polar)
+      use_past = (use_mutate .and. .not.use_epdt .and. use_polar)
       use_plmda = use_past
 c
 c     perform dynamic allocation of some global arrays
@@ -1380,28 +1370,20 @@ c
          call fatal
       end if
 c
-c     ost requires polarization lambda derivatives
-      if (use_ost .and. use_pdlmda .and. use_past) then
-         write (iout,20)
-   20    format (/,' MUTATE_CHECK  --  OST cannot be used with',
-     &              ' absolute single topology polarization; add',
-     &              ' POL-DUALTOPO or remove OST')
-         call fatal
-      end if
-c
-c     absolute single topology currently supports the scalar derivative
-c     for mutual Thole polarization in direct and Ewald modes
+c     single topology currently supports the scalar derivative for
+c     mutual Thole polarization in direct and Ewald modes
 c
       if (use_pdlmda .and. use_past) then
          if (poltyp.ne.'MUTUAL' .or. .not.use_thole .or. use_chgpen
      &          .or. use_expol .or. use_solv) then
             write (iout,30)
-   30       format (/,' MUTATE_CHECK  --  Absolute Single Topology',
+   30       format (/,' MUTATE_CHECK  --  Single Topology',
      &                 ' Polarization dU/dLambda supports MUTUAL Thole',
      &                 ' polarization only, in either direct or Ewald',
      &                 ' mode; use POLARIZATION MUTUAL without charge',
      &                 ' penetration, exchange polarization or',
-     &                 ' implicit solvent')
+     &                 ' implicit solvent, or add LAMBDA-DERIV2 or',
+     &                 ' POL-DUALTOPO')
             call fatal
          end if
       end if
@@ -1477,14 +1459,16 @@ c
          call fatal
       end if
 c
-c     relative electrostatics charges one ligand at a time against an
-c     annihilated partner, which needs the staged relative schedule
+c     relative electrostatics and polarization charge one ligand at
+c     a time against an annihilated partner, which needs the staged
+c     relative schedule
 c
-      if (use_rel .and. use_mpole .and. .not.use_relstage) then
+      if (use_rel .and. (use_mpole .or. use_polar)
+     &       .and. .not.use_relstage) then
          write (iout,111)
-  111    format (/,' MUTATE_CHECK  --  Relative Electrostatics',
-     &              ' Requires the Staged Schedule; add the',
-     &              ' REL-STAGE Keyword')
+  111    format (/,' MUTATE_CHECK  --  Relative Electrostatics and',
+     &              ' Polarization Require the Staged Schedule; add',
+     &              ' the REL-STAGE Keyword')
          call fatal
       end if
 c
@@ -1569,10 +1553,10 @@ c     ################################################################
 c
 c
 c     "altelec" constructs the electrostatic parameters of every site
-c     from their original values and the scale that "emscale" gives
+c     from their original values and the scale that "grpscale" gives
 c     the site's group, so the charging ligand carries "elambda", the
 c     other ligand of a staged relative leg is annihilated, and the
-c     environment is restored after any subsystem install
+c     environment keeps its unscaled values
 c
 c     note charge transfer electrostatics is not treated by parameter
 c     scaling due to the functional form used, and must be done via
@@ -1604,7 +1588,7 @@ c
 c
 c     get the electrostatic scale of the environment and each ligand
 c
-      call emscale (emsc,demsc)
+      call grpscale (elambda,emsc,demsc)
 c
 c     set scaled parameters for partial charge models
 c
@@ -1733,8 +1717,11 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "altpolr" constructs mutated polarization parameters based
-c     on the lambda mutation parameter "plambda"
+c     "altpolr" constructs the polarization parameters of every site
+c     from their original values and the scale that "grpscale" gives
+c     the site's group at "plambda", so the charging ligand carries
+c     "plambda" and the other ligand of a staged relative leg is
+c     annihilated
 c
 c
       subroutine altpolr
@@ -1750,25 +1737,30 @@ c
       use potent
       implicit none
       integer i,j,k
-      integer k1,k2
       integer ia,ib,ic
+      real*8 psc
+      real*8 sc(0:2)
+      real*8 dsc(0:2)
 c
+c
+c     get the polarization scale of the environment and each ligand
+c
+      call grpscale (plambda,sc,dsc)
 c
 c     set scaled parameters for atomic multipole models
 c
       if (use_polar) then
          do i = 1, npole
             k = ipole(i)
-            if (mutg(k) .ne. 0) then
-               do j = 1, 13
-                  pole(j,k) = poleorig(j,k) * plambda
-               end do
-               mono0(k) = pole(1,k)
-               if (use_chgpen) then
-                  pcore(k) = pcoreorig(k) * plambda
-                  pval(k) = pvalorig(k) * plambda
-                  pval0(k) = pval(k)
-               end if
+            psc = sc(mutg(k))
+            do j = 1, 13
+               pole(j,k) = poleorig(j,k) * psc
+            end do
+            mono0(k) = pole(1,k)
+            if (use_chgpen) then
+               pcore(k) = pcoreorig(k) * psc
+               pval(k) = pvalorig(k) * psc
+               pval0(k) = pval(k)
             end if
          end do
       end if
@@ -1778,11 +1770,10 @@ c
       if (use_polar) then
          do i = 1, npole
             k = ipole(i)
-            if (mutg(k) .ne. 0) then
-               polarity(k) = polarityorig(k) * plambda
-               douind(k) = douindorig(k)
-               if (plambda .eq. 0.0d0)  douind(k) = .false.
-            end if
+            psc = sc(mutg(k))
+            polarity(k) = polarityorig(k) * psc
+            douind(k) = douindorig(k)
+            if (psc .eq. 0.0d0)  douind(k) = .false.
          end do
       end if
 c
@@ -1792,9 +1783,9 @@ c
          do i = 1, nbond
             ia = ibnd(1,i)
             ib = ibnd(2,i)
-            if (mutg(ia).ne.0 .and. mutg(ib).ne.0) then
-               bflx(i) = bflxorig(i) * plambda
-            end if
+            psc = 1.0d0
+            if (mutg(ia).ne.0 .and. mutg(ib).ne.0)  psc = sc(mutg(ia))
+            bflx(i) = bflxorig(i) * psc
          end do
       end if
 c
@@ -1805,13 +1796,13 @@ c
             ia = iang(1,i)
             ib = iang(2,i)
             ic = iang(3,i)
+            psc = 1.0d0
             if (mutg(ia).ne.0 .and. mutg(ib).ne.0 .and.
-     &          mutg(ic).ne.0) then
-               aflx(1,i) = aflxorig(1,i) * plambda
-               aflx(2,i) = aflxorig(2,i) * plambda
-               abflx(1,i) = abflxorig(1,i) * plambda
-               abflx(2,i) = abflxorig(2,i) * plambda
-            end if
+     &          mutg(ic).ne.0)  psc = sc(mutg(ia))
+            aflx(1,i) = aflxorig(1,i) * psc
+            aflx(2,i) = aflxorig(2,i) * psc
+            abflx(1,i) = abflxorig(1,i) * psc
+            abflx(2,i) = abflxorig(2,i) * psc
          end do
       end if
 c
@@ -1868,96 +1859,18 @@ c     installed by "altelec" for the current value of "elambda", so
 c     that a rescale performed by "altepdt" leaves no trace for any
 c     later energy term
 c
-c     note "altelec" scales the permanent multipoles under "use_mpole"
-c     while "altpolr" scales them under "use_polar"; with the multipole
-c     term not in use they were never scaled by "altelec" and must be
-c     returned to their unscaled values here
-c
 c
       subroutine alteprst
-      use angbnd
-      use bndstr
-      use cflux
-      use chgpen
-      use dlmda
-      use mplpot
-      use mpole
       use mutant
-      use polar
-      use potent
       implicit none
-      integer i,j,k
-      integer ia,ib,ic
       real*8 elmdaorig
 c
 c
-c     multipole term in use, so the multipole reset restores every
-c     parameter that "altpolr" scaled
+c     reinstall the electrostatic lambda state, which also restores
+c     every parameter that "altpolr" scaled
 c
-      if (use_mpole) then
-         elmdaorig = elambda
-         call altemdt (elmdaorig)
-         return
-      end if
-c
-c     return the permanent multipoles to their unscaled values, and
-c     the polarizabilities to the electrostatics lambda state
-c
-      if (use_polar) then
-         do i = 1, npole
-            k = ipole(i)
-            if (mutg(k) .ne. 0) then
-               do j = 1, 13
-                  pole(j,k) = poleorig(j,k)
-               end do
-               mono0(k) = pole(1,k)
-               if (use_chgpen) then
-                  pcore(k) = pcoreorig(k)
-                  pval(k) = pvalorig(k)
-                  pval0(k) = pval(k)
-               end if
-               polarity(k) = polarityorig(k) * elambda
-               douind(k) = douindorig(k)
-               if (elambda .eq. 0.0d0)  douind(k) = .false.
-            end if
-         end do
-      end if
-c
-c     restore scaled parameters for bond stretch charge flux
-c
-      if (use_chgflx) then
-         do i = 1, nbond
-            ia = ibnd(1,i)
-            ib = ibnd(2,i)
-            if (mutg(ia).ne.0 .and. mutg(ib).ne.0) then
-               bflx(i) = bflxorig(i) * elambda
-            end if
-         end do
-      end if
-c
-c     restore scaled parameters for angle bend charge flux
-c
-      if (use_chgflx) then
-         do i = 1, nangle
-            ia = iang(1,i)
-            ib = iang(2,i)
-            ic = iang(3,i)
-            if (mutg(ia).ne.0 .and. mutg(ib).ne.0 .and.
-     &          mutg(ic).ne.0) then
-               aflx(1,i) = aflxorig(1,i) * elambda
-               aflx(2,i) = aflxorig(2,i) * elambda
-               abflx(1,i) = abflxorig(1,i) * elambda
-               abflx(2,i) = abflxorig(2,i) * elambda
-            end if
-         end do
-      end if
-c
-c     update monopoles for charge flux, then get global frame
-c     multipoles for the restored state
-c
-      if (use_chgflx)  call alterchg
-      call chkpole
-      call rotpole ('MPOLE')
+      elmdaorig = elambda
+      call altemdt (elmdaorig)
       return
       end
 c
@@ -2049,197 +1962,5 @@ c
             end if
          end do
       end if
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine submask  --  select relative subsystem atoms  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "submask" flags which atoms are active in the subsystem currently
-c     being built for a relative dual topology energy term; group A is
-c     included when "la", group B when "lb", and the environment when
-c     "le", with all other alchemical atoms zeroed out
-c
-c
-      subroutine submask (la,lb,le)
-      use atoms
-      use mutant
-      implicit none
-      integer i
-      logical la,lb,le
-c
-c
-      do i = 1, n
-         if (mutg(i) .eq. 1) then
-            subon(i) = la
-         else if (mutg(i) .eq. 2) then
-            subon(i) = lb
-         else
-            subon(i) = le
-         end if
-      end do
-      return
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine relslot  --  relative subsystem slot lookup  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "relslot" returns the group mask of the subsystem in slot "k"
-c     along with whether that subsystem belongs to the coupling states
-c     "ist0" and "ist1" holding the two interpolation endpoints; only
-c     the polarization term uses these subsystems, since the relative
-c     multipole and van der Waals terms are evaluated in a single pass
-c
-c     only five subsystems are reachable through "submask", and the
-c     three coupling states of a relative dual topology are sums of
-c     them, the decoupled state being the one that the plain relative
-c     schedule never needs and the staged schedule is built around,
-c
-c        slot   la     lb     le     subsystem
-c          1    T      F      T      ligand 1 with environment
-c          2    F      T      T      ligand 2 with environment
-c          3    F      F      T      environment alone
-c          4    T      F      F      ligand 1 alone
-c          5    F      T      F      ligand 2 alone
-c
-c        rellig1 = slots 1 and 5 ,   ligand 1 bound, ligand 2 free
-c        rellig2 = slots 2 and 4 ,   ligand 2 bound, ligand 1 free
-c        relnone = slots 3, 4 and 5 ,  neither ligand bound
-c
-c
-      subroutine relslot (k,ist0,ist1,la,lb,le,in0,in1)
-      implicit none
-      integer k,ist0,ist1
-      logical la,lb,le
-      logical in0,in1
-      logical subla(5),sublb(5),suble(5)
-      logical relmem(5,3)
-      save subla,sublb,suble,relmem
-      data subla  / .true., .false.,.false.,.true., .false. /
-      data sublb  / .false.,.true., .false.,.false.,.true.  /
-      data suble  / .true., .true., .true., .false.,.false. /
-      data relmem / .true., .false.,.false.,.false.,.true.,
-     &              .false.,.true., .false.,.true., .false.,
-     &              .false.,.false.,.true., .true., .true.  /
-c
-c
-      la = subla(k)
-      lb = sublb(k)
-      le = suble(k)
-      in0 = relmem(k,ist0)
-      in1 = relmem(k,ist1)
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine altpolrsub  --  subsystem polarization state  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "altpolrsub" installs the polarizability and multipole values for
-c     the atom subsystem flagged by "subon", using full original values
-c     for active atoms and zero for inactive atoms, for the polarization
-c     dual topology subsystem energies
-c
-c
-      subroutine altpolrsub (la,lb,le)
-      use angbnd
-      use bndstr
-      use cflux
-      use chgpen
-      use dlmda
-      use mplpot
-      use mpole
-      use mutant
-      use polar
-      use potent
-      implicit none
-      integer i,j,k
-      integer ia,ib,ic
-      logical la,lb,le
-c
-c
-      call submask (la,lb,le)
-      if (use_polar) then
-         do i = 1, npole
-            k = ipole(i)
-            if (subon(k)) then
-               do j = 1, 13
-                  pole(j,k) = poleorig(j,k)
-               end do
-               if (use_chgpen) then
-                  pcore(k) = pcoreorig(k)
-                  pval(k) = pvalorig(k)
-                  pval0(k) = pval(k)
-               end if
-               polarity(k) = polarityorig(k)
-               douind(k) = douindorig(k)
-            else
-               do j = 1, 13
-                  pole(j,k) = 0.0d0
-               end do
-               if (use_chgpen) then
-                  pcore(k) = 0.0d0
-                  pval(k) = 0.0d0
-                  pval0(k) = 0.0d0
-               end if
-               polarity(k) = 0.0d0
-               douind(k) = .false.
-            end if
-            mono0(k) = pole(1,k)
-         end do
-      end if
-c
-c     set subsystem parameters for charge flux
-c
-      if (use_chgflx) then
-         do i = 1, nbond
-            ia = ibnd(1,i)
-            ib = ibnd(2,i)
-            if (subon(ia) .and. subon(ib)) then
-               bflx(i) = bflxorig(i)
-            else
-               bflx(i) = 0.0d0
-            end if
-         end do
-         do i = 1, nangle
-            ia = iang(1,i)
-            ib = iang(2,i)
-            ic = iang(3,i)
-            if (subon(ia) .and. subon(ib) .and. subon(ic)) then
-               aflx(1,i) = aflxorig(1,i)
-               aflx(2,i) = aflxorig(2,i)
-               abflx(1,i) = abflxorig(1,i)
-               abflx(2,i) = abflxorig(2,i)
-            else
-               aflx(1,i) = 0.0d0
-               aflx(2,i) = 0.0d0
-               abflx(1,i) = 0.0d0
-               abflx(2,i) = 0.0d0
-            end if
-         end do
-      end if
-c
-c     update monopoles for charge flux in the requested subsystem
-c
-      if (use_chgflx)  call alterchg
-c
-c     get global frame multipoles for the requested subsystem
-c
-      call chkpole
-      call rotpole ('MPOLE')
       return
       end

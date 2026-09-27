@@ -447,6 +447,39 @@ c
      &                     'lmdamode ost mapped use_past')
       call final
 c
+c     the first lambda derivative alone keeps polarization on one state
+c
+      call loadfix_keyadd ('water2','152_water_lmda_mp05.key',
+     &                     'LAMBDA-DERIV')
+      call assert_logical (use_dlmda,.true.,'lmdaderiv use_dlmda')
+      call assert_logical (use_d2lmda,.false.,'lmdaderiv use_d2lmda')
+      call assert_logical (use_epdt,.false.,'lmdaderiv use_epdt')
+      call assert_logical (use_past,.true.,'lmdaderiv use_past')
+      call final
+c
+c     second lambda derivatives need dual topology polarization
+c
+      call loadfix_keyadd ('water2','152_water_lmda_mp05.key',
+     &                     'LAMBDA-DERIV2')
+      call assert_logical (use_dlmda,.true.,'lmdaderiv2 use_dlmda')
+      call assert_logical (use_d2lmda,.true.,'lmdaderiv2 use_d2lmda')
+      call assert_logical (use_epdt,.true.,'lmdaderiv2 use_epdt')
+      call assert_logical (use_past,.false.,'lmdaderiv2 use_past')
+      call final
+c
+c     the staged relative legs choose the polarization path the same way
+c
+      call loadfix ('water2','203_water_rels_st_l085.key')
+      call assert_logical (use_rel,.true.,'rels deriv use_rel')
+      call assert_logical (use_epdt,.false.,'rels deriv use_epdt')
+      call assert_logical (use_past,.true.,'rels deriv use_past')
+      call final
+      call loadfix ('water2','136_water_rels_ye_l085.key')
+      call assert_logical (use_rel,.true.,'rels deriv2 use_rel')
+      call assert_logical (use_epdt,.true.,'rels deriv2 use_epdt')
+      call assert_logical (use_past,.false.,'rels deriv2 use_past')
+      call final
+c
 c     an unknown mode leaves every sampling method off
 c
       call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
@@ -636,9 +669,10 @@ c     ##############################################################
 c
 c
 c     "test_mutate_ast" runs the eighteen absolute single topology water
-c     fixtures 030-040, 182 and 187-192, each carrying the "lambda-deriv"
-c     keyword, and drives them through "test_mutate_calc" with the level
-c     4 lambda derivative checks enabled; cases 030-035 keep only the
+c     fixtures 030-040, 182 and 187-192, each carrying "lambda-deriv2"
+c     (187-192 carry "lambda-deriv", first derivatives only), and drives
+c     them through "test_mutate_calc" with the level 4 lambda derivative
+c     checks enabled; cases 030-035 keep only the
 c     multipole term at three ele-lambda values with Ewald on and off;
 c     cases 036-038 keep only the van der Waals term at three vdw-lambda
 c     values, and cases 039-040 leave the multipole and polarization
@@ -723,7 +757,7 @@ c
 c
 c     "test_mutate_adt" runs the eight absolute polarization dual
 c     topology water fixtures 047-052 and 056-057, each carrying the
-c     "lambda-deriv" keyword and the POL-DUALTOPO keyword, and drives
+c     "lambda-deriv2" keyword and the POL-DUALTOPO keyword, and drives
 c     them through "test_mutate_calc" with the level 4 lambda derivative
 c     checks enabled; cases 047-052 keep only the polarization term at
 c     three pol-lambda values, and cases 056-057 also keep the multipole
@@ -770,40 +804,19 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_mutate_rdt" runs the nine relative dual topology water
-c     fixtures 064-072, each carrying the "lambda-deriv" keyword and a
+c     "test_mutate_rdt" runs the three unstaged relative water
+c     fixtures 070-072, each carrying the "lambda-deriv2" keyword and a
 c     pair of "ligand1" and "ligand2" groups, and drives them through
 c     "test_mutate_calc" with the level 4 lambda derivative checks
-c     enabled; cases 064-069 keep only the polarization term at three
-c     pol-lambda values with Ewald on and off, and cases 070-072 keep
-c     only the van der Waals term at three vdw-lambda values; relative
-c     electrostatics with the multipole term requires the staged
-c     schedule and is covered by "test_mutate_rels"; the no-Ewald
-c     cases cannot use a pairwise neighbor list
+c     enabled; the cases keep only the van der Waals term at three
+c     vdw-lambda values; relative electrostatics and polarization
+c     require the staged schedule and are covered by "test_mutate_rels"
 c
 c
       subroutine test_mutate_rdt
       implicit none
 c
 c
-      call test_mutate_calc ('water2','064_water_rdt_ye_p10.key',
-     &   '064_water_rdt_ye_p10.txt','064_water_rdt_ye_p10',
-     &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','065_water_rdt_ne_p10.key',
-     &   '065_water_rdt_ne_p10.txt','065_water_rdt_ne_p10',
-     &   .false., .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','066_water_rdt_ye_p05.key',
-     &   '066_water_rdt_ye_p05.txt','066_water_rdt_ye_p05',
-     &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','067_water_rdt_ne_p05.key',
-     &   '067_water_rdt_ne_p05.txt','067_water_rdt_ne_p05',
-     &   .false., .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','068_water_rdt_ye_p00.key',
-     &   '068_water_rdt_ye_p00.txt','068_water_rdt_ye_p00',
-     &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','069_water_rdt_ne_p00.key',
-     &   '069_water_rdt_ne_p00.txt','069_water_rdt_ne_p00',
-     &   .false., .true.,  .false., .false., .true.)
       call test_mutate_calc ('water2','070_water_rdt_v10.key',
      &   '070_water_rdt_v10.txt','070_water_rdt_v10',
      &   .false., .false., .true.,  .true.,  .true.)
@@ -956,14 +969,14 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_exf" runs the sixteen water fixtures 102-104,
-c     111-117, 184-186 and 193-195 that apply an external electric
-c     field to a mutated system, each carrying the "lambda-deriv"
-c     keyword so the level 4 lambda derivative checks are enabled;
+c     "test_mutate_exf" runs the thirteen water fixtures 102-104,
+c     111-113, 117, 184-186 and 193-195 that apply an external electric
+c     field to a mutated system, each carrying "lambda-deriv2" (193-195
+c     carry "lambda-deriv") so the level 4 checks are enabled;
 c     cases 102-104 keep only the multipole term under single topology
-c     at ele-lambda values 1.0, 0.5 and 0.0; cases 111-116 keep only the
-c     polarization term, with 111-113 absolute and 114-116 relative
-c     dual topology at pol-lambda values 1.0, 0.5 and 0.0, since the
+c     at ele-lambda values 1.0, 0.5 and 0.0; cases 111-113 keep only the
+c     polarization term under absolute dual topology at pol-lambda
+c     values 1.0, 0.5 and 0.0, since the
 c     induced dipoles respond to the applied field through the direct
 c     field; case 117 leaves the multipole and polarization terms active
 c     together under absolute polarization dual topology with single
@@ -1002,15 +1015,6 @@ c
       call test_mutate_calc ('water2','113_water_exf_adt_p00.key',
      &   '113_water_exf_adt_p00.txt','113_water_exf_adt_p00',
      &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','114_water_exf_rdt_p10.key',
-     &   '114_water_exf_rdt_p10.txt','114_water_exf_rdt_p10',
-     &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','115_water_exf_rdt_p05.key',
-     &   '115_water_exf_rdt_p05.txt','115_water_exf_rdt_p05',
-     &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','116_water_exf_rdt_p00.key',
-     &   '116_water_exf_rdt_p00.txt','116_water_exf_rdt_p00',
-     &   .false., .true.,  .false., .true.,  .true.)
       call test_mutate_calc ('water2','117_water_exf_adt_mp05.key',
      &   '117_water_exf_adt_mp05.txt','117_water_exf_adt_mp05',
      &   .true.,  .true.,  .false., .true.,  .true.)
@@ -1046,7 +1050,7 @@ c
 c     "test_mutate_emplar" runs the six water fixtures 119-124 that
 c     keep the multipole and polarization terms active together at
 c     matched ele-lambda and pol-lambda values, each carrying the
-c     "lambda-deriv" keyword and the POL-DUALTOPO keyword, and drives
+c     "lambda-deriv2" keyword and the POL-DUALTOPO keyword, and drives
 c     them through "test_mutate_calc" with the level 4 lambda derivative
 c     checks enabled; the multipoles use single topology, and each case
 c     sits at ele-/pol-lambda values 1.0, 0.5 and 0.0 with Ewald on and
@@ -1121,15 +1125,16 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "test_mutate_rels" runs the nine water fixtures 135-141 and 168-169
-c     that drive the staged relative free energy schedule, each of them
+c     "test_mutate_rels" runs the eleven water fixtures 135-141, 168-169
+c     and 203-204 that drive the staged relative free energy schedule,
+c     each of them
 c     naming the one leg it walks, so ligand 2 is discharged on the LIG2
 c     leg, van der Waals morphs between the ligands on the VDWM leg, and
 c     ligand 1 is charged on the LIG1 leg; the cases sit one per regime,
 c     at main lambda values 1.0 and 0.0 where a leg is flat and only the
 c     coupled endpoint is built, 0.85 and 0.15 inside the two mixing
 c     legs, and 0.5 in the middle of the morph window where both ligands
-c     are decoupled and every electrostatic lambda derivative vanishes
+c     are annihilated and every electrostatic lambda derivative vanishes
 c
 c     the leg boundaries at 0.7 and 0.3 are each run twice, once from
 c     either side, since the quintic taper is flat at both ends of every
@@ -1138,9 +1143,11 @@ c     are the same state reached from the LIG2 and VDWM legs, and 137 and
 c     169 the same state reached from the VDWM and LIG1 legs, so each
 c     pair shares one set of reference values
 c
-c     all nine carry the "lambda-deriv" keyword and run the level 4
-c     lambda derivative checks, and the reference values agree with the
-c     tinker9 CUDA implementation of the same schedule
+c     the first nine carry the "lambda-deriv2" keyword, so polarization
+c     takes the dual topology path between the annihilated endpoints;
+c     203 and 204 repeat 136 and 177 with the "lambda-deriv" keyword, so
+c     polarization takes the single topology path and only the first
+c     lambda derivative is checked; all run the level 4 checks
 c
 c
       subroutine test_mutate_rels
@@ -1175,6 +1182,14 @@ c
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2','141_water_rels_ye_l000.key',
      &   '141_water_rels_ye_l000.txt','141_water_rels_ye_l000',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','203_water_rels_st_l085.key',
+     &   '203_water_rels_st_l085.txt','203_water_rels_st_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '204_water_rels_st_lig2_exp_l030.key',
+     &   '204_water_rels_st_lig2_exp_l030.txt',
+     &   '204_water_rels_st_lig2_exp_l030',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1221,7 +1236,7 @@ c
 c
 c     "test_mutate_lmdafix" runs the eight water fixtures 146-153 that
 c     drive the sublambdas from the "lambda" keyword at a fixed lambda
-c     value; no fixture carries the "lambda-deriv" keyword, so the level
+c     value; no fixture carries a lambda derivative keyword, so the level
 c     4 checks stay off and only the energy, gradient, virial and named
 c     components are verified; cases 146 and 147, 148 and 149, and 152
 c     and 153 are pairs that must agree, respectively matching the
@@ -1278,7 +1293,7 @@ c     van der Waals maps at a main lambda of 0.6, so every fixture
 c     drives one subset of the sublambdas on the identity map and holds
 c     the rest fully coupled at one; all three nonbonded terms stay
 c     active throughout, so an undriven term is present in the energy
-c     rather than switched off; cases 154-160 carry no "lambda-deriv"
+c     rather than switched off; cases 154-160 carry no "lambda-deriv2"
 c     keyword while 161-167 repeat them with it, and the two halves
 c     share their energy, gradient and virial values, which holds the
 c     plain and the lambda derivative energy routines to the same
@@ -1359,7 +1374,7 @@ c     supplies the polarization lambda derivative only through dual
 c     topology
 c
 c     a pinned sublambda is held at its own keyword value and leaves the
-c     chain rule, so every fixture names the "lambda-deriv" keyword and
+c     chain rule, so every fixture names the "lambda-deriv2" keyword and
 c     runs the level 4 checks, where the pinned terms report exact zeros
 c     and the driven ones carry the whole derivative; all three
 c     nonbonded terms stay active, so a pinned term is still present in
@@ -1415,7 +1430,7 @@ c     leg drives, since a ligand leg pins the van der Waals endpoint and
 c     the VDWM leg holds both electrostatic endpoints at the same
 c     decoupled state, leaving the other exponents with nothing to scale
 c
-c     every fixture names the "lambda-deriv" keyword and runs the level
+c     every fixture names the "lambda-deriv2" keyword and runs the level
 c     4 checks, all three nonbonded terms stay active, and all six use
 c     Ewald and support a neighbor list
 c

@@ -27,11 +27,7 @@ c
 c     choose the method to sum over polarization interactions
 c
       if (use_epdt) then
-         if (use_rel) then
-            call epolar0fr
-         else
-            call epolar0f
-         end if
+         call epolar0f
       else if (use_plmda) then
          call epolar0p
       else
@@ -2244,78 +2240,5 @@ c
 c     restore the electrostatics lambda state
 c
       call alteprst
-      return
-      end
-c     ##########################################################
-c     ##                                                      ##
-c     ##  subroutine epolar0fr  --  relative dual topo polar  ##
-c     ##                                                      ##
-c     ##########################################################
-c
-c
-c     "epolar0fr" interpolates between the two coupling states of a
-c     two-ligand relative dual topology calculation, each state a sum
-c     of parameter-zeroed subsystem energies,
-c
-c        E = weight1*E(prelst1) + (1-weight1)*E(prelst0)
-c
-c
-      subroutine epolar0fr
-      use dlmda
-      use energi
-      use mutant
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      integer k
-      real*8 ep0,ep1
-      logical la,lb,le
-      logical in0,in1
-      logical need0,need1
-c
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 dpldlmda,d2pldlmda2,need0,need1)
-c
-c     zero out the two endpoint accumulators
-c
-      ep0 = 0.0d0
-      ep1 = 0.0d0
-c
-c     build each subsystem once, add to the endpoints
-c
-      do k = 1, nrelsub
-         call relslot (k,prelst0,prelst1,la,lb,le,in0,in1)
-         in0 = in0 .and. need0
-         in1 = in1 .and. need1
-         if (.not. (in0 .or. in1))  cycle
-         call altpolrsub (la,lb,le)
-         call epolar0calc
-         if (in0) then
-            ep0 = ep0 + ep
-         end if
-         if (in1) then
-            ep1 = ep1 + ep
-         end if
-      end do
-c
-c     restore the full atom mask and the installed electrostatic state
-c
-      call submask (.true.,.true.,.true.)
-      call altemdt (elambda)
-c
-c     copy energy if only one endpoint state is computed
-c
-      if (.not. need0) then
-         ep0 = ep1
-      else if (.not. need1) then
-         ep1 = ep0
-      end if
-c
-c     interpolate between the two endpoint states
-c
-      ep = weight1*ep1 + (1.0d0-weight1)*ep0
       return
       end

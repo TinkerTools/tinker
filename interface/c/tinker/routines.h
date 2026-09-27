@@ -306,8 +306,8 @@ inline void tinker_f_gdastat(int* nstep, double* beta, double* xx, tinker_fchars
 // dlambda.f
 void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
-void emscale_(double* emsc, double* demsc);
-#define tinker_f_emscale emscale_
+void grpscale_(double* lmda, double* sc, double* dsc);
+#define tinker_f_grpscale grpscale_
 void mapsublmda_(double* lmda);
 #define tinker_f_mapsublmda mapsublmda_
 void sublmdamap_(double* lmda, char* map, int* nexp, int* invn, double* inveps, int* apmn, double* apmrho, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub, tinker_fchar_len_t map_cap);
@@ -1250,8 +1250,6 @@ void epolar0calc_();
 #define tinker_f_epolar0calc epolar0calc_
 void epolar0p_();
 #define tinker_f_epolar0p epolar0p_
-void epolar0fr_();
-#define tinker_f_epolar0fr epolar0fr_
 
 // epolar1.f
 void epolar1_();
@@ -1278,8 +1276,6 @@ void epolar1calc_();
 #define tinker_f_epolar1calc epolar1calc_
 void epolar1p_();
 #define tinker_f_epolar1p epolar1p_
-void epolar1fr_();
-#define tinker_f_epolar1fr epolar1fr_
 
 // epolar2.f
 void epolar2_(int* i);
@@ -1312,8 +1308,6 @@ void epolar3calc_();
 #define tinker_f_epolar3calc epolar3calc_
 void epolar3p_();
 #define tinker_f_epolar3p epolar3p_
-void epolar3fr_();
-#define tinker_f_epolar3fr epolar3fr_
 
 // epolar4.f
 void epolar4_();
@@ -1324,8 +1318,6 @@ void epolar4d_(double* plmda);
 #define tinker_f_epolar4d epolar4d_
 void epolar4f_();
 #define tinker_f_epolar4f epolar4f_
-void epolar4fr_();
-#define tinker_f_epolar4fr epolar4fr_
 
 // erepel.f
 void erepel_();
@@ -2270,12 +2262,6 @@ void alttors_(int* ntbnd, int* itbnd);
 #define tinker_f_alttors alttors_
 void altsolv_();
 #define tinker_f_altsolv altsolv_
-void submask_(int* la, int* lb, int* le);
-#define tinker_f_submask submask_
-void relslot_(int* k, int* ist0, int* ist1, int* la, int* lb, int* le, int* in0, int* in1);
-#define tinker_f_relslot relslot_
-void altpolrsub_(int* la, int* lb, int* le);
-#define tinker_f_altpolrsub altpolrsub_
 
 // nblist.f
 void nblist_();
