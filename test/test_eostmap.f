@@ -61,7 +61,7 @@ c
       use_elmdamap = .true.
       use_plmdamap = .true.
       use_vlmdamap = .true.
-      use_relstage = .false.
+      use_rel = .false.
       elmdamap = 'EXP'
       plmdamap = 'EXP'
       vlmdamap = 'EXP'
@@ -988,7 +988,7 @@ c
 c     drive the schedule directly; only the scalar mapping is
 c     exercised here, the endpoint mixing needs a real system
 c
-      use_relstage = .true.
+      use_rel = .true.
       elmdamap = 'QNT'
       vlmdamap = 'QNT'
       qntvlmda0 = 0.3d0
@@ -1255,7 +1255,7 @@ c
 c
 c     the ordinary maps must be untouched when staging is off
 c
-      use_relstage = .false.
+      use_rel = .false.
       relstage = 'VDWM'
       return
       end

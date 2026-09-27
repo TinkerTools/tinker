@@ -130,7 +130,6 @@ c     use_ostdyn    flag to propagate lambda particle
 c     use_pdlmda    flag that the polarization term has a lambda deriv
 c     use_plmda     flag governing rescale to a decoupled plambda
 c     use_plmdamap  flag that plambda follows the main lambda map
-c     use_relstage  flag to use staged relative free energy schedule
 c     use_ti        flag to use thermodynamic integration
 c     use_vdlmda    flag that the van der Waals term has a lambda deriv
 c     use_vlmdamap  flag that vlambda follows the main lambda map
@@ -265,7 +264,6 @@ c
       logical use_pdlmda
       logical use_plmda
       logical use_plmdamap
-      logical use_relstage
       logical use_ti
       logical use_vdlmda
       logical use_vlmdamap

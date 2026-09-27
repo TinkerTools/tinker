@@ -206,10 +206,6 @@ c
       if (lambda .lt. 0.0d0)  lambda = 0.0d0
       if (lambda .gt. 1.0d0)  lambda = 1.0d0
 c
-c     a second ligand group makes the free energy a relative one
-c
-      use_rel = (nmutb .gt. 0)
-c
 c     turn off hybrid potentials if no sites are mutated
 c
       use_mutate = .true.
@@ -263,13 +259,10 @@ c
 c
 c     report the mode chosen along each axis of the calculation
 c
-         if (use_relstage) then
+         if (use_rel) then
             write (iout,60)  relstage
    60       format (/,' Free Energy Mode',12x,'Staged Relative',
      &              /,' Staged Leg',29x,a4)
-         else if (use_rel) then
-            write (iout,70)
-   70       format (/,' Free Energy Mode',19x,'Relative')
          else
             write (iout,80)
    80       format (/,' Free Energy Mode',19x,'Absolute')
@@ -386,7 +379,6 @@ c
 c
 c     set defaults for the staged relative free energy schedule
 c
-      use_relstage = .false.
       relstage = 'VDWM'
       setpolmap = .false.
       setpolrng = .false.
@@ -566,7 +558,6 @@ c
             read (string,*,err=10)  vlmdainveps
          else if (keyword(1:10) .eq. 'REL-STAGE ') then
             use_rel = .true.
-            use_relstage = .true.
             call getword (record,legword,next)
             call upcase (legword)
             relstage = legword
@@ -626,7 +617,7 @@ c
 c
 c     a main lambda drives sublambdas that name a map
 c
-      if (use_mainlmda .and. use_relstage) then
+      if (use_mainlmda .and. use_rel) then
 c
 c     the staged relative schedule maps every sublambda itself
 c
@@ -744,7 +735,7 @@ c     a staged run drives one leg, so the leg must be named; the map it
 c     walks, the window of that map and the dual topology exponent of
 c     the term it drives are all free, as on any other relative leg
 c
-      if (use_relstage) then
+      if (use_rel) then
          if (relstage.ne.'LIG1' .and. relstage.ne.'LIG2'
      &          .and. relstage.ne.'VDWM') then
             write (iout,30)
@@ -873,13 +864,14 @@ c
 c
       subroutine setdlmdaterms
       use dlmda
+      use mutant
       implicit none
 c
 c
       use_edlmda = use_dlmda .and. use_elmdamap
       use_pdlmda = use_dlmda .and. use_plmdamap
       use_vdlmda = use_dlmda .and. use_vlmdamap
-      if (use_relstage) then
+      if (use_rel) then
          if (relstage .eq. 'VDWM') then
             use_edlmda = .false.
             use_pdlmda = .false.
@@ -1402,7 +1394,7 @@ c
 c     the staged relative schedule maps every sublambda on its own,
 c     so a sublambda set by its own keyword would be overwritten
 c
-      if (use_relstage .and.
+      if (use_rel .and.
      &    (setelambda .or. setplambda .or. setvlambda)) then
          write (iout,60)
    60    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
@@ -1441,10 +1433,20 @@ c
 c
 c     the staged relative schedule morphs one ligand into another
 c
-      if (use_relstage .and. nmutb.eq.0) then
+      if (use_rel .and. nmutb.eq.0) then
          write (iout,100)
   100    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
      &              ' ligand group; add the LIGAND2 keyword')
+         call fatal
+      end if
+c
+c     a second ligand group makes the free energy a relative one,
+c     which is only computed by the staged relative schedule
+c
+      if (nmutb.gt.0 .and. .not.use_rel) then
+         write (iout,105)
+  105    format (/,' MUTATE_CHECK  --  Relative Free Energy Requires',
+     &              ' the Staged Schedule; add the REL-STAGE Keyword')
          call fatal
       end if
 c
@@ -1459,16 +1461,14 @@ c
          call fatal
       end if
 c
-c     relative electrostatics and polarization charge one ligand at
-c     a time against an annihilated partner, which needs the staged
-c     relative schedule
+c     partial charge and bond dipole electrostatics have no relative
+c     free energy treatment
 c
-      if (use_rel .and. (use_mpole .or. use_polar)
-     &       .and. .not.use_relstage) then
+      if (use_rel .and. (use_charge .or. use_dipole)) then
          write (iout,111)
-  111    format (/,' MUTATE_CHECK  --  Relative Electrostatics and',
-     &              ' Polarization Require the Staged Schedule; add',
-     &              ' the REL-STAGE Keyword')
+  111    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
+     &              ' Available for Partial Charge or Bond Dipole',
+     &              ' Electrostatics')
          call fatal
       end if
 c

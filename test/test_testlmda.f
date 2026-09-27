@@ -33,9 +33,9 @@ c
       call test_testlmda_case ('10_water_ast_vcorr_l05','1e-4')
       call test_testlmda_case ('11_water_ast_vcorr_annih_l05','1e-4')
       call test_testlmda_case ('12_water_ast_vcorr_l06exp','1e-4')
-      call test_testlmda_case ('13_water_rdt_vcorr_l05','1e-4')
-      call test_testlmda_case ('14_water_rdt_vcorr_annih_l05','1e-4')
-      call test_testlmda_case ('16_water_rdt_lights_l05','1e-4')
+      call test_testlmda_case ('14_water_rels_vdwm_vcorr_annih_l05',
+     &                         '1e-4')
+      call test_testlmda_case ('16_water_rels_vdwm_lights_l05','1e-4')
       call test_testlmda_case ('17_water_rels_vdwm_vcorr_l050','1e-5')
       call test_testlmda_case ('18_water_rels_lig1_l085','1e-4')
       call test_testlmda_case ('19_water_rels_lig2_l015','1e-4')

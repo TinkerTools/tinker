@@ -17,11 +17,12 @@
 
  Number of FEP Hybrid Atoms               12
  van der Waals Lambda Value            0.500
- Electrostatics Lambda Value           1.000
- Polarization Lambda Value             1.000
+ Electrostatics Lambda Value           0.000
+ Polarization Lambda Value             0.000
  Torsion Angle Lambda Value            1.000
 
- Free Energy Mode                   Relative
+ Free Energy Mode            Staged Relative
+ Staged Leg                             VDWM
  Sampling Mode                  Fixed Lambda
  Polarization Topology                Single
  Main Lambda Value                     0.500

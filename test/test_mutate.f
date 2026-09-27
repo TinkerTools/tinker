@@ -27,7 +27,6 @@ c
       call test_mutate_mp
       call test_mutate_ast
       call test_mutate_adt
-      call test_mutate_rdt
       call test_mutate_qnt
       call test_mutate_exp
       call test_mutate_inv
@@ -35,7 +34,6 @@ c
       call test_mutate_emplar
       call test_mutate_qntrng
       call test_mutate_rels
-      call test_mutate_vcorr
       call test_mutate_lmdafix
       call test_mutate_lmdadrv
       call test_mutate_lmdapin
@@ -797,39 +795,6 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine test_mutate_rdt  --  rel dual topo lambda  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "test_mutate_rdt" runs the three unstaged relative water
-c     fixtures 070-072, each carrying the "lambda-deriv2" keyword and a
-c     pair of "ligand1" and "ligand2" groups, and drives them through
-c     "test_mutate_calc" with the level 4 lambda derivative checks
-c     enabled; the cases keep only the van der Waals term at three
-c     vdw-lambda values; relative electrostatics and polarization
-c     require the staged schedule and are covered by "test_mutate_rels"
-c
-c
-      subroutine test_mutate_rdt
-      implicit none
-c
-c
-      call test_mutate_calc ('water2','070_water_rdt_v10.key',
-     &   '070_water_rdt_v10.txt','070_water_rdt_v10',
-     &   .false., .false., .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','071_water_rdt_v05.key',
-     &   '071_water_rdt_v05.txt','071_water_rdt_v05',
-     &   .false., .false., .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','072_water_rdt_v00.key',
-     &   '072_water_rdt_v00.txt','072_water_rdt_v00',
-     &   .false., .false., .true.,  .true.,  .true.)
-      return
-      end
-c
-c
 c     ##########################################################
 c     ##                                                      ##
 c     ##  subroutine test_mutate_qnt  --  quintic lambda map  ##
@@ -1191,38 +1156,6 @@ c
      &   '204_water_rels_st_lig2_exp_l030.txt',
      &   '204_water_rels_st_lig2_exp_l030',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine test_mutate_vcorr  --  VDW correction tests  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "test_mutate_vcorr" runs the two VDW-only water fixtures
-c     144-145 with the long-range VDW correction enabled, using
-c     relative dual topology at the coupled and decoupled quintic
-c     endpoints; both support a pairwise neighbor list and exercise
-c     the level 4 lambda derivative checks
-c
-c
-      subroutine test_mutate_vcorr
-      implicit none
-c
-c
-      call test_mutate_calc ('water2',
-     &   '144_water_qnt_vcorr_rdt_l10.key',
-     &   '144_water_qnt_vcorr_rdt_l10.txt',
-     &   '144_water_qnt_vcorr_rdt_l10',
-     &   .false., .false., .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2',
-     &   '145_water_qnt_vcorr_rdt_l00.key',
-     &   '145_water_qnt_vcorr_rdt_l00.txt',
-     &   '145_water_qnt_vcorr_rdt_l00',
-     &   .false., .false., .true.,  .true.,  .true.)
       return
       end
 c

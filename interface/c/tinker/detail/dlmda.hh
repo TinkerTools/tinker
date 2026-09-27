@@ -121,7 +121,6 @@ extern int TINKER_MOD(dlmda, use_ostdyn);
 extern int TINKER_MOD(dlmda, use_pdlmda);
 extern int TINKER_MOD(dlmda, use_plmda);
 extern int TINKER_MOD(dlmda, use_plmdamap);
-extern int TINKER_MOD(dlmda, use_relstage);
 extern int TINKER_MOD(dlmda, use_ti);
 extern int TINKER_MOD(dlmda, use_vdlmda);
 extern int TINKER_MOD(dlmda, use_vlmdamap);

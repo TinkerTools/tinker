@@ -1257,6 +1257,7 @@ c
 c
       subroutine resettisteps (nbin,nstepavg,steps,nequil)
       use dlmda
+      use mutant
       use thrmint
       implicit none
       integer nbin,nstepavg,nequil
@@ -1267,7 +1268,7 @@ c
 c     put the sublambda maps on the power law branch, which is
 c     plain arithmetic and needs no molecular system
 c
-      use_relstage = .false.
+      use_rel = .false.
       elmdamap = 'EXP'
       plmdamap = 'EXP'
       vlmdamap = 'EXP'

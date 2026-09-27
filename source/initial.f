@@ -213,7 +213,7 @@ c
       use_past = .false.
       use_plmda = .false.
       use_plmdamap = .false.
-      use_relstage = .false.
+      use_rel = .false.
       use_ti = .false.
       use_vdlmda = .false.
       use_vlmdamap = .false.

@@ -55,6 +55,7 @@ c
 c
       subroutine grpscale (lmda,sc,dsc)
       use dlmda
+      use mutant
       implicit none
       real*8 lmda
       real*8 sc(0:2)
@@ -69,7 +70,7 @@ c
       dsc(1) = 1.0d0
       sc(2) = 0.0d0
       dsc(2) = 0.0d0
-      if (use_relstage .and. relstage.eq.'LIG2') then
+      if (use_rel .and. relstage.eq.'LIG2') then
          sc(1) = 0.0d0
          dsc(1) = 0.0d0
          sc(2) = lmda
@@ -98,7 +99,7 @@ c
 c
 c     the staged relative schedule maps the sublambdas its own way
 c
-      if (use_relstage) then
+      if (use_rel) then
          call maprelstage (lmda)
          return
       end if
