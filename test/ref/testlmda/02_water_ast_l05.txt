@@ -25,7 +25,6 @@
  Sampling Mode                           OST
  Electrostatics Topology              Single
  Polarization Topology                  Dual
- van der Waals Topology               Single
  Main Lambda Value                     0.500
 
  Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL

@@ -19,7 +19,6 @@ c
 c
       subroutine ehal4
       use dlmda
-      use mutant
       use energi
       use limits
       use vdwpot
@@ -33,30 +32,26 @@ c
 c
 c     choose the method for summing over pairwise interactions
 c
-      if (use_rel) then
-         call ehal4dr
+      if (use_lights) then
+         call ehal4b
+      else if (use_vlist) then
+         call ehal4c
       else
-         if (use_lights) then
-            call ehal4b
-         else if (use_vlist) then
-            call ehal4c
-         else
-            call ehal4a
-         end if
+         call ehal4a
+      end if
 c
 c     apply the long range van der Waals correction if used,
 c     along with its lambda derivative
 c
-         if (use_vcorr) then
-            mode = 'VDW'
-            call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
-            ev = ev + elrc
-            devdl = devdl + delrc
-            do i = 1, 3
-               evvir(i,i) = evvir(i,i) + vlrc
-               devvirdl(i,i) = devvirdl(i,i) + dvlrc
-            end do
-         end if
+      if (use_vcorr) then
+         mode = 'VDW'
+         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
+         ev = ev + elrc
+         devdl = devdl + delrc
+         do i = 1, 3
+            evvir(i,i) = evvir(i,i) + vlrc
+            devvirdl(i,i) = devvirdl(i,i) + dvlrc
+         end do
       end if
 c
 c     add the van der Waals virial to main virial
@@ -102,8 +97,12 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
+      integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,eps0,rdn
+      real*8 vlmd,vsgn(2)
+      real*8 vlsc(2),vlsc1(2),vlsc2(2)
+      real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -175,6 +174,23 @@ c
       mode = 'VDW'
       call switch (mode)
 c
+c     set the soft core lambda terms for each ligand group, where
+c     a second ligand group couples as the complement of vlambda
+c
+      do ig = 1, 2
+         vlmd = vlambda
+         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
+         vlsc(ig) = vlmd**scexp
+         vscal(ig) = scalphav * (1.0d0-vlmd)**2
+         vlsc1(ig) = vlmd**(scexp-1)
+         vlsc2(ig) = vlmd**(scexp-2)
+         dvscal(ig) = 2.0d0 * scalphav * (1.0d0-vlmd)
+      end do
+      vsgn(1) = 1.0d0
+      vsgn(2) = -1.0d0
+      dhal17 = (1.0d0+dhal)**7
+      ghal1 = 1.0d0 + ghal
+c
 c     apply any reduction factor to the atomic coordinates
 c
       do k = 1, nvdw
@@ -198,7 +214,8 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
+         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -222,9 +239,14 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            mutgk = mutg(k)
+            mutk = (mutgk .ne. 0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (mutgi*mutgk .ne. 2)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
 c
 c     compute the energy contribution for this interaction
@@ -262,6 +284,10 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
+c
+c     take the soft core terms of the ligand group in this pair
+c
+                     ig = max(mutgi,mutgk)
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho
@@ -269,12 +295,10 @@ c
                      rhopdhal6 = rhopdhal**6
                      rhopdhal7 = rhopdhal6 * rhopdhal
                      eps0 = eps
-                     eps = eps * vlambda**scexp
-                     scal = scalphav * (1.0d0-vlambda)**2
+                     eps = eps * vlsc(ig)
+                     scal = vscal(ig)
                      s1 = 1.0d0 / (scal+rhopdhal7)
                      s2 = 1.0d0 / (scal+rho7+ghal)
-                     dhal17 = (1.0d0+dhal)**7
-                     ghal1 = 1.0d0 + ghal
                      t1 = dhal17 * s1
                      t2 = ghal1 * s2
                      t2m2 = t2 - 2.0d0
@@ -283,8 +307,8 @@ c
                      e = eps * t1 * t2m2
                      de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
                      t0 = eps
-                     dt0dl = eps0 * scexp * vlambda**(scexp-1)
-                     dscaldl = 2.0d0 * scalphav * (1.0d0-vlambda)
+                     dt0dl = eps0 * scexp * vlsc1(ig)
+                     dscaldl = dvscal(ig)
                      ds1dl = dscaldl * s1 * s1
                      ds2dl = dscaldl * s2 * s2
                      dt1dl = dhal17 * ds1dl
@@ -292,7 +316,7 @@ c
                      dlambda = dt0dl * t1 * t2m2
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
-                     d2t0dl2 = eps0*scexp*(scexp-1) * vlambda**(scexp-2)
+                     d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
                      d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
      &                         + 2.0d0*dscaldl*s1*ds1dl)
                      d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
@@ -305,12 +329,14 @@ c
      &                          + 2.0d0*t0*dt1dl*dt2dl
                      d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6 
                      d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                     dlde = scexp*vlambda**(scexp-1)
+                     dlde = scexp*vlsc1(ig)
      &                      * (dt1drho*t2m2 + t1*dt2drho)
-     &                      + vlambda**scexp
+     &                      + vlsc(ig)
      &                      * (d2t1dldrho*t2m2 + t1*d2t2dldrho
      &                      + dt1dl*dt2drho + dt1drho*dt2dl)
                      dlde = eps0 / rv * dlde
+                     dlambda = vsgn(ig) * dlambda
+                     dlde = vsgn(ig) * dlde
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -499,7 +525,8 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
+         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -523,9 +550,14 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            mutgk = mutg(k)
+            mutk = (mutgk .ne. 0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (mutgi*mutgk .ne. 2)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
 c
 c     compute the energy contribution for this interaction
@@ -568,6 +600,10 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                      if (mutik) then
+c
+c     take the soft core terms of the ligand group in this pair
+c
+                        ig = max(mutgi,mutgk)
                         rho = rik / rv
                         rho6 = rho**6
                         rho7 = rho6 * rho
@@ -575,12 +611,10 @@ c
                         rhopdhal6 = rhopdhal**6
                         rhopdhal7 = rhopdhal6 * rhopdhal
                         eps0 = eps
-                        eps = eps * vlambda**scexp
-                        scal = scalphav * (1.0d0-vlambda)**2
+                        eps = eps * vlsc(ig)
+                        scal = vscal(ig)
                         s1 = 1.0d0 / (scal+rhopdhal7)
                         s2 = 1.0d0 / (scal+rho7+ghal)
-                        dhal17 = (1.0d0+dhal)**7
-                        ghal1 = 1.0d0 + ghal
                         t1 = dhal17 * s1
                         t2 = ghal1 * s2
                         t2m2 = t2 - 2.0d0
@@ -589,8 +623,8 @@ c
                         e = eps * t1 * t2m2
                         de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
                         t0 = eps
-                        dt0dl = eps0 * scexp * vlambda**(scexp-1)
-                        dscaldl = 2.0d0 * scalphav * (1.0d0-vlambda)
+                        dt0dl = eps0 * scexp * vlsc1(ig)
+                        dscaldl = dvscal(ig)
                         ds1dl = dscaldl * s1 * s1
                         ds2dl = dscaldl * s2 * s2
                         dt1dl = dhal17 * ds1dl
@@ -599,7 +633,7 @@ c
      &                            + t0 * dt1dl * t2m2
      &                            + t0 * t1 * dt2dl
                         d2t0dl2 = eps0*scexp*(scexp-1)
-     &                            * vlambda**(scexp-2)
+     &                            * vlsc2(ig)
                         d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
      &                            + 2.0d0*dscaldl*s1*ds1dl)
                         d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
@@ -612,12 +646,14 @@ c
      &                             + 2.0d0*t0*dt1dl*dt2dl
                         d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6 
                         d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                        dlde = scexp*vlambda**(scexp-1)
+                        dlde = scexp*vlsc1(ig)
      &                         * (dt1drho*t2m2 + t1*dt2drho)
-     &                         + vlambda**scexp
+     &                         + vlsc(ig)
      &                         * (d2t1dldrho*t2m2 + t1*d2t2dldrho
      &                         + dt1dl*dt2drho + dt1drho*dt2dl)
                         dlde = eps0 / rv * dlde
+                        dlambda = vsgn(ig) * dlambda
+                        dlde = vsgn(ig) * dlde
                      else
                         rv7 = rv**7
                         rik6 = rik2**3
@@ -839,10 +875,14 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
+      integer mutgi,mutgk,ig
       integer kgy,kgz
       integer start,stop
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,eps0,rdn
+      real*8 vlmd,vsgn(2)
+      real*8 vlsc(2),vlsc1(2),vlsc2(2)
+      real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -921,6 +961,23 @@ c
       mode = 'VDW'
       call switch (mode)
 c
+c     set the soft core lambda terms for each ligand group, where
+c     a second ligand group couples as the complement of vlambda
+c
+      do ig = 1, 2
+         vlmd = vlambda
+         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
+         vlsc(ig) = vlmd**scexp
+         vscal(ig) = scalphav * (1.0d0-vlmd)**2
+         vlsc1(ig) = vlmd**(scexp-1)
+         vlsc2(ig) = vlmd**(scexp-2)
+         dvscal(ig) = 2.0d0 * scalphav * (1.0d0-vlmd)
+      end do
+      vsgn(1) = 1.0d0
+      vsgn(2) = -1.0d0
+      dhal17 = (1.0d0+dhal)**7
+      ghal1 = 1.0d0 + ghal
+c
 c     apply any reduction factor to the atomic coordinates
 c
       do j = 1, nvdw
@@ -957,7 +1014,8 @@ c
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
+         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1004,13 +1062,18 @@ c
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
+            mutgk = mutg(k)
+            mutk = (mutgk .ne. 0)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
 c
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (mutgi*mutgk .ne. 2)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
 c
 c     compute the energy contribution for this interaction
@@ -1062,6 +1125,10 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
+c
+c     take the soft core terms of the ligand group in this pair
+c
+                     ig = max(mutgi,mutgk)
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho
@@ -1069,12 +1136,10 @@ c
                      rhopdhal6 = rhopdhal**6
                      rhopdhal7 = rhopdhal6 * rhopdhal
                      eps0 = eps
-                     eps = eps * vlambda**scexp
-                     scal = scalphav * (1.0d0-vlambda)**2
+                     eps = eps * vlsc(ig)
+                     scal = vscal(ig)
                      s1 = 1.0d0 / (scal+rhopdhal7)
                      s2 = 1.0d0 / (scal+rho7+ghal)
-                     dhal17 = (1.0d0+dhal)**7
-                     ghal1 = 1.0d0 + ghal
                      t1 = dhal17 * s1
                      t2 = ghal1 * s2
                      t2m2 = t2 - 2.0d0
@@ -1083,8 +1148,8 @@ c
                      e = eps * t1 * t2m2
                      de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
                      t0 = eps
-                     dt0dl = eps0 * scexp * vlambda**(scexp-1)
-                     dscaldl = 2.0d0 * scalphav * (1.0d0-vlambda)
+                     dt0dl = eps0 * scexp * vlsc1(ig)
+                     dscaldl = dvscal(ig)
                      ds1dl = dscaldl * s1 * s1
                      ds2dl = dscaldl * s2 * s2
                      dt1dl = dhal17 * ds1dl
@@ -1092,7 +1157,7 @@ c
                      dlambda = dt0dl * t1 * t2m2
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
-                     d2t0dl2 = eps0*scexp*(scexp-1) * vlambda**(scexp-2)
+                     d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
                      d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
      &                         + 2.0d0*dscaldl*s1*ds1dl)
                      d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
@@ -1105,12 +1170,14 @@ c
      &                          + 2.0d0*t0*dt1dl*dt2dl
                      d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6 
                      d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                     dlde = scexp*vlambda**(scexp-1)
+                     dlde = scexp*vlsc1(ig)
      &                      * (dt1drho*t2m2 + t1*dt2drho)
-     &                      + vlambda**scexp
+     &                      + vlsc(ig)
      &                      * (d2t1dldrho*t2m2 + t1*d2t2dldrho
      &                      + dt1dl*dt2drho + dt1drho*dt2dl)
                      dlde = eps0 / rv * dlde
+                     dlambda = vsgn(ig) * dlambda
+                     dlde = vsgn(ig) * dlde
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -1332,8 +1399,12 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
+      integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,eps0,rdn
+      real*8 vlmd,vsgn(2)
+      real*8 vlsc(2),vlsc1(2),vlsc2(2)
+      real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -1405,6 +1476,23 @@ c
       mode = 'VDW'
       call switch (mode)
 c
+c     set the soft core lambda terms for each ligand group, where
+c     a second ligand group couples as the complement of vlambda
+c
+      do ig = 1, 2
+         vlmd = vlambda
+         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
+         vlsc(ig) = vlmd**scexp
+         vscal(ig) = scalphav * (1.0d0-vlmd)**2
+         vlsc1(ig) = vlmd**(scexp-1)
+         vlsc2(ig) = vlmd**(scexp-2)
+         dvscal(ig) = 2.0d0 * scalphav * (1.0d0-vlmd)
+      end do
+      vsgn(1) = 1.0d0
+      vsgn(2) = -1.0d0
+      dhal17 = (1.0d0+dhal)**7
+      ghal1 = 1.0d0 + ghal
+c
 c     apply any reduction factor to the atomic coordinates
 c
       do k = 1, nvdw
@@ -1422,8 +1510,8 @@ c
 !$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
-!$OMP& dhal,cut2,vcouple,vlambda,mutg,scexp,scalphav,
-!$OMP& c0,c1,c2,c3,c4,c5)
+!$OMP& dhal,cut2,vcouple,mutg,scexp,scalphav,vlsc,vlsc1,
+!$OMP& vlsc2,vscal,dvscal,vsgn,dhal17,ghal1,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfvdl,devdl,d2evdl2,
 !$OMP& evvir,devvirdl)
 !$OMP DO reduction(+:ev,dev,dfvdl,devdl,d2evdl2,evvir,devvirdl)
@@ -1440,7 +1528,8 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
+         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1464,9 +1553,14 @@ c
             k = vlst(kk,i)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            mutgk = mutg(k)
+            mutk = (mutgk .ne. 0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (mutgi*mutgk .ne. 2)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
 c
 c     compute the energy contribution for this interaction
@@ -1504,6 +1598,10 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
+c
+c     take the soft core terms of the ligand group in this pair
+c
+                     ig = max(mutgi,mutgk)
                      rho = rik / rv
                      rho6 = rho**6
                      rho7 = rho6 * rho
@@ -1511,12 +1609,10 @@ c
                      rhopdhal6 = rhopdhal**6
                      rhopdhal7 = rhopdhal6 * rhopdhal
                      eps0 = eps
-                     eps = eps * vlambda**scexp
-                     scal = scalphav * (1.0d0-vlambda)**2
+                     eps = eps * vlsc(ig)
+                     scal = vscal(ig)
                      s1 = 1.0d0 / (scal+rhopdhal7)
                      s2 = 1.0d0 / (scal+rho7+ghal)
-                     dhal17 = (1.0d0+dhal)**7
-                     ghal1 = 1.0d0 + ghal
                      t1 = dhal17 * s1
                      t2 = ghal1 * s2
                      t2m2 = t2 - 2.0d0
@@ -1525,8 +1621,8 @@ c
                      e = eps * t1 * t2m2
                      de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
                      t0 = eps
-                     dt0dl = eps0 * scexp * vlambda**(scexp-1)
-                     dscaldl = 2.0d0 * scalphav * (1.0d0-vlambda)
+                     dt0dl = eps0 * scexp * vlsc1(ig)
+                     dscaldl = dvscal(ig)
                      ds1dl = dscaldl * s1 * s1
                      ds2dl = dscaldl * s2 * s2
                      dt1dl = dhal17 * ds1dl
@@ -1534,7 +1630,7 @@ c
                      dlambda = dt0dl * t1 * t2m2
      &                         + t0 * dt1dl * t2m2
      &                         + t0 * t1 * dt2dl
-                     d2t0dl2 = eps0*scexp*(scexp-1) * vlambda**(scexp-2)
+                     d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
                      d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
      &                         + 2.0d0*dscaldl*s1*ds1dl)
                      d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
@@ -1547,12 +1643,14 @@ c
      &                          + 2.0d0*t0*dt1dl*dt2dl
                      d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6 
                      d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                     dlde = scexp*vlambda**(scexp-1)
+                     dlde = scexp*vlsc1(ig)
      &                      * (dt1drho*t2m2 + t1*dt2drho)
-     &                      + vlambda**scexp
+     &                      + vlsc(ig)
      &                      * (d2t1dldrho*t2m2 + t1*d2t2dldrho
      &                      + dt1dl*dt2drho + dt1drho*dt2dl)
                      dlde = eps0 / rv * dlde
+                     dlambda = vsgn(ig) * dlambda
+                     dlde = vsgn(ig) * dlde
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -1733,171 +1831,5 @@ c     perform deallocation of some local arrays
 c
       deallocate (iv14)
       deallocate (vscale)
-      return
-      end
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine ehal4dr  --  relative dual topo 14-7 dlmda  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "ehal4dr" interpolates between the two coupling states of a
-c     two-ligand relative dual topology calculation, each state a sum
-c     of parameter-zeroed subsystem energies,
-c
-c        E = weight1*E(vrelst1) + (1-weight1)*E(vrelst0)
-c
-c
-      subroutine ehal4dr
-      use atoms
-      use deriv
-      use dlmda
-      use energi
-      use mutant
-      use virial
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      integer i,j,k
-      real*8 ev0,ev1
-      real*8 evvir0(3,3),evvir1(3,3)
-      logical la,lb,le
-      logical in0,in1
-      logical need0,need1
-      real*8, allocatable :: dev0(:,:)
-      real*8, allocatable :: dev1(:,:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (dev0(3,n))
-      allocate (dev1(3,n))
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 dvldlmda,d2vldlmda2,need0,need1)
-c
-c     zero out the two endpoint accumulators
-c
-      ev0 = 0.0d0
-      ev1 = 0.0d0
-      do i = 1, n
-         do j = 1, 3
-            dev0(j,i) = 0.0d0
-            dev1(j,i) = 0.0d0
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvir0(j,i) = 0.0d0
-            evvir1(j,i) = 0.0d0
-         end do
-      end do
-c
-c     build each subsystem once, add to the endpoints
-c
-      do k = 1, nrelsub
-         call relslot (k,vrelst0,vrelst1,la,lb,le,in0,in1)
-         in0 = in0 .and. need0
-         in1 = in1 .and. need1
-         if (.not. (in0 .or. in1))  cycle
-         call submask (la,lb,le)
-         call ehal1calc
-         if (in0) then
-            ev0 = ev0 + ev
-            do i = 1, n
-               do j = 1, 3
-                  dev0(j,i) = dev0(j,i) + dev(j,i)
-               end do
-            end do
-            do i = 1, 3
-               do j = 1, 3
-                  evvir0(j,i) = evvir0(j,i) + evvir(j,i)
-               end do
-            end do
-         end if
-         if (in1) then
-            ev1 = ev1 + ev
-            do i = 1, n
-               do j = 1, 3
-                  dev1(j,i) = dev1(j,i) + dev(j,i)
-               end do
-            end do
-            do i = 1, 3
-               do j = 1, 3
-                  evvir1(j,i) = evvir1(j,i) + evvir(j,i)
-               end do
-            end do
-         end if
-      end do
-c
-c     restore the original full system parameters
-c
-      call submask (.true.,.true.,.true.)
-c
-c     copy energy if only one endpoint state is computed
-c
-      if (.not. need0) then
-         ev0 = ev1
-         do i = 1, n
-            do j = 1, 3
-               dev0(j,i) = dev1(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               evvir0(j,i) = evvir1(j,i)
-            end do
-         end do
-      else if (.not. need1) then
-         ev1 = ev0
-         do i = 1, n
-            do j = 1, 3
-               dev1(j,i) = dev0(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               evvir1(j,i) = evvir0(j,i)
-            end do
-         end do
-      end if
-c
-c     interpolate between the two endpoint states
-c
-      ev = weight1*ev1 + (1.0d0-weight1)*ev0
-      do i = 1, n
-         do j = 1, 3
-            dev(j,i) = weight1*dev1(j,i) + (1.0d0-weight1)*dev0(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvir(j,i) = weight1*evvir1(j,i)
-     &                + (1.0d0-weight1)*evvir0(j,i)
-         end do
-      end do
-c
-c     interpolate the lambda derivative
-c
-      devdl = dweight1 * (ev1-ev0)
-      d2evdl2 = d2weight1 * (ev1-ev0)
-      do i = 1, 3
-         do j = 1, 3
-            devvirdl(j,i) = dweight1 * (evvir1(j,i)-evvir0(j,i))
-         end do
-      end do
-      do i = 1, n
-         do j = 1, 3
-            dfvdl(j,i) = dweight1 * (dev1(j,i)-dev0(j,i))
-         end do
-      end do
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (dev0)
-      deallocate (dev1)
       return
       end

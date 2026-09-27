@@ -35,7 +35,6 @@ c     setplambda  flag that plambda was set by its own keyword
 c     setvlambda  flag that vlambda was set by its own keyword
 c     use_past    flag for absolute single topology polarization
 c     use_rel     flag to use two-ligand relative dual topology
-c     use_subsys  flag that a parameter-zeroed subsystem is active
 c     subon       true if an atom is active in the subsystem currently
 c                   being built for a relative dual topo energy
 c
@@ -64,7 +63,6 @@ c
       logical setvlambda
       logical use_past
       logical use_rel
-      logical use_subsys
       logical, allocatable :: subon(:)
       save
       end

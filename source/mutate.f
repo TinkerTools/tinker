@@ -104,7 +104,6 @@ c
       nmutb = 0
       use_rel = .false.
       use_past = .false.
-      use_subsys = .false.
       do i = 1, n
          mutg(i) = 0
          subon(i) = .true.
@@ -308,13 +307,6 @@ c
             write (iout,160)
   160       format (' Polarization Topology',16x,'Single')
          end if
-         if (use_rel) then
-            write (iout,170)
-  170       format (' van der Waals Topology',17x,'Dual')
-         else
-            write (iout,180)
-  180       format (' van der Waals Topology',15x,'Single')
-         end if
          if (use_mainlmda) then
             write (iout,190)  lambda
   190       format (' Main Lambda Value',18x,f8.3)
@@ -402,7 +394,6 @@ c     set defaults for dual topology
 c
       emdtexp = 1
       epdtexp = 1
-      evdtexp = 1
 c
 c     interpolate between the two coupled states unless a staged
 c     leg says otherwise
@@ -411,8 +402,6 @@ c
       erelst1 = rellig1
       prelst0 = rellig2
       prelst1 = rellig1
-      vrelst0 = rellig2
-      vrelst1 = rellig1
 c
 c     set defaults for the staged relative free energy schedule
 c
@@ -546,9 +535,6 @@ c
          else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=10)  epdtexp
-         else if (keyword(1:17) .eq. 'VDW-DUALTOPO-EXP ') then
-            string = record(next:240)
-            read (string,*,err=10)  evdtexp
          else if (keyword(1:15) .eq. 'ELE-LMDA-RANGE ') then
             string = record(next:240)
             read (string,*,err=10)  qntelmda0, qntelmda1
@@ -725,7 +711,6 @@ c
       end if
       if (emdtexp .lt. 1)  emdtexp = 1
       if (epdtexp .lt. 1)  epdtexp = 1
-      if (evdtexp .lt. 1)  evdtexp = 1
       if (elmdaexp .lt. 1)  elmdaexp = 1
       if (plmdaexp .lt. 1)  plmdaexp = 1
       if (vlmdaexp .lt. 1)  vlmdaexp = 1
@@ -1387,6 +1372,7 @@ c
       use mutant
       use polpot
       use potent
+      use vdwpot
       implicit none
 c
 c
@@ -1491,16 +1477,14 @@ c
          call fatal
       end if
 c
-c     relative free energy requires the isolated ligand van der Waals
-c     terms that annihilation would remove from the thermodynamic cycle
+c     relative free energy handles only the buffered 14-7 form of
+c     the van der Waals potential
 c
-      if (use_rel .and. vcouple.eq.1) then
+      if (use_rel .and. use_vdw .and. vdwtyp.ne.'BUFFERED-14-7') then
          write (iout,110)
-  110    format (/,' MUTATE_CHECK  --  VDW-ANNIHILATE is not',
-     &              ' compatible with relative free energy; the',
-     &              ' isolated-ligand van der Waals terms are needed',
-     &              ' to preserve the relative thermodynamic cycle;',
-     &              ' remove the VDW-ANNIHILATE keyword')
+  110    format (/,' MUTATE_CHECK  --  Relative Free Energy is only',
+     &              ' Available for the Buffered 14-7 van der Waals',
+     &              ' Potential')
          call fatal
       end if
 c
@@ -2083,7 +2067,6 @@ c
             subon(i) = le
          end if
       end do
-      use_subsys = .not. (la .and. lb .and. le)
       return
       end
 c
@@ -2097,7 +2080,9 @@ c
 c
 c     "relslot" returns the group mask of the subsystem in slot "k"
 c     along with whether that subsystem belongs to the coupling states
-c     "ist0" and "ist1" holding the two interpolation endpoints
+c     "ist0" and "ist1" holding the two interpolation endpoints; only
+c     the multipole and polarization terms use these subsystems, since
+c     the relative van der Waals term is evaluated in a single pass
 c
 c     only five subsystems are reachable through "submask", and the
 c     three coupling states of a relative dual topology are sums of

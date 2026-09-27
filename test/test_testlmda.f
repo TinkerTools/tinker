@@ -21,18 +21,23 @@ c
       implicit none
 c
 c
-      call test_testlmda_case ('01_water_adt_l05')
-      call test_testlmda_case ('02_water_ast_l05')
-      call test_testlmda_case ('03_water_adt_l06exp')
-      call test_testlmda_case ('04_water_ast_l06exp')
-      call test_testlmda_case ('05_water_ast_nodl_l05')
-      call test_testlmda_case ('06_water_ast_vonly_l05')
-      call test_testlmda_case ('07_water_ast_ye_l10')
-      call test_testlmda_case ('08_water_ast_ye_l05')
-      call test_testlmda_case ('09_water_ast_ye_l00')
-      call test_testlmda_case ('10_water_ast_vcorr_l05')
-      call test_testlmda_case ('11_water_ast_vcorr_annih_l05')
-      call test_testlmda_case ('12_water_ast_vcorr_l06exp')
+      call test_testlmda_case ('01_water_adt_l05','1e-4')
+      call test_testlmda_case ('02_water_ast_l05','1e-4')
+      call test_testlmda_case ('03_water_adt_l06exp','1e-4')
+      call test_testlmda_case ('04_water_ast_l06exp','1e-4')
+      call test_testlmda_case ('05_water_ast_nodl_l05','1e-4')
+      call test_testlmda_case ('06_water_ast_vonly_l05','1e-4')
+      call test_testlmda_case ('07_water_ast_ye_l10','1e-4')
+      call test_testlmda_case ('08_water_ast_ye_l05','1e-4')
+      call test_testlmda_case ('09_water_ast_ye_l00','1e-4')
+      call test_testlmda_case ('10_water_ast_vcorr_l05','1e-4')
+      call test_testlmda_case ('11_water_ast_vcorr_annih_l05','1e-4')
+      call test_testlmda_case ('12_water_ast_vcorr_l06exp','1e-4')
+      call test_testlmda_case ('13_water_rdt_vcorr_l05','1e-4')
+      call test_testlmda_case ('14_water_rdt_vcorr_annih_l05','1e-4')
+      call test_testlmda_case ('15_water_rdt_l06exp_nlist','1e-4')
+      call test_testlmda_case ('16_water_rdt_lights_l05','1e-4')
+      call test_testlmda_case ('17_water_rels_vdwm_vcorr_l050','1e-5')
       return
       end
 c
@@ -46,17 +51,18 @@ c
 c
 c     "test_testlmda_case" runs "testlmda" on the water mutation fixture
 c     whose key file and reference share the given base name, computing
-c     both the analytical and the numerical lambda derivatives, and
-c     checks the full program output against the reference; the
-c     tolerance is loose enough to absorb the finite difference noise in
-c     the numerical derivatives
+c     both the analytical and the numerical lambda derivatives with the
+c     given finite difference step, and checks the full program output
+c     against the reference; the tolerance is loose enough to absorb the
+c     finite difference noise in the numerical derivatives, and a steep
+c     lambda map takes a smaller step to keep its truncation error low
 c
 c
-      subroutine test_testlmda_case (base)
+      subroutine test_testlmda_case (base,step)
       implicit none
       integer ist
       logical skiptest
-      character*(*) base
+      character*(*) base,step
       character*240 rpath
       character*512 args
 c
@@ -64,7 +70,7 @@ c
       if (skiptest('test_testlmda_'//base,'testlmda'))  return
       call pushdir ('file/testlmda')
       call execute_command_line ('rm -f out.txt')
-      args = '-k '//base//'.key water2.xyz Y Y 1e-4'
+      args = '-k '//base//'.key water2.xyz Y Y '//step
       call run_prog ('testlmda',trim(args),'out.txt',ist)
       if (ist .eq. -1) then
          call popdir

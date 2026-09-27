@@ -19,8 +19,6 @@ c
       subroutine ehal3
       use analyz
       use atoms
-      use dlmda
-      use mutant
       use energi
       use inform
       use iounit
@@ -34,10 +32,6 @@ c
 c
 c     choose the method for summing over pairwise interactions
 c
-      if (use_rel) then
-         call ehal3dr
-         return
-      end if
       if (use_lights) then
          call ehal3b
       else if (use_vlist) then
@@ -108,8 +102,11 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
+      integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
       real*8 e,rv,rv7
+      real*8 vlmd
+      real*8 vlsc(2),vscal(2)
       real*8 eps,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -150,6 +147,16 @@ c
       mode = 'VDW'
       call switch (mode)
 c
+c     set the soft core lambda terms for each ligand group, where
+c     a second ligand group couples as the complement of vlambda
+c
+      do ig = 1, 2
+         vlmd = vlambda
+         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
+         vlsc(ig) = vlmd**scexp
+         vscal(ig) = scalphav * (1.0d0-vlmd)**2
+      end do
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -182,7 +189,8 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
+         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -206,13 +214,15 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            mutgk = mutg(k)
+            mutk = (mutgk .ne. 0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (mutgi*mutgk .ne. 2)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
-            if (use_subsys .and. proceed) then
-               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
-            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -238,7 +248,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if ((muti .or. mutk) .and. .not.use_subsys) then
+                  if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -249,9 +259,13 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
+c
+c     take the soft core terms of the ligand group in this pair
+c
+                     ig = max(mutgi,mutgk)
                      rho = rik / rv
-                     eps = eps * vlambda**scexp
-                     scal = scalphav * (1.0d0-vlambda)**2
+                     eps = eps * vlsc(ig)
+                     scal = vscal(ig)
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)
@@ -349,7 +363,8 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
+         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -373,13 +388,15 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            mutgk = mutg(k)
+            mutk = (mutgk .ne. 0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (mutgi*mutgk .ne. 2)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
-            if (use_subsys .and. proceed) then
-               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
-            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -410,7 +427,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                      mutik = .false.
-                     if ((muti .or. mutk) .and. .not.use_subsys) then
+                     if (muti .or. mutk) then
                         if (vcouple .eq. 1) then
                            mutik = .true.
                         else if (.not.muti .or. .not.mutk) then
@@ -421,9 +438,13 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                      if (mutik) then
+c
+c     take the soft core terms of the ligand group in this pair
+c
+                        ig = max(mutgi,mutgk)
                         rho = rik / rv
-                        eps = eps * vlambda**scexp
-                        scal = scalphav * (1.0d0-vlambda)**2
+                        eps = eps * vlsc(ig)
+                        scal = vscal(ig)
                         t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                         t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                         e = eps * t1 * (t2-2.0d0)
@@ -555,11 +576,14 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
+      integer mutgi,mutgk,ig
       integer kgy,kgz
       integer start,stop
       integer ikmin,ikmax
       integer, allocatable :: iv14(:)
       real*8 e,rv,rv7
+      real*8 vlmd
+      real*8 vlsc(2),vscal(2)
       real*8 eps,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -607,6 +631,16 @@ c
       mode = 'VDW'
       call switch (mode)
 c
+c     set the soft core lambda terms for each ligand group, where
+c     a second ligand group couples as the complement of vlambda
+c
+      do ig = 1, 2
+         vlmd = vlambda
+         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
+         vlsc(ig) = vlmd**scexp
+         vscal(ig) = scalphav * (1.0d0-vlmd)**2
+      end do
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -652,7 +686,8 @@ c
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
+         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -699,17 +734,19 @@ c
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
+            mutgk = mutg(k)
+            mutk = (mutgk .ne. 0)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
 c
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (mutgi*mutgk .ne. 2)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
-            if (use_subsys .and. proceed) then
-               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
-            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -749,7 +786,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if ((muti .or. mutk) .and. .not.use_subsys) then
+                  if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -760,9 +797,13 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
+c
+c     take the soft core terms of the ligand group in this pair
+c
+                     ig = max(mutgi,mutgk)
                      rho = rik / rv
-                     eps = eps * vlambda**scexp
-                     scal = scalphav * (1.0d0-vlambda)**2
+                     eps = eps * vlsc(ig)
+                     scal = vscal(ig)
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)
@@ -906,8 +947,11 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
+      integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
       real*8 e,eps,rdn
+      real*8 vlmd
+      real*8 vlsc(2),vscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -948,6 +992,16 @@ c
       mode = 'VDW'
       call switch (mode)
 c
+c     set the soft core lambda terms for each ligand group, where
+c     a second ligand group couples as the complement of vlambda
+c
+      do ig = 1, 2
+         vlmd = vlambda
+         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
+         vlsc(ig) = vlmd**scexp
+         vscal(ig) = scalphav * (1.0d0-vlmd)**2
+      end do
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -973,11 +1027,10 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,
-!$OMP& subon,use_subsys,
 !$OMP& ired,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
-!$OMP& dhal,vcouple,vlambda,mutg,scexp,scalphav,cut2,c0,c1,
+!$OMP& dhal,vcouple,vlsc,vscal,mutg,cut2,c0,c1,
 !$OMP& c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter)
@@ -992,7 +1045,8 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
+         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1016,13 +1070,15 @@ c
             k = vlst(kk,i)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            mutgk = mutg(k)
+            mutk = (mutgk .ne. 0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (mutgi*mutgk .ne. 2)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
-            if (use_subsys .and. proceed) then
-               if (.not.subon(i) .or. .not.subon(k))  proceed = .false.
-            end if
 c
 c     compute the energy contribution for this interaction
 c
@@ -1048,7 +1104,7 @@ c
 c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = .false.
-                  if ((muti .or. mutk) .and. .not.use_subsys) then
+                  if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
                         mutik = .true.
                      else if (.not.muti .or. .not.mutk) then
@@ -1059,9 +1115,13 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
+c
+c     take the soft core terms of the ligand group in this pair
+c
+                     ig = max(mutgi,mutgk)
                      rho = rik / rv
-                     eps = eps * vlambda**scexp
-                     scal = scalphav * (1.0d0-vlambda)**2
+                     eps = eps * vlsc(ig)
+                     scal = vscal(ig)
                      t1 = (1.0d0+dhal)**7 / (scal+(rho+dhal)**7)
                      t2 = (1.0d0+ghal) / (scal+rho**7+ghal)
                      e = eps * t1 * (t2-2.0d0)
@@ -1152,201 +1212,5 @@ c     perform deallocation of some local arrays
 c
       deallocate (iv14)
       deallocate (vscale)
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine ehal3calc  --  compute buffered 14-7 analysis  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "ehal3calc" evaluates the buffered 14-7 van der Waals energy and
-c     analysis for the state currently installed
-c
-c
-      subroutine ehal3calc
-      use analyz
-      use atoms
-      use energi
-      use limits
-      use mutant
-      use vdwpot
-      implicit none
-      integer i,nsub
-      real*8 elrc,aelrc
-      character*6 mode
-c
-c
-      if (use_lights) then
-         call ehal3b
-      else if (use_vlist) then
-         call ehal3c
-      else
-         call ehal3a
-      end if
-      if (use_vcorr) then
-         mode = 'VDW'
-         call evcorr (mode,elrc)
-         ev = ev + elrc
-         if (use_subsys) then
-            nsub = 0
-            do i = 1, n
-               if (subon(i))  nsub = nsub + 1
-            end do
-         else
-            nsub = n
-         end if
-         if (nsub .ne. 0) then
-            aelrc = elrc / dble(nsub)
-            do i = 1, n
-               if (.not.use_subsys .or. subon(i)) then
-                  aev(i) = aev(i) + aelrc
-               end if
-            end do
-         end if
-      end if
-      return
-      end
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine ehal3dr  --  relative dual topo 14-7 analysis  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "ehal3dr" interpolates between the two coupling states of a
-c     two-ligand relative dual topology calculation, accumulating the
-c     partitioned energy of each parameter-zeroed subsystem,
-c
-c        E = weight1*E(vrelst1) + (1-weight1)*E(vrelst0)
-c
-c
-      subroutine ehal3dr
-      use action
-      use analyz
-      use atoms
-      use dlmda
-      use energi
-      use inter
-      use mutant
-      implicit none
-      real*8 weight1,dweight1,d2weight1
-      integer i,k
-      integer nev0,nev1
-      integer ncpl0,ncpl1
-      real*8 ev0,ev1
-      real*8 einterorig
-      real*8 einter0,einter1
-      logical la,lb,le
-      logical in0,in1
-      logical need0,need1
-      real*8, allocatable :: aev0(:)
-      real*8, allocatable :: aev1(:)
-c
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (aev0(n))
-      allocate (aev1(n))
-      einterorig = einter
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (vlambda,evdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 dvldlmda,d2vldlmda2,need0,need1)
-c
-c     zero out the two endpoint accumulators
-c
-      ev0 = 0.0d0
-      ev1 = 0.0d0
-      nev0 = 0
-      nev1 = 0
-      ncpl0 = -1
-      ncpl1 = -1
-      einter0 = 0.0d0
-      einter1 = 0.0d0
-      do i = 1, n
-         aev0(i) = 0.0d0
-         aev1(i) = 0.0d0
-      end do
-c
-c     build each subsystem once, add to the endpoints
-c
-      do k = 1, nrelsub
-         call relslot (k,vrelst0,vrelst1,la,lb,le,in0,in1)
-         in0 = in0 .and. need0
-         in1 = in1 .and. need1
-         if (.not. (in0 .or. in1))  cycle
-         call submask (la,lb,le)
-         call ehal3calc
-         if (in0) then
-            ev0 = ev0 + ev
-            nev0 = nev0 + nev
-            if (le .and. (la .or. lb))  ncpl0 = nev
-            einter0 = einter0 + einter - einterorig
-            do i = 1, n
-               aev0(i) = aev0(i) + aev(i)
-            end do
-         end if
-         if (in1) then
-            ev1 = ev1 + ev
-            einter1 = einter1 + einter - einterorig
-            do i = 1, n
-               aev1(i) = aev1(i) + aev(i)
-            end do
-            nev1 = nev1 + nev
-            if (le .and. (la .or. lb))  ncpl1 = nev
-         end if
-         einter = einterorig
-      end do
-c
-c     restore the original full system parameters
-c
-      call submask (.true.,.true.,.true.)
-c
-c     copy energy if only one endpoint state is computed
-c
-      if (.not. need0) then
-         ev0 = ev1
-         einter0 = einter1
-         do i = 1, n
-            aev0(i) = aev1(i)
-         end do
-      else if (.not. need1) then
-         ev1 = ev0
-         einter1 = einter0
-         do i = 1, n
-            aev1(i) = aev0(i)
-         end do
-      end if
-c
-c     interpolate between the two endpoint states
-c
-      ev = weight1*ev1 + (1.0d0-weight1)*ev0
-      einter = einterorig + weight1*einter1
-     &                    + (1.0d0-weight1)*einter0
-      do i = 1, n
-         aev(i) = weight1*aev1(i) + (1.0d0-weight1)*aev0(i)
-      end do
-c
-c     the count comes from the coupled subsystem while an endpoint
-c     holding one is live, and from the decoupled reference otherwise
-c
-      if (ncpl0 .ge. 0)  nev0 = ncpl0
-      if (ncpl1 .ge. 0)  nev1 = ncpl1
-      if (need1) then
-         nev = nev1
-      else
-         nev = nev0
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (aev0)
-      deallocate (aev1)
       return
       end

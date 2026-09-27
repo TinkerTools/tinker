@@ -768,10 +768,6 @@ void ehal0b_();
 #define tinker_f_ehal0b ehal0b_
 void ehal0c_();
 #define tinker_f_ehal0c ehal0c_
-void ehal0calc_();
-#define tinker_f_ehal0calc ehal0calc_
-void ehal0dr_();
-#define tinker_f_ehal0dr ehal0dr_
 
 // ehal1.f
 void ehal1_();
@@ -782,10 +778,6 @@ void ehal1b_();
 #define tinker_f_ehal1b ehal1b_
 void ehal1c_();
 #define tinker_f_ehal1c ehal1c_
-void ehal1calc_();
-#define tinker_f_ehal1calc ehal1calc_
-void ehal1dr_();
-#define tinker_f_ehal1dr ehal1dr_
 
 // ehal2.f
 void ehal2_(int* iatom);
@@ -800,10 +792,6 @@ void ehal3b_();
 #define tinker_f_ehal3b ehal3b_
 void ehal3c_();
 #define tinker_f_ehal3c ehal3c_
-void ehal3calc_();
-#define tinker_f_ehal3calc ehal3calc_
-void ehal3dr_();
-#define tinker_f_ehal3dr ehal3dr_
 
 // ehal4.f
 void ehal4_();
@@ -814,8 +802,6 @@ void ehal4b_();
 #define tinker_f_ehal4b ehal4b_
 void ehal4c_();
 #define tinker_f_ehal4c ehal4c_
-void ehal4dr_();
-#define tinker_f_ehal4dr ehal4dr_
 
 // eimprop.f
 void eimprop_();

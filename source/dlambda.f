@@ -153,13 +153,6 @@ c
       real*8 lmda
 c
 c
-c     van der Waals interpolates between the two coupled states on every
-c     leg, morphing over its own map in the middle and held at one
-c     end or the other while a ligand is being charged
-c
-      vrelst0 = rellig2
-      vrelst1 = rellig1
-c
 c     the middle leg holds both ligands decoupled, so electrostatics
 c     and polarization sit at the reference state and leave the chain
 c     rule while van der Waals morphs across its map

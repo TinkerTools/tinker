@@ -1219,9 +1219,9 @@ c     derivative vanishes, which the level 4 checks confirm; cases
 c     131-132 use absolute dual topology for the multipole and
 c     polarization terms only, with van der Waals switched off, and
 c     cases 133-134 relative dual topology, each at 1.0 and 0.0, with a
-c     different dual topology interpolation exponent per term so no term
-c     can mask an error in another; all four use Ewald and support a
-c     pairwise neighbor list
+c     different dual topology interpolation exponent for the multipole
+c     and polarization terms so neither can mask an error in the other;
+c     all four use Ewald and support a pairwise neighbor list
 c
 c
       subroutine test_mutate_qntrng

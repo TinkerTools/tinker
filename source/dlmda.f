@@ -19,7 +19,6 @@ c     emdtexp       multipole exponent for dual topology interpolation
 c     epdtexp       polarization lambda exponent for dual topology
 c     erelst0       multipole coupling state at the lower endpoint
 c     erelst1       multipole coupling state at the upper endpoint
-c     evdtexp       van der Waals exponent for dual topo interpolation
 c     lmdaintv      steps in each adaptive bias sample interval
 c     lmdanpa       steps propagating the lambda particle
 c     lmdanpb       steps equilibrating at the frozen lambda
@@ -41,8 +40,6 @@ c     sizelmdahist  allocation size of the lambda bias history
 c     vlmdaapmn     power exponent for van der Waals asymmetric map
 c     vlmdaexp      exponent for van der Waals exponential mapping
 c     vlmdainvn     inverse-power exponent for van der Waals mapping
-c     vrelst0       van der Waals coupling state at the lower endpoint
-c     vrelst1       van der Waals coupling state at the upper endpoint
 c     lmdaihist     step at which each history entry was saved
 c     d2edl2        total energy second order lambda derivative
 c     d2eldlmda2    second derivative of elambda wrt main lambda
@@ -166,7 +163,6 @@ c
       integer epdtexp
       integer erelst0
       integer erelst1
-      integer evdtexp
       integer lmdaintv
       integer lmdanpa
       integer lmdanpb
@@ -188,8 +184,6 @@ c
       integer vlmdaapmn
       integer vlmdaexp
       integer vlmdainvn
-      integer vrelst0
-      integer vrelst1
       integer, allocatable :: lmdaihist(:)
       parameter (nrelsub=5)
       parameter (rellig1=1)

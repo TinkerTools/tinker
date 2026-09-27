@@ -25,7 +25,6 @@
  Sampling Mode                  Fixed Lambda
  Electrostatics Topology              Single
  Polarization Topology                Single
- van der Waals Topology               Single
  Main Lambda Value                     1.000
 
  Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL

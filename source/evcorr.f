@@ -39,10 +39,14 @@ c
       integer nstep,ndelta,nvt
       integer, allocatable :: ivt(:)
       integer, allocatable :: jvt(:)
-      integer, allocatable :: mvt(:)
+      integer, allocatable :: avt(:)
+      integer, allocatable :: bvt(:)
       real*8 elrc,etot
       real*8 range,rdelta
-      real*8 fi,fk,fim,fkm,fik
+      real*8 fi,fk,fik
+      real*8 fie,fia,fib
+      real*8 fke,fka,fkb
+      real*8 ee,ea,eb,aa,bb
       real*8 e,eps,vlam1
       real*8 offset,taper
       real*8 rv,rv2,rv6,rv7
@@ -79,29 +83,31 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (ivt(n))
       allocate (jvt(n))
-      allocate (mvt(n))
+      allocate (avt(n))
+      allocate (bvt(n))
 c
 c     count the number of types and their frequencies
 c
       nvt = 0
       do i = 1, n
-         if (.not.use_subsys .or. subon(i)) then
-            if (use_vdw)  it = jvdw(i)
-            if (use_disp)  it = class(i)
-            do k = 1, nvt
-               if (ivt(k) .eq. it) then
-                  jvt(k) = jvt(k) + 1
-                  if (mutg(i) .ne. 0)  mvt(k) = mvt(k) + 1
-                  goto 10
-               end if
-            end do
-            nvt = nvt + 1
-            ivt(nvt) = it
-            jvt(nvt) = 1
-            mvt(nvt) = 0
-            if (mutg(i) .ne. 0)  mvt(nvt) = 1
-   10       continue
-         end if
+         if (use_vdw)  it = jvdw(i)
+         if (use_disp)  it = class(i)
+         do k = 1, nvt
+            if (ivt(k) .eq. it) then
+               jvt(k) = jvt(k) + 1
+               if (mutg(i) .eq. 1)  avt(k) = avt(k) + 1
+               if (mutg(i) .eq. 2)  bvt(k) = bvt(k) + 1
+               goto 10
+            end if
+         end do
+         nvt = nvt + 1
+         ivt(nvt) = it
+         jvt(nvt) = 1
+         avt(nvt) = 0
+         bvt(nvt) = 0
+         if (mutg(i) .eq. 1)  avt(nvt) = 1
+         if (mutg(i) .eq. 2)  bvt(nvt) = 1
+   10    continue
       end do
 c
 c     find the correction energy via double loop search
@@ -109,20 +115,29 @@ c
       do i = 1, nvt
          it = ivt(i)
          fi = 4.0d0 * pi * dble(jvt(i))
-         fim = 4.0d0 * pi * dble(mvt(i))
+         fia = 4.0d0 * pi * dble(avt(i))
+         fib = 4.0d0 * pi * dble(bvt(i))
+         fie = fi - fia - fib
          do k = i, nvt
             kt = ivt(k)
             fk = dble(jvt(k))
-            fkm = dble(mvt(k))
+            fka = dble(avt(k))
+            fkb = dble(bvt(k))
+            fke = fk - fka - fkb
 c
-c     set decoupling or annihilation for intraligand interactions
+c     split the pair count into environment and ligand group
+c     classes, with ligand 2 coupling as the complement of vlambda
+c     and no interaction between the two ligand groups
 c
-            if (use_subsys) then
-               fik = fi * fk
-            else if (vcouple .eq. 0) then
-               fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
+            ee = fie * fke
+            ea = fie*fka + fia*fke
+            eb = fie*fkb + fib*fke
+            aa = fia * fka
+            bb = fib * fkb
+            if (vcouple .eq. 0) then
+               fik = ee + aa + bb + vlambda*ea + vlam1*eb
             else
-               fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
+               fik = ee + vlambda*(ea+aa) + vlam1*(eb+bb)
             end if
             if (k .eq. i)  fik = 0.5d0 * fik
             if (use_disp) then
@@ -178,7 +193,8 @@ c     perform deallocation of some local arrays
 c
       deallocate (ivt)
       deallocate (jvt)
-      deallocate (mvt)
+      deallocate (avt)
+      deallocate (bvt)
       return
       end
 c
@@ -218,13 +234,16 @@ c
       integer nstep,ndelta,nvt
       integer, allocatable :: ivt(:)
       integer, allocatable :: jvt(:)
-      integer, allocatable :: mvt(:)
+      integer, allocatable :: avt(:)
+      integer, allocatable :: bvt(:)
       real*8 elrc,vlrc
       real*8 delrc,dvlrc
       real*8 etot,vtot
       real*8 range,rdelta
-      real*8 fi,fk,fim,fkm
-      real*8 fik,dfik
+      real*8 fi,fk,fik,dfik
+      real*8 fie,fia,fib
+      real*8 fke,fka,fkb
+      real*8 ee,ea,eb,aa,bb
       real*8 e,de,eps
       real*8 offset,vlam1
       real*8 taper,dtaper
@@ -266,29 +285,31 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (ivt(n))
       allocate (jvt(n))
-      allocate (mvt(n))
+      allocate (avt(n))
+      allocate (bvt(n))
 c
 c     count the number of vdw types and their frequencies
 c
       nvt = 0
       do i = 1, n
-         if (.not.use_subsys .or. subon(i)) then
-            if (use_vdw)  it = jvdw(i)
-            if (use_disp)  it = class(i)
-            do k = 1, nvt
-               if (ivt(k) .eq. it) then
-                  jvt(k) = jvt(k) + 1
-                  if (mutg(i) .ne. 0)  mvt(k) = mvt(k) + 1
-                  goto 10
-               end if
-            end do
-            nvt = nvt + 1
-            ivt(nvt) = it
-            jvt(nvt) = 1
-            mvt(nvt) = 0
-            if (mutg(i) .ne. 0)  mvt(nvt) = 1
-   10       continue
-         end if
+         if (use_vdw)  it = jvdw(i)
+         if (use_disp)  it = class(i)
+         do k = 1, nvt
+            if (ivt(k) .eq. it) then
+               jvt(k) = jvt(k) + 1
+               if (mutg(i) .eq. 1)  avt(k) = avt(k) + 1
+               if (mutg(i) .eq. 2)  bvt(k) = bvt(k) + 1
+               goto 10
+            end if
+         end do
+         nvt = nvt + 1
+         ivt(nvt) = it
+         jvt(nvt) = 1
+         avt(nvt) = 0
+         bvt(nvt) = 0
+         if (mutg(i) .eq. 1)  avt(nvt) = 1
+         if (mutg(i) .eq. 2)  bvt(nvt) = 1
+   10    continue
       end do
 c
 c     find the van der Waals energy via double loop search
@@ -296,24 +317,32 @@ c
       do i = 1, nvt
          it = ivt(i)
          fi = 4.0d0 * pi * dble(jvt(i))
-         fim = 4.0d0 * pi * dble(mvt(i))
+         fia = 4.0d0 * pi * dble(avt(i))
+         fib = 4.0d0 * pi * dble(bvt(i))
+         fie = fi - fia - fib
          do k = i, nvt
             kt = ivt(k)
             fk = dble(jvt(k))
-            fkm = dble(mvt(k))
+            fka = dble(avt(k))
+            fkb = dble(bvt(k))
+            fke = fk - fka - fkb
 c
-c     set decoupling or annihilation for intraligand interactions,
-c     and the derivative of the pair weight with respect to lambda
+c     split the pair count into environment and ligand group
+c     classes, with ligand 2 coupling as the complement of vlambda
+c     and no interaction between the two ligand groups, and get the
+c     derivative of the pair weight with respect to lambda
 c
-            if (use_subsys) then
-               fik = fi * fk
-               dfik = 0.0d0
-            else if (vcouple .eq. 0) then
-               fik = fi*fk - vlam1*(fim*(fk-fkm)+(fi-fim)*fkm)
-               dfik = fim*(fk-fkm) + (fi-fim)*fkm
+            ee = fie * fke
+            ea = fie*fka + fia*fke
+            eb = fie*fkb + fib*fke
+            aa = fia * fka
+            bb = fib * fkb
+            if (vcouple .eq. 0) then
+               fik = ee + aa + bb + vlambda*ea + vlam1*eb
+               dfik = ea - eb
             else
-               fik = vlambda*fi*fk + vlam1*(fi-fim)*(fk-fkm)
-               dfik = fi*fk - (fi-fim)*(fk-fkm)
+               fik = ee + vlambda*(ea+aa) + vlam1*(eb+bb)
+               dfik = ea + aa - eb - bb
             end if
             if (k .eq. i) then
                fik = 0.5d0 * fik
@@ -390,6 +419,7 @@ c     perform deallocation of some local arrays
 c
       deallocate (ivt)
       deallocate (jvt)
-      deallocate (mvt)
+      deallocate (avt)
+      deallocate (bvt)
       return
       end
