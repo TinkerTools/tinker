@@ -62,7 +62,6 @@ c     lmdafric      friction coefficient of theta lambda coordinate
 c     lmdamass      fictitious mass of the theta lambda coordinate
 c     lmdaparatio   interval fraction propagating the lambda particle
 c     lmdapbratio   interval fraction equilibrating at fixed lambda
-c     lmdapcratio   interval fraction averaging at fixed lambda
 c     lmdastd       interval deviation of the main lambda
 c     lmdathalpha   sharpness of the smoothed triangle theta map
 c     lmdatheta     theta coordinate used to propagate lambda
@@ -197,7 +196,6 @@ c
       real*8 lmdamass
       real*8 lmdaparatio
       real*8 lmdapbratio
-      real*8 lmdapcratio
       real*8 lmdastd
       real*8 lmdathalpha
       real*8 lmdatheta

@@ -94,7 +94,6 @@ c
       integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
-      real*8 vlmd
       real*8 vlsc(2),vscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
@@ -102,10 +101,8 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,rho6,rho7
-      real*8 tau,tau7,scal
-      real*8 s1,s2,t1,t2
-      real*8 dt1drho,dt2drho
+      real*8 rho
+      real*8 tau,tau7
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -151,15 +148,9 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group, where
-c     a second ligand group couples as the complement of vlambda
+c     set the soft core lambda terms for each ligand group
 c
-      do ig = 1, 2
-         vlmd = vlambda
-         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc(ig) = vlmd**scexp
-         vscal(ig) = scalphav * (1.0d0-vlmd)**2
-      end do
+      call halsc (vlsc,vscal)
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -242,14 +233,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -258,19 +243,7 @@ c
 c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
-                     rho = rik / rv
-                     rho6 = rho**6
-                     rho7 = rho6 * rho
-                     eps = eps * vlsc(ig)
-                     scal = vscal(ig)
-                     s1 = 1.0d0 / (scal+(rho+dhal)**7)
-                     s2 = 1.0d0 / (scal+rho7+ghal)
-                     t1 = (1.0d0+dhal)**7 * s1
-                     t2 = (1.0d0+ghal) * s2
-                     dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
-                     dt2drho = -7.0d0*rho6 * t2 * s2
-                     e = eps * t1 * (t2-2.0d0)
-                     de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                     call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -459,14 +432,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = .false.
-                     if (muti .or. mutk) then
-                        if (vcouple .eq. 1) then
-                           mutik = .true.
-                        else if (.not.muti .or. .not.mutk) then
-                           mutik = .true.
-                        end if
-                     end if
+                     mutik = (muti.or.mutk) .and.
+     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -475,19 +442,7 @@ c
 c     take the soft core terms of the ligand group in this pair
 c
                         ig = max(mutgi,mutgk)
-                        rho = rik / rv
-                        rho6 = rho**6
-                        rho7 = rho6 * rho
-                        eps = eps * vlsc(ig)
-                        scal = vscal(ig)
-                        s1 = 1.0d0 / (scal+(rho+dhal)**7)
-                        s2 = 1.0d0 / (scal+rho7+ghal)
-                        t1 = (1.0d0+dhal)**7 * s1
-                        t2 = (1.0d0+ghal) * s2
-                        dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
-                        dt2drho = -7.0d0*rho6 * t2 * s2
-                        e = eps * t1 * (t2-2.0d0)
-                        de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                        call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                      else
                         rv7 = rv**7
                         rik6 = rik2**3
@@ -646,7 +601,6 @@ c
       integer start,stop
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
-      real*8 vlmd
       real*8 vlsc(2),vscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
@@ -654,10 +608,8 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,rho6,rho7
-      real*8 tau,tau7,scal
-      real*8 s1,s2,t1,t2
-      real*8 dt1drho,dt2drho
+      real*8 rho
+      real*8 tau,tau7
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -710,15 +662,9 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group, where
-c     a second ligand group couples as the complement of vlambda
+c     set the soft core lambda terms for each ligand group
 c
-      do ig = 1, 2
-         vlmd = vlambda
-         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc(ig) = vlmd**scexp
-         vscal(ig) = scalphav * (1.0d0-vlmd)**2
-      end do
+      call halsc (vlsc,vscal)
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -855,14 +801,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -871,19 +811,7 @@ c
 c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
-                     rho = rik / rv
-                     rho6 = rho**6
-                     rho7 = rho6 * rho
-                     eps = eps * vlsc(ig)
-                     scal = vscal(ig)
-                     s1 = 1.0d0 / (scal+(rho+dhal)**7)
-                     s2 = 1.0d0 / (scal+rho7+ghal)
-                     t1 = (1.0d0+dhal)**7 * s1
-                     t2 = (1.0d0+ghal) * s2
-                     dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
-                     dt2drho = -7.0d0*rho6 * t2 * s2
-                     e = eps * t1 * (t2-2.0d0)
-                     de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                     call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -1044,7 +972,6 @@ c
       integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
-      real*8 vlmd
       real*8 vlsc(2),vscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
@@ -1052,10 +979,8 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,rho6,rho7
-      real*8 tau,tau7,scal
-      real*8 s1,s2,t1,t2
-      real*8 dt1drho,dt2drho
+      real*8 rho
+      real*8 tau,tau7
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -1101,15 +1026,9 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group, where
-c     a second ligand group couples as the complement of vlambda
+c     set the soft core lambda terms for each ligand group
 c
-      do ig = 1, 2
-         vlmd = vlambda
-         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc(ig) = vlmd**scexp
-         vscal(ig) = scalphav * (1.0d0-vlmd)**2
-      end do
+      call halsc (vlsc,vscal)
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -1203,14 +1122,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -1219,19 +1132,7 @@ c
 c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
-                     rho = rik / rv
-                     rho6 = rho**6
-                     rho7 = rho6 * rho
-                     eps = eps * vlsc(ig)
-                     scal = vscal(ig)
-                     s1 = 1.0d0 / (scal+(rho+dhal)**7)
-                     s2 = 1.0d0 / (scal+rho7+ghal)
-                     t1 = (1.0d0+dhal)**7 * s1
-                     t2 = (1.0d0+ghal) * s2
-                     dt1drho = -7.0d0*(rho+dhal)**6 * t1 * s1
-                     dt2drho = -7.0d0*rho6 * t2 * s2
-                     e = eps * t1 * (t2-2.0d0)
-                     de = eps * (dt1drho*(t2-2.0d0)+t1*dt2drho) / rv
+                     call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
                      rv7 = rv**7
                      rik6 = rik2**3

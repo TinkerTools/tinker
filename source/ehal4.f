@@ -99,8 +99,7 @@ c
       integer kk,kt,kv
       integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
-      real*8 e,de,eps,eps0,rdn
-      real*8 vlmd,vsgn(2)
+      real*8 e,de,eps,rdn
       real*8 vlsc(2),vlsc1(2),vlsc2(2)
       real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
@@ -109,18 +108,9 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,rho6,rho7
-      real*8 tau,tau7,scal
-      real*8 s1,s2,t1,t2
-      real*8 dt1drho,dt2drho
-      real*8 t0,dt0dl,dt1dl,dt2dl
-      real*8 dhal17,ghal1
-      real*8 ds1dl,ds2dl
-      real*8 d2t0dl2,d2t1dl2,d2t2dl2
-      real*8 d2t1dldrho,d2t2dldrho
-      real*8 dscaldl,dlambda,dlambda2
-      real*8 rhopdhal,rhopdhal6,rhopdhal7
-      real*8 t2m2
+      real*8 rho
+      real*8 tau,tau7
+      real*8 dlambda,dlambda2
       real*8 dlde
       real*8 dldedx,dldedy,dldedz
       real*8 dtau,gtau
@@ -175,22 +165,9 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group, where
-c     a second ligand group couples as the complement of vlambda
+c     set the soft core lambda terms for each ligand group
 c
-      do ig = 1, 2
-         vlmd = vlambda
-         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc(ig) = vlmd**scexp
-         vscal(ig) = scalphav * (1.0d0-vlmd)**2
-         vlsc1(ig) = vlmd**(scexp-1)
-         vlsc2(ig) = vlmd**(scexp-2)
-         dvscal(ig) = 2.0d0 * scalphav * (1.0d0-vlmd)
-      end do
-      vsgn(1) = 1.0d0
-      vsgn(2) = -1.0d0
-      dhal17 = (1.0d0+dhal)**7
-      ghal1 = 1.0d0 + ghal
+      call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -273,14 +250,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
                   mutd2 = mutik .and. use_d2lmda
 c
 c     get interaction energy, via soft core lambda scaling as needed
@@ -290,57 +261,8 @@ c
 c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
-                     rho = rik / rv
-                     rho6 = rho**6
-                     rho7 = rho6 * rho
-                     rhopdhal = rho + dhal
-                     rhopdhal6 = rhopdhal**6
-                     rhopdhal7 = rhopdhal6 * rhopdhal
-                     eps0 = eps
-                     eps = eps * vlsc(ig)
-                     scal = vscal(ig)
-                     s1 = 1.0d0 / (scal+rhopdhal7)
-                     s2 = 1.0d0 / (scal+rho7+ghal)
-                     t1 = dhal17 * s1
-                     t2 = ghal1 * s2
-                     t2m2 = t2 - 2.0d0
-                     dt1drho = -7.0d0*rhopdhal6 * t1 * s1
-                     dt2drho = -7.0d0*rho6 * t2 * s2
-                     e = eps * t1 * t2m2
-                     de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
-                     t0 = eps
-                     dt0dl = eps0 * scexp * vlsc1(ig)
-                     dscaldl = dvscal(ig)
-                     ds1dl = dscaldl * s1 * s1
-                     ds2dl = dscaldl * s2 * s2
-                     dt1dl = dhal17 * ds1dl
-                     dt2dl = ghal1 * ds2dl
-                     dlambda = dt0dl * t1 * t2m2
-     &                         + t0 * dt1dl * t2m2
-     &                         + t0 * t1 * dt2dl
-                     dlambda = vsgn(ig) * dlambda
-                     if (use_d2lmda) then
-                        d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
-                        d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                            + 2.0d0*dscaldl*s1*ds1dl)
-                        d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                            + 2.0d0*dscaldl*s2*ds2dl)
-                        dlambda2 = d2t0dl2*t1*t2m2
-     &                             + t0*d2t1dl2*t2m2
-     &                             + t0*t1*d2t2dl2
-     &                             + 2.0d0*dt0dl*dt1dl*t2m2
-     &                             + 2.0d0*dt0dl*t1*dt2dl
-     &                             + 2.0d0*t0*dt1dl*dt2dl
-                        d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6
-                        d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                        dlde = scexp*vlsc1(ig)
-     &                         * (dt1drho*t2m2 + t1*dt2drho)
-     &                         + vlsc(ig)
-     &                         * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &                         + dt1dl*dt2drho + dt1drho*dt2dl)
-                        dlde = eps0 / rv * dlde
-                        dlde = vsgn(ig) * dlde
-                     end if
+                     call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
+     &                             dvscal,e,de,dlambda,dlambda2,dlde)
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -590,14 +512,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = .false.
-                     if (muti .or. mutk) then
-                        if (vcouple .eq. 1) then
-                           mutik = .true.
-                        else if (.not.muti .or. .not.mutk) then
-                           mutik = .true.
-                        end if
-                     end if
+                     mutik = (muti.or.mutk) .and.
+     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
                      mutd2 = mutik .and. use_d2lmda
 c
 c     get interaction energy, via soft core lambda scaling as needed
@@ -607,59 +523,9 @@ c
 c     take the soft core terms of the ligand group in this pair
 c
                         ig = max(mutgi,mutgk)
-                        rho = rik / rv
-                        rho6 = rho**6
-                        rho7 = rho6 * rho
-                        rhopdhal = rho + dhal
-                        rhopdhal6 = rhopdhal**6
-                        rhopdhal7 = rhopdhal6 * rhopdhal
-                        eps0 = eps
-                        eps = eps * vlsc(ig)
-                        scal = vscal(ig)
-                        s1 = 1.0d0 / (scal+rhopdhal7)
-                        s2 = 1.0d0 / (scal+rho7+ghal)
-                        t1 = dhal17 * s1
-                        t2 = ghal1 * s2
-                        t2m2 = t2 - 2.0d0
-                        dt1drho = -7.0d0*rhopdhal6 * t1 * s1
-                        dt2drho = -7.0d0*rho6 * t2 * s2
-                        e = eps * t1 * t2m2
-                        de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
-                        t0 = eps
-                        dt0dl = eps0 * scexp * vlsc1(ig)
-                        dscaldl = dvscal(ig)
-                        ds1dl = dscaldl * s1 * s1
-                        ds2dl = dscaldl * s2 * s2
-                        dt1dl = dhal17 * ds1dl
-                        dt2dl = ghal1 * ds2dl
-                        dlambda = dt0dl * t1 * t2m2
-     &                            + t0 * dt1dl * t2m2
-     &                            + t0 * t1 * dt2dl
-                        dlambda = vsgn(ig) * dlambda
-                        if (use_d2lmda) then
-                           d2t0dl2 = eps0*scexp*(scexp-1)
-     &                               * vlsc2(ig)
-                           d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                               + 2.0d0*dscaldl*s1*ds1dl)
-                           d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                               + 2.0d0*dscaldl*s2*ds2dl)
-                           dlambda2 = d2t0dl2*t1*t2m2
-     &                                + t0*d2t1dl2*t2m2
-     &                                + t0*t1*d2t2dl2
-     &                                + 2.0d0*dt0dl*dt1dl*t2m2
-     &                                + 2.0d0*dt0dl*t1*dt2dl
-     &                                + 2.0d0*t0*dt1dl*dt2dl
-                           d2t1dldrho = -14.0d0*dhal17*s1*ds1dl
-     &                                  * rhopdhal6
-                           d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                           dlde = scexp*vlsc1(ig)
-     &                            * (dt1drho*t2m2 + t1*dt2drho)
-     &                            + vlsc(ig)
-     &                            * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &                            + dt1dl*dt2drho + dt1drho*dt2dl)
-                           dlde = eps0 / rv * dlde
-                           dlde = vsgn(ig) * dlde
-                        end if
+                        call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,
+     &                                vscal,dvscal,e,de,dlambda,
+     &                                dlambda2,dlde)
                      else
                         rv7 = rv**7
                         rik6 = rik2**3
@@ -885,8 +751,7 @@ c
       integer kgy,kgz
       integer start,stop
       integer, allocatable :: iv14(:)
-      real*8 e,de,eps,eps0,rdn
-      real*8 vlmd,vsgn(2)
+      real*8 e,de,eps,rdn
       real*8 vlsc(2),vlsc1(2),vlsc2(2)
       real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
@@ -895,18 +760,9 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,rho6,rho7
-      real*8 tau,tau7,scal
-      real*8 s1,s2,t1,t2
-      real*8 dt1drho,dt2drho
-      real*8 t0,dt0dl,dt1dl,dt2dl
-      real*8 dhal17,ghal1
-      real*8 ds1dl,ds2dl
-      real*8 d2t0dl2,d2t1dl2,d2t2dl2
-      real*8 d2t1dldrho,d2t2dldrho
-      real*8 dscaldl,dlambda,dlambda2
-      real*8 rhopdhal,rhopdhal6,rhopdhal7
-      real*8 t2m2
+      real*8 rho
+      real*8 tau,tau7
+      real*8 dlambda,dlambda2
       real*8 dlde
       real*8 dldedx,dldedy,dldedz
       real*8 dtau,gtau
@@ -968,22 +824,9 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group, where
-c     a second ligand group couples as the complement of vlambda
+c     set the soft core lambda terms for each ligand group
 c
-      do ig = 1, 2
-         vlmd = vlambda
-         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc(ig) = vlmd**scexp
-         vscal(ig) = scalphav * (1.0d0-vlmd)**2
-         vlsc1(ig) = vlmd**(scexp-1)
-         vlsc2(ig) = vlmd**(scexp-2)
-         dvscal(ig) = 2.0d0 * scalphav * (1.0d0-vlmd)
-      end do
-      vsgn(1) = 1.0d0
-      vsgn(2) = -1.0d0
-      dhal17 = (1.0d0+dhal)**7
-      ghal1 = 1.0d0 + ghal
+      call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -1120,14 +963,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
                   mutd2 = mutik .and. use_d2lmda
 c
 c     get interaction energy, via soft core lambda scaling as needed
@@ -1137,57 +974,8 @@ c
 c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
-                     rho = rik / rv
-                     rho6 = rho**6
-                     rho7 = rho6 * rho
-                     rhopdhal = rho + dhal
-                     rhopdhal6 = rhopdhal**6
-                     rhopdhal7 = rhopdhal6 * rhopdhal
-                     eps0 = eps
-                     eps = eps * vlsc(ig)
-                     scal = vscal(ig)
-                     s1 = 1.0d0 / (scal+rhopdhal7)
-                     s2 = 1.0d0 / (scal+rho7+ghal)
-                     t1 = dhal17 * s1
-                     t2 = ghal1 * s2
-                     t2m2 = t2 - 2.0d0
-                     dt1drho = -7.0d0*rhopdhal6 * t1 * s1
-                     dt2drho = -7.0d0*rho6 * t2 * s2
-                     e = eps * t1 * t2m2
-                     de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
-                     t0 = eps
-                     dt0dl = eps0 * scexp * vlsc1(ig)
-                     dscaldl = dvscal(ig)
-                     ds1dl = dscaldl * s1 * s1
-                     ds2dl = dscaldl * s2 * s2
-                     dt1dl = dhal17 * ds1dl
-                     dt2dl = ghal1 * ds2dl
-                     dlambda = dt0dl * t1 * t2m2
-     &                         + t0 * dt1dl * t2m2
-     &                         + t0 * t1 * dt2dl
-                     dlambda = vsgn(ig) * dlambda
-                     if (use_d2lmda) then
-                        d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
-                        d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                            + 2.0d0*dscaldl*s1*ds1dl)
-                        d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                            + 2.0d0*dscaldl*s2*ds2dl)
-                        dlambda2 = d2t0dl2*t1*t2m2
-     &                             + t0*d2t1dl2*t2m2
-     &                             + t0*t1*d2t2dl2
-     &                             + 2.0d0*dt0dl*dt1dl*t2m2
-     &                             + 2.0d0*dt0dl*t1*dt2dl
-     &                             + 2.0d0*t0*dt1dl*dt2dl
-                        d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6
-                        d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                        dlde = scexp*vlsc1(ig)
-     &                         * (dt1drho*t2m2 + t1*dt2drho)
-     &                         + vlsc(ig)
-     &                         * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &                         + dt1dl*dt2drho + dt1drho*dt2dl)
-                        dlde = eps0 / rv * dlde
-                        dlde = vsgn(ig) * dlde
-                     end if
+                     call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
+     &                             dvscal,e,de,dlambda,dlambda2,dlde)
                   else
                      rv7 = rv**7
                      rik6 = rik2**3
@@ -1409,8 +1197,8 @@ c
       integer kk,kt,kv
       integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
-      real*8 e,de,eps,eps0,rdn
-      real*8 vlmd,vsgn(2)
+      real*8 e,de,eps,rdn
+      real*8 vsgn(2)
       real*8 vlsc(2),vlsc1(2),vlsc2(2)
       real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
@@ -1419,18 +1207,10 @@ c
       real*8 redi,rediv
       real*8 redk,redkv
       real*8 dedx,dedy,dedz
-      real*8 rho,rho6,rho7
-      real*8 tau,tau7,scal
-      real*8 s1,s2,t1,t2
-      real*8 dt1drho,dt2drho
-      real*8 t0,dt0dl,dt1dl,dt2dl
+      real*8 rho
+      real*8 tau,tau7
       real*8 dhal17,ghal1
-      real*8 ds1dl,ds2dl
-      real*8 d2t0dl2,d2t1dl2,d2t2dl2
-      real*8 d2t1dldrho,d2t2dldrho
-      real*8 dscaldl,dlambda,dlambda2
-      real*8 rhopdhal,rhopdhal6,rhopdhal7
-      real*8 t2m2
+      real*8 dlambda,dlambda2
       real*8 dlde
       real*8 dldedx,dldedy,dldedz
       real*8 dtau,gtau
@@ -1485,22 +1265,9 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group, where
-c     a second ligand group couples as the complement of vlambda
+c     set the soft core lambda terms for each ligand group
 c
-      do ig = 1, 2
-         vlmd = vlambda
-         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc(ig) = vlmd**scexp
-         vscal(ig) = scalphav * (1.0d0-vlmd)**2
-         vlsc1(ig) = vlmd**(scexp-1)
-         vlsc2(ig) = vlmd**(scexp-2)
-         dvscal(ig) = 2.0d0 * scalphav * (1.0d0-vlmd)
-      end do
-      vsgn(1) = 1.0d0
-      vsgn(2) = -1.0d0
-      dhal17 = (1.0d0+dhal)**7
-      ghal1 = 1.0d0 + ghal
+      call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -1596,14 +1363,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
                   mutd2 = mutik .and. use_d2lmda
 c
 c     get interaction energy, via soft core lambda scaling as needed
@@ -1613,57 +1374,8 @@ c
 c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
-                     rho = rik / rv
-                     rho6 = rho**6
-                     rho7 = rho6 * rho
-                     rhopdhal = rho + dhal
-                     rhopdhal6 = rhopdhal**6
-                     rhopdhal7 = rhopdhal6 * rhopdhal
-                     eps0 = eps
-                     eps = eps * vlsc(ig)
-                     scal = vscal(ig)
-                     s1 = 1.0d0 / (scal+rhopdhal7)
-                     s2 = 1.0d0 / (scal+rho7+ghal)
-                     t1 = dhal17 * s1
-                     t2 = ghal1 * s2
-                     t2m2 = t2 - 2.0d0
-                     dt1drho = -7.0d0*rhopdhal6 * t1 * s1
-                     dt2drho = -7.0d0*rho6 * t2 * s2
-                     e = eps * t1 * t2m2
-                     de = eps * (dt1drho*t2m2+t1*dt2drho) / rv
-                     t0 = eps
-                     dt0dl = eps0 * scexp * vlsc1(ig)
-                     dscaldl = dvscal(ig)
-                     ds1dl = dscaldl * s1 * s1
-                     ds2dl = dscaldl * s2 * s2
-                     dt1dl = dhal17 * ds1dl
-                     dt2dl = ghal1 * ds2dl
-                     dlambda = dt0dl * t1 * t2m2
-     &                         + t0 * dt1dl * t2m2
-     &                         + t0 * t1 * dt2dl
-                     dlambda = vsgn(ig) * dlambda
-                     if (use_d2lmda) then
-                        d2t0dl2 = eps0*scexp*(scexp-1) * vlsc2(ig)
-                        d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                            + 2.0d0*dscaldl*s1*ds1dl)
-                        d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                            + 2.0d0*dscaldl*s2*ds2dl)
-                        dlambda2 = d2t0dl2*t1*t2m2
-     &                             + t0*d2t1dl2*t2m2
-     &                             + t0*t1*d2t2dl2
-     &                             + 2.0d0*dt0dl*dt1dl*t2m2
-     &                             + 2.0d0*dt0dl*t1*dt2dl
-     &                             + 2.0d0*t0*dt1dl*dt2dl
-                        d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6
-                        d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-                        dlde = scexp*vlsc1(ig)
-     &                         * (dt1drho*t2m2 + t1*dt2drho)
-     &                         + vlsc(ig)
-     &                         * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &                         + dt1dl*dt2drho + dt1drho*dt2dl)
-                        dlde = eps0 / rv * dlde
-                        dlde = vsgn(ig) * dlde
-                     end if
+                     call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
+     &                             dvscal,e,de,dlambda,dlambda2,dlde)
                   else
                      rv7 = rv**7
                      rik6 = rik2**3

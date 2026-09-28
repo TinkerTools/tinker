@@ -543,43 +543,40 @@ c
       integer i,j
 c
 c
+c     apply chain rule for second derivatives, force and virial wrt
+c     global lambda, using the first derivatives before their rescale
+c
+      if (use_d2lmda) then
+         d2epdl2 = d2epdl2 * dpldlmda*dpldlmda + depdl * d2pldlmda2
+         d2evdl2 = d2evdl2 * dvldlmda*dvldlmda + devdl * d2vldlmda2
+         d2emdl2 = d2emdl2 * deldlmda*deldlmda + demdl * d2eldlmda2
+         d2edl2 = d2evdl2 + d2emdl2 + d2epdl2
+         do i = 1, n
+            do j = 1, 3
+               dfpdl(j,i) = dfpdl(j,i) * dpldlmda
+               dfmdl(j,i) = dfmdl(j,i) * deldlmda
+               dfvdl(j,i) = dfvdl(j,i) * dvldlmda
+               dfsumdl(j,i) = dfvdl(j,i) + dfmdl(j,i) + dfpdl(j,i)
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               depvirdl(j,i) = depvirdl(j,i) * dpldlmda
+               demvirdl(j,i) = demvirdl(j,i) * deldlmda
+               devvirdl(j,i) = devvirdl(j,i) * dvldlmda
+               dvirdl(j,i) = devvirdl(j,i) + demvirdl(j,i)
+     &                          + depvirdl(j,i)
+            end do
+         end do
+      end if
+c
 c     apply chain rule for derivative of energy wrt global lambda
+c     and sum up to get the total lambda derivative
 c
-      d2epdl2 = d2epdl2 * dpldlmda*dpldlmda + depdl * d2pldlmda2
       depdl = depdl * dpldlmda
-      d2evdl2 = d2evdl2 * dvldlmda*dvldlmda + devdl * d2vldlmda2
       devdl = devdl * dvldlmda
-      d2emdl2 = d2emdl2 * deldlmda*deldlmda + demdl * d2eldlmda2
       demdl = demdl * deldlmda
-      do i = 1, n
-         do j = 1, 3
-            dfpdl(j,i) = dfpdl(j,i) * dpldlmda
-            dfmdl(j,i) = dfmdl(j,i) * deldlmda
-            dfvdl(j,i) = dfvdl(j,i) * dvldlmda
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            depvirdl(j,i) = depvirdl(j,i) * dpldlmda
-            demvirdl(j,i) = demvirdl(j,i) * deldlmda
-            devvirdl(j,i) = devvirdl(j,i) * dvldlmda
-         end do
-      end do
-c
-c     sum up to get the total lambda derivative
-c
       dedl = devdl + demdl + depdl
-      d2edl2 = d2evdl2 + d2emdl2 + d2epdl2
-      do i = 1, n
-         do j = 1, 3
-            dfsumdl(j,i) = dfvdl(j,i) + dfmdl(j,i) + dfpdl(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            dvirdl(j,i) = devvirdl(j,i) + demvirdl(j,i) + depvirdl(j,i)
-         end do
-      end do
 c
 c     zero d2edl2 and dfdl unless second lambda derivs are requested
 c
@@ -1027,9 +1024,8 @@ c
 c     "setlmdaphase" divides the lambda sample interval into the
 c     phase that propagates the lambda particle, the phase that
 c     equilibrates at the frozen lambda and the phase that averages
-c     dU/dlambda at that same fixed lambda; the phase counts are the
-c     authoritative split, while lmdapcratio is only the nominal
-c     fraction left over before truncation to whole samples
+c     dU/dlambda at that same fixed lambda, the averaging phase taking
+c     whatever the other two leave
 c
 c
       subroutine setlmdaphase
@@ -1041,7 +1037,6 @@ c     divide the interval, keeping at least one propagation step and
 c     at least two samples to average
 c
       if (lmdaintv .lt. 1)  lmdaintv = 1
-      lmdapcratio = 1.0d0 - (lmdaparatio+lmdapbratio)
       lmdanpa = int(lmdaparatio*dble(lmdaintv))
       lmdanpb = int(lmdapbratio*dble(lmdaintv))
       lmdanpa = max(1,min(lmdanpa,lmdaintv-1))

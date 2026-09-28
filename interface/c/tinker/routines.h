@@ -805,6 +805,16 @@ void ehal4b_();
 void ehal4c_();
 #define tinker_f_ehal4c ehal4c_
 
+// ehalsc.f
+void halsc_(double* vlsc, double* vscal);
+#define tinker_f_halsc halsc_
+void halsc4_(double* vlsc, double* vscal, double* vlsc1, double* vlsc2, double* dvscal);
+#define tinker_f_halsc4 halsc4_
+void ehalsc_(double* rik, double* rv, double* eps, int* ig, double* vlsc, double* vscal, double* e, double* de);
+#define tinker_f_ehalsc ehalsc_
+void ehalsc4_(double* rik, double* rv, double* eps, int* ig, double* vlsc, double* vlsc1, double* vlsc2, double* vscal, double* dvscal, double* e, double* de, double* dlambda, double* dlambda2, double* dlde);
+#define tinker_f_ehalsc4 ehalsc4_
+
 // eimprop.f
 void eimprop_();
 #define tinker_f_eimprop eimprop_

@@ -55,7 +55,6 @@ extern double TINKER_MOD(dlmda, lmdafric);
 extern double TINKER_MOD(dlmda, lmdamass);
 extern double TINKER_MOD(dlmda, lmdaparatio);
 extern double TINKER_MOD(dlmda, lmdapbratio);
-extern double TINKER_MOD(dlmda, lmdapcratio);
 extern double TINKER_MOD(dlmda, lmdastd);
 extern double TINKER_MOD(dlmda, lmdathalpha);
 extern double TINKER_MOD(dlmda, lmdatheta);
