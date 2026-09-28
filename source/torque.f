@@ -389,3 +389,73 @@ c
       end if
       return
       end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine torqvir  --  virial of torque frame site forces  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "torqvir" adds to a virial tensor the contribution of the forces
+c     that "torque" places on the local frame sites of site "i"; the
+c     frame site forces sum to the negative of the force on site "i",
+c     so only the frame vectors relative to site "i" enter
+c
+c
+      subroutine torqvir (i,frcx,frcy,frcz,vir)
+      use atoms
+      use mpole
+      implicit none
+      integer i,ix,iy,iz
+      real*8 xix,yix,zix
+      real*8 xiy,yiy,ziy
+      real*8 xiz,yiz,ziz
+      real*8 vxx,vyy,vzz
+      real*8 vxy,vxz,vyz
+      real*8 frcx(3),frcy(3)
+      real*8 frcz(3)
+      real*8 vir(3,3)
+c
+c
+c     get the frame vectors from site "i" to its defining sites
+c
+      iz = zaxis(i)
+      ix = xaxis(i)
+      iy = abs(yaxis(i))
+      if (iz .eq. 0)  iz = i
+      if (ix .eq. 0)  ix = i
+      if (iy .eq. 0)  iy = i
+      xiz = x(iz) - x(i)
+      yiz = y(iz) - y(i)
+      ziz = z(iz) - z(i)
+      xix = x(ix) - x(i)
+      yix = y(ix) - y(i)
+      zix = z(ix) - z(i)
+      xiy = x(iy) - x(i)
+      yiy = y(iy) - y(i)
+      ziy = z(iy) - z(i)
+c
+c     increment the symmetrized virial tensor components
+c
+      vxx = xix*frcx(1) + xiy*frcy(1) + xiz*frcz(1)
+      vxy = 0.5d0 * (yix*frcx(1) + yiy*frcy(1) + yiz*frcz(1)
+     &                 + xix*frcx(2) + xiy*frcy(2) + xiz*frcz(2))
+      vxz = 0.5d0 * (zix*frcx(1) + ziy*frcy(1) + ziz*frcz(1)
+     &                 + xix*frcx(3) + xiy*frcy(3) + xiz*frcz(3))
+      vyy = yix*frcx(2) + yiy*frcy(2) + yiz*frcz(2)
+      vyz = 0.5d0 * (zix*frcx(2) + ziy*frcy(2) + ziz*frcz(2)
+     &                 + yix*frcx(3) + yiy*frcy(3) + yiz*frcz(3))
+      vzz = zix*frcx(3) + ziy*frcy(3) + ziz*frcz(3)
+      vir(1,1) = vir(1,1) + vxx
+      vir(2,1) = vir(2,1) + vxy
+      vir(3,1) = vir(3,1) + vxz
+      vir(1,2) = vir(1,2) + vxy
+      vir(2,2) = vir(2,2) + vyy
+      vir(3,2) = vir(3,2) + vyz
+      vir(1,3) = vir(1,3) + vxz
+      vir(2,3) = vir(2,3) + vyz
+      vir(3,3) = vir(3,3) + vzz
+      return
+      end

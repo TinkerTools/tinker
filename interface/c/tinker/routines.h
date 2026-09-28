@@ -2984,6 +2984,8 @@ void torphase_(int* ft, double* vt, double* st);
 // torque.f
 void torque_(int* i, double* trq, double* frcx, double* frcy, double* frcz, double* de);
 #define tinker_f_torque torque_
+void torqvir_(int* i, double* frcx, double* frcy, double* frcz, double* vir);
+#define tinker_f_torqvir torqvir_
 
 // torsions.f
 void torsions_();

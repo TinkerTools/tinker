@@ -4,9 +4,9 @@
  EngCnt  Atomic Multipoles                      -163.1496             2962
  EngCnt  Polarization                            -59.6877             2961
 
- Internal Virial Tensor :                -119.828        7.584      -21.385
-                                            7.584     -170.764       19.585
-                                          -21.385       19.585      -86.755
+ Internal Virial Tensor :                -119.760        7.584      -21.385
+                                            7.584     -170.696       19.585
+                                          -21.385       19.585      -86.687
 
  Cartesian Gradient Breakdown over Individual Atoms :
 
@@ -238,6 +238,6 @@
  Lambda      106        -0.353615      0.584040     -0.244526      0.725217
  Lambda      107        -0.262643      0.839328     -0.858670      1.229133
 
- Analytical dV/dL :               19.071        1.402      -16.521
-                                   1.402        4.856        4.844
-                                 -16.521        4.844       43.708
+ Analytical dV/dL :               19.342        1.402      -16.521
+                                   1.402        5.128        4.844
+                                 -16.521        4.844       43.979

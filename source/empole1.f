@@ -1684,7 +1684,6 @@ c
       real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
-      real*8 xv,yv,zv,vterm
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -1833,6 +1832,12 @@ c
       if (abs(sum) .gt. 1.0d-10) then
          e = fterm * sum**2
          em = em + e
+c
+c     the background term scales as the inverse volume
+c
+         do j = 1, 3
+            emvir(j,j) = emvir(j,j) - e
+         end do
       end if
 c
 c     compute the cell dipole boundary correction term
@@ -1841,14 +1846,21 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
+         xq = 0.0d0
+         yq = 0.0d0
+         zq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
+            xq = xq + rpole(1,i)*x(i)
+            yq = yq + rpole(1,i)*y(i)
+            zq = zq + rpole(1,i)*z(i)
             xd = xd + rpole(2,i) + rpole(1,i)*x(i)
             yd = yd + rpole(3,i) + rpole(1,i)*y(i)
             zd = zd + rpole(4,i) + rpole(1,i)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
-         em = em + term*(xd*xd+yd*yd+zd*zd)
+         e = term * (xd*xd+yd*yd+zd*zd)
+         em = em + e
          do ii = 1, npole
             i = ipole(ii)
             dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,i)*xd
@@ -1864,36 +1876,18 @@ c
             tem(2) = rpole(4,i)*xdfield - rpole(2,i)*zdfield
             tem(3) = rpole(2,i)*ydfield - rpole(3,i)*xdfield
             call torque (i,tem,frcx,frcy,frcz,dem)
+            call torqvir (i,frcx,frcy,frcz,emvir)
          end do
 c
-c     boundary correction to virial due to overall cell dipole
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary energy
 c
-         xd = 0.0d0
-         yd = 0.0d0
-         zd = 0.0d0
-         xq = 0.0d0
-         yq = 0.0d0
-         zq = 0.0d0
-         do ii = 1, npole
-            i = ipole(ii)
-            xd = xd + rpole(2,i)
-            yd = yd + rpole(3,i)
-            zd = zd + rpole(4,i)
-            xq = xq + rpole(1,i)*x(i)
-            yq = yq + rpole(1,i)*y(i)
-            zq = zq + rpole(1,i)*z(i)
-         end do
-         xv = xd * xq
-         yv = yd * yq
-         zv = zd * zq
-         vterm = term * (xd*xd + yd*yd + zd*zd + 2.0d0*(xv+yv+zv)
-     &                      + xq*xq + yq*yq + zq*zq)
-         vxx = 2.0d0*term*(xq*xq+xv) + vterm
-         vxy = 2.0d0*term*(xq*yq+xv)
-         vxz = 2.0d0*term*(xq*zq+xv)
-         vyy = 2.0d0*term*(yq*yq+yv) + vterm
-         vyz = 2.0d0*term*(yq*zq+yv)
-         vzz = 2.0d0*term*(zq*zq+zv) + vterm
+         vxx = 2.0d0*term*xq*xd - e
+         vxy = term * (xq*yd+yq*xd)
+         vxz = term * (xq*zd+zq*xd)
+         vyy = 2.0d0*term*yq*yd - e
+         vyz = term * (yq*zd+zq*yd)
+         vzz = 2.0d0*term*zq*zd - e
          emvir(1,1) = emvir(1,1) + vxx
          emvir(2,1) = emvir(2,1) + vxy
          emvir(3,1) = emvir(3,1) + vxz
@@ -2867,7 +2861,6 @@ c
       real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
-      real*8 xv,yv,zv,vterm
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -3016,6 +3009,12 @@ c
       if (abs(sum) .gt. 1.0d-10) then
          e = fterm * sum**2
          em = em + e
+c
+c     the background term scales as the inverse volume
+c
+         do j = 1, 3
+            emvir(j,j) = emvir(j,j) - e
+         end do
       end if
 c
 c     compute the cell dipole boundary correction term
@@ -3024,14 +3023,21 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
+         xq = 0.0d0
+         yq = 0.0d0
+         zq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
+            xq = xq + rpole(1,i)*x(i)
+            yq = yq + rpole(1,i)*y(i)
+            zq = zq + rpole(1,i)*z(i)
             xd = xd + rpole(2,i) + rpole(1,i)*x(i)
             yd = yd + rpole(3,i) + rpole(1,i)*y(i)
             zd = zd + rpole(4,i) + rpole(1,i)*z(i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
-         em = em + term*(xd*xd+yd*yd+zd*zd)
+         e = term * (xd*xd+yd*yd+zd*zd)
+         em = em + e
          do ii = 1, npole
             i = ipole(ii)
             dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,i)*xd
@@ -3047,36 +3053,18 @@ c
             tem(2) = rpole(4,i)*xdfield - rpole(2,i)*zdfield
             tem(3) = rpole(2,i)*ydfield - rpole(3,i)*xdfield
             call torque (i,tem,frcx,frcy,frcz,dem)
+            call torqvir (i,frcx,frcy,frcz,emvir)
          end do
 c
-c     boundary correction to virial due to overall cell dipole
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary energy
 c
-         xd = 0.0d0
-         yd = 0.0d0
-         zd = 0.0d0
-         xq = 0.0d0
-         yq = 0.0d0
-         zq = 0.0d0
-         do ii = 1, npole
-            i = ipole(ii)
-            xd = xd + rpole(2,i)
-            yd = yd + rpole(3,i)
-            zd = zd + rpole(4,i)
-            xq = xq + rpole(1,i)*x(i)
-            yq = yq + rpole(1,i)*y(i)
-            zq = zq + rpole(1,i)*z(i)
-         end do
-         xv = xd * xq
-         yv = yd * yq
-         zv = zd * zq
-         vterm = term * (xd*xd + yd*yd + zd*zd + 2.0d0*(xv+yv+zv)
-     &                      + xq*xq + yq*yq + zq*zq)
-         vxx = 2.0d0*term*(xq*xq+xv) + vterm
-         vxy = 2.0d0*term*(xq*yq+xv)
-         vxz = 2.0d0*term*(xq*zq+xv)
-         vyy = 2.0d0*term*(yq*yq+yv) + vterm
-         vyz = 2.0d0*term*(yq*zq+yv)
-         vzz = 2.0d0*term*(zq*zq+zv) + vterm
+         vxx = 2.0d0*term*xq*xd - e
+         vxy = term * (xq*yd+yq*xd)
+         vxz = term * (xq*zd+zq*xd)
+         vyy = 2.0d0*term*yq*yd - e
+         vyz = term * (yq*zd+zq*yd)
+         vzz = 2.0d0*term*zq*zd - e
          emvir(1,1) = emvir(1,1) + vxx
          emvir(2,1) = emvir(2,1) + vxy
          emvir(3,1) = emvir(3,1) + vxz

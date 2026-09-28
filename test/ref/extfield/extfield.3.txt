@@ -1,8 +1,8 @@
  Total Potential Energy :               -130.0061 Kcal/mole
 
- Internal Virial Tensor :                   0.045        6.396       11.818
-                                            6.396      -29.011        7.945
-                                           11.818        7.945       13.848
+ Internal Virial Tensor :                   0.317        6.396       11.818
+                                            6.396      -28.739        7.945
+                                           11.818        7.945       14.120
 
  Cartesian Gradient Breakdown over Individual Atoms :
 

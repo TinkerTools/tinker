@@ -4064,6 +4064,12 @@ c     compute the cell dipole boundary correction to the gradient,
 c     whose energy is already included via the direct field
 c
       if (boundary .eq. 'VACUUM') then
+         xd = 0.0d0
+         yd = 0.0d0
+         zd = 0.0d0
+         xq = 0.0d0
+         yq = 0.0d0
+         zq = 0.0d0
          xu = 0.0d0
          yu = 0.0d0
          zu = 0.0d0
@@ -4072,6 +4078,12 @@ c
          zup = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
+            xq = xq + rpole(1,i)*x(i)
+            yq = yq + rpole(1,i)*y(i)
+            zq = zq + rpole(1,i)*z(i)
+            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
+            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
+            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
             xu = xu + uind(1,i)
             yu = yu + uind(2,i)
             zu = zu + uind(3,i)
@@ -4095,46 +4107,35 @@ c
             tep(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
             tep(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
             call torque (i,tep,fix,fiy,fiz,dep)
+            call torqvir (i,fix,fiy,fiz,epvir)
          end do
 c
-c     boundary correction to virial due to overall cell dipole
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary terms, where
+c     mutual polarization adds the induced cell dipole interaction
 c
-         xd = 0.0d0
-         yd = 0.0d0
-         zd = 0.0d0
-         xq = 0.0d0
-         yq = 0.0d0
-         zq = 0.0d0
-         do ii = 1, npole
-            i = ipole(ii)
-            xd = xd + rpole(2,i)
-            yd = yd + rpole(3,i)
-            zd = zd + rpole(4,i)
-            xq = xq + rpole(1,i)*x(i)
-            yq = yq + rpole(1,i)*y(i)
-            zq = zq + rpole(1,i)*z(i)
-         end do
-         xv = xq * (xu+xup)
-         yv = yq * (yu+yup)
-         zv = zq * (zu+zup)
-         vterm = xv + yv + zv + xu*xup + yu*yup + zu*zup
-     &              + xd*(xu+xup) + yd*(yu+yup) + zd*(zu+zup)
-         vterm = term * vterm
-         epvir(1,1) = epvir(1,1) + term*xv + vterm
-         epvir(2,1) = epvir(2,1) + term*xv
-         epvir(3,1) = epvir(3,1) + term*xv
-         epvir(1,2) = epvir(1,2) + term*yv
-         epvir(2,2) = epvir(2,2) + term*yv + vterm
-         epvir(3,2) = epvir(3,2) + term*yv
-         epvir(1,3) = epvir(1,3) + term*zv
-         epvir(2,3) = epvir(2,3) + term*zv
-         epvir(3,3) = epvir(3,3) + term*zv + vterm
-         if (poltyp .eq. 'DIRECT') then
-            vterm = term * (xu*xup+yu*yup+zu*zup)
-            epvir(1,1) = epvir(1,1) + vterm
-            epvir(2,2) = epvir(2,2) + vterm
-            epvir(3,3) = epvir(3,3) + vterm
+         vterm = term * (xd*(xu+xup)+yd*(yu+yup)+zd*(zu+zup))
+         if (poltyp .ne. 'DIRECT') then
+            vterm = vterm + term*(xu*xup+yu*yup+zu*zup)
          end if
+         xv = xu + xup
+         yv = yu + yup
+         zv = zu + zup
+         vxx = term*xq*xv - vterm
+         vxy = 0.5d0 * term * (xq*yv+yq*xv)
+         vxz = 0.5d0 * term * (xq*zv+zq*xv)
+         vyy = term*yq*yv - vterm
+         vyz = 0.5d0 * term * (yq*zv+zq*yv)
+         vzz = term*zq*zv - vterm
+         epvir(1,1) = epvir(1,1) + vxx
+         epvir(2,1) = epvir(2,1) + vxy
+         epvir(3,1) = epvir(3,1) + vxz
+         epvir(1,2) = epvir(1,2) + vxy
+         epvir(2,2) = epvir(2,2) + vyy
+         epvir(3,2) = epvir(3,2) + vyz
+         epvir(1,3) = epvir(1,3) + vxz
+         epvir(2,3) = epvir(2,3) + vyz
+         epvir(3,3) = epvir(3,3) + vzz
       end if
       return
       end
@@ -6919,6 +6920,12 @@ c     compute the cell dipole boundary correction to the gradient,
 c     whose energy is already included via the direct field
 c
       if (boundary .eq. 'VACUUM') then
+         xd = 0.0d0
+         yd = 0.0d0
+         zd = 0.0d0
+         xq = 0.0d0
+         yq = 0.0d0
+         zq = 0.0d0
          xu = 0.0d0
          yu = 0.0d0
          zu = 0.0d0
@@ -6927,6 +6934,12 @@ c
          zup = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
+            xq = xq + rpole(1,i)*x(i)
+            yq = yq + rpole(1,i)*y(i)
+            zq = zq + rpole(1,i)*z(i)
+            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
+            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
+            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
             xu = xu + uind(1,i)
             yu = yu + uind(2,i)
             zu = zu + uind(3,i)
@@ -6950,46 +6963,35 @@ c
             tep(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
             tep(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
             call torque (i,tep,fix,fiy,fiz,dep)
+            call torqvir (i,fix,fiy,fiz,epvir)
          end do
 c
-c     boundary correction to virial due to overall cell dipole
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary terms, where
+c     mutual polarization adds the induced cell dipole interaction
 c
-         xd = 0.0d0
-         yd = 0.0d0
-         zd = 0.0d0
-         xq = 0.0d0
-         yq = 0.0d0
-         zq = 0.0d0
-         do ii = 1, npole
-            i = ipole(ii)
-            xd = xd + rpole(2,i)
-            yd = yd + rpole(3,i)
-            zd = zd + rpole(4,i)
-            xq = xq + rpole(1,i)*x(i)
-            yq = yq + rpole(1,i)*y(i)
-            zq = zq + rpole(1,i)*z(i)
-         end do
-         xv = xq * (xu+xup)
-         yv = yq * (yu+yup)
-         zv = zq * (zu+zup)
-         vterm = xv + yv + zv + xu*xup + yu*yup + zu*zup
-     &              + xd*(xu+xup) + yd*(yu+yup) + zd*(zu+zup)
-         vterm = term * vterm
-         epvir(1,1) = epvir(1,1) + term*xv + vterm
-         epvir(2,1) = epvir(2,1) + term*xv
-         epvir(3,1) = epvir(3,1) + term*xv
-         epvir(1,2) = epvir(1,2) + term*yv
-         epvir(2,2) = epvir(2,2) + term*yv + vterm
-         epvir(3,2) = epvir(3,2) + term*yv
-         epvir(1,3) = epvir(1,3) + term*zv
-         epvir(2,3) = epvir(2,3) + term*zv
-         epvir(3,3) = epvir(3,3) + term*zv + vterm
-         if (poltyp .eq. 'DIRECT') then
-            vterm = term * (xu*xup+yu*yup+zu*zup)
-            epvir(1,1) = epvir(1,1) + vterm
-            epvir(2,2) = epvir(2,2) + vterm
-            epvir(3,3) = epvir(3,3) + vterm
+         vterm = term * (xd*(xu+xup)+yd*(yu+yup)+zd*(zu+zup))
+         if (poltyp .ne. 'DIRECT') then
+            vterm = vterm + term*(xu*xup+yu*yup+zu*zup)
          end if
+         xv = xu + xup
+         yv = yu + yup
+         zv = zu + zup
+         vxx = term*xq*xv - vterm
+         vxy = 0.5d0 * term * (xq*yv+yq*xv)
+         vxz = 0.5d0 * term * (xq*zv+zq*xv)
+         vyy = term*yq*yv - vterm
+         vyz = 0.5d0 * term * (yq*zv+zq*yv)
+         vzz = term*zq*zv - vterm
+         epvir(1,1) = epvir(1,1) + vxx
+         epvir(2,1) = epvir(2,1) + vxy
+         epvir(3,1) = epvir(3,1) + vxz
+         epvir(1,2) = epvir(1,2) + vxy
+         epvir(2,2) = epvir(2,2) + vyy
+         epvir(3,2) = epvir(3,2) + vyz
+         epvir(1,3) = epvir(1,3) + vxz
+         epvir(2,3) = epvir(2,3) + vyz
+         epvir(3,3) = epvir(3,3) + vzz
       end if
       return
       end

@@ -2019,10 +2019,8 @@ c
       real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
-      real*8 dxd,dyd,dzd
       real*8 dxq,dyq,dzq
-      real*8 xv,yv,zv,vterm
-      real*8 dxv,dyv,dzv,dldvterm
+      real*8 dle
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -2193,9 +2191,17 @@ c
          sum = sum + emsc(mutg(i))*ci
       end do
       e = fterm * sum**2
+      dle = fterm * 2.0d0 * sum * dlsum
       em = em + e
-      demdl = demdl + fterm * 2.0d0 * sum * dlsum
+      demdl = demdl + dle
       d2emdl2 = d2emdl2 + fterm * 2.0d0 * dlsum**2
+c
+c     the background term scales as the inverse volume
+c
+      do j = 1, 3
+         emvir(j,j) = emvir(j,j) - e
+         demvirdl(j,j) = demvirdl(j,j) - dle
+      end do
 c
 c     compute the cell dipole boundary correction term
 c
@@ -2203,9 +2209,15 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
+         xq = 0.0d0
+         yq = 0.0d0
+         zq = 0.0d0
          dlxd = 0.0d0
          dlyd = 0.0d0
          dlzd = 0.0d0
+         dxq = 0.0d0
+         dyq = 0.0d0
+         dzq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -2217,6 +2229,9 @@ c
             diz = rpole(4,i)
             esi = emsc(mutg(i))
             desi = demsc(mutg(i))
+            dxq = dxq + desi*ci*xi
+            dyq = dyq + desi*ci*yi
+            dzq = dzq + desi*ci*zi
             dlxd = dlxd + desi*(dix+ci*xi)
             dlyd = dlyd + desi*(diy+ci*yi)
             dlzd = dlzd + desi*(diz+ci*zi)
@@ -2224,13 +2239,18 @@ c
             dix = dix * esi
             diy = diy * esi
             diz = diz * esi
+            xq = xq + ci*xi
+            yq = yq + ci*yi
+            zq = zq + ci*zi
             xd = xd + dix + ci*xi
             yd = yd + diy + ci*yi
             zd = zd + diz + ci*zi
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
-         em = em + term*(xd*xd+yd*yd+zd*zd)
-         demdl = demdl + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
+         e = term * (xd*xd+yd*yd+zd*zd)
+         dle = 2.0d0 * term * (xd*dlxd+yd*dlyd+zd*dlzd)
+         em = em + e
+         demdl = demdl + dle
          d2emdl2 = d2emdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
          do ii = 1, npole
             i = ipole(ii)
@@ -2272,70 +2292,25 @@ c
             tem(3) = dix*ydfield - diy*xdfield
             call torque (i,tem,frcx,frcy,frcz,dem)
             call torque (i,dltem,dlfrcx,dlfrcy,dlfrcz,dfmdl)
+            call torqvir (i,frcx,frcy,frcz,emvir)
+            call torqvir (i,dlfrcx,dlfrcy,dlfrcz,demvirdl)
          end do
 c
-c     boundary correction to virial due to overall cell dipole
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary energy
 c
-         xd = 0.0d0
-         yd = 0.0d0
-         zd = 0.0d0
-         xq = 0.0d0
-         yq = 0.0d0
-         zq = 0.0d0
-         dxd = 0.0d0
-         dyd = 0.0d0
-         dzd = 0.0d0
-         dxq = 0.0d0
-         dyq = 0.0d0
-         dzq = 0.0d0
-         do ii = 1, npole
-            i = ipole(ii)
-            ci = rpole(1,i)
-            dix = rpole(2,i)
-            diy = rpole(3,i)
-            diz = rpole(4,i)
-            esi = emsc(mutg(i))
-            desi = demsc(mutg(i))
-            dxd = dxd + desi*dix
-            dyd = dyd + desi*diy
-            dzd = dzd + desi*diz
-            dxq = dxq + desi*ci*x(i)
-            dyq = dyq + desi*ci*y(i)
-            dzq = dzq + desi*ci*z(i)
-            ci = ci * esi
-            dix = dix * esi
-            diy = diy * esi
-            diz = diz * esi
-            xd = xd + dix
-            yd = yd + diy
-            zd = zd + diz
-            xq = xq + ci*x(i)
-            yq = yq + ci*y(i)
-            zq = zq + ci*z(i)
-         end do
-         xv = xd * xq
-         yv = yd * yq
-         zv = zd * zq
-         dxv = dxd*xq + xd*dxq
-         dyv = dyd*yq + yd*dyq
-         dzv = dzd*zq + zd*dzq
-         vterm = term * (xd*xd + yd*yd + zd*zd + 2.0d0*(xv+yv+zv)
-     &                      + xq*xq + yq*yq + zq*zq)
-         dldvterm = term * (2.0d0*xd*dxd + 2.0d0*yd*dyd + 2.0d0*zd*dzd
-     &                   + 2.0d0*(dxv+dyv+dzv)
-     &                   + 2.0d0*xq*dxq + 2.0d0*yq*dyq + 2.0d0*zq*dzq)
-         vxx = 2.0d0*term*(xq*xq+xv) + vterm
-         vxy = 2.0d0*term*(xq*yq+xv)
-         vxz = 2.0d0*term*(xq*zq+xv)
-         vyy = 2.0d0*term*(yq*yq+yv) + vterm
-         vyz = 2.0d0*term*(yq*zq+yv)
-         vzz = 2.0d0*term*(zq*zq+zv) + vterm
-         dldvxx = 2.0d0*term*(2.0d0*xq*dxq + dxv) + dldvterm
-         dldvxy = 2.0d0*term*(dxq*yq + xq*dyq + dxv)
-         dldvxz = 2.0d0*term*(dxq*zq + xq*dzq + dxv)
-         dldvyy = 2.0d0*term*(2.0d0*yq*dyq + dyv) + dldvterm
-         dldvyz = 2.0d0*term*(dyq*zq + yq*dzq + dyv)
-         dldvzz = 2.0d0*term*(2.0d0*zq*dzq + dzv) + dldvterm
+         vxx = 2.0d0*term*xq*xd - e
+         vxy = term * (xq*yd+yq*xd)
+         vxz = term * (xq*zd+zq*xd)
+         vyy = 2.0d0*term*yq*yd - e
+         vyz = term * (yq*zd+zq*yd)
+         vzz = 2.0d0*term*zq*zd - e
+         dldvxx = 2.0d0*term*(dxq*xd+xq*dlxd) - dle
+         dldvxy = term * (dxq*yd+xq*dlyd+dyq*xd+yq*dlxd)
+         dldvxz = term * (dxq*zd+xq*dlzd+dzq*xd+zq*dlxd)
+         dldvyy = 2.0d0*term*(dyq*yd+yq*dlyd) - dle
+         dldvyz = term * (dyq*zd+yq*dlzd+dzq*yd+zq*dlyd)
+         dldvzz = 2.0d0*term*(dzq*zd+zq*dlzd) - dle
          emvir(1,1) = emvir(1,1) + vxx
          emvir(2,1) = emvir(2,1) + vxy
          emvir(3,1) = emvir(3,1) + vxz
@@ -3508,10 +3483,8 @@ c
       real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
-      real*8 dxd,dyd,dzd
       real*8 dxq,dyq,dzq
-      real*8 xv,yv,zv,vterm
-      real*8 dxv,dyv,dzv,dldvterm
+      real*8 dle
       real*8 ci,dix,diy,diz
       real*8 qixx,qixy,qixz
       real*8 qiyy,qiyz,qizz
@@ -3682,9 +3655,17 @@ c
          sum = sum + emsc(mutg(i))*ci
       end do
       e = fterm * sum**2
+      dle = fterm * 2.0d0 * sum * dlsum
       em = em + e
-      demdl = demdl + fterm * 2.0d0 * sum * dlsum
+      demdl = demdl + dle
       d2emdl2 = d2emdl2 + fterm * 2.0d0 * dlsum**2
+c
+c     the background term scales as the inverse volume
+c
+      do j = 1, 3
+         emvir(j,j) = emvir(j,j) - e
+         demvirdl(j,j) = demvirdl(j,j) - dle
+      end do
 c
 c     compute the cell dipole boundary correction term
 c
@@ -3692,9 +3673,15 @@ c
          xd = 0.0d0
          yd = 0.0d0
          zd = 0.0d0
+         xq = 0.0d0
+         yq = 0.0d0
+         zq = 0.0d0
          dlxd = 0.0d0
          dlyd = 0.0d0
          dlzd = 0.0d0
+         dxq = 0.0d0
+         dyq = 0.0d0
+         dzq = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
             xi = x(i)
@@ -3706,6 +3693,9 @@ c
             diz = rpole(4,i)
             esi = emsc(mutg(i))
             desi = demsc(mutg(i))
+            dxq = dxq + desi*ci*xi
+            dyq = dyq + desi*ci*yi
+            dzq = dzq + desi*ci*zi
             dlxd = dlxd + desi*(dix+ci*xi)
             dlyd = dlyd + desi*(diy+ci*yi)
             dlzd = dlzd + desi*(diz+ci*zi)
@@ -3713,13 +3703,18 @@ c
             dix = dix * esi
             diy = diy * esi
             diz = diz * esi
+            xq = xq + ci*xi
+            yq = yq + ci*yi
+            zq = zq + ci*zi
             xd = xd + dix + ci*xi
             yd = yd + diy + ci*yi
             zd = zd + diz + ci*zi
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
-         em = em + term*(xd*xd+yd*yd+zd*zd)
-         demdl = demdl + 2.0d0*term*(xd*dlxd+yd*dlyd+zd*dlzd)
+         e = term * (xd*xd+yd*yd+zd*zd)
+         dle = 2.0d0 * term * (xd*dlxd+yd*dlyd+zd*dlzd)
+         em = em + e
+         demdl = demdl + dle
          d2emdl2 = d2emdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
          do ii = 1, npole
             i = ipole(ii)
@@ -3761,70 +3756,25 @@ c
             tem(3) = dix*ydfield - diy*xdfield
             call torque (i,tem,frcx,frcy,frcz,dem)
             call torque (i,dltem,dlfrcx,dlfrcy,dlfrcz,dfmdl)
+            call torqvir (i,frcx,frcy,frcz,emvir)
+            call torqvir (i,dlfrcx,dlfrcy,dlfrcz,demvirdl)
          end do
 c
-c     boundary correction to virial due to overall cell dipole
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary energy
 c
-         xd = 0.0d0
-         yd = 0.0d0
-         zd = 0.0d0
-         xq = 0.0d0
-         yq = 0.0d0
-         zq = 0.0d0
-         dxd = 0.0d0
-         dyd = 0.0d0
-         dzd = 0.0d0
-         dxq = 0.0d0
-         dyq = 0.0d0
-         dzq = 0.0d0
-         do ii = 1, npole
-            i = ipole(ii)
-            ci = rpole(1,i)
-            dix = rpole(2,i)
-            diy = rpole(3,i)
-            diz = rpole(4,i)
-            esi = emsc(mutg(i))
-            desi = demsc(mutg(i))
-            dxd = dxd + desi*dix
-            dyd = dyd + desi*diy
-            dzd = dzd + desi*diz
-            dxq = dxq + desi*ci*x(i)
-            dyq = dyq + desi*ci*y(i)
-            dzq = dzq + desi*ci*z(i)
-            ci = ci * esi
-            dix = dix * esi
-            diy = diy * esi
-            diz = diz * esi
-            xd = xd + dix
-            yd = yd + diy
-            zd = zd + diz
-            xq = xq + ci*x(i)
-            yq = yq + ci*y(i)
-            zq = zq + ci*z(i)
-         end do
-         xv = xd * xq
-         yv = yd * yq
-         zv = zd * zq
-         dxv = dxd*xq + xd*dxq
-         dyv = dyd*yq + yd*dyq
-         dzv = dzd*zq + zd*dzq
-         vterm = term * (xd*xd + yd*yd + zd*zd + 2.0d0*(xv+yv+zv)
-     &                      + xq*xq + yq*yq + zq*zq)
-         dldvterm = term * (2.0d0*xd*dxd + 2.0d0*yd*dyd + 2.0d0*zd*dzd
-     &                   + 2.0d0*(dxv+dyv+dzv)
-     &                   + 2.0d0*xq*dxq + 2.0d0*yq*dyq + 2.0d0*zq*dzq)
-         vxx = 2.0d0*term*(xq*xq+xv) + vterm
-         vxy = 2.0d0*term*(xq*yq+xv)
-         vxz = 2.0d0*term*(xq*zq+xv)
-         vyy = 2.0d0*term*(yq*yq+yv) + vterm
-         vyz = 2.0d0*term*(yq*zq+yv)
-         vzz = 2.0d0*term*(zq*zq+zv) + vterm
-         dldvxx = 2.0d0*term*(2.0d0*xq*dxq + dxv) + dldvterm
-         dldvxy = 2.0d0*term*(dxq*yq + xq*dyq + dxv)
-         dldvxz = 2.0d0*term*(dxq*zq + xq*dzq + dxv)
-         dldvyy = 2.0d0*term*(2.0d0*yq*dyq + dyv) + dldvterm
-         dldvyz = 2.0d0*term*(dyq*zq + yq*dzq + dyv)
-         dldvzz = 2.0d0*term*(2.0d0*zq*dzq + dzv) + dldvterm
+         vxx = 2.0d0*term*xq*xd - e
+         vxy = term * (xq*yd+yq*xd)
+         vxz = term * (xq*zd+zq*xd)
+         vyy = 2.0d0*term*yq*yd - e
+         vyz = term * (yq*zd+zq*yd)
+         vzz = 2.0d0*term*zq*zd - e
+         dldvxx = 2.0d0*term*(dxq*xd+xq*dlxd) - dle
+         dldvxy = term * (dxq*yd+xq*dlyd+dyq*xd+yq*dlxd)
+         dldvxz = term * (dxq*zd+xq*dlzd+dzq*xd+zq*dlxd)
+         dldvyy = 2.0d0*term*(dyq*yd+yq*dlyd) - dle
+         dldvyz = term * (dyq*zd+yq*dlzd+dzq*yd+zq*dlyd)
+         dldvzz = 2.0d0*term*(dzq*zd+zq*dlzd) - dle
          emvir(1,1) = emvir(1,1) + vxx
          emvir(2,1) = emvir(2,1) + vxy
          emvir(3,1) = emvir(3,1) + vxz
