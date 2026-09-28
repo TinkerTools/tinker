@@ -224,7 +224,7 @@ c     check to see if preconditioner list should be disabled
 c
       if (poltyp .eq. 'DIRECT')  use_ulist = .false.
       if (usolvcut .le. 0.0d0)  use_ulist = .false.
-      if (use_list)  usolvcut = usolvcut - pbuffer
+      if (use_ulist)  usolvcut = usolvcut - pbuffer
 c
 c     apply any Ewald cutoff to dispersion and electrostatics
 c

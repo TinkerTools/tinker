@@ -40,6 +40,8 @@ c
       call test_mutate_relsmap
       call test_mutate_apm
       call test_mutate_vsoft
+      call test_mutate_g3
+      call test_mutate_hal
       call test_mutate_gate
       call test_mutate_chiral
       return
@@ -679,8 +681,8 @@ c     terms active with Ewald on and off; case 182 leaves all three
 c     nonbonded terms active and annihilates van der Waals interactions;
 c     cases 187-192 leave all three nonbonded terms active at matched
 c     vdw-lambda, ele-lambda and pol-lambda values 1.0, 0.5 and 0.0 with
-c     Ewald on and off; the no-Ewald cases cannot use a pairwise
-c     neighbor list
+c     Ewald on and off; the no-Ewald cases take the van der Waals list
+c     in place of the full pairwise neighbor list
 c
 c
       subroutine test_mutate_ast
@@ -761,7 +763,8 @@ c     them through "test_mutate_calc" with the level 4 lambda derivative
 c     checks enabled; cases 047-052 keep only the polarization term at
 c     three pol-lambda values, and cases 056-057 also keep the multipole
 c     term, on its single topology path, with Ewald on and off; the
-c     no-Ewald cases cannot use a pairwise neighbor list
+c     no-Ewald cases take the van der Waals list in place of the full
+c     pairwise neighbor list
 c
 c
       subroutine test_mutate_adt
@@ -1021,7 +1024,8 @@ c     them through "test_mutate_calc" with the level 4 lambda derivative
 c     checks enabled; the multipoles use single topology, and each case
 c     sits at ele-/pol-lambda values 1.0, 0.5 and 0.0 with Ewald on and
 c     off; the polarization term uses an interpolation exponent of
-c     three; the no-Ewald cases cannot use a pairwise neighbor list
+c     three; the no-Ewald cases take the van der Waals list in place of
+c     the full pairwise neighbor list
 c
 c
       subroutine test_mutate_emplar
@@ -1503,6 +1507,90 @@ c
       end
 c
 c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_mutate_g3  --  flexible guest ligand  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_mutate_g3" runs the four fixtures 207-210 on SAMPL8 guest 3,
+c     a cyclopentylacetate anion with the 29 waters nearest to it, which
+c     has the 1-4 and 1-5 pairs the water fixtures lack; electrostatics,
+c     polarization and van der Waals all follow the main lambda on the
+c     identity map, fixtures 207 and 208 decouple the guest at a main
+c     lambda of 1.0 and 0.5, 209 annihilates it with a van der Waals
+c     1-4 scale of one half and the artificial "vdw14" values from
+c     "g3_vdw14.prm", so the soft core pairs inside the guest carry a
+c     fractional exclusion scale and 1-4 radii and well depths, and 210
+c     repeats 208 as an isolated cluster with no box; the cluster sits
+c     at the corner of the periodic cell so the method of lights wraps
+c     along all three axes; every fixture carries "lambda-deriv2" and
+c     runs the level 4 checks
+c
+c
+      subroutine test_mutate_g3
+      implicit none
+c
+c
+      call test_mutate_calc ('g3','207_g3_ast_ye_l10.key',
+     &   '207_g3_ast_ye_l10.txt','207_g3_ast_ye_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','208_g3_ast_ye_l05.key',
+     &   '208_g3_ast_ye_l05.txt','208_g3_ast_ye_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','209_g3_ast_annih_l05.key',
+     &   '209_g3_ast_annih_l05.txt','209_g3_ast_annih_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','210_g3_ast_nobox_l05.key',
+     &   '210_g3_ast_nobox_l05.txt','210_g3_ast_nobox_l05',
+     &   .true.,  .true.,  .true.,  .false.,  .true.)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_mutate_hal  --  14-7 vdw lambda paths  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_mutate_hal" runs the four water fixtures 211-214 that reach
+c     the buffered 14-7 lambda derivative paths the other water cases
+c     leave out; 211 annihilates the ligand with the long range van der
+c     Waals correction, 212 and 213 repeat the single topology midpoint
+c     in a monoclinic and a triclinic cell, and 214 is a staged relative
+c     van der Waals leg whose second ligand has pairs in the switching
+c     window, at a main lambda of 0.4 so the two ligands sit at unequal
+c     soft core strengths; every fixture carries "lambda-deriv2", runs
+c     the level 4 checks, uses Ewald and supports a neighbor list
+c
+c
+      subroutine test_mutate_hal
+      implicit none
+c
+c
+      call test_mutate_calc ('water2',
+     &   '211_water_ast_vcorr_annih_l05.key',
+     &   '211_water_ast_vcorr_annih_l05.txt',
+     &   '211_water_ast_vcorr_annih_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','212_water_ast_mono_l05.key',
+     &   '212_water_ast_mono_l05.txt','212_water_ast_mono_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','213_water_ast_tric_l05.key',
+     &   '213_water_ast_tric_l05.txt','213_water_ast_tric_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '214_water_rels_ye_vdwm_lig2t_l040.key',
+     &   '214_water_rels_ye_vdwm_lig2t_l040.txt',
+     &   '214_water_rels_ye_vdwm_lig2t_l040',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
 c     ##############################################################
 c     ##                                                          ##
 c     ##  subroutine test_mutate_chiral  --  chiral frame refresh  ##
@@ -1650,8 +1738,8 @@ c     ##                                                       ##
 c     ###########################################################
 c
 c
-c     "test_mutate_fixed" runs a single mutation fixture with and
-c     without the neighbor-list keyword, checking the level 0/1/3
+c     "test_mutate_fixed" runs a single mutation fixture under each
+c     of the three pairwise neighbor methods, checking the level 0/1/3
 c     energy, gradient, virial and named component regressions; it is
 c     a thin wrapper around "test_mutate_calc" with the level 4 lambda
 c     derivative checks disabled, and backs the "test_mutate_mv" and
@@ -1678,19 +1766,23 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "test_mutate_calc" runs a single mutation fixture with and
-c     without the neighbor-list keyword; for each neighbor-list
-c     variant the force field is built once, then the checks are
-c     repeated twice before teardown, giving four passes per fixture;
-c     the "checkm", "checkp" and "checkv" flags select which level 3
-c     energy components are verified (Atomic Multipoles, Polarization
-c     and Van der Waals); the "canlist" flag records whether the
-c     neighbor-list variant is compatible with this fixture (false for
-c     the no-Ewald cases); when "dolmda" is set, the level 4 checks
-c     also verify the analytical lambda derivatives, second lambda
-c     derivatives, per-atom lambda gradient and dV/dL tensor against
-c     the reference read by "load_lmdaref", reusing the values already
-c     produced by the level 1 gradient call
+c     "test_mutate_calc" runs a single mutation fixture three ways,
+c     with the double loop, with a pairwise neighbor list and with
+c     the method of lights, and holds all three to the one reference;
+c     for each variant the force field is built once, then the checks
+c     are repeated twice before teardown, giving six passes per
+c     fixture; the "checkm", "checkp" and "checkv" flags select which
+c     level 3 energy components are verified (Atomic Multipoles,
+c     Polarization and Van der Waals); the "canlist" flag records
+c     whether the full "neighbor-list" keyword is compatible with this
+c     fixture, and when it is not (the no-Ewald cases) the list variant
+c     uses "vdw-list" so only the van der Waals term takes a list;
+c     the method of lights only changes the van der Waals and charge
+c     loops, so it applies to every fixture; when "dolmda" is set, the
+c     level 4 checks also verify the analytical lambda derivatives,
+c     second lambda derivatives, per-atom lambda gradient and dV/dL
+c     tensor against the reference read by "load_lmdaref", reusing the
+c     values already produced by the level 1 gradient call
 c
 c
       subroutine test_mutate_calc
@@ -1701,14 +1793,14 @@ c
       use energi
       use virial
       implicit none
-      integer nat,natl,irun,ilist,nlist
+      integer nat,natl,irun,imeth
       real*8 energy,e,ref_e,ref_ei
       real*8 eps_e,eps_g,eps_v,eps_l,refv(3,3)
       real*8 ref_dedl(4),ref_d2edl2(4),ref_dvdl(3,3)
       real*8, allocatable :: derivs(:,:)
       real*8, allocatable :: refg(:,:)
       real*8, allocatable :: ref_lg(:,:)
-      logical skiptest,checkm,checkp,checkv,canlist,uselist,dolmda
+      logical skiptest,checkm,checkp,checkv,canlist,dolmda
       character*(*) base,key,ref,cname
       character*240 rpath,pre
       character*8 rtag
@@ -1716,23 +1808,27 @@ c
 c
       if (skiptest('test_'//trim(cname),'mutate'))  return
 c
-c     run each fixture without the neighbor-list keyword, and with it
-c     when the fixture supports a pairwise neighbor list
+c     run each fixture with the double loop, a pairwise neighbor
+c     list and the method of lights against the same reference
 c
-      nlist = 2
-      if (.not. canlist)  nlist = 1
-      do ilist = 1, nlist
-         uselist = (ilist .eq. 2)
+      do imeth = 1, 3
 c
-c     set up the force field once for this neighbor-list variant
+c     set up the force field once for this neighbor method
 c
          call pushdir ('file/mutate')
-         if (uselist) then
-            call loadfix_keyadd (base,key,'neighbor-list')
-            pre = 'test_'//trim(cname)//' list'
-         else
+         if (imeth .eq. 1) then
             call loadfix (base,key)
             pre = 'test_'//trim(cname)//' nolist'
+         else if (imeth .eq. 2) then
+            if (canlist) then
+               call loadfix_keyadd (base,key,'neighbor-list')
+            else
+               call loadfix_keyadd (base,key,'vdw-list')
+            end if
+            pre = 'test_'//trim(cname)//' list'
+         else
+            call loadfix_keyadd (base,key,'lights')
+            pre = 'test_'//trim(cname)//' lights'
          end if
          allocate (derivs(3,n))
          allocate (refg(3,n))
@@ -1821,7 +1917,7 @@ c
             end if
          end do
 c
-c     clean up this neighbor-list variant
+c     clean up this neighbor method variant
 c
          deallocate (derivs)
          deallocate (refg)
