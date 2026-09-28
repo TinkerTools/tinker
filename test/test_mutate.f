@@ -47,6 +47,8 @@ c
       call test_mutate_mirror
       call test_mutate_polst
       call test_mutate_deriv1
+      call test_mutate_vsoft1
+      call test_mutate_scexp
       call test_mutate_gate
       call test_mutate_flat
       call test_mutate_chiral
@@ -1803,6 +1805,131 @@ c
      &   '234_water_rels_ye_vdwm_d1_l040.txt',
      &   '234_water_rels_ye_vdwm_d1_l040',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_vsoft1  --  linear softcore vdw  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_vsoft1" runs the three water fixtures 235-237 that
+c     use a softcore exponent of one, allowed when only the first lambda
+c     derivative is requested as by TI, ABF and metadynamics; 235 and
+c     236 annihilate the ligand van der Waals on the identity map at a
+c     main lambda of 0.0 and 0.05, and 237 is a staged relative van der
+c     Waals leg at a main lambda of 1.0, where the second ligand group
+c     sits at its decoupled endpoint; the first lambda derivative must
+c     stay finite at the endpoint, where the second derivative factor
+c     diverges, and the level 4 checks confirm that the second, force
+c     and virial lambda derivatives stay zero
+c
+c
+      subroutine test_mutate_vsoft1
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','235_water_vsoft_n1_d1_l00.key',
+     &   '235_water_vsoft_n1_d1_l00.txt','235_water_vsoft_n1_d1_l00',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','236_water_vsoft_n1_d1_l005.key',
+     &   '236_water_vsoft_n1_d1_l005.txt','236_water_vsoft_n1_d1_l005',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '237_water_rels_vdwm_n1_d1_l10.key',
+     &   '237_water_rels_vdwm_n1_d1_l10.txt',
+     &   '237_water_rels_vdwm_n1_d1_l10',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_scexp  --  softcore exponent gate  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_scexp" runs "analyze" on keyfiles with a softcore
+c     exponent below the allowed limits; an exponent of 0.5 must stop
+c     in any mode, 1.5 must stop with "lambda-deriv2" or OST since the
+c     second lambda derivative diverges at the endpoint, and 1.5 with
+c     TI must run
+c
+c
+      subroutine test_mutate_scexp
+      implicit none
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_scexp','mutate'))  return
+      call pushdir ('file/mutate')
+      call test_mutate_scexpcase ('vsoft_n05_d1.key','one',
+     &                            'test_mutate_scexp n05 deriv')
+      call test_mutate_scexpcase ('vsoft_n15_d2.key','two',
+     &                            'test_mutate_scexp n15 deriv2')
+      call test_mutate_scexpcase ('vsoft_n15_ost.key','two',
+     &                            'test_mutate_scexp n15 ost')
+      call test_mutate_scexpcase ('vsoft_n15_ti.key','',
+     &                            'test_mutate_scexp n15 ti')
+      call popdir
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_mutate_scexpcase  --  one exponent keyfile  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "test_mutate_scexpcase" runs "analyze" on one keyfile and checks
+c     the exponent error it prints, where "limit" names the violated
+c     lower bound, or is blank if the run must not stop
+c
+c
+      subroutine test_mutate_scexpcase (key,limit,label)
+      implicit none
+      integer ist,iout
+      logical found,want
+      character*(*) key,limit,label
+      character*240 line
+      character*512 args
+c
+c
+      call execute_command_line ('rm -f out.txt')
+      args = '-k '//key//' water2.xyz E'
+      call run_prog ('analyze',trim(args),'out.txt',ist)
+      if (ist .eq. -1)  return
+c
+c     find the exponent error and the bound it names
+c
+      found = .false.
+      want = .false.
+      open (newunit=iout,file='out.txt',status='old')
+      do while (.true.)
+         read (iout,'(a)',end=10)  line
+         if (index(line,'VDW-SOFTCORE exponent') .ne. 0) then
+            found = .true.
+            if (len(limit) .gt. 0) then
+               want = (index(line,'equal to '//limit) .ne. 0)
+            end if
+         end if
+      end do
+   10 continue
+      close (unit=iout)
+      if (len(limit) .gt. 0) then
+         call assert_logical (found,.true.,label//' stops')
+         call assert_logical (want,.true.,label//' bound')
+      else
+         call assert_logical (found,.false.,label//' runs')
+      end if
+      call execute_command_line ('rm -f out.txt')
       return
       end
 c

@@ -1332,10 +1332,21 @@ c
      &              ' greater than or equal to zero')
          call fatal
       end if
-      if (scexp .lt. 2.0d0) then
+      if (scexp .lt. 1.0d0) then
          write (iout,6)
     6    format (/,' MUTATE_CHECK  --  VDW-SOFTCORE exponent must be',
-     &              ' greater than or equal to two')
+     &              ' greater than or equal to one')
+         call fatal
+      end if
+c
+c     the second lambda derivative diverges at the endpoint unless
+c     the soft core exponent is at least two
+c
+      if (use_d2lmda .and. scexp.lt.2.0d0) then
+         write (iout,7)
+    7    format (/,' MUTATE_CHECK  --  VDW-SOFTCORE exponent must be',
+     &              ' greater than or equal to two with OST or',
+     &              ' LAMBDA-DERIV2')
          call fatal
       end if
 c

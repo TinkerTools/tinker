@@ -276,6 +276,7 @@ add_library (tinkerObjF OBJECT
 ../source/ehal2.f
 ../source/ehal3.f
 ../source/ehal4.f
+../source/ehalsc.f
 ../source/eimprop.f
 ../source/eimprop1.f
 ../source/eimprop2.f

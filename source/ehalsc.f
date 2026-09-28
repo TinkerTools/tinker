@@ -47,10 +47,13 @@ c
 c
 c     "halsc4" sets the soft core terms of the buffered 14-7 potential
 c     for each ligand group along with the factors needed for their
-c     first and second derivatives with respect to the group lambda
+c     first and second derivatives with respect to the group lambda,
+c     where the second derivative factor is only set when requested
+c     since it diverges at the endpoint for exponents below two
 c
 c
       subroutine halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
+      use dlmda
       use mutant
       implicit none
       integer ig
@@ -69,7 +72,8 @@ c
          vlmd = vlambda
          if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
          vlsc1(ig) = vlmd**(scexp-1)
-         vlsc2(ig) = vlmd**(scexp-2)
+         vlsc2(ig) = 0.0d0
+         if (use_d2lmda)  vlsc2(ig) = vlmd**(scexp-2)
          dvscal(ig) = 2.0d0 * scalphav * (1.0d0-vlmd)
       end do
       return
