@@ -2106,14 +2106,10 @@ c
       use analyz
       use atoms
       use atomid
-      use boxes
       use chgpot
       use energi
-      use ewald
       use inform
       use iounit
-      use limits
-      use math
       use mpole
       use polar
       use polpot
@@ -2121,11 +2117,7 @@ c
       use units
       implicit none
       integer i,j,ii
-      real*8 e,f,fi,term
-      real*8 xd,yd,zd
-      real*8 xu,yu,zu
-      real*8 dix,diy,diz
-      real*8 uix,uiy,uiz
+      real*8 e,f,fi
       logical header,huge
 c
 c
@@ -2206,42 +2198,9 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     compute the cell dipole boundary correction term
+c     the direct field in "udirp" already carries any vacuum cell
+c     dipole boundary field, so the boundary energy is included above
 c
-      if (use_ewald) then
-         if (boundary .eq. 'VACUUM') then
-            f = electric / dielec
-            xd = 0.0d0
-            yd = 0.0d0
-            zd = 0.0d0
-            xu = 0.0d0
-            yu = 0.0d0
-            zu = 0.0d0
-            do ii = 1, npole
-               i = ipole(ii)
-               dix = rpole(2,i)
-               diy = rpole(3,i)
-               diz = rpole(4,i)
-               uix = uind(1,i)
-               uiy = uind(2,i)
-               uiz = uind(3,i)
-               xd = xd + dix + rpole(1,i)*x(i)
-               yd = yd + diy + rpole(1,i)*y(i)
-               zd = zd + diz + rpole(1,i)*z(i)
-               xu = xu + uix
-               yu = yu + uiy
-               zu = zu + uiz
-            end do
-            term = (2.0d0/3.0d0) * f * (pi/volbox)
-            e = term * (xd*xu+yd*yu+zd*zu)
-            nep = nep + 1
-            ep = ep + e
-            do ii = 1, npole
-               i = ipole(ii)
-               aep(i) = aep(i) + e/dble(npole)
-            end do
-         end if
-      end if
       return
       end
 c

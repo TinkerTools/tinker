@@ -4060,12 +4060,10 @@ c
          epvir(3,3) = epvir(3,3) + vzz
       end do
 c
-c     compute the cell dipole boundary correction term
+c     compute the cell dipole boundary correction to the gradient,
+c     whose energy is already included via the direct field
 c
       if (boundary .eq. 'VACUUM') then
-         xd = 0.0d0
-         yd = 0.0d0
-         zd = 0.0d0
          xu = 0.0d0
          yu = 0.0d0
          zu = 0.0d0
@@ -4074,9 +4072,6 @@ c
          zup = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,i) + rpole(1,i)*x(i)
-            yd = yd + rpole(3,i) + rpole(1,i)*y(i)
-            zd = zd + rpole(4,i) + rpole(1,i)*z(i)
             xu = xu + uind(1,i)
             yu = yu + uind(2,i)
             zu = zu + uind(3,i)
@@ -4085,7 +4080,6 @@ c
             zup = zup + uinp(3,i)
          end do
          term = (2.0d0/3.0d0) * f * (pi/volbox)
-         ep = ep + term*(xd*xu+yd*yu+zd*zu)
          do ii = 1, npole
             i = ipole(ii)
             dep(1,i) = dep(1,i) + term*rpole(1,i)*(xu+xup)
@@ -4096,6 +4090,7 @@ c
          yufield = -term * (yu+yup)
          zufield = -term * (zu+zup)
          do ii = 1, npole
+            i = ipole(ii)
             tep(1) = rpole(3,i)*zufield - rpole(4,i)*yufield
             tep(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
             tep(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
@@ -6920,12 +6915,10 @@ c
          epvir(3,3) = epvir(3,3) + vzz
       end do
 c
-c     compute the cell dipole boundary correction term
+c     compute the cell dipole boundary correction to the gradient,
+c     whose energy is already included via the direct field
 c
       if (boundary .eq. 'VACUUM') then
-         xd = 0.0d0
-         yd = 0.0d0
-         zd = 0.0d0
          xu = 0.0d0
          yu = 0.0d0
          zu = 0.0d0
@@ -6934,9 +6927,6 @@ c
          zup = 0.0d0
          do ii = 1, npole
             i = ipole(ii)
-            xd = xd + rpole(2,i) + rpole(1,i)*x(ii)
-            yd = yd + rpole(3,i) + rpole(1,i)*y(ii)
-            zd = zd + rpole(4,i) + rpole(1,i)*z(ii)
             xu = xu + uind(1,i)
             yu = yu + uind(2,i)
             zu = zu + uind(3,i)
@@ -6955,6 +6945,7 @@ c
          yufield = -term * (yu+yup)
          zufield = -term * (zu+zup)
          do ii = 1, npole
+            i = ipole(ii)
             tep(1) = rpole(3,i)*zufield - rpole(4,i)*yufield
             tep(2) = rpole(4,i)*xufield - rpole(2,i)*zufield
             tep(3) = rpole(2,i)*yufield - rpole(3,i)*xufield
@@ -8481,23 +8472,14 @@ c     from the induced dipoles times the electric field
 c
 c
       subroutine epolar1e
-      use atoms
-      use boxes
       use chgpot
       use energi
-      use ewald
-      use limits
-      use math
       use mpole
       use polar
       use polpot
       implicit none
       integer i,j,ii
-      real*8 e,f,fi,term
-      real*8 xd,yd,zd
-      real*8 xu,yu,zu
-      real*8 dix,diy,diz
-      real*8 uix,uiy,uiz
+      real*8 e,f,fi
 c
 c
 c     set the energy unit conversion factor
@@ -8528,37 +8510,9 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
-c     compute the cell dipole boundary correction term
+c     the direct field in "udirp" already carries any vacuum cell
+c     dipole boundary field, so the boundary energy is included above
 c
-      if (use_ewald) then
-         if (boundary .eq. 'VACUUM') then
-            f = electric / dielec
-            xd = 0.0d0
-            yd = 0.0d0
-            zd = 0.0d0
-            xu = 0.0d0
-            yu = 0.0d0
-            zu = 0.0d0
-            do ii = 1, npole
-               i = ipole(ii)
-               dix = rpole(2,i)
-               diy = rpole(3,i)
-               diz = rpole(4,i)
-               uix = uind(1,i)
-               uiy = uind(2,i)
-               uiz = uind(3,i)
-               xd = xd + dix + rpole(1,i)*x(i)
-               yd = yd + diy + rpole(1,i)*y(i)
-               zd = zd + diz + rpole(1,i)*z(i)
-               xu = xu + uix
-               yu = yu + uiy
-               zu = zu + uiz
-            end do
-            term = (2.0d0/3.0d0) * f * (pi/volbox)
-            e = term * (xd*xu+yd*yu+zd*zu)
-            ep = ep + e
-         end if
-      end if
       return
       end
 c

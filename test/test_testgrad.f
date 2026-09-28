@@ -21,35 +21,39 @@ c
       implicit none
 c
 c
-      call test_testgrad_case ('01_water_ye_m10v10')
-      call test_testgrad_case ('02_water_ye_m05v05')
-      call test_testgrad_case ('03_water_ye_m00v00')
-      call test_testgrad_case ('04_water_ast_ye_l10')
-      call test_testgrad_case ('05_water_ast_ye_l05')
-      call test_testgrad_case ('06_water_ast_ye_l00')
+      call test_testgrad_case ('01_water_ye_m10v10','water2')
+      call test_testgrad_case ('02_water_ye_m05v05','water2')
+      call test_testgrad_case ('03_water_ye_m00v00','water2')
+      call test_testgrad_case ('04_water_ast_ye_l10','water2')
+      call test_testgrad_case ('05_water_ast_ye_l05','water2')
+      call test_testgrad_case ('06_water_ast_ye_l00','water2')
+      call test_testgrad_case ('07_water_vac','water2')
+      call test_testgrad_case ('08_water_vac_nlist','water2')
+      call test_testgrad_case ('09_g3_vac','g3')
+      call test_testgrad_case ('10_g3_vac_nlist','g3')
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine test_testgrad_case  --  one lambda-scan case  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_testgrad_case  --  one testgrad case  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "test_testgrad_case" runs "testgrad" on the water mutation fixture
-c     whose key file and reference share the given base name, computing
+c     "test_testgrad_case" runs "testgrad" on the given coordinates with
+c     the key file and reference that share the given base name, computing
 c     both the analytical and the numerical gradient, and checks the full
 c     program output against the reference; the tolerance is loose enough
 c     to absorb the finite difference noise in the numerical gradient
 c
 c
-      subroutine test_testgrad_case (base)
+      subroutine test_testgrad_case (base,xyz)
       implicit none
       integer ist
       logical skiptest
-      character*(*) base
+      character*(*) base,xyz
       character*240 rpath
       character*512 args
 c
@@ -57,7 +61,11 @@ c
       if (skiptest('test_testgrad_'//base,'testgrad'))  return
       call pushdir ('file/testgrad')
       call execute_command_line ('rm -f out.txt')
-      args = '-k '//base//'.key water2 Y Y 0.00001'
+c
+c     the trailing answer declines the per-component breakdown that
+c     "testgrad" only offers for systems above one hundred atoms
+c
+      args = '-k '//base//'.key '//xyz//' Y Y 0.00001 N'
       call run_prog ('testgrad',trim(args),'out.txt',ist)
       if (ist .eq. -1) then
          call popdir
