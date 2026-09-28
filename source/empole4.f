@@ -18,8 +18,6 @@ c     and lambda derivatives
 c
 c
       subroutine empole4
-      use atoms
-      use dlmda
       use extfld
       use limits
       use virial
@@ -46,23 +44,6 @@ c
 c     get contribution from external electric field if used
 c
       if (use_exfld)  call exfield4
-c
-c     the second, force and virial lambda derivatives are only built
-c     when needed, so clear the partial values left otherwise
-c
-      if (.not. use_d2lmda) then
-         d2emdl2 = 0.0d0
-         do i = 1, n
-            do j = 1, 3
-               dfmdl(j,i) = 0.0d0
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               demvirdl(j,i) = 0.0d0
-            end do
-         end do
-      end if
 c
 c     add the electrostatic virial to main virial
 c

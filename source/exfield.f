@@ -437,7 +437,7 @@ c
       call grpscale (elambda,emsc,demsc)
 !$OMP PARALLEL default(private) shared(npole,ipole,use,mutg,emsc,demsc,
 !$OMP& x,y,z,xaxis,yaxis,zaxis,f,rpole,texfld,em,dem,emvir,
-!$OMP& demdl,dfmdl,demvirdl)
+!$OMP& demdl,dfmdl,demvirdl,use_d2lmda)
 !$OMP DO reduction(+:em,dem,emvir,demdl,dfmdl,demvirdl)
       do ii = 1, npole
          i = ipole(ii)
@@ -487,10 +487,11 @@ c
             ziy = z(iy) - z(i)
 c
 c     lambda derivative of the energy, gradient and virial, which
-c     for a mutated site is the unscaled external field term
+c     for a mutated site is the unscaled external field term; the
+c     gradient and virial parts are only built when requested
 c
-            if (muti) then
-               demdl = demdl + e
+            if (muti)  demdl = demdl + e
+            if (muti .and. use_d2lmda) then
                call torque (i,tem,dlfix,dlfiy,dlfiz,dfmdl)
                vxx = xix*dlfix(1) + xiy*dlfiy(1) + xiz*dlfiz(1)
                vxy = 0.5d0 * (yix*dlfix(1) + yiy*dlfiy(1) + yiz*dlfiz(1)
