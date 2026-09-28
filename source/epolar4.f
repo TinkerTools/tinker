@@ -278,14 +278,14 @@ c
       allocate (dep0(3,n))
       allocate (dep1(3,n))
 c
-c     compute energy, force, and virial of the lambda = 0 state
-c
-c
 c     an endpoint is live when it carries weight or a lambda derivative
 c
       call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &                 dpldlmda,d2pldlmda2,need0,need1)
+c
+c     compute energy, force, and virial of the lambda = 0 state
+c
       if (need0) then
          call altepdt (0.0d0)
          call epolar1calc
@@ -305,7 +305,7 @@ c
          end do
       end if
 c
-c     compute energy of the lambda = 1 state
+c     compute energy, force, and virial of the lambda = 1 state
 c
       if (need1) then
          call altepdt (1.0d0)
@@ -375,22 +375,23 @@ c
          end do
       end do
 c
-c     compute lambda derivative
+c     compute lambda derivative, along with the second, force and
+c     virial lambda derivatives only when they are requested
 c
       depdl = dweight1 * (ep1 - ep0)
-      d2epdl2 = d2weight1 * (ep1 - ep0)
-      do i = 1, n
-         do j = 1, 3
-            dep(j,i) = weight1 * dep1(j,i)
-     &                 + (1.0d0 - weight1) * dep0(j,i)
-            dfpdl(j,i) = dweight1 * (dep1(j,i) - dep0(j,i))
+      if (use_d2lmda) then
+         d2epdl2 = d2weight1 * (ep1 - ep0)
+         do i = 1, n
+            do j = 1, 3
+               dfpdl(j,i) = dweight1 * (dep1(j,i) - dep0(j,i))
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            depvirdl(j,i) = dweight1 * (epvir1(j,i) - epvir0(j,i))
+         do i = 1, 3
+            do j = 1, 3
+               depvirdl(j,i) = dweight1 * (epvir1(j,i) - epvir0(j,i))
+            end do
          end do
-      end do
+      end if
 c
 c     perform deallocation of some local arrays
 c

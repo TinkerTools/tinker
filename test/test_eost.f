@@ -2186,8 +2186,6 @@ c
       call assert_int (lmdanpa,3,'setlmdaphase propagation phase')
       call assert_int (lmdanpb,3,'setlmdaphase equilibration phase')
       call assert_int (lmdanpc,4,'setlmdaphase averaging phase')
-      call assert_real (lmdapcratio,0.4d0,1.0d-12,
-     &                  'setlmdaphase leftover ratio')
       call assert_int (lmdanpa+lmdanpb+lmdanpc,lmdaintv,
      &                 'setlmdaphase spans the whole interval')
 c
@@ -2414,7 +2412,6 @@ c
       vlmdainveps = 0.0d0
       lmdaparatio = 0.3d0
       lmdapbratio = 0.3d0
-      lmdapcratio = 0.4d0
       hbias = 0.0d0
       lmdadeltag = 0.0d0
       oststdev = 1.0d0
