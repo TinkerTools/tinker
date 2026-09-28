@@ -46,6 +46,7 @@ c
       call test_mutate_frames
       call test_mutate_mirror
       call test_mutate_polst
+      call test_mutate_deriv1
       call test_mutate_gate
       call test_mutate_chiral
       return
@@ -1761,6 +1762,45 @@ c
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('g3','231_g3_rels_lig2_d1_l015.key',
      &   '231_g3_rels_lig2_d1_l015.txt','231_g3_rels_lig2_d1_l015',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_deriv1  --  first derivative only  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_deriv1" runs the three water fixtures 232-234 that
+c     carry "lambda-deriv" alone on paths otherwise only tested with
+c     second lambda derivatives; 232 forces dual topology polarization
+c     with a squared weight at a main lambda of 0.6, so the second
+c     weight derivative is nonzero but must be cleared by "lmdachain";
+c     233 annihilates the ligand van der Waals with the long range
+c     correction, and 234 is a staged relative van der Waals leg at a
+c     main lambda of 0.4; the level 4 checks confirm that the second,
+c     force and virial lambda derivatives stay zero
+c
+c
+      subroutine test_mutate_deriv1
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','232_water_adt_d1_x2_l06.key',
+     &   '232_water_adt_d1_x2_l06.txt','232_water_adt_d1_x2_l06',
+     &   .false., .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '233_water_ast_vcorr_annih_d1_l05.key',
+     &   '233_water_ast_vcorr_annih_d1_l05.txt',
+     &   '233_water_ast_vcorr_annih_d1_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '234_water_rels_ye_vdwm_d1_l040.key',
+     &   '234_water_rels_ye_vdwm_d1_l040.txt',
+     &   '234_water_rels_ye_vdwm_d1_l040',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
