@@ -45,6 +45,7 @@ c
       call test_mutate_mpole4
       call test_mutate_frames
       call test_mutate_mirror
+      call test_mutate_polst
       call test_mutate_gate
       call test_mutate_chiral
       return
@@ -1709,6 +1710,57 @@ c
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('chigm','225_chigm_ast_ye_l05.key',
      &   '225_chigm_ast_ye_l05.txt','225_chigm_ast_ye_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_mutate_polst  --  single topology polar  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_mutate_polst" runs the six fixtures 226-231 that repeat
+c     earlier cases with "lambda-deriv" alone, so polarization takes the
+c     single topology scalar derivative of "epolar4d" instead of the
+c     dual topology interpolation that "lambda-deriv2" selects; 226 is
+c     the water midpoint without Ewald and with the shorter multipole
+c     cutoff, so its list run reaches the no-Ewald list field routines;
+c     227 and 228 decouple guest 3 at a main lambda of 0.5 and 0.0, the
+c     latter taking the zero polarizability branch, on a charged ligand
+c     with multi-site polarization groups and 1-4 and 1-5 polarization
+c     scaling; 229 adds the vacuum boundary to 227, and 230 and 231 are
+c     the charging and discharging legs of the relative mutation from
+c     guest 3 to one of its waters; every fixture runs the level 4
+c     checks, whose second, force and virial lambda derivatives stay
+c     zero on the single topology path
+c
+c
+      subroutine test_mutate_polst
+      implicit none
+c
+c
+      call test_mutate_calc ('water2',
+     &   '226_water_ast_ne_mcut_d1_l05.key',
+     &   '226_water_ast_ne_mcut_d1_l05.txt',
+     &   '226_water_ast_ne_mcut_d1_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','227_g3_ast_d1_l05.key',
+     &   '227_g3_ast_d1_l05.txt','227_g3_ast_d1_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','228_g3_ast_d1_l00.key',
+     &   '228_g3_ast_d1_l00.txt','228_g3_ast_d1_l00',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','229_g3_ast_vac_d1_l05.key',
+     &   '229_g3_ast_vac_d1_l05.txt','229_g3_ast_vac_d1_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','230_g3_rels_lig1_d1_l085.key',
+     &   '230_g3_rels_lig1_d1_l085.txt','230_g3_rels_lig1_d1_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','231_g3_rels_lig2_d1_l015.key',
+     &   '231_g3_rels_lig2_d1_l015.txt','231_g3_rels_lig2_d1_l015',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end

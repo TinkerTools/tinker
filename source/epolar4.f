@@ -78,24 +78,19 @@ c     force lambda and virial lambda derivatives are not computed
 c
 c
       subroutine epolar4s
-      use dlmda
       use mutant
       implicit none
       real*8 plambdaorig
       logical same
 c
 c
-c     add the scalar derivative with respect to plambda, which is
-c     skipped when polarization does not follow the main lambda
+c     add the scalar derivative with respect to plambda; "gradient"
+c     only calls "epolar4" when polarization follows the main lambda
 c
       plambdaorig = plambda
       call altepset (same)
       call epolar1calc
-      if (use_pdlmda) then
-         call epolar4d (plambdaorig)
-      else
-         depdl = 0.0d0
-      end if
+      call epolar4d (plambdaorig)
 c
 c     restore the electrostatic parameter state for subsequent terms,
 c     which "epolar4d" leaves at plambda
