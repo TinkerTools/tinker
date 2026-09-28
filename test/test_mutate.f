@@ -48,6 +48,7 @@ c
       call test_mutate_polst
       call test_mutate_deriv1
       call test_mutate_gate
+      call test_mutate_flat
       call test_mutate_chiral
       return
       end
@@ -1942,6 +1943,202 @@ c
       deallocate (g1)
       call popdir
       call final
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_flat  --  flat lambda map dispatch  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_flat" moves the staged ligand 1 charging leg below
+c     its 0.7 to 1.0 electrostatic window, where the quintic map is flat
+c     and "gradient" takes the plain multipole and polarization routines;
+c     the lambda derivatives must be exact zeros, the plain and lambda
+c     derivative routines must agree there, and moving back inside the
+c     window must restore the multipole lambda derivative; the single
+c     topology fixture 203 and the dual topology fixture 136 cover both
+c     polarization paths
+c
+c
+      subroutine test_mutate_flat
+      implicit none
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_flat','mutate'))  return
+      call test_mutate_flatcase ('203_water_rels_st_l085.key',
+     &                           'test_mutate_flat single')
+      call test_mutate_flatcase ('136_water_rels_ye_l085.key',
+     &                           'test_mutate_flat dual')
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_flatcase  --  one flat map fixture  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_flatcase" runs the "test_mutate_flat" checks on one
+c     staged ligand 1 fixture whose windows span 0.7 to 1.0
+c
+c
+      subroutine test_mutate_flatcase (key,label)
+      use atoms
+      use deriv
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      integer i,j
+      real*8 e
+      real*8 em1,ep1,em4,ep4
+      real*8 vm1(3,3),vp1(3,3)
+      real*8 vm4(3,3),vp4(3,3)
+      real*8 dfm,dfp,dvm
+      real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: gm1(:,:),gp1(:,:)
+      real*8, allocatable :: gm4(:,:),gp4(:,:)
+      character*(*) key,label
+c
+c
+      call pushdir ('file/mutate')
+      call loadfix ('water2',key)
+      allocate (derivs(3,n))
+      allocate (gm1(3,n))
+      allocate (gp1(3,n))
+      allocate (gm4(3,n))
+      allocate (gp4(3,n))
+c
+c     below the window the chain rule is flat and every lambda
+c     derivative is an exact zero
+c
+      lambda = 0.5d0
+      call gradient (e,derivs)
+      call assert_real (deldlmda,0.0d0,0.0d0,label//' dEL/dL flat')
+      call assert_real (dpldlmda,0.0d0,0.0d0,label//' dPL/dL flat')
+      call assert_real (dedl,0.0d0,0.0d0,label//' dE/dL')
+      call assert_real (d2edl2,0.0d0,0.0d0,label//' d2E/dL2')
+      call assert_real (demdl,0.0d0,0.0d0,label//' dEM/dL')
+      call assert_real (depdl,0.0d0,0.0d0,label//' dEP/dL')
+      dfm = 0.0d0
+      dfp = 0.0d0
+      do i = 1, n
+         do j = 1, 3
+            dfm = dfm + abs(dfmdl(j,i))
+            dfp = dfp + abs(dfpdl(j,i))
+         end do
+      end do
+      dvm = 0.0d0
+      do i = 1, 3
+         do j = 1, 3
+            dvm = dvm + abs(demvirdl(j,i))
+         end do
+      end do
+      call assert_real (dfm,0.0d0,0.0d0,label//' dFM/dL')
+      call assert_real (dfp,0.0d0,0.0d0,label//' dFP/dL')
+      call assert_real (dvm,0.0d0,0.0d0,label//' dVM/dL')
+c
+c     the plain and lambda derivative routines agree at the flat point,
+c     which is what lets "gradient" skip the latter; polarization reuses
+c     the reciprocal multipole potential left by the multipole call just
+c     before it, so each polarization call follows one, and the mixed
+c     pairs cover maps whose windows differ
+c
+      call test_mutate_flatpair (1,1,em1,ep1,gm1,gp1,vm1,vp1)
+      call test_mutate_flatpair (4,4,em4,ep4,gm4,gp4,vm4,vp4)
+      call assert_real (em4,em1,1.0d-10,label//' EM plain')
+      call assert_grad (gm4,gm1,n,1.0d-10,label//' dEM plain')
+      call assert_grad (vm4,vm1,3,1.0d-10,label//' VM plain')
+      call assert_real (ep4,ep1,1.0d-10,label//' EP plain')
+      call assert_grad (gp4,gp1,n,1.0d-10,label//' dEP plain')
+      call assert_grad (vp4,vp1,3,1.0d-10,label//' VP plain')
+      call test_mutate_flatpair (1,4,em4,ep4,gm4,gp4,vm4,vp4)
+      call assert_real (ep4,ep1,1.0d-10,label//' EP mixed 1-4')
+      call assert_grad (gp4,gp1,n,1.0d-10,label//' dEP mixed 1-4')
+      call assert_grad (vp4,vp1,3,1.0d-10,label//' VP mixed 1-4')
+      call test_mutate_flatpair (4,1,em4,ep4,gm4,gp4,vm4,vp4)
+      call assert_real (ep4,ep1,1.0d-10,label//' EP mixed 4-1')
+      call assert_grad (gp4,gp1,n,1.0d-10,label//' dEP mixed 4-1')
+      call assert_grad (vp4,vp1,3,1.0d-10,label//' VP mixed 4-1')
+c
+c     back inside the window the multipole lambda derivative returns
+c
+      lambda = 0.85d0
+      call gradient (e,derivs)
+      call assert_logical (demdl.ne.0.0d0,.true.,
+     &                     label//' dEM/dL inside window')
+      deallocate (derivs)
+      deallocate (gm1)
+      deallocate (gp1)
+      deallocate (gm4)
+      deallocate (gp4)
+      call popdir
+      call final
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_flatpair  --  mpole and polar pair  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_flatpair" calls the multipole routine chosen by
+c     "mflav" and then the polarization routine chosen by "pflav", the
+c     plain routine for 1 and the lambda derivative one for 4, in the
+c     order "gradient" uses, and returns their energies, gradients and
+c     virials
+c
+c
+      subroutine test_mutate_flatpair (mflav,pflav,emo,epo,gmo,gpo,
+     &                                 vmo,vpo)
+      use atoms
+      use deriv
+      use energi
+      use virial
+      implicit none
+      integer i,j
+      integer mflav,pflav
+      real*8 emo,epo
+      real*8 gmo(3,*)
+      real*8 gpo(3,*)
+      real*8 vmo(3,3)
+      real*8 vpo(3,3)
+c
+c
+      if (mflav .eq. 4) then
+         call empole4
+      else
+         call empole1
+      end if
+      if (pflav .eq. 4) then
+         call epolar4
+      else
+         call epolar1
+      end if
+      emo = em
+      epo = ep
+      do i = 1, n
+         do j = 1, 3
+            gmo(j,i) = dem(j,i)
+            gpo(j,i) = dep(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            vmo(j,i) = emvir(j,i)
+            vpo(j,i) = epvir(j,i)
+         end do
+      end do
       return
       end
 c

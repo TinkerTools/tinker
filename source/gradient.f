@@ -33,11 +33,24 @@ c
       integer i,j
       real*8 energy,cutoff
       real*8 derivs(3,*)
+      logical edrv,pdrv,vdrv
 c
 c
 c     refresh sublambdas from the active main lambda
 c
       call refreshsublmda
+c
+c     a term takes its lambda derivative routine only while its map
+c     has slope or curvature; a flat map, such as a quintic taper away
+c     from its window, zeroes the chain rule and the plain routine
+c     gives the same energy and gradient for less work
+c
+      edrv = use_edlmda .and. (deldlmda.ne.0.0d0
+     &          .or. d2eldlmda2.ne.0.0d0)
+      pdrv = use_pdlmda .and. (dpldlmda.ne.0.0d0
+     &          .or. d2pldlmda2.ne.0.0d0)
+      vdrv = use_vdlmda .and. (dvldlmda.ne.0.0d0
+     &          .or. d2vldlmda2.ne.0.0d0)
 c
 c     zero out each of the potential energy components
 c
@@ -276,14 +289,14 @@ c
       if (use_chgdpl)  call echgdpl1
       if (use_dipole)  call edipole1
       if (use_mpole) then
-         if (use_edlmda) then
+         if (edrv) then
             call empole4
          else
             call empole1
          end if
       end if
       if (use_polar) then
-         if (use_pdlmda) then
+         if (pdrv) then
             call epolar4
          else
             call epolar1
@@ -299,7 +312,7 @@ c
          if (vdwtyp .eq. 'BUCKINGHAM')  call ebuck1
          if (vdwtyp .eq. 'MM3-HBOND')  call emm3hb1
          if (vdwtyp .eq. 'BUFFERED-14-7') then
-            if (use_vdlmda) then
+            if (vdrv) then
                call ehal4
             else
                call ehal1
