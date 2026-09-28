@@ -123,7 +123,10 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         springi = kpep(i) / polarity(i)
+         springi = 0.0d0
+         if (polarity(i) .ne. 0.0d0) then
+            springi = kpep(i) / polarity(i)
+         end if
          sizi = prepep(i)
          alphai = dmppep(i)
          epli = lpep(i)
@@ -175,7 +178,10 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  springk = kpep(k) / polarity(k)
+                  springk = 0.0d0
+                  if (polarity(k) .ne. 0.0d0) then
+                     springk = kpep(k) / polarity(k)
+                  end if
                   sizk = prepep(k)
                   alphak = dmppep(k)
                   sizik = sizi * sizk
@@ -303,7 +309,10 @@ c
             xi = x(i)
             yi = y(i)
             zi = z(i)
-            springi = kpep(i) / polarity(i)
+            springi = 0.0d0
+            if (polarity(i) .ne. 0.0d0) then
+               springi = kpep(i) / polarity(i)
+            end if
             sizi = prepep(i)
             alphai = dmppep(i)
             epli = lpep(i)
@@ -356,7 +365,10 @@ c
                      r2 = xr*xr + yr*yr + zr*zr
                      if (r2 .le. off2) then
                         r = sqrt(r2)
-                        springk = kpep(k) / polarity(k)
+                        springk = 0.0d0
+                        if (polarity(k) .ne. 0.0d0) then
+                           springk = kpep(k) / polarity(k)
+                        end if
                         sizk = prepep(k)
                         alphak = dmppep(k)
                         sizik = sizi * sizk
@@ -582,7 +594,10 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         springi = kpep(i) / polarity(i)
+         springi = 0.0d0
+         if (polarity(i) .ne. 0.0d0) then
+            springi = kpep(i) / polarity(i)
+         end if
          sizi = prepep(i)
          alphai = dmppep(i)
          epli = lpep(i)
@@ -635,7 +650,10 @@ c
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. off2) then
                   r = sqrt(r2)
-                  springk = kpep(k) / polarity(k)
+                  springk = 0.0d0
+                  if (polarity(k) .ne. 0.0d0) then
+                     springk = kpep(k) / polarity(k)
+                  end if
                   sizk = prepep(k)
                   alphak = dmppep(k)
                   sizik = sizi * sizk

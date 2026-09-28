@@ -12,16 +12,15 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "epolar4" calculates the induced dipole polarization energy
-c     and first derivatives with respect to Cartesian coordinates
+c     "epolar4" calculates the induced dipole polarization energy,
+c     first derivatives with respect to Cartesian coordinates, and
+c     derivatives with respect to the polarization lambda
 c
 c
       subroutine epolar4
       use dlmda
       use iounit
-      use limits
       use mplpot
-      use mutant
       use polpot
       use virial
       implicit none
@@ -37,18 +36,13 @@ c
          call fatal
       end if
 c
-c     compute polarization interactions
+c     compute polarization interactions, where exchange polarization
+c     is already applied to each state by "epolar1calc"
 c
       if (use_prst) then
          call epolar4s
       else
          call epolar4f
-      end if
-c
-c     modify the gradient and virial for exchange polarization
-c
-      if (use_expol) then
-         call dexpol
       end if
 c
 c     add the polarization virial to main virial
@@ -60,8 +54,6 @@ c
       end do
       return
       end
-c
-c
 c
 c
 c     ############################################################
@@ -76,49 +68,18 @@ c     and Cartesian derivatives together with the first energy
 c     derivative with respect to polarization lambda; second lambda,
 c     force lambda and virial lambda derivatives are not computed
 c
-c
-      subroutine epolar4s
-      use mutant
-      implicit none
-      real*8 plambdaorig
-      logical same
-c
-c
-c     add the scalar derivative with respect to plambda; "gradient"
-c     only calls "epolar4" when polarization follows the main lambda
-c
-      plambdaorig = plambda
-      call altepset (same)
-      call epolar1calc
-      call epolar4d (plambdaorig)
-c
-c     restore the electrostatic parameter state for subsequent terms,
-c     which "epolar4d" leaves at plambda
-c
-      if (.not. same)  call alteprst
-      return
-      end
-c
-c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine epolar4d  --  single topology polar dU/dl  ##
-c     ##                                                        ##
-c     ############################################################
-c
-c
-c     "epolar4d" evaluates the explicit plambda derivative of the
-c     stationary mutual polarization functional.  The permanent field
+c     the lambda derivative is the explicit plambda derivative of the
+c     stationary mutual polarization functional; the permanent field
 c     derivative is exact because "altpolr" scales the permanent
 c     electrostatic parameters of the charging ligand linearly, so it is
-c     just the field of those multipoles held at their unscaled values;
-c     the other ligand of a staged leg is annihilated and adds nothing.
-c     The inverse-polarizability derivative of the charging ligand is
-c     evaluated from the local total fields, which remains finite at
-c     plambda equal to zero.
+c     just the field of those multipoles held at their unscaled values,
+c     and the other ligand of a staged leg is annihilated and adds
+c     nothing; the inverse-polarizability derivative of the charging
+c     ligand is evaluated from the local total fields, which remains
+c     finite at plambda equal to zero
 c
 c
-      subroutine epolar4d (plmda)
+      subroutine epolar4s
       use atoms
       use chgpot
       use dlmda
@@ -140,8 +101,16 @@ c
       real*8, allocatable :: ufieldp(:,:)
       real*8 sc(0:2)
       real*8 dsc(0:2)
-      logical atzero
+      logical atzero,same
 c
+c
+c     compute the polarization energy and gradient at plambda; the
+c     "gradient" routine only calls "epolar4" when polarization
+c     follows the main lambda
+c
+      plmda = plambda
+      call altepset (same)
+      call epolar1calc
 c
 c     only the charging ligand carries a polarizability derivative
 c
@@ -230,6 +199,11 @@ c
          deallocate (field0)
          deallocate (fieldp0)
       end if
+c
+c     restore the electrostatic parameter state for subsequent terms,
+c     which is left at plambda above
+c
+      if (.not. same)  call alteprst
       return
       end
 c
@@ -248,147 +222,71 @@ c
 c
       subroutine epolar4f
       use atoms
-      use energi
       use deriv
       use dlmda
-      use limits
+      use energi
       use mutant
-      use polar
-      use polpot
-      use potent
       use virial
       implicit none
-      real*8 weight1,dweight1,d2weight1
-      logical need0,need1
       integer i,j
-      real*8 ep1,ep0
-      real*8 plambdaorig
-      real*8 epvir1(3,3)
+      real*8 weight1,dweight1,d2weight1
+      real*8 ep0,plambdaorig
       real*8 epvir0(3,3)
-      real*8, allocatable :: dep1(:,:)
       real*8, allocatable :: dep0(:,:)
+      logical need0,need1
 c
-c
-c     copy original plambda
-c
-      plambdaorig = plambda
-c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (dep0(3,n))
-      allocate (dep1(3,n))
 c
 c     an endpoint is live when it carries weight or a lambda derivative
 c
+      plambdaorig = plambda
       call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &                 dpldlmda,d2pldlmda2,need0,need1)
 c
-c     compute energy, force, and virial of the lambda = 0 state
+c     build the needed endpoint states, then restore plambda
 c
-      if (need0) then
-         call altepdt (0.0d0)
-         call epolar1calc
-c
-c     copy energy, force, and virial of the lambda = 0 state
-c
-         ep0 = ep
-         do i = 1, n
-            do j = 1, 3
-               dep0(j,i) = dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir0(j,i) = epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     compute energy, force, and virial of the lambda = 1 state
-c
-      if (need1) then
-         call altepdt (1.0d0)
-         call epolar1calc
-c
-c     copy energy, force, and virial of the lambda = 1 state
-c
-         ep1 = ep
-         do i = 1, n
-            do j = 1, 3
-               dep1(j,i) = dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir1(j,i) = epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     copy energy, force, and virial if only one state is computed
-c
-      if (need0 .and. .not.need1) then
-         ep1 = ep0
-         do i = 1, n
-            do j = 1, 3
-               dep1(j,i) = dep0(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir1(j,i) = epvir0(j,i)
-            end do
-         end do
-      else if (.not.need0 .and. need1) then
-         ep0 = ep1
-         do i = 1, n
-            do j = 1, 3
-               dep0(j,i) = dep1(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir0(j,i) = epvir1(j,i)
-            end do
-         end do
-      end if
-c
-c     set original plambda
-c
+      allocate (dep0(3,n))
+      call epolar1dt (need0,need1,ep0,dep0,epvir0)
       plambda = plambdaorig
       call alteprst
 c
-c     interpolate energy, force, and virial
+c     a single state carries all of the weight and no lambda
+c     derivative, and is already in place
 c
-      ep = weight1 * ep1 + (1.0d0 - weight1) * ep0
-      do i = 1, n
-         do j = 1, 3
-            dep(j,i) = weight1 * dep1(j,i)
-     &                 + (1.0d0 - weight1) * dep0(j,i)
-         end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvir(j,i) = weight1 * epvir1(j,i)
-     &                 + (1.0d0 - weight1) * epvir0(j,i)
-         end do
-      end do
+      depdl = 0.0d0
+      if (need0 .and. need1) then
 c
 c     compute lambda derivative, along with the second, force and
 c     virial lambda derivatives only when they are requested
 c
-      depdl = dweight1 * (ep1 - ep0)
-      if (use_d2lmda) then
-         d2epdl2 = d2weight1 * (ep1 - ep0)
+         depdl = dweight1 * (ep - ep0)
+         if (use_d2lmda) then
+            d2epdl2 = d2weight1 * (ep - ep0)
+            do i = 1, n
+               do j = 1, 3
+                  dfpdl(j,i) = dweight1 * (dep(j,i) - dep0(j,i))
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  depvirdl(j,i) = dweight1 * (epvir(j,i)-epvir0(j,i))
+               end do
+            end do
+         end if
+c
+c     interpolate energy, force, and virial between the two states
+c
+         ep = weight1 * ep + (1.0d0 - weight1) * ep0
          do i = 1, n
             do j = 1, 3
-               dfpdl(j,i) = dweight1 * (dep1(j,i) - dep0(j,i))
+               dep(j,i) = weight1 * dep(j,i)
+     &                       + (1.0d0 - weight1) * dep0(j,i)
             end do
          end do
          do i = 1, 3
             do j = 1, 3
-               depvirdl(j,i) = dweight1 * (epvir1(j,i) - epvir0(j,i))
+               epvir(j,i) = weight1 * epvir(j,i)
+     &                         + (1.0d0 - weight1) * epvir0(j,i)
             end do
          end do
       end if
@@ -396,6 +294,5 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (dep0)
-      deallocate (dep1)
       return
       end

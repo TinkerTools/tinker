@@ -2084,34 +2084,25 @@ c
       subroutine epolar0f
       use dlmda
       use energi
-      use limits
       use mutant
-      use potent
       implicit none
       real*8 weight1,dweight1,d2weight1
+      real*8 ep0,plambdaorig
       logical need0,need1
-      real*8 ep1,ep0
-      real*8 plambdaorig
 c
 c
-c     copy original plambda
+c     only the endpoint states that carry weight are needed
 c
       plambdaorig = plambda
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      need0 = (weight1 .ne. 1.0d0)
+      need1 = (weight1 .ne. 0.0d0)
 c
 c     compute energy of the lambda = 0 state
 c
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 dpldlmda,d2pldlmda2,need0,need1)
       if (need0) then
          call altepdt (0.0d0)
          call epolar0calc
-c
-c     copy energy of the lambda = 0 state
-c
          ep0 = ep
       end if
 c
@@ -2120,18 +2111,6 @@ c
       if (need1) then
          call altepdt (1.0d0)
          call epolar0calc
-c
-c     copy energy of the lambda = 1 state
-c
-         ep1 = ep
-      end if
-c
-c     copy energy if only one state is computed
-c
-      if (need0 .and. .not.need1) then
-         ep1 = ep0
-      else if (.not.need0 .and. need1) then
-         ep0 = ep1
       end if
 c
 c     set original plambda
@@ -2139,9 +2118,12 @@ c
       plambda = plambdaorig
       call alteprst
 c
-c     interpolate energy
+c     interpolate energy between the two states, while a single
+c     state carries all of the weight and is in place
 c
-      ep = weight1 * ep1 + (1.0d0 - weight1) * ep0
+      if (need0 .and. need1) then
+         ep = weight1 * ep + (1.0d0 - weight1) * ep0
+      end if
       return
       end
 c

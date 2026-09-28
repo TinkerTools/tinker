@@ -1,6 +1,6 @@
  Total Potential Energy :               -126.2253 Kcal/mole
 
- EngCnt  Polarization                           -126.2253              418
+ EngCnt  Polarization                           -126.2253              270
 
  Internal Virial Tensor :                   5.130      -22.999      -13.185
                                           -22.999      -20.834      -12.793

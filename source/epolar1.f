@@ -9621,136 +9621,56 @@ c
 c
       subroutine epolar1f
       use atoms
-      use energi
       use deriv
       use dlmda
-      use limits
+      use energi
       use mutant
-      use polpot
-      use potent
       use virial
       implicit none
-      real*8 weight1,dweight1,d2weight1
-      logical need0,need1
       integer i,j
-      real*8 ep1,ep0
-      real*8 plambdaorig
-      real*8 epvir1(3,3)
+      real*8 weight1,dweight1,d2weight1
+      real*8 ep0,plambdaorig
       real*8 epvir0(3,3)
-      real*8, allocatable :: dep1(:,:)
       real*8, allocatable :: dep0(:,:)
+      logical need0,need1
 c
 c
-c     copy original plambda
+c     only the endpoint states that carry weight are needed
 c
       plambdaorig = plambda
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      need0 = (weight1 .ne. 1.0d0)
+      need1 = (weight1 .ne. 0.0d0)
 c
-c     perform dynamic allocation of some local arrays
+c     build the needed endpoint states, then restore plambda
 c
       allocate (dep0(3,n))
-      allocate (dep1(3,n))
-c
-c     compute energy, force, and virial of the lambda = 0 state
-c
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 dpldlmda,d2pldlmda2,need0,need1)
-      if (need0) then
-         call altepdt (0.0d0)
-         call epolar1calc
-c
-c     copy energy, force, and virial of the lambda = 0 state
-c
-         ep0 = ep
-         do i = 1, n
-            do j = 1, 3
-               dep0(j,i) = dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir0(j,i) = epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     compute energy of the lambda = 1 state
-c
-      if (need1) then
-         call altepdt (1.0d0)
-         call epolar1calc
-c
-c     copy energy, force, and virial of the lambda = 1 state
-c
-         ep1 = ep
-         do i = 1, n
-            do j = 1, 3
-               dep1(j,i) = dep(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir1(j,i) = epvir(j,i)
-            end do
-         end do
-      end if
-c
-c     copy energy, force, and virial if only one state is computed
-c
-      if (need0 .and. .not.need1) then
-         ep1 = ep0
-         do i = 1, n
-            do j = 1, 3
-               dep1(j,i) = dep0(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir1(j,i) = epvir0(j,i)
-            end do
-         end do
-      else if (.not.need0 .and. need1) then
-         ep0 = ep1
-         do i = 1, n
-            do j = 1, 3
-               dep0(j,i) = dep1(j,i)
-            end do
-         end do
-         do i = 1, 3
-            do j = 1, 3
-               epvir0(j,i) = epvir1(j,i)
-            end do
-         end do
-      end if
-c
-c     set original plambda
-c
+      call epolar1dt (need0,need1,ep0,dep0,epvir0)
       plambda = plambdaorig
       call alteprst
 c
-c     interpolate energy, force, and virial
+c     interpolate energy, force, and virial between the two states,
+c     while a single state carries all of the weight and is in place
 c
-      ep = weight1 * ep1 + (1.0d0 - weight1) * ep0
-      do i = 1, n
-         do j = 1, 3
-            dep(j,i) = weight1 * dep1(j,i)
-     &                 + (1.0d0 - weight1) * dep0(j,i)
+      if (need0 .and. need1) then
+         ep = weight1 * ep + (1.0d0 - weight1) * ep0
+         do i = 1, n
+            do j = 1, 3
+               dep(j,i) = weight1 * dep(j,i)
+     &                       + (1.0d0 - weight1) * dep0(j,i)
+            end do
          end do
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            epvir(j,i) = weight1 * epvir1(j,i)
-     &                 + (1.0d0 - weight1) * epvir0(j,i)
+         do i = 1, 3
+            do j = 1, 3
+               epvir(j,i) = weight1 * epvir(j,i)
+     &                         + (1.0d0 - weight1) * epvir0(j,i)
+            end do
          end do
-      end do
+      end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (dep0)
-      deallocate (dep1)
       return
       end
 c
@@ -9787,6 +9707,65 @@ c
          end if
       end if
       if (use_expol)  call dexpol
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine epolar1dt  --  dual topology polar end states  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "epolar1dt" computes the polarization energy, gradient and
+c     virial of the dual topology endpoint states flagged by "need0"
+c     and "need1"; when both are needed, the lambda = 0 state is
+c     returned in "ep0", "dep0" and "epvir0" and the lambda = 1 state
+c     is left in the global polarization arrays, otherwise the single
+c     state is left in the global arrays
+c
+c
+      subroutine epolar1dt (need0,need1,ep0,dep0,epvir0)
+      use atoms
+      use deriv
+      use energi
+      use virial
+      implicit none
+      integer i,j
+      real*8 ep0
+      real*8 dep0(3,*)
+      real*8 epvir0(3,3)
+      logical need0,need1
+c
+c
+c     compute energy, force, and virial of the lambda = 0 state,
+c     keeping a copy when the lambda = 1 state is also needed
+c
+      if (need0) then
+         call altepdt (0.0d0)
+         call epolar1calc
+         if (need1) then
+            ep0 = ep
+            do i = 1, n
+               do j = 1, 3
+                  dep0(j,i) = dep(j,i)
+               end do
+            end do
+            do i = 1, 3
+               do j = 1, 3
+                  epvir0(j,i) = epvir(j,i)
+               end do
+            end do
+         end if
+      end if
+c
+c     compute energy, force, and virial of the lambda = 1 state
+c
+      if (need1) then
+         call altepdt (1.0d0)
+         call epolar1calc
+      end if
       return
       end
 c

@@ -2430,48 +2430,46 @@ c
       use atoms
       use dlmda
       use energi
-      use limits
+      use inter
       use mutant
-      use potent
       implicit none
-      real*8 weight1,dweight1,d2weight1
-      logical need0,need1
       integer i
-      integer nep1,nep0
-      real*8 ep1,ep0
-      real*8 plambdaorig
-      real*8, allocatable :: aep1(:)
+      integer nep0
+      real*8 weight1,dweight1,d2weight1
+      real*8 ep0,plambdaorig
+      real*8 einter0,einterorig
       real*8, allocatable :: aep0(:)
+      logical need0,need1
 c
 c
-c     copy original plambda
+c     only the endpoint states that carry weight are needed
 c
       plambdaorig = plambda
+      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      need0 = (weight1 .ne. 1.0d0)
+      need1 = (weight1 .ne. 0.0d0)
 c
 c     perform dynamic allocation of some local arrays
 c
       allocate (aep0(n))
-      allocate (aep1(n))
 c
-c     compute energy of the lambda = 0 state
+c     compute energy of the lambda = 0 state, keeping a copy when
+c     the lambda = 1 state is also needed; each state adds its own
+c     intermolecular energy, so it is set aside for weighting
 c
-c
-c     an endpoint is live when it carries weight or a lambda derivative
-c
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
-      call relneed (weight1,dweight1,d2weight1,
-     &                 dpldlmda,d2pldlmda2,need0,need1)
+      einterorig = einter
       if (need0) then
          call altepdt (0.0d0)
          call epolar3calc
-c
-c     copy energy of the lambda = 0 state
-c
-         ep0 = ep
-         nep0 = nep
-         do i = 1, n
-            aep0(i) = aep(i)
-         end do
+         if (need1) then
+            ep0 = ep
+            nep0 = nep
+            do i = 1, n
+               aep0(i) = aep(i)
+            end do
+            einter0 = einter - einterorig
+            einter = einterorig
+         end if
       end if
 c
 c     compute energy of the lambda = 1 state
@@ -2479,30 +2477,6 @@ c
       if (need1) then
          call altepdt (1.0d0)
          call epolar3calc
-c
-c     copy energy of the lambda = 1 state
-c
-         ep1 = ep
-         nep1 = nep
-         do i = 1, n
-            aep1(i) = aep(i)
-         end do
-      end if
-c
-c     copy energy if only one state is computed
-c
-      if (need0 .and. .not.need1) then
-         ep1 = ep0
-         nep1 = nep0
-         do i = 1, n
-            aep1(i) = aep0(i)
-         end do
-      else if (.not.need0 .and. need1) then
-         ep0 = ep1
-         nep0 = nep1
-         do i = 1, n
-            aep0(i) = aep1(i)
-         end do
       end if
 c
 c     set original plambda
@@ -2510,18 +2484,22 @@ c
       plambda = plambdaorig
       call alteprst
 c
-c     interpolate energy
+c     interpolate energy between the two states, while a single
+c     state carries all of the weight and is in place
 c
-      ep = weight1 * ep1 + (1.0d0 - weight1) * ep0
-      do i = 1, n
-         aep(i) = weight1 * aep1(i) + (1.0d0-weight1) * aep0(i)
-      end do
-      nep = max(nep1,nep0)
+      if (need0 .and. need1) then
+         ep = weight1 * ep + (1.0d0 - weight1) * ep0
+         do i = 1, n
+            aep(i) = weight1 * aep(i) + (1.0d0-weight1) * aep0(i)
+         end do
+         nep = max(nep,nep0)
+         einter = einterorig + weight1*(einter-einterorig)
+     &               + (1.0d0-weight1)*einter0
+      end if
 c
 c     perform deallocation of some local arrays
 c
       deallocate (aep0)
-      deallocate (aep1)
       return
       end
 c
