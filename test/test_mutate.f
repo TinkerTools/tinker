@@ -42,6 +42,9 @@ c
       call test_mutate_vsoft
       call test_mutate_g3
       call test_mutate_hal
+      call test_mutate_mpole4
+      call test_mutate_frames
+      call test_mutate_mirror
       call test_mutate_gate
       call test_mutate_chiral
       return
@@ -1523,10 +1526,11 @@ c     lambda of 1.0 and 0.5, 209 annihilates it with a van der Waals
 c     1-4 scale of one half and the artificial "vdw14" values from
 c     "g3_vdw14.prm", so the soft core pairs inside the guest carry a
 c     fractional exclusion scale and 1-4 radii and well depths, and 210
-c     repeats 208 as an isolated cluster with no box; the cluster sits
-c     at the corner of the periodic cell so the method of lights wraps
-c     along all three axes; every fixture carries "lambda-deriv2" and
-c     runs the level 4 checks
+c     repeats 208 as an isolated cluster with no box, whose list run
+c     takes the full neighbor list and so the no-Ewald multipole list
+c     path; the cluster sits at the corner of the periodic cell so the
+c     method of lights wraps along all three axes; every fixture carries
+c     "lambda-deriv2" and runs the level 4 checks
 c
 c
       subroutine test_mutate_g3
@@ -1544,7 +1548,7 @@ c
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('g3','210_g3_ast_nobox_l05.key',
      &   '210_g3_ast_nobox_l05.txt','210_g3_ast_nobox_l05',
-     &   .true.,  .true.,  .true.,  .false.,  .true.)
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
 c
@@ -1586,6 +1590,125 @@ c
      &   '214_water_rels_ye_vdwm_lig2t_l040.key',
      &   '214_water_rels_ye_vdwm_lig2t_l040.txt',
      &   '214_water_rels_ye_vdwm_lig2t_l040',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_mpole4  --  multipole lambda paths  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_mpole4" runs the five fixtures 215-219 that reach the
+c     multipole lambda derivative paths the other cases leave out; 215
+c     is the water single topology midpoint without Ewald, with a
+c     multipole cutoff of 6.5 so its list run can take the full neighbor
+c     list and the no-Ewald multipole list path; 216 is guest 3 with
+c     the vacuum boundary, whose cell dipole term carries the lambda
+c     derivatives of energy, gradient and virial; 217 and 218 are the
+c     charging and discharging legs of a staged relative mutation from
+c     the charged guest 3 to one of its waters, so the uniform
+c     background term carries a lambda derivative with a second ligand
+c     present; 219 is the water discharging leg without Ewald, again
+c     with the shorter multipole cutoff so its list run is available;
+c     every fixture carries "lambda-deriv2" and runs the level 4 checks
+c
+c
+      subroutine test_mutate_mpole4
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','215_water_ast_ne_mcut_l05.key',
+     &   '215_water_ast_ne_mcut_l05.txt','215_water_ast_ne_mcut_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','216_g3_ast_vac_l05.key',
+     &   '216_g3_ast_vac_l05.txt','216_g3_ast_vac_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','217_g3_rels_lig1_l085.key',
+     &   '217_g3_rels_lig1_l085.txt','217_g3_rels_lig1_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('g3','218_g3_rels_lig2_l015.key',
+     &   '218_g3_rels_lig2_l015.txt','218_g3_rels_lig2_l015',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '219_water_rels_ne_lig2_l015.key',
+     &   '219_water_rels_ne_lig2_l015.txt',
+     &   '219_water_rels_ne_lig2_l015',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_frames  --  local frame torques  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_frames" runs the two fixtures 220 and 221 on an
+c     acetonitrile and ammonia dimer system from the amoeba09 force
+c     field, whose multipole sites use the z-only, 3-fold and z-bisector
+c     local frames that water and guest 3 lack; the ligand is the
+c     acetonitrile and the first ammonia, so the lambda torques reach
+c     every frame type on both mutated and environment sites; 220 uses
+c     Ewald in a periodic cell and 221 is an isolated cluster, so the
+c     two cover all four multipole summation paths; both carry
+c     "lambda-deriv2" and run the level 4 checks
+c
+c
+      subroutine test_mutate_frames
+      implicit none
+c
+c
+      call test_mutate_calc ('frames','220_frames_ast_ye_l05.key',
+     &   '220_frames_ast_ye_l05.txt','220_frames_ast_ye_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('frames','221_frames_ast_nobox_l05.key',
+     &   '221_frames_ast_nobox_l05.txt','221_frames_ast_nobox_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_mirror  --  mirrored chiral frames  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_mirror" runs the four chignolin fixtures 222-225 in
+c     the amoebabio09 force field, whose chiral alpha carbon multipoles
+c     carry nonzero y components, unlike the later protein parameters;
+c     223 and 225 repeat 222 and 224 on the mirror image, so "chkpole"
+c     inverts the chiral sites in one of each pair and a lost inversion
+c     under lambda would show up as a mirror whose values differ from
+c     the original; the ligand is residues three to six, which spans
+c     the three chiral alpha carbon types; 222 and 223 are isolated and
+c     224 and 225 use Ewald, so the pairs cover all four multipole
+c     summation paths; every fixture carries "lambda-deriv2" and runs
+c     the level 4 checks
+c
+c
+      subroutine test_mutate_mirror
+      implicit none
+c
+c
+      call test_mutate_calc ('chig','222_chig_ast_nobox_l05.key',
+     &   '222_chig_ast_nobox_l05.txt','222_chig_ast_nobox_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('chigm','223_chigm_ast_nobox_l05.key',
+     &   '223_chigm_ast_nobox_l05.txt','223_chigm_ast_nobox_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('chig','224_chig_ast_ye_l05.key',
+     &   '224_chig_ast_ye_l05.txt','224_chig_ast_ye_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('chigm','225_chigm_ast_ye_l05.key',
+     &   '225_chigm_ast_ye_l05.txt','225_chigm_ast_ye_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
