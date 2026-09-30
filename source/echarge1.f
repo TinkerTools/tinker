@@ -1153,6 +1153,12 @@ c
       if (abs(sum) .gt. 1.0d-10) then
          e = fs * sum**2
          ec = ec + e
+c
+c     the background term scales as the inverse volume
+c
+         do j = 1, 3
+            vir(j,j) = vir(j,j) - e
+         end do
       end if
 c
 c     compute the cell dipole boundary correction term
@@ -1180,6 +1186,25 @@ c
             dec(2,i) = dec(2,i) + dedy
             dec(3,i) = dec(3,i) + dedz
          end do
+c
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary energy
+c
+         vxx = 2.0d0*term*xd*xd - e
+         vyx = 2.0d0*term*yd*xd
+         vzx = 2.0d0*term*zd*xd
+         vyy = 2.0d0*term*yd*yd - e
+         vzy = 2.0d0*term*zd*yd
+         vzz = 2.0d0*term*zd*zd - e
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vyx
+         vir(3,1) = vir(3,1) + vzx
+         vir(1,2) = vir(1,2) + vyx
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vzy
+         vir(1,3) = vir(1,3) + vzx
+         vir(2,3) = vir(2,3) + vzy
+         vir(3,3) = vir(3,3) + vzz
       end if
 c
 c     compute reciprocal space Ewald energy and first derivatives
@@ -1553,6 +1578,12 @@ c
       if (abs(sum) .gt. 1.0d-10) then
          e = fs * sum**2
          ec = ec + e
+c
+c     the background term scales as the inverse volume
+c
+         do j = 1, 3
+            vir(j,j) = vir(j,j) - e
+         end do
       end if
 c
 c     compute the cell dipole boundary correction term
@@ -1580,6 +1611,25 @@ c
             dec(2,i) = dec(2,i) + dedy
             dec(3,i) = dec(3,i) + dedz
          end do
+c
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary energy
+c
+         vxx = 2.0d0*term*xd*xd - e
+         vyx = 2.0d0*term*yd*xd
+         vzx = 2.0d0*term*zd*xd
+         vyy = 2.0d0*term*yd*yd - e
+         vzy = 2.0d0*term*zd*yd
+         vzz = 2.0d0*term*zd*zd - e
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vyx
+         vir(3,1) = vir(3,1) + vzx
+         vir(1,2) = vir(1,2) + vyx
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vzy
+         vir(1,3) = vir(1,3) + vzx
+         vir(2,3) = vir(2,3) + vzy
+         vir(3,3) = vir(3,3) + vzz
       end if
 c
 c     compute reciprocal space Ewald energy and first derivatives
@@ -1882,6 +1932,12 @@ c
       if (abs(sum) .gt. 1.0d-10) then
          e = fs * sum**2
          ec = ec + e
+c
+c     the background term scales as the inverse volume
+c
+         do j = 1, 3
+            vir(j,j) = vir(j,j) - e
+         end do
       end if
 c
 c     compute the cell dipole boundary correction term
@@ -1909,6 +1965,25 @@ c
             dec(2,i) = dec(2,i) + dedy
             dec(3,i) = dec(3,i) + dedz
          end do
+c
+c     boundary correction to virial from the charge positions, and
+c     from the inverse volume dependence of the boundary energy
+c
+         vxx = 2.0d0*term*xd*xd - e
+         vyx = 2.0d0*term*yd*xd
+         vzx = 2.0d0*term*zd*xd
+         vyy = 2.0d0*term*yd*yd - e
+         vzy = 2.0d0*term*zd*yd
+         vzz = 2.0d0*term*zd*zd - e
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vyx
+         vir(3,1) = vir(3,1) + vzx
+         vir(1,2) = vir(1,2) + vyx
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vzy
+         vir(1,3) = vir(1,3) + vzx
+         vir(2,3) = vir(2,3) + vzy
+         vir(3,3) = vir(3,3) + vzz
       end if
 c
 c     compute reciprocal space Ewald energy and first derivatives

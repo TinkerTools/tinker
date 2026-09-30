@@ -102,6 +102,7 @@ c
       call test_pdbxyz
       call test_testgrad
       call test_testlmda
+      call test_testvir
       call test_tinkernist
       call test_xyzpdb
 c

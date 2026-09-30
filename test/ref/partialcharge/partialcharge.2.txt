@@ -2,9 +2,9 @@
 
  EngCnt Charge-Charge                   -784.3682             5040
 
- Internal Virial Tensor :                 308.950      -10.859       21.517
-                                          -10.859      307.362       18.690
-                                           21.517       18.690      167.439
+ Internal Virial Tensor :                 309.148      -10.859       21.517
+                                          -10.859      307.560       18.690
+                                           21.517       18.690      167.636
 
  Cartesian Gradient Breakdown over Individual Atoms :
 
