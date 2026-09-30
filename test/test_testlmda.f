@@ -16,6 +16,10 @@ c     this file collects Tinker system tests that run the "testlmda"
 c     program as a subprocess and compare its output against a stored
 c     reference with a floating-point tolerance
 c
+c     the ionwat cases decouple the chloride of a +2 environment under
+c     Ewald, so the uniform background correction carries a lambda
+c     scaled net charge into the dV/dL tensor from "empole4"
+c
 c
       subroutine test_testlmda
       implicit none
@@ -48,6 +52,9 @@ c
       call test_testlmda_case ('27_water_rels_lig1_st_prng_l088','1e-4')
       call test_testlmda_case ('28_water_rels_lig1_dt_prng_l088','1e-4')
       call test_testlmda_case ('29_water_rels_lig2_st_pmap_l015','1e-4')
+      call test_testlmda_xyz ('30_ionwat_ewald_l05','ionwat','1e-4')
+      call test_testlmda_xyz ('31_ionwat_ewald_nlist_l05','ionwat',
+     &                        '1e-4')
       return
       end
 c
@@ -60,19 +67,41 @@ c     ################################################################
 c
 c
 c     "test_testlmda_case" runs "testlmda" on the water mutation fixture
-c     whose key file and reference share the given base name, computing
-c     both the analytical and the numerical lambda derivatives with the
-c     given finite difference step, and checks the full program output
-c     against the reference; the tolerance is loose enough to absorb the
-c     finite difference noise in the numerical derivatives, and a steep
-c     lambda map takes a smaller step to keep its truncation error low
+c     via "test_testlmda_xyz"
 c
 c
       subroutine test_testlmda_case (base,step)
       implicit none
+      character*(*) base,step
+c
+c
+      call test_testlmda_xyz (base,'water2',step)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_testlmda_xyz  --  one lambda derivative  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_testlmda_xyz" runs "testlmda" on the given coordinates with
+c     the key file and reference that share the given base name,
+c     computing both the analytical and the numerical lambda derivatives
+c     with the given finite difference step, and checks the full program
+c     output against the reference; the tolerance is loose enough to
+c     absorb the finite difference noise in the numerical derivatives,
+c     and a steep lambda map takes a smaller step to keep its truncation
+c     error low
+c
+c
+      subroutine test_testlmda_xyz (base,xyz,step)
+      implicit none
       integer ist
       logical skiptest
-      character*(*) base,step
+      character*(*) base,xyz,step
       character*240 rpath
       character*512 args
 c
@@ -80,7 +109,7 @@ c
       if (skiptest('test_testlmda_'//base,'testlmda'))  return
       call pushdir ('file/testlmda')
       call execute_command_line ('rm -f out.txt')
-      args = '-k '//base//'.key water2.xyz Y Y '//step
+      args = '-k '//base//'.key '//xyz//'.xyz Y Y '//step
       call run_prog ('testlmda',trim(args),'out.txt',ist)
       if (ist .eq. -1) then
          call popdir
