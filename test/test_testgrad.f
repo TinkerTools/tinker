@@ -29,6 +29,8 @@ c
       call test_testgrad_case ('06_water_ast_ye_l00','water2')
       call test_testgrad_case ('09_g3','g3')
       call test_testgrad_case ('10_g3_nlist','g3')
+      call test_testgrad_case ('11_aplus_thole0','tetramer')
+      call test_testgrad_case ('12_aplus_polpair','tetramer')
       return
       end
 c

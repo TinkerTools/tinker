@@ -211,7 +211,7 @@ c
       integer nlist,jcell
       integer list(*)
       real*8 f,pgamma
-      real*8 pdi,pti,ddi
+      real*8 pdi
       real*8 damp,expdamp
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
@@ -392,8 +392,6 @@ c
          end do
          if (use_thole) then
             pdi = pdamp(i)
-            pti = thole(i)
-            ddi = tholed(i)
          else if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -1008,8 +1006,10 @@ c
                      rc5(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
+                  it = jpolar(i)
+                  kt = jpolar(k)
+                  pgamma = thlval(it,kt)
+                  if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)
@@ -1444,8 +1444,6 @@ c
          end do
          if (use_thole) then
             pdi = pdamp(i)
-            pti = thole(i)
-            ddi = tholed(i)
          else if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -2065,8 +2063,10 @@ c
                      rc5(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
+                  it = jpolar(i)
+                  kt = jpolar(k)
+                  pgamma = thlval(it,kt)
+                  if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)

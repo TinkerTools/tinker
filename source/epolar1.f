@@ -114,7 +114,7 @@ c
       integer ix,iy,iz
       integer it,kt
       real*8 f,pgamma
-      real*8 pdi,pti,ddi
+      real*8 pdi
       real*8 damp,expdamp
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
@@ -300,8 +300,6 @@ c
          end do
          if (use_thole) then
             pdi = pdamp(i)
-            pti = thole(i)
-            ddi = tholed(i)
          else if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -915,8 +913,10 @@ c
                      rc5(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
+                  it = jpolar(i)
+                  kt = jpolar(k)
+                  pgamma = thlval(it,kt)
+                  if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)
@@ -1367,8 +1367,6 @@ c
          end do
          if (use_thole) then
             pdi = pdamp(i)
-            pti = thole(i)
-            ddi = tholed(i)
          else if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -1988,8 +1986,10 @@ c
                      rc5(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
+                  it = jpolar(i)
+                  kt = jpolar(k)
+                  pgamma = thlval(it,kt)
+                  if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)
@@ -2560,7 +2560,7 @@ c
       integer ix,iy,iz
       integer it,kt
       real*8 f,pgamma
-      real*8 pdi,pti,ddi
+      real*8 pdi
       real*8 damp,expdamp
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
@@ -2710,7 +2710,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
-!$OMP& uinp,jpolar,thole,tholed,pdamp,thlval,thdval,pcore,pval,palpha,
+!$OMP& uinp,jpolar,pdamp,thlval,thdval,pcore,pval,palpha,
 !$OMP& n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,
 !$OMP& np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,
 !$OMP& p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,u1scale,
@@ -2761,8 +2761,6 @@ c
          end do
          if (use_thole) then
             pdi = pdamp(i)
-            pti = thole(i)
-            ddi = tholed(i)
          else if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -3377,8 +3375,10 @@ c
                      rc5(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
+                  it = jpolar(i)
+                  kt = jpolar(k)
+                  pgamma = thlval(it,kt)
+                  if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)
@@ -4180,7 +4180,7 @@ c
       integer ix,iy,iz
       integer it,kt
       real*8 f,pgamma
-      real*8 pdi,pti,ddi
+      real*8 pdi
       real*8 damp,expdamp
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
@@ -4344,8 +4344,6 @@ c
          end do
          if (use_thole) then
             pdi = pdamp(i)
-            pti = thole(i)
-            ddi = tholed(i)
          else if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -5038,8 +5036,10 @@ c
                      rc5(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
+                  it = jpolar(i)
+                  kt = jpolar(k)
+                  pgamma = thlval(it,kt)
+                  if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)
@@ -5510,8 +5510,6 @@ c
          end do
          if (use_thole) then
             pdi = pdamp(i)
-            pti = thole(i)
-            ddi = tholed(i)
          else if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -6210,8 +6208,10 @@ c
                      rc5(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
+                  it = jpolar(i)
+                  kt = jpolar(k)
+                  pgamma = thlval(it,kt)
+                  if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)
@@ -7035,7 +7035,7 @@ c
       integer ix,iy,iz
       integer it,kt
       real*8 f,pgamma
-      real*8 pdi,pti,ddi
+      real*8 pdi
       real*8 damp,expdamp
       real*8 temp3,temp5,temp7
       real*8 sc3,sc5,sc7
@@ -7163,7 +7163,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
-!$OMP& uinp,jpolar,thole,tholed,pdamp,thlval,thdval,pcore,pval,palpha,
+!$OMP& uinp,jpolar,pdamp,thlval,thdval,pcore,pval,palpha,
 !$OMP& n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,np13,ip13,
 !$OMP& np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,
 !$OMP& p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,u1scale,
@@ -7214,8 +7214,6 @@ c
          end do
          if (use_thole) then
             pdi = pdamp(i)
-            pti = thole(i)
-            ddi = tholed(i)
          else if (use_chgpen) then
             corei = pcore(i)
             vali = pval(i)
@@ -7909,8 +7907,10 @@ c
                      rc5(j) = 0.0d0
                   end do
                   damp = pdi * pdamp(k)
-                  if (damp .ne. 0.0d0) then
-                     pgamma = min(pti,thole(k))
+                  it = jpolar(i)
+                  kt = jpolar(k)
+                  pgamma = thlval(it,kt)
+                  if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                      damp = pgamma * (r/damp)**3
                      if (damp .lt. 50.0d0) then
                         expdamp = exp(-damp)

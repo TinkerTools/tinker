@@ -2627,6 +2627,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk
+      integer it,kt
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 ei,f,fgrp
@@ -2641,7 +2642,7 @@ c
       real*8 scale7i
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pgamma
       real*8 ci,di(3),qi(9)
       real*8 ck,dk(3),qk(9)
       real*8 fridmp(3),findmp(3)
@@ -2713,9 +2714,9 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
-!$OMP& zaxis,pdamp,thole,rpole,uind,uinp,uinds,uinps,use,n12,n13,n14,
-!$OMP& n15,i12,i13,i14,i15,np11,ip11,np12,ip12,np13,ip13,np14,ip14,
-!$OMP& p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
+!$OMP& zaxis,pdamp,jpolar,thlval,rpole,uind,uinp,uinds,uinps,use,n12,
+!$OMP& n13,n14,n15,i12,i13,i14,i15,np11,ip11,np12,ip12,np13,ip13,np14,
+!$OMP& ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,p3iscale,p4iscale,
 !$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,u1scale,u2scale,
 !$OMP& u3scale,u4scale,dpequal,use_group,use_intra,off2,f)
 !$OMP& firstprivate(pscale,dscale,uscale)
@@ -2733,7 +2734,6 @@ c
          ix = xaxis(i)
          iy = abs(yaxis(i))
          pdi = pdamp(i)
-         pti = thole(i)
          ci = rpole(1,i)
          di(1) = rpole(2,i)
          di(2) = rpole(3,i)
@@ -2894,8 +2894,9 @@ c
 c     apply Thole polarization damping to scale factors
 c
                damp = pdi * pdamp(k)
-               pgamma = min(pti,thole(k))
-               if (pgamma .eq. 0.0d0)  pgamma = max(pti,thole(k))
+               it = jpolar(i)
+               kt = jpolar(k)
+               pgamma = thlval(it,kt)
                if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                   damp = -pgamma * (r/damp)**3
                   if (damp .gt. -50.0d0) then
@@ -3656,6 +3657,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk
+      integer it,kt
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 ei,f,fgrp
@@ -3670,7 +3672,7 @@ c
       real*8 scale7i
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9
-      real*8 pdi,pti,pgamma
+      real*8 pdi,pgamma
       real*8 ci,di(3),qi(9)
       real*8 ck,dk(3),qk(9)
       real*8 fridmp(3),findmp(3)
@@ -3742,7 +3744,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,xaxis,yaxis,
-!$OMP& zaxis,pdamp,thole,rpole,uind,uinp,uinds,uinps,nelst,elst,
+!$OMP& zaxis,pdamp,jpolar,thlval,rpole,uind,uinp,uinds,uinps,nelst,elst,
 !$OMP& use,n12,n13,n14,n15,i12,i13,i14,i15,np11,ip11,np12,ip12,np13,
 !$OMP& ip13,np14,ip14,p2scale,p3scale,p4scale,p5scale,p2iscale,
 !$OMP& p3iscale,p4iscale,p5iscale,d1scale,d2scale,d3scale,d4scale,
@@ -3763,7 +3765,6 @@ c
          ix = xaxis(i)
          iy = abs(yaxis(i))
          pdi = pdamp(i)
-         pti = thole(i)
          ci = rpole(1,i)
          di(1) = rpole(2,i)
          di(2) = rpole(3,i)
@@ -3924,8 +3925,9 @@ c
 c     apply Thole polarization damping to scale factors
 c
                damp = pdi * pdamp(k)
-               pgamma = min(pti,thole(k))
-               if (pgamma .eq. 0.0d0)  pgamma = max(pti,thole(k))
+               it = jpolar(i)
+               kt = jpolar(k)
+               pgamma = thlval(it,kt)
                if (damp.ne.0.0d0 .and. pgamma.ne.0.0d0) then
                   damp = -pgamma * (r/damp)**3
                   if (damp .gt. -50.0d0) then
