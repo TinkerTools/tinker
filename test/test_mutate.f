@@ -49,6 +49,7 @@ c
       call test_mutate_deriv1
       call test_mutate_vsoft1
       call test_mutate_scexp
+      call test_mutate_epdtsave
       call test_mutate_gate
       call test_mutate_flat
       call test_mutate_chiral
@@ -1923,6 +1924,88 @@ c
          call assert_logical (found,.false.,label//' runs')
       end if
       call execute_command_line ('rm -f out.txt')
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_mutate_epdtsave  --  dual topology dipoles  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "test_mutate_epdtsave" runs "analyze" on keyfiles that save the
+c     induced dipoles or a quantity built from them; dual topology keeps
+c     the dipoles of the last end state computed, so each save must
+c     stop, whether dual topology is set by "pol-dualtopo" or follows
+c     from "lambda-deriv2" with a polarization lambda map; the static,
+c     charge and direct field saves do not need the induced dipoles and
+c     must run, as must an induced dipole save with single topology
+c
+c
+      subroutine test_mutate_epdtsave
+      implicit none
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_epdtsave','mutate'))  return
+      call pushdir ('file/mutate')
+      call test_mutate_epdtcase ('epdtsave_uind.key',.true.,
+     &                           'test_mutate_epdtsave uinduce')
+      call test_mutate_epdtcase ('epdtsave_udir.key',.true.,
+     &                           'test_mutate_epdtsave udirect')
+      call test_mutate_epdtcase ('epdtsave_usys.key',.true.,
+     &                           'test_mutate_epdtsave usystem')
+      call test_mutate_epdtcase ('epdtsave_tef_d2.key',.true.,
+     &                           'test_mutate_epdtsave tefield deriv2')
+      call test_mutate_epdtcase ('epdtsave_perm.key',.false.,
+     &                           'test_mutate_epdtsave permanent')
+      call test_mutate_epdtcase ('epdtsave_pst.key',.false.,
+     &                           'test_mutate_epdtsave single topology')
+      call popdir
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_epdtcase  --  one dipole save key  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_epdtcase" runs "analyze" on one keyfile and checks
+c     whether it stops with the dual topology dipole save error
+c
+c
+      subroutine test_mutate_epdtcase (key,stops,label)
+      implicit none
+      integer ist,iout
+      logical stops,found
+      character*(*) key,label
+      character*240 line
+      character*512 args
+c
+c
+      call execute_command_line ('rm -f out.txt water2.uind*')
+      args = '-k '//key//' water2.xyz E'
+      call run_prog ('analyze',trim(args),'out.txt',ist)
+      if (ist .eq. -1)  return
+c
+c     find the dual topology dipole save error
+c
+      found = .false.
+      open (newunit=iout,file='out.txt',status='old')
+      do while (.true.)
+         read (iout,'(a)',end=10)  line
+         if (index(line,'Induced Dipoles cannot be Saved') .ne. 0)
+     &      found = .true.
+      end do
+   10 continue
+      close (unit=iout)
+      call assert_logical (found,stops,label)
+      call execute_command_line ('rm -f out.txt water2.uind*')
       return
       end
 c

@@ -1315,6 +1315,7 @@ c
       subroutine mutate_check
       use dlmda
       use iounit
+      use keys
       use limits
       use mplpot
       use mutant
@@ -1322,6 +1323,10 @@ c
       use potent
       use vdwpot
       implicit none
+      integer i,next
+      logical polsave
+      character*20 keyword
+      character*240 record
 c
 c
 c     enforce the allowed soft core van der Waals parameters
@@ -1507,6 +1512,33 @@ c
      &              ' least 3 to hold a propagation, equilibration',
      &              ' and averaging phase')
          call fatal
+      end if
+c
+c     dual topology leaves the induced dipoles of the last end state
+c     computed, not of the current lambda, so saving them or anything
+c     built from them is refused; the save keywords are read here as
+c     "mdinit" and "optinit" parse them only after this check
+c
+      if (use_epdt .and. use_polar) then
+         polsave = .false.
+         do i = 1, nkey
+            next = 1
+            record = keyline(i)
+            call gettext (record,keyword,next)
+            call upcase (keyword)
+            if (keyword(1:13).eq.'SAVE-UINDUCE ' .or.
+     &          keyword(1:13).eq.'SAVE-UDIRECT ' .or.
+     &          keyword(1:13).eq.'SAVE-USYSTEM ' .or.
+     &          keyword(1:13).eq.'SAVE-TEFIELD ')  polsave = .true.
+         end do
+         if (polsave) then
+            write (iout,140)
+  140       format (/,' MUTATE_CHECK  --  Induced Dipoles cannot be',
+     &                 ' Saved with Dual Topology Polarization; remove',
+     &                 ' the SAVE-UINDUCE, SAVE-UDIRECT, SAVE-USYSTEM',
+     &                 ' and SAVE-TEFIELD keywords')
+            call fatal
+         end if
       end if
       return
       end
