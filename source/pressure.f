@@ -551,12 +551,16 @@ c
       use mdstuf
       use molcul
       use moldyn
+      use polar
+      use potent
       use units
+      use uprior
       use usage
       use virial
       implicit none
       integer i,j,k
       integer start,stop
+      integer nualtold
       real*8 epot,temp,term
       real*8 energy,random
       real*8 expterm,weigh
@@ -581,7 +585,22 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: dtrial(:,:)
+      real*8, allocatable :: uindold(:,:)
+      real*8, allocatable :: uinpold(:,:)
+      real*8, allocatable :: udirold(:,:)
+      real*8, allocatable :: udirpold(:,:)
+      real*8, allocatable :: uindsold(:,:)
+      real*8, allocatable :: uinpsold(:,:)
+      real*8, allocatable :: udirsold(:,:)
+      real*8, allocatable :: udirpsold(:,:)
+      real*8, allocatable :: udaltold(:,:,:)
+      real*8, allocatable :: upaltold(:,:,:)
+      real*8, allocatable :: usaltold(:,:,:)
+      real*8, allocatable :: upsaltold(:,:,:)
       logical dotrial
+      logical savepol
+      logical savepred
+      logical savesolv
       logical eostapprox
       logical isotropic
       logical idealgas
@@ -613,6 +632,33 @@ c
          allocate (zold(n))
          if (use_ostdyn)  allocate (dtrial(3,n))
 c
+c     the trial energy solves the induced dipoles at the trial
+c     geometry and adds them to the predictor history
+c
+         savepol = use_polar
+         savepred = (use_polar .and. use_pred)
+         savesolv = (use_polar .and. use_solv .and. allocated(uinds))
+         if (savepol) then
+            allocate (uindold(3,n))
+            allocate (uinpold(3,n))
+            allocate (udirold(3,n))
+            allocate (udirpold(3,n))
+         end if
+         if (savepred) then
+            allocate (udaltold(maxualt,3,n))
+            allocate (upaltold(maxualt,3,n))
+         end if
+         if (savesolv) then
+            allocate (uindsold(3,n))
+            allocate (uinpsold(3,n))
+            allocate (udirsold(3,n))
+            allocate (udirpsold(3,n))
+            if (savepred) then
+               allocate (usaltold(maxualt,3,n))
+               allocate (upsaltold(maxualt,3,n))
+            end if
+         end if
+c
 c     save the system state prior to trial box size change
 c
          xboxold = xbox
@@ -628,6 +674,27 @@ c
             yold(i) = y(i)
             zold(i) = z(i)
          end do
+         if (savepol) then
+            uindold = uind
+            uinpold = uinp
+            udirold = udir
+            udirpold = udirp
+         end if
+         if (savepred) then
+            nualtold = nualt
+            udaltold = udalt
+            upaltold = upalt
+         end if
+         if (savesolv) then
+            uindsold = uinds
+            uinpsold = uinps
+            udirsold = udirs
+            udirpsold = udirps
+            if (savepred) then
+               usaltold = usalt
+               upsaltold = upsalt
+            end if
+         end if
 c
 c     for the isotropic case, change the lattice lengths uniformly
 c
@@ -1103,6 +1170,27 @@ c
                y(i) = yold(i)
                z(i) = zold(i)
             end do
+            if (savepol) then
+               uind = uindold
+               uinp = uinpold
+               udir = udirold
+               udirp = udirpold
+            end if
+            if (savepred) then
+               nualt = nualtold
+               udalt = udaltold
+               upalt = upaltold
+            end if
+            if (savesolv) then
+               uinds = uindsold
+               uinps = uinpsold
+               udirs = udirsold
+               udirps = udirpsold
+               if (savepred) then
+                  usalt = usaltold
+                  upsalt = upsaltold
+               end if
+            end if
          end if
 c
 c     perform deallocation of some local arrays
@@ -1111,6 +1199,26 @@ c
          deallocate (yold)
          deallocate (zold)
          if (use_ostdyn)  deallocate (dtrial)
+         if (savepol) then
+            deallocate (uindold)
+            deallocate (uinpold)
+            deallocate (udirold)
+            deallocate (udirpold)
+         end if
+         if (savepred) then
+            deallocate (udaltold)
+            deallocate (upaltold)
+         end if
+         if (savesolv) then
+            deallocate (uindsold)
+            deallocate (uinpsold)
+            deallocate (udirsold)
+            deallocate (udirpsold)
+            if (savepred) then
+               deallocate (usaltold)
+               deallocate (upsaltold)
+            end if
+         end if
       end if
       return
       end

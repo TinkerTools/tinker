@@ -60,6 +60,7 @@ c
       call test_angtor
       call test_aplusgas
       call test_aplusliquid
+      call test_barostat
       call test_bond
       call test_bounds
       call test_box
