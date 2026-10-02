@@ -18,7 +18,8 @@ c     reference with a floating-point tolerance
 c
 c     the ionwat cases decouple the chloride of a +2 environment under
 c     Ewald, so the uniform background correction carries a lambda
-c     scaled net charge into the dV/dL tensor from "empole4"
+c     scaled net charge into the dV/dL tensor from "empole4"; case 32
+c     adds dual topology polarization alongside it
 c
 c
       subroutine test_testlmda
@@ -55,6 +56,7 @@ c
       call test_testlmda_xyz ('30_ionwat_ewald_l05','ionwat','1e-4')
       call test_testlmda_xyz ('31_ionwat_ewald_nlist_l05','ionwat',
      &                        '1e-4')
+      call test_testlmda_xyz ('32_ionwat_pol_ewald_l05','ionwat','1e-4')
       return
       end
 c

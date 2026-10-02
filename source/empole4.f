@@ -251,8 +251,8 @@ c
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(i)
-            vali = pval(i)
+            corei = pcoreorig(i)
+            vali = pvalorig(i)
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
@@ -397,8 +397,8 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(k)
-                  valk = pval(k)
+                  corek = pcoreorig(k)
+                  valk = pvalorig(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -696,8 +696,8 @@ c
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(i)
-            vali = pval(i)
+            corei = pcoreorig(i)
+            vali = pvalorig(i)
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
@@ -845,8 +845,8 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(k)
-                  valk = pval(k)
+                  corek = pcoreorig(k)
+                  valk = pvalorig(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -1369,8 +1369,8 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcore,
-!$OMP& pval,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
+!$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcoreorig,
+!$OMP& pvalorig,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
 !$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
 !$OMP& use_group,use_intra,use_bounds,off2,f,mutg,emsc,demsc,
 !$OMP& use_d2lmda)
@@ -1400,8 +1400,8 @@ c
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(i)
-            vali = pval(i)
+            corei = pcoreorig(i)
+            vali = pvalorig(i)
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
@@ -1547,8 +1547,8 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(k)
-                  valk = pval(k)
+                  corek = pcoreorig(k)
+                  valk = pvalorig(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -2429,8 +2429,8 @@ c
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(i)
-            vali = pval(i)
+            corei = pcoreorig(i)
+            vali = pvalorig(i)
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
@@ -2568,8 +2568,8 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(k)
-                  valk = pval(k)
+                  corek = pcoreorig(k)
+                  valk = pvalorig(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -2860,8 +2860,8 @@ c
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(i)
-            vali = pval(i)
+            corei = pcoreorig(i)
+            vali = pvalorig(i)
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
@@ -3003,8 +3003,8 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(k)
-                  valk = pval(k)
+                  corek = pcoreorig(k)
+                  valk = pvalorig(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -3861,7 +3861,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,rpole,pcore,pval,palpha,n12,i12,
+!$OMP& shared(npole,ipole,x,y,z,rpole,pcoreorig,pvalorig,palpha,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
 !$OMP& yaxis,zaxis,emsc,demsc,mutg,use_d2lmda)
@@ -3888,8 +3888,8 @@ c
          qiyz = rpole(10,i)
          qizz = rpole(13,i)
          if (use_chgpen) then
-            corei = pcore(i)
-            vali = pval(i)
+            corei = pcoreorig(i)
+            vali = pvalorig(i)
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
@@ -4028,8 +4028,8 @@ c
 c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
-                  corek = pcore(k)
-                  valk = pval(k)
+                  corek = pcoreorig(k)
+                  valk = pvalorig(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali

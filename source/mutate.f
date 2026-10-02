@@ -1495,6 +1495,19 @@ c
          call fatal
       end if
 c
+c     the HIPPO repulsion, dispersion and charge transfer terms are
+c     scaled by lambda but add nothing to the lambda derivative, and
+c     the charge penetration lambda derivatives are not yet validated
+c
+      if (use_dlmda .and. (use_repel .or. use_disp .or. use_chgtrn
+     &       .or. use_chgpen)) then
+         write (iout,115)
+  115    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
+     &              ' Available for HIPPO Repulsion, Dispersion,',
+     &              ' Charge Transfer or Charge Penetration')
+         call fatal
+      end if
+c
 c     the ost and abf sample interval must keep a propagation phase,
 c     an equilibration phase and samples to average at the fixed lambda
 c

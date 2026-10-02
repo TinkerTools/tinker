@@ -48,6 +48,8 @@ c
       call test_mutate_polst
       call test_mutate_deriv1
       call test_mutate_vsoft1
+      call test_mutate_noewald
+      call test_mutate_ion
       call test_mutate_scexp
       call test_mutate_epdtsave
       call test_mutate_gate
@@ -1841,6 +1843,61 @@ c
       end
 c
 c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_noewald  --  cutoff electrostatics  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_noewald" runs the three water fixtures 239-241 that
+c     repeat Ewald fixtures with a 6.5 Ang multipole cutoff instead;
+c     239 is the single topology staged ligand 1 leg of 203 and 240 the
+c     dual topology one of 136, both at a main lambda of 0.85, and 241
+c     is the first derivative only dual topology polarization of 232
+c
+c
+      subroutine test_mutate_noewald
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','239_water_rels_st_ne_l085.key',
+     &   '239_water_rels_st_ne_l085.txt','239_water_rels_st_ne_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','240_water_rels_ne_l085.key',
+     &   '240_water_rels_ne_l085.txt','240_water_rels_ne_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','241_water_adt_d1_ne_l06.key',
+     &   '241_water_adt_d1_ne_l06.txt','241_water_adt_d1_ne_l06',
+     &   .false., .true.,  .false., .true.,  .true.)
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine test_mutate_ion  --  charged ligand pol  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "test_mutate_ion" runs fixture 242, which decouples the chloride
+c     of the two sodium, chloride and water cluster with single topology
+c     multipoles and polarization under Ewald, so the uniform background
+c     term carries a lambda scaled net charge alongside polarization
+c
+c
+      subroutine test_mutate_ion
+      implicit none
+c
+c
+      call test_mutate_calc ('ionwat','242_ionwat_ast_l05.key',
+     &   '242_ionwat_ast_l05.txt','242_ionwat_ast_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
 c     ################################################################
 c     ##                                                            ##
 c     ##  subroutine test_mutate_scexp  --  softcore exponent gate  ##
@@ -2164,7 +2221,7 @@ c     the lambda derivatives must be exact zeros, the plain and lambda
 c     derivative routines must agree there, and moving back inside the
 c     window must restore the multipole lambda derivative; the single
 c     topology fixture 203 and the dual topology fixture 136 cover both
-c     polarization paths
+c     polarization paths, and 239 and 240 repeat them without Ewald
 c
 c
       subroutine test_mutate_flat
@@ -2177,6 +2234,10 @@ c
      &                           'test_mutate_flat single')
       call test_mutate_flatcase ('136_water_rels_ye_l085.key',
      &                           'test_mutate_flat dual')
+      call test_mutate_flatcase ('239_water_rels_st_ne_l085.key',
+     &                           'test_mutate_flat single noewald')
+      call test_mutate_flatcase ('240_water_rels_ne_l085.key',
+     &                           'test_mutate_flat dual noewald')
       return
       end
 c
