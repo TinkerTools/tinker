@@ -52,8 +52,15 @@ c
       subroutine test_eostmap_refresh
       use dlmda
       use mutant
+      use potent
       implicit none
 c
+c
+c     no system is loaded, so turn off any electrostatic terms left
+c     on by an earlier test before refreshsublmda calls altelec
+c
+      call potoff
+      use_chgflx = .false.
 c
 c     use identity maps so a sublambda tracks the main lambda exactly
 c

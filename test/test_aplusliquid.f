@@ -22,6 +22,7 @@ c
 c
       call test_aplusliquid_ewald
       call test_aplusliquid_nonewald
+      call test_aplusliquid_pair
       return
       end
 c
@@ -64,6 +65,47 @@ c
       call test_aplusliquid_case ('liquid','aplusliquid.2.txt',
      &                           'aplusliquid_nonewald_nolist',
      &                           .false.,1.0d-4,1.0d-4,1.0d-3)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_aplusliquid_pair  --  zero damping pairs  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_aplusliquid_pair" checks the Ewald liquid with zero or
+c     vanishing polarization parameters on propanol H (type 17);
+c     pairs without polarization energy, or fully damped pairs, must
+c     not count as interactions, a zero damping pair value leaves the
+c     pair undamped, and a zero per-atom value falls back to that of
+c     the partner atom
+c
+c
+      subroutine test_aplusliquid_pair
+      implicit none
+      integer i
+      character*11 name(6)
+      character*17 ref(6)
+      data name  / 'zeropol', 'zerothole', 'zerodirdamp',
+     &             'polpair', 'zeropair', 'tinypair' /
+      data ref   / 'aplusliquid.3.txt', 'aplusliquid.4.txt',
+     &             'aplusliquid.5.txt', 'aplusliquid.6.txt',
+     &             'aplusliquid.7.txt', 'aplusliquid.8.txt' /
+c
+c
+      do i = 1, 6
+         call test_aplusliquid_case ('liquid_ewald_'//trim(name(i)),
+     &                              ref(i),'aplusliquid_'//
+     &                              trim(name(i))//'_list',.true.,
+     &                              1.0d-4,1.0d-4,1.0d-3)
+         call test_aplusliquid_case ('liquid_ewald_'//trim(name(i)),
+     &                              ref(i),'aplusliquid_'//
+     &                              trim(name(i))//'_nolist',.false.,
+     &                              1.0d-4,1.0d-4,1.0d-3)
+      end do
       return
       end
 c

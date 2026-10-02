@@ -60,6 +60,14 @@ c
      &                     .true.,1.0d-4,1.0d-4,1.0d-3)
       call test_disp_case ('dewald','disp.2.txt','disp_dewald',
      &                     .false.,1.0d-4,1.0d-4,1.0d-3)
+c
+c     no dispersion on the methyl H, so its excluded pairs have no
+c     energy and must not be taken away from the interaction count
+c
+      call test_disp_case ('dewald_zeroc6','disp.3.txt',
+     &                     'disp_zeroc6',.true.,1.0d-4,1.0d-4,1.0d-3)
+      call test_disp_case ('dewald_zeroc6','disp.3.txt',
+     &                     'disp_zeroc6',.false.,1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c

@@ -1426,9 +1426,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
+         do kkk = 1, nelst(i)
+            k = elst(kkk,i)
             kz = zaxis(k)
             kx = xaxis(k)
             ky = abs(yaxis(k))
@@ -3913,9 +3912,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
+         do kkk = 1, nelst(i)
+            k = elst(kkk,i)
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi

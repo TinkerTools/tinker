@@ -1542,14 +1542,15 @@ c
             if (keyword(1:13).eq.'SAVE-UINDUCE ' .or.
      &          keyword(1:13).eq.'SAVE-UDIRECT ' .or.
      &          keyword(1:13).eq.'SAVE-USYSTEM ' .or.
-     &          keyword(1:13).eq.'SAVE-TEFIELD ')  polsave = .true.
+     &          keyword(1:13).eq.'SAVE-TEFIELD ' .or.
+     &          keyword(1:13).eq.'SAVE-DEFIELD ')  polsave = .true.
          end do
          if (polsave) then
             write (iout,140)
   140       format (/,' MUTATE_CHECK  --  Induced Dipoles cannot be',
      &                 ' Saved with Dual Topology Polarization; remove',
-     &                 ' the SAVE-UINDUCE, SAVE-UDIRECT, SAVE-USYSTEM',
-     &                 ' and SAVE-TEFIELD keywords')
+     &                 ' the SAVE-UINDUCE, SAVE-UDIRECT, SAVE-USYSTEM,',
+     &                 ' SAVE-TEFIELD and SAVE-DEFIELD keywords')
             call fatal
          end if
       end if

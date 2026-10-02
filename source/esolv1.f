@@ -2869,9 +2869,9 @@ c
             qk(7) = rpole(11,k)
             qk(8) = rpole(12,k)
             qk(9) = rpole(13,k)
-            xr = x(kk) - xi
-            yr = y(kk) - yi
-            zr = z(kk) - zi
+            xr = x(k) - xi
+            yr = y(k) - yi
+            zr = z(k) - zi
             call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. off2) then

@@ -43,6 +43,16 @@ c
       call test_ephippo_case ('ewald','ephippo.1.txt',
      &                       'ephippo_ewald',.false.,
      &                       1.0d-4,1.0d-4,1.0d-3)
+c
+c     no polarizability on the methyl H, so the H-H pairs have no
+c     polarization energy and must not count as interactions
+c
+      call test_ephippo_case ('ewald_zeropol','ephippo.3.txt',
+     &                       'ephippo_zeropol',.true.,
+     &                       1.0d-4,1.0d-4,1.0d-3)
+      call test_ephippo_case ('ewald_zeropol','ephippo.3.txt',
+     &                       'ephippo_zeropol',.false.,
+     &                       1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c

@@ -1925,9 +1925,68 @@ c
      &                            'test_mutate_scexp n15 deriv2')
       call test_mutate_scexpcase ('vsoft_n15_ost.key','two',
      &                            'test_mutate_scexp n15 ost')
-      call test_mutate_scexpcase ('vsoft_n15_ti.key','',
-     &                            'test_mutate_scexp n15 ti')
+      call test_mutate_scexpcase ('238_water_vsoft_n15_ti_l00.key',
+     &                            '','test_mutate_scexp n15 ti')
       call popdir
+      call test_mutate_scexpti
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_scexpti  --  TI softcore exponent  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_scexpti" evaluates fixture 238, a softcore exponent
+c     of 1.5 under TI, in its first window at a main lambda of zero;
+c     TI asks for only the first lambda derivative, the ligand van der
+c     Waals is fully decoupled, so energy, gradient and virial match
+c     fixture 235 with an exponent of one, and the lambda derivative
+c     vanishes since the softcore weight is flat at the endpoint
+c
+c
+      subroutine test_mutate_scexpti
+      use atoms
+      use dlmda
+      use energi
+      use mutant
+      use virial
+      implicit none
+      integer nat
+      real*8 e,ref_e,ref_ei
+      real*8 refv(3,3)
+      real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: refg(:,:)
+      logical skiptest
+      character*240 rpath
+      character*(*) tname
+      parameter (tname='test_mutate_scexpti')
+c
+c
+      if (skiptest(tname,'mutate'))  return
+      call pushdir ('file/mutate')
+      call loadfix_keyadd ('water2','238_water_vsoft_n15_ti_l00.key',
+     &                     'ti-window 0.0')
+      allocate (derivs(3,n))
+      allocate (refg(3,n))
+      call refpath ('mutate','235_water_vsoft_n1_d1_l00.txt',rpath)
+      call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
+      call assert_logical (use_ti,.true.,tname//' TI mode')
+      call assert_logical (use_d2lmda,.false.,tname//' first only')
+      call assert_real (lambda,0.0d0,0.0d0,tname//' lambda')
+      call gradient (e,derivs)
+      call assert_real (esum,ref_e,1.0d-4,tname//' energy')
+      call assert_grad (derivs,refg,n,1.0d-4,tname//' gradient')
+      call assert_grad (vir,refv,3,1.0d-3,tname//' virial')
+      call assert_real (dedl,0.0d0,1.0d-8,tname//' dE/dL')
+      call assert_real (d2edl2,0.0d0,0.0d0,tname//' d2E/dL2')
+      deallocate (derivs)
+      deallocate (refg)
+      call popdir
+      call final
       return
       end
 c
@@ -1996,9 +2055,11 @@ c     "test_mutate_epdtsave" runs "analyze" on keyfiles that save the
 c     induced dipoles or a quantity built from them; dual topology keeps
 c     the dipoles of the last end state computed, so each save must
 c     stop, whether dual topology is set by "pol-dualtopo" or follows
-c     from "lambda-deriv2" with a polarization lambda map; the static,
-c     charge and direct field saves do not need the induced dipoles and
-c     must run, as must an induced dipole save with single topology
+c     from "lambda-deriv2" with a polarization lambda map; the direct
+c     field save is built from the direct induced dipoles and must stop
+c     as well; the static and charge dipole saves do not need induced
+c     dipoles and must run, as must an induced dipole save with single
+c     topology
 c
 c
       subroutine test_mutate_epdtsave
@@ -2014,6 +2075,8 @@ c
      &                           'test_mutate_epdtsave udirect')
       call test_mutate_epdtcase ('epdtsave_usys.key',.true.,
      &                           'test_mutate_epdtsave usystem')
+      call test_mutate_epdtcase ('epdtsave_def.key',.true.,
+     &                           'test_mutate_epdtsave defield')
       call test_mutate_epdtcase ('epdtsave_tef_d2.key',.true.,
      &                           'test_mutate_epdtsave tefield deriv2')
       call test_mutate_epdtcase ('epdtsave_perm.key',.false.,

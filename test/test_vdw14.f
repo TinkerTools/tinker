@@ -22,6 +22,7 @@ c
 c
       call test_vdw14_nopbc
       call test_vdw14_cutoff
+      call test_vdw14_hal
       return
       end
 c
@@ -37,8 +38,8 @@ c
       implicit none
 c
 c
-      call test_vdw14_case ('vdw14.1','vdw14.1.txt',
-     &                      'vdw14_nopbc',.false.)
+      call test_vdw14_case ('trp_charmm','vdw14.1','vdw14.1.txt',
+     &                      'vdw14_nopbc',.false.,'charmm')
       return
       end
 c
@@ -54,10 +55,37 @@ c
       implicit none
 c
 c
-      call test_vdw14_case ('vdw14.2','vdw14.2.txt',
-     &                      'vdw14_cutoff_list',.true.)
-      call test_vdw14_case ('vdw14.2','vdw14.2.txt',
-     &                      'vdw14_cutoff_nolist',.false.)
+      call test_vdw14_case ('trp_charmm','vdw14.2','vdw14.2.txt',
+     &                      'vdw14_cutoff_list',.true.,'charmm')
+      call test_vdw14_case ('trp_charmm','vdw14.2','vdw14.2.txt',
+     &                      'vdw14_cutoff_nolist',.false.,'charmm')
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_vdw14_hal  --  buffered 14-7 1-4 vdW  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_vdw14_hal" checks buffered 14-7 van der Waals on SAMPL8
+c     guest 3 and its waters, with artificial vdw14 values and a 1-4
+c     scale of one half, so every 1-4 pair inside the guest takes a
+c     scaled vdw14 radius and well depth
+c
+c
+      subroutine test_vdw14_hal
+      implicit none
+c
+c
+      call test_vdw14_case ('../mutate/g3','vdw14.3','vdw14.3.txt',
+     &                      'vdw14_hal_nopbc',.false.,'amoeba')
+      call test_vdw14_case ('../mutate/g3','vdw14.4','vdw14.4.txt',
+     &                      'vdw14_hal_cutoff_list',.true.,'amoeba')
+      call test_vdw14_case ('../mutate/g3','vdw14.4','vdw14.4.txt',
+     &                      'vdw14_hal_cutoff_nolist',.false.,'amoeba')
       return
       end
 c
@@ -69,7 +97,7 @@ c     ##                                               ##
 c     ###################################################
 c
 c
-      subroutine test_vdw14_case (key,reffile,tname,uselist)
+      subroutine test_vdw14_case (base,key,reffile,tname,uselist,tag)
       use action
       use atoms
       use energi
@@ -82,19 +110,18 @@ c
       real*8 refv(3,3)
       real*8, allocatable :: refg(:,:)
       logical skiptest,uselist
-      character*(*) key,reffile,tname
+      character*(*) base,key,reffile,tname,tag
       character*240 rpath
       character*(*) tpre
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'charmm'))  return
+      if (skiptest(tpre//tname,tag))  return
       call pushdir ('file/vdw14')
       if (uselist) then
-         call loadfix_keyadd ('trp_charmm',key//'.key',
-     &                        'neighbor-list')
+         call loadfix_keyadd (base,key//'.key','neighbor-list')
       else
-         call loadfix ('trp_charmm',key//'.key')
+         call loadfix (base,key//'.key')
       end if
       allocate (derivs(3,n))
       allocate (refg(3,n))

@@ -472,9 +472,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
+         do kkk = 1, nelst(i)
+            k = elst(kkk,i)
             eplk = lpep(k)
             if (epli .or. eplk) then
                xr = x(k) - xi

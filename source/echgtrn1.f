@@ -543,9 +543,8 @@ c
 c
 c     evaluate all sites within the cutoff distance
 c
-         do kkk = 1, nelst(ii)
-            kk = elst(kkk,ii)
-            k = ipole(kk)
+         do kkk = 1, nelst(i)
+            k = elst(kkk,i)
             mutk = (mutg(k) .ne. 0)
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)

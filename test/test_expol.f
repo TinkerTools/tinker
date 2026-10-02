@@ -32,6 +32,12 @@ c
      &                      'expol_s2',1.0d-4,1.0d-4,1.0d-3)
       call test_expol_case ('crys','expolg','expol.6.txt',
      &                      'expol_g',1.0d-4,1.0d-4,1.0d-3)
+c
+c     exchange polarization switched on for water, so intramolecular
+c     O-H and H-H pairs take the scaled pair path
+c
+      call test_expol_case ('water2Na2Clbox','expolw','expol.7.txt',
+     &                      'expol_water',1.0d-4,1.0d-4,1.0d-3)
       return
       end
 c
