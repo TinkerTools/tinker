@@ -30,7 +30,7 @@ c
       integer nualt0
       real*8 energy,e0
       real*8 epot,temp
-      real*8 xbox0
+      real*8 xbox0,box0(7)
       real*8, allocatable :: x0(:)
       real*8, allocatable :: y0(:)
       real*8, allocatable :: z0(:)
@@ -46,9 +46,10 @@ c
 c
 c
       if (skiptest(tname,'amoeba'))  return
-      call pushdir ('file/tinkernist')
-      call loadfix_keyadd ('water30','water30.key','polar-predict')
+      call pushdir ('file/barostat')
+      call loadfix ('water30','water30.key')
       call predict
+      call assert_int (n,2700,tname//' atoms')
 c
 c     set the Monte Carlo barostat state that "mdinit" would read
 c
@@ -65,11 +66,13 @@ c
       use_metadyn = .false.
       use_abfdyn = .false.
 c
-c     fill the predictor history with solves at nearby geometries
+c     match the C++ fixture's 19 solves and zero-based perturbations;
+c     ASPC stores 17 slots here, including a zero-coefficient slot,
+c     and 16 in C++, so both histories are full before the trial
 c
-      do step = 1, maxualt+2
+      do step = 0, 18
          do i = 1, n
-            x(i) = x(i) + 0.01d0*dble(mod(i+step,3)-1)
+            x(i) = x(i) + 0.01d0*dble(mod(i-1+step,3)-1)
          end do
          e0 = energy ()
       end do
@@ -84,9 +87,9 @@ c
       allocate (udalt0(maxualt,3,n))
       allocate (upalt0(maxualt,3,n))
 c
-c     an old energy far below the trial energy rejects the move
+c     use the same forced-rejection energy as the C++ test
 c
-      xbox0 = xbox
+      box0 = (/ xbox,ybox,zbox,alpha,beta,gamma,volbox /)
       x0 = x(1:n)
       y0 = y(1:n)
       z0 = z(1:n)
@@ -97,10 +100,16 @@ c
       nualt0 = nualt
       udalt0 = udalt
       upalt0 = upalt
-      epot = e0 - 200.0d0
+      epot = -1.0d30
       call pmonte (epot,temp)
-      call assert_real (epot,e0-200.0d0,0.0d0,tname//' reject epot')
-      call assert_real (xbox,xbox0,0.0d0,tname//' reject box')
+      call assert_real (epot,-1.0d30,0.0d0,tname//' reject epot')
+      call assert_real (xbox,box0(1),0.0d0,tname//' reject xbox')
+      call assert_real (ybox,box0(2),0.0d0,tname//' reject ybox')
+      call assert_real (zbox,box0(3),0.0d0,tname//' reject zbox')
+      call assert_real (alpha,box0(4),0.0d0,tname//' reject alpha')
+      call assert_real (beta,box0(5),0.0d0,tname//' reject beta')
+      call assert_real (gamma,box0(6),0.0d0,tname//' reject gamma')
+      call assert_real (volbox,box0(7),0.0d0,tname//' reject volume')
       call assert_array1 (x,x0,n,0.0d0,tname//' reject x')
       call assert_array1 (y,y0,n,0.0d0,tname//' reject y')
       call assert_array1 (z,z0,n,0.0d0,tname//' reject z')

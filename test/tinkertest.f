@@ -94,6 +94,7 @@ c
       call test_thermint
       call test_torsion
       call test_tortor
+      call test_truncated8
       call test_urey
       call test_vdw14
 c
