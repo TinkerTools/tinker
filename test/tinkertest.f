@@ -103,6 +103,7 @@ c
       call test_bar
       call test_potential
       call test_pdbxyz
+      call test_stochastic
       call test_testgrad
       call test_testlmda
       call test_testvir

@@ -153,6 +153,7 @@ c
             tefsave = .true.
          else if (keyword(1:9) .eq. 'FRICTION ') then
             read (string,*,err=10,end=10)  friction
+            friction = abs(friction)
          else if (keyword(1:17) .eq. 'FRICTION-SCALING ') then
             use_sdarea = .true.
          else if (keyword(1:11) .eq. 'THERMOSTAT ') then
@@ -247,7 +248,7 @@ c
       end if
 c
 c     decide whether to remove center of mass motion; note
-c     should be applied by default to stochastic dynamics
+c     stochastic dynamics only does so if explicitly requested
 c
       dorest = .true.
       if (irest .eq. 0) then
@@ -257,7 +258,7 @@ c
 c        if (integrate .eq. 'BAOAB')  dorest = .false.
 c        if (integrate .eq. 'OBABO')  dorest = .false.
 c        if (integrate .eq. 'SRESPA')  dorest = .false.
-c        if (integrate .eq. 'STOCHASTIC')  dorest = .false.
+         if (integrate .eq. 'STOCHASTIC')  dorest = .false.
          if (integrate .eq. 'GHMC')  dorest = .false.
          if (isothermal .and. thermostat.eq.'ANDERSEN')
      &      dorest = .false.
@@ -365,6 +366,17 @@ c
                else
                   nfree = nfree - 6
                end if
+            end if
+         end if
+c
+c     stochastic dynamics thermalizes overall translation and
+c     rotation, so these only come out if inertia is removed
+c
+         if (integrate.eq.'STOCHASTIC' .and. dorest) then
+            if (use_bounds) then
+               nfree = nfree - 3
+            else
+               nfree = nfree - 6
             end if
          end if
       end if

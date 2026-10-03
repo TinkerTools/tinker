@@ -25,8 +25,8 @@ c
 c
 c     check steps between center of mass motion removal
 c
-c     if (.not. dorest)  return
-c     if (mod(istep,irest) .ne. 0)  return
+      if (.not. dorest)  return
+      if (mod(istep,irest) .ne. 0)  return
 c
 c     eliminate system translational and rotational motion
 c
@@ -103,7 +103,7 @@ c
          do k = igrp(1,i), igrp(2,i)
             m = kgrp(k)
             weigh = mass(m)
-            totmass = totmass + weigh
+            totmass(i) = totmass(i) + weigh
             do j = 1, 3
                vtot(j,i) = vtot(j,i) + v(j,m)*weigh
             end do
