@@ -91,7 +91,7 @@ c
 c
       if (skiptest('test_mutate_refresh','mutate'))  return
       call pushdir ('file/mutate')
-      call loadfix ('water2','085_water_exp_ast_l05.key')
+      call loadfix ('water2','056_water_exp_ast_l05.key')
       allocate (derivs(3,n))
       allocate (derivsref(3,n))
 c
@@ -263,7 +263,7 @@ c
 c
 c     a main lambda with no map keyword drives all three sublambdas
 c
-      call loadfix ('water2','146_water_lmda_ast_l05.key')
+      call loadfix ('water2','089_water_lmda_ast_l05.key')
       call assert_logical (use_mainlmda,.true.,
      &                  'lmda linear use_mainlmda')
       call assert_logical (use_elmdamap,.true.,
@@ -280,14 +280,14 @@ c
       call assert_real (dvldlmda,1.0d0,0.0d0,'lmda linear dvldlmda')
       e = energy ()
       call final
-      call loadfix ('water2','147_water_lmda_ast_e05.key')
+      call loadfix ('water2','090_water_lmda_ast_e05.key')
       eref = energy ()
       call assert_real (e,eref,1.0d-10,'lmda linear energy')
       call final
 c
 c     the fully coupled endpoint matches a fixture with no lambda
 c
-      call loadfix ('water2','148_water_lmda_ast_l10.key')
+      call loadfix ('water2','091_water_lmda_ast_l10.key')
       call assert_real (elambda,1.0d0,0.0d0,'lmda endpoint elambda')
       call assert_real (plambda,1.0d0,0.0d0,'lmda endpoint plambda')
       call assert_real (vlambda,1.0d0,0.0d0,'lmda endpoint vlambda')
@@ -296,7 +296,7 @@ c
       call assert_real (scexp,2.0d0,0.0d0,'lmda endpoint scexp')
       e = energy ()
       call final
-      call loadfix ('water2','149_water_lmda_ast_none.key')
+      call loadfix ('water2','092_water_lmda_ast_none.key')
       eref = energy ()
       call assert_real (e,eref,1.0d-10,'lmda endpoint energy')
       call final
@@ -304,7 +304,7 @@ c
 c     an explicit electrostatic map drives electrostatics alone, with
 c     polarization no longer following it
 c
-      call loadfix ('water2','150_water_lmda_qnt_l05.key')
+      call loadfix ('water2','093_water_lmda_qnt_l05.key')
       call assert_logical (use_elmdamap,.true.,
      &                  'lmda ele only use_elmdamap')
       call assert_logical (use_plmdamap,.false.,
@@ -325,7 +325,7 @@ c     different values with different chain factors; the polarization
 c     window starts at the main lambda, leaving it on the flat side of
 c     its taper and fully decoupled
 c
-      call loadfix ('water2','151_water_lmda_vexp_l05.key')
+      call loadfix ('water2','094_water_lmda_vexp_l05.key')
       call assert_logical (vlmdamap.eq.'EXP',.true.,
      &                  'lmda mixed vlmdamap')
       call assert_real (elambda,0.31744d0,1.0d-12,
@@ -341,7 +341,7 @@ c
 c     naming two maps drives those terms and leaves the third fully
 c     coupled, matching the same state set by explicit sublambdas
 c
-      call loadfix ('water2','152_water_lmda_mp05.key')
+      call loadfix ('water2','095_water_lmda_mp05.key')
       call assert_logical (use_elmdamap,.true.,
      &                  'lmda pair use_elmdamap')
       call assert_logical (use_plmdamap,.true.,
@@ -356,7 +356,7 @@ c
       call assert_real (dvldlmda,0.0d0,0.0d0,'lmda pair dvldlmda')
       e = energy ()
       call final
-      call loadfix ('water2','153_water_lmda_mp05_expl.key')
+      call loadfix ('water2','096_water_lmda_mp05_expl.key')
       call assert_real (vlambda,1.0d0,0.0d0,'lmda pair expl vlambda')
       eref = energy ()
       call assert_real (e,eref,1.0d-10,'lmda pair energy')
@@ -392,7 +392,7 @@ c
 c
 c     an abf mode turns on abf alone and drives the main lambda
 c
-      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+      call loadfix_keyadd ('water2','093_water_lmda_qnt_l05.key',
      &                     'LAMBDA-MODE abf')
       call assert_logical (lmdasampmode.eq.'ABF',.true.,
      &                     'lmdamode abf lmdasampmode')
@@ -436,7 +436,7 @@ c
 c
 c     ost leaves pinned polarization in absolute single topology
 c
-      call loadfix_keyadd ('water2','170_water_lmda_ast_epin_l05.key',
+      call loadfix_keyadd ('water2','113_water_lmda_ast_epin_l05.key',
      &                     'LAMBDA-MODE ost')
       call assert_logical (use_ost,.true.,'lmdamode ost use_ost')
       call assert_logical (use_pdlmda,.false.,
@@ -449,7 +449,7 @@ c
 c
 c     ost uses dual topology when polarization follows the main lambda
 c
-      call loadfix_keyadd ('water2','152_water_lmda_mp05.key',
+      call loadfix_keyadd ('water2','095_water_lmda_mp05.key',
      &                     'LAMBDA-MODE ost')
       call assert_logical (use_pdlmda,.true.,
      &                     'lmdamode ost mapped use_pdlmda')
@@ -461,7 +461,7 @@ c
 c
 c     the first lambda derivative alone keeps polarization on one state
 c
-      call loadfix_keyadd ('water2','152_water_lmda_mp05.key',
+      call loadfix_keyadd ('water2','095_water_lmda_mp05.key',
      &                     'LAMBDA-DERIV')
       call assert_logical (use_dlmda,.true.,'lmdaderiv use_dlmda')
       call assert_logical (use_d2lmda,.false.,'lmdaderiv use_d2lmda')
@@ -471,7 +471,7 @@ c
 c
 c     second lambda derivatives need dual topology polarization
 c
-      call loadfix_keyadd ('water2','152_water_lmda_mp05.key',
+      call loadfix_keyadd ('water2','095_water_lmda_mp05.key',
      &                     'LAMBDA-DERIV2')
       call assert_logical (use_dlmda,.true.,'lmdaderiv2 use_dlmda')
       call assert_logical (use_d2lmda,.true.,'lmdaderiv2 use_d2lmda')
@@ -481,12 +481,12 @@ c
 c
 c     the staged relative legs choose the polarization path the same way
 c
-      call loadfix ('water2','203_water_rels_st_l085.key')
+      call loadfix ('water2','142_water_rels_st_l085.key')
       call assert_logical (use_rel,.true.,'rels deriv use_rel')
       call assert_logical (use_epdt,.false.,'rels deriv use_epdt')
       call assert_logical (use_prst,.true.,'rels deriv use_prst')
       call final
-      call loadfix ('water2','136_water_rels_ye_l085.key')
+      call loadfix ('water2','083_water_rels_ye_l085.key')
       call assert_logical (use_rel,.true.,'rels deriv2 use_rel')
       call assert_logical (use_epdt,.true.,'rels deriv2 use_epdt')
       call assert_logical (use_prst,.false.,'rels deriv2 use_prst')
@@ -494,7 +494,7 @@ c
 c
 c     an unknown mode leaves every sampling method off
 c
-      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+      call loadfix_keyadd ('water2','093_water_lmda_qnt_l05.key',
      &                     'LAMBDA-MODE bogus')
       call assert_logical (use_abf,.false.,'lmdamode bogus use_abf')
       call assert_logical (use_ost,.false.,'lmdamode bogus use_ost')
@@ -508,7 +508,7 @@ c
 c
 c     a meta mode turns on metadynamics alone
 c
-      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+      call loadfix_keyadd ('water2','093_water_lmda_qnt_l05.key',
      &                     'LAMBDA-MODE meta')
       call assert_logical (use_meta,.true.,'lmdamode meta use_meta')
       call assert_logical (use_ost,.false.,'lmdamode meta use_ost')
@@ -516,7 +516,7 @@ c
 c
 c     the convergence gate reads the deviation then the ratio
 c
-      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+      call loadfix_keyadd ('water2','093_water_lmda_qnt_l05.key',
      &                     'LAMBDA-CONVCRI 5.0 0.2')
       call assert_logical (use_lmdacv,.true.,
      &                     'lmdamode convcri use_lmdacv')
@@ -528,7 +528,7 @@ c
 c
 c     a bare convergence keyword keeps the default tolerances
 c
-      call loadfix_keyadd ('water2','150_water_lmda_qnt_l05.key',
+      call loadfix_keyadd ('water2','093_water_lmda_qnt_l05.key',
      &                     'LAMBDA-CONVCRI')
       call assert_logical (use_lmdacv,.true.,
      &                     'lmdamode bare convcri use_lmdacv')
@@ -681,16 +681,16 @@ c     ##############################################################
 c
 c
 c     "test_mutate_ast" runs the eighteen absolute single topology water
-c     fixtures 030-040, 182 and 187-192, each carrying "lambda-deriv2"
-c     (187-192 carry "lambda-deriv", first derivatives only), and drives
+c     fixtures 030-040, 122 and 126-131, each carrying "lambda-deriv2"
+c     (126-131 carry "lambda-deriv", first derivatives only), and drives
 c     them through "test_mutate_calc" with the level 4 lambda derivative
 c     checks enabled; cases 030-035 keep only the
 c     multipole term at three ele-lambda values with Ewald on and off;
 c     cases 036-038 keep only the van der Waals term at three vdw-lambda
 c     values, and cases 039-040 leave the multipole and polarization
-c     terms active with Ewald on and off; case 182 leaves all three
+c     terms active with Ewald on and off; case 122 leaves all three
 c     nonbonded terms active and annihilates van der Waals interactions;
-c     cases 187-192 leave all three nonbonded terms active at matched
+c     cases 126-131 leave all three nonbonded terms active at matched
 c     vdw-lambda, ele-lambda and pol-lambda values 1.0, 0.5 and 0.0 with
 c     Ewald on and off; the no-Ewald cases take the van der Waals list
 c     in place of the full pairwise neighbor list
@@ -734,27 +734,27 @@ c
      &   '040_water_ast_ne_mp05.txt','040_water_ast_ne_mp05',
      &   .true.,  .true.,  .false., .false., .true.)
       call test_mutate_calc ('water2',
-     &   '182_water_ast_v05_annihilate.key',
-     &   '182_water_ast_v05_annihilate.txt',
-     &   '182_water_ast_v05_annihilate',
+     &   '122_water_ast_v05_annihilate.key',
+     &   '122_water_ast_v05_annihilate.txt',
+     &   '122_water_ast_v05_annihilate',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','187_water_ast_ye_l10.key',
-     &   '187_water_ast_ye_l10.txt','187_water_ast_ye_l10',
+      call test_mutate_calc ('water2','126_water_ast_ye_l10.key',
+     &   '126_water_ast_ye_l10.txt','126_water_ast_ye_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','188_water_ast_ne_l10.key',
-     &   '188_water_ast_ne_l10.txt','188_water_ast_ne_l10',
+      call test_mutate_calc ('water2','127_water_ast_ne_l10.key',
+     &   '127_water_ast_ne_l10.txt','127_water_ast_ne_l10',
      &   .true.,  .true.,  .true.,  .false., .true.)
-      call test_mutate_calc ('water2','189_water_ast_ye_l05.key',
-     &   '189_water_ast_ye_l05.txt','189_water_ast_ye_l05',
+      call test_mutate_calc ('water2','128_water_ast_ye_l05.key',
+     &   '128_water_ast_ye_l05.txt','128_water_ast_ye_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','190_water_ast_ne_l05.key',
-     &   '190_water_ast_ne_l05.txt','190_water_ast_ne_l05',
+      call test_mutate_calc ('water2','129_water_ast_ne_l05.key',
+     &   '129_water_ast_ne_l05.txt','129_water_ast_ne_l05',
      &   .true.,  .true.,  .true.,  .false., .true.)
-      call test_mutate_calc ('water2','191_water_ast_ye_l00.key',
-     &   '191_water_ast_ye_l00.txt','191_water_ast_ye_l00',
+      call test_mutate_calc ('water2','130_water_ast_ye_l00.key',
+     &   '130_water_ast_ye_l00.txt','130_water_ast_ye_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','192_water_ast_ne_l00.key',
-     &   '192_water_ast_ne_l00.txt','192_water_ast_ne_l00',
+      call test_mutate_calc ('water2','131_water_ast_ne_l00.key',
+     &   '131_water_ast_ne_l00.txt','131_water_ast_ne_l00',
      &   .true.,  .true.,  .true.,  .false., .true.)
       return
       end
@@ -768,11 +768,11 @@ c     ############################################################
 c
 c
 c     "test_mutate_adt" runs the eight absolute polarization dual
-c     topology water fixtures 047-052 and 056-057, each carrying the
+c     topology water fixtures 041-048, each carrying the
 c     "lambda-deriv2" keyword and the POL-DUALTOPO keyword, and drives
 c     them through "test_mutate_calc" with the level 4 lambda derivative
-c     checks enabled; cases 047-052 keep only the polarization term at
-c     three pol-lambda values, and cases 056-057 also keep the multipole
+c     checks enabled; cases 041-046 keep only the polarization term at
+c     three pol-lambda values, and cases 047-048 also keep the multipole
 c     term, on its single topology path, with Ewald on and off; the
 c     no-Ewald cases take the van der Waals list in place of the full
 c     pairwise neighbor list
@@ -782,29 +782,29 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','047_water_adt_ye_p10.key',
-     &   '047_water_adt_ye_p10.txt','047_water_adt_ye_p10',
+      call test_mutate_calc ('water2','041_water_adt_ye_p10.key',
+     &   '041_water_adt_ye_p10.txt','041_water_adt_ye_p10',
      &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','048_water_adt_ne_p10.key',
-     &   '048_water_adt_ne_p10.txt','048_water_adt_ne_p10',
+      call test_mutate_calc ('water2','042_water_adt_ne_p10.key',
+     &   '042_water_adt_ne_p10.txt','042_water_adt_ne_p10',
      &   .false., .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','049_water_adt_ye_p05.key',
-     &   '049_water_adt_ye_p05.txt','049_water_adt_ye_p05',
+      call test_mutate_calc ('water2','043_water_adt_ye_p05.key',
+     &   '043_water_adt_ye_p05.txt','043_water_adt_ye_p05',
      &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','050_water_adt_ne_p05.key',
-     &   '050_water_adt_ne_p05.txt','050_water_adt_ne_p05',
+      call test_mutate_calc ('water2','044_water_adt_ne_p05.key',
+     &   '044_water_adt_ne_p05.txt','044_water_adt_ne_p05',
      &   .false., .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','051_water_adt_ye_p00.key',
-     &   '051_water_adt_ye_p00.txt','051_water_adt_ye_p00',
+      call test_mutate_calc ('water2','045_water_adt_ye_p00.key',
+     &   '045_water_adt_ye_p00.txt','045_water_adt_ye_p00',
      &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','052_water_adt_ne_p00.key',
-     &   '052_water_adt_ne_p00.txt','052_water_adt_ne_p00',
+      call test_mutate_calc ('water2','046_water_adt_ne_p00.key',
+     &   '046_water_adt_ne_p00.txt','046_water_adt_ne_p00',
      &   .false., .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','056_water_adt_ye_mp05.key',
-     &   '056_water_adt_ye_mp05.txt','056_water_adt_ye_mp05',
+      call test_mutate_calc ('water2','047_water_adt_ye_mp05.key',
+     &   '047_water_adt_ye_mp05.txt','047_water_adt_ye_mp05',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','057_water_adt_ne_mp05.key',
-     &   '057_water_adt_ne_mp05.txt','057_water_adt_ne_mp05',
+      call test_mutate_calc ('water2','048_water_adt_ne_mp05.key',
+     &   '048_water_adt_ne_mp05.txt','048_water_adt_ne_mp05',
      &   .true.,  .true.,  .false., .false., .true.)
       return
       end
@@ -817,12 +817,12 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "test_mutate_qnt" runs the six water fixtures 075-080 that map the
+c     "test_mutate_qnt" runs the six water fixtures 049-054 that map the
 c     main lambda to the electrostatics, polarization and van der Waals
 c     sub-lambdas with the quintic "qnt" scheme; each carries the "ost"
 c     keyword and drives "test_mutate_calc" with the level 4 lambda
-c     derivative checks enabled; cases 075-077 use single topology and
-c     078-080 use polarization dual topology with single topology
+c     derivative checks enabled; cases 049-051 use single topology and
+c     052-054 use polarization dual topology with single topology
 c     multipoles and van der Waals switched off, each at main lambda
 c     values 1.0, 0.5 and 0.0; all fixtures use Ewald and support a
 c     pairwise neighbor list
@@ -832,23 +832,23 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','075_water_qnt_ast_l10.key',
-     &   '075_water_qnt_ast_l10.txt','075_water_qnt_ast_l10',
+      call test_mutate_calc ('water2','049_water_qnt_ast_l10.key',
+     &   '049_water_qnt_ast_l10.txt','049_water_qnt_ast_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','076_water_qnt_ast_l05.key',
-     &   '076_water_qnt_ast_l05.txt','076_water_qnt_ast_l05',
+      call test_mutate_calc ('water2','050_water_qnt_ast_l05.key',
+     &   '050_water_qnt_ast_l05.txt','050_water_qnt_ast_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','077_water_qnt_ast_l00.key',
-     &   '077_water_qnt_ast_l00.txt','077_water_qnt_ast_l00',
+      call test_mutate_calc ('water2','051_water_qnt_ast_l00.key',
+     &   '051_water_qnt_ast_l00.txt','051_water_qnt_ast_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','078_water_qnt_adt_l10.key',
-     &   '078_water_qnt_adt_l10.txt','078_water_qnt_adt_l10',
+      call test_mutate_calc ('water2','052_water_qnt_adt_l10.key',
+     &   '052_water_qnt_adt_l10.txt','052_water_qnt_adt_l10',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','079_water_qnt_adt_l05.key',
-     &   '079_water_qnt_adt_l05.txt','079_water_qnt_adt_l05',
+      call test_mutate_calc ('water2','053_water_qnt_adt_l05.key',
+     &   '053_water_qnt_adt_l05.txt','053_water_qnt_adt_l05',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','080_water_qnt_adt_l00.key',
-     &   '080_water_qnt_adt_l00.txt','080_water_qnt_adt_l00',
+      call test_mutate_calc ('water2','054_water_qnt_adt_l00.key',
+     &   '054_water_qnt_adt_l00.txt','054_water_qnt_adt_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
       return
       end
@@ -861,12 +861,12 @@ c     ##                                                  ##
 c     ######################################################
 c
 c
-c     "test_mutate_exp" runs the six water fixtures 084-089 that map the
+c     "test_mutate_exp" runs the six water fixtures 055-060 that map the
 c     main lambda to the electrostatics, polarization and van der Waals
 c     sub-lambdas with the exponential "exp" scheme; each carries the
 c     "ost" keyword and drives "test_mutate_calc" with the level 4
-c     lambda derivative checks enabled; cases 084-086 use single
-c     topology and 087-089 use polarization dual topology with single
+c     lambda derivative checks enabled; cases 055-057 use single
+c     topology and 058-060 use polarization dual topology with single
 c     topology multipoles and van der Waals switched off, each at main
 c     lambda values 1.0, 0.5 and 0.0; all fixtures use Ewald and
 c     support a pairwise neighbor list
@@ -876,23 +876,23 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','084_water_exp_ast_l10.key',
-     &   '084_water_exp_ast_l10.txt','084_water_exp_ast_l10',
+      call test_mutate_calc ('water2','055_water_exp_ast_l10.key',
+     &   '055_water_exp_ast_l10.txt','055_water_exp_ast_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','085_water_exp_ast_l05.key',
-     &   '085_water_exp_ast_l05.txt','085_water_exp_ast_l05',
+      call test_mutate_calc ('water2','056_water_exp_ast_l05.key',
+     &   '056_water_exp_ast_l05.txt','056_water_exp_ast_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','086_water_exp_ast_l00.key',
-     &   '086_water_exp_ast_l00.txt','086_water_exp_ast_l00',
+      call test_mutate_calc ('water2','057_water_exp_ast_l00.key',
+     &   '057_water_exp_ast_l00.txt','057_water_exp_ast_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','087_water_exp_adt_l10.key',
-     &   '087_water_exp_adt_l10.txt','087_water_exp_adt_l10',
+      call test_mutate_calc ('water2','058_water_exp_adt_l10.key',
+     &   '058_water_exp_adt_l10.txt','058_water_exp_adt_l10',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','088_water_exp_adt_l05.key',
-     &   '088_water_exp_adt_l05.txt','088_water_exp_adt_l05',
+      call test_mutate_calc ('water2','059_water_exp_adt_l05.key',
+     &   '059_water_exp_adt_l05.txt','059_water_exp_adt_l05',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','089_water_exp_adt_l00.key',
-     &   '089_water_exp_adt_l00.txt','089_water_exp_adt_l00',
+      call test_mutate_calc ('water2','060_water_exp_adt_l00.key',
+     &   '060_water_exp_adt_l00.txt','060_water_exp_adt_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
       return
       end
@@ -905,12 +905,12 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "test_mutate_inv" runs the six water fixtures 093-098 that map the
+c     "test_mutate_inv" runs the six water fixtures 061-066 that map the
 c     main lambda to the electrostatics, polarization and van der Waals
 c     sub-lambdas with the inverse "inv" scheme; each carries the "ost"
 c     keyword and drives "test_mutate_calc" with the level 4 lambda
-c     derivative checks enabled; cases 093-095 use single topology and
-c     096-098 use polarization dual topology with single topology
+c     derivative checks enabled; cases 061-063 use single topology and
+c     064-066 use polarization dual topology with single topology
 c     multipoles and van der Waals switched off, each at main lambda
 c     values 1.0, 0.5 and 0.0; all fixtures use Ewald and support a
 c     pairwise neighbor list
@@ -920,23 +920,23 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','093_water_inv_ast_l10.key',
-     &   '093_water_inv_ast_l10.txt','093_water_inv_ast_l10',
+      call test_mutate_calc ('water2','061_water_inv_ast_l10.key',
+     &   '061_water_inv_ast_l10.txt','061_water_inv_ast_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','094_water_inv_ast_l05.key',
-     &   '094_water_inv_ast_l05.txt','094_water_inv_ast_l05',
+      call test_mutate_calc ('water2','062_water_inv_ast_l05.key',
+     &   '062_water_inv_ast_l05.txt','062_water_inv_ast_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','095_water_inv_ast_l00.key',
-     &   '095_water_inv_ast_l00.txt','095_water_inv_ast_l00',
+      call test_mutate_calc ('water2','063_water_inv_ast_l00.key',
+     &   '063_water_inv_ast_l00.txt','063_water_inv_ast_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','096_water_inv_adt_l10.key',
-     &   '096_water_inv_adt_l10.txt','096_water_inv_adt_l10',
+      call test_mutate_calc ('water2','064_water_inv_adt_l10.key',
+     &   '064_water_inv_adt_l10.txt','064_water_inv_adt_l10',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','097_water_inv_adt_l05.key',
-     &   '097_water_inv_adt_l05.txt','097_water_inv_adt_l05',
+      call test_mutate_calc ('water2','065_water_inv_adt_l05.key',
+     &   '065_water_inv_adt_l05.txt','065_water_inv_adt_l05',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','098_water_inv_adt_l00.key',
-     &   '098_water_inv_adt_l00.txt','098_water_inv_adt_l00',
+      call test_mutate_calc ('water2','066_water_inv_adt_l00.key',
+     &   '066_water_inv_adt_l00.txt','066_water_inv_adt_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
       return
       end
@@ -949,22 +949,22 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_exf" runs the thirteen water fixtures 102-104,
-c     111-113, 117, 184-186 and 193-195 that apply an external electric
-c     field to a mutated system, each carrying "lambda-deriv2" (193-195
+c     "test_mutate_exf" runs the thirteen water fixtures 067-073,
+c     123-125 and 132-134 that apply an external electric
+c     field to a mutated system, each carrying "lambda-deriv2" (132-134
 c     carry "lambda-deriv") so the level 4 checks are enabled;
-c     cases 102-104 keep only the multipole term under single topology
-c     at ele-lambda values 1.0, 0.5 and 0.0; cases 111-113 keep only the
+c     cases 067-069 keep only the multipole term under single topology
+c     at ele-lambda values 1.0, 0.5 and 0.0; cases 070-072 keep only the
 c     polarization term under absolute dual topology at pol-lambda
 c     values 1.0, 0.5 and 0.0, since the
 c     induced dipoles respond to the applied field through the direct
-c     field; case 117 leaves the multipole and polarization terms active
+c     field; case 073 leaves the multipole and polarization terms active
 c     together under absolute polarization dual topology with single
-c     topology multipoles; cases 184-186 leave all three nonbonded terms
+c     topology multipoles; cases 123-125 leave all three nonbonded terms
 c     active under the same topology at matched ele-lambda and
 c     pol-lambda values 1.0, 0.5 and 0.0, so the unscaled van der Waals
 c     term is carried alongside the field-driven multipole and
-c     polarization terms; cases 193-195 repeat that all-term case under
+c     polarization terms; cases 132-134 repeat that all-term case under
 c     single topology at matched vdw-lambda, ele-lambda and pol-lambda
 c     values 1.0, 0.5 and 0.0; the dual topology cases use an exponent
 c     of two, since with the default exponent of one the dual topology
@@ -977,44 +977,44 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','102_water_exf_ast_m10.key',
-     &   '102_water_exf_ast_m10.txt','102_water_exf_ast_m10',
+      call test_mutate_calc ('water2','067_water_exf_ast_m10.key',
+     &   '067_water_exf_ast_m10.txt','067_water_exf_ast_m10',
      &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','103_water_exf_ast_m05.key',
-     &   '103_water_exf_ast_m05.txt','103_water_exf_ast_m05',
+      call test_mutate_calc ('water2','068_water_exf_ast_m05.key',
+     &   '068_water_exf_ast_m05.txt','068_water_exf_ast_m05',
      &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','104_water_exf_ast_m00.key',
-     &   '104_water_exf_ast_m00.txt','104_water_exf_ast_m00',
+      call test_mutate_calc ('water2','069_water_exf_ast_m00.key',
+     &   '069_water_exf_ast_m00.txt','069_water_exf_ast_m00',
      &   .true.,  .false., .false., .true.,  .true.)
-      call test_mutate_calc ('water2','111_water_exf_adt_p10.key',
-     &   '111_water_exf_adt_p10.txt','111_water_exf_adt_p10',
+      call test_mutate_calc ('water2','070_water_exf_adt_p10.key',
+     &   '070_water_exf_adt_p10.txt','070_water_exf_adt_p10',
      &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','112_water_exf_adt_p05.key',
-     &   '112_water_exf_adt_p05.txt','112_water_exf_adt_p05',
+      call test_mutate_calc ('water2','071_water_exf_adt_p05.key',
+     &   '071_water_exf_adt_p05.txt','071_water_exf_adt_p05',
      &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','113_water_exf_adt_p00.key',
-     &   '113_water_exf_adt_p00.txt','113_water_exf_adt_p00',
+      call test_mutate_calc ('water2','072_water_exf_adt_p00.key',
+     &   '072_water_exf_adt_p00.txt','072_water_exf_adt_p00',
      &   .false., .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','117_water_exf_adt_mp05.key',
-     &   '117_water_exf_adt_mp05.txt','117_water_exf_adt_mp05',
+      call test_mutate_calc ('water2','073_water_exf_adt_mp05.key',
+     &   '073_water_exf_adt_mp05.txt','073_water_exf_adt_mp05',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','184_water_exf_adt_l10.key',
-     &   '184_water_exf_adt_l10.txt','184_water_exf_adt_l10',
+      call test_mutate_calc ('water2','123_water_exf_adt_l10.key',
+     &   '123_water_exf_adt_l10.txt','123_water_exf_adt_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','185_water_exf_adt_l05.key',
-     &   '185_water_exf_adt_l05.txt','185_water_exf_adt_l05',
+      call test_mutate_calc ('water2','124_water_exf_adt_l05.key',
+     &   '124_water_exf_adt_l05.txt','124_water_exf_adt_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','186_water_exf_adt_l00.key',
-     &   '186_water_exf_adt_l00.txt','186_water_exf_adt_l00',
+      call test_mutate_calc ('water2','125_water_exf_adt_l00.key',
+     &   '125_water_exf_adt_l00.txt','125_water_exf_adt_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','193_water_exf_ast_l10.key',
-     &   '193_water_exf_ast_l10.txt','193_water_exf_ast_l10',
+      call test_mutate_calc ('water2','132_water_exf_ast_l10.key',
+     &   '132_water_exf_ast_l10.txt','132_water_exf_ast_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','194_water_exf_ast_l05.key',
-     &   '194_water_exf_ast_l05.txt','194_water_exf_ast_l05',
+      call test_mutate_calc ('water2','133_water_exf_ast_l05.key',
+     &   '133_water_exf_ast_l05.txt','133_water_exf_ast_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','195_water_exf_ast_l00.key',
-     &   '195_water_exf_ast_l00.txt','195_water_exf_ast_l00',
+      call test_mutate_calc ('water2','134_water_exf_ast_l00.key',
+     &   '134_water_exf_ast_l00.txt','134_water_exf_ast_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1027,7 +1027,7 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_emplar" runs the six water fixtures 119-124 that
+c     "test_mutate_emplar" runs the six water fixtures 074-079 that
 c     keep the multipole and polarization terms active together at
 c     matched ele-lambda and pol-lambda values, each carrying the
 c     "lambda-deriv2" keyword and the POL-DUALTOPO keyword, and drives
@@ -1043,23 +1043,23 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','119_water_adt_ye_l10.key',
-     &   '119_water_adt_ye_l10.txt','119_water_adt_ye_l10',
+      call test_mutate_calc ('water2','074_water_adt_ye_l10.key',
+     &   '074_water_adt_ye_l10.txt','074_water_adt_ye_l10',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','120_water_adt_ne_l10.key',
-     &   '120_water_adt_ne_l10.txt','120_water_adt_ne_l10',
+      call test_mutate_calc ('water2','075_water_adt_ne_l10.key',
+     &   '075_water_adt_ne_l10.txt','075_water_adt_ne_l10',
      &   .true.,  .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','121_water_adt_ye_l05.key',
-     &   '121_water_adt_ye_l05.txt','121_water_adt_ye_l05',
+      call test_mutate_calc ('water2','076_water_adt_ye_l05.key',
+     &   '076_water_adt_ye_l05.txt','076_water_adt_ye_l05',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','122_water_adt_ne_l05.key',
-     &   '122_water_adt_ne_l05.txt','122_water_adt_ne_l05',
+      call test_mutate_calc ('water2','077_water_adt_ne_l05.key',
+     &   '077_water_adt_ne_l05.txt','077_water_adt_ne_l05',
      &   .true.,  .true.,  .false., .false., .true.)
-      call test_mutate_calc ('water2','123_water_adt_ye_l00.key',
-     &   '123_water_adt_ye_l00.txt','123_water_adt_ye_l00',
+      call test_mutate_calc ('water2','078_water_adt_ye_l00.key',
+     &   '078_water_adt_ye_l00.txt','078_water_adt_ye_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','124_water_adt_ne_l00.key',
-     &   '124_water_adt_ne_l00.txt','124_water_adt_ne_l00',
+      call test_mutate_calc ('water2','079_water_adt_ne_l00.key',
+     &   '079_water_adt_ne_l00.txt','079_water_adt_ne_l00',
      &   .true.,  .true.,  .false., .false., .true.)
       return
       end
@@ -1072,7 +1072,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_qntrng" runs the two water fixtures 131-132 that
+c     "test_mutate_qntrng" runs the two water fixtures 080-081 that
 c     narrow the quintic sub-lambda windows to 0.1-0.9 with the
 c     "ele-lmda-range", "pol-lmda-range" and "vdw-lmda-range" keywords,
 c     then sample the main lambda at the 1.0 and 0.0 endpoints which
@@ -1089,11 +1089,11 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','131_water_qnt_adt_l10.key',
-     &   '131_water_qnt_adt_l10.txt','131_water_qnt_adt_l10',
+      call test_mutate_calc ('water2','080_water_qnt_adt_l10.key',
+     &   '080_water_qnt_adt_l10.txt','080_water_qnt_adt_l10',
      &   .true.,  .true.,  .false., .true.,  .true.)
-      call test_mutate_calc ('water2','132_water_qnt_adt_l00.key',
-     &   '132_water_qnt_adt_l00.txt','132_water_qnt_adt_l00',
+      call test_mutate_calc ('water2','081_water_qnt_adt_l00.key',
+     &   '081_water_qnt_adt_l00.txt','081_water_qnt_adt_l00',
      &   .true.,  .true.,  .false., .true.,  .true.)
       return
       end
@@ -1106,8 +1106,8 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "test_mutate_rels" runs the twelve water fixtures 135-141, 168-169
-c     and 203-205 that drive the staged relative free energy schedule,
+c     "test_mutate_rels" runs the twelve water fixtures 082-088, 111-112
+c     and 142-144 that drive the staged relative free energy schedule,
 c     each of them
 c     naming the one leg it walks, so ligand 2 is discharged on the LIG2
 c     leg, van der Waals morphs between the ligands on the VDWM leg, and
@@ -1119,63 +1119,63 @@ c     are annihilated and every electrostatic lambda derivative vanishes
 c
 c     the leg boundaries at 0.7 and 0.3 are each run twice, once from
 c     either side, since the quintic taper is flat at both ends of every
-c     window and leaves the boundary state derivative free; 139 and 168
-c     are the same state reached from the LIG2 and VDWM legs, and 137 and
-c     169 the same state reached from the VDWM and LIG1 legs, so each
+c     window and leaves the boundary state derivative free; 086 and 111
+c     are the same state reached from the LIG2 and VDWM legs, and 084 and
+c     112 the same state reached from the VDWM and LIG1 legs, so each
 c     pair shares one set of reference values
 c
 c     the first nine carry the "lambda-deriv2" keyword, so polarization
 c     takes the dual topology path between the annihilated endpoints;
-c     203 and 204 repeat 136 and 177 with the "lambda-deriv" keyword, so
+c     142 and 143 repeat 083 and 117 with the "lambda-deriv" keyword, so
 c     polarization takes the single topology path and only the first
-c     lambda derivative is checked; 205 drops the "lambda" keyword from
-c     135, so REL-STAGE must default the main lambda to one and match
-c     the 135 reference; all run the level 4 checks
+c     lambda derivative is checked; 144 drops the "lambda" keyword from
+c     082, so REL-STAGE must default the main lambda to one and match
+c     the 082 reference; all run the level 4 checks
 c
 c
       subroutine test_mutate_rels
       implicit none
 c
 c
-      call test_mutate_calc ('water2','135_water_rels_ye_l100.key',
-     &   '135_water_rels_ye_l100.txt','135_water_rels_ye_l100',
+      call test_mutate_calc ('water2','082_water_rels_ye_l100.key',
+     &   '082_water_rels_ye_l100.txt','082_water_rels_ye_l100',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','136_water_rels_ye_l085.key',
-     &   '136_water_rels_ye_l085.txt','136_water_rels_ye_l085',
+      call test_mutate_calc ('water2','083_water_rels_ye_l085.key',
+     &   '083_water_rels_ye_l085.txt','083_water_rels_ye_l085',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','137_water_rels_ye_l070.key',
-     &   '137_water_rels_ye_l070.txt','137_water_rels_ye_l070',
+      call test_mutate_calc ('water2','084_water_rels_ye_l070.key',
+     &   '084_water_rels_ye_l070.txt','084_water_rels_ye_l070',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','169_water_rels_ye_lig1_l070.key',
-     &   '169_water_rels_ye_lig1_l070.txt',
-     &   '169_water_rels_ye_lig1_l070',
+      call test_mutate_calc ('water2','112_water_rels_ye_lig1_l070.key',
+     &   '112_water_rels_ye_lig1_l070.txt',
+     &   '112_water_rels_ye_lig1_l070',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','138_water_rels_ye_l050.key',
-     &   '138_water_rels_ye_l050.txt','138_water_rels_ye_l050',
+      call test_mutate_calc ('water2','085_water_rels_ye_l050.key',
+     &   '085_water_rels_ye_l050.txt','085_water_rels_ye_l050',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','139_water_rels_ye_l030.key',
-     &   '139_water_rels_ye_l030.txt','139_water_rels_ye_l030',
+      call test_mutate_calc ('water2','086_water_rels_ye_l030.key',
+     &   '086_water_rels_ye_l030.txt','086_water_rels_ye_l030',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','168_water_rels_ye_vdwm_l030.key',
-     &   '168_water_rels_ye_vdwm_l030.txt',
-     &   '168_water_rels_ye_vdwm_l030',
+      call test_mutate_calc ('water2','111_water_rels_ye_vdwm_l030.key',
+     &   '111_water_rels_ye_vdwm_l030.txt',
+     &   '111_water_rels_ye_vdwm_l030',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','140_water_rels_ye_l015.key',
-     &   '140_water_rels_ye_l015.txt','140_water_rels_ye_l015',
+      call test_mutate_calc ('water2','087_water_rels_ye_l015.key',
+     &   '087_water_rels_ye_l015.txt','087_water_rels_ye_l015',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','141_water_rels_ye_l000.key',
-     &   '141_water_rels_ye_l000.txt','141_water_rels_ye_l000',
+      call test_mutate_calc ('water2','088_water_rels_ye_l000.key',
+     &   '088_water_rels_ye_l000.txt','088_water_rels_ye_l000',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','203_water_rels_st_l085.key',
-     &   '203_water_rels_st_l085.txt','203_water_rels_st_l085',
+      call test_mutate_calc ('water2','142_water_rels_st_l085.key',
+     &   '142_water_rels_st_l085.txt','142_water_rels_st_l085',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '204_water_rels_st_lig2_exp_l030.key',
-     &   '204_water_rels_st_lig2_exp_l030.txt',
-     &   '204_water_rels_st_lig2_exp_l030',
+     &   '143_water_rels_st_lig2_exp_l030.key',
+     &   '143_water_rels_st_lig2_exp_l030.txt',
+     &   '143_water_rels_st_lig2_exp_l030',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','205_water_rels_nolmda.key',
-     &   '135_water_rels_ye_l100.txt','205_water_rels_nolmda',
+      call test_mutate_calc ('water2','144_water_rels_nolmda.key',
+     &   '082_water_rels_ye_l100.txt','144_water_rels_nolmda',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1188,16 +1188,16 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "test_mutate_lmdafix" runs the eight water fixtures 146-153 that
+c     "test_mutate_lmdafix" runs the eight water fixtures 089-096 that
 c     drive the sublambdas from the "lambda" keyword at a fixed lambda
 c     value; no fixture carries a lambda derivative keyword, so the level
 c     4 checks stay off and only the energy, gradient, virial and named
-c     components are verified; cases 146 and 147, 148 and 149, and 152
-c     and 153 are pairs that must agree, respectively matching the
+c     components are verified; cases 089 and 090, 091 and 092, and 095
+c     and 096 are pairs that must agree, respectively matching the
 c     linear map against explicit sublambdas, the fully coupled endpoint
 c     against a fixture with no lambda at all, and two named maps
-c     against the same state set by explicit sublambdas; case 150 maps
-c     only electrostatics while 151 maps only van der Waals, each
+c     against the same state set by explicit sublambdas; case 093 maps
+c     only electrostatics while 094 maps only van der Waals, each
 c     leaving the unnamed terms fully coupled; all fixtures use Ewald
 c     and support a neighbor list
 c
@@ -1206,29 +1206,29 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','146_water_lmda_ast_l05.key',
-     &   '146_water_lmda_ast_l05.txt','146_water_lmda_ast_l05',
+      call test_mutate_calc ('water2','089_water_lmda_ast_l05.key',
+     &   '089_water_lmda_ast_l05.txt','089_water_lmda_ast_l05',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','147_water_lmda_ast_e05.key',
-     &   '147_water_lmda_ast_e05.txt','147_water_lmda_ast_e05',
+      call test_mutate_calc ('water2','090_water_lmda_ast_e05.key',
+     &   '090_water_lmda_ast_e05.txt','090_water_lmda_ast_e05',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','148_water_lmda_ast_l10.key',
-     &   '148_water_lmda_ast_l10.txt','148_water_lmda_ast_l10',
+      call test_mutate_calc ('water2','091_water_lmda_ast_l10.key',
+     &   '091_water_lmda_ast_l10.txt','091_water_lmda_ast_l10',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','149_water_lmda_ast_none.key',
-     &   '149_water_lmda_ast_none.txt','149_water_lmda_ast_none',
+      call test_mutate_calc ('water2','092_water_lmda_ast_none.key',
+     &   '092_water_lmda_ast_none.txt','092_water_lmda_ast_none',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','150_water_lmda_qnt_l05.key',
-     &   '150_water_lmda_qnt_l05.txt','150_water_lmda_qnt_l05',
+      call test_mutate_calc ('water2','093_water_lmda_qnt_l05.key',
+     &   '093_water_lmda_qnt_l05.txt','093_water_lmda_qnt_l05',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','151_water_lmda_vexp_l05.key',
-     &   '151_water_lmda_vexp_l05.txt','151_water_lmda_vexp_l05',
+      call test_mutate_calc ('water2','094_water_lmda_vexp_l05.key',
+     &   '094_water_lmda_vexp_l05.txt','094_water_lmda_vexp_l05',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','152_water_lmda_mp05.key',
-     &   '152_water_lmda_mp05.txt','152_water_lmda_mp05',
+      call test_mutate_calc ('water2','095_water_lmda_mp05.key',
+     &   '095_water_lmda_mp05.txt','095_water_lmda_mp05',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','153_water_lmda_mp05_expl.key',
-     &   '153_water_lmda_mp05_expl.txt','153_water_lmda_mp05_expl',
+      call test_mutate_calc ('water2','096_water_lmda_mp05_expl.key',
+     &   '096_water_lmda_mp05_expl.txt','096_water_lmda_mp05_expl',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
       return
       end
@@ -1241,14 +1241,14 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_lmdadrv" runs the fourteen water fixtures 154-167
+c     "test_mutate_lmdadrv" runs the fourteen water fixtures 097-110
 c     that name each combination of the electrostatic, polarization and
 c     van der Waals maps at a main lambda of 0.6, so every fixture
 c     drives one subset of the sublambdas on the identity map and holds
 c     the rest fully coupled at one; all three nonbonded terms stay
 c     active throughout, so an undriven term is present in the energy
-c     rather than switched off; cases 154-160 carry no "lambda-deriv2"
-c     keyword while 161-167 repeat them with it, and the two halves
+c     rather than switched off; cases 097-103 carry no "lambda-deriv2"
+c     keyword while 104-110 repeat them with it, and the two halves
 c     share their energy, gradient and virial values, which holds the
 c     plain and the lambda derivative energy routines to the same
 c     result; the level 4 checks run only for the derivative half
@@ -1258,47 +1258,47 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','154_water_lmda_e_l06.key',
-     &   '154_water_lmda_e_l06.txt','154_water_lmda_e_l06',
+      call test_mutate_calc ('water2','097_water_lmda_e_l06.key',
+     &   '097_water_lmda_e_l06.txt','097_water_lmda_e_l06',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','155_water_lmda_p_l06.key',
-     &   '155_water_lmda_p_l06.txt','155_water_lmda_p_l06',
+      call test_mutate_calc ('water2','098_water_lmda_p_l06.key',
+     &   '098_water_lmda_p_l06.txt','098_water_lmda_p_l06',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','156_water_lmda_v_l06.key',
-     &   '156_water_lmda_v_l06.txt','156_water_lmda_v_l06',
+      call test_mutate_calc ('water2','099_water_lmda_v_l06.key',
+     &   '099_water_lmda_v_l06.txt','099_water_lmda_v_l06',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','157_water_lmda_ep_l06.key',
-     &   '157_water_lmda_ep_l06.txt','157_water_lmda_ep_l06',
+      call test_mutate_calc ('water2','100_water_lmda_ep_l06.key',
+     &   '100_water_lmda_ep_l06.txt','100_water_lmda_ep_l06',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','158_water_lmda_ev_l06.key',
-     &   '158_water_lmda_ev_l06.txt','158_water_lmda_ev_l06',
+      call test_mutate_calc ('water2','101_water_lmda_ev_l06.key',
+     &   '101_water_lmda_ev_l06.txt','101_water_lmda_ev_l06',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','159_water_lmda_pv_l06.key',
-     &   '159_water_lmda_pv_l06.txt','159_water_lmda_pv_l06',
+      call test_mutate_calc ('water2','102_water_lmda_pv_l06.key',
+     &   '102_water_lmda_pv_l06.txt','102_water_lmda_pv_l06',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','160_water_lmda_epv_l06.key',
-     &   '160_water_lmda_epv_l06.txt','160_water_lmda_epv_l06',
+      call test_mutate_calc ('water2','103_water_lmda_epv_l06.key',
+     &   '103_water_lmda_epv_l06.txt','103_water_lmda_epv_l06',
      &   .true.,  .true.,  .true.,  .true.,  .false.)
-      call test_mutate_calc ('water2','161_water_dlmda_e_l06.key',
-     &   '161_water_dlmda_e_l06.txt','161_water_dlmda_e_l06',
+      call test_mutate_calc ('water2','104_water_dlmda_e_l06.key',
+     &   '104_water_dlmda_e_l06.txt','104_water_dlmda_e_l06',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','162_water_dlmda_p_l06.key',
-     &   '162_water_dlmda_p_l06.txt','162_water_dlmda_p_l06',
+      call test_mutate_calc ('water2','105_water_dlmda_p_l06.key',
+     &   '105_water_dlmda_p_l06.txt','105_water_dlmda_p_l06',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','163_water_dlmda_v_l06.key',
-     &   '163_water_dlmda_v_l06.txt','163_water_dlmda_v_l06',
+      call test_mutate_calc ('water2','106_water_dlmda_v_l06.key',
+     &   '106_water_dlmda_v_l06.txt','106_water_dlmda_v_l06',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','164_water_dlmda_ep_l06.key',
-     &   '164_water_dlmda_ep_l06.txt','164_water_dlmda_ep_l06',
+      call test_mutate_calc ('water2','107_water_dlmda_ep_l06.key',
+     &   '107_water_dlmda_ep_l06.txt','107_water_dlmda_ep_l06',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','165_water_dlmda_ev_l06.key',
-     &   '165_water_dlmda_ev_l06.txt','165_water_dlmda_ev_l06',
+      call test_mutate_calc ('water2','108_water_dlmda_ev_l06.key',
+     &   '108_water_dlmda_ev_l06.txt','108_water_dlmda_ev_l06',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','166_water_dlmda_pv_l06.key',
-     &   '166_water_dlmda_pv_l06.txt','166_water_dlmda_pv_l06',
+      call test_mutate_calc ('water2','109_water_dlmda_pv_l06.key',
+     &   '109_water_dlmda_pv_l06.txt','109_water_dlmda_pv_l06',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','167_water_dlmda_epv_l06.key',
-     &   '167_water_dlmda_epv_l06.txt','167_water_dlmda_epv_l06',
+      call test_mutate_calc ('water2','110_water_dlmda_epv_l06.key',
+     &   '110_water_dlmda_epv_l06.txt','110_water_dlmda_epv_l06',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1311,18 +1311,18 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_lmdapin" runs the three water fixtures 170, 171 and
-c     173 that hold one term at a fixed coupling state while the main
+c     "test_mutate_lmdapin" runs the three water fixtures 113, 114 and
+c     115 that hold one term at a fixed coupling state while the main
 c     lambda morphs another, the way a leg of a two simulation free
 c     energy split is set up; the "epin" fixtures pin electrostatics and
 c     polarization decoupled by their own keywords and drive van der
 c     Waals from the "lambda" keyword, while the "vpin" fixtures pin
 c     van der Waals decoupled and drive the other two
 c
-c     the fixtures walk one topology and one map form each, 170 and
-c     171 absolute single topology on the exponential map at a main
-c     lambda of 0.5, and 173 absolute polarization dual topology on the
-c     quintic map at 0.6; 171 carries POL-DUALTOPO even though
+c     the fixtures walk one topology and one map form each, 113 and
+c     114 absolute single topology on the exponential map at a main
+c     lambda of 0.5, and 115 absolute polarization dual topology on the
+c     quintic map at 0.6; 114 carries POL-DUALTOPO even though
 c     the rest of that pair is single topology, since "epolar4"
 c     supplies the polarization lambda derivative only through dual
 c     topology
@@ -1340,17 +1340,17 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','170_water_lmda_ast_epin_l05.key',
-     &   '170_water_lmda_ast_epin_l05.txt',
-     &   '170_water_lmda_ast_epin_l05',
+      call test_mutate_calc ('water2','113_water_lmda_ast_epin_l05.key',
+     &   '113_water_lmda_ast_epin_l05.txt',
+     &   '113_water_lmda_ast_epin_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','171_water_lmda_ast_vpin_l05.key',
-     &   '171_water_lmda_ast_vpin_l05.txt',
-     &   '171_water_lmda_ast_vpin_l05',
+      call test_mutate_calc ('water2','114_water_lmda_ast_vpin_l05.key',
+     &   '114_water_lmda_ast_vpin_l05.txt',
+     &   '114_water_lmda_ast_vpin_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','173_water_lmda_adt_vpin_l06.key',
-     &   '173_water_lmda_adt_vpin_l06.txt',
-     &   '173_water_lmda_adt_vpin_l06',
+      call test_mutate_calc ('water2','115_water_lmda_adt_vpin_l06.key',
+     &   '115_water_lmda_adt_vpin_l06.txt',
+     &   '115_water_lmda_adt_vpin_l06',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1363,21 +1363,21 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "test_mutate_relsmap" runs the six water fixtures 176-181 that
+c     "test_mutate_relsmap" runs the six water fixtures 116-121 that
 c     drive a staged relative leg with a map form and a dual topology
 c     exponent that the staged schedule once refused, every leg now
 c     walking the map named for the one term it drives and honoring the
 c     exponent of that term as any other relative leg does
 c
-c     176 to 178 name a map other than the quintic, taking the VDWM leg
+c     116 to 118 name a map other than the quintic, taking the VDWM leg
 c     on the exponential, the LIG2 leg on the exponential through the
 c     complement that discharges ligand 2, and the LIG1 leg on the
 c     inverse power; the exponential and inverse power maps carry no
 c     window, so these three walk the whole main lambda range rather
 c     than a slice of it and are each a run of their own
 c
-c     179 to 181 exercise the dual topology exponents, 179 and 180 on
-c     the quintic windows of 138 and 136 and 181 on the inverse power,
+c     119 to 121 exercise the dual topology exponents, 119 and 120 on
+c     the quintic windows of 085 and 083 and 121 on the inverse power,
 c     so each is the state of an existing fixture reached with a
 c     different endpoint weight; the exponent is placed on the term the
 c     leg drives, since a ligand leg pins the van der Waals endpoint and
@@ -1394,34 +1394,34 @@ c
 c
 c
       call test_mutate_calc ('water2',
-     &   '176_water_rels_ye_vdwm_exp_l050.key',
-     &   '176_water_rels_ye_vdwm_exp_l050.txt',
-     &   '176_water_rels_ye_vdwm_exp_l050',
+     &   '116_water_rels_ye_vdwm_exp_l050.key',
+     &   '116_water_rels_ye_vdwm_exp_l050.txt',
+     &   '116_water_rels_ye_vdwm_exp_l050',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '177_water_rels_ye_lig2_exp_l030.key',
-     &   '177_water_rels_ye_lig2_exp_l030.txt',
-     &   '177_water_rels_ye_lig2_exp_l030',
+     &   '117_water_rels_ye_lig2_exp_l030.key',
+     &   '117_water_rels_ye_lig2_exp_l030.txt',
+     &   '117_water_rels_ye_lig2_exp_l030',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '178_water_rels_ye_lig1_inv_l070.key',
-     &   '178_water_rels_ye_lig1_inv_l070.txt',
-     &   '178_water_rels_ye_lig1_inv_l070',
+     &   '118_water_rels_ye_lig1_inv_l070.key',
+     &   '118_water_rels_ye_lig1_inv_l070.txt',
+     &   '118_water_rels_ye_lig1_inv_l070',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '179_water_rels_ye_vdwm_vx3_l050.key',
-     &   '179_water_rels_ye_vdwm_vx3_l050.txt',
-     &   '179_water_rels_ye_vdwm_vx3_l050',
+     &   '119_water_rels_ye_vdwm_vx3_l050.key',
+     &   '119_water_rels_ye_vdwm_vx3_l050.txt',
+     &   '119_water_rels_ye_vdwm_vx3_l050',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '180_water_rels_ye_lig1_ex3_l085.key',
-     &   '180_water_rels_ye_lig1_ex3_l085.txt',
-     &   '180_water_rels_ye_lig1_ex3_l085',
+     &   '120_water_rels_ye_lig1_ex3_l085.key',
+     &   '120_water_rels_ye_lig1_ex3_l085.txt',
+     &   '120_water_rels_ye_lig1_ex3_l085',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '181_water_rels_ye_lig2_ix2_l015.key',
-     &   '181_water_rels_ye_lig2_ix2_l015.txt',
-     &   '181_water_rels_ye_lig2_ix2_l015',
+     &   '121_water_rels_ye_lig2_ix2_l015.key',
+     &   '121_water_rels_ye_lig2_ix2_l015.txt',
+     &   '121_water_rels_ye_lig2_ix2_l015',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1434,7 +1434,7 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_apm" runs the four water fixtures 196-199 that map
+c     "test_mutate_apm" runs the four water fixtures 135-138 that map
 c     the main lambda onto a sublambda with the asymmetric power "apm"
 c     scheme, whose shape is compiled into "mutate_dlmda" rather than
 c     read from the keyfile, so a fixture names the map and nothing
@@ -1445,15 +1445,15 @@ c     rule factor is neither the unit slope of the linear map nor the
 c     vanishing endpoint slope of the quintic taper
 c
 c     the fixtures pin one set of terms and drive the rest the way the
-c     170-175 pair does; 196 copies 170, pinning electrostatics and
+c     113-115 set does; 135 copies 113, pinning electrostatics and
 c     polarization decoupled by their own keywords and driving van der
-c     Waals across the map at a main lambda of 0.5, while 197-199 copy
-c     171, pinning van der Waals decoupled and driving electrostatics
+c     Waals across the map at a main lambda of 0.5, while 136-138 copy
+c     114, pinning van der Waals decoupled and driving electrostatics
 c     and polarization at main lambda values of 0.0, 0.5 and 1.0; the
 c     three walk the whole interval, so they cover both endpoints of
 c     the map, where the slope ratio it normalizes to is defined, as
-c     well as the interior; 197-199 carry POL-DUALTOPO for the same
-c     reason 171 does, "epolar4" supplying the polarization lambda
+c     well as the interior; 136-138 carry POL-DUALTOPO for the same
+c     reason 114 does, "epolar4" supplying the polarization lambda
 c     derivative only through dual topology
 c
 c     all four use Ewald and support a pairwise neighbor list, and all
@@ -1465,21 +1465,21 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','196_water_apm_ast_vpin_l05.key',
-     &   '196_water_apm_ast_vpin_l05.txt',
-     &   '196_water_apm_ast_vpin_l05',
+      call test_mutate_calc ('water2','135_water_apm_ast_vpin_l05.key',
+     &   '135_water_apm_ast_vpin_l05.txt',
+     &   '135_water_apm_ast_vpin_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','197_water_apm_ast_epin_l00.key',
-     &   '197_water_apm_ast_epin_l00.txt',
-     &   '197_water_apm_ast_epin_l00',
+      call test_mutate_calc ('water2','136_water_apm_ast_epin_l00.key',
+     &   '136_water_apm_ast_epin_l00.txt',
+     &   '136_water_apm_ast_epin_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','198_water_apm_ast_epin_l05.key',
-     &   '198_water_apm_ast_epin_l05.txt',
-     &   '198_water_apm_ast_epin_l05',
+      call test_mutate_calc ('water2','137_water_apm_ast_epin_l05.key',
+     &   '137_water_apm_ast_epin_l05.txt',
+     &   '137_water_apm_ast_epin_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','199_water_apm_ast_epin_l10.key',
-     &   '199_water_apm_ast_epin_l10.txt',
-     &   '199_water_apm_ast_epin_l10',
+      call test_mutate_calc ('water2','138_water_apm_ast_epin_l10.key',
+     &   '138_water_apm_ast_epin_l10.txt',
+     &   '138_water_apm_ast_epin_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1492,7 +1492,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "test_mutate_vsoft" runs the three water fixtures 200-202 that
+c     "test_mutate_vsoft" runs the three water fixtures 139-141 that
 c     scan an exponential van der Waals lambda map using a small
 c     softcore alpha and a cubic softcore exponent; electrostatics and
 c     polarization are pinned decoupled while van der Waals is checked
@@ -1505,14 +1505,14 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','200_water_vsoft_l10.key',
-     &   '200_water_vsoft_l10.txt','200_water_vsoft_l10',
+      call test_mutate_calc ('water2','139_water_vsoft_l10.key',
+     &   '139_water_vsoft_l10.txt','139_water_vsoft_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','201_water_vsoft_l05.key',
-     &   '201_water_vsoft_l05.txt','201_water_vsoft_l05',
+      call test_mutate_calc ('water2','140_water_vsoft_l05.key',
+     &   '140_water_vsoft_l05.txt','140_water_vsoft_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','202_water_vsoft_l00.key',
-     &   '202_water_vsoft_l00.txt','202_water_vsoft_l00',
+      call test_mutate_calc ('water2','141_water_vsoft_l00.key',
+     &   '141_water_vsoft_l00.txt','141_water_vsoft_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1525,16 +1525,16 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_mutate_g3" runs the four fixtures 207-210 on SAMPL8 guest 3,
+c     "test_mutate_g3" runs the four fixtures 146-149 on SAMPL8 guest 3,
 c     a cyclopentylacetate anion with the 29 waters nearest to it, which
 c     has the 1-4 and 1-5 pairs the water fixtures lack; electrostatics,
 c     polarization and van der Waals all follow the main lambda on the
-c     identity map, fixtures 207 and 208 decouple the guest at a main
-c     lambda of 1.0 and 0.5, 209 annihilates it with a van der Waals
+c     identity map, fixtures 146 and 147 decouple the guest at a main
+c     lambda of 1.0 and 0.5, 148 annihilates it with a van der Waals
 c     1-4 scale of one half and the artificial "vdw14" values from
 c     "g3_vdw14.prm", so the soft core pairs inside the guest carry a
-c     fractional exclusion scale and 1-4 radii and well depths, and 210
-c     repeats 208 as an isolated cluster with no box, whose list run
+c     fractional exclusion scale and 1-4 radii and well depths, and 149
+c     repeats 147 as an isolated cluster with no box, whose list run
 c     takes the full neighbor list and so the no-Ewald multipole list
 c     path; the cluster sits at the corner of the periodic cell so the
 c     method of lights wraps along all three axes; every fixture carries
@@ -1545,17 +1545,17 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('g3','207_g3_ast_ye_l10.key',
-     &   '207_g3_ast_ye_l10.txt','207_g3_ast_ye_l10',
+      call test_mutate_calc ('g3','146_g3_ast_ye_l10.key',
+     &   '146_g3_ast_ye_l10.txt','146_g3_ast_ye_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','208_g3_ast_ye_l05.key',
-     &   '208_g3_ast_ye_l05.txt','208_g3_ast_ye_l05',
+      call test_mutate_calc ('g3','147_g3_ast_ye_l05.key',
+     &   '147_g3_ast_ye_l05.txt','147_g3_ast_ye_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','209_g3_ast_annih_l05.key',
-     &   '209_g3_ast_annih_l05.txt','209_g3_ast_annih_l05',
+      call test_mutate_calc ('g3','148_g3_ast_annih_l05.key',
+     &   '148_g3_ast_annih_l05.txt','148_g3_ast_annih_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','210_g3_ast_nobox_l05.key',
-     &   '210_g3_ast_nobox_l05.txt','210_g3_ast_nobox_l05',
+      call test_mutate_calc ('g3','149_g3_ast_nobox_l05.key',
+     &   '149_g3_ast_nobox_l05.txt','149_g3_ast_nobox_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1568,11 +1568,11 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "test_mutate_hal" runs the four water fixtures 211-214 that reach
+c     "test_mutate_hal" runs the four water fixtures 150-153 that reach
 c     the buffered 14-7 lambda derivative paths the other water cases
-c     leave out; 211 annihilates the ligand with the long range van der
-c     Waals correction, 212 and 213 repeat the single topology midpoint
-c     in a monoclinic and a triclinic cell, and 214 is a staged relative
+c     leave out; 150 annihilates the ligand with the long range van der
+c     Waals correction, 151 and 152 repeat the single topology midpoint
+c     in a monoclinic and a triclinic cell, and 153 is a staged relative
 c     van der Waals leg whose second ligand has pairs in the switching
 c     window, at a main lambda of 0.4 so the two ligands sit at unequal
 c     soft core strengths; every fixture carries "lambda-deriv2", runs
@@ -1584,20 +1584,20 @@ c
 c
 c
       call test_mutate_calc ('water2',
-     &   '211_water_ast_vcorr_annih_l05.key',
-     &   '211_water_ast_vcorr_annih_l05.txt',
-     &   '211_water_ast_vcorr_annih_l05',
+     &   '150_water_ast_vcorr_annih_l05.key',
+     &   '150_water_ast_vcorr_annih_l05.txt',
+     &   '150_water_ast_vcorr_annih_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','212_water_ast_mono_l05.key',
-     &   '212_water_ast_mono_l05.txt','212_water_ast_mono_l05',
+      call test_mutate_calc ('water2','151_water_ast_mono_l05.key',
+     &   '151_water_ast_mono_l05.txt','151_water_ast_mono_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','213_water_ast_tric_l05.key',
-     &   '213_water_ast_tric_l05.txt','213_water_ast_tric_l05',
+      call test_mutate_calc ('water2','152_water_ast_tric_l05.key',
+     &   '152_water_ast_tric_l05.txt','152_water_ast_tric_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '214_water_rels_ye_vdwm_lig2t_l040.key',
-     &   '214_water_rels_ye_vdwm_lig2t_l040.txt',
-     &   '214_water_rels_ye_vdwm_lig2t_l040',
+     &   '153_water_rels_ye_vdwm_lig2t_l040.key',
+     &   '153_water_rels_ye_vdwm_lig2t_l040.txt',
+     &   '153_water_rels_ye_vdwm_lig2t_l040',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1610,15 +1610,15 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_mpole4" runs the four fixtures 215 and 217-219 that
+c     "test_mutate_mpole4" runs the four fixtures 154-157 that
 c     reach the multipole lambda derivative paths the other cases leave
-c     out; 215 is the water single topology midpoint without Ewald, with
+c     out; 154 is the water single topology midpoint without Ewald, with
 c     a multipole cutoff of 6.5 so its list run can take the full
-c     neighbor list and the no-Ewald multipole list path; 217 and 218
+c     neighbor list and the no-Ewald multipole list path; 155 and 156
 c     are the charging and discharging legs of a staged relative
 c     mutation from the charged guest 3 to one of its waters, so the
 c     uniform background term carries a lambda derivative with a second
-c     ligand present; 219 is the water discharging leg without Ewald,
+c     ligand present; 157 is the water discharging leg without Ewald,
 c     again with the shorter multipole cutoff so its list run is
 c     available; every fixture carries "lambda-deriv2" and runs the
 c     level 4 checks
@@ -1628,19 +1628,19 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','215_water_ast_ne_mcut_l05.key',
-     &   '215_water_ast_ne_mcut_l05.txt','215_water_ast_ne_mcut_l05',
+      call test_mutate_calc ('water2','154_water_ast_ne_mcut_l05.key',
+     &   '154_water_ast_ne_mcut_l05.txt','154_water_ast_ne_mcut_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','217_g3_rels_lig1_l085.key',
-     &   '217_g3_rels_lig1_l085.txt','217_g3_rels_lig1_l085',
+      call test_mutate_calc ('g3','155_g3_rels_lig1_l085.key',
+     &   '155_g3_rels_lig1_l085.txt','155_g3_rels_lig1_l085',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','218_g3_rels_lig2_l015.key',
-     &   '218_g3_rels_lig2_l015.txt','218_g3_rels_lig2_l015',
+      call test_mutate_calc ('g3','156_g3_rels_lig2_l015.key',
+     &   '156_g3_rels_lig2_l015.txt','156_g3_rels_lig2_l015',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '219_water_rels_ne_lig2_l015.key',
-     &   '219_water_rels_ne_lig2_l015.txt',
-     &   '219_water_rels_ne_lig2_l015',
+     &   '157_water_rels_ne_lig2_l015.key',
+     &   '157_water_rels_ne_lig2_l015.txt',
+     &   '157_water_rels_ne_lig2_l015',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1653,13 +1653,13 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_frames" runs the two fixtures 220 and 221 on an
+c     "test_mutate_frames" runs the two fixtures 158 and 159 on an
 c     acetonitrile and ammonia dimer system from the amoeba09 force
 c     field, whose multipole sites use the z-only, 3-fold and z-bisector
 c     local frames that water and guest 3 lack; the ligand is the
 c     acetonitrile and the first ammonia, so the lambda torques reach
-c     every frame type on both mutated and environment sites; 220 uses
-c     Ewald in a periodic cell and 221 is an isolated cluster, so the
+c     every frame type on both mutated and environment sites; 158 uses
+c     Ewald in a periodic cell and 159 is an isolated cluster, so the
 c     two cover all four multipole summation paths; both carry
 c     "lambda-deriv2" and run the level 4 checks
 c
@@ -1668,11 +1668,11 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('frames','220_frames_ast_ye_l05.key',
-     &   '220_frames_ast_ye_l05.txt','220_frames_ast_ye_l05',
+      call test_mutate_calc ('frames','158_frames_ast_ye_l05.key',
+     &   '158_frames_ast_ye_l05.txt','158_frames_ast_ye_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('frames','221_frames_ast_nobox_l05.key',
-     &   '221_frames_ast_nobox_l05.txt','221_frames_ast_nobox_l05',
+      call test_mutate_calc ('frames','159_frames_ast_nobox_l05.key',
+     &   '159_frames_ast_nobox_l05.txt','159_frames_ast_nobox_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1685,15 +1685,15 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_mirror" runs the four chignolin fixtures 222-225 in
+c     "test_mutate_mirror" runs the four chignolin fixtures 160-163 in
 c     the amoebabio09 force field, whose chiral alpha carbon multipoles
 c     carry nonzero y components, unlike the later protein parameters;
-c     223 and 225 repeat 222 and 224 on the mirror image, so "chkpole"
+c     161 and 163 repeat 160 and 162 on the mirror image, so "chkpole"
 c     inverts the chiral sites in one of each pair and a lost inversion
 c     under lambda would show up as a mirror whose values differ from
 c     the original; the ligand is residues three to six, which spans
-c     the three chiral alpha carbon types; 222 and 223 are isolated and
-c     224 and 225 use Ewald, so the pairs cover all four multipole
+c     the three chiral alpha carbon types; 160 and 161 are isolated and
+c     162 and 163 use Ewald, so the pairs cover all four multipole
 c     summation paths; every fixture carries "lambda-deriv2" and runs
 c     the level 4 checks
 c
@@ -1702,17 +1702,17 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('chig','222_chig_ast_nobox_l05.key',
-     &   '222_chig_ast_nobox_l05.txt','222_chig_ast_nobox_l05',
+      call test_mutate_calc ('chig','160_chig_ast_nobox_l05.key',
+     &   '160_chig_ast_nobox_l05.txt','160_chig_ast_nobox_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('chigm','223_chigm_ast_nobox_l05.key',
-     &   '223_chigm_ast_nobox_l05.txt','223_chigm_ast_nobox_l05',
+      call test_mutate_calc ('chigm','161_chigm_ast_nobox_l05.key',
+     &   '161_chigm_ast_nobox_l05.txt','161_chigm_ast_nobox_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('chig','224_chig_ast_ye_l05.key',
-     &   '224_chig_ast_ye_l05.txt','224_chig_ast_ye_l05',
+      call test_mutate_calc ('chig','162_chig_ast_ye_l05.key',
+     &   '162_chig_ast_ye_l05.txt','162_chig_ast_ye_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('chigm','225_chigm_ast_ye_l05.key',
-     &   '225_chigm_ast_ye_l05.txt','225_chigm_ast_ye_l05',
+      call test_mutate_calc ('chigm','163_chigm_ast_ye_l05.key',
+     &   '163_chigm_ast_ye_l05.txt','163_chigm_ast_ye_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1725,17 +1725,17 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "test_mutate_polst" runs the five fixtures 226-228 and 230-231
+c     "test_mutate_polst" runs the five fixtures 164-168
 c     that repeat earlier cases with "lambda-deriv" alone, so
 c     polarization takes the single topology scalar derivative of
 c     "epolar4d" instead of the dual topology interpolation that
-c     "lambda-deriv2" selects; 226 is the water midpoint without Ewald
+c     "lambda-deriv2" selects; 164 is the water midpoint without Ewald
 c     and with the shorter multipole cutoff, so its list run reaches
-c     the no-Ewald list field routines; 227 and 228 decouple guest 3 at
+c     the no-Ewald list field routines; 165 and 166 decouple guest 3 at
 c     a main lambda of 0.5 and 0.0, the latter taking the zero
 c     polarizability branch, on a charged ligand with multi-site
-c     polarization groups and 1-4 and 1-5 polarization scaling; 230 and
-c     231 are the charging and discharging legs of the relative mutation
+c     polarization groups and 1-4 and 1-5 polarization scaling; 167 and
+c     168 are the charging and discharging legs of the relative mutation
 c     from guest 3 to one of its waters; every fixture runs the level 4
 c     checks, whose second, force and virial lambda derivatives stay
 c     zero on the single topology path
@@ -1746,21 +1746,21 @@ c
 c
 c
       call test_mutate_calc ('water2',
-     &   '226_water_ast_ne_mcut_d1_l05.key',
-     &   '226_water_ast_ne_mcut_d1_l05.txt',
-     &   '226_water_ast_ne_mcut_d1_l05',
+     &   '164_water_ast_ne_mcut_d1_l05.key',
+     &   '164_water_ast_ne_mcut_d1_l05.txt',
+     &   '164_water_ast_ne_mcut_d1_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','227_g3_ast_d1_l05.key',
-     &   '227_g3_ast_d1_l05.txt','227_g3_ast_d1_l05',
+      call test_mutate_calc ('g3','165_g3_ast_d1_l05.key',
+     &   '165_g3_ast_d1_l05.txt','165_g3_ast_d1_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','228_g3_ast_d1_l00.key',
-     &   '228_g3_ast_d1_l00.txt','228_g3_ast_d1_l00',
+      call test_mutate_calc ('g3','166_g3_ast_d1_l00.key',
+     &   '166_g3_ast_d1_l00.txt','166_g3_ast_d1_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','230_g3_rels_lig1_d1_l085.key',
-     &   '230_g3_rels_lig1_d1_l085.txt','230_g3_rels_lig1_d1_l085',
+      call test_mutate_calc ('g3','167_g3_rels_lig1_d1_l085.key',
+     &   '167_g3_rels_lig1_d1_l085.txt','167_g3_rels_lig1_d1_l085',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('g3','231_g3_rels_lig2_d1_l015.key',
-     &   '231_g3_rels_lig2_d1_l015.txt','231_g3_rels_lig2_d1_l015',
+      call test_mutate_calc ('g3','168_g3_rels_lig2_d1_l015.key',
+     &   '168_g3_rels_lig2_d1_l015.txt','168_g3_rels_lig2_d1_l015',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1773,13 +1773,13 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "test_mutate_deriv1" runs the three water fixtures 232-234 that
+c     "test_mutate_deriv1" runs the three water fixtures 169-171 that
 c     carry "lambda-deriv" alone on paths otherwise only tested with
-c     second lambda derivatives; 232 forces dual topology polarization
+c     second lambda derivatives; 169 forces dual topology polarization
 c     with a squared weight at a main lambda of 0.6, so the second
 c     weight derivative is nonzero but must be cleared by "lmdachain";
-c     233 annihilates the ligand van der Waals with the long range
-c     correction, and 234 is a staged relative van der Waals leg at a
+c     170 annihilates the ligand van der Waals with the long range
+c     correction, and 171 is a staged relative van der Waals leg at a
 c     main lambda of 0.4; the level 4 checks confirm that the second,
 c     force and virial lambda derivatives stay zero
 c
@@ -1788,18 +1788,18 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','232_water_adt_d1_x2_l06.key',
-     &   '232_water_adt_d1_x2_l06.txt','232_water_adt_d1_x2_l06',
+      call test_mutate_calc ('water2','169_water_adt_d1_x2_l06.key',
+     &   '169_water_adt_d1_x2_l06.txt','169_water_adt_d1_x2_l06',
      &   .false., .true.,  .false., .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '233_water_ast_vcorr_annih_d1_l05.key',
-     &   '233_water_ast_vcorr_annih_d1_l05.txt',
-     &   '233_water_ast_vcorr_annih_d1_l05',
+     &   '170_water_ast_vcorr_annih_d1_l05.key',
+     &   '170_water_ast_vcorr_annih_d1_l05.txt',
+     &   '170_water_ast_vcorr_annih_d1_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '234_water_rels_ye_vdwm_d1_l040.key',
-     &   '234_water_rels_ye_vdwm_d1_l040.txt',
-     &   '234_water_rels_ye_vdwm_d1_l040',
+     &   '171_water_rels_ye_vdwm_d1_l040.key',
+     &   '171_water_rels_ye_vdwm_d1_l040.txt',
+     &   '171_water_rels_ye_vdwm_d1_l040',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1812,11 +1812,11 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_vsoft1" runs the three water fixtures 235-237 that
+c     "test_mutate_vsoft1" runs the three water fixtures 172-174 that
 c     use a softcore exponent of one, allowed when only the first lambda
-c     derivative is requested as by TI, ABF and metadynamics; 235 and
-c     236 annihilate the ligand van der Waals on the identity map at a
-c     main lambda of 0.0 and 0.05, and 237 is a staged relative van der
+c     derivative is requested as by TI, ABF and metadynamics; 172 and
+c     173 annihilate the ligand van der Waals on the identity map at a
+c     main lambda of 0.0 and 0.05, and 174 is a staged relative van der
 c     Waals leg at a main lambda of 1.0, where the second ligand group
 c     sits at its decoupled endpoint; the first lambda derivative must
 c     stay finite at the endpoint, where the second derivative factor
@@ -1828,16 +1828,16 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('water2','235_water_vsoft_n1_d1_l00.key',
-     &   '235_water_vsoft_n1_d1_l00.txt','235_water_vsoft_n1_d1_l00',
+      call test_mutate_calc ('water2','172_water_vsoft_n1_d1_l00.key',
+     &   '172_water_vsoft_n1_d1_l00.txt','172_water_vsoft_n1_d1_l00',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','236_water_vsoft_n1_d1_l005.key',
-     &   '236_water_vsoft_n1_d1_l005.txt','236_water_vsoft_n1_d1_l005',
+      call test_mutate_calc ('water2','173_water_vsoft_n1_d1_l005.key',
+     &   '173_water_vsoft_n1_d1_l005.txt','173_water_vsoft_n1_d1_l005',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       call test_mutate_calc ('water2',
-     &   '237_water_rels_vdwm_n1_d1_l10.key',
-     &   '237_water_rels_vdwm_n1_d1_l10.txt',
-     &   '237_water_rels_vdwm_n1_d1_l10',
+     &   '174_water_rels_vdwm_n1_d1_l10.key',
+     &   '174_water_rels_vdwm_n1_d1_l10.txt',
+     &   '174_water_rels_vdwm_n1_d1_l10',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1850,25 +1850,25 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "test_mutate_noewald" runs the three water fixtures 239-241 that
+c     "test_mutate_noewald" runs the three water fixtures 176-178 that
 c     repeat Ewald fixtures with a 6.5 Ang multipole cutoff instead;
-c     239 is the single topology staged ligand 1 leg of 203 and 240 the
-c     dual topology one of 136, both at a main lambda of 0.85, and 241
-c     is the first derivative only dual topology polarization of 232
+c     176 is the single topology staged ligand 1 leg of 142 and 177 the
+c     dual topology one of 083, both at a main lambda of 0.85, and 178
+c     is the first derivative only dual topology polarization of 169
 c
 c
       subroutine test_mutate_noewald
       implicit none
 c
 c
-      call test_mutate_calc ('water2','239_water_rels_st_ne_l085.key',
-     &   '239_water_rels_st_ne_l085.txt','239_water_rels_st_ne_l085',
+      call test_mutate_calc ('water2','176_water_rels_st_ne_l085.key',
+     &   '176_water_rels_st_ne_l085.txt','176_water_rels_st_ne_l085',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','240_water_rels_ne_l085.key',
-     &   '240_water_rels_ne_l085.txt','240_water_rels_ne_l085',
+      call test_mutate_calc ('water2','177_water_rels_ne_l085.key',
+     &   '177_water_rels_ne_l085.txt','177_water_rels_ne_l085',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
-      call test_mutate_calc ('water2','241_water_adt_d1_ne_l06.key',
-     &   '241_water_adt_d1_ne_l06.txt','241_water_adt_d1_ne_l06',
+      call test_mutate_calc ('water2','178_water_adt_d1_ne_l06.key',
+     &   '178_water_adt_d1_ne_l06.txt','178_water_adt_d1_ne_l06',
      &   .false., .true.,  .false., .true.,  .true.)
       return
       end
@@ -1881,7 +1881,7 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "test_mutate_ion" runs fixture 242, which decouples the chloride
+c     "test_mutate_ion" runs fixture 179, which decouples the chloride
 c     of the two sodium, chloride and water cluster with single topology
 c     multipoles and polarization under Ewald, so the uniform background
 c     term carries a lambda scaled net charge alongside polarization
@@ -1891,8 +1891,8 @@ c
       implicit none
 c
 c
-      call test_mutate_calc ('ionwat','242_ionwat_ast_l05.key',
-     &   '242_ionwat_ast_l05.txt','242_ionwat_ast_l05',
+      call test_mutate_calc ('ionwat','179_ionwat_ast_l05.key',
+     &   '179_ionwat_ast_l05.txt','179_ionwat_ast_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
@@ -1925,7 +1925,7 @@ c
      &                            'test_mutate_scexp n15 deriv2')
       call test_mutate_scexpcase ('vsoft_n15_ost.key','two',
      &                            'test_mutate_scexp n15 ost')
-      call test_mutate_scexpcase ('238_water_vsoft_n15_ti_l00.key',
+      call test_mutate_scexpcase ('175_water_vsoft_n15_ti_l00.key',
      &                            '','test_mutate_scexp n15 ti')
       call popdir
       call test_mutate_scexpti
@@ -1940,11 +1940,11 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "test_mutate_scexpti" evaluates fixture 238, a softcore exponent
+c     "test_mutate_scexpti" evaluates fixture 175, a softcore exponent
 c     of 1.5 under TI, in its first window at a main lambda of zero;
 c     TI asks for only the first lambda derivative, the ligand van der
 c     Waals is fully decoupled, so energy, gradient and virial match
-c     fixture 235 with an exponent of one, and the lambda derivative
+c     fixture 172 with an exponent of one, and the lambda derivative
 c     vanishes since the softcore weight is flat at the endpoint
 c
 c
@@ -1968,11 +1968,11 @@ c
 c
       if (skiptest(tname,'mutate'))  return
       call pushdir ('file/mutate')
-      call loadfix_keyadd ('water2','238_water_vsoft_n15_ti_l00.key',
+      call loadfix_keyadd ('water2','175_water_vsoft_n15_ti_l00.key',
      &                     'ti-window 0.0')
       allocate (derivs(3,n))
       allocate (refg(3,n))
-      call refpath ('mutate','235_water_vsoft_n1_d1_l00.txt',rpath)
+      call refpath ('mutate','172_water_vsoft_n1_d1_l00.txt',rpath)
       call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
       call assert_logical (use_ti,.true.,tname//' TI mode')
       call assert_logical (use_d2lmda,.false.,tname//' first only')
@@ -2160,7 +2160,7 @@ c
 c
       if (skiptest('test_mutate_chiral','mutate'))  return
       call pushdir ('file/mutate')
-      call loadfix ('../angle/trpcage','206_trpcage_chiral_m05.key')
+      call loadfix ('../angle/trpcage','145_trpcage_chiral_m05.key')
       do i = 1, n
          if (polaxe(i).eq.'Z-then-X' .and. yaxis(i).ne.0) then
             poleorig(3,i) = 0.1d0
@@ -2195,7 +2195,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "test_mutate_gate" runs the staged ligand 1 charging fixture 136,
+c     "test_mutate_gate" runs the staged ligand 1 charging fixture 083,
 c     whose multipole second lambda derivative is nonzero, with and
 c     without the second, force and virial lambda derivatives; turning
 c     them off must leave the energy, gradient and first lambda
@@ -2217,7 +2217,7 @@ c
 c
       if (skiptest('test_mutate_gate','mutate'))  return
       call pushdir ('file/mutate')
-      call loadfix ('water2','136_water_rels_ye_l085.key')
+      call loadfix ('water2','083_water_rels_ye_l085.key')
       allocate (derivs(3,n))
       allocate (g1(3,n))
 c
@@ -2283,8 +2283,8 @@ c     and "gradient" takes the plain multipole and polarization routines;
 c     the lambda derivatives must be exact zeros, the plain and lambda
 c     derivative routines must agree there, and moving back inside the
 c     window must restore the multipole lambda derivative; the single
-c     topology fixture 203 and the dual topology fixture 136 cover both
-c     polarization paths, and 239 and 240 repeat them without Ewald
+c     topology fixture 142 and the dual topology fixture 083 cover both
+c     polarization paths, and 176 and 177 repeat them without Ewald
 c
 c
       subroutine test_mutate_flat
@@ -2293,13 +2293,13 @@ c
 c
 c
       if (skiptest('test_mutate_flat','mutate'))  return
-      call test_mutate_flatcase ('203_water_rels_st_l085.key',
+      call test_mutate_flatcase ('142_water_rels_st_l085.key',
      &                           'test_mutate_flat single')
-      call test_mutate_flatcase ('136_water_rels_ye_l085.key',
+      call test_mutate_flatcase ('083_water_rels_ye_l085.key',
      &                           'test_mutate_flat dual')
-      call test_mutate_flatcase ('239_water_rels_st_ne_l085.key',
+      call test_mutate_flatcase ('176_water_rels_st_ne_l085.key',
      &                           'test_mutate_flat single noewald')
-      call test_mutate_flatcase ('240_water_rels_ne_l085.key',
+      call test_mutate_flatcase ('177_water_rels_ne_l085.key',
      &                           'test_mutate_flat dual noewald')
       return
       end

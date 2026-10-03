@@ -18,7 +18,7 @@ c     reference with a floating-point tolerance
 c
 c     the ionwat cases decouple the chloride of a +2 environment under
 c     Ewald, so the uniform background correction carries a lambda
-c     scaled net charge into the dV/dL tensor from "empole4"; case 32
+c     scaled net charge into the dV/dL tensor from "empole4"; case 26
 c     adds dual topology polarization alongside it
 c
 c
@@ -32,31 +32,31 @@ c
       call test_testlmda_case ('04_water_ast_l06exp','1e-4')
       call test_testlmda_case ('05_water_ast_nodl_l05','1e-4')
       call test_testlmda_case ('06_water_ast_vonly_l05','1e-4')
-      call test_testlmda_case ('10_water_ast_vcorr_l05','1e-4')
-      call test_testlmda_case ('11_water_ast_vcorr_annih_l05','1e-4')
-      call test_testlmda_case ('12_water_ast_vcorr_l06exp','1e-4')
-      call test_testlmda_case ('14_water_rels_vdwm_vcorr_annih_l05',
+      call test_testlmda_case ('07_water_ast_vcorr_l05','1e-4')
+      call test_testlmda_case ('08_water_ast_vcorr_annih_l05','1e-4')
+      call test_testlmda_case ('09_water_ast_vcorr_l06exp','1e-4')
+      call test_testlmda_case ('10_water_rels_vdwm_vcorr_annih_l05',
      &                         '1e-4')
-      call test_testlmda_case ('17_water_rels_vdwm_vcorr_l050','1e-5')
-      call test_testlmda_case ('18_water_rels_lig1_l085','1e-4')
-      call test_testlmda_case ('19_water_rels_lig2_l015','1e-4')
-      call test_testlmda_case ('20_water_rels_lig1_ne_l085','1e-4')
-      call test_testlmda_case ('21_water_rels_lig1_nlist_exf_l085',
+      call test_testlmda_case ('11_water_rels_vdwm_vcorr_l050','1e-5')
+      call test_testlmda_case ('12_water_rels_lig1_l085','1e-4')
+      call test_testlmda_case ('13_water_rels_lig2_l015','1e-4')
+      call test_testlmda_case ('14_water_rels_lig1_ne_l085','1e-4')
+      call test_testlmda_case ('15_water_rels_lig1_nlist_exf_l085',
      &                         '1e-4')
-      call test_testlmda_case ('22_water_rels_lig1_st_l085','1e-4')
-      call test_testlmda_case ('23_water_rels_lig2_st_l015','1e-4')
-      call test_testlmda_case ('24_water_rels_lig1_st_ne_l085','1e-4')
-      call test_testlmda_case ('25_water_rels_lig1_st_polonly_l085',
+      call test_testlmda_case ('16_water_rels_lig1_st_l085','1e-4')
+      call test_testlmda_case ('17_water_rels_lig2_st_l015','1e-4')
+      call test_testlmda_case ('18_water_rels_lig1_st_ne_l085','1e-4')
+      call test_testlmda_case ('19_water_rels_lig1_st_polonly_l085',
      &                         '1e-4')
-      call test_testlmda_case ('26_water_rels_lig1_dt_polonly_l078',
+      call test_testlmda_case ('20_water_rels_lig1_dt_polonly_l078',
      &                         '1e-4')
-      call test_testlmda_case ('27_water_rels_lig1_st_prng_l088','1e-4')
-      call test_testlmda_case ('28_water_rels_lig1_dt_prng_l088','1e-4')
-      call test_testlmda_case ('29_water_rels_lig2_st_pmap_l015','1e-4')
-      call test_testlmda_xyz ('30_ionwat_ewald_l05','ionwat','1e-4')
-      call test_testlmda_xyz ('31_ionwat_ewald_nlist_l05','ionwat',
+      call test_testlmda_case ('21_water_rels_lig1_st_prng_l088','1e-4')
+      call test_testlmda_case ('22_water_rels_lig1_dt_prng_l088','1e-4')
+      call test_testlmda_case ('23_water_rels_lig2_st_pmap_l015','1e-4')
+      call test_testlmda_xyz ('24_ionwat_ewald_l05','ionwat','1e-4')
+      call test_testlmda_xyz ('25_ionwat_ewald_nlist_l05','ionwat',
      &                        '1e-4')
-      call test_testlmda_xyz ('32_ionwat_pol_ewald_l05','ionwat','1e-4')
+      call test_testlmda_xyz ('26_ionwat_pol_ewald_l05','ionwat','1e-4')
       return
       end
 c

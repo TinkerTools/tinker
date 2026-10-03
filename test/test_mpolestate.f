@@ -66,9 +66,9 @@ c
      &             '../mutate/water2', '../mutate/water2',
      &             '../rephippo/h2o10', '../mutate/water2' /
       data key   / 'rels_prng_nodl.key',
-     &             '27_water_rels_lig1_st_prng_l088.key',
-     &             '203_water_rels_st_l085.key',
-     &             '136_water_rels_ye_l085.key',
+     &             '21_water_rels_lig1_st_prng_l088.key',
+     &             '142_water_rels_st_l085.key',
+     &             '083_water_rels_ye_l085.key',
      &             'emast_mponly.key', 'polpinned.key',
      &             'hippo_cflux.key', 'rels_prng_l100.key' /
       data name  / 'rels_prng_nodl', 'rels_prng_dl', 'rels_st',
@@ -187,7 +187,7 @@ c
 c
       if (skiptest(tname,'mpolestate,mutate'))  return
       call pushdir ('file/testlmda')
-      call loadfix ('water2','27_water_rels_lig1_st_prng_l088.key')
+      call loadfix ('water2','21_water_rels_lig1_st_prng_l088.key')
       allocate (derivs(3,n))
       allocate (uind0(3,n))
       call assert_logical (use_prst,.true.,tname//' single topology')
