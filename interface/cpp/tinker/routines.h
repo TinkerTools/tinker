@@ -308,6 +308,8 @@ void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
 void grpscale_(double* lmda, double* sc, double* dsc);
 #define tinker_f_grpscale grpscale_
+void eleclive_(int* live, int* doskip);
+#define tinker_f_eleclive eleclive_
 void mapsublmda_(double* lmda);
 #define tinker_f_mapsublmda mapsublmda_
 void sublmdamap_(double* lmda, char* map, int* nexp, int* invn, double* inveps, int* apmn, double* apmrho, double* qnt0, double* qnt1, double* sub, double* dsub, double* d2sub, tinker_fchar_len_t map_cap);
