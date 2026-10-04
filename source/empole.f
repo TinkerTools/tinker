@@ -75,6 +75,7 @@ c
       use math
       use mplpot
       use mpole
+      use mutant
       use polpot
       use shunt
       use usage
@@ -115,6 +116,8 @@ c
       real*8 dmpik(9)
       real*8, allocatable :: mscale(:)
       logical proceed,usei,usek
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -147,10 +150,15 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     calculate the multipole interaction energy term
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         livei = live(mutg(i))
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -207,7 +215,10 @@ c
                zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
-               if (r2 .le. off2) then
+               dopr = (r2 .le. off2)
+               if (dopr .and. doskip)
+     &            dopr = (livei .and. live(mutg(k)))
+               if (dopr) then
                   r = sqrt(r2)
                   ck = rpole(1,k)
                   dkx = rpole(2,k)
@@ -332,6 +343,7 @@ c     calculate interaction energy with other unit cells
 c
          do ii = 1, npole
             i = ipole(ii)
+            livei = live(mutg(i))
             iz = zaxis(i)
             ix = xaxis(i)
             iy = abs(yaxis(i))
@@ -390,7 +402,10 @@ c
                      r2 = xr*xr + yr* yr + zr*zr
                      if (.not. (use_polymer .and. r2.le.polycut2))
      &                  mscale(k) = 1.0d0
-                     if (r2 .le. off2) then
+                     dopr = (r2 .le. off2)
+                     if (dopr .and. doskip)
+     &                  dopr = (livei .and. live(mutg(k)))
+                     if (dopr) then
                         r = sqrt(r2)
                         ck = rpole(1,k)
                         dkx = rpole(2,k)
@@ -538,6 +553,7 @@ c
       use math
       use mplpot
       use mpole
+      use mutant
       use neigh
       use shunt
       use usage
@@ -578,6 +594,8 @@ c
       real*8 dmpik(9)
       real*8, allocatable :: mscale(:)
       logical proceed,usei,usek
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -610,6 +628,10 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
@@ -618,12 +640,14 @@ c
 !$OMP& m4scale,m5scale,f,nelst,elst,use_chgpen,use_group,use_intra,
 !$OMP& use_bounds,off2)
 !$OMP& firstprivate(mscale) shared (em)
+!$OMP& shared(mutg,live,doskip)
 !$OMP DO reduction(+:em)
 c
 c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          iz = zaxis(i)
          ix = xaxis(i)
          iy = abs(yaxis(i))
@@ -680,7 +704,10 @@ c
                zr = z(k) - zi
                if (use_bounds)  call image (xr,yr,zr)
                r2 = xr*xr + yr* yr + zr*zr
-               if (r2 .le. off2) then
+               dopr = (r2 .le. off2)
+               if (dopr .and. doskip)
+     &            dopr = (livei .and. live(mutg(k)))
+               if (dopr) then
                   r = sqrt(r2)
                   ck = rpole(1,k)
                   dkx = rpole(2,k)
@@ -960,6 +987,7 @@ c
       use math
       use mplpot
       use mpole
+      use mutant
       use shunt
       implicit none
       integer i,j,k
@@ -996,6 +1024,8 @@ c
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(9),dmpe(9)
       real*8, allocatable :: mscale(:)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -1015,10 +1045,15 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         livei = live(mutg(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -1062,7 +1097,9 @@ c
             zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -1196,6 +1233,7 @@ c     calculate interaction energy with other unit cells
 c
          do ii = 1, npole
             i = ipole(ii)
+            livei = live(mutg(i))
             xi = x(i)
             yi = y(i)
             zi = z(i)
@@ -1242,7 +1280,10 @@ c
                   r2 = xr*xr + yr* yr + zr*zr
                   if (.not. (use_polymer .and. r2.le.polycut2))
      &               mscale(k) = 1.0d0
-                  if (r2 .le. off2) then
+                  dopr = (r2 .le. off2)
+                  if (dopr .and. doskip)
+     &               dopr = (livei .and. live(mutg(k)))
+                  if (dopr) then
                      r = sqrt(r2)
                      ck = rpole(1,k)
                      dkx = rpole(2,k)
@@ -1529,6 +1570,7 @@ c
       use math
       use mplpot
       use mpole
+      use mutant
       use neigh
       use shunt
       implicit none
@@ -1565,6 +1607,8 @@ c
       real*8 dmpi(9),dmpk(9)
       real*8 dmpik(9),dmpe(9)
       real*8, allocatable :: mscale(:)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -1584,6 +1628,10 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
@@ -1591,12 +1639,14 @@ c
 !$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
 !$OMP& f,nelst,elst,use_bounds,use_chgpen,off2)
 !$OMP& firstprivate(mscale) shared (em)
+!$OMP& shared(mutg,live,doskip)
 !$OMP DO reduction(+:em)
 c
 c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -1640,7 +1690,9 @@ c
             zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)

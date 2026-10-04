@@ -278,9 +278,14 @@ c
                      de = de * fgrp
                   end if
 c
-c     find the chain rule terms for derivative components
+c     find the chain rule terms for derivative components; atoms at
+c     the same point have no direction and take zero force
 c
-                  de = de / rik
+                  if (rik .ne. 0.0d0) then
+                     de = de / rik
+                  else
+                     de = 0.0d0
+                  end if
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
@@ -477,9 +482,14 @@ c
                         de = de * fgrp
                      end if
 c
-c     find the chain rule terms for derivative components
+c     find the chain rule terms for derivative components; atoms at
+c     the same point have no direction and take zero force
 c
-                     de = de / rik
+                     if (rik .ne. 0.0d0) then
+                        de = de / rik
+                     else
+                        de = 0.0d0
+                     end if
                      dedx = de * xr
                      dedy = de * yr
                      dedz = de * zr
@@ -846,9 +856,14 @@ c
                      de = de * fgrp
                   end if
 c
-c     find the chain rule terms for derivative components
+c     find the chain rule terms for derivative components; atoms at
+c     the same point have no direction and take zero force
 c
-                  de = de / rik
+                  if (rik .ne. 0.0d0) then
+                     de = de / rik
+                  else
+                     de = 0.0d0
+                  end if
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
@@ -1167,9 +1182,14 @@ c
                      de = de * fgrp
                   end if
 c
-c     find the chain rule terms for derivative components
+c     find the chain rule terms for derivative components; atoms at
+c     the same point have no direction and take zero force
 c
-                  de = de / rik
+                  if (rik .ne. 0.0d0) then
+                     de = de / rik
+                  else
+                     de = 0.0d0
+                  end if
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr

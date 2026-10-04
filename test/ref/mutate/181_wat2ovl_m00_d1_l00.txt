@@ -1,0 +1,37 @@
+ Total Potential Energy :                  0.0000 Kcal/mole
+
+ Internal Virial Tensor :                   0.000        0.000        0.000
+                                            0.000        0.000        0.000
+                                            0.000        0.000        0.000
+
+ Cartesian Gradient Breakdown over Individual Atoms :
+
+  Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
+
+ Anlyt         1             0.0000      0.0000      0.0000        0.0000
+ Anlyt         2             0.0000      0.0000      0.0000        0.0000
+ Anlyt         3             0.0000      0.0000      0.0000        0.0000
+ Anlyt         4             0.0000      0.0000      0.0000        0.0000
+ Anlyt         5             0.0000      0.0000      0.0000        0.0000
+ Anlyt         6             0.0000      0.0000      0.0000        0.0000
+
+ Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                          0.000000      0.000000      0.000000      0.000000
+
+ Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
+                                          0.000000      0.000000      0.000000      0.000000
+
+ Lambda Gradient Breakdown over Individual Atoms :
+
+  Type      Atom           dFx/dL        dFy/dL        dFz/dL          Norm
+
+ Lambda        1         0.000000      0.000000      0.000000      0.000000
+ Lambda        2         0.000000      0.000000      0.000000      0.000000
+ Lambda        3         0.000000      0.000000      0.000000      0.000000
+ Lambda        4         0.000000      0.000000      0.000000      0.000000
+ Lambda        5         0.000000      0.000000      0.000000      0.000000
+ Lambda        6         0.000000      0.000000      0.000000      0.000000
+
+ Analytical dV/dL :                0.000        0.000        0.000
+                                   0.000        0.000        0.000
+                                   0.000        0.000        0.000

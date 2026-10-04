@@ -79,6 +79,79 @@ c
       return
       end
 c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine eleclive  --  live electrostatic groups  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "eleclive" flags the atom groups that carry multipoles,
+c     polarizability or a lambda slope in the current evaluation;
+c     the environment is always live, the charging ligand is live
+c     unless it is held uncharged with no lambda derivative left to
+c     take, and in a staged relative leg the other ligand never is;
+c     a pair with a site outside the live groups contributes nothing,
+c     so the pair loops skip it instead of forming zero times an
+c     inverse distance for two sites that may overlap; "doskip" tells
+c     the pair loops whether any atom lies outside the live groups
+c
+c
+      subroutine eleclive (live,doskip)
+      use atoms
+      use dlmda
+      use mutant
+      implicit none
+      integer i
+      logical live(0:2)
+      logical doskip
+      logical edrv,pdrv,dead
+c
+c
+c     a program that bypasses the mutation setup has no ligand groups,
+c     so every atom is put in the environment for the pair loops
+c
+      if (allocated(mutg)) then
+         if (size(mutg) .lt. n)  deallocate (mutg)
+      end if
+      if (.not. allocated(mutg)) then
+         allocate (mutg(n))
+         do i = 1, n
+            mutg(i) = 0
+         end do
+      end if
+c
+c     a term keeps its lambda derivative while its map has slope
+c     or curvature, as in the "gradient" routine
+c
+      edrv = use_edlmda .and. (deldlmda.ne.0.0d0
+     &          .or. d2eldlmda2.ne.0.0d0)
+      pdrv = use_pdlmda .and. (dpldlmda.ne.0.0d0
+     &          .or. d2pldlmda2.ne.0.0d0)
+      dead = (elambda.eq.0.0d0 .and. plambda.eq.0.0d0
+     &           .and. .not.edrv .and. .not.pdrv)
+c
+c     the first ligand group charges unless the leg charges the second
+c
+      live(0) = .true.
+      live(1) = .not. dead
+      live(2) = .false.
+      if (use_rel .and. relstage.eq.'LIG2') then
+         live(1) = .false.
+         live(2) = .not. dead
+      end if
+c
+c     the pair loops test group membership only when some atom
+c     belongs to a group that is not live
+c
+      doskip = .false.
+      do i = 1, n
+         if (.not. live(mutg(i)))  doskip = .true.
+      end do
+      return
+      end
+c
 c     #############################################################
 c     ##                                                         ##
 c     ##  subroutine mapsublmda -- map from lambda to sublambda  ##

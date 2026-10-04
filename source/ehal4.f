@@ -307,9 +307,14 @@ c
                      end if
                   end if
 c
-c     find the chain rule terms for derivative components
+c     find the chain rule terms for derivative components; atoms at
+c     the same point have no direction and take zero force
 c
-                  de = de / rik
+                  if (rik .ne. 0.0d0) then
+                     de = de / rik
+                  else
+                     de = 0.0d0
+                  end if
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
@@ -318,7 +323,11 @@ c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
                   if (mutd2) then
-                     dlde = dlde / rik
+                     if (rik .ne. 0.0d0) then
+                        dlde = dlde / rik
+                     else
+                        dlde = 0.0d0
+                     end if
                      dldedx = dlde * xr
                      dldedy = dlde * yr
                      dldedz = dlde * zr
@@ -570,9 +579,14 @@ c
                         end if
                      end if
 c
-c     find the chain rule terms for derivative components
+c     find the chain rule terms for derivative components; atoms at
+c     the same point have no direction and take zero force
 c
-                     de = de / rik
+                     if (rik .ne. 0.0d0) then
+                        de = de / rik
+                     else
+                        de = 0.0d0
+                     end if
                      dedx = de * xr
                      dedy = de * yr
                      dedz = de * zr
@@ -582,7 +596,11 @@ c
                      if (i .eq. k)  e = 0.5d0 * e
                      ev = ev + e
                      if (mutd2) then
-                        dlde = dlde / rik
+                        if (rik .ne. 0.0d0) then
+                           dlde = dlde / rik
+                        else
+                           dlde = 0.0d0
+                        end if
                         dldedx = dlde * xr
                         dldedy = dlde * yr
                         dldedz = dlde * zr
@@ -1020,9 +1038,14 @@ c
                      end if
                   end if
 c
-c     find the chain rule terms for derivative components
+c     find the chain rule terms for derivative components; atoms at
+c     the same point have no direction and take zero force
 c
-                  de = de / rik
+                  if (rik .ne. 0.0d0) then
+                     de = de / rik
+                  else
+                     de = 0.0d0
+                  end if
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
@@ -1031,7 +1054,11 @@ c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
                   if (mutd2) then
-                     dlde = dlde / rik
+                     if (rik .ne. 0.0d0) then
+                        dlde = dlde / rik
+                     else
+                        dlde = 0.0d0
+                     end if
                      dldedx = dlde * xr
                      dldedy = dlde * yr
                      dldedz = dlde * zr
@@ -1420,9 +1447,14 @@ c
                      end if
                   end if
 c
-c     find the chain rule terms for derivative components
+c     find the chain rule terms for derivative components; atoms at
+c     the same point have no direction and take zero force
 c
-                  de = de / rik
+                  if (rik .ne. 0.0d0) then
+                     de = de / rik
+                  else
+                     de = 0.0d0
+                  end if
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
@@ -1431,7 +1463,11 @@ c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
                   if (mutd2) then
-                     dlde = dlde / rik
+                     if (rik .ne. 0.0d0) then
+                        dlde = dlde / rik
+                     else
+                        dlde = 0.0d0
+                     end if
                      dldedx = dlde * xr
                      dldedy = dlde * yr
                      dldedz = dlde * zr

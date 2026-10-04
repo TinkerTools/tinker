@@ -100,6 +100,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polopt
@@ -192,6 +193,8 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -261,10 +264,15 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     compute the dipole polarization gradient components
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         livei = live(mutg(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -417,7 +425,9 @@ c
             zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -1332,6 +1342,7 @@ c     calculate interaction with other unit cells
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -1490,7 +1501,9 @@ c
                dscale(k) = 1.0d0
                uscale(k) = 1.0d0
             end if
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -2545,6 +2558,7 @@ c
       use molcul
       use mplpot
       use mpole
+      use mutant
       use neigh
       use polar
       use polgrp
@@ -2638,6 +2652,8 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -2707,6 +2723,10 @@ c
       mode = 'MPOLE'
       call switch (mode)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
@@ -2720,12 +2740,14 @@ c
 !$OMP& tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,pot,epvir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
+!$OMP& shared(mutg,live,doskip)
 !$OMP DO reduction(+:dep,ufld,dufld,pot,epvir)
 c
 c     compute the dipole polarization gradient components
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -2878,7 +2900,9 @@ c
             zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -4165,6 +4189,7 @@ c
       use mplpot
       use molcul
       use mpole
+      use mutant
       use polar
       use polgrp
       use polopt
@@ -4266,6 +4291,8 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -4304,10 +4331,15 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     compute the dipole polarization gradient components
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         livei = live(mutg(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -4460,7 +4492,9 @@ c
             zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -5474,6 +5508,7 @@ c     calculate interaction with other unit cells
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -5632,7 +5667,9 @@ c
                dscale(k) = 1.0d0
                uscale(k) = 1.0d0
             end if
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -7019,6 +7056,7 @@ c
       use math
       use mplpot
       use mpole
+      use mutant
       use neigh
       use polar
       use polgrp
@@ -7121,6 +7159,8 @@ c
       real*8, allocatable :: decfx(:)
       real*8, allocatable :: decfy(:)
       real*8, allocatable :: decfz(:)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -7159,6 +7199,10 @@ c
       mode = 'EWALD'
       call switch (mode)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,rpole,uind,
@@ -7172,12 +7216,14 @@ c
 !$OMP& tcgnab,uad,uap,ubd,ubp,xaxis,yaxis,zaxis)
 !$OMP& shared (dep,ufld,dufld,pot,epvir)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale)
+!$OMP& shared(mutg,live,doskip)
 !$OMP DO reduction(+:dep,ufld,dufld,pot,epvir)
 c
 c     compute the dipole polarization gradient components
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          xi = x(i)
          yi = y(i)
          zi = z(i)
@@ -7330,7 +7376,9 @@ c
             zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)

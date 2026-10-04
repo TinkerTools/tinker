@@ -701,6 +701,8 @@ c
       real*8 field(3,*)
       real*8 fieldp(3,*)
       logical muti,mutk,dopr
+      logical livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -730,10 +732,15 @@ c
          pscale(i) = 1.0d0
       end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     find the electrostatic field due to permanent multipoles
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         livei = live(mutg(i))
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -841,6 +848,7 @@ c
             r2 = xr*xr + yr* yr + zr*zr
             mutk = .true.
             dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
             if (mutfield) then
                mutk = (mutg(k) .ne. 0)
                if (dopr)  dopr = (muti .or. mutk)
@@ -996,6 +1004,7 @@ c
       if (use_replica) then
          do ii = 1, npole
             i = ipole(ii)
+            livei = live(mutg(i))
             ci = rpole(1,i)
             dix = rpole(2,i)
             diy = rpole(3,i)
@@ -1114,7 +1123,10 @@ c
                   zr = z(k) - z(i)
                   call imager (xr,yr,zr,m)
                   r2 = xr*xr + yr* yr + zr*zr
-                  if (r2 .le. off2) then
+                  dopr = (r2 .le. off2)
+                  if (dopr .and. doskip)
+     &               dopr = (livei .and. live(mutg(k)))
+                  if (dopr) then
                      r = sqrt(r2)
 c
 c     intermediates involving moments and separation distance
@@ -1289,6 +1301,7 @@ c
       use couple
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpot
@@ -1314,6 +1327,8 @@ c
       real*8, allocatable :: wscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -1343,10 +1358,15 @@ c
          wscale(i) = 1.0d0
       end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     find the electrostatic field due to mutual induced dipoles
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         livei = live(mutg(i))
          dix = uind(1,i)
          diy = uind(2,i)
          diz = uind(3,i)
@@ -1395,7 +1415,9 @@ c
             zr = z(k) - z(i)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                dkx = uind(1,k)
                dky = uind(2,k)
@@ -1487,6 +1509,7 @@ c
       if (use_replica) then
          do ii = 1, npole
             i = ipole(ii)
+            livei = live(mutg(i))
             dix = uind(1,i)
             diy = uind(2,i)
             diz = uind(3,i)
@@ -1542,7 +1565,10 @@ c
                   zr = z(k) - z(i)
                   call imager (xr,yr,zr,m)
                   r2 = xr*xr + yr* yr + zr*zr
-                  if (r2 .le. off2) then
+                  dopr = (r2 .le. off2)
+                  if (dopr .and. doskip)
+     &               dopr = (livei .and. live(mutg(k)))
+                  if (dopr) then
                      r = sqrt(r2)
 c
 c     intermediates involving moments and separation distance
@@ -1699,6 +1725,8 @@ c
       real*8, allocatable :: fieldt(:,:)
       real*8, allocatable :: fieldtp(:,:)
       logical muti,mutk,dopr
+      logical livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -1730,6 +1758,10 @@ c
          end do
       end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
@@ -1739,12 +1771,14 @@ c
 !$OMP& p5iscale,d1scale,d2scale,d3scale,d4scale,nelst,elst,dpequal,
 !$OMP& use_thole,use_chgpen,use_bounds,off2,mutg,mutfield,field,fieldp)
 !$OMP& firstprivate(dscale,pscale) shared (fieldt,fieldtp)
+!$OMP& shared(live,doskip)
 !$OMP DO reduction(+:fieldt,fieldtp)
 c
 c     find the electrostatic field due to permanent multipoles
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -1852,6 +1886,7 @@ c
             r2 = xr*xr + yr* yr + zr*zr
             mutk = .true.
             dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
             if (mutfield) then
                mutk = (mutg(k) .ne. 0)
                if (dopr)  dopr = (muti .or. mutk)
@@ -2044,6 +2079,7 @@ c
       use couple
       use mplpot
       use mpole
+      use mutant
       use neigh
       use polar
       use polgrp
@@ -2072,6 +2108,8 @@ c
       real*8 fieldp(3,*)
       real*8, allocatable :: fieldt(:,:)
       real*8, allocatable :: fieldtp(:,:)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -2103,6 +2141,10 @@ c
          end do
       end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
@@ -2111,12 +2153,14 @@ c
 !$OMP& u1scale,u2scale,u3scale,u4scale,w2scale,w3scale,w4scale,w5scale,
 !$OMP& nelst,elst,use_thole,use_chgpen,use_bounds,off2,field,fieldp)
 !$OMP& firstprivate(uscale,wscale) shared (fieldt,fieldtp)
+!$OMP& shared(mutg,live,doskip)
 !$OMP DO reduction(+:fieldt,fieldtp)
 c
 c     find the electrostatic field due to mutual induced dipoles
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          dix = uind(1,i)
          diy = uind(2,i)
          diz = uind(3,i)
@@ -2165,7 +2209,9 @@ c
             zr = z(k) - z(i)
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                dkx = uind(1,k)
                dky = uind(2,k)
@@ -2637,6 +2683,8 @@ c
       real*8 field(3,*)
       real*8 fieldp(3,*)
       logical muti,mutk,dopr
+      logical livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -2658,10 +2706,15 @@ c
          dscale(i) = 1.0d0
       end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     compute real space Ewald field due to permanent multipoles
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         livei = live(mutg(i))
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -2770,6 +2823,7 @@ c
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
             if (mutfield) then
                if (dopr)  dopr = (muti .or. mutk)
             end if
@@ -2976,6 +3030,7 @@ c
       if (use_replica) then
          do ii = 1, npole
             i = ipole(ii)
+            livei = live(mutg(i))
             ci = rpole(1,i)
             dix = rpole(2,i)
             diy = rpole(3,i)
@@ -3095,6 +3150,8 @@ c
                   call imager (xr,yr,zr,m)
                   r2 = xr*xr + yr* yr + zr*zr
                   dopr = (r2 .le. off2)
+                  if (dopr .and. doskip)
+     &               dopr = (livei .and. live(mutg(k)))
                   if (mutfield) then
                      if (dopr)  dopr = (muti .or. mutk)
                   end if
@@ -3394,6 +3451,8 @@ c
       real*8, allocatable :: fieldtp(:,:)
       real*8, allocatable :: dlocal(:,:)
       logical muti,mutk,dopr
+      logical livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -3447,6 +3506,10 @@ c
          end do
       end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,rpole,x,y,z,pcore,
@@ -3458,12 +3521,14 @@ c
 !$OMP& mutg,mutfield,nslice,ntpair,tindex,tdipdip,toffset,field,fieldp,
 !$OMP& fieldt,fieldtp)
 !$OMP& firstprivate(pscale,dscale,uscale,wscale,nlocal)
+!$OMP& shared(live,doskip)
 !$OMP DO reduction(+:fieldt,fieldtp) schedule(static,nslice)
 c
 c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole
          i = ipole(ii)
+         livei = live(mutg(i))
          ci = rpole(1,i)
          dix = rpole(2,i)
          diy = rpole(3,i)
@@ -3596,6 +3661,7 @@ c
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
             dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
             if (mutfield) then
                if (dopr)  dopr = (muti .or. mutk)
             end if
@@ -4170,6 +4236,7 @@ c
       use math
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpot
@@ -4197,6 +4264,8 @@ c
       real*8, allocatable :: wscale(:)
       real*8 field(3,*)
       real*8 fieldp(3,*)
+      logical dopr,livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -4218,10 +4287,15 @@ c
          wscale(i) = 1.0d0
       end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole-1
          i = ipole(ii)
+         livei = live(mutg(i))
          dix = uind(1,i)
          diy = uind(2,i)
          diz = uind(3,i)
@@ -4270,7 +4344,9 @@ c
             zr = z(k) - z(i)
             call image (xr,yr,zr)
             r2 = xr*xr + yr* yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                rr1 = 1.0d0 / r
                rr2 = rr1 * rr1
@@ -4373,6 +4449,7 @@ c
       if (use_replica) then
          do ii = 1, npole
             i = ipole(ii)
+            livei = live(mutg(i))
             dix = uind(1,i)
             diy = uind(2,i)
             diz = uind(3,i)
@@ -4428,7 +4505,10 @@ c
                   zr = z(k) - z(i)
                   call imager (xr,yr,zr,m)
                   r2 = xr*xr + yr* yr + zr*zr
-                  if (r2 .le. off2) then
+                  dopr = (r2 .le. off2)
+                  if (dopr .and. doskip)
+     &               dopr = (livei .and. live(mutg(k)))
+                  if (dopr) then
                      r = sqrt(r2)
                      rr1 = 1.0d0 / r
                      rr2 = rr1 * rr1
@@ -7222,6 +7302,7 @@ c
       use limits
       use mplpot
       use mpole
+      use mutant
       use polar
       use polgrp
       use polpcg
@@ -7245,6 +7326,8 @@ c      real*8 polmin
       real*8 rsdp(3,*)
       real*8 zrsd(3,*)
       real*8 zrsdp(3,*)
+      logical livei,doskip
+      logical live(0:2)
       character*6 mode
 c
 c
@@ -7330,12 +7413,17 @@ c
             wscale(i) = 1.0d0
          end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+         call eleclive (live,doskip)
+c
 c     determine the off-diagonal elements of the preconditioner
 c
          off2 = usolvcut * usolvcut
          m = 0
          do ii = 1, npole-1
             i = ipole(ii)
+            livei = live(mutg(i))
             xi = x(i)
             yi = y(i)
             zi = z(i)
@@ -7391,8 +7479,17 @@ c
                      dmpik(5) = wscale(k) * dmpik(5)
                   end if
                   polik = poli * polarity(k)
-                  rr3 = dmpik(3) * polik / (r*r2)
-                  rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
+c
+c     a pair outside the live groups stores a zero block, which
+c     keeps the packed elements in step with the apply phase
+c
+                  if (livei .and. live(mutg(k))) then
+                     rr3 = dmpik(3) * polik / (r*r2)
+                     rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
+                  else
+                     rr3 = 0.0d0
+                     rr5 = 0.0d0
+                  end if
                   minv(m+1) = rr5*xr*xr - rr3
                   minv(m+2) = rr5*xr*yr
                   minv(m+3) = rr5*xr*zr
@@ -7458,6 +7555,7 @@ c
       use limits
       use mplpot
       use mpole
+      use mutant
       use neigh
       use polar
       use polgrp
@@ -7481,6 +7579,8 @@ c      real*8 polmin
       real*8 rsdp(3,*)
       real*8 zrsd(3,*)
       real*8 zrsdp(3,*)
+      logical livei,doskip
+      logical live(0:2)
       real*8, allocatable :: zrsdt(:,:)
       real*8, allocatable :: zrsdtp(:,:)
       character*6 mode
@@ -7597,6 +7697,10 @@ c
             wscale(i) = 1.0d0
          end do
 c
+c     flag the atom groups that take part in pair interactions
+c
+         call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(npole,ipole,x,y,z,polarity,
@@ -7604,12 +7708,14 @@ c
 !$OMP& w5scale,n12,i12,n13,i13,n14,i14,n15,i15,np11,ip11,np12,ip12,
 !$OMP& np13,ip13,np14,ip14,use_thole,use_chgpen,nulst,ulst,mindex,minv)
 !$OMP& firstprivate (uscale,wscale)
+!$OMP& shared(mutg,live,doskip)
 c
 c     determine the off-diagonal elements of the preconditioner
 c
 !$OMP DO
          do ii = 1, npole
             i = ipole(ii)
+            livei = live(mutg(i))
             xi = x(i)
             yi = y(i)
             zi = z(i)
@@ -7665,8 +7771,17 @@ c
                   dmpik(5) = wscale(k) * dmpik(5)
                end if
                polik = poli * polarity(k)
-               rr3 = dmpik(3) * polik / (r*r2)
-               rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
+c
+c     a pair outside the live groups stores a zero block, which
+c     keeps the packed elements in step with the apply phase
+c
+               if (livei .and. live(mutg(k))) then
+                  rr3 = dmpik(3) * polik / (r*r2)
+                  rr5 = 3.0d0 * dmpik(5) * polik / (r*r2*r2)
+               else
+                  rr3 = 0.0d0
+                  rr5 = 0.0d0
+               end if
                minv(m+1) = rr5*xr*xr - rr3
                minv(m+2) = rr5*xr*yr
                minv(m+3) = rr5*xr*zr

@@ -50,6 +50,7 @@ c
       call test_mutate_vsoft1
       call test_mutate_noewald
       call test_mutate_ion
+      call test_mutate_overlap
       call test_mutate_scexp
       call test_mutate_epdtsave
       call test_mutate_gate
@@ -1893,6 +1894,68 @@ c
 c
       call test_mutate_calc ('ionwat','179_ionwat_ast_l05.key',
      &   '179_ionwat_ast_l05.txt','179_ionwat_ast_l05',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_overlap  --  coincident ligands  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_overlap" runs fixtures 180-188, where an annihilated
+c     ligand sits exactly on other atoms; 180-183 are two waters with
+c     the second a ghost on the first or 1.0d-6 Ang off it, at fixed
+c     lambdas and with van der Waals on the main lambda, and every
+c     term is zero so no energy component is listed; 184 repeats 181
+c     under Ewald; 185 and 186 place ligand 2 of the staged relative
+c     water on ligand 1, as the Ewald ligand 1 leg of 120 and the
+c     cutoff ligand 2 leg of 157, where the charging ligand keeps its
+c     lambda derivative; 187 and 188 are the middle leg of 116, with
+c     both ligands uncharged, on that geometry and 1.0d-6 Ang off it
+c
+c
+      subroutine test_mutate_overlap
+      implicit none
+c
+c
+      call test_mutate_calc ('wat2ovl','180_wat2ovl_m00v00.key',
+     &   '180_wat2ovl_m00v00.txt','180_wat2ovl_m00v00',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('wat2ovl','181_wat2ovl_m00_d1_l00.key',
+     &   '181_wat2ovl_m00_d1_l00.txt','181_wat2ovl_m00_d1_l00',
+     &   .false., .false., .false., .false., .true.)
+      call test_mutate_calc ('wat2near','182_wat2near_m00v00.key',
+     &   '182_wat2near_m00v00.txt','182_wat2near_m00v00',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('wat2near','183_wat2near_m00_d1_l00.key',
+     &   '183_wat2near_m00_d1_l00.txt','183_wat2near_m00_d1_l00',
+     &   .false., .false., .false., .false., .true.)
+      call test_mutate_calc ('wat2ovl','184_wat2ovl_ye_m00_d1_l00.key',
+     &   '184_wat2ovl_ye_m00_d1_l00.txt','184_wat2ovl_ye_m00_d1_l00',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2ovl',
+     &   '185_water2ovl_rels_ye_lig1_ex3_l085.key',
+     &   '185_water2ovl_rels_ye_lig1_ex3_l085.txt',
+     &   '185_water2ovl_rels_ye_lig1_ex3_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2ovl',
+     &   '186_water2ovl_rels_ne_lig2_l015.key',
+     &   '186_water2ovl_rels_ne_lig2_l015.txt',
+     &   '186_water2ovl_rels_ne_lig2_l015',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2ovl',
+     &   '187_water2ovl_rels_ye_vdwm_exp_l050.key',
+     &   '187_water2ovl_rels_ye_vdwm_exp_l050.txt',
+     &   '187_water2ovl_rels_ye_vdwm_exp_l050',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2near',
+     &   '188_water2near_rels_ye_vdwm_exp_l050.key',
+     &   '188_water2near_rels_ye_vdwm_exp_l050.txt',
+     &   '188_water2near_rels_ye_vdwm_exp_l050',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
       return
       end
