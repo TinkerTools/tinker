@@ -50,13 +50,14 @@ c
      &                         '1e-4')
       call test_testlmda_case ('20_water_rels_lig1_dt_polonly_l078',
      &                         '1e-4')
-      call test_testlmda_case ('21_water_rels_lig1_st_prng_l088','1e-4')
-      call test_testlmda_case ('22_water_rels_lig1_dt_prng_l088','1e-4')
-      call test_testlmda_case ('23_water_rels_lig2_st_pmap_l015','1e-4')
+      call test_testlmda_case ('21_water_rels_lig1_st_l088','1e-4')
+      call test_testlmda_case ('22_water_rels_lig1_dt_l088','1e-4')
+      call test_testlmda_case ('23_water_rels_3stg_l085','1e-4')
       call test_testlmda_xyz ('24_ionwat_ewald_l05','ionwat','1e-4')
       call test_testlmda_xyz ('25_ionwat_ewald_nlist_l05','ionwat',
      &                        '1e-4')
       call test_testlmda_xyz ('26_ionwat_pol_ewald_l05','ionwat','1e-4')
+      call test_testlmda_case ('27_water_rels_2stg_l075','1e-4')
       return
       end
 c

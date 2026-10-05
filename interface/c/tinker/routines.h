@@ -318,6 +318,8 @@ inline void tinker_f_sublmdamap(double* lmda, tinker_fchars map, int* nexp, int*
 }
 void maprelstage_(double* lmda);
 #define tinker_f_maprelstage maprelstage_
+void relstgloc_(double* lmda, double* s, double* ds);
+#define tinker_f_relstgloc relstgloc_
 void relpowerwt_(double* x, int* nexp, double* w, double* dw, double* d2w);
 #define tinker_f_relpowerwt relpowerwt_
 void relneed_(double* w, double* dw, double* d2w, double* chain, double* d2chain, int* need0, int* need1);

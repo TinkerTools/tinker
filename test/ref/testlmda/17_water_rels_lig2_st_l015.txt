@@ -22,7 +22,7 @@
  Torsion Angle Lambda Value            1.000
 
  Free Energy Mode            Staged Relative
- Staged Leg                             LIG2
+ Staged Leg LIG2 Range         0.000   0.300
  Sampling Mode                  Fixed Lambda
  Polarization Topology                Single
  Main Lambda Value                     0.150

@@ -38,6 +38,8 @@ c
       call test_mutate_lmdadrv
       call test_mutate_lmdapin
       call test_mutate_relsmap
+      call test_mutate_relstg
+      call test_mutate_stgscale
       call test_mutate_apm
       call test_mutate_vsoft
       call test_mutate_g3
@@ -1424,6 +1426,188 @@ c
      &   '121_water_rels_ye_lig2_ix2_l015.txt',
      &   '121_water_rels_ye_lig2_ix2_l015',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_relstg  --  several staged legs  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_relstg" runs the twelve water fixtures 189-200 that
+c     declare the lambda range of each staged relative leg on the
+c     "rel-stage" keyword, so one main lambda walks several legs; the
+c     082-088 set is that same schedule taken one leg at a time, with
+c     ligand 2 discharged over 0.0 to 0.3, van der Waals morphed over
+c     0.3 to 0.7 and ligand 1 charged over 0.7 to 1.0, so every case
+c     here is held to the reference of the single leg fixture that sits
+c     at the same state and no reference of its own is needed
+c
+c     189 to 195 declare all three legs and repeat 082 to 088 at main
+c     lambda values 1.0, 0.85, 0.7, 0.5, 0.3, 0.15 and 0.0, where 0.7
+c     and 0.3 are the junctions between legs; 196 repeats 190 with the
+c     "lambda-deriv" keyword against 142; 197 and 198 declare only the
+c     VDWM and LIG1 legs, 198 placing the main lambda below both so the
+c     lower end state of the VDWM leg is held with a flat slope; 199
+c     shortens the LIG2 leg to leave a gap and sits inside it, where
+c     the end state of the LIG2 leg is held; 200 declares the VDWM leg
+c     alone with its bounds reversed, which are swapped on input
+c
+c
+      subroutine test_mutate_relstg
+      implicit none
+c
+c
+      call test_mutate_calc ('water2','189_water_rels3_l100.key',
+     &   '082_water_rels_ye_l100.txt','189_water_rels3_l100',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','190_water_rels3_l085.key',
+     &   '083_water_rels_ye_l085.txt','190_water_rels3_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','191_water_rels3_l070.key',
+     &   '084_water_rels_ye_l070.txt','191_water_rels3_l070',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','192_water_rels3_l050.key',
+     &   '085_water_rels_ye_l050.txt','192_water_rels3_l050',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','193_water_rels3_l030.key',
+     &   '086_water_rels_ye_l030.txt','193_water_rels3_l030',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','194_water_rels3_l015.key',
+     &   '087_water_rels_ye_l015.txt','194_water_rels3_l015',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','195_water_rels3_l000.key',
+     &   '088_water_rels_ye_l000.txt','195_water_rels3_l000',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','196_water_rels3_st_l085.key',
+     &   '142_water_rels_st_l085.txt','196_water_rels3_st_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','197_water_rels2_l085.key',
+     &   '083_water_rels_ye_l085.txt','197_water_rels2_l085',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','198_water_rels2_l015.key',
+     &   '111_water_rels_ye_vdwm_l030.txt','198_water_rels2_l015',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','199_water_rels3_gap_l025.key',
+     &   '086_water_rels_ye_l030.txt','199_water_rels3_gap_l025',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('water2','200_water_rels1_flip_l050.key',
+     &   '085_water_rels_ye_l050.txt','200_water_rels1_flip_l050',
+     &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_mutate_stgscale  --  staged leg rescale  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_mutate_stgscale" runs the water fixture 201, which walks
+c     the LIG2 leg of 117 on the same exponential map but over the main
+c     lambda range 0.0 to 0.5, at a main lambda of 0.15; the map is
+c     taken on the local coordinate of the leg, so this is the state of
+c     117 at its main lambda of 0.3 with the leg compressed to half the
+c     width; the energy, gradient and virial must match the reference
+c     of 117, while the first lambda derivatives are twice and the
+c     second four times those of 117
+c
+c
+      subroutine test_mutate_stgscale
+      use atoms
+      use dlmda
+      use energi
+      use virial
+      implicit none
+      integer i,j,nat,natl
+      real*8 e,ref_e,ref_ei
+      real*8 eps_e,eps_g,eps_v,eps_l
+      real*8 refv(3,3)
+      real*8 ref_dedl(4),ref_d2edl2(4),ref_dvdl(3,3)
+      real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: refg(:,:)
+      real*8, allocatable :: ref_lg(:,:)
+      logical skiptest
+      character*240 rpath
+      character*40 pre
+c
+c
+      pre = 'test_201_water_rels1_lig2_exp_l015'
+      if (skiptest(trim(pre),'mutate'))  return
+c
+c     set up the compressed leg and read the reference of the full one
+c
+      call pushdir ('file/mutate')
+      call loadfix ('water2','201_water_rels1_lig2_exp_l015.key')
+      allocate (derivs(3,n))
+      allocate (refg(3,n))
+      allocate (ref_lg(3,n))
+      call refpath ('mutate','117_water_rels_ye_lig2_exp_l030.txt',
+     &              rpath)
+      call load_ref (rpath,n,ref_e,ref_ei,refv,refg,nat)
+      call load_lmdaref (rpath,n,ref_dedl,ref_d2edl2,ref_lg,
+     &                   ref_dvdl,natl)
+      eps_e = 1.0d-4
+      eps_g = 1.0d-4
+      eps_v = 1.0d-3
+      eps_l = 1.0d-4
+c
+c     a leg of half the width doubles the slope of its local coordinate
+c
+      do i = 1, 4
+         ref_dedl(i) = 2.0d0 * ref_dedl(i)
+         ref_d2edl2(i) = 4.0d0 * ref_d2edl2(i)
+      end do
+      do i = 1, n
+         do j = 1, 3
+            ref_lg(j,i) = 2.0d0 * ref_lg(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            ref_dvdl(j,i) = 2.0d0 * ref_dvdl(j,i)
+         end do
+      end do
+c
+c     the state matches the full leg and the lambda derivatives scale
+c
+      call gradient (e,derivs)
+      call assert_real (esum,ref_e,eps_e,trim(pre)//' energy')
+      call assert_grad (derivs,refg,n,eps_g,trim(pre)//' grad')
+      call assert_grad (vir,refv,3,eps_v,trim(pre)//' virial')
+      call assert_real (dedl,ref_dedl(1),2.0d0*eps_l,
+     &                  trim(pre)//' dE/dL')
+      call assert_real (devdl,ref_dedl(2),2.0d0*eps_l,
+     &                  trim(pre)//' dEV/dL')
+      call assert_real (demdl,ref_dedl(3),2.0d0*eps_l,
+     &                  trim(pre)//' dEM/dL')
+      call assert_real (depdl,ref_dedl(4),2.0d0*eps_l,
+     &                  trim(pre)//' dEP/dL')
+      call assert_real (d2edl2,ref_d2edl2(1),4.0d0*eps_l,
+     &                  trim(pre)//' d2E/dL2')
+      call assert_real (d2evdl2,ref_d2edl2(2),4.0d0*eps_l,
+     &                  trim(pre)//' d2EV/dL2')
+      call assert_real (d2emdl2,ref_d2edl2(3),4.0d0*eps_l,
+     &                  trim(pre)//' d2EM/dL2')
+      call assert_real (d2epdl2,ref_d2edl2(4),4.0d0*eps_l,
+     &                  trim(pre)//' d2EP/dL2')
+      call assert_grad (dfsumdl,ref_lg,n,2.0d0*eps_g,
+     &                  trim(pre)//' lgrad')
+      call assert_grad (dvirdl,ref_dvdl,3,2.0d0*eps_v,
+     &                  trim(pre)//' dV/dL')
+c
+c     clean up
+c
+      deallocate (derivs)
+      deallocate (refg)
+      deallocate (ref_lg)
+      call popdir
+      call final
       return
       end
 c

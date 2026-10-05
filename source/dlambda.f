@@ -249,7 +249,8 @@ c     ################################################################
 c
 c
 c     "maprelstage" maps the main lambda "lmda" onto the sublambdas of
-c     the one staged relative leg with the following configuration:
+c     the staged relative schedule, where each declared leg spans its
+c     own range of the main lambda with the following configuration:
 c
 c        LIG2   charge ligand 2 with ligand 1 annihilated, its
 c                 weight falling as the main lambda rises
@@ -258,8 +259,9 @@ c                 der Waals morphs from ligand 2 onto ligand 1
 c        LIG1   charge ligand 1 with ligand 2 annihilated, its
 c                 weight rising with the main lambda
 c
-c     as in the absolute free energy, the electrostatic and polarization
-c     weights of a charging leg each follow their own map and window
+c     the leg holding "lmda" is walked on its local coordinate, the
+c     term it drives following its own map across the whole leg, and
+c     polarization always carries the electrostatic weight
 c
 c
       subroutine maprelstage (lmda)
@@ -267,26 +269,31 @@ c
       use mutant
       implicit none
       real*8 lmda
+      real*8 s,ds
 c
+c
+c     find the active leg and the local coordinate along it
+c
+      call relstgloc (lmda,s,ds)
 c
 c     the middle leg holds both ligands uncharged, so electrostatics
-c     and polarization sit at the reference state and leave the chain
-c     rule while van der Waals morphs across its map
+c     sits at the reference state and leaves the chain rule while
+c     van der Waals morphs across its map
 c
       if (relstage .eq. 'VDWM') then
          elambda = 0.0d0
          deldlmda = 0.0d0
          d2eldlmda2 = 0.0d0
-         call sublmdamap (lmda,vlmdamap,vlmdaexp,vlmdainvn,vlmdainveps,
-     &                    vlmdaapmn,vlmdaapmrho,qntvlmda0,qntvlmda1,
+         call sublmdamap (s,vlmdamap,vlmdaexp,vlmdainvn,vlmdainveps,
+     &                    vlmdaapmn,vlmdaapmrho,0.0d0,1.0d0,
      &                    vlambda,dvldlmda,d2vldlmda2)
 c
 c     the ligand 1 leg charges ligand 1 with ligand 2 annihilated and
 c     van der Waals already morphed onto ligand 1
 c
       else if (relstage .eq. 'LIG1') then
-         call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
-     &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
+         call sublmdamap (s,elmdamap,elmdaexp,elmdainvn,elmdainveps,
+     &                    elmdaapmn,elmdaapmrho,0.0d0,1.0d0,
      &                    elambda,deldlmda,d2eldlmda2)
          vlambda = 1.0d0
          dvldlmda = 0.0d0
@@ -297,8 +304,8 @@ c     its weight is the complement of the map, with van der Waals still
 c     on it
 c
       else
-         call sublmdamap (lmda,elmdamap,elmdaexp,elmdainvn,elmdainveps,
-     &                    elmdaapmn,elmdaapmrho,qntelmda0,qntelmda1,
+         call sublmdamap (s,elmdamap,elmdaexp,elmdainvn,elmdainveps,
+     &                    elmdaapmn,elmdaapmrho,0.0d0,1.0d0,
      &                    elambda,deldlmda,d2eldlmda2)
          elambda = 1.0d0 - elambda
          deldlmda = -deldlmda
@@ -312,27 +319,77 @@ c     numerical guard on the map complement
 c
       elambda = min(1.0d0,max(0.0d0,elambda))
 c
-c     polarization follows its own map on a charging leg, just as the
-c     multipoles do, as the complement of that map on the ligand 2 leg;
-c     the middle leg holds it at zero with the multipoles
+c     carry the chain rule from the local coordinate of the leg back
+c     to the main lambda
 c
-      if (relstage .eq. 'VDWM') then
-         plambda = 0.0d0
-         dpldlmda = 0.0d0
-         d2pldlmda2 = 0.0d0
-      else
-         call sublmdamap (lmda,plmdamap,plmdaexp,plmdainvn,plmdainveps,
-     &                    plmdaapmn,plmdaapmrho,qntplmda0,qntplmda1,
-     &                    plambda,dpldlmda,d2pldlmda2)
-         if (relstage .eq. 'LIG2') then
-            plambda = 1.0d0 - plambda
-            dpldlmda = -dpldlmda
-            d2pldlmda2 = -d2pldlmda2
-         end if
-         plambda = min(1.0d0,max(0.0d0,plambda))
-      end if
+      deldlmda = deldlmda * ds
+      d2eldlmda2 = d2eldlmda2 * ds * ds
+      dvldlmda = dvldlmda * ds
+      d2vldlmda2 = d2vldlmda2 * ds * ds
+c
+c     polarization stages with the multipoles, same state same weight
+c
+      plambda = elambda
+      dpldlmda = deldlmda
+      d2pldlmda2 = d2eldlmda2
       return
       end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine relstgloc -- active leg and local coordinate  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "relstgloc" finds the declared leg of the staged relative
+c     schedule that holds the main lambda "lmda" and makes it the
+c     active leg, returning the local coordinate "s" running from zero
+c     to one across that leg and its derivative "ds" with respect to
+c     the main lambda; a main lambda outside every declared range holds
+c     the end state of the adjacent leg, where the derivative is zero
+c
+c
+      subroutine relstgloc (lmda,s,ds)
+      use dlmda
+      implicit none
+      integer i,k
+      real*8 lmda,s,ds
+      real*8 lo,hi
+      character*4 leg(3)
+      data leg  / 'LIG2', 'VDWM', 'LIG1' /
+c
+c
+c     take the last declared leg starting at or below the main lambda,
+c     or the first declared leg when the main lambda lies below all
+c
+      k = 0
+      do i = 1, 3
+         if (use_relstg(i)) then
+            if (k.eq.0 .or. lmda.ge.relstglo(i))  k = i
+         end if
+      end do
+c
+c     with no leg declared the active leg is left as it was set, and
+c     spans the whole main lambda
+c
+      s = lmda
+      ds = 1.0d0
+      if (k .eq. 0)  return
+c
+c     set the active leg and the local coordinate along it
+c
+      relstage = leg(k)
+      lo = relstglo(k)
+      hi = relstghi(k)
+      ds = 1.0d0 / (hi-lo)
+      s = min(1.0d0,max(0.0d0,(lmda-lo)*ds))
+      if (lmda .ge. hi)  s = 1.0d0
+      if (lmda.lt.lo .or. lmda.gt.hi)  ds = 0.0d0
+      return
+      end
+c
 c
 c     ############################################################
 c     ##                                                        ##

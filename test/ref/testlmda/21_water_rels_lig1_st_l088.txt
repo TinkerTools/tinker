@@ -18,11 +18,11 @@
  Number of FEP Hybrid Atoms                6
  van der Waals Lambda Value            1.000
  Electrostatics Lambda Value           0.683
- Polarization Lambda Value             0.317
+ Polarization Lambda Value             0.683
  Torsion Angle Lambda Value            1.000
 
  Free Energy Mode            Staged Relative
- Staged Leg                             LIG1
+ Staged Leg LIG1 Range         0.700   1.000
  Sampling Mode                  Fixed Lambda
  Polarization Topology                Single
  Main Lambda Value                     0.880
@@ -32,10 +32,10 @@
  Number of Ligand2 Atoms                   3
 
  Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                         -4.452896      0.000000     -1.047573     -3.405324
+                                         -3.559456      0.000000     -1.047573     -2.511884
 
  Numerical Lambda Derivatives :              dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                         -4.452889      0.000000     -1.047572     -3.405317
+                                         -3.559453      0.000000     -1.047572     -2.511881
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
                                           0.000000      0.000000      0.000000      0.000000

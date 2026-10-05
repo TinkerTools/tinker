@@ -49,9 +49,11 @@ c
       integer ntbnd
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
+      character*4 leg(3)
       character*20 keyword
       character*240 record
       character*240 string
+      data leg  / 'LIG2', 'VDWM', 'LIG1' /
 c
 c
 c     perform dynamic allocation of some global arrays
@@ -259,9 +261,14 @@ c
 c     report the mode chosen along each axis of the calculation
 c
          if (use_rel) then
-            write (iout,60)  relstage
-   60       format (/,' Free Energy Mode',12x,'Staged Relative',
-     &              /,' Staged Leg',29x,a4)
+            write (iout,60)
+   60       format (/,' Free Energy Mode',12x,'Staged Relative')
+            do i = 1, 3
+               if (use_relstg(i)) then
+                  write (iout,70)  leg(i),relstglo(i),relstghi(i)
+   70             format (' Staged Leg ',a4,' Range',6x,2f8.3)
+               end if
+            end do
          else
             write (iout,80)
    80       format (/,' Free Energy Mode',19x,'Absolute')
@@ -342,6 +349,7 @@ c
       integer i,j,k
       integer next
       real*8 temp
+      real*8 lo,hi
       character*4 legword
       character*20 keyword
       character*240 record
@@ -376,6 +384,11 @@ c
 c     set defaults for the staged relative free energy schedule
 c
       relstage = 'VDWM'
+      do i = 1, 3
+         use_relstg(i) = .false.
+         relstglo(i) = 0.0d0
+         relstghi(i) = 1.0d0
+      end do
 c
 c     set default mapping from main lambda to sublambda
 c
@@ -553,7 +566,35 @@ c
             use_mainlmda = .true.
             call getword (record,legword,next)
             call upcase (legword)
-            relstage = legword
+            k = 0
+            if (legword .eq. 'LIG2')  k = 1
+            if (legword .eq. 'VDWM')  k = 2
+            if (legword .eq. 'LIG1')  k = 3
+            if (k .eq. 0) then
+               write (iout,2)
+    2          format (/,' MUTATE_DLMDA  --  REL-STAGE requires the',
+     &                    ' leg to be named; use LIG2 to discharge',
+     &                    ' ligand 2, VDWM to morph van der Waals, or',
+     &                    ' LIG1 to charge ligand 1')
+               call fatal
+            end if
+c
+c     a leg spans the whole main lambda unless it names both bounds
+c
+            use_relstg(k) = .true.
+            relstglo(k) = 0.0d0
+            relstghi(k) = 1.0d0
+            string = record(next:240)
+            read (string,*,err=5,end=5)  lo,hi
+            relstglo(k) = lo
+            relstghi(k) = hi
+            goto 10
+    5       continue
+            read (string,*,err=10,end=10)  lo
+            write (iout,7)
+    7       format (/,' MUTATE_DLMDA  --  REL-STAGE takes both bounds',
+     &                 ' of the main lambda range of a leg, or neither')
+            call fatal
          end if
    10    continue
       end do
@@ -720,22 +761,6 @@ c
          qntvlmda1 = temp
       end if
 c
-c     a staged run drives one leg, so the leg must be named; the map it
-c     walks, the window of that map and the dual topology exponent of
-c     the term it drives are all free, as on any other relative leg
-c
-      if (use_rel) then
-         if (relstage.ne.'LIG1' .and. relstage.ne.'LIG2'
-     &          .and. relstage.ne.'VDWM') then
-            write (iout,30)
-   30       format (/,' MUTATE_DLMDA  --  REL-STAGE requires the leg',
-     &                 ' to be named; use LIG2 to discharge ligand 2,',
-     &                 ' VDWM to morph van der Waals, or LIG1 to',
-     &                 ' charge ligand 1')
-            call fatal
-         end if
-      end if
-c
 c     single topology evaluates polarization from one parameter state
 c     at plambda, independently of the electrostatic lambda state
 c
@@ -829,11 +854,11 @@ c     derivative, and so which of them has to be routed to its "empole4"
 c     flavored energy routine rather than the plain gradient one
 c
 c     a term qualifies when the main lambda drives its sublambda through
-c     a map, except on a staged relative leg, which walks one window and
-c     pins the sublambdas of the other terms to a constant; a pinned
-c     sublambda has a flat chain rule, so its term has nothing for the
-c     lambda derivative to sample and the plain routine gives the same
-c     answer for less work
+c     a map, except on a staged relative schedule, where a term that no
+c     declared leg drives has its sublambda pinned to a constant; a
+c     pinned sublambda has a flat chain rule, so its term has nothing
+c     for the lambda derivative to sample and the plain routine gives
+c     the same answer for less work
 c
 c     "gradient" zeroes every lambda derivative accumulator before it
 c     dispatches, so a term left out here reports exact zeros
@@ -849,12 +874,11 @@ c
       use_pdlmda = use_dlmda .and. use_plmdamap
       use_vdlmda = use_dlmda .and. use_vlmdamap
       if (use_rel) then
-         if (relstage .eq. 'VDWM') then
+         if (.not. (use_relstg(1) .or. use_relstg(3))) then
             use_edlmda = .false.
             use_pdlmda = .false.
-         else
-            use_vdlmda = .false.
          end if
+         if (.not. use_relstg(2))  use_vdlmda = .false.
       end if
       return
       end
@@ -1323,7 +1347,9 @@ c
       use potent
       use vdwpot
       implicit none
-      integer i,next
+      integer i,k,next
+      integer nstg
+      real*8 eps,temp
       logical polsave
       character*20 keyword
       character*240 record
@@ -1430,6 +1456,68 @@ c
          write (iout,100)
   100    format (/,' MUTATE_CHECK  --  REL-STAGE requires a second',
      &              ' ligand group; add the LIGAND2 keyword')
+         call fatal
+      end if
+c
+c     the staged legs must follow one another without overlap in the
+c     order LIG2, VDWM and LIG1 of rising main lambda; bounds given in
+c     reverse are swapped, and two legs that meet share one bound
+c
+      eps = 1.0d-8
+      nstg = 0
+      k = 0
+      do i = 1, 3
+         if (use_relstg(i)) then
+            nstg = nstg + 1
+            relstglo(i) = min(1.0d0,max(0.0d0,relstglo(i)))
+            relstghi(i) = min(1.0d0,max(0.0d0,relstghi(i)))
+            if (relstghi(i) .lt. relstglo(i)) then
+               temp = relstglo(i)
+               relstglo(i) = relstghi(i)
+               relstghi(i) = temp
+            end if
+            if (k .ne. 0) then
+               if (relstglo(i) .lt. relstghi(k)-eps) then
+                  write (iout,101)
+  101             format (/,' MUTATE_CHECK  --  REL-STAGE ranges must',
+     &                       ' not overlap and must follow the order',
+     &                       ' LIG2, VDWM, LIG1 as the main lambda',
+     &                       ' rises')
+                  call fatal
+               end if
+               if (relstglo(i) .lt. relstghi(k)+eps) then
+                  relstglo(i) = relstghi(k)
+               end if
+            end if
+            if (relstghi(i) .le. relstglo(i)) then
+               write (iout,102)
+  102          format (/,' MUTATE_CHECK  --  REL-STAGE range must span',
+     &                    ' a nonzero width of the main lambda')
+               call fatal
+            end if
+            k = i
+         end if
+      end do
+c
+c     van der Waals has to morph between the two charging legs
+c
+      if (use_relstg(1) .and. use_relstg(3)
+     &       .and. .not.use_relstg(2)) then
+         write (iout,103)
+  103    format (/,' MUTATE_CHECK  --  REL-STAGE with the LIG2 and',
+     &              ' LIG1 legs requires the VDWM leg between them')
+         call fatal
+      end if
+c
+c     legs that share a main lambda meet with a flat slope only on
+c     the quintic map
+c
+      if (nstg.gt.1 .and.
+     &    (elmdamap.ne.'QNT' .or. vlmdamap.ne.'QNT')) then
+         write (iout,104)
+  104    format (/,' MUTATE_CHECK  --  REL-STAGE with more than one',
+     &              ' leg requires the QNT lambda map; remove the',
+     &              ' ELE-LMDA-MAP and VDW-LMDA-MAP keywords')
          call fatal
       end if
 c

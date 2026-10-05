@@ -217,6 +217,11 @@ c
       use_vdlmda = .false.
       use_vlmdamap = .false.
       relstage = 'VDWM'
+      do i = 1, 3
+         use_relstg(i) = .false.
+         relstglo(i) = 0.0d0
+         relstghi(i) = 1.0d0
+      end do
 c
 c     flag for use of rigid bodies
 c

@@ -59,21 +59,20 @@ c
       character*14 name(nfix)
       character*10 tags(nfix)
       character*1 lvl(3)
-      data dir   / 'mpolestate', 'testlmda', 'mutate', 'mutate',
+      data dir   / 'mpolestate', 'mpolestate', 'mutate', 'mutate',
      &             'mpolestate', 'mpolestate', 'mpolestate',
      &             'mpolestate' /
-      data base  / '../mutate/water2', 'water2', 'water2', 'water2',
-     &             '../mutate/water2', '../mutate/water2',
+      data base  / '../mutate/water2', '../mutate/water2', 'water2',
+     &             'water2', '../mutate/water2', '../mutate/water2',
      &             '../rephippo/h2o10', '../mutate/water2' /
-      data key   / 'rels_prng_nodl.key',
-     &             '21_water_rels_lig1_st_prng_l088.key',
+      data key   / 'abs_prng_nodl.key', 'abs_prng_dl.key',
      &             '142_water_rels_st_l085.key',
      &             '083_water_rels_ye_l085.key',
      &             'emast_mponly.key', 'polpinned.key',
-     &             'hippo_cflux.key', 'rels_prng_l100.key' /
-      data name  / 'rels_prng_nodl', 'rels_prng_dl', 'rels_st',
+     &             'hippo_cflux.key', 'rels_l100.key' /
+      data name  / 'abs_prng_nodl', 'abs_prng_dl', 'rels_st',
      &             'epdt', 'emast_mponly', 'polpinned', 'hippo_cflux',
-     &             'rels_prng_l100' /
+     &             'rels_l100' /
       data tags  / 'mutate', 'mutate', 'mutate', 'mutate', 'mutate',
      &             'mutate', 'hippo', 'mutate' /
       data lvl   / '0', '1', '3' /
@@ -186,8 +185,8 @@ c
 c
 c
       if (skiptest(tname,'mpolestate,mutate'))  return
-      call pushdir ('file/testlmda')
-      call loadfix ('water2','21_water_rels_lig1_st_prng_l088.key')
+      call pushdir ('file/mpolestate')
+      call loadfix ('../mutate/water2','abs_prng_dl.key')
       allocate (derivs(3,n))
       allocate (uind0(3,n))
       call assert_logical (use_prst,.true.,tname//' single topology')

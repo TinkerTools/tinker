@@ -974,8 +974,8 @@ c     ###########################################################
 c
 c
 c     "test_eostmap_relstage" checks the staged relative free energy
-c     schedule, in which each run walks one declared leg, the LIG2 leg
-c     discharging ligand 2 over its electrostatic window, the VDWM leg
+c     schedule, in which each declared leg spans its own range of the
+c     main lambda, the LIG2 leg discharging ligand 2, the VDWM leg
 c     morphing van der Waals between the two ligands while both stay
 c     electrostatically annihilated, and the LIG1 leg charging ligand 1
 c
@@ -988,7 +988,6 @@ c
       real*8 tref(3),dtref(3),d2tref(3)
       real*8 probe(3)
       real*8 wlo,dlo,vlo,dvlo
-      real*8 weight1,dweight1,d2weight1
       logical need0,need1
 c
 c
@@ -999,25 +998,20 @@ c
       elmdamap = 'QNT'
       plmdamap = 'QNT'
       vlmdamap = 'QNT'
-      qntvlmda0 = 0.3d0
-      qntvlmda1 = 0.7d0
-c
-c     a staged leg spends its exponents on the taper, so the endpoint
-c     weight is linear in each sublambda
-c
       epdtexp = 1
 c
-c     the ligand 1 leg charges ligand 1 over the upper window against
-c     the annihilated reference, with van der Waals already morphed on
+c     declare all three legs, ligand 2 discharging over the lower
+c     range, van der Waals morphing over the middle one and ligand 1
+c     charging over the upper one
 c
-      relstage = 'LIG1'
-      qntelmda0 = 0.7d0
-      qntelmda1 = 1.0d0
+      call test_eostmap_setstg (0.0d0,0.3d0,0.3d0,0.7d0,0.7d0,1.0d0)
 c
 c     lambda of one, ligand 1 fully coupled and van der Waals with it,
 c     so only the coupled endpoint has to be built
 c
       call mapsublmda (1.0d0)
+      call assert_logical (relstage.eq.'LIG1',.true.,
+     &                     'maprelstage lig1 leg at lambda one')
       call assert_real (elambda,1.0d0,1.0d-14,
      &                  'maprelstage lig1 elambda at lambda one')
       call assert_real (vlambda,1.0d0,1.0d-14,
@@ -1037,6 +1031,8 @@ c     interior of the ligand 1 leg, the weight growing with lambda and
 c     both endpoint states live
 c
       call mapsublmda (0.85d0)
+      call assert_logical (relstage.eq.'LIG1',.true.,
+     &                     'maprelstage lig1 leg on leg')
       call assert_real (elambda,0.5d0,1.0d-12,
      &                  'maprelstage lig1 elambda on leg')
       call assert_logical (deldlmda.gt.0.0d0,.true.,
@@ -1058,10 +1054,13 @@ c
       call assert_real (dvldlmda,0.0d0,1.0d-14,
      &                  'maprelstage lig1 vdw slope on leg')
 c
-c     the flat end of the ligand 1 leg, where the weight has fallen to
-c     zero and only the annihilated reference has to be built
+c     the junction with the middle leg belongs to the upper leg, at
+c     its flat end, where the weight has fallen to zero and only the
+c     annihilated reference has to be built
 c
       call mapsublmda (0.7d0)
+      call assert_logical (relstage.eq.'LIG1',.true.,
+     &                     'maprelstage lig1 leg at junction')
       call assert_real (elambda,0.0d0,1.0d-14,
      &                  'maprelstage lig1 elambda at leg end')
       call assert_real (deldlmda,0.0d0,1.0d-14,
@@ -1073,13 +1072,12 @@ c
       call assert_logical (need1,.false.,
      &                     'maprelstage lig1 need1 at leg end')
 c
-c     the ligand 2 leg discharges ligand 2 over the lower window, so
+c     the ligand 2 leg discharges ligand 2 over the lower range, so
 c     its weight is the taper itself and falls as lambda rises
 c
-      relstage = 'LIG2'
-      qntelmda0 = 0.0d0
-      qntelmda1 = 0.3d0
       call mapsublmda (0.0d0)
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                     'maprelstage lig2 leg at lambda zero')
       call assert_real (elambda,1.0d0,1.0d-14,
      &                  'maprelstage lig2 elambda at lambda zero')
       call assert_real (vlambda,0.0d0,1.0d-14,
@@ -1097,12 +1095,13 @@ c
 c     the middle leg holds both ligands annihilated, so electrostatics
 c     sit at the reference state and van der Waals morphs across
 c
-      relstage = 'VDWM'
       probe(1) = 0.3d0
       probe(2) = 0.5d0
-      probe(3) = 0.7d0
+      probe(3) = 0.6d0
       do i = 1, 3
          call mapsublmda (probe(i))
+         call assert_logical (relstage.eq.'VDWM',.true.,
+     &                        'maprelstage vdwm leg')
          call assert_real (elambda,0.0d0,1.0d-14,
      &                     'maprelstage vdwm elambda')
          call assert_real (deldlmda,0.0d0,1.0d-14,
@@ -1118,22 +1117,21 @@ c
       end do
       call mapsublmda (0.5d0)
       call assert_real (vlambda,0.5d0,1.0d-12,
-     &                  'maprelstage vdwm vlambda in morph window')
+     &                  'maprelstage vdwm vlambda in morph range')
 c
-c     each leg hands its end state to the next, so the three legs of a
-c     transformation compose; the shared boundary must map to the same
+c     each leg hands its end state to the next, so the legs of a
+c     transformation compose; a junction must map to the same
 c     sublambdas and the same flat derivatives from either side, which
-c     is what lets the legs be run as separate calculations
+c     is what lets the legs be run together or as separate calculations
 c
-      relstage = 'LIG2'
-      qntelmda0 = 0.0d0
-      qntelmda1 = 0.3d0
+      use_relstg(2) = .false.
+      use_relstg(3) = .false.
       call mapsublmda (0.3d0)
       wlo = elambda
       dlo = deldlmda
       vlo = vlambda
       dvlo = dvldlmda
-      relstage = 'VDWM'
+      use_relstg(2) = .true.
       call mapsublmda (0.3d0)
       call assert_real (elambda,wlo,0.0d0,
      &                  'maprelstage lig2 to vdwm elambda')
@@ -1148,9 +1146,7 @@ c
       dlo = deldlmda
       vlo = vlambda
       dvlo = dvldlmda
-      relstage = 'LIG1'
-      qntelmda0 = 0.7d0
-      qntelmda1 = 1.0d0
+      use_relstg(3) = .true.
       call mapsublmda (0.7d0)
       call assert_real (elambda,wlo,0.0d0,
      &                  'maprelstage vdwm to lig1 elambda')
@@ -1165,7 +1161,7 @@ c     just inside a leg the weight is built by cancellation and
 c     collapses onto zero for about 7e-7 of main lambda past the
 c     decoupled edge; that has to clamp to zero so the energy is the
 c     bare reference there, since a weight of one would switch a whole
-c     ligand on inside a window lambda dynamics can visit
+c     ligand on inside a range lambda dynamics can visit
 c
 c     the taper slope survives the collapse, though, so the coupled
 c     endpoint stays live and dU/dlambda keeps sampling it; the weight
@@ -1200,26 +1196,8 @@ c
       call assert_logical (need1,.true.,
      &                     'maprelstage lig1 revived need1')
 c
-c     polarization given the same map and window as the multipoles
-c     tracks them exactly, so the two terms never see different states
-c
-      qntplmda0 = qntelmda0
-      qntplmda1 = qntelmda1
-      probe(1) = 0.95d0
-      probe(2) = 0.72d0
-      probe(3) = 0.85d0
-      do i = 1, 3
-         call mapsublmda (probe(i))
-         call assert_real (plambda,elambda,1.0d-15,
-     &                     'maprelstage plambda tracks elambda')
-         call assert_real (dpldlmda,deldlmda,1.0d-15,
-     &                     'maprelstage dpldlmda tracks deldlmda')
-         call assert_real (d2pldlmda2,d2eldlmda2,1.0d-15,
-     &                     'maprelstage d2pldlmda2 tracks d2eldlmda2')
-      end do
-c
 c     the staged weight of each leg is the quintic taper of its own
-c     window, rising with lambda on the ligand 1 leg
+c     range, rising with lambda on the ligand 1 leg
 c
       probe(1) = 0.75d0
       probe(2) = 0.85d0
@@ -1244,11 +1222,8 @@ c
       end do
 c
 c     and falling with lambda on the ligand 2 leg, the same taper of a
-c     window of the same width read the other way
+c     range of the same width read the other way
 c
-      relstage = 'LIG2'
-      qntelmda0 = 0.0d0
-      qntelmda1 = 0.3d0
       probe(1) = 0.05d0
       probe(2) = 0.15d0
       probe(3) = 0.25d0
@@ -1262,40 +1237,138 @@ c
      &                     'maprelstage lig2 leg d2eldlmda2')
       end do
 c
-c     polarization follows its own window on the charging legs, read
-c     the other way on the ligand 2 leg, and stays at zero on the
-c     middle leg
+c     polarization carries the electrostatic weight on every leg, and
+c     neither a map of its own nor the sublambda windows of the
+c     unstaged maps can move a staged leg
 c
-      qntplmda0 = 0.0d0
-      qntplmda1 = 0.2d0
-      call mapsublmda (0.1d0)
-      call assert_real (plambda,0.5d0,1.0d-12,
-     &                  'maprelstage lig2 own pol map weight')
-      call assert_real (dpldlmda,-9.375d0,1.0d-12,
-     &                  'maprelstage lig2 own pol map slope')
-      call assert_real (elambda,1.0d0-0.20987654320987653d0,1.0d-12,
-     &                  'maprelstage lig2 own pol map elambda')
-      relstage = 'LIG1'
+      plmdamap = 'EXP'
+      qntelmda0 = 0.9d0
       qntplmda0 = 0.8d0
-      qntplmda1 = 1.0d0
-      call mapsublmda (0.9d0)
-      call assert_real (plambda,0.5d0,1.0d-12,
-     &                  'maprelstage lig1 own pol map weight')
-      call assert_real (dpldlmda,9.375d0,1.0d-12,
-     &                  'maprelstage lig1 own pol map slope')
-      relstage = 'VDWM'
+      qntvlmda1 = 0.1d0
+      probe(1) = 0.1d0
+      probe(2) = 0.5d0
+      probe(3) = 0.85d0
+      do i = 1, 3
+         call mapsublmda (probe(i))
+         call assert_real (plambda,elambda,0.0d0,
+     &                     'maprelstage plambda tracks elambda')
+         call assert_real (dpldlmda,deldlmda,0.0d0,
+     &                     'maprelstage dpldlmda tracks deldlmda')
+         call assert_real (d2pldlmda2,d2eldlmda2,0.0d0,
+     &                     'maprelstage d2pldlmda2 tracks d2eldlmda2')
+      end do
+      call assert_real (elambda,0.5d0,1.0d-12,
+     &                  'maprelstage lig1 ignores ele window')
       call mapsublmda (0.5d0)
-      call assert_real (plambda,0.0d0,0.0d0,
-     &                  'maprelstage vdwm own pol map weight')
-      call assert_real (dpldlmda,0.0d0,0.0d0,
-     &                  'maprelstage vdwm own pol map slope')
+      call assert_real (vlambda,0.5d0,1.0d-12,
+     &                  'maprelstage vdwm ignores vdw window')
+      plmdamap = 'QNT'
+      qntelmda0 = 0.0d0
       qntplmda0 = 0.0d0
-      qntplmda1 = 1.0d0
+      qntvlmda1 = 1.0d0
+c
+c     legs of unequal width carry the slope of their own local
+c     coordinate, here twice the quintic slope on a leg of half width
+c
+      call test_eostmap_setstg (0.0d0,0.0d0,0.0d0,0.5d0,0.5d0,1.0d0)
+      call mapsublmda (0.75d0)
+      call assert_logical (relstage.eq.'LIG1',.true.,
+     &                     'maprelstage two leg lig1 leg')
+      call assert_real (elambda,0.5d0,1.0d-12,
+     &                  'maprelstage two leg elambda')
+      call assert_real (deldlmda,3.75d0,1.0d-12,
+     &                  'maprelstage two leg deldlmda')
+      call assert_real (vlambda,1.0d0,0.0d0,
+     &                  'maprelstage two leg lig1 vlambda')
+      call mapsublmda (0.25d0)
+      call assert_logical (relstage.eq.'VDWM',.true.,
+     &                     'maprelstage two leg vdwm leg')
+      call assert_real (vlambda,0.5d0,1.0d-12,
+     &                  'maprelstage two leg vlambda')
+      call assert_real (dvldlmda,3.75d0,1.0d-12,
+     &                  'maprelstage two leg dvldlmda')
+      call assert_real (elambda,0.0d0,0.0d0,
+     &                  'maprelstage two leg vdwm elambda')
+c
+c     a main lambda in a gap between legs holds the end state of the
+c     leg below, with every slope an exact zero
+c
+      call test_eostmap_setstg (0.0d0,0.2d0,0.3d0,0.7d0,0.7d0,1.0d0)
+      call mapsublmda (0.25d0)
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                     'maprelstage gap leg')
+      call assert_real (elambda,0.0d0,0.0d0,'maprelstage gap elambda')
+      call assert_real (vlambda,0.0d0,0.0d0,'maprelstage gap vlambda')
+      call assert_real (deldlmda,0.0d0,0.0d0,
+     &                  'maprelstage gap deldlmda')
+      call assert_real (d2eldlmda2,0.0d0,0.0d0,
+     &                  'maprelstage gap d2eldlmda2')
+      call assert_real (dvldlmda,0.0d0,0.0d0,
+     &                  'maprelstage gap dvldlmda')
+c
+c     a main lambda below or above every declared leg holds the end
+c     state of the nearest one
+c
+      use_relstg(1) = .false.
+      call mapsublmda (0.1d0)
+      call assert_logical (relstage.eq.'VDWM',.true.,
+     &                     'maprelstage below legs leg')
+      call assert_real (vlambda,0.0d0,0.0d0,
+     &                  'maprelstage below legs vlambda')
+      call assert_real (dvldlmda,0.0d0,0.0d0,
+     &                  'maprelstage below legs dvldlmda')
+      use_relstg(1) = .true.
+      use_relstg(2) = .false.
+      use_relstg(3) = .false.
+      call mapsublmda (0.6d0)
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                     'maprelstage above legs leg')
+      call assert_real (elambda,0.0d0,0.0d0,
+     &                  'maprelstage above legs elambda')
+      call assert_real (deldlmda,0.0d0,0.0d0,
+     &                  'maprelstage above legs deldlmda')
 c
 c     the ordinary maps must be untouched when staging is off
 c
       use_rel = .false.
       relstage = 'VDWM'
+      do i = 1, 3
+         use_relstg(i) = .false.
+         relstglo(i) = 0.0d0
+         relstghi(i) = 1.0d0
+      end do
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eostmap_setstg  --  declare staged legs  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eostmap_setstg" declares the main lambda ranges of the
+c     LIG2, VDWM and LIG1 legs of the staged relative schedule, where
+c     a leg given a zero width is left undeclared
+c
+c
+      subroutine test_eostmap_setstg (lo2,hi2,lov,hiv,lo1,hi1)
+      use dlmda
+      implicit none
+      integer i
+      real*8 lo2,hi2,lov,hiv,lo1,hi1
+c
+c
+      relstglo(1) = lo2
+      relstghi(1) = hi2
+      relstglo(2) = lov
+      relstghi(2) = hiv
+      relstglo(3) = lo1
+      relstghi(3) = hi1
+      do i = 1, 3
+         use_relstg(i) = (relstghi(i) .gt. relstglo(i))
+      end do
       return
       end
 c

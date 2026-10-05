@@ -22,7 +22,7 @@
  Torsion Angle Lambda Value            1.000
 
  Free Energy Mode            Staged Relative
- Staged Leg                             VDWM
+ Staged Leg VDWM Range         0.000   1.000
  Sampling Mode                  Fixed Lambda
  Polarization Topology                Single
  Main Lambda Value                     0.500

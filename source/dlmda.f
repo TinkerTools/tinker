@@ -79,6 +79,8 @@ c     vlmdaapmrho   endpoint slope ratio for van der Waals asym map
 c     vlmdainveps   shift for van der Waals inverse-power mapping
 c     wlmda         width of lambda bins
 c     wlmda2        half width of lambda bins
+c     relstghi      upper main lambda bound of each staged leg
+c     relstglo      lower main lambda bound of each staged leg
 c     demvirdl      multipole virial lambda derivative
 c     depvirdl      polarization virial lambda derivative
 c     devvirdl      van der Waals virial lambda derivative
@@ -132,13 +134,15 @@ c     use_prst      flag for polarization single topology at plambda
 c     use_ti        flag to use thermodynamic integration
 c     use_vdlmda    flag that the van der Waals term has a lambda deriv
 c     use_vlmdamap  flag that vlambda follows the main lambda map
+c     use_relstg    flag that each staged leg is declared, in the
+c                     order LIG2, VDWM and LIG1 of rising lambda
 c     douindorig    original douind
 c     elmdamap      mapping type from main to electrostatic lambda
 c     plmdamap      mapping type from main to polarization lambda
 c     vlmdamap      mapping type from main to van der Waals lambda
 c     lmdathmap     mapping type from theta to main lambda, SIN or TRI
 c     lmdasampmode  lambda sampling method, OST, META, TI, ABF or NONE
-c     relstage      declared leg of the staged schedule
+c     relstage      active leg of the staged schedule
 c     abflabel      history label record of the abf history file
 c     abftitle      title record of the abf history file
 c     lmdasavefile  name of the file holding the lambda bias history
@@ -213,6 +217,8 @@ c
       real*8 vlmdainveps
       real*8 wlmda
       real*8 wlmda2
+      real*8 relstghi(3)
+      real*8 relstglo(3)
       real*8 demvirdl(3,3)
       real*8 depvirdl(3,3)
       real*8 devvirdl(3,3)
@@ -264,6 +270,7 @@ c
       logical use_ti
       logical use_vdlmda
       logical use_vlmdamap
+      logical use_relstg(3)
       logical, allocatable :: douindorig(:)
       character*3 elmdamap
       character*3 plmdamap
