@@ -1924,8 +1924,11 @@ c
             ib = 0
             call getnumb (record,ia,next)
             call getnumb (record,ib,next)
-            ia = itype(ia)
-            ib = itype(ib)
+c
+c     retain external atom types in special polarization pairs
+c
+            if (itype(ia) .ne. 0)  ia = itype(ia)
+            if (itype(ib) .ne. 0)  ib = itype(ib)
             if (min(ia,ib) .ne. 0) then
                call prmsort (2,ia,ib,0,0,0)
                write (iprm,500)  ia,ib,record(next:length)
@@ -1963,6 +1966,14 @@ c
             if (min(ia,ib,ic) .ne. 0) then
                write (iprm,530)  ia,ib,ic,record(next:length)
   530          format ('angcflux',2x,3i5,a)
+            end if
+         else if (keyword(1:7) .eq. 'SOLUTE ') then
+            ia = 0
+            call getnumb (record,ia,next)
+            ia = itype(ia)
+            if (ia .ne. 0) then
+               write (iprm,535)  ia,record(next:length)
+  535          format ('solute',4x,i5,a)
             end if
          else if (keyword(1:7) .eq. 'PIATOM ') then
             ia = 0
