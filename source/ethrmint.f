@@ -53,17 +53,14 @@ c
       implicit none
       integer i
       integer nw,ne,nb
-      integer istart
 c
 c
 c     count the blocks each window can hold; a window too short for
 c     a complete block still runs, but records nothing
 c
       tinbtot = 0
-      istart = 0
       do i = 1, nlmdawin
-         nw = lmdawinend(i) - istart
-         ne = int(dble(nw) * lmdawinratio)
+         call lmdawinsize (i,nw,ne)
          nb = (nw-ne) / tinstepavg
          if (nb .eq. 0) then
             write (iout,10)  i,lmdawinlist(i),lmdawinfrac(i)
@@ -73,7 +70,6 @@ c
      &                 ' and will record no samples')
          end if
          tinbtot = tinbtot + nb
-         istart = lmdawinend(i)
       end do
 c
 c     perform dynamic allocation of some global arrays

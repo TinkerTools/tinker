@@ -42,6 +42,7 @@
 #include "detail/expol.hh"
 #include "detail/extfld.hh"
 #include "detail/faces.hh"
+#include "detail/fep.hh"
 #include "detail/fft.hh"
 #include "detail/fields.hh"
 #include "detail/files.hh"

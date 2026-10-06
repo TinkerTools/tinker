@@ -80,6 +80,7 @@ c
 c     set defaults for TCG induced dipole parameters
 c
       tcgorder = 0
+      tcgnab = 0
       tcgguess = .true.
       tcgpeek = 1.0d0
       if (poltyp .eq. 'TCG   ')  poltyp = 'TCG2  '

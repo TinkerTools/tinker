@@ -61,9 +61,10 @@ c
          end if
       end do
 c
-c     disable dipole prediction during adaptive lambda simulations
+c     disable dipole prediction for dual topology polarization, and
+c     for free energy perturbation between lambda windows
 c
-      if (use_epdt) then
+      if (use_epdt .or. use_fep) then
          use_pred = .false.
          use_ielscf = .false.
          polpred = '    '
@@ -173,7 +174,9 @@ c
       use atoms
       use ielscf
       use keys
+      use limits
       use polar
+      use potent
       implicit none
       integer i,j,next
       real*8 speed
@@ -215,6 +218,15 @@ c
       allocate (upaux(3,n))
       allocate (vpaux(3,n))
       allocate (apaux(3,n))
+c
+c     get neighbor lists and global frame multipoles as needed
+c     by the induced dipole solver prior to any energy evaluation
+c
+      if (use_list)  call nblist
+      if (use_born)  call born
+      if (use_chgflx)  call alterchg
+      call chkpole
+      call rotpole ('MPOLE')
 c
 c     set auxiliary dipole values equal to induced dipoles
 c

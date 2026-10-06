@@ -372,8 +372,12 @@ void initlmdawin_(int* nstep);
 #define tinker_f_initlmdawin initlmdawin_
 void setlmdawin_();
 #define tinker_f_setlmdawin setlmdawin_
+void lmdawinsize_(int* iwin, int* nlen, int* neq);
+#define tinker_f_lmdawinsize lmdawinsize_
 void lmdawinphase_(int* istep, int* iprod);
 #define tinker_f_lmdawinphase lmdawinphase_
+void lmdawindyn_(int* istep);
+#define tinker_f_lmdawindyn lmdawindyn_
 void nextlmdawin_();
 #define tinker_f_nextlmdawin nextlmdawin_
 void lmdawinstep_(int* istep);
@@ -716,6 +720,18 @@ void edisp3d_();
 #define tinker_f_edisp3d edisp3d_
 void edreal3d_();
 #define tinker_f_edreal3d edreal3d_
+
+// efep.f
+void efeptrial_(int* ntrial, double* ltrial, double* etrial, double* enative);
+#define tinker_f_efeptrial efeptrial_
+void initfepdyn_(int* nstep);
+#define tinker_f_initfepdyn initfepdyn_
+void prtfephead_();
+#define tinker_f_prtfephead prtfephead_
+void efepdyn_(int* istep);
+#define tinker_f_efepdyn efepdyn_
+void savefep_();
+#define tinker_f_savefep savefep_
 
 // egauss.f
 void egauss_();
@@ -2266,6 +2282,8 @@ void mutate_window_();
 #define tinker_f_mutate_window mutate_window_
 void mutate_ti_();
 #define tinker_f_mutate_ti mutate_ti_
+void mutate_fep_();
+#define tinker_f_mutate_fep mutate_fep_
 void mutate_check_();
 #define tinker_f_mutate_check mutate_check_
 void setligand_(int* j, int* igrp);

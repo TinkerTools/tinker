@@ -40,6 +40,7 @@ c
       use domega
       use expol
       use faces
+      use fep
       use fft
       use fields
       use fracs
@@ -453,6 +454,13 @@ c
       if (allocated(fqa))  deallocate (fqa)
       if (allocated(fqncy))  deallocate (fqncy)
       if (allocated(fqcy))  deallocate (fqcy)
+c
+c     deallocation of global arrays from module fep
+c
+      if (allocated(fepstep))  deallocate (fepstep)
+      if (allocated(fepene))  deallocate (fepene)
+      if (allocated(feplmda))  deallocate (feplmda)
+      if (allocated(feptrial))  deallocate (feptrial)
 c
 c     deallocation of global arrays from module fft
 c

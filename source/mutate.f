@@ -220,6 +220,7 @@ c
       call mutate_meta
       call mutate_window
       call mutate_ti
+      call mutate_fep
       call mutate_check
 c
 c     map the active main lambda and install its dependent parameters
@@ -286,6 +287,9 @@ c
          else if (use_abf) then
             write (iout,115)
   115       format (' Sampling Mode',27x,'ABF')
+         else if (use_fep) then
+            write (iout,117)
+  117       format (' Sampling Mode',27x,'FEP')
          else
             write (iout,120)
   120       format (' Sampling Mode',18x,'Fixed Lambda')
@@ -365,6 +369,7 @@ c
       use_dlmda = .false.
       use_elmdamap = .false.
       use_epdt = .false.
+      use_fep = .false.
       use_meta = .false.
       use_metadyn = .false.
       use_ost = .false.
@@ -640,16 +645,16 @@ c
       if (lmdasampmode .eq. 'META')  use_meta = .true.
       if (lmdasampmode .eq. 'TI')  use_ti = .true.
       if (lmdasampmode .eq. 'ABF')  use_abf = .true.
-      if (lmdasampmode .eq. 'FEP') then
-         write (iout,15)
-   15    format (/,' MUTATE_DLMDA  --  LAMBDA-MODE FEP is not',
-     &              ' yet available')
-         call fatal
-      end if
+      if (lmdasampmode .eq. 'FEP')  use_fep = .true.
       if (use_ost .or. use_meta .or. use_ti .or. use_abf) then
          use_dlmda = .true.
          use_mainlmda = .true.
       end if
+c
+c     free energy perturbation moves a main lambda from window to
+c     window, but makes no use of the lambda derivative
+c
+      if (use_fep)  use_mainlmda = .true.
 c
 c     only orthogonal space tempering consumes the second, force and
 c     virial lambda derivatives, which LAMBDA-DERIV2 also asks for
@@ -671,6 +676,14 @@ c
             if (use_dlmda) then
                write (iout,20)
    20          format (/,' MUTATE_DLMDA  --  A Lambda Derivative',
+     &                    ' requires an explicit map for each driven',
+     &                    ' sublambda; add the ELE-LMDA-MAP,',
+     &                    ' POL-LMDA-MAP or VDW-LMDA-MAP keywords')
+               call fatal
+            end if
+            if (use_fep) then
+               write (iout,25)
+   25          format (/,' MUTATE_DLMDA  --  Free Energy Perturbation',
      &                    ' requires an explicit map for each driven',
      &                    ' sublambda; add the ELE-LMDA-MAP,',
      &                    ' POL-LMDA-MAP or VDW-LMDA-MAP keywords')
@@ -1258,7 +1271,7 @@ c     only a sequential lambda method visits the lambda windows
 c
       if (allocated(lmdawinlist))  deallocate (lmdawinlist)
       if (allocated(lmdawinfrac))  deallocate (lmdawinfrac)
-      if (.not. use_ti)  return
+      if (.not.use_ti .and. .not.use_fep)  return
 c
 c     size the lambda window schedule to the worst case
 c
@@ -1311,6 +1324,15 @@ c
 c     build the schedule of lambda windows from the values found
 c
       call setlmdasched (nwin,nwinset)
+c
+c     free energy perturbation needs a neighbor for each window
+c
+      if (use_fep .and. nlmdawin.lt.2) then
+         write (iout,30)
+   30    format (/,' MUTATE_WINDOW  --  Free Energy Perturbation',
+     &              ' needs at least two lambda windows')
+         call fatal
+      end if
       return
       end
 c
@@ -1378,6 +1400,66 @@ c
          do i = 1, tinstepavg
             tidedllist(i) = 0.0d0
          end do
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine mutate_fep  --  trial energy sample interval  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "mutate_fep" sets the number of dynamics steps between the
+c     samples of the trial lambda energies found during free energy
+c     perturbation over lambda windows, which is taken from the first
+c     "LAMBDA-INTERVAL" value
+c
+c
+      subroutine mutate_fep
+      use dlmda
+      use fep
+      use iounit
+      use keys
+      implicit none
+      integer i
+      integer next
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     set defaults for free energy perturbation sampling
+c
+      nfep = 0
+      nfepsave = 0
+      nfeptot = 0
+      fepintv = 1000
+c
+c     search keywords for free energy perturbation options; a
+c     value that cannot be read is left invalid and rejected below
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         if (keyword(1:16) .eq. 'LAMBDA-INTERVAL ') then
+            fepintv = 0
+            string = record(next:240)
+            read (string,*,err=10,end=10)  fepintv
+         end if
+   10    continue
+      end do
+c
+c     the samples must be at least one dynamics step apart
+c
+      if (use_fep .and. fepintv.lt.1) then
+         write (iout,20)
+   20    format (/,' MUTATE_FEP  --  LAMBDA-INTERVAL must be positive')
+         call fatal
       end if
       return
       end
@@ -1700,6 +1782,16 @@ c
      &                 ' SAVE-TEFIELD and SAVE-DEFIELD keywords')
             call fatal
          end if
+      end if
+c
+c     the implicit solvation parameters are scaled once at setup,
+c     and so do not follow the main lambda to its trial values
+c
+      if (use_fep .and. use_solv) then
+         write (iout,150)
+  150    format (/,' MUTATE_CHECK  --  Free Energy Perturbation is',
+     &              ' not Available with Implicit Solvation')
+         call fatal
       end if
       return
       end

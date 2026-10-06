@@ -1751,13 +1751,37 @@ c
       implicit none
 c
 c
-c     measure the current window against the preceding boundary
+c     get the length and the equilibration of the current window
 c
-      lmdawinlen = lmdawinend(lmdawin)
-      if (lmdawin .gt. 1) then
-         lmdawinlen = lmdawinend(lmdawin) - lmdawinend(lmdawin-1)
-      end if
-      lmdawineq = int(dble(lmdawinlen) * lmdawinratio)
+      call lmdawinsize (lmdawin,lmdawinlen,lmdawineq)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine lmdawinsize  --  size of one lambda window  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "lmdawinsize" finds the number of dynamics steps in one of
+c     the lambda windows, and the number of those steps at the start
+c     of the window that are discarded as equilibration
+c
+c
+      subroutine lmdawinsize (iwin,nlen,neq)
+      use dlmda
+      implicit none
+      integer iwin
+      integer nlen,neq
+c
+c
+c     measure the window against the preceding boundary
+c
+      nlen = lmdawinend(iwin)
+      if (iwin .gt. 1)  nlen = lmdawinend(iwin) - lmdawinend(iwin-1)
+      neq = int(dble(nlen) * lmdawinratio)
       return
       end
 c
@@ -1820,6 +1844,10 @@ c
 c     collect dU/dlambda for thermodynamic integration
 c
       if (use_ti)  call etidyn (istep)
+c
+c     find trial lambda energies for free energy perturbation
+c
+      if (use_fep)  call efepdyn (istep)
       return
       end
 c

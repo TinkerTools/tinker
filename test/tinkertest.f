@@ -74,6 +74,7 @@ c
       call test_ephippo
       call test_expol
       call test_extfield
+      call test_fep
       call test_geom
       call test_improp
       call test_imptor

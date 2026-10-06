@@ -249,6 +249,13 @@ c
          call prttihead
       end if
 c
+c     lay out the free energy perturbation lambda windows
+c
+      if (use_fep) then
+         call initfepdyn (nstep)
+         call prtfephead
+      end if
+c
 c     only allow Montecarlo or anisotropic barostat
 c     for NPT + extfield simulation
 c
@@ -351,7 +358,7 @@ c
 c
 c     move to the next lambda window at the end of the current one
 c
-         if (use_ti)  call lmdawinstep (istep)
+         if (use_ti .or. use_fep)  call lmdawinstep (istep)
       end do
 c
 c     save lambda dynamics information
@@ -360,6 +367,7 @@ c
       if (use_metadyn)  call savemeta
       if (use_abf)  call saveabf
       if (use_ti)  call saveti
+      if (use_fep)  call savefep
 c
 c     save dynamic at the end if it was not saved during simulation
 c

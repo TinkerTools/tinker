@@ -46,6 +46,7 @@ add_library (tinkerObjF OBJECT
 ../source/expol.f
 ../source/extfld.f
 ../source/faces.f
+../source/fep.f
 ../source/fft.f
 ../source/fields.f
 ../source/files.f
@@ -263,6 +264,7 @@ add_library (tinkerObjF OBJECT
 ../source/edisp1.f
 ../source/edisp2.f
 ../source/edisp3.f
+../source/efep.f
 ../source/egauss.f
 ../source/egauss1.f
 ../source/egauss2.f

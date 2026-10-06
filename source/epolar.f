@@ -1885,7 +1885,7 @@ c
 c
 c     OpenMP directives for the major loop structure
 c
-!$OMP PARALLEL default(shared) private(ii,j,fi,e)
+!$OMP PARALLEL default(shared) private(i,ii,j,fi,e)
 !$OMP DO reduction(+:ep)
 c
 c     get polarization energy via induced dipoles times field

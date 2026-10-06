@@ -361,6 +361,7 @@ c
       if (use_metadyn)  call savemeta
       if (use_abf)  call saveabf
       if (use_ti)  call saveti
+      if (use_fep)  call savefep
       if (dynsave)  call prtdyn
 c
 c     save the velocity vector components at the current step
