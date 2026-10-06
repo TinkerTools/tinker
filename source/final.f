@@ -354,6 +354,9 @@ c
       if (allocated(lmdaihist))  deallocate (lmdaihist)
       if (allocated(lmdalhist))  deallocate (lmdalhist)
       if (allocated(lmdallist))  deallocate (lmdallist)
+      if (allocated(lmdawinend))  deallocate (lmdawinend)
+      if (allocated(lmdawinfrac))  deallocate (lmdawinfrac)
+      if (allocated(lmdawinlist))  deallocate (lmdawinlist)
       if (allocated(lqgrid))  deallocate (lqgrid)
       if (allocated(pchg0orig))  deallocate (pchg0orig)
       if (allocated(pchgorig))  deallocate (pchgorig)
@@ -1246,12 +1249,9 @@ c
 c     deallocation of global arrays from module thrmint
 c
       if (allocated(tidedllist))  deallocate (tidedllist)
-      if (allocated(tifraclist))  deallocate (tifraclist)
       if (allocated(tilmdadedl))  deallocate (tilmdadedl)
       if (allocated(tilmdadedlstd))  deallocate (tilmdadedlstd)
       if (allocated(tilmdahist))  deallocate (tilmdahist)
-      if (allocated(tilmdalist))  deallocate (tilmdalist)
-      if (allocated(tiwinend))  deallocate (tiwinend)
 c
 c     deallocation of global arrays from module tors
 c

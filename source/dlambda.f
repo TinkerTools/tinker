@@ -1509,3 +1509,379 @@ c
       end do
       return
       end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine setlmdasched  --  build the lambda schedule  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "setlmdasched" fills the list of lambda values visited by the
+c     sequential lambda windows, either from the explicit
+c     "LAMBDA-WINDOW" keyword lines already parsed into "lmdawinlist"
+c     or, by default, as the "nlmdawin" evenly spaced values that
+c     descend from one to zero; the fraction of the run spent in
+c     each window is resolved into "lmdawinfrac" summing to one
+c
+c
+      subroutine setlmdasched (nwin,nwinset)
+      use dlmda
+      use iounit
+      use mutant
+      implicit none
+      integer i
+      integer nwin
+      integer nunspec
+      real*8 fsum,frem
+      real*8, allocatable :: tlist(:)
+      logical nwinset
+      logical up,down
+c
+c
+c     with no explicit windows, space them evenly over [0,1]
+c
+      if (nwin .eq. 0) then
+         if (nlmdawin .lt. 2) then
+            write (iout,10)
+   10       format (/,' SETLMDASCHED  --  LAMBDA-NWINDOW must be',
+     &                 ' at least 2')
+            call fatal
+         end if
+         if (allocated(lmdawinlist))  deallocate (lmdawinlist)
+         if (allocated(lmdawinfrac))  deallocate (lmdawinfrac)
+         allocate (lmdawinlist(nlmdawin))
+         allocate (lmdawinfrac(nlmdawin))
+         do i = 1, nlmdawin
+            lmdawinlist(i) = 1.0d0 - dble(i-1)/dble(nlmdawin-1)
+            lmdawinfrac(i) = 1.0d0 / dble(nlmdawin)
+         end do
+         lmdawinlist(nlmdawin) = 0.0d0
+      else
+c
+c     an explicit schedule sets the number of windows itself
+c
+         if (nwinset) then
+            write (iout,20)
+   20       format (/,' SETLMDASCHED  --  LAMBDA-NWINDOW and',
+     &                 ' LAMBDA-WINDOW cannot both be used')
+            call fatal
+         end if
+         nlmdawin = nwin
+c
+c     compact the parsed values down to the number of windows
+c
+         allocate (tlist(nlmdawin))
+         do i = 1, nlmdawin
+            tlist(i) = lmdawinlist(i)
+         end do
+         deallocate (lmdawinlist)
+         allocate (lmdawinlist(nlmdawin))
+         do i = 1, nlmdawin
+            lmdawinlist(i) = tlist(i)
+         end do
+         do i = 1, nlmdawin
+            tlist(i) = lmdawinfrac(i)
+         end do
+         deallocate (lmdawinfrac)
+         allocate (lmdawinfrac(nlmdawin))
+         do i = 1, nlmdawin
+            lmdawinfrac(i) = tlist(i)
+         end do
+         deallocate (tlist)
+c
+c     a time share that was given must be a positive fraction
+c
+         fsum = 0.0d0
+         nunspec = 0
+         do i = 1, nlmdawin
+            if (lmdawinfrac(i) .lt. 0.0d0) then
+               nunspec = nunspec + 1
+            else if (lmdawinfrac(i) .gt. 0.0d0) then
+               fsum = fsum + lmdawinfrac(i)
+            else
+               write (iout,30)  i
+   30          format (/,' SETLMDASCHED  --  LAMBDA-WINDOW',i5,
+     &                    ' was given a time fraction that is',
+     &                    ' not positive')
+               call fatal
+            end if
+         end do
+c
+c     share whatever time is left among the windows that did not
+c     ask for a fraction of their own
+c
+         if (nunspec .gt. 0) then
+            frem = 1.0d0 - fsum
+            if (frem .le. 0.0d0) then
+               write (iout,40)  fsum
+   40          format (/,' SETLMDASCHED  --  LAMBDA-WINDOW fractions',
+     &                    ' total',f12.6,' leaving no time for the',
+     &                 /,'                   windows without an',
+     &                    ' explicit value')
+               call fatal
+            end if
+            do i = 1, nlmdawin
+               if (lmdawinfrac(i) .lt. 0.0d0) then
+                  lmdawinfrac(i) = frem / dble(nunspec)
+               end if
+            end do
+         end if
+c
+c     rescale the time shares so that they span the whole run
+c
+         fsum = 0.0d0
+         do i = 1, nlmdawin
+            fsum = fsum + lmdawinfrac(i)
+         end do
+         do i = 1, nlmdawin
+            lmdawinfrac(i) = lmdawinfrac(i) / fsum
+         end do
+c
+c     each window must sit within the physical lambda range
+c
+         do i = 1, nlmdawin
+            if (.not. (lmdawinlist(i).ge.0.0d0 .and.
+     &                 lmdawinlist(i).le.1.0d0)) then
+               write (iout,50)  i,lmdawinlist(i)
+   50          format (/,' SETLMDASCHED  --  LAMBDA-WINDOW',i5,
+     &                    ' value',f12.6,' is outside [0,1]')
+               call fatal
+            end if
+         end do
+c
+c     the schedule must walk in one direction without repeating
+c
+         if (nlmdawin .ge. 2) then
+            up = .true.
+            down = .true.
+            do i = 2, nlmdawin
+               if (lmdawinlist(i) .le. lmdawinlist(i-1))  up = .false.
+               if (lmdawinlist(i) .ge. lmdawinlist(i-1))  down = .false.
+            end do
+            if (.not.up .and. .not.down) then
+               write (iout,60)
+   60          format (/,' SETLMDASCHED  --  LAMBDA-WINDOW values must',
+     &                    ' increase or decrease monotonically')
+               call fatal
+            end if
+         end if
+      end if
+c
+c     start the schedule at its first window
+c
+      lmdawin = 1
+      lambda = lmdawinlist(1)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine initlmdawin  --  set up lambda window layout  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "initlmdawin" divides a dynamics run of "nstep" steps among the
+c     sequential lambda windows according to their requested time
+c     fractions, and puts the main lambda at the start of the schedule
+c
+c
+      subroutine initlmdawin (nstep)
+      use dlmda
+      use iounit
+      use mutant
+      implicit none
+      integer i
+      integer nstep
+      integer istart
+      real*8 cum
+c
+c
+c     give each window the share of the run that it asked for, and
+c     pin the last boundary so the whole trajectory is covered
+c
+      if (allocated(lmdawinend))  deallocate (lmdawinend)
+      allocate (lmdawinend(nlmdawin))
+      cum = 0.0d0
+      do i = 1, nlmdawin
+         cum = cum + lmdawinfrac(i)
+         lmdawinend(i) = nint(cum*dble(nstep))
+      end do
+      lmdawinend(nlmdawin) = nstep
+c
+c     every window must receive at least one dynamics step
+c
+      istart = 0
+      do i = 1, nlmdawin
+         if (lmdawinend(i) .le. istart) then
+            write (iout,10)  i,lmdawinlist(i)
+   10       format (/,' INITLMDAWIN  --  LAMBDA-WINDOW',i5,
+     &                 ' at lambda',f12.6,' was given no dynamics',
+     &                 ' steps')
+            call fatal
+         end if
+         istart = lmdawinend(i)
+      end do
+c
+c     start the schedule at its first window
+c
+      lmdawin = 1
+      lambda = lmdawinlist(1)
+      call setlmdawin
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine setlmdawin  --  size the current lambda window  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "setlmdawin" sets the step count and equilibration length of
+c     the lambda window that is currently active
+c
+c
+      subroutine setlmdawin
+      use dlmda
+      implicit none
+c
+c
+c     measure the current window against the preceding boundary
+c
+      lmdawinlen = lmdawinend(lmdawin)
+      if (lmdawin .gt. 1) then
+         lmdawinlen = lmdawinend(lmdawin) - lmdawinend(lmdawin-1)
+      end if
+      lmdawineq = int(dble(lmdawinlen) * lmdawinratio)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine lmdawinphase  --  find step in lambda window  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "lmdawinphase" finds the position of a dynamics step within the
+c     production portion of the current lambda window; the value is
+c     zero while the window is equilibrating, once the schedule has
+c     run out, or when the window layout was never set up
+c
+c
+      subroutine lmdawinphase (istep,iprod)
+      use dlmda
+      implicit none
+      integer istep
+      integer iprod
+      integer istart
+c
+c
+c     no step is in production outside of the window schedule
+c
+      iprod = 0
+      if (.not. allocated(lmdawinend))  return
+      if (lmdawin.lt.1 .or. lmdawin.gt.nlmdawin)  return
+c
+c     count the steps taken since the window finished equilibrating
+c
+      istart = 0
+      if (lmdawin .gt. 1)  istart = lmdawinend(lmdawin-1)
+      iprod = max(0,istep-istart-lmdawineq)
+      return
+      end
+c
+c
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine lmdawindyn  --  lambda window sampling  ##
+c     ##                                                     ##
+c     #########################################################
+c
+c
+c     "lmdawindyn" takes the sample that a sequential lambda method
+c     collects at each dynamics step; it is called by the integrators
+c     once the step is complete and before the trajectory is saved,
+c     so anything finished on a step is written out on that step
+c
+c
+      subroutine lmdawindyn (istep)
+      use dlmda
+      implicit none
+      integer istep
+c
+c
+c     collect dU/dlambda for thermodynamic integration
+c
+      if (use_ti)  call etidyn (istep)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine nextlmdawin  --  advance the lambda window  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "nextlmdawin" moves the main lambda to the value of the next
+c     window in the schedule; past the final window the lambda is
+c     left where it is, and further calls have no effect
+c
+c     note the accelerations saved by the integrator are not updated
+c     for the new lambda, so the first half step of the velocities
+c     in a new window still uses forces from the previous window
+c
+c
+      subroutine nextlmdawin
+      use dlmda
+      use mutant
+      implicit none
+c
+c
+c     take the next lambda value
+c
+      if (lmdawin .gt. nlmdawin)  return
+      lmdawin = lmdawin + 1
+      if (lmdawin .le. nlmdawin) then
+         lambda = lmdawinlist(lmdawin)
+         call setlmdawin
+      end if
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine lmdawinstep  --  test for lambda window end  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "lmdawinstep" moves on to the next lambda window once the final
+c     dynamics step of the current window has been taken
+c
+c
+      subroutine lmdawinstep (istep)
+      use dlmda
+      implicit none
+      integer istep
+c
+c
+c     nothing is left to advance outside of the window schedule
+c
+      if (.not. allocated(lmdawinend))  return
+      if (lmdawin.lt.1 .or. lmdawin.gt.nlmdawin)  return
+c
+c     move on to the next lambda window at the window boundary
+c
+      if (istep .eq. lmdawinend(lmdawin))  call nextlmdawin
+      return
+      end

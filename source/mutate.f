@@ -218,6 +218,7 @@ c
       call mutate_ost
       call mutate_abf
       call mutate_meta
+      call mutate_window
       call mutate_ti
       call mutate_check
 c
@@ -639,6 +640,12 @@ c
       if (lmdasampmode .eq. 'META')  use_meta = .true.
       if (lmdasampmode .eq. 'TI')  use_ti = .true.
       if (lmdasampmode .eq. 'ABF')  use_abf = .true.
+      if (lmdasampmode .eq. 'FEP') then
+         write (iout,15)
+   15    format (/,' MUTATE_DLMDA  --  LAMBDA-MODE FEP is not',
+     &              ' yet available')
+         call fatal
+      end if
       if (use_ost .or. use_meta .or. use_ti .or. use_abf) then
          use_dlmda = .true.
          use_mainlmda = .true.
@@ -1210,17 +1217,113 @@ c
       end
 c
 c
-c     ########################################################
-c     ##                                                    ##
-c     ##  subroutine mutate_ti  --  lambda window schedule  ##
-c     ##                                                    ##
-c     ########################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine mutate_window  --  lambda window schedule  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "mutate_ti" sets the lambda window schedule and the block size
-c     used to average dU/dlambda during a thermodynamic integration,
-c     either from explicit "TI-WINDOW" values or from the "TI-NBIN"
-c     count of evenly spaced windows
+c     "mutate_window" sets the schedule of lambda windows visited in
+c     turn by a sequential lambda method, either from explicit
+c     "LAMBDA-WINDOW" values or from the "LAMBDA-NWINDOW" count of
+c     evenly spaced windows; the first "LAMBDA-EQRATIO" value is the
+c     fraction of each window discarded as equilibration
+c
+c
+      subroutine mutate_window
+      use dlmda
+      use iounit
+      use keys
+      implicit none
+      integer i
+      integer next
+      integer nwin
+      real*8 frac
+      logical nwinset
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     set defaults for the sequential lambda windows
+c
+      lmdawin = 0
+      lmdawineq = 0
+      lmdawinlen = 0
+      nlmdawin = 21
+      lmdawinratio = 0.5d0
+c
+c     only a sequential lambda method visits the lambda windows
+c
+      if (allocated(lmdawinlist))  deallocate (lmdawinlist)
+      if (allocated(lmdawinfrac))  deallocate (lmdawinfrac)
+      if (.not. use_ti)  return
+c
+c     size the lambda window schedule to the worst case
+c
+      allocate (lmdawinlist(max(1,nkey)))
+      allocate (lmdawinfrac(max(1,nkey)))
+      do i = 1, max(1,nkey)
+         lmdawinlist(i) = 0.0d0
+         lmdawinfrac(i) = -1.0d0
+      end do
+      nwin = 0
+      nwinset = .false.
+c
+c     search keywords for lambda window options; a value that
+c     cannot be read is left invalid and is rejected below
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:15) .eq. 'LAMBDA-NWINDOW ') then
+            nlmdawin = 0
+            nwinset = .true.
+            read (string,*,err=10,end=10)  nlmdawin
+         else if (keyword(1:14) .eq. 'LAMBDA-WINDOW ') then
+            nwin = nwin + 1
+            lmdawinlist(nwin) = -1.0d0
+            read (string,*,err=10,end=10)  lmdawinlist(nwin)
+            read (string,*,err=10,end=10)  lmdawinlist(nwin),frac
+            if (.not. (frac .gt. 0.0d0))  frac = 0.0d0
+            lmdawinfrac(nwin) = frac
+         else if (keyword(1:15) .eq. 'LAMBDA-EQRATIO ') then
+            lmdawinratio = -1.0d0
+            read (string,*,err=10,end=10)  lmdawinratio
+         end if
+   10    continue
+      end do
+c
+c     some of each window must be left after the equilibration
+c
+      if (.not. (lmdawinratio.ge.0.0d0 .and.
+     &           lmdawinratio.lt.1.0d0)) then
+         write (iout,20)
+   20    format (/,' MUTATE_WINDOW  --  The first LAMBDA-EQRATIO',
+     &              ' value must be in [0,1)')
+         call fatal
+      end if
+c
+c     build the schedule of lambda windows from the values found
+c
+      call setlmdasched (nwin,nwinset)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine mutate_ti  --  dU/dlambda block averaging  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "mutate_ti" sets the block size used to average dU/dlambda
+c     over the lambda windows of a thermodynamic integration
 c
 c
       subroutine mutate_ti
@@ -1231,86 +1334,42 @@ c
       implicit none
       integer i
       integer next
-      integer ntiwin
-      real*8 frac
-      real*8 temp
-      logical tinbinset
       character*20 keyword
       character*240 record
       character*240 string
 c
 c
-c     set defaults for thermodynamic integration windows
+c     set defaults for thermodynamic integration averaging
 c
-      tibin = 0
-      tinbin = 21
-      tinblock = 0
       tinbcount = 0
       tinbsave = 0
       tinbtot = 0
-      tinequil = 0
       tinstepavg = 100
-      tiwindow = 0
-      tieqratio = 0.5d0
 c
-c     size the lambda window schedule to the worst case
-c
-      if (allocated(tilmdalist))  deallocate (tilmdalist)
-      if (allocated(tifraclist))  deallocate (tifraclist)
-      allocate (tilmdalist(max(1,nkey)))
-      allocate (tifraclist(max(1,nkey)))
-      do i = 1, max(1,nkey)
-         tilmdalist(i) = 0.0d0
-         tifraclist(i) = -1.0d0
-      end do
-      ntiwin = 0
-      tinbinset = .false.
-c
-c     search keywords for thermodynamic integration options
+c     search keywords for thermodynamic integration options; a
+c     value that cannot be read is left invalid and rejected below
 c
       do i = 1, nkey
          next = 1
          record = keyline(i)
          call gettext (record,keyword,next)
          call upcase (keyword)
-         if (keyword(1:8) .eq. 'TI-NBIN ') then
+         if (keyword(1:12) .eq. 'TI-NSTEPAVG ') then
+            tinstepavg = 0
             string = record(next:240)
-            read (string,*,err=20)  tinbin
-            tinbinset = .true.
-         else if (keyword(1:10) .eq. 'TI-WINDOW ') then
-            temp = 0.0d0
-            frac = -1.0d0
-            string = record(next:240)
-            read (string,*,err=10,end=10)  temp,frac
-   10       continue
-            ntiwin = ntiwin + 1
-            tilmdalist(ntiwin) = temp
-            tifraclist(ntiwin) = frac
-         else if (keyword(1:12) .eq. 'TI-NSTEPAVG ') then
-            string = record(next:240)
-            read (string,*,err=20)  tinstepavg
-         else if (keyword(1:15) .eq. 'TI-EQUIL-RATIO ') then
-            string = record(next:240)
-            read (string,*,err=20)  tieqratio
+            read (string,*,err=10,end=10)  tinstepavg
          end if
-   20    continue
+   10    continue
       end do
 c
-c     the lambda windows must span [0,1] and leave room to average
+c     each block average must hold at least one dynamics step
 c
       if (use_ti) then
          if (tinstepavg .lt. 1) then
-            write (iout,30)
-   30       format (/,' MUTATE_TI  --  TI-NSTEPAVG must be positive')
+            write (iout,20)
+   20       format (/,' MUTATE_TI  --  TI-NSTEPAVG must be positive')
             call fatal
          end if
-         if (tieqratio.lt.0.0d0 .or. tieqratio.ge.1.0d0) then
-            write (iout,40)
-   40       format (/,' MUTATE_TI  --  TI-EQUIL-RATIO must be',
-     &                 ' in [0,1)')
-            call fatal
-         end if
-         call settisched (ntiwin,tinbinset)
 c
 c     allocate the dU/dlambda block buffer
 c

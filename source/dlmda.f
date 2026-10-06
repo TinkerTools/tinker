@@ -21,9 +21,13 @@ c     lmdanpa       steps propagating the lambda particle
 c     lmdanpb       steps equilibrating at the frozen lambda
 c     lmdanpc       steps averaged at the frozen lambda
 c     lmdastep      dynamics step count of the adaptive lambda bias
+c     lmdawin       index of the current sequential lambda window
+c     lmdawineq     equilibration steps in the current lambda window
+c     lmdawinlen    total dynamics steps in the current lambda window
 c     nlmda         number of lambda bins
 c     nlmdahist     number of saved lambda bias history entries
 c     nlmdasave     history entries already written to the file
+c     nlmdawin      number of sequential lambda windows
 c     plmdaapmn     power exponent for polarization asymmetric map
 c     plmdaexp      exponent for polarization exponential mapping
 c     plmdainvn     inverse-power exponent for polarization mapping
@@ -32,6 +36,7 @@ c     vlmdaapmn     power exponent for van der Waals asymmetric map
 c     vlmdaexp      exponent for van der Waals exponential mapping
 c     vlmdainvn     inverse-power exponent for van der Waals mapping
 c     lmdaihist     step at which each history entry was saved
+c     lmdawinend    last dynamics step belonging to each lambda window
 c     d2edl2        total energy second order lambda derivative
 c     d2eldlmda2    second derivative of elambda wrt main lambda
 c     d2emdl2       multipole second order lambda derivative
@@ -67,6 +72,7 @@ c     lmdathalpha   sharpness of the smoothed triangle theta map
 c     lmdatheta     theta coordinate used to propagate lambda
 c     lmdavbias     saved lambda bias energy shift
 c     lmdavtheta    velocity of the theta lambda coordinate
+c     lmdawinratio  fraction of each lambda window spent equilibrating
 c     plmdaapmrho   endpoint slope ratio for polarization asym map
 c     plmdainveps   shift for polarization inverse-power mapping
 c     qntelmda0     sublambda lower bound for electrostatics
@@ -94,6 +100,8 @@ c     lmdafsum      weighted dU/dlambda sum of each lambda bin
 c     lmdafwt       total weight of each lambda bin
 c     lmdalhist     lambda value of each history entry
 c     lmdallist     lambda values saved within an interval
+c     lmdawinfrac   fraction of the run spent in each lambda window
+c     lmdawinlist   main lambda of each window in schedule order
 c     pchg0orig     original pchg0
 c     pchgorig      original pchg
 c     pcoreorig     original pcore
@@ -146,6 +154,7 @@ c     relstage      active leg of the staged schedule
 c     abflabel      history label record of the abf history file
 c     abftitle      title record of the abf history file
 c     lmdasavefile  name of the file holding the lambda bias history
+c                     or the sequential lambda window output
 c
 c
       module dlmda
@@ -159,9 +168,13 @@ c
       integer lmdanpb
       integer lmdanpc
       integer lmdastep
+      integer lmdawin
+      integer lmdawineq
+      integer lmdawinlen
       integer nlmda
       integer nlmdahist
       integer nlmdasave
+      integer nlmdawin
       integer plmdaapmn
       integer plmdaexp
       integer plmdainvn
@@ -170,6 +183,7 @@ c
       integer vlmdaexp
       integer vlmdainvn
       integer, allocatable :: lmdaihist(:)
+      integer, allocatable :: lmdawinend(:)
       real*8 d2edl2
       real*8 d2eldlmda2
       real*8 d2emdl2
@@ -205,6 +219,7 @@ c
       real*8 lmdatheta
       real*8 lmdavbias
       real*8 lmdavtheta
+      real*8 lmdawinratio
       real*8 plmdaapmrho
       real*8 plmdainveps
       real*8 qntelmda0
@@ -232,6 +247,8 @@ c
       real*8, allocatable :: lmdafwt(:)
       real*8, allocatable :: lmdalhist(:)
       real*8, allocatable :: lmdallist(:)
+      real*8, allocatable :: lmdawinfrac(:)
+      real*8, allocatable :: lmdawinlist(:)
       real*8, allocatable :: pchg0orig(:)
       real*8, allocatable :: pchgorig(:)
       real*8, allocatable :: pcoreorig(:)

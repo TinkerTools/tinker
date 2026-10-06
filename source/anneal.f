@@ -155,7 +155,7 @@ c
          if (dtsave .le. 0.0d0)  dtsave = 0.1d0
   220    continue
       end do
-      iwrite = nint(dtsave/dt)
+      iwrite = max(1,nint(dtsave/dt))
 c
 c     get factor by which atomic weights are to be increased
 c

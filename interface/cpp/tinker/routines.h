@@ -366,6 +366,18 @@ void efreelmda_(double* eflmda, double* dfdl);
 #define tinker_f_efreelmda efreelmda_
 double efreetot_();
 #define tinker_f_efreetot efreetot_
+void setlmdasched_(int* nwin, int* nwinset);
+#define tinker_f_setlmdasched setlmdasched_
+void initlmdawin_(int* nstep);
+#define tinker_f_initlmdawin initlmdawin_
+void setlmdawin_();
+#define tinker_f_setlmdawin setlmdawin_
+void lmdawinphase_(int* istep, int* iprod);
+#define tinker_f_lmdawinphase lmdawinphase_
+void nextlmdawin_();
+#define tinker_f_nextlmdawin nextlmdawin_
+void lmdawinstep_(int* istep);
+#define tinker_f_lmdawinstep lmdawinstep_
 
 // eabf.f
 void eabfbias_();
@@ -1524,20 +1536,14 @@ void estrtor3_();
 #define tinker_f_estrtor3 estrtor3_
 
 // ethrmint.f
-void settisched_(int* ntiwin, int* tinbinset);
-#define tinker_f_settisched settisched_
 void inittidyn_(int* nstep);
 #define tinker_f_inittidyn inittidyn_
 void settiblocks_();
 #define tinker_f_settiblocks settiblocks_
-void settiwindow_();
-#define tinker_f_settiwindow settiwindow_
 void prttihead_();
 #define tinker_f_prttihead prttihead_
 void etidyn_(int* istep);
 #define tinker_f_etidyn etidyn_
-void tischedule_();
-#define tinker_f_tischedule tischedule_
 void saveti_();
 #define tinker_f_saveti saveti_
 
@@ -2256,6 +2262,8 @@ void mutate_abf_();
 #define tinker_f_mutate_abf mutate_abf_
 void mutate_meta_();
 #define tinker_f_mutate_meta mutate_meta_
+void mutate_window_();
+#define tinker_f_mutate_window mutate_window_
 void mutate_ti_();
 #define tinker_f_mutate_ti mutate_ti_
 void mutate_check_();

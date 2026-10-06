@@ -106,21 +106,21 @@ c
       use_metadyn = .false.
       use_ti = .true.
       use_mainlmda = .true.
-      tinbin = 3
-      tibin = 1
-      tieqratio = 0.0d0
+      nlmdawin = 3
+      lmdawin = 1
+      lmdawinratio = 0.0d0
       tinstepavg = 1
-      if (allocated(tilmdalist))  deallocate (tilmdalist)
-      if (allocated(tiwinend))  deallocate (tiwinend)
-      allocate (tilmdalist(tinbin))
-      allocate (tiwinend(tinbin))
-      tilmdalist(1) = 0.50d0
-      tilmdalist(2) = 0.25d0
-      tilmdalist(3) = 1.00d0
-      tiwinend(1) = 10
-      tiwinend(2) = 20
-      tiwinend(3) = 30
-      lambda = tilmdalist(2)
+      if (allocated(lmdawinlist))  deallocate (lmdawinlist)
+      if (allocated(lmdawinend))  deallocate (lmdawinend)
+      allocate (lmdawinlist(nlmdawin))
+      allocate (lmdawinend(nlmdawin))
+      lmdawinlist(1) = 0.50d0
+      lmdawinlist(2) = 0.25d0
+      lmdawinlist(3) = 1.00d0
+      lmdawinend(1) = 10
+      lmdawinend(2) = 20
+      lmdawinend(3) = 30
+      lambda = lmdawinlist(2)
       call mapsublmda (lambda)
       call altelec
       eref = energy ()
@@ -138,11 +138,11 @@ c
 c     install the first-window arrays, advance only the authoritative TI
 c     lambda, and require energy to rebuild all dependent parameter state
 c
-      tibin = 1
-      lambda = tilmdalist(1)
+      lmdawin = 1
+      lambda = lmdawinlist(1)
       call mapsublmda (lambda)
       call altelec
-      call tischedule
+      call nextlmdawin
       call assert_real (lambda,0.25d0,0.0d0,
      &                  'energy refresh TI window')
       call assert_real (elambda,0.50d0,0.0d0,
@@ -161,16 +161,16 @@ c
 c
 c     returning from a fractional state to one must restore originals
 c
-      lambda = tilmdalist(3)
+      lambda = lmdawinlist(3)
       call mapsublmda (lambda)
       call altelec
       eoneref = energy ()
       emoneref = em
-      tibin = 2
-      lambda = tilmdalist(2)
+      lmdawin = 2
+      lambda = lmdawinlist(2)
       call mapsublmda (lambda)
       call altelec
-      call tischedule
+      call nextlmdawin
       e = energy ()
       call assert_real (elambda,1.0d0,0.0d0,
      &                  'energy refresh endpoint elambda')
@@ -181,11 +181,11 @@ c
 c
 c     repeat with stale first-window arrays at the analysis boundary
 c
-      tibin = 1
-      lambda = tilmdalist(1)
+      lmdawin = 1
+      lambda = lmdawinlist(1)
       call mapsublmda (lambda)
       call altelec
-      call tischedule
+      call nextlmdawin
       call analysis (e)
       call assert_real (e,earef,1.0d-10,
      &                  'analysis refresh total')
@@ -199,11 +199,11 @@ c
 c     poison the mapped scalars as well as leaving first-window arrays
 c     installed, then require gradient to refresh values and derivatives
 c
-      tibin = 1
-      lambda = tilmdalist(1)
+      lmdawin = 1
+      lambda = lmdawinlist(1)
       call mapsublmda (lambda)
       call altelec
-      call tischedule
+      call nextlmdawin
       elambda = -1.0d0
       plambda = -1.0d0
       vlambda = -1.0d0
@@ -2216,7 +2216,7 @@ c
       if (skiptest(tname,'mutate'))  return
       call pushdir ('file/mutate')
       call loadfix_keyadd ('water2','175_water_vsoft_n15_ti_l00.key',
-     &                     'ti-window 0.0')
+     &                     'lambda-window 0.0')
       allocate (derivs(3,n))
       allocate (refg(3,n))
       call refpath ('mutate','172_water_vsoft_n1_d1_l00.txt',rpath)

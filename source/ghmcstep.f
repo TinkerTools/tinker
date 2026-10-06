@@ -233,6 +233,10 @@ c     total energy is sum of kinetic and potential energies
 c
       etot = eksum + epot
 c
+c     sample the lambda window of a sequential lambda method
+c
+      call lmdawindyn (istep)
+c
 c     compute statistics and save trajectory for this step
 c
       call mdstat (istep,dt,etot,epot,eksum,temp,pres)

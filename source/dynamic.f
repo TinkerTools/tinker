@@ -31,7 +31,6 @@ c
       use potent
       use stodyn
       use output
-      use thrmint
       use usage
       implicit none
       integer i,next,mode
@@ -131,7 +130,7 @@ c
          if (dtsave .le. 0.0d0)  dtsave = 0.1d0
   120    continue
       end do
-      iwrite = nint(dtsave/dt)
+      iwrite = max(1,nint(dtsave/dt))
 c
 c     get choice of statistical ensemble for periodic system
 c
@@ -349,7 +348,10 @@ c
          else
             call beeman (istep,dt)
          end if
-         if (use_ti)  call etidyn (istep)
+c
+c     move to the next lambda window at the end of the current one
+c
+         if (use_ti)  call lmdawinstep (istep)
       end do
 c
 c     save lambda dynamics information
