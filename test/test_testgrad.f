@@ -31,6 +31,7 @@ c
       call test_testgrad_case ('08_g3_nlist','g3')
       call test_testgrad_case ('09_aplus_thole0','tetramer')
       call test_testgrad_case ('10_aplus_polpair','tetramer')
+      call test_testgrad_case ('11_hippo_ast_l05','dmso')
       return
       end
 c
