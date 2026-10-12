@@ -1277,10 +1277,47 @@ c     ############################################################
 c
 c
 c     "lmdalangevin" propagates the auxiliary lambda particle in
-c     theta space, where lambda follows the theta map "lmdathmap"
+c     theta space, where lambda follows the theta map "lmdathmap";
+c     it draws the random kick and has "lmdalangstep" take the step
 c
 c
       subroutine lmdalangevin
+      use dlmda
+      implicit none
+      real*8 gauss
+      real*8 normal
+      external normal
+c
+c
+c     return if lambda dynamics parameters are invalid
+c
+      if (lmdadt .le. 0.0d0)  return
+      if (lmdamass .le. 0.0d0)  return
+c
+c     draw the random kick only when the friction puts it to use
+c
+      gauss = 0.0d0
+      if (lmdafric .gt. 0.0d0)  gauss = normal ()
+      call lmdalangstep (gauss)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine lmdalangstep -- lambda particle time step  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "lmdalangstep" takes one Langevin step of the lambda particle
+c     in theta space, with the standard normal deviate "gauss" as
+c     its random kick; the force on theta is in kcal/mole, so the
+c     mass is in kcal/mole*ps**2 and the size of the kick follows
+c     from the thermal energy in kcal/mole
+c
+c
+      subroutine lmdalangstep (gauss)
       use bath
       use dlmda
       use math
@@ -1290,17 +1327,11 @@ c
       real*8 c
       real*8 force
       real*8 gamma
-      real*8 normal
+      real*8 gauss
       real*8 sigma
       real*8 dldth
       real*8 ktm
-      external normal
 c
-c
-c     return if lambda dynamics parameters are invalid
-c
-      if (lmdadt .le. 0.0d0)  return
-      if (lmdamass .le. 0.0d0)  return
 c
 c     force on theta from dU/dlambda and the theta map derivative
 c
@@ -1312,11 +1343,11 @@ c
       gamma = max(0.0d0,lmdafric)
       if (gamma .gt. 0.0d0) then
          c = exp(-gamma*lmdadt)
-         ktm = boltzmann * kelvin / lmdamass
+         ktm = gasconst * kelvin / lmdamass
          sigma = sqrt(ktm*(1.0d0-c*c))
          lmdavtheta = c*lmdavtheta
      &                 + (1.0d0-c)*force/(gamma*lmdamass)
-     &                 + sigma*normal()
+     &                 + sigma*gauss
       else
          lmdavtheta = lmdavtheta + lmdadt*force/lmdamass
       end if

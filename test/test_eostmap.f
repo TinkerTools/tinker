@@ -1383,19 +1383,24 @@ c
 c     "test_eostmap_theta" checks the sine squared and smoothed
 c     triangle maps from the lambda particle theta onto the main
 c     lambda, their theta derivatives and inverses, and a lambda
-c     particle step taken with the smoothed triangle map
+c     particle step taken with the smoothed triangle map, without
+c     friction and then with friction and a given random kick
 c
 c
       subroutine test_eostmap_theta
+      use bath
       use dlmda
       use math
       use mutant
+      use units
       implicit none
       integer i,j
       real*8 theta,lmda,dldth
       real*8 lp,lm,dnum,h
       real*8 alpha,asina
       real*8 v0,th0,vref,thref
+      real*8 gauss,decay,sigma
+      real*8 kelvin0
       real*8 alist(2),llist(6)
       logical inrange
       character*3 maps(2)
@@ -1526,6 +1531,39 @@ c
       call assert_real (lambda,0.5d0-asin(alpha*cos(2.0d0*thref))
      &                     /(2.0d0*asina),1.0d-14,
      &                  'lmdalangevin tri lambda')
+c
+c     a step with friction and a given random kick; the kick is
+c     sized by the thermal energy in kcal/mole, as is the force
+c
+      kelvin0 = kelvin
+      kelvin = 300.0d0
+      lmdafric = 0.5d0
+      gauss = 0.8d0
+      lmdatheta = th0
+      lmdavtheta = v0
+      call lmdalangstep (gauss)
+      decay = exp(-lmdafric*lmdadt)
+      sigma = sqrt(gasconst*kelvin*(1.0d0-decay*decay)/lmdamass)
+      vref = decay*v0
+     &          - (1.0d0-decay)*deffdl*dldth/(lmdafric*lmdamass)
+     &          + sigma*gauss
+      thref = th0 + lmdadt*vref
+      call assert_real (lmdavtheta,vref,1.0d-14,
+     &                  'lmdalangstep friction theta velocity')
+      call assert_real (lmdatheta,thref,1.0d-14,
+     &                  'lmdalangstep friction theta')
+c
+c     a unit kick from rest with no force leaves the equipartition
+c     value, which is gasconst times 300 K in kcal/mole
+c
+      deffdl = 0.0d0
+      lmdatheta = th0
+      lmdavtheta = 0.0d0
+      call lmdalangstep (1.0d0)
+      call assert_real (lmdamass*lmdavtheta**2/(1.0d0-decay*decay),
+     &                  0.59616127758d0,1.0d-12,
+     &                  'lmdalangstep thermal energy in kcal/mole')
+      kelvin = kelvin0
 c
 c     a step past the end of the period wraps theta into [0,pi)
 c
