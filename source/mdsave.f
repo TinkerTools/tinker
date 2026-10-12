@@ -52,6 +52,7 @@ c
       integer trimtext
       integer modsave
       real*8 dt,pico
+      real*8 mcratio
       real*8 epot,eksum
       real*8 xustc,yustc,zustc
       real*8 xuind,yuind,zuind
@@ -194,6 +195,19 @@ c
             write (iout,210)  lambda
             write (iout,220)  dedl
          end if
+      end if
+c
+c     print the acceptance of any Monte Carlo lambda moves
+c
+      if (use_lmdamc .and. (use_ostdyn .or. use_metadyn
+     &                         .or. use_abfdyn)) then
+         mcratio = 0.0d0
+         if (nlmdamctry .gt. 0) then
+            mcratio = 100.0d0 * dble(nlmdamcacc) / dble(nlmdamctry)
+         end if
+         write (iout,255)  nlmdamcacc,nlmdamctry,mcratio
+  255    format (' Lambda MC Accept',4x,i7,' of',i7,' Trials',
+     &              f8.1,' Percent')
       end if
 c
 c     print the values of the lattice lengths and angles

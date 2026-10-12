@@ -160,13 +160,13 @@ c
       end do
       pres = (stress(1,1)+stress(2,2)+stress(3,3)) / 3.0d0
 c
+c     sample the lambda window or try a Monte Carlo lambda move
+c
+      call lmdawindyn (istep,epot)
+c
 c     total energy is sum of kinetic and potential energies
 c
       etot = epot + eksum
-c
-c     sample the lambda window of a sequential lambda method
-c
-      call lmdawindyn (istep)
 c
 c     compute statistics and save trajectory for this step
 c

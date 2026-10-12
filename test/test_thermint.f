@@ -1452,9 +1452,11 @@ c
       subroutine tidynstep (istep)
       implicit none
       integer istep
+      real*8 epot
 c
 c
-      call lmdawindyn (istep)
+      epot = 0.0d0
+      call lmdawindyn (istep,epot)
       call lmdawinstep (istep)
       return
       end

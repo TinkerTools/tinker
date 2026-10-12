@@ -79,6 +79,7 @@ c
       call test_improp
       call test_imptor
       call test_kinetic
+      call test_lmdamc
       call test_localframe
       call test_localframe2
       call test_localframe3

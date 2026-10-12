@@ -356,6 +356,7 @@ c
       real*8 temp
       real*8 lo,hi
       character*4 legword
+      character*8 propword
       character*20 keyword
       character*240 record
       character*240 string
@@ -370,6 +371,7 @@ c
       use_elmdamap = .false.
       use_epdt = .false.
       use_fep = .false.
+      use_lmdamc = .false.
       use_meta = .false.
       use_metadyn = .false.
       use_ost = .false.
@@ -440,7 +442,7 @@ c
 c     set default lambda sample interval and its phase ratios
 c
       lmdastep = 0
-      lmdaintv = 10
+      lmdaintv = 100
       lmdaparatio = 0.3d0
       lmdapbratio = 0.3d0
       nlmdasave = 0
@@ -458,6 +460,13 @@ c
       lmdadt = 0.001d0
       lmdathmap = 'TRI'
       lmdathalpha = 0.999999999d0
+c
+c     set defaults for the Monte Carlo lambda trial moves
+c
+      lmdamctrial = 10
+      lmdamcmove = 0.02d0
+      nlmdamctry = 0
+      nlmdamcacc = 0
 c
 c     set default lambda bins and lambda bias free energy
 c
@@ -507,6 +516,25 @@ c
          else if (keyword(1:19) .eq. 'LAMBDA-THETA-ALPHA ') then
             string = record(next:240)
             read (string,*,err=10)  lmdathalpha
+         else if (keyword(1:17) .eq. 'LAMBDA-PROPAGATE ') then
+            call getword (record,propword,next)
+            call upcase (propword)
+            if (propword .eq. 'MC') then
+               use_lmdamc = .true.
+            else if (propword .eq. 'LANGEVIN') then
+               use_lmdamc = .false.
+            else
+               write (iout,3)
+    3          format (/,' MUTATE_DLMDA  --  LAMBDA-PROPAGATE takes',
+     &                    ' either LANGEVIN or MC')
+               call fatal
+            end if
+         else if (keyword(1:16) .eq. 'LAMBDA-MC-TRIAL ') then
+            string = record(next:240)
+            read (string,*,err=10)  lmdamctrial
+         else if (keyword(1:15) .eq. 'LAMBDA-MC-MOVE ') then
+            string = record(next:240)
+            read (string,*,err=10)  lmdamcmove
          else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
             string = record(next:240)
             read (string,*,err=10)  nlmda
@@ -624,6 +652,11 @@ c
       if (lmdaparatio .lt. 0.0d0)  lmdaparatio = 0.0d0
       if (lmdapbratio .lt. 0.0d0)  lmdapbratio = 0.0d0
       call setlmdaphase
+c
+c     keep the Monte Carlo lambda move within a single reflection
+c
+      if (lmdamctrial .lt. 1)  lmdamctrial = 1
+      lmdamcmove = min(1.0d0,abs(lmdamcmove))
 c
 c     validate the theta map of the lambda particle
 c

@@ -17,6 +17,7 @@ c     elmdaexp      exponent for electrostatic exponential mapping
 c     elmdainvn     inverse-power exponent for electrostatic mapping
 c     epdtexp       polarization lambda exponent for dual topology
 c     lmdaintv      steps in each adaptive bias sample interval
+c     lmdamctrial   mean number of steps between lambda trial moves
 c     lmdanpa       steps propagating the lambda particle
 c     lmdanpb       steps equilibrating at the frozen lambda
 c     lmdanpc       steps averaged at the frozen lambda
@@ -26,6 +27,8 @@ c     lmdawineq     equilibration steps in the current lambda window
 c     lmdawinlen    total dynamics steps in the current lambda window
 c     nlmda         number of lambda bins
 c     nlmdahist     number of saved lambda bias history entries
+c     nlmdamcacc    number of accepted Monte Carlo lambda moves
+c     nlmdamctry    number of attempted Monte Carlo lambda moves
 c     nlmdasave     history entries already written to the file
 c     nlmdawin      number of sequential lambda windows
 c     plmdaapmn     power exponent for polarization asymmetric map
@@ -65,6 +68,7 @@ c     lmdadfdl      saved bias free energy derivative for dynamics
 c     lmdadt        time step of the theta lambda coordinate
 c     lmdafric      friction coefficient of theta lambda coordinate
 c     lmdamass      fictitious mass of the theta lambda coordinate
+c     lmdamcmove    maximum size of a Monte Carlo lambda move
 c     lmdaparatio   interval fraction propagating the lambda particle
 c     lmdapbratio   interval fraction equilibrating at fixed lambda
 c     lmdastd       interval deviation of the main lambda
@@ -131,6 +135,7 @@ c     use_elmdamap  flag that elambda follows the main lambda map
 c     use_epdt      flag governing use of polarization dual topology
 c     use_fep       flag to use free energy perturbation over windows
 c     use_lmdacv    flag to gate interval samples by convergence
+c     use_lmdamc    flag to move lambda by Monte Carlo trial moves
 c     use_mainlmda  flag that a main lambda value was specified
 c     use_meta      flag to use metadynamics
 c     use_metadyn   flag to propagate metadynamics lambda particle
@@ -164,6 +169,7 @@ c
       integer elmdainvn
       integer epdtexp
       integer lmdaintv
+      integer lmdamctrial
       integer lmdanpa
       integer lmdanpb
       integer lmdanpc
@@ -173,6 +179,8 @@ c
       integer lmdawinlen
       integer nlmda
       integer nlmdahist
+      integer nlmdamcacc
+      integer nlmdamctry
       integer nlmdasave
       integer nlmdawin
       integer plmdaapmn
@@ -212,6 +220,7 @@ c
       real*8 lmdadt
       real*8 lmdafric
       real*8 lmdamass
+      real*8 lmdamcmove
       real*8 lmdaparatio
       real*8 lmdapbratio
       real*8 lmdastd
@@ -276,6 +285,7 @@ c
       logical use_epdt
       logical use_fep
       logical use_lmdacv
+      logical use_lmdamc
       logical use_mainlmda
       logical use_meta
       logical use_metadyn

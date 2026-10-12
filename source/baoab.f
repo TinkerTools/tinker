@@ -199,13 +199,13 @@ c
       deallocate (vrand)
       deallocate (derivs)
 c
+c     sample the lambda window or try a Monte Carlo lambda move
+c
+      call lmdawindyn (istep,epot)
+c
 c     total energy is sum of kinetic and potential energies
 c
       etot = eksum + epot
-c
-c     sample the lambda window of a sequential lambda method
-c
-      call lmdawindyn (istep)
 c
 c     compute statistics and save trajectory for this step
 c
@@ -400,13 +400,13 @@ c
       deallocate (vrand)
       deallocate (derivs)
 c
+c     sample the lambda window or try a Monte Carlo lambda move
+c
+      call lmdawindyn (istep,epot)
+c
 c     total energy is sum of kinetic and potential energies
 c
-      etot = eksum + epot 
-c
-c     sample the lambda window of a sequential lambda method
-c
-      call lmdawindyn (istep)
+      etot = eksum + epot
 c
 c     compute statistics and save trajectory for this step
 c

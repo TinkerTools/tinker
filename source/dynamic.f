@@ -232,6 +232,17 @@ c
          end if
       end if
 c
+c     Monte Carlo lambda moves are accepted at a set temperature
+c
+      if (use_lmdamc .and. .not.isothermal) then
+         if (use_ostdyn .or. use_metadyn .or. use_abfdyn) then
+            write (iout,335)
+  335       format (/,' DYNAMIC  --  Monte Carlo Lambda Moves Require',
+     &                 ' a Constant Temperature Ensemble')
+            call fatal
+         end if
+      end if
+c
 c     perform the setup functions needed to run dynamics
 c
       call mdinit (dt)

@@ -623,7 +623,7 @@ c
       integer irow
       integer nrow
       integer oldleng
-      real*8 eps
+      real*8 eps,epot
       real*8 simlmda,trial,ene
       character*240 oldname
 c
@@ -631,6 +631,7 @@ c
 c     the mode owns the main lambda without the lambda derivative
 c
       eps = 1.0d-8
+      epot = 0.0d0
       call pushdir ('file/fep')
       call loadfix ('../mutate/water2','window.key')
       call assert_logical (use_fep,.true.,'fep sample use_fep')
@@ -648,7 +649,7 @@ c
       call initfepdyn (60)
       call assert_int (nfeptot,14,'fep sample capacity')
       do istep = 1, 60
-         call lmdawindyn (istep)
+         call lmdawindyn (istep,epot)
          call lmdawinstep (istep)
       end do
       call assert_int (nfep,14,'fep sample records')
@@ -723,7 +724,7 @@ c
       lambda = lmdawinlist(1)
       call initfepdyn (60)
       do istep = 1, 60
-         call lmdawindyn (istep)
+         call lmdawindyn (istep,epot)
          call lmdawinstep (istep)
       end do
       call assert_int (nfep,14,'fep sample ascending records')

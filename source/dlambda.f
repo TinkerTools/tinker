@@ -1195,7 +1195,9 @@ c     "elmdadyn" advances the adaptive lambda bias by one dynamics
 c     step for orthogonal space tempering, metadynamics or adaptive
 c     biasing force; it builds the effective lambda derivative, saves
 c     the interval samples, deposits the interval average at the end
-c     of each interval and propagates the lambda particle
+c     of each interval and propagates the lambda particle; when the
+c     lambda is moved by Monte Carlo trials the particle is left alone
+c     and "lmdamonte" changes the lambda once the step is complete
 c
 c
       subroutine elmdadyn
@@ -1260,10 +1262,12 @@ c
 c     propagate the lambda particle; ost and abf hold lambda fixed
 c     after the propagation phase
 c
-      if (use_ost .or. use_abf) then
-         if (isamp .le. lmdanpa)  call lmdalangevin
-      else
-         call lmdalangevin
+      if (.not. use_lmdamc) then
+         if (use_ost .or. use_abf) then
+            if (isamp .le. lmdanpa)  call lmdalangevin
+         else
+            call lmdalangevin
+         end if
       end if
       return
       end
@@ -1362,6 +1366,328 @@ c
 c     map theta back to the main lambda
 c
       call lmdathetamap (lmdatheta,lambda,dldth)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine elmdabias  --  bias that follows lambda alone  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "elmdabias" finds the adaptive bias energy at the current
+c     lambda for the methods whose bias depends on lambda alone,
+c     adaptive biasing force and metadynamics, from the history as
+c     it now stands; "slope" returns the value that each method saves
+c     to drive the lambda particle, the mean force for abf and the
+c     bias derivative for metadynamics; no saved value is changed
+c
+c
+      subroutine elmdabias (vbias,slope)
+      use dlmda
+      use mutant
+      implicit none
+      real*8 vbias,slope
+c
+c
+      if (use_abfdyn) then
+         call efreelmda (vbias,slope)
+         vbias = -vbias
+      else
+         call emetabias (lambda,vbias,slope)
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine lmdamonte  --  Monte Carlo move of lambda  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "lmdamonte" attempts a Monte Carlo change of the main lambda
+c     at fixed coordinates, in place of propagating the lambda
+c     particle; a trial is made at random, on average once every
+c     "lmdamctrial" steps of the propagation phase of the sample
+c     interval, by a step drawn uniformly up to "lmdamcmove" in
+c     either direction and reflected at the ends of the lambda range
+c
+c     the trial is accepted by the Metropolis test on the change in
+c     the potential energy plus the adaptive bias, both taken at the
+c     coordinates, box and bias history in place when the move is
+c     tried; "epot" is the energy of the completed step on entry, and
+c     is replaced by the energy at the new lambda only when the move
+c     is accepted
+c
+c     the induced dipoles, the lambda dependent parameters and the
+c     forces and multipoles read by the saved output are returned
+c     to what the step left after a rejected move, while
+c     an accepted move keeps those of the trial; prediction of the
+c     induced dipoles is assumed to be off, as is enforced for the
+c     adaptive bias methods by "predict", so no history is changed
+c
+c
+      subroutine lmdamonte (epot)
+      use atoms
+      use bath
+      use bound
+      use deriv
+      use dlmda
+      use mdstuf
+      use mpole
+      use mutant
+      use ost
+      use output
+      use polar
+      use potent
+      use units
+      use virial
+      implicit none
+      integer i,j
+      integer istep,isamp
+      real*8 epot
+      real*8 eold,enew
+      real*8 de,kt
+      real*8 lold,ltrial
+      real*8 vbias,slope
+      real*8 energy,random
+      real*8 dedlold,d2edl2old
+      real*8 vbiasold,dfdlold
+      real*8 bdgdlold,bdgdflold
+      real*8 virsave(3,3)
+      real*8, allocatable :: dtrial(:,:)
+      real*8, allocatable :: desumold(:,:)
+      real*8, allocatable :: rpoleold(:,:)
+      real*8, allocatable :: uindold(:,:)
+      real*8, allocatable :: uinpold(:,:)
+      real*8, allocatable :: udirold(:,:)
+      real*8, allocatable :: udirpold(:,:)
+      real*8, allocatable :: uindsold(:,:)
+      real*8, allocatable :: uinpsold(:,:)
+      real*8, allocatable :: udirsold(:,:)
+      real*8, allocatable :: udirpsold(:,:)
+      logical accept,stale
+      logical savepol,savesolv
+      logical savepole
+      external random
+c
+c
+c     ost and abf move lambda only in the propagation phase of the
+c     sample interval, while metadynamics moves it at any step
+c
+      istep = mod(lmdastep,lmdaintv)
+      if (istep .eq. 0) then
+         isamp = lmdaintv
+      else
+         isamp = istep
+      end if
+      if (use_ostdyn .or. use_abfdyn) then
+         if (isamp .gt. lmdanpa)  return
+      end if
+c
+c     decide whether to attempt a lambda change at this step
+c
+      if (random() .ge. 1.0d0/dble(lmdamctrial))  return
+c
+c     draw the trial lambda and reflect it into the lambda range
+c
+      kt = gasconst * kelvin
+      ltrial = lambda + lmdamcmove*(2.0d0*random()-1.0d0)
+      if (ltrial .lt. 0.0d0)  ltrial = -ltrial
+      if (ltrial .gt. 1.0d0)  ltrial = 2.0d0 - ltrial
+      nlmdamctry = nlmdamctry + 1
+c
+c     the energy of the step no longer holds once the coordinates or
+c     the box have changed since its forces were found, as they have
+c     after a scaling barostat or after a rigid body step, which finds
+c     its forces before it moves; nor does the ost energy hold once
+c     this step has added to the history
+c
+      stale = (integrate .eq. 'RIGIDBODY')
+      if (isobaric .and. use_bounds) then
+         if (barostat.eq.'BERENDSEN' .or. barostat.eq.'BUSSI')
+     &      stale = .true.
+      end if
+      if (use_ostdyn .and. istep.eq.0)  stale = .true.
+c
+c     perform dynamic allocation of some local arrays
+c
+      savepol = use_polar
+      savesolv = (use_polar .and. use_solv .and. allocated(uinds))
+      savepole = (allocated(rpole) .and.
+     &               (ustcsave .or. uchgsave .or. usyssave))
+      if (use_ostdyn) then
+         allocate (dtrial(3,n))
+         allocate (desumold(3,n))
+      end if
+      if (savepole)  allocate (rpoleold(maxpole,n))
+      if (savepol) then
+         allocate (uindold(3,n))
+         allocate (uinpold(3,n))
+         allocate (udirold(3,n))
+         allocate (udirpold(3,n))
+      end if
+      if (savesolv) then
+         allocate (uindsold(3,n))
+         allocate (uinpsold(3,n))
+         allocate (udirsold(3,n))
+         allocate (udirpsold(3,n))
+      end if
+c
+c     save the native lambda state before any energy is found, so
+c     that a rejected move restores just what the step has left
+c
+      lold = lambda
+      dedlold = dedl
+      d2edl2old = d2edl2
+      vbiasold = lmdavbias
+      dfdlold = lmdadfdl
+      bdgdlold = ostbdgdl
+      bdgdflold = ostbdgdfl
+      do i = 1, 3
+         do j = 1, 3
+            virsave(j,i) = vir(j,i)
+         end do
+      end do
+      if (use_ostdyn)  desumold = desum
+      if (savepole)  rpoleold = rpole
+      if (savepol) then
+         uindold = uind
+         uinpold = uinp
+         udirold = udir
+         udirpold = udirp
+      end if
+      if (savesolv) then
+         uindsold = uinds
+         uinpsold = uinps
+         udirsold = udirs
+         udirpsold = udirps
+      end if
+c
+c     get the old energy at the native lambda, using the energy of
+c     the step unless it is stale; a bias that follows lambda alone
+c     is taken from the history as it now stands, which may hold a
+c     deposit made after the forces of the step were found
+c
+      if (use_ostdyn) then
+         eold = epot
+         if (stale)  call gradient (eold,dtrial)
+      else
+         if (stale) then
+            eold = energy ()
+         else
+            eold = epot - lmdavbias
+         end if
+         call elmdabias (vbias,slope)
+         eold = eold + vbias
+      end if
+c
+c     get the new energy at the trial lambda; the ost bias follows
+c     dU/dlambda, so it is found along with the lambda derivative
+c
+      lambda = ltrial
+      if (use_ostdyn) then
+         call gradient (enew,dtrial)
+         vbias = lmdavbias
+      else
+         call elmdabias (vbias,slope)
+         enew = energy () + vbias
+      end if
+c
+c     acceptance from the change in potential energy plus bias
+c
+      de = enew - eold
+      accept = (de .le. 0.0d0)
+      if (.not.accept .and. kt.gt.0.0d0) then
+         if (random() .lt. exp(-de/kt))  accept = .true.
+      end if
+c
+c     accept the step, and keep the lambda particle at the new lambda
+c
+      if (accept) then
+         nlmdamcacc = nlmdamcacc + 1
+         epot = enew
+         lmdavbias = vbias
+         if (use_ostdyn) then
+            ostdgdl = ostbdgdl + ostbdgdfl*d2edl2
+            lmdaddgdl = lmdadfdl
+         else if (use_abfdyn) then
+            lmdadfdl = slope
+            lmdaddgdl = slope
+         else
+            ostbdgdl = slope
+         end if
+         call lmdathetainv (lambda,lmdatheta)
+         lmdavtheta = 0.0d0
+c
+c     reject the step, and restore values prior to the trial change
+c
+      else
+         lambda = lold
+         dedl = dedlold
+         d2edl2 = d2edl2old
+         lmdavbias = vbiasold
+         lmdadfdl = dfdlold
+         ostbdgdl = bdgdlold
+         ostbdgdfl = bdgdflold
+         if (savepol) then
+            uind = uindold
+            uinp = uinpold
+            udir = udirold
+            udirp = udirpold
+         end if
+         if (savesolv) then
+            uinds = uindsold
+            uinps = uinpsold
+            udirs = udirsold
+            udirps = udirpsold
+         end if
+c
+c     reinstall the native lambda dependent parameters, along with
+c     the charge flux monopoles and the global frame multipoles
+c
+         call refreshsublmda
+         if (use_mpole .or. use_polar)  call alteprst
+c
+c     put back the forces of the step, and the global frame
+c     multipoles as its last routine left them, which the saved
+c     output reads; the multipoles are kept only if they are saved
+c
+         if (use_ostdyn)  desum = desumold
+         if (savepole)  rpole = rpoleold
+      end if
+c
+c     the virial of the completed step is left in place
+c
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = virsave(j,i)
+         end do
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      if (use_ostdyn) then
+         deallocate (dtrial)
+         deallocate (desumold)
+      end if
+      if (savepole)  deallocate (rpoleold)
+      if (savepol) then
+         deallocate (uindold)
+         deallocate (uinpold)
+         deallocate (udirold)
+         deallocate (udirpold)
+      end if
+      if (savesolv) then
+         deallocate (uindsold)
+         deallocate (uinpsold)
+         deallocate (udirsold)
+         deallocate (udirpsold)
+      end if
       return
       end
 c
@@ -1853,25 +2179,28 @@ c
       end
 c
 c
-c     #########################################################
-c     ##                                                     ##
-c     ##  subroutine lmdawindyn  --  lambda window sampling  ##
-c     ##                                                     ##
-c     #########################################################
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine lmdawindyn  --  end of step lambda work  ##
+c     ##                                                      ##
+c     ##########################################################
 c
 c
 c     "lmdawindyn" advances the adaptive lambda bias and the lambda
-c     particle by one dynamics step, and takes the sample that a
-c     sequential lambda method collects at each step; it is called
-c     by the integrators once the step is complete and before the
-c     trajectory is saved, so anything finished on a step is written
-c     out on that step
+c     particle by one dynamics step, takes the sample that a
+c     sequential lambda method collects at each step, and attempts
+c     the Monte Carlo move of an adaptively biased lambda; it is
+c     called by the integrators once the step is complete and before
+c     the trajectory is saved, so anything finished on a step is
+c     written out on that step; "epot" is the potential energy of
+c     the step, which an accepted lambda move replaces
 c
 c
-      subroutine lmdawindyn (istep)
+      subroutine lmdawindyn (istep,epot)
       use dlmda
       implicit none
       integer istep
+      real*8 epot
 c
 c
 c     advance the adaptive lambda bias and the lambda particle, now
@@ -1886,6 +2215,14 @@ c
 c     find trial lambda energies for free energy perturbation
 c
       if (use_fep)  call efepdyn (istep)
+c
+c     try a Monte Carlo move of an adaptively biased lambda
+c
+      if (use_lmdamc) then
+         if (use_ostdyn .or. use_metadyn .or. use_abfdyn) then
+            call lmdamonte (epot)
+         end if
+      end if
       return
       end
 c

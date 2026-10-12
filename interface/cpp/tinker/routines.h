@@ -360,6 +360,10 @@ void lmdalangevin_();
 #define tinker_f_lmdalangevin lmdalangevin_
 void lmdalangstep_(double* gauss);
 #define tinker_f_lmdalangstep lmdalangstep_
+void elmdabias_(double* vbias, double* slope);
+#define tinker_f_elmdabias elmdabias_
+void lmdamonte_(double* epot);
+#define tinker_f_lmdamonte lmdamonte_
 void lmdathetamap_(double* theta, double* lmda, double* dldth);
 #define tinker_f_lmdathetamap lmdathetamap_
 void lmdathetainv_(double* lmda, double* theta);
@@ -378,7 +382,7 @@ void lmdawinsize_(int* iwin, int* nlen, int* neq);
 #define tinker_f_lmdawinsize lmdawinsize_
 void lmdawinphase_(int* istep, int* iprod);
 #define tinker_f_lmdawinphase lmdawinphase_
-void lmdawindyn_(int* istep);
+void lmdawindyn_(int* istep, double* epot);
 #define tinker_f_lmdawindyn lmdawindyn_
 void nextlmdawin_();
 #define tinker_f_nextlmdawin nextlmdawin_

@@ -61,10 +61,13 @@ c
          end if
       end do
 c
-c     disable dipole prediction for dual topology polarization, and
-c     for free energy perturbation between lambda windows
+c     disable dipole prediction for dual topology polarization, for
+c     free energy perturbation between lambda windows, and for the
+c     adaptive lambda bias methods, where the lambda changes as the
+c     dynamics runs and trial energies are found at other lambdas
 c
-      if (use_epdt .or. use_fep) then
+      if (use_epdt .or. use_fep .or. use_ost
+     &       .or. use_abf .or. use_meta) then
          use_pred = .false.
          use_ielscf = .false.
          polpred = '    '

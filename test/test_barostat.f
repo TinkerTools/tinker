@@ -191,6 +191,7 @@ c
       use atoms
       use bath
       use boxes
+      use deriv
       use dlmda
       use mdstuf
       use mutant
@@ -209,6 +210,7 @@ c
       real*8, allocatable :: y0(:)
       real*8, allocatable :: z0(:)
       real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: desum0(:,:)
       character*(*) tname
       parameter (tname='test_barostat_ost')
 c
@@ -254,11 +256,13 @@ c
      &                     tname//' bias slope')
 c
 c     an old energy far below any trial energy rejects the move, which
-c     puts back the lambda derivative and the saved bias of the step
+c     puts back the lambda derivative, the saved bias and the forces
+c     of the step
 c
       allocate (x0(n))
       allocate (y0(n))
       allocate (z0(n))
+      allocate (desum0(3,n))
       box0 = (/ xbox,ybox,zbox,alpha,beta,gamma,volbox /)
       x0 = x(1:n)
       y0 = y(1:n)
@@ -269,6 +273,7 @@ c
       dfdl0 = lmdadfdl
       bdgdl0 = ostbdgdl
       bdgdfl0 = ostbdgdfl
+      desum0 = desum
       epot = -1.0d30
       call pmonte (epot,temp)
       call assert_real (epot,-1.0d30,0.0d0,tname//' reject epot')
@@ -283,6 +288,7 @@ c
       call assert_real (lmdadfdl,dfdl0,0.0d0,tname//' reject dfdl')
       call assert_real (ostbdgdl,bdgdl0,0.0d0,tname//' reject dgdl')
       call assert_real (ostbdgdfl,bdgdfl0,0.0d0,tname//' reject dgdfl')
+      call assert_array2 (desum,desum0,3,n,0.0d0,tname//' reject desum')
 c
 c     an old energy far above the trial energy accepts the move, which
 c     returns the energy, lambda derivative and bias of the new box
@@ -305,13 +311,14 @@ c
 c     the end of step call advances the bias by one dynamics step
 c
       lmdastep0 = lmdastep
-      call lmdawindyn (1)
+      call lmdawindyn (1,epot)
       call assert_int (lmdastep,lmdastep0+1,
      &                 tname//' lmdawindyn lmdastep')
       deallocate (x0)
       deallocate (y0)
       deallocate (z0)
       deallocate (derivs)
+      deallocate (desum0)
       call popdir
       call final
       return

@@ -545,6 +545,7 @@ c
       use atoms
       use bath
       use boxes
+      use deriv
       use dlmda
       use group
       use math
@@ -589,6 +590,7 @@ c
       real*8, allocatable :: yold(:)
       real*8, allocatable :: zold(:)
       real*8, allocatable :: dtrial(:,:)
+      real*8, allocatable :: desumold(:,:)
       real*8, allocatable :: uindold(:,:)
       real*8, allocatable :: uinpold(:,:)
       real*8, allocatable :: udirold(:,:)
@@ -633,7 +635,10 @@ c
          allocate (xold(n))
          allocate (yold(n))
          allocate (zold(n))
-         if (use_ostdyn)  allocate (dtrial(3,n))
+         if (use_ostdyn) then
+            allocate (dtrial(3,n))
+            allocate (desumold(3,n))
+         end if
 c
 c     the trial energy solves the induced dipoles at the trial
 c     geometry and adds them to the predictor history
@@ -679,6 +684,7 @@ c
             dfdlold = lmdadfdl
             bdgdlold = ostbdgdl
             bdgdflold = ostbdgdfl
+            desumold = desum
          end if
          do i = 1, n
             xold(i) = x(i)
@@ -1171,6 +1177,7 @@ c
                lmdadfdl = dfdlold
                ostbdgdl = bdgdlold
                ostbdgdfl = bdgdflold
+               desum = desumold
             end if
             xbox = xboxold
             ybox = yboxold
@@ -1212,7 +1219,10 @@ c
          deallocate (xold)
          deallocate (yold)
          deallocate (zold)
-         if (use_ostdyn)  deallocate (dtrial)
+         if (use_ostdyn) then
+            deallocate (dtrial)
+            deallocate (desumold)
+         end if
          if (savepol) then
             deallocate (uindold)
             deallocate (uinpold)
