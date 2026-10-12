@@ -358,6 +358,8 @@ void elmdadyn_();
 #define tinker_f_elmdadyn elmdadyn_
 void lmdalangevin_();
 #define tinker_f_lmdalangevin lmdalangevin_
+void lmdalangstep_(double* gauss);
+#define tinker_f_lmdalangstep lmdalangstep_
 void lmdathetamap_(double* theta, double* lmda, double* dldth);
 #define tinker_f_lmdathetamap lmdathetamap_
 void lmdathetainv_(double* lmda, double* theta);

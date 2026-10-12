@@ -551,6 +551,7 @@ c
       use mdstuf
       use molcul
       use moldyn
+      use ost
       use polar
       use potent
       use units
@@ -566,6 +567,9 @@ c
       real*8 expterm,weigh
       real*8 kt,step,scale
       real*8 eold,rnd6,cosine
+      real*8 dedlold,d2edl2old
+      real*8 vbiasold,dfdlold
+      real*8 bdgdlold,bdgdflold
       real*8 xcm,ycm,zcm
       real*8 volold,voltarget
       real*8 dpot,dpv,dkin
@@ -601,7 +605,6 @@ c
       logical savepol
       logical savepred
       logical savesolv
-      logical eostapprox
       logical isotropic
       logical idealgas
       logical semixy
@@ -669,6 +672,14 @@ c
          gammaold = gamma
          volold = volbox
          eold = epot
+         if (use_ostdyn) then
+            dedlold = dedl
+            d2edl2old = d2edl2
+            vbiasold = lmdavbias
+            dfdlold = lmdadfdl
+            bdgdlold = ostbdgdl
+            bdgdflold = ostbdgdfl
+         end if
          do i = 1, n
             xold(i) = x(i)
             yold(i) = y(i)
@@ -1089,19 +1100,14 @@ c
             end if
          end if
 c
-c     get the potential energy and PV work changes for trial move
+c     get the potential energy and PV work changes for trial move;
+c     the ost bias follows dU/dlambda, which changes with the box,
+c     so its trial takes the lambda derivative from the gradient
 c
          if (use_ostdyn) then
-            eostapprox = .true.
-            if (eostapprox) then
-               epot = energy () + lmdavbias
-            else
-               virsave = vir
-               lmdatrial = .true.
-               call gradient (epot,dtrial)
-               lmdatrial = .false.
-               vir = virsave
-            end if
+            virsave = vir
+            call gradient (epot,dtrial)
+            vir = virsave
          else if (use_metadyn) then
             epot = energy () + lmdavbias
          else if (use_abfdyn) then
@@ -1158,6 +1164,14 @@ c     reject the step, and restore values prior to trial change
 c
          if (random() .gt. expterm) then
             epot = eold
+            if (use_ostdyn) then
+               dedl = dedlold
+               d2edl2 = d2edl2old
+               lmdavbias = vbiasold
+               lmdadfdl = dfdlold
+               ostbdgdl = bdgdlold
+               ostbdgdfl = bdgdflold
+            end if
             xbox = xboxold
             ybox = yboxold
             zbox = zboxold

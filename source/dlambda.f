@@ -1860,10 +1860,12 @@ c     ##                                                     ##
 c     #########################################################
 c
 c
-c     "lmdawindyn" takes the sample that a sequential lambda method
-c     collects at each dynamics step; it is called by the integrators
-c     once the step is complete and before the trajectory is saved,
-c     so anything finished on a step is written out on that step
+c     "lmdawindyn" advances the adaptive lambda bias and the lambda
+c     particle by one dynamics step, and takes the sample that a
+c     sequential lambda method collects at each step; it is called
+c     by the integrators once the step is complete and before the
+c     trajectory is saved, so anything finished on a step is written
+c     out on that step
 c
 c
       subroutine lmdawindyn (istep)
@@ -1871,6 +1873,11 @@ c
       implicit none
       integer istep
 c
+c
+c     advance the adaptive lambda bias and the lambda particle, now
+c     that the step and any Monte Carlo box change are complete
+c
+      if (use_ostdyn .or. use_metadyn .or. use_abfdyn)  call elmdadyn
 c
 c     collect dU/dlambda for thermodynamic integration
 c

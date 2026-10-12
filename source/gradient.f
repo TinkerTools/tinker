@@ -363,7 +363,6 @@ c
             else
                call eostbias
             end if
-            if (.not. lmdatrial)  call elmdadyn
             energy = esum
             do i = 1, n
                do j = 1, 3

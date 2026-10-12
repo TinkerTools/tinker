@@ -195,7 +195,6 @@ c
 c
 c     flag for use of lambda derivative
 c
-      lmdatrial = .false.
       mutfield = .false.
       use_abf = .false.
       use_abfdyn = .false.
