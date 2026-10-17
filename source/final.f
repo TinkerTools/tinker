@@ -461,6 +461,7 @@ c
       if (allocated(fepene))  deallocate (fepene)
       if (allocated(feplmda))  deallocate (feplmda)
       if (allocated(feptrial))  deallocate (feptrial)
+      if (allocated(fepvol))  deallocate (fepvol)
 c
 c     deallocation of global arrays from module fft
 c

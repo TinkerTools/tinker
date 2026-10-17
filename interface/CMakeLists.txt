@@ -192,6 +192,7 @@ add_library (tinkerObjF OBJECT
 ../source/angles.f
 ../source/attach.f
 ../source/baoab.f
+../source/barpair.f
 ../source/basefile.f
 ../source/beeman.f
 ../source/bicubic.f

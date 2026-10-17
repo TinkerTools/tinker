@@ -1,0 +1,58 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                         Version 26.2  April 2026                         ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2026               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Free Energy from Tinker FEP File :
+
+ FEP File Name :            analytic.fep
+ Lambda Windows Found :              4
+ Lambda Schedule :              1.0000 -->   0.0000
+ Simulation Temperature :       298.00 K
+ Samples per Window :               4 to       4
+ Sample Selection :          First     1  Last   All  Step     1
+ Bootstrap Trials per Pair :    10000
+
+ Bootstrap errors assume independent samples, which may not hold at the
+ sampling interval used
+
+ Free Energy by Window Pair :
+
+  Pair  Lambda A  Lambda B    BAR Iter     +/-    BAR Boot     +/-    Cumul dG
+
+     1    1.0000    0.7000      0.5000  0.0000      0.5000  0.0000      0.5000
+     2    0.7000    0.2000     -0.3000  0.0000     -0.3000  0.0000      0.2000
+     3    0.2000    0.0000      1.2000  0.0000      1.2000  0.0000      1.4000
+
+ Sampling Diagnostics by Window Pair :
+
+  Pair    nA    nB    FEP Fwd    FEP Bwd    Fwd-Bwd  SD dU Fwd  SD dU Bwd
+
+     1     4     4     0.5000     0.5000     0.0000     0.0000     0.0000
+     2     4     4    -0.3000    -0.3000    -0.0000     0.0000     0.0000
+     3     4     4     1.2000     1.2000     0.0000     0.0000     0.0000
+
+ Free Energy Totals :
+
+ Free Energy via Forward FEP               1.4000 +/-   0.0000 Kcal/mol
+ Free Energy via Backward FEP              1.4000 +/-   0.0000 Kcal/mol
+ Free Energy via BAR Iteration             1.4000 +/-   0.0000 Kcal/mol
+ Free Energy via BAR Bootstrap             1.4000 +/-   0.0000 Kcal/mol
+
+ Enthalpy and Entropy Totals :
+
+ Enthalpy via Direct Estimate              1.0000 +/-   0.0000 Kcal/mol
+ Enthalpy via BAR Estimate                 1.4000 +/-   0.0000 Kcal/mol
+ BAR Estimate -T*dS Value                  0.0000 Kcal/mol
+
+ Enthalpy and Entropy Estimates are much Noisier than the Free Energy

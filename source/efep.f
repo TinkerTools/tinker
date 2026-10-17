@@ -152,10 +152,12 @@ c
       if (allocated(fepene))  deallocate (fepene)
       if (allocated(feplmda))  deallocate (feplmda)
       if (allocated(feptrial))  deallocate (feptrial)
+      if (allocated(fepvol))  deallocate (fepvol)
       allocate (fepstep(max(1,nfeptot)))
       allocate (fepene(max(1,nfeptot)))
       allocate (feplmda(max(1,nfeptot)))
       allocate (feptrial(max(1,nfeptot)))
+      allocate (fepvol(max(1,nfeptot)))
 c
 c     zero out the energies recorded along the schedule
 c
@@ -164,6 +166,7 @@ c
          fepene(i) = 0.0d0
          feplmda(i) = 0.0d0
          feptrial(i) = 0.0d0
+         fepvol(i) = 0.0d0
       end do
       nfep = 0
       nfepsave = 0
@@ -179,8 +182,9 @@ c     ##############################################################
 c
 c
 c     "prtfephead" creates the external file that collects the trial
-c     lambda energies and writes the fixed header that describes the
-c     lambda windows and the sampling; the energies themselves are
+c     lambda energies and writes the fixed header giving the sampling
+c     parameters, the pressure for an isobaric simulation, and the
+c     column labels; the energies and box volumes themselves are
 c     appended later by "savefep"
 c
 c
@@ -191,7 +195,6 @@ c
       use files
       use iounit
       implicit none
-      integer i
       integer ifep
       integer freeunit
       integer trimtext
@@ -220,30 +223,24 @@ c
      &        /,' Number of Dynamics Steps',9x,i10,
      &        /,' Total Number of Energy Values',4x,i10,
      &        /,' Simulation Temperature',13x,f8.2)
-c
-c     list the main lambda and the final step of each window
-c
-      write (ifep,30)
-   30 format (/,' Lambda Windows :',
-     &        //,4x,'Window',8x,'Lambda',5x,'Last Step',/)
-      do i = 1, nlmdawin
-         write (ifep,40)  i,lmdawinlist(i),lmdawinend(i)
-   40    format (i10,f14.8,i14)
-      end do
+      if (isobaric) then
+         write (ifep,30)  atmsph
+   30    format (' Simulation Pressure',16x,f8.2)
+      end if
 c
 c     label the columns of the energies appended by "savefep"
 c
+      write (ifep,40)
+   40 format (/,' Potential Energies at Trial Lambda Values :')
       write (ifep,50)
-   50 format (/,' Potential Energies at Trial Lambda Values :')
-      write (ifep,60)
-   60 format (/,7x,'Step',4x,'Sim Lambda',2x,'Trial Lambda',
-     &           14x,'Energy',/)
+   50 format (/,7x,'Step',4x,'Sim Lambda',2x,'Trial Lambda',
+     &           14x,'Energy',12x,'Volume',/)
       close (unit=ifep)
 c
 c     report the name of the file holding the trial energies
 c
-      write (iout,70)  lmdasavefile(1:trimtext(lmdasavefile))
-   70 format (/,' FEP  --  Trial Lambda Energies Written To  ',a)
+      write (iout,60)  lmdasavefile(1:trimtext(lmdasavefile))
+   60 format (/,' FEP  --  Trial Lambda Energies Written To  ',a)
       return
       end
 c
@@ -258,10 +255,12 @@ c
 c     "efepdyn" finds the potential energy at the main lambda of the
 c     current window and at those of its neighboring windows, at
 c     regular intervals over the production portion of the window,
-c     and records the values for output
+c     and records the values for output along with the box volume
 c
 c
       subroutine efepdyn (istep)
+      use bound
+      use boxes
       use dlmda
       use fep
       use mutant
@@ -271,6 +270,7 @@ c
       integer iprod
       integer ntrial
       real*8 enative
+      real*8 vol
       real*8 ltrial(2)
       real*8 etrial(2)
 c
@@ -299,6 +299,11 @@ c     get the energy at the native and at the trial lambda values
 c
       call efeptrial (ntrial,ltrial,etrial,enative)
 c
+c     all energies of the sample share the current box volume
+c
+      vol = 0.0d0
+      if (use_bounds)  vol = volbox
+c
 c     record the native energy, then that of each trial lambda
 c
       nfep = nfep + 1
@@ -306,12 +311,14 @@ c
       fepene(nfep) = enative
       feplmda(nfep) = lambda
       feptrial(nfep) = lambda
+      fepvol(nfep) = vol
       do i = 1, ntrial
          nfep = nfep + 1
          fepstep(nfep) = istep
          fepene(nfep) = etrial(i)
          feplmda(nfep) = lambda
          feptrial(nfep) = ltrial(i)
+         fepvol(nfep) = vol
       end do
       return
       end
@@ -353,8 +360,9 @@ c
       ifep = freeunit ()
       open (unit=ifep,file=lmdasavefile,status='old',position='append')
       do i = nfepsave+1, nfep
-         write (ifep,10)  fepstep(i),feplmda(i),feptrial(i),fepene(i)
-   10    format (i11,2f14.8,f20.8)
+         write (ifep,10)  fepstep(i),feplmda(i),feptrial(i),fepene(i),
+     &                    fepvol(i)
+   10    format (i11,2f14.8,f20.8,f18.4)
       end do
       nfepsave = nfep
       close (unit=ifep)

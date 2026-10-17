@@ -149,6 +149,7 @@ OBJS =	action.o \
 	atoms.o \
 	attach.o \
 	baoab.o \
+	barpair.o \
 	bar.o \
 	basefile.o \
 	bath.o \
@@ -1112,6 +1113,7 @@ libtinker.a: ${OBJS}
 	atoms.o \
 	attach.o \
 	baoab.o \
+	barpair.o \
 	basefile.o \
 	bath.o \
 	beeman.o \
@@ -1665,6 +1667,7 @@ atomid.o: sizes.o
 atoms.o: sizes.o
 attach.o: atoms.o couple.o iounit.o
 baoab.o: atomid.o atoms.o bath.o freeze.o moldyn.o stodyn.o units.o usage.o virial.o
+barpair.o: iounit.o units.o
 bar.o: boxes.o files.o inform.o iounit.o keys.o output.o titles.o units.o
 basefile.o: ascii.o files.o
 bath.o:

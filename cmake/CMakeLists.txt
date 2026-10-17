@@ -100,7 +100,7 @@ endif()
 set(_FILES
     action active alfmol align alterchg alterpol analysis analyz angang
     angbnd angles angpot angtor argue ascii atmlst atomid atoms attach
-    baoab basefile bath beeman bicubic bitor bitors bndpot bndstr bonds
+    baoab barpair basefile bath beeman bicubic bitor bitors bndpot bndstr bonds
     born bound bounds boxes calendar cell center cflux charge chgpen
     chgpot chgtrn chkpole chkring chksymm chkxyz cholesky chrono chunks
     clock cluster column command connect connolly control couple cspline

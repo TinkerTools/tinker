@@ -163,6 +163,22 @@ The distribution version of the Tinker package contains over 1000 separate progr
 
 **BARCALC Subroutine**
 
+**BARFEP Subroutine**
+
+"barfep" finds the free energy and enthalpy change from the sampled state to the other state via thermodynamic perturbation over a list of frames, which may repeat, along with the average energy and volume of those frames; the exponentials are shifted by their largest exponent so the sum cannot overflow, and the enthalpy includes the PV term
+
+**BARHBAR Subroutine**
+
+"barhbar" finds the enthalpy change from state 0 to state 1 via the BAR estimator of Wyczalkowski et al. over lists of frames sampled in each state, given the BAR free energy change for the same frames; the state energies include the PV term, which cancels in the energy differences
+
+**BARITER Subroutine**
+
+"bariter" solves the Bennett acceptance ratio equation for the free energy change from state 0 to state 1 by iteration over lists of frames sampled in each state, starting from an initial value; also finds the analytical error of Bennett
+
+**BARPAIR Subroutine**
+
+"barpair" computes the free energy, enthalpy and entropy change from state 0 to state 1 via the FEP and BAR methods, given the potential energies of frames sampled in each state evaluated under both states, with bootstrap estimates of the error
+
 **BASEFILE Subroutine**
 
 "basefile" extracts from an input filename the portion consisting of any directory name and the base filename; also reads any keyfile and sets information level values
@@ -2117,6 +2133,10 @@ in small rings and removes constraints that are redundant
 **FATAL Subroutine**
 
 "fatal" terminates execution due to a user request, a severe error or some other nonstandard condition
+
+**FEPCALC Subroutine**
+
+"fepcalc" reads the trial lambda energies of a Tinker FEP file written by dynamics over a schedule of lambda windows, finds the free energy change between each pair of adjacent windows via the FEP and BAR methods, and sums them over the whole schedule
 
 **FFTBACK Subroutine**
 

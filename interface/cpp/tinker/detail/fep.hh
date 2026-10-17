@@ -11,6 +11,7 @@ extern int*& fepstep;
 extern double*& fepene;
 extern double*& feplmda;
 extern double*& feptrial;
+extern double*& fepvol;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" int TINKER_MOD(fep, fepintv);
@@ -21,6 +22,7 @@ extern "C" int* TINKER_MOD(fep, fepstep);
 extern "C" double* TINKER_MOD(fep, fepene);
 extern "C" double* TINKER_MOD(fep, feplmda);
 extern "C" double* TINKER_MOD(fep, feptrial);
+extern "C" double* TINKER_MOD(fep, fepvol);
 
 int& fepintv = TINKER_MOD(fep, fepintv);
 int& nfep = TINKER_MOD(fep, nfep);
@@ -30,5 +32,6 @@ int*& fepstep = TINKER_MOD(fep, fepstep);
 double*& fepene = TINKER_MOD(fep, fepene);
 double*& feplmda = TINKER_MOD(fep, feplmda);
 double*& feptrial = TINKER_MOD(fep, feptrial);
+double*& fepvol = TINKER_MOD(fep, fepvol);
 #endif
 } }

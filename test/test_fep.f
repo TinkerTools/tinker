@@ -612,6 +612,8 @@ c     that each record is written to the output file exactly once
 c
 c
       subroutine test_fep_sample
+      use bound
+      use boxes
       use dlmda
       use fep
       use files
@@ -625,6 +627,8 @@ c
       integer oldleng
       real*8 eps,epot
       real*8 simlmda,trial,ene
+      real*8 vol,vref
+      logical found
       character*240 oldname
 c
 c
@@ -687,6 +691,14 @@ c
       call assert_real (fepene(6),fepene(1),eps,'fep sample up')
       call assert_real (fepene(7),fepene(11),eps,'fep sample last')
 c
+c     every record holds the box volume of its sample
+c
+      vref = 0.0d0
+      if (use_bounds)  vref = volbox
+      call assert_real (fepvol(1),vref,0.0d0,'fep sample volume 1')
+      call assert_real (fepvol(7),vref,0.0d0,'fep sample volume 7')
+      call assert_real (fepvol(14),vref,0.0d0,'fep sample volume 14')
+c
 c     write the records into a file of our own in two parts, and
 c     check that a call with nothing new adds no rows
 c
@@ -699,6 +711,12 @@ c
       call prtfephead
       call fepcount ('fepsave_tmp.fep',nrow)
       call assert_int (nrow,0,'fep sample header only')
+      call fephas ('fepsave_tmp.fep','Lambda Windows :',found)
+      call assert_logical (found,.false.,'fep sample no window table')
+      call fephas ('fepsave_tmp.fep','Number of Lambda Windows',found)
+      call assert_logical (found,.true.,'fep sample window count line')
+      call fephas ('fepsave_tmp.fep','Energy            Volume',found)
+      call assert_logical (found,.true.,'fep sample volume column')
       call savefep
       call fepcount ('fepsave_tmp.fep',nrow)
       call assert_int (nrow,5,'fep sample first rows')
@@ -708,11 +726,12 @@ c
       call fepcount ('fepsave_tmp.fep',nrow)
       call assert_int (nrow,14,'fep sample all rows once')
       irow = 6
-      call feprow ('fepsave_tmp.fep',irow,i,simlmda,trial,ene)
+      call feprow ('fepsave_tmp.fep',irow,i,simlmda,trial,ene,vol)
       call assert_int (i,34,'fep sample row step')
       call assert_real (simlmda,0.5d0,eps,'fep sample row sim')
       call assert_real (trial,1.0d0,eps,'fep sample row trial')
       call assert_real (ene,fepene(6),eps,'fep sample row energy')
+      call assert_real (vol,fepvol(6),1.0d-4,'fep sample row volume')
       call tiwipe ('fepsave_tmp.fep')
       filename = oldname
       leng = oldleng
@@ -778,10 +797,12 @@ c
 c     "feprun" makes one dynamics run in a scratch directory, with
 c     windows of twenty steps that each take a single sample on
 c     their final step, where a frame is also saved, and compares
-c     the seven energies written against those of the saved frames
+c     the seven energies and box volumes written against those of
+c     the saved frames
 c
 c
       subroutine feprun (args,addkey,tag)
+      use boxes
       implicit none
       integer i
       integer ist
@@ -790,7 +811,7 @@ c
       integer iwin(7)
       real*8 energy
       real*8 eref
-      real*8 simlmda,trial,ene
+      real*8 simlmda,trial,ene,vol
       real*8 sim(7)
       real*8 tri(7)
       character*1 quote
@@ -827,10 +848,21 @@ c
          call execute_command_line (cmd,exitstat=ist)
          call assert_int (ist,0,'fep run '//tag//' temperature')
 c
+c     only an isobaric run gives the pressure in the header
+c
+         cmd = 'grep -q "Simulation Pressure  *1.00" water2.fep'
+         call execute_command_line (cmd,exitstat=ist)
+         if (tag .eq. 'npt') then
+            call assert_int (ist,0,'fep run '//tag//' pressure')
+         else
+            call assert_logical (ist.ne.0,.true.,
+     &                           'fep run '//tag//' no pressure')
+         end if
+c
 c     set each saved frame up afresh at the trial lambda of the row
 c
          do i = 1, min(nrow,7)
-            call feprow ('water2.fep',i,istep,simlmda,trial,ene)
+            call feprow ('water2.fep',i,istep,simlmda,trial,ene,vol)
             write (label,10)  tag,i
    10       format ('fep run ',a,' row ',i0)
             call assert_int (istep,20*iwin(i),trim(label)//' step')
@@ -847,6 +879,7 @@ c
             call loadfix_keyadd ('frame','ref.key',lmdakey)
             eref = energy ()
             call assert_real (ene,eref,1.0d-5,trim(label)//' energy')
+            call assert_real (vol,volbox,1.0d-3,trim(label)//' volume')
             call final
          end do
       end if
@@ -988,6 +1021,43 @@ c
       end
 c
 c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine fephas  --  find text in a trial energy file  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "fephas" reports whether any record of a trial energy file
+c     contains the given text
+c
+c
+      subroutine fephas (fname,text,found)
+      implicit none
+      integer ifep
+      integer freeunit
+      logical found
+      character*(*) fname,text
+      character*240 record
+c
+c
+      found = .false.
+      ifep = freeunit ()
+      open (unit=ifep,file=fname,status='old')
+   10 continue
+      read (ifep,20,end=30)  record
+   20 format (a240)
+      if (index(record,text) .ne. 0) then
+         found = .true.
+         goto 30
+      end if
+      goto 10
+   30 continue
+      close (unit=ifep)
+      return
+      end
+c
+c
 c     ############################################################
 c     ##                                                        ##
 c     ##  subroutine feprow  --  values of one FEP file record  ##
@@ -996,19 +1066,20 @@ c     ############################################################
 c
 c
 c     "feprow" returns the step, the simulation and trial lambda
-c     values and the energy held in the requested data record of a
-c     trial energy file; the step is negative if there is no such
-c     record
+c     values, the energy and the box volume held in the requested
+c     data record of a trial energy file; the step is negative if
+c     there is no such record, and the volume is negative if the
+c     record has no volume column
 c
 c
-      subroutine feprow (fname,irow,istep,simlmda,trial,ene)
+      subroutine feprow (fname,irow,istep,simlmda,trial,ene,vol)
       implicit none
       integer irow
       integer istep
       integer nrow
       integer ifep
       integer freeunit
-      real*8 simlmda,trial,ene
+      real*8 simlmda,trial,ene,vol
       logical header
       character*(*) fname
       character*240 record
@@ -1018,6 +1089,7 @@ c
       simlmda = -1.0d0
       trial = -1.0d0
       ene = 0.0d0
+      vol = -1.0d0
       nrow = 0
       header = .false.
       ifep = freeunit ()
@@ -1030,6 +1102,10 @@ c
       else if (record .ne. ' ') then
          nrow = nrow + 1
          if (nrow .eq. irow) then
+            read (record,*,err=25,end=25)  istep,simlmda,trial,ene,vol
+            goto 30
+   25       continue
+            vol = -1.0d0
             read (record,*,err=30,end=30)  istep,simlmda,trial,ene
             goto 30
          end if

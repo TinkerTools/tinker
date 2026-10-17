@@ -63,6 +63,16 @@ void obabo_(int* istep, double* dt);
 void oprep_(double* dt, double* vfric, double* vrand);
 #define tinker_f_oprep oprep_
 
+// barpair.f
+void barpair_(int* nfrma, int* nfrmb, double* ua0, double* ua1, double* ub0, double* ub1, double* vola, double* volb, double* tempa, double* tempb, double* patm, int* nbst, int* verbose, double* dgfep, double* dgbar, int* nboot, double* sdu, double* uave, double* hbar, int* istat);
+#define tinker_f_barpair barpair_
+void barfep_(int* n, int* idx, double* uo, double* ut, double* vol, double* rt, double* pres, double* dg, double* dh, double* uave, double* vave);
+#define tinker_f_barfep barfep_
+void bariter_(int* na, int* ia, int* nb, int* ib, double* ua0, double* ua1, double* ub0, double* ub1, double* rta, double* rtb, double* cinit, int* maxiter, double* cnew, double* stdev, int* niter, double* hist, int* conv);
+#define tinker_f_bariter bariter_
+void barhbar_(int* na, int* ia, int* nb, int* ib, double* ua0, double* ua1, double* ub0, double* ub1, double* vola, double* volb, double* rta, double* rtb, double* pres, double* cbar, double* hbr);
+#define tinker_f_barhbar barhbar_
+
 // basefile.f
 void basefile_(char* string, tinker_fchar_len_t string_cap);
 inline void tinker_f_basefile(tinker_fchars string) {
