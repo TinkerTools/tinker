@@ -560,7 +560,7 @@ c
       integer starta,startb
       integer stopa,stopb
       integer stepa,stepb
-      integer maxframe,istat
+      integer maxa,maxb,istat
       integer freeunit
       integer trimtext
       integer nboot(2)
@@ -602,15 +602,31 @@ c
          inquire (file=barfile,exist=exist)
       end do
 c
+c     find the number of frames listed for each trajectory
+c
+      maxa = 0
+      maxb = 0
+      ibar = freeunit ()
+      open (unit=ibar,file=barfile,status='old')
+      rewind (unit=ibar)
+      read (ibar,*,err=25,end=25)  maxa
+      do i = 1, maxa
+         read (ibar,'()',err=25,end=25)
+      end do
+      read (ibar,*,err=25,end=25)  maxb
+   25 continue
+      close (unit=ibar)
+      maxa = max(0,maxa)
+      maxb = max(0,maxb)
+c
 c     perform dynamic allocation of some local arrays
 c
-      maxframe = 1000000
-      allocate (ua0(maxframe))
-      allocate (ua1(maxframe))
-      allocate (ub0(maxframe))
-      allocate (ub1(maxframe))
-      allocate (vola(maxframe))
-      allocate (volb(maxframe))
+      allocate (ua0(max(1,maxa)))
+      allocate (ua1(max(1,maxa)))
+      allocate (vola(max(1,maxa)))
+      allocate (ub0(max(1,maxb)))
+      allocate (ub1(max(1,maxb)))
+      allocate (volb(max(1,maxb)))
 c
 c     set beginning and ending frame for trajectory A
 c
@@ -637,9 +653,9 @@ c
          read (record,*,err=60,end=60)  starta,stopa,stepa
    60    continue
       end if
-      if (starta .eq. 0)  starta = 1
-      if (stopa .eq. 0)  stopa = maxframe
-      if (stepa .eq. 0)  stepa = 1
+      if (starta .lt. 1)  starta = 1
+      if (stopa.lt.1 .or. stopa.gt.maxa)  stopa = maxa
+      if (stepa .lt. 1)  stepa = 1
 c
 c     set beginning and ending frame for trajectory B
 c
@@ -666,9 +682,9 @@ c
          read (record,*,err=100,end=100)  startb,stopb,stepb
   100    continue
       end if
-      if (startb .eq. 0)  startb = 1
-      if (stopb .eq. 0)  stopb = maxframe
-      if (stepb .eq. 0)  stepb = 1
+      if (startb .lt. 1)  startb = 1
+      if (stopb.lt.1 .or. stopb.gt.maxb)  stopb = maxb
+      if (stepb .lt. 1)  stepb = 1
 c
 c     read potential energies and volumes for trajectory A
 c
@@ -900,6 +916,7 @@ c
       integer ifep,nrow
       integer nsamp,nwin,nwhead
       integer npair,norphan
+      integer nvol,nzero,izero
       integer first,last,step
       integer lastw,iord
       integer nbst,nbstin
@@ -1120,10 +1137,43 @@ c
       close (unit=ifep)
       nrow = n
 c
+c     a file with a pressure but only zero box volumes gets no PV
+c     terms, while volumes missing from only some samples are an error
+c
+      tol = 1.0d-6
+      if (usevol) then
+         nvol = 0
+         nzero = 0
+         izero = 0
+         do i = 1, nrow
+            if (abs(rtrl(i)-rsim(i)) .lt. tol) then
+               if (rvol(i) .ne. 0.0d0) then
+                  nvol = nvol + 1
+               else
+                  nzero = nzero + 1
+                  if (izero .eq. 0)  izero = i
+               end if
+            end if
+         end do
+         if (nvol .eq. 0) then
+            usevol = .false.
+            patm = 1.0d0
+            pres = 0.0d0
+            write (iout,182)
+  182       format (/,' FEPCALC  --  File gives a Pressure but No Box',
+     &                 ' Volumes;',
+     &              /,' PV Terms are not Included')
+         else if (nzero .gt. 0) then
+            write (iout,184)  rstep(izero)
+  184       format (/,' FEPCALC  --  Box Volume Missing at Step',i11,
+     &              /,' in a File with Volumes for Other Samples')
+            call fatal
+         end if
+      end if
+c
 c     group the records into samples, each with its native record
 c     first, followed by those at the trial lambda values
 c
-      tol = 1.0d-6
       nsamp = 0
       norphan = 0
       do i = 1, nrow
@@ -1614,7 +1664,8 @@ c
   640    format (' Enthalpy via Direct Estimate',8x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
 c
-c     sum the BAR enthalpy and entropy over the pairs
+c     sum the BAR enthalpy and entropy over the pairs, where the
+c     enthalpy error needs two converged bootstrap trials per pair
 c
          n = 0
          do k = 1, 4
@@ -1622,7 +1673,7 @@ c
             sum2(k) = 0.0d0
          end do
          do iw = 1, npair
-            if (pstat(iw) .eq. 2)  n = n + 1
+            if (pconv(iw) .lt. 2)  n = n + 1
             sum(1) = sum(1) + phs(1,iw)
             sum2(1) = sum2(1) + phs(2,iw)**2
             sum(2) = sum(2) + phs(3,iw)
@@ -1631,14 +1682,13 @@ c
             write (iout,650)  sum(1),sqrt(sum2(1))
   650       format (' Enthalpy via BAR Estimate',11x,f12.4,
      &                 ' +/-',f9.4,' Kcal/mol')
-            write (iout,660)  sum(2)
-  660       format (' BAR Estimate -T*dS Value',12x,f12.4,' Kcal/mol')
          else
-            write (iout,670)
-  670       format (' BAR Enthalpy and Entropy not Computed; No',
-     &                 ' Bootstrap Trial Converged',
-     &              /,' for Some Pairs')
+            write (iout,660)  sum(1)
+  660       format (' Enthalpy via BAR Estimate',11x,f12.4,
+     &                 ' Kcal/mol, Error not Available')
          end if
+         write (iout,670)  sum(2)
+  670    format (' BAR Estimate -T*dS Value',12x,f12.4,' Kcal/mol')
          write (iout,680)
   680    format (/,' Enthalpy and Entropy Estimates are much Noisier',
      &              ' than the Free Energy')

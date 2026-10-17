@@ -570,23 +570,26 @@ c     "test_bar_fepvol" runs mode 3 on a two-window FEP file holding
 c     the same frames and volumes as "test_bar_pv", so the totals must
 c     match the mode 2 values found there; the file is then written
 c     again without the pressure line, so the volumes are ignored and
-c     the enthalpies are those without the PV term
+c     the enthalpies are those without the PV term; with the pressure
+c     line but only zero volumes, the PV terms are dropped with a note
+c     and the values match those without the pressure line, and with
+c     one volume missing among the others, mode 3 stops with a message
 c
 c
       subroutine test_bar_fepvol
       use units
       implicit none
       integer i,k,m,n
-      integer ist,icase
+      integer ist,icase,iexp
       integer unit,freeunit
       real*8 temp,beta,patm
       real*8 pres,ratio,a,u
-      real*8 value,err
+      real*8 value,err,v
       real*8 alpha(3)
       real*8 expect(6,2)
       real*8 vola(2000),volb(2000)
       logical found
-      character*12 tag(2)
+      character*16 tag(4)
       character*32 label(6)
       data label  / 'Free Energy via Forward FEP',
      &              'Free Energy via Backward FEP',
@@ -598,7 +601,8 @@ c
      &               0.0d0, -0.0063d0, 1.0048d0,
      &               0.9975d0, 0.9959d0, 0.9985d0,
      &               0.7639d0, 0.7619d0, 0.2365d0 /
-      data tag  / 'pressure', 'no pressure' /
+      data tag  / 'pressure', 'no pressure', 'zero volume',
+     &            'missing volume' /
 c
 c
 c     build the volumes of the two windows as in "test_bar_pv"
@@ -623,11 +627,12 @@ c
       end do
 c
 c     write the FEP file with and then without the pressure line,
+c     then with the pressure line and zero or one missing volume,
 c     where window 1 at lambda 1 has energy 0 and window 2 at lambda
 c     0 has energy a*V
 c
       call pushdir ('file/bar')
-      do icase = 1, 2
+      do icase = 1, 4
          call execute_command_line ('rm -f fepvol.fep out.txt')
          unit = freeunit ()
          open (unit=unit,file='fepvol.fep',status='new')
@@ -635,24 +640,45 @@ c
    10    format (/,' Free Energy Perturbation Parameters :',
      &           //,' Number of Lambda Windows',9x,i10,
      &           /,' Simulation Temperature',13x,f8.2)
-         if (icase .eq. 1)  write (unit,20)  patm
+         if (icase .ne. 2)  write (unit,20)  patm
    20    format (' Simulation Pressure',16x,f8.2)
          write (unit,30)
    30    format (/,' Potential Energies at Trial Lambda Values :',
      &           //,7x,'Step',4x,'Sim Lambda',2x,'Trial Lambda',
      &              14x,'Energy',12x,'Volume',/)
          do i = 1, n
-            write (unit,40)  i,1.0d0,1.0d0,0.0d0,vola(i)
-            write (unit,40)  i,1.0d0,0.0d0,a*vola(i),vola(i)
+            v = vola(i)
+            if (icase.eq.3 .or. (icase.eq.4 .and. i.eq.1))  v = 0.0d0
+            write (unit,40)  i,1.0d0,1.0d0,0.0d0,v
+            write (unit,40)  i,1.0d0,0.0d0,a*vola(i),v
    40       format (i11,2f14.8,f20.8,f18.4)
          end do
          do i = 1, n
-            write (unit,40)  n+i,0.0d0,0.0d0,a*volb(i),volb(i)
-            write (unit,40)  n+i,0.0d0,1.0d0,0.0d0,volb(i)
+            v = volb(i)
+            if (icase .eq. 3)  v = 0.0d0
+            write (unit,40)  n+i,0.0d0,0.0d0,a*volb(i),v
+            write (unit,40)  n+i,0.0d0,1.0d0,0.0d0,v
          end do
          close (unit=unit)
          call run_prog ('bar','3 fepvol.fep 0 0 0','out.txt',ist)
          if (ist .eq. -1)  goto 50
+c
+c     zero volumes give a note, and a missing volume stops the run
+c
+         if (icase .eq. 3) then
+            call barfind ('out.txt','No Box Volumes',found,value,err)
+            call assert_logical (found,.true.,
+     &                           'test_bar fepvol zero volume note')
+         end if
+         if (icase .eq. 4) then
+            call barfind ('out.txt','Box Volume Missing at Step',
+     &                    found,value,err)
+            call assert_logical (found,.true.,
+     &                           'test_bar fepvol missing volume stop')
+            call assert_real (value,1.0d0,0.0d0,
+     &                        'test_bar fepvol missing volume step')
+            goto 50
+         end if
 c
 c     check the pressure echo and each total against its reference
 c
@@ -665,10 +691,11 @@ c
             call assert_real (value,patm,1.0d-6,
      &                        'test_bar fepvol pressure value')
          end if
+         iexp = min(icase,2)
          do m = 1, 6
             call barfind ('out.txt',trim(label(m)),found,value,err)
             if (.not. found)  value = 1.0d10
-            call assert_real (value,expect(m,icase),2.0d-4,
+            call assert_real (value,expect(m,iexp),2.0d-4,
      &                        'test_bar fepvol '//trim(tag(icase))//
      &                        ' '//trim(label(m)))
          end do

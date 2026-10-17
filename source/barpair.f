@@ -43,8 +43,7 @@ c     uave     average state 0 energy and error, state 1 energy
 c                and error
 c     hbar     BAR enthalpy and error, BAR -T*dS value
 c     istat    0 if all values are found, 1 if the BAR iteration
-c                fails to converge, 2 if no BAR bootstrap trial
-c                converges so the BAR enthalpy and entropy are not found
+c                fails to converge
 c
 c     each value is computed once from all of the frames, and the BAR
 c     enthalpy and entropy use the BAR iteration free energy; the BAR
@@ -52,7 +51,8 @@ c     iteration error is the analytical estimate of Bennett, the other
 c     errors are standard deviations over bootstrap trials that apply
 c     the same estimators to frames resampled with replacement; the
 c     BAR bootstrap value is the mean over converged trials only, and
-c     BAR errors are reported only if at least two trials converge
+c     the BAR bootstrap and BAR enthalpy errors are found only if at
+c     least two trials converge, as given by "nboot", else are zero
 c
 c
       subroutine barpair (nfrma,nfrmb,ua0,ua1,ub0,ub1,vola,volb,
@@ -384,26 +384,8 @@ c
   230    format (' Backward FEP -T*dS Value',12x,f12.4,' Kcal/mol')
       end if
 c
-c     the BAR enthalpy and entropy need converged bootstrap trials
-c
-      if (verbose) then
-         write (iout,240)
-  240    format (/,' Enthalpy and Entropy via BAR Method :',/)
-      end if
-      if (nconv .eq. 0) then
-         istat = 2
-         if (verbose) then
-            write (iout,250)
-  250       format (' BAR Enthalpy and Entropy not Computed')
-         end if
-         deallocate (ia)
-         deallocate (ib)
-         deallocate (hist)
-         deallocate (work)
-         return
-      end if
-c
-c     report the enthalpy and entropy via the BAR method
+c     report the enthalpy and entropy via the BAR method, where the
+c     enthalpy error needs at least two converged bootstrap trials
 c
       tsbar = hbr - cbar
       sbar = tsbar / (0.5d0*(tempa+tempb))
@@ -411,9 +393,17 @@ c
       hbar(2) = stdhbr
       hbar(3) = -tsbar
       if (verbose) then
-         write (iout,260)  hbr,stdhbr
-  260    format (' Enthalpy via BAR Estimate',11x,f12.4,
-     &              ' +/-',f9.4,' Kcal/mol')
+         write (iout,240)
+  240    format (/,' Enthalpy and Entropy via BAR Method :',/)
+         if (nconv .ge. 2) then
+            write (iout,250)  hbr,stdhbr
+  250       format (' Enthalpy via BAR Estimate',11x,f12.4,
+     &                 ' +/-',f9.4,' Kcal/mol')
+         else
+            write (iout,260)  hbr
+  260       format (' Enthalpy via BAR Estimate',11x,f12.4,
+     &                 ' Kcal/mol, Error not Available')
+         end if
          write (iout,270)  sbar
   270    format (' Entropy via BAR Estimate',12x,f12.6,' Kcal/mol/K')
          write (iout,280)  -tsbar
