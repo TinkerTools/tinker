@@ -29,7 +29,7 @@ c     and both trajectories must be at the same temperature; in
 c     mode 3, a trial lambda energy file written by dynamics over a
 c     schedule of lambda windows is read, and the FEP and BAR free
 c     energies are found for each pair of adjacent windows and summed
-c     over the whole schedule
+c     over the whole schedule, taken in order of increasing lambda
 c
 c     modifications for NPT simulations by Chengwen Liu, University
 c     of Texas at Austin, October 2015; enthalpy and entropy methods
@@ -989,7 +989,10 @@ c     FEP and BAR methods, and sums them over the whole schedule
 c
 c     note the windows are taken from the lambda values of the data
 c     records, so a window without samples of its own is still found
-c     from the trial energies of its neighbors; the native and trial
+c     from the trial energies of its neighbors; the windows are put
+c     in order of increasing lambda for either direction of the
+c     simulation, so the values are for lambda 0 --> 1, and all of
+c     the samples of each window are used; the native and trial
 c     energies of a sample share the same periodic box, whose volume
 c     is in a fifth column of newer files, and the volumes are used
 c     for the PV enthalpy terms only if the file header also gives
@@ -1008,10 +1011,7 @@ c
       integer nsamp,nwin,nwhead
       integer npair,norphan
       integer nvol,nzero,izero
-      integer first,last,step
-      integer lastw,iord
-      integer nbst,nbstin
-      integer nsmin,nsmax
+      integer nbst,nbstin,nsmax
       integer na,nb,iw,istat
       integer kt,maxiter
       integer ntota,ntotb
@@ -1025,7 +1025,6 @@ c
       integer, allocatable :: sfirst(:)
       integer, allocatable :: slast(:)
       integer, allocatable :: swin(:)
-      integer, allocatable :: wcount(:)
       integer, allocatable :: wsel(:)
       integer, allocatable :: wseen(:)
       integer, allocatable :: woff(:)
@@ -1084,12 +1083,10 @@ c
       real*8, allocatable :: psdu(:,:)
       real*8, allocatable :: phs(:,:)
       real*8, allocatable :: psum(:,:)
-      logical exist,query
-      logical header,found
-      logical totals,down
+      logical exist,header
+      logical found,totals
       logical hasvol,usevol
       logical allf,allc,tconv
-      logical, allocatable :: ssel(:)
       character*240 record
       character*240 string
       character*240 fepfile
@@ -1114,35 +1111,6 @@ c
          call suffix (fepfile,'fep','old')
          inquire (file=fepfile,exist=exist)
       end do
-c
-c     set the samples to be used within each lambda window
-c
-      first = 0
-      last = 0
-      step = 0
-      query = .true.
-      call nextarg (string,exist)
-      if (exist) then
-         read (string,*,err=30,end=30)  first
-         query = .false.
-      end if
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=30,end=30)  last
-      call nextarg (string,exist)
-      if (exist)  read (string,*,err=30,end=30)  step
-   30 continue
-      if (query) then
-         write (iout,40)
-   40    format (/,' First & Last Sample and Step Increment',
-     &              ' within Each Window :  ',$)
-         read (input,50)  record
-   50    format (a240)
-         read (record,*,err=60,end=60)  first,last,step
-   60    continue
-      end if
-      if (first .le. 0)  first = 1
-      if (last .lt. 0)  last = 0
-      if (step .le. 0)  step = 1
 c
 c     get any requested number of bootstrap trials for each pair
 c
@@ -1211,7 +1179,6 @@ c
       allocate (sfirst(n))
       allocate (slast(n))
       allocate (swin(n))
-      allocate (ssel(n))
       allocate (wlmda(2*n))
 c
 c     read the data records, ignoring a final record that was cut
@@ -1310,8 +1277,7 @@ c
          end if
       end do
 c
-c     the direction of the schedule is set by the first two windows
-c     with samples, since the windows must be strictly monotonic
+c     at least two of the windows must have samples of their own
 c
       found = .false.
       if (nsamp .gt. 0) then
@@ -1331,7 +1297,6 @@ c
      &              ' have Samples')
          return
       end if
-      down = (lsecond .lt. lfirst)
 c
 c     find the windows from the simulation and trial lambda values
 c
@@ -1351,14 +1316,13 @@ c
          end do
       end do
 c
-c     sort the windows into the order of the schedule
+c     sort the windows into order of increasing lambda
 c
       do i = 2, nwin
          lmda = wlmda(i)
          j = i - 1
          do while (j .ge. 1)
-            if ((.not.down .and. wlmda(j).gt.lmda) .or.
-     &          (down .and. wlmda(j).lt.lmda)) then
+            if (wlmda(j) .gt. lmda) then
                wlmda(j+1) = wlmda(j)
                j = j - 1
             else
@@ -1369,41 +1333,26 @@ c
          wlmda(j+1) = lmda
       end do
 c
-c     assign each sample to its window and apply the selection
+c     assign each sample to its window and count those of each
 c
-      allocate (wcount(nwin))
       allocate (wsel(nwin))
       allocate (wseen(nwin))
       do i = 1, nwin
-         wcount(i) = 0
          wsel(i) = 0
-         wseen(i) = 0
       end do
       do i = 1, nsamp
          lmda = rsim(sfirst(i))
          do k = 1, nwin
             if (abs(wlmda(k)-lmda) .lt. tol)  swin(i) = k
          end do
-         wcount(swin(i)) = wcount(swin(i)) + 1
+         wsel(swin(i)) = wsel(swin(i)) + 1
       end do
-      do i = 1, nsamp
-         iw = swin(i)
-         wseen(iw) = wseen(iw) + 1
-         iord = wseen(iw)
-         lastw = wcount(iw)
-         if (last .gt. 0)  lastw = min(last,wcount(iw))
-         ssel(i) = (iord.ge.first .and. iord.le.lastw .and.
-     &                 mod(iord-first,step).eq.0)
-         if (ssel(i))  wsel(iw) = wsel(iw) + 1
-      end do
-      nsmin = wsel(1)
-      nsmax = wsel(1)
-      do i = 2, nwin
-         nsmin = min(nsmin,wsel(i))
+      nsmax = 0
+      do i = 1, nwin
          nsmax = max(nsmax,wsel(i))
       end do
 c
-c     list the selected samples of each window in file order
+c     list the samples of each window in file order
 c
       npair = nwin - 1
       allocate (woff(nwin+1))
@@ -1414,11 +1363,9 @@ c
          wseen(i) = 0
       end do
       do i = 1, nsamp
-         if (ssel(i)) then
-            iw = swin(i)
-            wseen(iw) = wseen(iw) + 1
-            wsamp(woff(iw)+wseen(iw)) = i
-         end if
+         iw = swin(i)
+         wseen(iw) = wseen(iw) + 1
+         wsamp(woff(iw)+wseen(iw)) = i
       end do
 c
 c     perform dynamic allocation of some local arrays
@@ -1704,30 +1651,17 @@ c
   270    format (' Lambda Windows in Header :',3x,i8,
      &              '  (Mismatch)')
       end if
-      write (iout,280)  wlmda(1),wlmda(nwin)
-  280 format (' Lambda Schedule :',11x,f9.4,' -->',f9.4)
       write (iout,290)  temp
   290 format (' Simulation Temperature :',4x,f9.2,' K')
       if (usevol) then
          write (iout,300)  patm
   300    format (' Simulation Pressure :',7x,f9.2,' Atm')
       end if
-      write (iout,310)  nsmin,nsmax
-  310 format (' Samples per Window :',8x,i8,' to',i8)
-      if (last .eq. 0) then
-         write (iout,320)  first,step
-  320    format (' Sample Selection :',10x,'First',i6,'  Last   All',
-     &              '  Step',i6)
-      else
-         write (iout,330)  first,last,step
-  330    format (' Sample Selection :',10x,'First',i6,'  Last',i6,
-     &              '  Step',i6)
-      end if
       write (iout,340)  nbst
-  340 format (' Bootstrap Trials :',10x,i8)
+  340 format (' Bootstrap Trials :',11x,i8)
       if (norphan .gt. 0) then
          write (iout,350)  norphan
-  350    format (' Records without a Native Energy :',i6,
+  350    format (' Records without Native Energy :',i6,
      &              '  (Ignored)')
       end if
 c
@@ -1941,9 +1875,7 @@ c
       deallocate (sfirst)
       deallocate (slast)
       deallocate (swin)
-      deallocate (ssel)
       deallocate (wlmda)
-      deallocate (wcount)
       deallocate (wsel)
       deallocate (wseen)
       deallocate (woff)

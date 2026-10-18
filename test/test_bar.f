@@ -211,7 +211,7 @@ c
 c
 c     mode 3 marks the pair and mode 2 stops with a message
 c
-      call barrun3 ('overlap.fep 0 0 0','overlap.out',
+      call barrun3 ('overlap.fep','overlap.out',
      &              'test_bar overlap mode 3')
       call pushdir ('file/bar')
       call execute_command_line ('rm -f out.txt')
@@ -239,21 +239,22 @@ c
 c     "test_bar_fep" runs "bar" in mode 3 on FEP files with a constant
 c     energy within each window and a constant energy difference over
 c     each pair, so that every estimate is exact and every error is
-c     zero; also checks the sample selection, a window without samples
-c     and a file header that disagrees with the windows found
+c     zero; also checks a given number of bootstrap trials, a window
+c     without samples and a file header that disagrees with the
+c     windows found
 c
 c
       subroutine test_bar_fep
       implicit none
 c
 c
-      call barrun3 ('analytic.fep 0 0 0','analytic.out',
+      call barrun3 ('analytic.fep','analytic.out',
      &              'test_bar fep analytic')
-      call barrun3 ('analytic.fep 2 4 2 500','analytic-sel.out',
-     &              'test_bar fep selection')
-      call barrun3 ('gap.fep 0 0 0','gap.out',
+      call barrun3 ('analytic.fep 500','analytic-boot.out',
+     &              'test_bar fep bootstrap trials')
+      call barrun3 ('gap.fep','gap.out',
      &              'test_bar fep missing window')
-      call barrun3 ('gap6.fep 0 0 0','gap6.out',
+      call barrun3 ('gap6.fep','gap6.out',
      &              'test_bar fep header mismatch')
       return
       end
@@ -270,7 +271,9 @@ c     "test_bar_cross" runs the same pair of states through mode 2
 c     from a BAR file and through mode 3 from an FEP file, and checks
 c     that both give the same BAR iteration value and analytical error,
 c     which mode 3 gives for each pair, as its total error comes from
-c     the bootstrap
+c     the bootstrap; state 0 of the BAR file is at lambda 1 and the
+c     FEP file runs from lambda 1 to 0, while mode 3 always reports
+c     lambda 0 --> 1, so its value has the opposite sign
 c
 c
       subroutine test_bar_cross
@@ -293,7 +296,7 @@ c
          call popdir
          return
       end if
-      call run_prog ('bar','3 cross.fep 0 0 0','out3.txt',ist)
+      call run_prog ('bar','3 cross.fep','out3.txt',ist)
       if (ist .eq. -1) then
          call popdir
          return
@@ -308,7 +311,7 @@ c
       call barfind ('out3.txt','Free Energy via BAR Iteration',found,
      &              val3,err3)
       call assert_logical (found,.true.,'test_bar cross mode 3')
-      call assert_real (val3,val2,eps,'test_bar cross BAR value')
+      call assert_real (val3,-val2,eps,'test_bar cross BAR value')
 c
 c     read the analytical error from the row of the only pair
 c
@@ -817,8 +820,8 @@ c
 c
 c     write the FEP file with and then without the pressure line,
 c     then with the pressure line and zero or one missing volume,
-c     where window 1 at lambda 1 has energy 0 and window 2 at lambda
-c     0 has energy a*V
+c     where window 1 at lambda 0 has energy 0 and window 2 at lambda
+c     1 has energy a*V
 c
       call pushdir ('file/bar')
       do icase = 1, 4
@@ -838,18 +841,18 @@ c
          do i = 1, n
             v = vola(i)
             if (icase.eq.3 .or. (icase.eq.4 .and. i.eq.1))  v = 0.0d0
-            write (unit,40)  i,1.0d0,1.0d0,0.0d0,v
-            write (unit,40)  i,1.0d0,0.0d0,a*vola(i),v
+            write (unit,40)  i,0.0d0,0.0d0,0.0d0,v
+            write (unit,40)  i,0.0d0,1.0d0,a*vola(i),v
    40       format (i11,2f14.8,f20.8,f18.4)
          end do
          do i = 1, n
             v = volb(i)
             if (icase .eq. 3)  v = 0.0d0
-            write (unit,40)  n+i,0.0d0,0.0d0,a*volb(i),v
-            write (unit,40)  n+i,0.0d0,1.0d0,0.0d0,v
+            write (unit,40)  n+i,1.0d0,1.0d0,a*volb(i),v
+            write (unit,40)  n+i,1.0d0,0.0d0,0.0d0,v
          end do
          close (unit=unit)
-         call run_prog ('bar','3 fepvol.fep 0 0 0','out.txt',ist)
+         call run_prog ('bar','3 fepvol.fep','out.txt',ist)
          if (ist .eq. -1)  goto 50
 c
 c     zero volumes give a note, and a missing volume stops the run
@@ -1186,7 +1189,7 @@ c
 c
       call pushdir ('file/bar')
       call execute_command_line ('rm -f out.txt')
-      call run_prog ('bar','3 chain.fep 0 0 0','out.txt',ist)
+      call run_prog ('bar','3 chain.fep','out.txt',ist)
       if (ist .eq. -1) then
          call popdir
          return

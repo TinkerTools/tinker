@@ -17,37 +17,34 @@
 
  FEP File Name :            analytic.fep
  Lambda Windows Found :              4
- Lambda Schedule :              1.0000 -->   0.0000
  Simulation Temperature :       298.00 K
- Samples per Window :               2 to       2
- Sample Selection :          First     2  Last     4  Step     2
- Bootstrap Trials :               500
+ Bootstrap Trials :                500
 
  Free Energy by Window Pair :
 
   Pair  Lambda A  Lambda B    BAR Iter     +/-    BAR Boot     +/-    Cumul dG
 
-     1    1.0000    0.7000      0.5000  0.0000      0.5000  0.0000      0.5000
-     2    0.7000    0.2000     -0.3000  0.0000     -0.3000  0.0000      0.2000
-     3    0.2000    0.0000      1.2000  0.0000      1.2000  0.0000      1.4000
+     1    0.0000    0.2000     -1.2000  0.0000     -1.2000  0.0000     -1.2000
+     2    0.2000    0.7000      0.3000  0.0000      0.3000  0.0000     -0.9000
+     3    0.7000    1.0000     -0.5000  0.0000     -0.5000  0.0000     -1.4000
 
  Sampling Diagnostics by Window Pair :
 
   Pair    nA    nB    FEP Fwd    FEP Bwd    Fwd-Bwd  SD dU Fwd  SD dU Bwd
 
-     1     2     2     0.5000     0.5000     0.0000     0.0000     0.0000
-     2     2     2    -0.3000    -0.3000    -0.0000     0.0000     0.0000
-     3     2     2     1.2000     1.2000     0.0000     0.0000     0.0000
+     1     4     4    -1.2000    -1.2000     0.0000     0.0000     0.0000
+     2     4     4     0.3000     0.3000    -0.0000     0.0000     0.0000
+     3     4     4    -0.5000    -0.5000     0.0000     0.0000     0.0000
 
  Free Energy Totals :
 
- Free Energy via Forward FEP               1.4000 +/-   0.0000 Kcal/mol
- Free Energy via Backward FEP              1.4000 +/-   0.0000 Kcal/mol
- Free Energy via BAR Iteration             1.4000 +/-   0.0000 Kcal/mol
- Free Energy via BAR Bootstrap             1.4000 +/-   0.0000 Kcal/mol
+ Free Energy via Forward FEP              -1.4000 +/-   0.0000 Kcal/mol
+ Free Energy via Backward FEP             -1.4000 +/-   0.0000 Kcal/mol
+ Free Energy via BAR Iteration            -1.4000 +/-   0.0000 Kcal/mol
+ Free Energy via BAR Bootstrap            -1.4000 +/-   0.0000 Kcal/mol
 
  Enthalpy and Entropy Totals :
 
- Enthalpy via Direct Estimate              1.0000 +/-   0.0000 Kcal/mol
- Enthalpy via BAR Estimate                 1.4000 +/-   0.0000 Kcal/mol
+ Enthalpy via Direct Estimate             -1.0000 +/-   0.0000 Kcal/mol
+ Enthalpy via BAR Estimate                -1.4000 +/-   0.0000 Kcal/mol
  BAR Estimate -T*dS Value                  0.0000 Kcal/mol

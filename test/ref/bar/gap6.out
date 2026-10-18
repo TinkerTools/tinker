@@ -18,29 +18,26 @@
  FEP File Name :            gap6.fep
  Lambda Windows Found :              5
  Lambda Windows in Header :          6  (Mismatch)
- Lambda Schedule :              1.0000 -->   0.0000
  Simulation Temperature :       298.00 K
- Samples per Window :               0 to       3
- Sample Selection :          First     1  Last   All  Step     1
- Bootstrap Trials :             10000
+ Bootstrap Trials :              10000
 
  Free Energy by Window Pair :
 
   Pair  Lambda A  Lambda B    BAR Iter     +/-    BAR Boot     +/-    Cumul dG
 
-     1    1.0000    0.7500      0.5000  0.0000      0.5000  0.0000      0.5000
-     2    0.7500    0.5000   Not Computed, Window   3 has no Samples
-     3    0.5000    0.2500   Not Computed, Window   3 has no Samples
-     4    0.2500    0.0000      0.2000  0.0000      0.2000  0.0000
+     1    0.0000    0.2500     -0.2000  0.0000     -0.2000  0.0000     -0.2000
+     2    0.2500    0.5000   Not Computed, Window   3 has no Samples
+     3    0.5000    0.7500   Not Computed, Window   3 has no Samples
+     4    0.7500    1.0000     -0.5000  0.0000     -0.5000  0.0000
 
  Sampling Diagnostics by Window Pair :
 
   Pair    nA    nB    FEP Fwd    FEP Bwd    Fwd-Bwd  SD dU Fwd  SD dU Bwd
 
-     1     3     3     0.5000     0.5000     0.0000     0.0000     0.0000
+     1     3     3    -0.2000    -0.2000     0.0000     0.0000     0.0000
      2     3     0   Not Computed
      3     0     3   Not Computed
-     4     3     3     0.2000     0.2000     0.0000     0.0000     0.0000
+     4     3     3    -0.5000    -0.5000     0.0000     0.0000     0.0000
 
  Totals not Computed; Missing or Failed Pairs :
          2    3
