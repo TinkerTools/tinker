@@ -21,10 +21,7 @@
  Simulation Temperature :       298.00 K
  Samples per Window :               2 to       2
  Sample Selection :          First     2  Last     4  Step     2
- Bootstrap Trials per Pair :      500
-
- Bootstrap errors assume independent samples, which may not hold at the
- sampling interval used
+ Bootstrap Trials :               500
 
  Free Energy by Window Pair :
 
@@ -54,5 +51,3 @@
  Enthalpy via Direct Estimate              1.0000 +/-   0.0000 Kcal/mol
  Enthalpy via BAR Estimate                 1.4000 +/-   0.0000 Kcal/mol
  BAR Estimate -T*dS Value                  0.0000 Kcal/mol
-
- Enthalpy and Entropy Estimates are much Noisier than the Free Energy

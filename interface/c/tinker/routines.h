@@ -72,6 +72,18 @@ void bariter_(int* na, int* ia, int* nb, int* ib, double* ua0, double* ua1, doub
 #define tinker_f_bariter bariter_
 void barhbar_(int* na, int* ia, int* nb, int* ib, double* ua0, double* ua1, double* ub0, double* ub1, double* vola, double* volb, double* rta, double* rtb, double* pres, double* cbar, double* hbr);
 #define tinker_f_barhbar barhbar_
+void bootprep_(int* na, int* nb, double* ua0, double* ua1, double* ub0, double* ub1, double* vola, double* volb, double* rta, double* rtb, double* pres, double* cref, double* xmaxa, double* xmaxb, double* wa, double* hwa, double* wb, double* hwb, double* ea, double* eb);
+#define tinker_f_bootprep bootprep_
+void bootfep_(int* n, int* idx, double* uo, double* ut, double* vol, double* w, double* hw, double* xmax, double* rt, double* pres, double* dg, double* dh, double* uave, double* vave);
+#define tinker_f_bootfep bootfep_
+void bootiter_(int* na, int* ia, int* nb, int* ib, double* ea, double* eb, double* cref, double* rta, double* rtb, double* cinit, int* maxiter, double* cnew, int* conv);
+#define tinker_f_bootiter bootiter_
+void boothbar_(int* na, int* ia, int* nb, int* ib, double* ua0, double* ua1, double* ub0, double* ub1, double* vola, double* volb, double* ea, double* eb, double* cref, double* rta, double* rtb, double* pres, double* cbar, double* hbr);
+#define tinker_f_boothbar boothbar_
+int barnbst_(int* n);
+#define tinker_f_barnbst barnbst_
+double barsd_(int* n, double* s, double* s2);
+#define tinker_f_barsd barsd_
 
 // basefile.f
 void basefile_(char* string, tinker_fchar_len_t string_cap);

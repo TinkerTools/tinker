@@ -471,17 +471,29 @@ c
 c
 c     "test_fep_dynamic" checks that a short trajectory is the same
 c     whether or not trial energies are found between its steps, with
-c     and without neighbor lists, and when the induced dipole solver
-c     starts from zero instead of from the direct field dipoles
+c     and without neighbor lists, when the induced dipole solver
+c     starts from zero instead of from the direct field dipoles, with
+c     dual topology polarization, whose trial energies weigh two
+c     solves apiece, and in a staged relative schedule, whose trial
+c     lambda values lie in other legs
 c
 c
       subroutine test_fep_dynamic
       implicit none
+      character*6 ion
+      character*6 wat
+      character*17 eps
+      parameter (ion='ionwat')
+      parameter (wat='water2')
+      parameter (eps='polar-eps 0.00001')
 c
 c
-      call fepdyn ('polar-eps 0.00001','default')
-      call fepdyn ('neighbor-list','lists')
-      call fepdyn ('pcg-noguess','noguess')
+      call fepdyn (ion,'179_ionwat_ast_l05.key',eps,'default')
+      call fepdyn (ion,'179_ionwat_ast_l05.key','neighbor-list','lists')
+      call fepdyn (ion,'179_ionwat_ast_l05.key','pcg-noguess',
+     &             'noguess')
+      call fepdyn (wat,'169_water_adt_d1_x2_l06.key',eps,'dual')
+      call fepdyn (wat,'190_water_rels3_l085.key',eps,'staged')
       return
       end
 c
@@ -493,12 +505,13 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "fepdyn" runs the same short trajectory twice from rest, the
-c     second time finding trial energies after every step, and then
-c     compares the final coordinates and velocities of the two runs
+c     "fepdyn" runs the same short trajectory of a fixture twice from
+c     rest, the second time finding trial energies after every step,
+c     and then compares the final coordinates and velocities of the
+c     two runs
 c
 c
-      subroutine fepdyn (addkey,tag)
+      subroutine fepdyn (base,key,addkey,tag)
       use atoms
       use moldyn
       implicit none
@@ -508,12 +521,13 @@ c
       real*8 dxmax,dvmax
       real*8, allocatable :: xref(:,:)
       real*8, allocatable :: vref(:,:)
+      character*(*) base,key
       character*(*) addkey,tag
 c
 c
       call pushdir ('file/mutate')
       do irun = 1, 2
-         call loadfix_keyadd ('ionwat','179_ionwat_ast_l05.key',addkey)
+         call loadfix_keyadd (base,key,addkey)
          call fepdynrun (irun.eq.2)
          if (irun .eq. 1) then
             nat = n

@@ -24,6 +24,7 @@ c     in mode 2, the FEP and BAR algorithms are used to compute the
 c     free energy for state 0 --> state 1, and similar estimators
 c     provide the enthalpy and entropy for state 0 --> state 1, with
 c     a PV term at a pressure asked for if the BAR file has volumes,
+c     which must then be given for every frame of both trajectories,
 c     and both trajectories must be at the same temperature; in
 c     mode 3, a trial lambda energy file written by dynamics over a
 c     schedule of lambda windows is read, and the FEP and BAR free
@@ -117,6 +118,7 @@ c
       integer ltitlea,ltitleb
       integer nkey0,nkey1
       integer nfrma,nfrmb
+      integer nloga,nlogb
       integer maxframe
       integer freeunit
       integer trimtext
@@ -275,17 +277,31 @@ c
          open (unit=iarc,file=arcfile,form='unformatted',status ='old')
       end if
 c
-c     check for log with energies of trajectory A in state 0
+c     read any log energies of trajectory A in state 0, where
+c     a log without energies is not used
 c
       use_log = .false.
+      nloga = 0
       if (.not. recompute) then
-         logfile = filea(1:lenga)
-         call suffix (logfile,'log','old')
+         logfile = filea(1:lenga)//'.log'
+         call version (logfile,'old')
          inquire (file=logfile,exist=exist)
-         if  (exist) then
-            use_log = .true.
+         if (exist) then
             ilog = freeunit ()
             open (unit=ilog,file=logfile,status='old')
+            do while (nloga .lt. maxframe)
+               read (ilog,130,err=150,end=150)  record
+  130          format (a240)
+               if (record(1:18) .eq. ' Current Potential') then
+                  string = record(19:240)
+                  read (string,*,err=140,end=140)  ua0(nloga+1)
+                  nloga = nloga + 1
+  140             continue
+               end if
+            end do
+  150       continue
+            close (unit=ilog)
+            use_log = (nloga .gt. 0)
          end if
       end if
 c
@@ -306,36 +322,30 @@ c     find potential energies for trajectory A in state 0
 c
       write (iout,120)
   120 format (/,' Initial Processing for Trajectory A :',/)
-      i = 0
-      do while (.not. abort)
-         i = i + 1
-         if (use_log) then
-            abort = .true.
-            do while (abort)
-               read (ilog,130,err=150,end=150)  record
-  130          format (a240)
-               if (record(1:18) .eq. ' Current Potential') then
-                  string = record(19:240)
-                  read (string,*,err=140,end=140)  ua0(i)
-                  abort = .false.
-               end if
-  140          continue
-            end do
-  150       continue
-            if (abort)  i = i - 1
-         else
+      if (use_log) then
+         do i = 1, nloga
+            if (mod(i,100).eq.0 .or. i.eq.nloga) then
+               write (iout,160)  i
+               flush (iout)
+            end if
+         end do
+      else
+         i = 0
+         do while (.not. abort)
+            i = i + 1
             call cutoffs
             ua0(i) = energy ()
             call readcart (iarc,first)
-         end if
-         imod = mod(i,100)
-         if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
-            write (iout,160)  i
-  160       format (7x,'Completed',i8,' Coordinate Frames')
-            flush (iout)
-         end if
-         if (i .ge. maxframe)  abort = .true.
-      end do
+            imod = mod(i,100)
+            if ((.not.abort.and.imod.eq.0) .or.
+     &          (abort.and.imod.ne.0)) then
+               write (iout,160)  i
+  160          format (7x,'Completed',i8,' Coordinate Frames')
+               flush (iout)
+            end if
+            if (i .ge. maxframe)  abort = .true.
+         end do
+      end if
 c
 c     reset trajectory A using the parameters for state 1
 c
@@ -361,7 +371,7 @@ c
          call cutoffs
          ua1(i) = energy ()
          vola(i) = volbox
-         if (verbose) then
+         if (verbose .and. (.not.use_log .or. i.le.nloga)) then
             write (iout,180)  i,ua0(i),ua1(i),ua1(i)-ua0(i)
   180       format (i11,2x,3f16.4)
          end if
@@ -370,6 +380,21 @@ c
       end do
       nfrma = i
       close (unit=iarc)
+      if (nfrma .ge. maxframe) then
+         write (iout,183)  maxframe,'A'
+  183    format (/,' BAR  --  Reading Stopped at the Limit of',i8,
+     &              ' Frames for Trajectory ',a)
+      end if
+c
+c     stop if the log energies do not match the archive frames
+c
+      if (use_log .and. nloga.ne.nfrma) then
+         write (iout,185)  nloga,nfrma
+  185    format (/,' BAR  --  Log File has',i8,' Energies but Archive',
+     &              ' has',i8,' Frames;',
+     &           /,' Answer N to Recompute the Energies')
+         call fatal
+      end if
 c
 c     save potential energies and volumes for trajectory A
 c
@@ -406,17 +431,31 @@ c
          open (unit=iarc,file=arcfile,form='unformatted',status ='old')
       end if
 c
-c     check for log with energies of trajectory B in state 1
+c     read any log energies of trajectory B in state 1, where
+c     a log without energies is not used
 c
       use_log = .false.
+      nlogb = 0
       if (.not. recompute) then
-         logfile = fileb(1:lengb)
-         call suffix (logfile,'log','old')
+         logfile = fileb(1:lengb)//'.log'
+         call version (logfile,'old')
          inquire (file=logfile,exist=exist)
          if (exist) then
-            use_log = .true.
             ilog = freeunit ()
             open (unit=ilog,file=logfile,status='old')
+            do while (nlogb .lt. maxframe)
+               read (ilog,240,err=260,end=260)  record
+  240          format (a240)
+               if (record(1:18) .eq. ' Current Potential') then
+                  string = record(19:240)
+                  read (string,*,err=250,end=250)  ub1(nlogb+1)
+                  nlogb = nlogb + 1
+  250             continue
+               end if
+            end do
+  260       continue
+            close (unit=ilog)
+            use_log = (nlogb .gt. 0)
          end if
       end if
 c
@@ -435,36 +474,30 @@ c     find potential energies for trajectory B in state 1
 c
       write (iout,230)
   230 format (/,' Initial Processing for Trajectory B :',/)
-      i = 0
-      do while (.not. abort)
-         i = i + 1
-         if (use_log) then
-            abort = .true.
-            do while (abort)
-               read (ilog,240,err=260,end=260)  record
-  240          format (a240)
-               if (record(1:18) .eq. ' Current Potential') then
-                  string = record(19:240)
-                  read (string,*,err=250,end=250)  ub1(i)
-                  abort = .false.
-               end if
-  250          continue
-            end do
-  260       continue
-            if (abort)  i = i - 1
-         else
+      if (use_log) then
+         do i = 1, nlogb
+            if (mod(i,100).eq.0 .or. i.eq.nlogb) then
+               write (iout,270)  i
+               flush (iout)
+            end if
+         end do
+      else
+         i = 0
+         do while (.not. abort)
+            i = i + 1
             call cutoffs
             ub1(i) = energy ()
             call readcart (iarc,first)
-         end if
-         imod = mod(i,100)
-         if ((.not.abort.and.imod.eq.0) .or. (abort.and.imod.ne.0)) then
-            write (iout,270)  i
-  270       format (7x,'Completed',i8,' Coordinate Frames')
-            flush (iout)
-         end if
-         if (i .ge. maxframe)  abort = .true.
-      end do
+            imod = mod(i,100)
+            if ((.not.abort.and.imod.eq.0) .or.
+     &          (abort.and.imod.ne.0)) then
+               write (iout,270)  i
+  270          format (7x,'Completed',i8,' Coordinate Frames')
+               flush (iout)
+            end if
+            if (i .ge. maxframe)  abort = .true.
+         end do
+      end if
 c
 c     reset trajectory B using the parameters for state 0
 c
@@ -490,7 +523,7 @@ c
          call cutoffs
          ub0(i) = energy ()
          volb(i) = volbox
-         if (verbose) then
+         if (verbose .and. (.not.use_log .or. i.le.nlogb)) then
             write (iout,290)  i,ub0(i),ub1(i),ub0(i)-ub1(i)
   290       format (i11,2x,3f16.4)
          end if
@@ -499,6 +532,16 @@ c
       end do
       nfrmb = i
       close (unit=iarc)
+      if (nfrmb .ge. maxframe)  write (iout,183)  maxframe,'B'
+c
+c     stop if the log energies do not match the archive frames,
+c     and remove the BAR file begun for trajectory A
+c
+      if (use_log .and. nlogb.ne.nfrmb) then
+         close (unit=ibar,status='delete')
+         write (iout,185)  nlogb,nfrmb
+         call fatal
+      end if
 c
 c     save potential energies and volumes for trajectory B
 c
@@ -553,7 +596,7 @@ c
       use titles
       implicit none
       integer i,j,k,ibar
-      integer size,next
+      integer next
       integer ltitlea,ltitleb
       integer nfrma,nfrmb
       integer nfrm,nbst
@@ -561,6 +604,8 @@ c
       integer stopa,stopb
       integer stepa,stepb
       integer maxa,maxb,istat
+      integer nvola,nvolb
+      integer barnbst
       integer freeunit
       integer trimtext
       integer nboot(2)
@@ -692,15 +737,16 @@ c
       open (unit=ibar,file=barfile,status='old')
       rewind (unit=ibar)
       nfrma = 0
+      j = 0
       tempa = 0.0d0
       next = 1
       read (ibar,110,err=250,end=250)  record
   110 format (a240)
-      size = trimtext (record)
       call gettext (record,string,next)
       read (string,*,err=250,end=250)  nfrma
       call gettext (record,string,next)
-      read (string,*,err=250,end=250)  tempa
+      read (string,*,err=115,end=115)  tempa
+  115 continue
       titlea = record(next:trimtext(record))
       call trimhead (titlea)
       ltitlea = trimtext(titlea)
@@ -722,7 +768,13 @@ c
          ua0(j) = 0.0d0
          ua1(j) = 0.0d0
          vola(j) = 0.0d0
-         read (record,*,err=140,end=140)  k,ua0(j),ua1(j),vola(j)
+         read (record,*,err=135,end=135)  k,ua0(j),ua1(j)
+         read (record,*,err=135,end=140)  k,ua0(j),ua1(j),vola(j)
+         goto 140
+  135    continue
+         write (iout,137)  record(1:trimtext(record))
+  137    format (/,' BAR  --  Unreadable Line in BAR File :',//,' ',a)
+         call fatal
   140    continue
          do k = 1, stepa-1
             read (ibar,150,err=160,end=160)
@@ -738,7 +790,6 @@ c
       next = 1
       read (ibar,170,err=190,end=190)  record
   170 format (a240)
-      size = trimtext (record)
       call gettext (record,string,next)
       read (string,*,err=190,end=190)  k
       do i = 1, k
@@ -750,15 +801,16 @@ c
 c     read potential energies and volumes for trajectory B
 c
       nfrmb = 0
+      j = 0
       tempb = 0.0d0
       next = 1
       read (ibar,200,err=250,end=250)  record
   200 format (a240)
-      size = trimtext (record)
       call gettext (record,string,next)
       read (string,*,err=250,end=250)  nfrmb
       call gettext (record,string,next)
-      read (string,*,err=250,end=250)  tempb
+      read (string,*,err=205,end=205)  tempb
+  205 continue
       titleb = record(next:trimtext(record))
       call trimhead (titleb)
       ltitleb = trimtext(titleb)
@@ -780,7 +832,12 @@ c
          ub0(j) = 0.0d0
          ub1(j) = 0.0d0
          volb(j) = 0.0d0
-         read (record,*,err=230,end=230)  k,ub0(j),ub1(j),volb(j)
+         read (record,*,err=225,end=225)  k,ub0(j),ub1(j)
+         read (record,*,err=225,end=230)  k,ub0(j),ub1(j),volb(j)
+         goto 230
+  225    continue
+         write (iout,137)  record(1:trimtext(record))
+         call fatal
   230    continue
          do k = 1, stepb-1
             read (ibar,240,err=250,end=250)
@@ -824,6 +881,18 @@ c
          call fatal
       end if
 c
+c     stop if either trajectory has no temperature
+c
+      if (.not. (tempa .gt. 0.0d0)) then
+         write (iout,325)  'A'
+  325    format (/,' BAR  --  No Temperature Found for Trajectory ',a)
+         call fatal
+      end if
+      if (.not. (tempb .gt. 0.0d0)) then
+         write (iout,325)  'B'
+         call fatal
+      end if
+c
 c     stop if the trajectories differ in temperature
 c
       if (abs(tempa-tempb) .gt. 0.01d0) then
@@ -836,13 +905,32 @@ c
 c
 c     get the pressure for the PV terms if volumes are present
 c
-      usevol = .false.
+      nvola = 0
       do i = 1, nfrma
-         if (vola(i) .ne. 0.0d0)  usevol = .true.
+         if (vola(i) .ne. 0.0d0)  nvola = nvola + 1
       end do
+      nvolb = 0
       do i = 1, nfrmb
-         if (volb(i) .ne. 0.0d0)  usevol = .true.
+         if (volb(i) .ne. 0.0d0)  nvolb = nvolb + 1
       end do
+      usevol = (nvola+nvolb .gt. 0)
+c
+c     the PV terms need a volume for every frame of both trajectories,
+c     or for none, since a missing volume would enter them as zero
+c
+      if (usevol) then
+         if (nvola .lt. nfrma) then
+            write (iout,335)  nfrma-nvola,nfrma,'A'
+  335       format (/,' BAR  --  Volumes Missing for',i8,' of',i8,
+     &                 ' Frames of Trajectory ',a,';',
+     &              /,' PV Terms Need a Volume for Every Frame')
+            call fatal
+         end if
+         if (nvolb .lt. nfrmb) then
+            write (iout,335)  nfrmb-nvolb,nfrmb,'B'
+            call fatal
+         end if
+      end if
       patm = 1.0d0
       if (usevol) then
          patm = -1.0d0
@@ -866,14 +954,14 @@ c
 c     set the number of bootstrap trials to be generated
 c
       nfrm = max(nfrma,nfrmb)
-      nbst = min(100000,nint(1.0d8/dble(nfrm)))
+      nbst = barnbst (nfrm)
 c
 c     find the free energy, enthalpy and entropy via FEP and BAR
 c
       call barpair (nfrma,nfrmb,ua0,ua1,ub0,ub1,vola,volb,tempa,
      &              tempb,patm,nbst,.true.,dgfep,dgbar,nboot,sdu,
      &              uave,hbar,istat)
-      if (istat .eq. 1)  call fatal
+      if (istat .ge. 1)  call fatal
 c
 c     perform deallocation of some local arrays
 c
@@ -905,7 +993,10 @@ c     from the trial energies of its neighbors; the native and trial
 c     energies of a sample share the same periodic box, whose volume
 c     is in a fifth column of newer files, and the volumes are used
 c     for the PV enthalpy terms only if the file header also gives
-c     the pressure of an isobaric simulation
+c     the pressure of an isobaric simulation; the errors come from
+c     bootstrap trials that resample the samples of every window at
+c     once, so the errors of the totals include the correlation of
+c     pairs that share a window
 c
 c
       subroutine fepcalc
@@ -920,10 +1011,13 @@ c
       integer first,last,step
       integer lastw,iord
       integer nbst,nbstin
-      integer nbmin,nbmax
       integer nsmin,nsmax
       integer na,nb,iw,istat
-      integer nlist,nmiss
+      integer kt,maxiter
+      integer ntota,ntotb
+      integer npboot,nwork
+      integer ntf,ntc,nlist
+      integer barnbst
       integer freeunit
       integer trimtext
       integer nboot(2)
@@ -934,23 +1028,34 @@ c
       integer, allocatable :: wcount(:)
       integer, allocatable :: wsel(:)
       integer, allocatable :: wseen(:)
+      integer, allocatable :: woff(:)
+      integer, allocatable :: wsamp(:)
+      integer, allocatable :: draw(:)
+      integer, allocatable :: mapa(:)
+      integer, allocatable :: mapb(:)
+      integer, allocatable :: ia(:)
+      integer, allocatable :: ib(:)
       integer, allocatable :: pstat(:)
       integer, allocatable :: pna(:)
       integer, allocatable :: pnb(:)
+      integer, allocatable :: paoff(:)
+      integer, allocatable :: pboff(:)
       integer, allocatable :: pskip(:)
       integer, allocatable :: pfail(:)
       integer, allocatable :: pconv(:)
-      integer, allocatable :: pnbst(:)
+      integer, allocatable :: ptry(:)
       integer, allocatable :: plist(:)
       real*8 temp,tol,lmda
-      real*8 patm,pres
-      real*8 v0,v1
+      real*8 patm,pres,rt
+      real*8 u0,u1,v0,v1
       real*8 lfirst,lsecond
       real*8 cumul,random
-      real*8 bst,ratio
-      real*8 u0,u1,hdir
-      real*8 hsum,hsum2
-      real*8 sum(4),sum2(4)
+      real*8 barsd,hdir,tds
+      real*8 cfore,cback
+      real*8 hfore,hback
+      real*8 ctrial,htrial
+      real*8 sum(4),val(5)
+      real*8 tsum(5),tsum2(5)
       real*8 dgfep(4),dgbar(4)
       real*8 sdu(2),uave(4)
       real*8 hbar(3)
@@ -959,20 +1064,31 @@ c
       real*8, allocatable :: rene(:)
       real*8, allocatable :: rvol(:)
       real*8, allocatable :: wlmda(:)
-      real*8, allocatable :: ua0(:)
-      real*8, allocatable :: ua1(:)
-      real*8, allocatable :: ub0(:)
-      real*8, allocatable :: ub1(:)
-      real*8, allocatable :: vola(:)
-      real*8, allocatable :: volb(:)
+      real*8, allocatable :: pa0(:)
+      real*8, allocatable :: pa1(:)
+      real*8, allocatable :: pva(:)
+      real*8, allocatable :: pb0(:)
+      real*8, allocatable :: pb1(:)
+      real*8, allocatable :: pvb(:)
+      real*8, allocatable :: wa(:)
+      real*8, allocatable :: hwa(:)
+      real*8, allocatable :: ea(:)
+      real*8, allocatable :: wb(:)
+      real*8, allocatable :: hwb(:)
+      real*8, allocatable :: eb(:)
+      real*8, allocatable :: pxa(:)
+      real*8, allocatable :: pxb(:)
+      real*8, allocatable :: pcref(:)
       real*8, allocatable :: pfep(:,:)
       real*8, allocatable :: pbar(:,:)
       real*8, allocatable :: psdu(:,:)
       real*8, allocatable :: phs(:,:)
+      real*8, allocatable :: psum(:,:)
       logical exist,query
       logical header,found
-      logical down,totals
+      logical totals,down
       logical hasvol,usevol
+      logical allf,allc,tconv
       logical, allocatable :: ssel(:)
       character*240 record
       character*240 string
@@ -1287,202 +1403,383 @@ c
          nsmax = max(nsmax,wsel(i))
       end do
 c
-c     perform dynamic allocation of some local arrays
+c     list the selected samples of each window in file order
 c
       npair = nwin - 1
+      allocate (woff(nwin+1))
+      allocate (wsamp(max(1,nsamp)))
+      woff(1) = 0
+      do i = 1, nwin
+         woff(i+1) = woff(i) + wsel(i)
+         wseen(i) = 0
+      end do
+      do i = 1, nsamp
+         if (ssel(i)) then
+            iw = swin(i)
+            wseen(iw) = wseen(iw) + 1
+            wsamp(woff(iw)+wseen(iw)) = i
+         end if
+      end do
+c
+c     perform dynamic allocation of some local arrays
+c
+      n = max(1,woff(nwin+1))
+      allocate (draw(n))
+      allocate (mapa(n))
+      allocate (mapb(n))
+      allocate (pa0(n))
+      allocate (pa1(n))
+      allocate (pva(n))
+      allocate (pb0(n))
+      allocate (pb1(n))
+      allocate (pvb(n))
+      allocate (wa(n))
+      allocate (hwa(n))
+      allocate (ea(n))
+      allocate (wb(n))
+      allocate (hwb(n))
+      allocate (eb(n))
       n = max(1,nsmax)
-      allocate (ua0(n))
-      allocate (ua1(n))
-      allocate (ub0(n))
-      allocate (ub1(n))
-      allocate (vola(n))
-      allocate (volb(n))
+      allocate (ia(n))
+      allocate (ib(n))
       allocate (pstat(npair))
       allocate (pna(npair))
       allocate (pnb(npair))
+      allocate (paoff(npair))
+      allocate (pboff(npair))
       allocate (pskip(npair))
       allocate (pfail(npair))
       allocate (pconv(npair))
-      allocate (pnbst(npair))
+      allocate (ptry(npair))
       allocate (plist(npair))
       allocate (pfep(4,npair))
       allocate (pbar(4,npair))
       allocate (psdu(2,npair))
       allocate (phs(3,npair))
-      do i = 1, n
-         vola(i) = 0.0d0
-         volb(i) = 0.0d0
-      end do
+      allocate (pxa(npair))
+      allocate (pxb(npair))
+      allocate (pcref(npair))
+      allocate (psum(8,npair))
 c
-c     find the free energy between each pair of adjacent windows
+c     gather the frames of each pair of adjacent windows, where a
+c     sample of window "iw" gives a state 0 frame if it has the energy
+c     at window "iw+1", and a sample of window "iw+1" gives a state 1
+c     frame if it has the energy at window "iw"; then find the free
+c     energy values from all of the frames of each pair
 c
-      nbmin = 0
-      nbmax = 0
+      rt = gasconst * temp
+      npboot = 0
+      nwork = 0
+      ntota = 0
+      ntotb = 0
       do iw = 1, npair
+         paoff(iw) = ntota
+         pboff(iw) = ntotb
          na = 0
          nb = 0
          pskip(iw) = 0
-         do i = 1, nsamp
-            if (ssel(i) .and. swin(i).eq.iw) then
-               found = .false.
-               do k = sfirst(i)+1, slast(i)
-                  if (abs(rtrl(k)-wlmda(iw+1)) .lt. tol) then
-                     if (.not. found) then
-                        na = na + 1
-                        ua0(na) = rene(sfirst(i))
-                        ua1(na) = rene(k)
-                        if (usevol)  vola(na) = rvol(sfirst(i))
-                     end if
-                     found = .true.
-                  end if
-               end do
-               if (.not. found)  pskip(iw) = pskip(iw) + 1
-            else if (ssel(i) .and. swin(i).eq.iw+1) then
-               found = .false.
-               do k = sfirst(i)+1, slast(i)
-                  if (abs(rtrl(k)-wlmda(iw)) .lt. tol) then
-                     if (.not. found) then
-                        nb = nb + 1
-                        ub1(nb) = rene(sfirst(i))
-                        ub0(nb) = rene(k)
-                        if (usevol)  volb(nb) = rvol(sfirst(i))
-                     end if
-                     found = .true.
-                  end if
-               end do
-               if (.not. found)  pskip(iw) = pskip(iw) + 1
+         do m = 1, wsel(iw)
+            i = wsamp(woff(iw)+m)
+            mapa(woff(iw)+m) = 0
+            j = 0
+            do k = sfirst(i)+1, slast(i)
+               if (j.eq.0 .and. abs(rtrl(k)-wlmda(iw+1)).lt.tol)  j = k
+            end do
+            if (j .ne. 0) then
+               na = na + 1
+               pa0(ntota+na) = rene(sfirst(i))
+               pa1(ntota+na) = rene(j)
+               pva(ntota+na) = 0.0d0
+               if (usevol)  pva(ntota+na) = rvol(sfirst(i))
+               mapa(woff(iw)+m) = na
+            else
+               pskip(iw) = pskip(iw) + 1
             end if
          end do
+         do m = 1, wsel(iw+1)
+            i = wsamp(woff(iw+1)+m)
+            mapb(woff(iw+1)+m) = 0
+            j = 0
+            do k = sfirst(i)+1, slast(i)
+               if (j.eq.0 .and. abs(rtrl(k)-wlmda(iw)).lt.tol)  j = k
+            end do
+            if (j .ne. 0) then
+               nb = nb + 1
+               pb1(ntotb+nb) = rene(sfirst(i))
+               pb0(ntotb+nb) = rene(j)
+               pvb(ntotb+nb) = 0.0d0
+               if (usevol)  pvb(ntotb+nb) = rvol(sfirst(i))
+               mapb(woff(iw+1)+m) = nb
+            else
+               pskip(iw) = pskip(iw) + 1
+            end if
+         end do
+         ntota = ntota + na
+         ntotb = ntotb + nb
          pna(iw) = na
          pnb(iw) = nb
-         pfail(iw) = 0
-         pconv(iw) = 0
-         pnbst(iw) = 0
          if (na.eq.0 .or. nb.eq.0) then
             pstat(iw) = -1
          else
-            nbst = nbstin
-            if (nbst .eq. 0) then
-               nbst = min(10000,nint(1.0d8/dble(max(na,nb))))
-               nbst = max(2,nbst)
-            end if
-            call barpair (na,nb,ua0,ua1,ub0,ub1,vola,volb,temp,temp,
-     &                    patm,nbst,.false.,dgfep,dgbar,nboot,sdu,
-     &                    uave,hbar,istat)
+            k = paoff(iw) + 1
+            j = pboff(iw) + 1
+            call barpair (na,nb,pa0(k),pa1(k),pb0(j),pb1(j),pva(k),
+     &                    pvb(j),temp,temp,patm,0,.false.,dgfep,dgbar,
+     &                    nboot,sdu,uave,hbar,istat)
             pstat(iw) = istat
-            pnbst(iw) = nbst
-            pconv(iw) = nboot(1)
-            pfail(iw) = nboot(2)
-            do k = 1, 4
-               pfep(k,iw) = dgfep(k)
-               pbar(k,iw) = dgbar(k)
+            pfep(1,iw) = dgfep(1)
+            pfep(3,iw) = dgfep(3)
+            pbar(1,iw) = dgbar(1)
+            pbar(2,iw) = dgbar(2)
+            psdu(1,iw) = sdu(1)
+            psdu(2,iw) = sdu(2)
+            phs(1,iw) = hbar(1)
+            phs(3,iw) = hbar(3)
+            pcref(iw) = 0.0d0
+            if (istat .eq. 0)  pcref(iw) = dgbar(1)
+            call bootprep (na,nb,pa0(k),pa1(k),pb0(j),pb1(j),pva(k),
+     &                     pvb(j),rt,rt,pres,pcref(iw),pxa(iw),pxb(iw),
+     &                     wa(k),hwa(k),wb(j),hwb(j),ea(k),eb(j))
+            if (istat .eq. 0) then
+               npboot = npboot + 1
+               nwork = nwork + na + nb
+            end if
+         end if
+      end do
+c
+c     set the number of bootstrap trials, shared by all of the pairs,
+c     from the frames of the pairs used in each trial, with no trials
+c     if no pair has a BAR free energy
+c
+      nbst = nbstin
+      if (nbst .eq. 0)  nbst = barnbst (nwork)
+      if (npboot .eq. 0)  nbst = 0
+      maxiter = 100
+c
+c     apply the estimators of every pair to bootstrap trials that
+c     resample the samples of each window once, so that the totals
+c     over the pairs include the correlation between pairs sharing a
+c     window; each BAR trial starts from the BAR value of its pair
+c
+      do iw = 1, npair
+         do k = 1, 8
+            psum(k,iw) = 0.0d0
+         end do
+         pconv(iw) = 0
+         ptry(iw) = 0
+      end do
+      do k = 1, 5
+         tsum(k) = 0.0d0
+         tsum2(k) = 0.0d0
+      end do
+      ntf = 0
+      ntc = 0
+      do kt = 1, nbst
+         do iw = 1, nwin
+            do m = 1, wsel(iw)
+               draw(woff(iw)+m) = int(dble(wsel(iw))*random()) + 1
             end do
+         end do
+         allf = .true.
+         allc = .true.
+         do k = 1, 5
+            val(k) = 0.0d0
+         end do
+         do iw = 1, npair
+            if (pstat(iw) .ne. 0)  goto 230
+            na = 0
+            do m = 1, wsel(iw)
+               j = mapa(woff(iw)+draw(woff(iw)+m))
+               if (j .ne. 0) then
+                  na = na + 1
+                  ia(na) = j
+               end if
+            end do
+            nb = 0
+            do m = 1, wsel(iw+1)
+               j = mapb(woff(iw+1)+draw(woff(iw+1)+m))
+               if (j .ne. 0) then
+                  nb = nb + 1
+                  ib(nb) = j
+               end if
+            end do
+            if (na.eq.0 .or. nb.eq.0) then
+               allf = .false.
+               allc = .false.
+               goto 230
+            end if
+            k = paoff(iw) + 1
+            j = pboff(iw) + 1
+            call bootfep (na,ia,pa0(k),pa1(k),pva(k),wa(k),hwa(k),
+     &                    pxa(iw),rt,pres,cfore,hfore,u0,v0)
+            call bootfep (nb,ib,pb1(j),pb0(j),pvb(j),wb(j),hwb(j),
+     &                    pxb(iw),rt,pres,cback,hback,u1,v1)
+            cback = -cback
+            ptry(iw) = ptry(iw) + 1
+            psum(1,iw) = psum(1,iw) + cfore
+            psum(2,iw) = psum(2,iw) + cfore*cfore
+            psum(3,iw) = psum(3,iw) + cback
+            psum(4,iw) = psum(4,iw) + cback*cback
+            val(1) = val(1) + cfore
+            val(2) = val(2) + cback
+            call bootiter (na,ia,nb,ib,ea(k),eb(j),pcref(iw),rt,rt,
+     &                     pbar(1,iw),maxiter,ctrial,tconv)
+            if (tconv) then
+               call boothbar (na,ia,nb,ib,pa0(k),pa1(k),pb0(j),pb1(j),
+     &                        pva(k),pvb(j),ea(k),eb(j),pcref(iw),rt,
+     &                        rt,pres,ctrial,htrial)
+               pconv(iw) = pconv(iw) + 1
+               psum(5,iw) = psum(5,iw) + ctrial
+               psum(6,iw) = psum(6,iw) + ctrial*ctrial
+               psum(7,iw) = psum(7,iw) + htrial
+               psum(8,iw) = psum(8,iw) + htrial*htrial
+               val(3) = val(3) + ctrial
+               val(4) = val(4) + htrial
+            else
+               allc = .false.
+            end if
+  230       continue
+         end do
+c
+c     the direct enthalpy uses the same samples of the end windows
+c
+         if (wsel(1).gt.0 .and. wsel(nwin).gt.0) then
+            u0 = 0.0d0
+            do m = 1, wsel(1)
+               i = wsamp(woff(1)+draw(woff(1)+m))
+               u0 = u0 + rene(sfirst(i)) + pres*rvol(sfirst(i))
+            end do
+            u1 = 0.0d0
+            do m = 1, wsel(nwin)
+               i = wsamp(woff(nwin)+draw(woff(nwin)+m))
+               u1 = u1 + rene(sfirst(i)) + pres*rvol(sfirst(i))
+            end do
+            val(5) = u1/dble(wsel(nwin)) - u0/dble(wsel(1))
+            tsum(5) = tsum(5) + val(5)
+            tsum2(5) = tsum2(5) + val(5)*val(5)
+         end if
+         if (allf) then
+            ntf = ntf + 1
             do k = 1, 2
-               psdu(k,iw) = sdu(k)
+               tsum(k) = tsum(k) + val(k)
+               tsum2(k) = tsum2(k) + val(k)*val(k)
             end do
-            do k = 1, 3
-               phs(k,iw) = hbar(k)
+         end if
+         if (allc) then
+            ntc = ntc + 1
+            do k = 3, 4
+               tsum(k) = tsum(k) + val(k)
+               tsum2(k) = tsum2(k) + val(k)*val(k)
             end do
-            if (nbmin .eq. 0)  nbmin = nbst
-            nbmin = min(nbmin,nbst)
-            nbmax = max(nbmax,nbst)
+         end if
+      end do
+c
+c     find the bootstrap errors of each pair
+c
+      do iw = 1, npair
+         pfail(iw) = 0
+         if (pstat(iw) .eq. 0) then
+            pfail(iw) = nbst - pconv(iw)
+            pfep(2,iw) = barsd (ptry(iw),psum(1,iw),psum(2,iw))
+            pfep(4,iw) = barsd (ptry(iw),psum(3,iw),psum(4,iw))
+            pbar(3,iw) = 0.0d0
+            if (pconv(iw) .ge. 1) then
+               pbar(3,iw) = psum(5,iw) / dble(pconv(iw))
+            end if
+            pbar(4,iw) = barsd (pconv(iw),psum(5,iw),psum(6,iw))
+            phs(2,iw) = barsd (pconv(iw),psum(7,iw),psum(8,iw))
          end if
       end do
 c
 c     print information about the file and the samples used
 c
-      write (iout,220)
-  220 format (/,' Free Energy from Tinker FEP File :',/)
-      write (iout,230)  fepfile(1:trimtext(fepfile))
-  230 format (' FEP File Name :',12x,a)
-      write (iout,240)  nwin
-  240 format (' Lambda Windows Found :',7x,i8)
+      write (iout,240)
+  240 format (/,' Free Energy from Tinker FEP File :',/)
+      write (iout,250)  fepfile(1:trimtext(fepfile))
+  250 format (' FEP File Name :',12x,a)
+      write (iout,260)  nwin
+  260 format (' Lambda Windows Found :',7x,i8)
       if (nwhead.gt.0 .and. nwhead.ne.nwin) then
-         write (iout,250)  nwhead
-  250    format (' Lambda Windows in Header :',3x,i8,
+         write (iout,270)  nwhead
+  270    format (' Lambda Windows in Header :',3x,i8,
      &              '  (Mismatch)')
       end if
-      write (iout,260)  wlmda(1),wlmda(nwin)
-  260 format (' Lambda Schedule :',11x,f9.4,' -->',f9.4)
-      write (iout,270)  temp
-  270 format (' Simulation Temperature :',4x,f9.2,' K')
+      write (iout,280)  wlmda(1),wlmda(nwin)
+  280 format (' Lambda Schedule :',11x,f9.4,' -->',f9.4)
+      write (iout,290)  temp
+  290 format (' Simulation Temperature :',4x,f9.2,' K')
       if (usevol) then
-         write (iout,275)  patm
-  275    format (' Simulation Pressure :',7x,f9.2,' Atm')
+         write (iout,300)  patm
+  300    format (' Simulation Pressure :',7x,f9.2,' Atm')
       end if
-      write (iout,280)  nsmin,nsmax
-  280 format (' Samples per Window :',8x,i8,' to',i8)
+      write (iout,310)  nsmin,nsmax
+  310 format (' Samples per Window :',8x,i8,' to',i8)
       if (last .eq. 0) then
-         write (iout,290)  first,step
-  290    format (' Sample Selection :',10x,'First',i6,'  Last   All',
+         write (iout,320)  first,step
+  320    format (' Sample Selection :',10x,'First',i6,'  Last   All',
      &              '  Step',i6)
       else
-         write (iout,300)  first,last,step
-  300    format (' Sample Selection :',10x,'First',i6,'  Last',i6,
+         write (iout,330)  first,last,step
+  330    format (' Sample Selection :',10x,'First',i6,'  Last',i6,
      &              '  Step',i6)
       end if
-      if (nbmin .eq. nbmax) then
-         write (iout,310)  nbmax
-  310    format (' Bootstrap Trials per Pair :',1x,i8)
-      else
-         write (iout,320)  nbmin,nbmax
-  320    format (' Bootstrap Trials per Pair :',1x,i8,' to',i8)
-      end if
+      write (iout,340)  nbst
+  340 format (' Bootstrap Trials :',10x,i8)
       if (norphan .gt. 0) then
-         write (iout,330)  norphan
-  330    format (' Records without a Native Energy :',i6,
+         write (iout,350)  norphan
+  350    format (' Records without a Native Energy :',i6,
      &              '  (Ignored)')
       end if
-      write (iout,340)
-  340 format (/,' Bootstrap errors assume independent samples,',
-     &           ' which may not hold at the',
-     &        /,' sampling interval used')
 c
 c     print the free energy for each pair of adjacent windows
 c
-      write (iout,350)
-  350 format (/,' Free Energy by Window Pair :',
+      write (iout,360)
+  360 format (/,' Free Energy by Window Pair :',
      &        //,'  Pair  Lambda A  Lambda B    BAR Iter     +/-',
      &           '    BAR Boot     +/-    Cumul dG',/)
       cumul = 0.0d0
       found = .true.
       do iw = 1, npair
          line = ' '
-         write (line(1:26),360)  iw,wlmda(iw),wlmda(iw+1)
-  360    format (i6,2f10.4)
+         write (line(1:26),370)  iw,wlmda(iw),wlmda(iw+1)
+  370    format (i6,2f10.4)
          if (pstat(iw) .lt. 0) then
             k = iw
             if (wsel(iw) .ne. 0)  k = iw + 1
             if (wsel(k) .eq. 0) then
-               write (line(27:80),370)  k
-  370          format (3x,'Not Computed, Window',i4,' has no Samples')
+               write (line(27:80),380)  k
+  380          format (3x,'Not Computed, Window',i4,' has no Samples')
             else
-               write (line(27:80),380)
-  380          format (3x,'Not Computed, No Neighbor Energies')
+               write (line(27:80),390)
+  390          format (3x,'Not Computed, No Neighbor Energies')
             end if
             found = .false.
          else if (pstat(iw) .eq. 1) then
-            write (line(27:80),390)
-  390       format (3x,'BAR Iteration not Converged')
+            write (line(27:80),400)
+  400       format (3x,'BAR Iteration not Converged')
+            found = .false.
+         else if (pstat(iw) .eq. 2) then
+            write (line(27:80),410)
+  410       format (3x,'BAR Failed, No Overlap')
             found = .false.
          else
-            write (line(27:46),400)  pbar(1,iw),pbar(2,iw)
-  400       format (f12.4,f8.4)
+            write (line(27:46),420)  pbar(1,iw),pbar(2,iw)
+  420       format (f12.4,f8.4)
             if (pconv(iw) .ge. 2) then
-               write (line(47:66),410)  pbar(3,iw),pbar(4,iw)
-  410          format (f12.4,f8.4)
+               write (line(47:66),430)  pbar(3,iw),pbar(4,iw)
+  430          format (f12.4,f8.4)
             else
-               write (line(47:66),420)
-  420          format (9x,'n/a')
+               write (line(47:66),440)
+  440          format (9x,'n/a')
             end if
             if (found) then
                cumul = cumul + pbar(1,iw)
-               write (line(67:78),430)  cumul
-  430          format (f12.4)
+               write (line(67:78),450)  cumul
+  450          format (f12.4)
             end if
          end if
-         write (iout,440)  line(1:trimtext(line))
-  440    format (a)
+         write (iout,460)  line(1:trimtext(line))
+  460    format (a)
       end do
 c
 c     note any samples skipped or bootstrap trials that failed
@@ -1491,45 +1788,48 @@ c
       do iw = 1, npair
          if (pskip(iw).gt.0 .or. pfail(iw).gt.0)  n = n + 1
       end do
-      if (n .gt. 0)  write (iout,450)
-  450 format ()
+      if (n .gt. 0)  write (iout,470)
+  470 format ()
       do iw = 1, npair
          if (pskip(iw) .gt. 0) then
-            write (iout,460)  iw,pskip(iw)
-  460       format (' Pair',i4,' :',i8,' Samples Skipped, Missing',
+            write (iout,480)  iw,pskip(iw)
+  480       format (' Pair',i4,' :',i8,' Samples Skipped, Missing',
      &                 ' a Neighbor Energy')
          end if
          if (pfail(iw) .gt. 0) then
-            write (iout,470)  iw,pfail(iw),pnbst(iw)
-  470       format (' Pair',i4,' :',i8,' of',i8,' Bootstrap Trials',
+            write (iout,490)  iw,pfail(iw),nbst
+  490       format (' Pair',i4,' :',i8,' of',i8,' Bootstrap Trials',
      &                 ' did not Converge')
          end if
       end do
 c
 c     print sampling diagnostics for each pair of windows
 c
-      write (iout,480)
-  480 format (/,' Sampling Diagnostics by Window Pair :',
+      write (iout,500)
+  500 format (/,' Sampling Diagnostics by Window Pair :',
      &        //,'  Pair    nA    nB    FEP Fwd    FEP Bwd    Fwd-Bwd',
      &           '  SD dU Fwd  SD dU Bwd',/)
       do iw = 1, npair
          line = ' '
-         write (line(1:18),490)  iw,pna(iw),pnb(iw)
-  490    format (3i6)
+         write (line(1:18),510)  iw,pna(iw),pnb(iw)
+  510    format (3i6)
          if (pstat(iw) .lt. 0) then
-            write (line(19:80),500)
-  500       format (3x,'Not Computed')
+            write (line(19:80),520)
+  520       format (3x,'Not Computed')
          else if (pstat(iw) .eq. 1) then
-            write (line(19:80),510)
-  510       format (3x,'BAR Iteration not Converged')
+            write (line(19:80),530)
+  530       format (3x,'BAR Iteration not Converged')
+         else if (pstat(iw) .eq. 2) then
+            write (line(19:80),540)
+  540       format (3x,'BAR Failed, No Overlap')
          else
-            write (line(19:73),520)  pfep(1,iw),pfep(3,iw),
+            write (line(19:73),550)  pfep(1,iw),pfep(3,iw),
      &                               pfep(1,iw)-pfep(3,iw),
      &                               psdu(1,iw),psdu(2,iw)
-  520       format (5f11.4)
+  550       format (5f11.4)
          end if
-         write (iout,530)  line(1:trimtext(line))
-  530    format (a)
+         write (iout,560)  line(1:trimtext(line))
+  560    format (a)
       end do
 c
 c     totals need every pair and the expected number of windows
@@ -1538,160 +1838,97 @@ c
       if (nwhead.gt.0 .and. nwhead.ne.nwin)  totals = .false.
       nlist = 0
       do iw = 1, npair
-         if (pstat(iw).lt.0 .or. pstat(iw).eq.1) then
+         if (pstat(iw) .ne. 0) then
             totals = .false.
             nlist = nlist + 1
             plist(nlist) = iw
          end if
       end do
       if (.not. totals) then
-         write (iout,540)
-  540    format (/,' Totals not Computed; Missing or Failed Pairs :')
          if (nlist .gt. 0) then
-            write (iout,550)  (plist(k),k=1,nlist)
-  550       format (5x,15i5)
-         end if
-         if (nwhead.gt.0 .and. nwhead.ne.nwin) then
-            write (iout,560)  nwhead,nwin
-  560       format (' File Header gives',i6,' Lambda Windows, but',
-     &                 i6,' are Found')
+            write (iout,570)
+  570       format (/,' Totals not Computed; Missing or Failed Pairs :')
+            write (iout,580)  (plist(k),k=1,nlist)
+  580       format (5x,15i5)
+         else
+            write (iout,590)
+  590       format (/,' Totals not Computed; Lambda Windows Differ',
+     &                 ' from the File Header')
          end if
       end if
 c
-c     sum the free energies over pairs, with errors in quadrature
+c     sum the free energies over pairs, with errors from the joint
+c     bootstrap trials over all of the windows
 c
       if (totals) then
-         nmiss = 0
          do k = 1, 4
             sum(k) = 0.0d0
-            sum2(k) = 0.0d0
          end do
          do iw = 1, npair
             sum(1) = sum(1) + pfep(1,iw)
-            sum2(1) = sum2(1) + pfep(2,iw)**2
             sum(2) = sum(2) + pfep(3,iw)
-            sum2(2) = sum2(2) + pfep(4,iw)**2
             sum(3) = sum(3) + pbar(1,iw)
-            sum2(3) = sum2(3) + pbar(2,iw)**2
-            sum(4) = sum(4) + pbar(3,iw)
-            sum2(4) = sum2(4) + pbar(4,iw)**2
-            if (pconv(iw) .lt. 2)  nmiss = nmiss + 1
+            sum(4) = sum(4) + phs(1,iw)
          end do
-         write (iout,570)
-  570    format (/,' Free Energy Totals :',/)
-         write (iout,580)  sum(1),sqrt(sum2(1))
-  580    format (' Free Energy via Forward FEP',9x,f12.4,
+         write (iout,600)
+  600    format (/,' Free Energy Totals :',/)
+         write (iout,610)  sum(1),barsd(ntf,tsum(1),tsum2(1))
+  610    format (' Free Energy via Forward FEP',9x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
-         write (iout,590)  sum(2),sqrt(sum2(2))
-  590    format (' Free Energy via Backward FEP',8x,f12.4,
+         write (iout,620)  sum(2),barsd(ntf,tsum(2),tsum2(2))
+  620    format (' Free Energy via Backward FEP',8x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
-         write (iout,600)  sum(3),sqrt(sum2(3))
-  600    format (' Free Energy via BAR Iteration',7x,f12.4,
-     &              ' +/-',f9.4,' Kcal/mol')
-         if (nmiss .eq. 0) then
-            write (iout,610)  sum(4),sqrt(sum2(4))
-  610       format (' Free Energy via BAR Bootstrap',7x,f12.4,
+         if (ntc .ge. 2) then
+            write (iout,630)  sum(3),barsd(ntc,tsum(3),tsum2(3))
+  630       format (' Free Energy via BAR Iteration',7x,f12.4,
+     &                 ' +/-',f9.4,' Kcal/mol')
+            write (iout,640)  tsum(3)/dble(ntc),
+     &                        barsd(ntc,tsum(3),tsum2(3))
+  640       format (' Free Energy via BAR Bootstrap',7x,f12.4,
      &                 ' +/-',f9.4,' Kcal/mol')
          else
-            write (iout,620)
-  620       format (' Free Energy via BAR Bootstrap',13x,
+            write (iout,650)  sum(3)
+  650       format (' Free Energy via BAR Iteration',7x,f12.4,
+     &                 ' Kcal/mol, Error not Available')
+            write (iout,660)
+  660       format (' Free Energy via BAR Bootstrap',13x,
      &                 'not Available')
          end if
-      end if
 c
-c     find the enthalpy directly from the end window energies
-c
-      if (totals) then
-         na = 0
-         nb = 0
-         do i = 1, nsamp
-            if (ssel(i) .and. swin(i).eq.1) then
-               na = na + 1
-               ua0(na) = rene(sfirst(i))
-               vola(na) = rvol(sfirst(i))
-            else if (ssel(i) .and. swin(i).eq.nwin) then
-               nb = nb + 1
-               ub1(nb) = rene(sfirst(i))
-               volb(nb) = rvol(sfirst(i))
-            end if
-         end do
-c
-c     the direct enthalpy uses all of the end window samples, with
-c     its error from bootstrap resamples of energy and volume
+c     find the enthalpy directly from the end window energies,
+c     and sum the BAR enthalpy and entropy over the pairs
 c
          u0 = 0.0d0
-         v0 = 0.0d0
-         do i = 1, na
-            u0 = u0 + ua0(i)
-            v0 = v0 + vola(i)
+         do m = 1, wsel(1)
+            i = wsamp(woff(1)+m)
+            u0 = u0 + rene(sfirst(i)) + pres*rvol(sfirst(i))
          end do
          u1 = 0.0d0
-         v1 = 0.0d0
-         do i = 1, nb
-            u1 = u1 + ub1(i)
-            v1 = v1 + volb(i)
+         do m = 1, wsel(nwin)
+            i = wsamp(woff(nwin)+m)
+            u1 = u1 + rene(sfirst(i)) + pres*rvol(sfirst(i))
          end do
-         hdir = (u1+pres*v1)/dble(nb) - (u0+pres*v0)/dble(na)
-         nbst = nbstin
-         if (nbst .eq. 0) then
-            nbst = min(10000,nint(1.0d8/dble(max(na,nb))))
-            nbst = max(2,nbst)
-         end if
-         bst = dble(nbst)
-         ratio = bst / (bst-1.0d0)
-         hsum = 0.0d0
-         hsum2 = 0.0d0
-         do k = 1, nbst
-            u0 = 0.0d0
-            do i = 1, na
-               j = int(dble(na)*random()) + 1
-               u0 = u0 + ua0(j) + pres*vola(j)
-            end do
-            u1 = 0.0d0
-            do i = 1, nb
-               j = int(dble(nb)*random()) + 1
-               u1 = u1 + ub1(j) + pres*volb(j)
-            end do
-            u1 = u1/dble(nb) - u0/dble(na)
-            hsum = hsum + u1
-            hsum2 = hsum2 + u1*u1
-         end do
-         u1 = hsum / bst
-         write (iout,630)
-  630    format (/,' Enthalpy and Entropy Totals :',/)
-         write (iout,640)  hdir,
-     &                     sqrt(max(0.0d0,ratio*(hsum2/bst-u1*u1)))
-  640    format (' Enthalpy via Direct Estimate',8x,f12.4,
+         hdir = u1/dble(wsel(nwin)) - u0/dble(wsel(1))
+         write (iout,670)
+  670    format (/,' Enthalpy and Entropy Totals :',/)
+         write (iout,680)  hdir,barsd(nbst,tsum(5),tsum2(5))
+  680    format (' Enthalpy via Direct Estimate',8x,f12.4,
      &              ' +/-',f9.4,' Kcal/mol')
-c
-c     sum the BAR enthalpy and entropy over the pairs, where the
-c     enthalpy error needs two converged bootstrap trials per pair
-c
-         n = 0
-         do k = 1, 4
-            sum(k) = 0.0d0
-            sum2(k) = 0.0d0
-         end do
-         do iw = 1, npair
-            if (pconv(iw) .lt. 2)  n = n + 1
-            sum(1) = sum(1) + phs(1,iw)
-            sum2(1) = sum2(1) + phs(2,iw)**2
-            sum(2) = sum(2) + phs(3,iw)
-         end do
-         if (n .eq. 0) then
-            write (iout,650)  sum(1),sqrt(sum2(1))
-  650       format (' Enthalpy via BAR Estimate',11x,f12.4,
+         if (ntc .ge. 2) then
+            write (iout,690)  sum(4),barsd(ntc,tsum(4),tsum2(4))
+  690       format (' Enthalpy via BAR Estimate',11x,f12.4,
      &                 ' +/-',f9.4,' Kcal/mol')
          else
-            write (iout,660)  sum(1)
-  660       format (' Enthalpy via BAR Estimate',11x,f12.4,
+            write (iout,700)  sum(4)
+  700       format (' Enthalpy via BAR Estimate',11x,f12.4,
      &                 ' Kcal/mol, Error not Available')
          end if
-         write (iout,670)  sum(2)
-  670    format (' BAR Estimate -T*dS Value',12x,f12.4,' Kcal/mol')
-         write (iout,680)
-  680    format (/,' Enthalpy and Entropy Estimates are much Noisier',
-     &              ' than the Free Energy')
+         tds = 0.0d0
+         do iw = 1, npair
+            tds = tds + phs(3,iw)
+         end do
+         write (iout,710)  tds
+  710    format (' BAR Estimate -T*dS Value',12x,f12.4,' Kcal/mol')
       end if
 c
 c     perform deallocation of some local arrays
@@ -1709,23 +1946,42 @@ c
       deallocate (wcount)
       deallocate (wsel)
       deallocate (wseen)
-      deallocate (ua0)
-      deallocate (ua1)
-      deallocate (ub0)
-      deallocate (ub1)
-      deallocate (vola)
-      deallocate (volb)
+      deallocate (woff)
+      deallocate (wsamp)
+      deallocate (draw)
+      deallocate (mapa)
+      deallocate (mapb)
+      deallocate (pa0)
+      deallocate (pa1)
+      deallocate (pva)
+      deallocate (pb0)
+      deallocate (pb1)
+      deallocate (pvb)
+      deallocate (wa)
+      deallocate (hwa)
+      deallocate (ea)
+      deallocate (wb)
+      deallocate (hwb)
+      deallocate (eb)
+      deallocate (ia)
+      deallocate (ib)
       deallocate (pstat)
       deallocate (pna)
       deallocate (pnb)
+      deallocate (paoff)
+      deallocate (pboff)
       deallocate (pskip)
       deallocate (pfail)
       deallocate (pconv)
-      deallocate (pnbst)
+      deallocate (ptry)
       deallocate (plist)
       deallocate (pfep)
       deallocate (pbar)
       deallocate (psdu)
       deallocate (phs)
+      deallocate (pxa)
+      deallocate (pxb)
+      deallocate (pcref)
+      deallocate (psum)
       return
       end

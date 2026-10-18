@@ -22,10 +22,7 @@
  Simulation Temperature :       298.00 K
  Samples per Window :               0 to       3
  Sample Selection :          First     1  Last   All  Step     1
- Bootstrap Trials per Pair :    10000
-
- Bootstrap errors assume independent samples, which may not hold at the
- sampling interval used
+ Bootstrap Trials :             10000
 
  Free Energy by Window Pair :
 
@@ -47,4 +44,3 @@
 
  Totals not Computed; Missing or Failed Pairs :
          2    3
- File Header gives     6 Lambda Windows, but     5 are Found

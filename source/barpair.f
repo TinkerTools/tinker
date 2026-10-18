@@ -32,7 +32,8 @@ c                or zero if not used
 c     tempa    temperature of the state 0 simulation
 c     tempb    temperature of the state 1 simulation
 c     patm     pressure in atmospheres for the PV enthalpy term
-c     nbst     number of bootstrap trials, at least two
+c     nbst     number of bootstrap trials, or zero to find only the
+c                values from all of the frames, with zero errors
 c     verbose  logical flag to print the results as they are found
 c     dgfep    forward FEP value and error, backward value and error
 c     dgbar    BAR iteration value and error, bootstrap value and error
@@ -43,7 +44,8 @@ c     uave     average state 0 energy and error, state 1 energy
 c                and error
 c     hbar     BAR enthalpy and error, BAR -T*dS value
 c     istat    0 if all values are found, 1 if the BAR iteration
-c                fails to converge
+c                fails to converge, 2 if the states have no overlap,
+c                so that the Fermi terms of one state all vanish
 c
 c     each value is computed once from all of the frames, and the BAR
 c     enthalpy and entropy use the BAR iteration free energy; the BAR
@@ -64,8 +66,7 @@ c
       integer i,k,m
       integer nfrma,nfrmb
       integer nfrm,nbst
-      integer niter,ntrial
-      integer maxiter
+      integer niter,maxiter
       integer nconv,istat
       integer nboot(2)
       integer, allocatable :: ia(:)
@@ -74,13 +75,14 @@ c
       real*8 frma,frmb
       real*8 tempa,tempb
       real*8 patm,pres
-      real*8 bst,ratio
+      real*8 barsd
       real*8 random,dave
       real*8 sum2,rconv
       real*8 cfore,cback
       real*8 cinit,cbar
       real*8 stdev,ctrial
-      real*8 etrial,htrial
+      real*8 htrial,cref
+      real*8 xmaxa,xmaxb
       real*8 vtrla,vtrlb
       real*8 csum,csum2
       real*8 hsum,hsum2
@@ -100,7 +102,12 @@ c
       real*8 sdu(2),uave(4)
       real*8 hbar(3)
       real*8, allocatable :: hist(:)
-      real*8, allocatable :: work(:)
+      real*8, allocatable :: wa(:)
+      real*8, allocatable :: hwa(:)
+      real*8, allocatable :: ea(:)
+      real*8, allocatable :: wb(:)
+      real*8, allocatable :: hwb(:)
+      real*8, allocatable :: eb(:)
       logical verbose
       logical conv,tconv
       external random
@@ -130,8 +137,6 @@ c
       rtb = gasconst * tempb
       pres = patm / prescon
       nfrm = max(nfrma,nfrmb)
-      bst = dble(nbst)
-      ratio = bst / (bst-1.0d0)
       maxiter = 100
 c
 c     perform dynamic allocation of some local arrays
@@ -139,7 +144,14 @@ c
       allocate (ia(nfrm))
       allocate (ib(nfrm))
       allocate (hist(0:maxiter))
-      allocate (work(0:maxiter))
+      if (nbst .gt. 0) then
+         allocate (wa(nfrma))
+         allocate (hwa(nfrma))
+         allocate (ea(nfrma))
+         allocate (wb(nfrmb))
+         allocate (hwb(nfrmb))
+         allocate (eb(nfrmb))
+      end if
 c
 c     find the spread of the energy differences over the frames
 c
@@ -201,8 +213,15 @@ c
 c
 c     apply the same estimators to bootstrap resamples of the frames,
 c     with each BAR trial started from the converged BAR value and
-c     dropped if it fails to converge
+c     dropped if it fails to converge; the exponentials of each frame
+c     are found once, with the Fermi terms taken at the BAR value
 c
+      cref = 0.0d0
+      if (conv)  cref = cbar
+      if (nbst .gt. 0) then
+         call bootprep (nfrma,nfrmb,ua0,ua1,ub0,ub1,vola,volb,rta,rtb,
+     &                  pres,cref,xmaxa,xmaxb,wa,hwa,wb,hwb,ea,eb)
+      end if
       do m = 1, 8
          vsum(m) = 0.0d0
          vsum2(m) = 0.0d0
@@ -219,10 +238,10 @@ c
          do i = 1, nfrmb
             ib(i) = int(frmb*random()) + 1
          end do
-         call barfep (nfrma,ia,ua0,ua1,vola,rta,pres,val(1),val(7),
-     &                val(3),vtrla)
-         call barfep (nfrmb,ib,ub1,ub0,volb,rtb,pres,val(2),val(8),
-     &                val(4),vtrlb)
+         call bootfep (nfrma,ia,ua0,ua1,vola,wa,hwa,xmaxa,rta,pres,
+     &                 val(1),val(7),val(3),vtrla)
+         call bootfep (nfrmb,ib,ub1,ub0,volb,wb,hwb,xmaxb,rtb,pres,
+     &                 val(2),val(8),val(4),vtrlb)
          val(2) = -val(2)
          val(8) = -val(8)
          val(5) = pres * (vtrlb-vtrla)
@@ -232,22 +251,22 @@ c
             vsum2(m) = vsum2(m) + val(m)*val(m)
          end do
          if (conv) then
-            call bariter (nfrma,ia,nfrmb,ib,ua0,ua1,ub0,ub1,rta,rtb,
-     &                    cbar,maxiter,ctrial,etrial,ntrial,work,tconv)
+            call bootiter (nfrma,ia,nfrmb,ib,ea,eb,cref,rta,rtb,cbar,
+     &                     maxiter,ctrial,tconv)
             if (tconv) then
                nconv = nconv + 1
                csum = csum + ctrial
                csum2 = csum2 + ctrial*ctrial
-               call barhbar (nfrma,ia,nfrmb,ib,ua0,ua1,ub0,ub1,vola,
-     &                       volb,rta,rtb,pres,ctrial,htrial)
+               call boothbar (nfrma,ia,nfrmb,ib,ua0,ua1,ub0,ub1,vola,
+     &                        volb,ea,eb,cref,rta,rtb,pres,ctrial,
+     &                        htrial)
                hsum = hsum + htrial
                hsum2 = hsum2 + htrial*htrial
             end if
          end if
       end do
       do m = 1, 8
-         sd(m) = vsum(m) / bst
-         sd(m) = sqrt(max(0.0d0,ratio*(vsum2(m)/bst-sd(m)*sd(m))))
+         sd(m) = barsd (nbst,vsum(m),vsum2(m))
       end do
 c
 c     report the free energy change via thermodynamic perturbation
@@ -273,8 +292,10 @@ c
          write (iout,40)
    40    format (/,' Free Energy Difference via BAR Method :',/)
          do i = 0, niter
-            write (iout,50)  i,hist(i)
-   50       format (' BAR Iteration',i4,19x,f12.4,' Kcal/mol')
+            if (abs(hist(i)) .lt. 1.0d100) then
+               write (iout,50)  i,hist(i)
+   50          format (' BAR Iteration',i4,19x,f12.4,' Kcal/mol')
+            end if
          end do
          if (conv .and. niter.eq.0) then
             write (iout,60)  cbar,stdev
@@ -291,15 +312,27 @@ c     report failure of the BAR iteration to the calling routine
 c
       if (.not. conv) then
          istat = 1
-         if (verbose) then
+         if (.not. (abs(cbar) .lt. 1.0d100))  istat = 2
+         if (verbose .and. istat.eq.1) then
             write (iout,80)  niter
    80       format (/,' BAR Free Energy Estimate not Converged',
      &                 ' after',i4,' Iterations')
+         else if (verbose) then
+            write (iout,85)
+   85       format (/,' BAR Free Energy not Found; the States have',
+     &                 ' no Overlap')
          end if
          deallocate (ia)
          deallocate (ib)
          deallocate (hist)
-         deallocate (work)
+         if (nbst .gt. 0) then
+            deallocate (wa)
+            deallocate (hwa)
+            deallocate (ea)
+            deallocate (wb)
+            deallocate (hwb)
+            deallocate (eb)
+         end if
          return
       end if
       dgbar(1) = cbar
@@ -415,7 +448,14 @@ c
       deallocate (ia)
       deallocate (ib)
       deallocate (hist)
-      deallocate (work)
+      if (nbst .gt. 0) then
+         deallocate (wa)
+         deallocate (hwa)
+         deallocate (ea)
+         deallocate (wb)
+         deallocate (hwb)
+         deallocate (eb)
+      end if
       return
       end
 c
@@ -506,6 +546,11 @@ c     free energy change from state 0 to state 1 by iteration over
 c     lists of frames sampled in each state, starting from an initial
 c     value; also finds the analytical error of Bennett
 c
+c     the Fermi functions include the optimal shift of Bennett,
+c     ln(nb/na), which gives the lowest variance when the numbers of
+c     frames differ, and the equation then balances the sums of the
+c     Fermi functions over the frames of each state
+c
 c     variables and parameters:
 c
 c     na       number of state 0 frames in the list
@@ -537,7 +582,7 @@ c
       real*8 rta,rtb,rt
       real*8 cinit,cold,cnew
       real*8 stdev,eps
-      real*8 frma,frmb,rfrm
+      real*8 frma,frmb,lnr
       real*8 top,top2
       real*8 bot,bot2
       real*8 fterm
@@ -547,13 +592,13 @@ c
       logical conv,fail
 c
 c
-c     set the convergence criterion and frame ratio
+c     set the convergence criterion and the shift of Bennett
 c
       eps = 0.0001d0
       rt = 0.5d0 * (rta+rtb)
       frma = dble(na)
       frmb = dble(nb)
-      rfrm = frma / frmb
+      lnr = log(frmb/frma)
 c
 c     iterate the BAR equation until the value stops changing
 c
@@ -569,7 +614,7 @@ c
          top2 = 0.0d0
          do i = 1, nb
             j = ib(i)
-            fterm = 1.0d0 / (1.0d0+exp((ub0(j)-ub1(j)+cold)/rtb))
+            fterm = 1.0d0 / (1.0d0+exp((ub0(j)-ub1(j)+cold)/rtb+lnr))
             top = top + fterm
             top2 = top2 + fterm*fterm
          end do
@@ -577,11 +622,11 @@ c
          bot2 = 0.0d0
          do i = 1, na
             j = ia(i)
-            fterm = 1.0d0 / (1.0d0+exp((ua1(j)-ua0(j)-cold)/rta))
+            fterm = 1.0d0 / (1.0d0+exp((ua1(j)-ua0(j)-cold)/rta-lnr))
             bot = bot + fterm
             bot2 = bot2 + fterm*fterm
          end do
-         cnew = rt*log(rfrm*top/bot) + cold
+         cnew = rt*log(top/bot) + cold
          stdev = rt * sqrt(max(0.0d0,(bot2-bot*bot/frma)/(bot*bot)
      &                        +(top2-top*top/frmb)/(top*top)))
          hist(niter) = cnew
@@ -608,7 +653,9 @@ c     "barhbar" finds the enthalpy change from state 0 to state 1 via
 c     the BAR estimator of Wyczalkowski et al. over lists of frames
 c     sampled in each state, given the BAR free energy change for the
 c     same frames; the state energies include the PV term, which
-c     cancels in the energy differences
+c     cancels in the energy differences, and the Fermi functions
+c     include the shift of Bennett used by "bariter", so the terms
+c     are sums over the frames of both states
 c
 c     variables and parameters:
 c
@@ -635,7 +682,7 @@ c
       integer i,j
       integer na,nb
       integer ia(*),ib(*)
-      real*8 rta,rtb
+      real*8 rta,rtb,lnr
       real*8 pres,cbar,hbr
       real*8 fore,back,h
       real*8 fsum,bsum
@@ -650,6 +697,7 @@ c
 c
 c     find the terms from the state 0 frames
 c
+      lnr = log(dble(nb)/dble(na))
       fsum = 0.0d0
       fvsum = 0.0d0
       fbvsum = 0.0d0
@@ -657,8 +705,8 @@ c
       fbsum0 = 0.0d0
       do i = 1, na
          j = ia(i)
-         fore = 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)-cbar)/rta))
-         back = 1.0d0/(1.0d0+exp((ua0(j)-ua1(j)+cbar)/rta))
+         fore = 1.0d0/(1.0d0+exp((ua1(j)-ua0(j)-cbar)/rta-lnr))
+         back = 1.0d0/(1.0d0+exp((ua0(j)-ua1(j)+cbar)/rta+lnr))
          h = ua0(j) + pres*vola(j)
          fsum = fsum + fore
          fvsum = fvsum + fore*h
@@ -677,8 +725,8 @@ c
       fbsum1 = 0.0d0
       do i = 1, nb
          j = ib(i)
-         fore = 1.0d0/(1.0d0+exp((ub1(j)-ub0(j)-cbar)/rtb))
-         back = 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+cbar)/rtb))
+         fore = 1.0d0/(1.0d0+exp((ub1(j)-ub0(j)-cbar)/rtb-lnr))
+         back = 1.0d0/(1.0d0+exp((ub0(j)-ub1(j)+cbar)/rtb+lnr))
          h = ub1(j) + pres*volb(j)
          bsum = bsum + back
          bvsum = bvsum + back*h
@@ -688,5 +736,392 @@ c
       end do
       alpha1 = bvsum - bsum*(vsum/dble(nb)) - fbvsum
       hbr = (alpha0-alpha1) / (fbsum0+fbsum1)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine bootprep  --  per-frame terms for bootstraps  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "bootprep" finds the exponentials of each frame used by the
+c     bootstrap versions of the FEP, BAR and BAR enthalpy estimators,
+c     so that a bootstrap trial needs no exponentials per frame; the
+c     FEP weights are shifted by their largest exponent over all of the
+c     frames, and the Fermi exponentials are taken at a reference free
+c     energy near the values found in the trials, without the shift
+c     of Bennett, which depends on the numbers of frames in a trial
+c
+c     variables and parameters:
+c
+c     na       number of frames sampled in state 0
+c     nb       number of frames sampled in state 1
+c     ua0      energies of state 0 frames under state 0
+c     ua1      energies of state 0 frames under state 1
+c     ub0      energies of state 1 frames under state 0
+c     ub1      energies of state 1 frames under state 1
+c     vola     volume of state 0 frames, or zero if not used
+c     volb     volume of state 1 frames, or zero if not used
+c     rta      gas constant times the state 0 temperature
+c     rtb      gas constant times the state 1 temperature
+c     pres     pressure in Kcal/mole/Ang**3
+c     cref     reference free energy change for the Fermi terms
+c     xmaxa    largest forward FEP exponent over the state 0 frames
+c     xmaxb    largest backward FEP exponent over the state 1 frames
+c     wa       shifted forward FEP weight of each state 0 frame
+c     hwa      state 1 enthalpy times the weight of each state 0 frame
+c     wb       shifted backward FEP weight of each state 1 frame
+c     hwb      state 0 enthalpy times the weight of each state 1 frame
+c     ea       exponential of the state 0 Fermi function argument
+c     eb       exponential of the state 1 Fermi function argument
+c
+c
+      subroutine bootprep (na,nb,ua0,ua1,ub0,ub1,vola,volb,rta,rtb,
+     &                     pres,cref,xmaxa,xmaxb,wa,hwa,wb,hwb,ea,eb)
+      implicit none
+      integer i,na,nb
+      real*8 rta,rtb,pres
+      real*8 cref
+      real*8 xmaxa,xmaxb
+      real*8 ua0(*),ua1(*)
+      real*8 ub0(*),ub1(*)
+      real*8 vola(*),volb(*)
+      real*8 wa(*),hwa(*)
+      real*8 wb(*),hwb(*)
+      real*8 ea(*),eb(*)
+c
+c
+c     find the shifted FEP weights for the frames of each state
+c
+      xmaxa = (ua0(1)-ua1(1)) / rta
+      do i = 2, na
+         xmaxa = max(xmaxa,(ua0(i)-ua1(i))/rta)
+      end do
+      do i = 1, na
+         wa(i) = exp((ua0(i)-ua1(i))/rta-xmaxa)
+         hwa(i) = (ua1(i)+pres*vola(i)) * wa(i)
+      end do
+      xmaxb = (ub1(1)-ub0(1)) / rtb
+      do i = 2, nb
+         xmaxb = max(xmaxb,(ub1(i)-ub0(i))/rtb)
+      end do
+      do i = 1, nb
+         wb(i) = exp((ub1(i)-ub0(i))/rtb-xmaxb)
+         hwb(i) = (ub0(i)+pres*volb(i)) * wb(i)
+      end do
+c
+c     find the Fermi exponentials at the reference free energy
+c
+      do i = 1, na
+         ea(i) = exp((ua1(i)-ua0(i)-cref)/rta)
+      end do
+      do i = 1, nb
+         eb(i) = exp((ub0(i)-ub1(i)+cref)/rtb)
+      end do
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine bootfep  --  FEP over a bootstrap selection  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "bootfep" gives the same values as "barfep" from the weights
+c     found by "bootprep", and calls "barfep" if every weight of the
+c     selected frames underflows
+c
+c     variables and parameters:
+c
+c     n      number of frames in the list
+c     idx    frame indices to use
+c     uo     energies of the frames under the sampled state
+c     ut     energies of the frames under the other state
+c     vol    volumes of the frames, or zero if not used
+c     w      shifted FEP weights of the frames
+c     hw     other state enthalpy times the weight of the frames
+c     xmax   shift of the FEP weights
+c     rt     gas constant times the sampling temperature
+c     pres   pressure in Kcal/mole/Ang**3
+c     dg     free energy change from sampled to other state
+c     dh     enthalpy change from sampled to other state
+c     uave   average energy of the frames under the sampled state
+c     vave   average volume of the frames
+c
+c
+      subroutine bootfep (n,idx,uo,ut,vol,w,hw,xmax,rt,pres,dg,dh,
+     &                    uave,vave)
+      implicit none
+      integer i,j,n
+      integer idx(*)
+      real*8 xmax,rt,pres
+      real*8 dg,dh
+      real*8 uave,vave
+      real*8 wsum,hwsum
+      real*8 usum,vsum
+      real*8 uo(*),ut(*)
+      real*8 vol(*)
+      real*8 w(*),hw(*)
+c
+c
+c     sum the precomputed weights over the selected frames
+c
+      wsum = 0.0d0
+      hwsum = 0.0d0
+      usum = 0.0d0
+      vsum = 0.0d0
+      do i = 1, n
+         j = idx(i)
+         wsum = wsum + w(j)
+         hwsum = hwsum + hw(j)
+         usum = usum + uo(j)
+         vsum = vsum + vol(j)
+      end do
+      if (wsum .eq. 0.0d0) then
+         call barfep (n,idx,uo,ut,vol,rt,pres,dg,dh,uave,vave)
+         return
+      end if
+      uave = usum / dble(n)
+      vave = vsum / dble(n)
+      dg = -rt * (xmax+log(wsum/dble(n)))
+      dh = hwsum/wsum - (uave+pres*vave)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine bootiter  --  BAR over a bootstrap selection  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "bootiter" solves the same equation as "bariter" from the Fermi
+c     exponentials found by "bootprep", without the analytical error
+c
+c     variables and parameters:
+c
+c     na       number of state 0 frames in the list
+c     ia       state 0 frame indices to use
+c     nb       number of state 1 frames in the list
+c     ib       state 1 frame indices to use
+c     ea       exponential of the state 0 Fermi function argument
+c     eb       exponential of the state 1 Fermi function argument
+c     cref     reference free energy change of the exponentials
+c     rta      gas constant times the state 0 temperature
+c     rtb      gas constant times the state 1 temperature
+c     cinit    initial value of the free energy change
+c     maxiter  maximum number of iterations
+c     cnew     final value of the free energy change
+c     conv     logical flag set if the iteration converged
+c
+c
+      subroutine bootiter (na,ia,nb,ib,ea,eb,cref,rta,rtb,cinit,
+     &                     maxiter,cnew,conv)
+      implicit none
+      integer i,na,nb
+      integer niter,maxiter
+      integer ia(*),ib(*)
+      real*8 rta,rtb,rt
+      real*8 cref,cinit
+      real*8 cold,cnew
+      real*8 eps,ka,kb,lnr
+      real*8 top,bot
+      real*8 ea(*),eb(*)
+      logical conv,fail
+c
+c
+c     iterate the BAR equation until the value stops changing
+c
+      eps = 0.0001d0
+      rt = 0.5d0 * (rta+rtb)
+      lnr = log(dble(nb)/dble(na))
+      cnew = cinit
+      niter = -1
+      conv = .false.
+      fail = .false.
+      do while (.not.conv .and. .not.fail)
+         niter = niter + 1
+         cold = cnew
+         ka = exp(-(cold-cref)/rta-lnr)
+         kb = exp((cold-cref)/rtb+lnr)
+         top = 0.0d0
+         do i = 1, nb
+            top = top + 1.0d0/(1.0d0+eb(ib(i))*kb)
+         end do
+         bot = 0.0d0
+         do i = 1, na
+            bot = bot + 1.0d0/(1.0d0+ea(ia(i))*ka)
+         end do
+         cnew = rt*log(top/bot) + cold
+         if (abs(cnew-cold) .lt. eps) then
+            conv = .true.
+         else if (niter .ge. maxiter) then
+            fail = .true.
+         else if (.not. (abs(cnew) .lt. 1.0d100)) then
+            fail = .true.
+         end if
+      end do
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine boothbar  --  BAR enthalpy, bootstrap selection  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "boothbar" gives the same value as "barhbar" from the Fermi
+c     exponentials found by "bootprep"; each Fermi function and its
+c     complement come from one exponential, and stay finite when it
+c     is zero or infinite
+c
+c     variables and parameters:
+c
+c     na       number of state 0 frames in the list
+c     ia       state 0 frame indices to use
+c     nb       number of state 1 frames in the list
+c     ib       state 1 frame indices to use
+c     ua0      energies of state 0 frames under state 0
+c     ua1      energies of state 0 frames under state 1
+c     ub0      energies of state 1 frames under state 0
+c     ub1      energies of state 1 frames under state 1
+c     vola     volume of state 0 frames, or zero if not used
+c     volb     volume of state 1 frames, or zero if not used
+c     ea       exponential of the state 0 Fermi function argument
+c     eb       exponential of the state 1 Fermi function argument
+c     cref     reference free energy change of the exponentials
+c     rta      gas constant times the state 0 temperature
+c     rtb      gas constant times the state 1 temperature
+c     pres     pressure in Kcal/mole/Ang**3
+c     cbar     BAR free energy change for these frames
+c     hbr      BAR enthalpy change
+c
+c
+      subroutine boothbar (na,ia,nb,ib,ua0,ua1,ub0,ub1,vola,volb,
+     &                     ea,eb,cref,rta,rtb,pres,cbar,hbr)
+      implicit none
+      integer i,j
+      integer na,nb
+      integer ia(*),ib(*)
+      real*8 rta,rtb,pres
+      real*8 cref,cbar,hbr
+      real*8 ka,kb,x,lnr
+      real*8 fore,back,h
+      real*8 fsum,bsum
+      real*8 fvsum,bvsum
+      real*8 fbvsum,vsum
+      real*8 fbsum0,fbsum1
+      real*8 alpha0,alpha1
+      real*8 ua0(*),ua1(*)
+      real*8 ub0(*),ub1(*)
+      real*8 vola(*),volb(*)
+      real*8 ea(*),eb(*)
+c
+c
+c     find the terms from the state 0 frames
+c
+      lnr = log(dble(nb)/dble(na))
+      ka = exp(-(cbar-cref)/rta-lnr)
+      kb = exp((cbar-cref)/rtb+lnr)
+      fsum = 0.0d0
+      fvsum = 0.0d0
+      fbvsum = 0.0d0
+      vsum = 0.0d0
+      fbsum0 = 0.0d0
+      do i = 1, na
+         j = ia(i)
+         x = ea(j) * ka
+         fore = 1.0d0 / (1.0d0+x)
+         back = 1.0d0 / (1.0d0+1.0d0/x)
+         h = ua0(j) + pres*vola(j)
+         fsum = fsum + fore
+         fvsum = fvsum + fore*h
+         fbvsum = fbvsum + fore*back*(ua1(j)-ua0(j))
+         vsum = vsum + h
+         fbsum0 = fbsum0 + fore*back
+      end do
+      alpha0 = fvsum - fsum*(vsum/dble(na)) + fbvsum
+c
+c     find the terms from the state 1 frames
+c
+      bsum = 0.0d0
+      bvsum = 0.0d0
+      fbvsum = 0.0d0
+      vsum = 0.0d0
+      fbsum1 = 0.0d0
+      do i = 1, nb
+         j = ib(i)
+         x = eb(j) * kb
+         back = 1.0d0 / (1.0d0+x)
+         fore = 1.0d0 / (1.0d0+1.0d0/x)
+         h = ub1(j) + pres*volb(j)
+         bsum = bsum + back
+         bvsum = bvsum + back*h
+         fbvsum = fbvsum + fore*back*(ub1(j)-ub0(j))
+         vsum = vsum + h
+         fbsum1 = fbsum1 + fore*back
+      end do
+      alpha1 = bvsum - bsum*(vsum/dble(nb)) - fbvsum
+      hbr = (alpha0-alpha1) / (fbsum0+fbsum1)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  function barnbst  --  default number of bootstrap trials  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "barnbst" gives the default number of bootstrap trials for
+c     "n" frame evaluations per trial, about 1.0d8 evaluations in
+c     all, between 2000 trials, which find errors to about 1.5 percent,
+c     and 10000 trials
+c
+c
+      function barnbst (n)
+      implicit none
+      integer n,barnbst
+c
+c
+      barnbst = max(2000,min(10000,nint(1.0d8/dble(max(1,n)))))
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  function barsd  --  standard deviation from running sums  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "barsd" gives the standard deviation of "n" values from their
+c     sum and sum of squares, or zero for fewer than two values
+c
+c
+      function barsd (n,s,s2)
+      implicit none
+      integer n
+      real*8 barsd
+      real*8 s,s2
+      real*8 rn,ave
+c
+c
+      barsd = 0.0d0
+      if (n .ge. 2) then
+         rn = dble(n)
+         ave = s / rn
+         barsd = sqrt(max(0.0d0,(rn/(rn-1.0d0))*(s2/rn-ave*ave)))
+      end if
       return
       end
