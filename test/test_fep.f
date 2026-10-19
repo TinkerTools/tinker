@@ -787,7 +787,8 @@ c
 c     "test_fep_run" runs dynamics over three lambda windows with
 c     free energy perturbation in use, and checks each energy in the
 c     output file against the saved frame it was found from, set up
-c     afresh at the trial lambda, at constant volume and pressure
+c     afresh at the trial lambda, at constant volume and pressure,
+c     along with the current lambda printed for each saved frame
 c
 c
       subroutine test_fep_run
@@ -812,27 +813,31 @@ c     "feprun" makes one dynamics run in a scratch directory, with
 c     windows of twenty steps that each take a single sample on
 c     their final step, where a frame is also saved, and compares
 c     the seven energies and box volumes written against those of
-c     the saved frames
+c     the saved frames, then checks that each of the six frames saved
+c     prints the lambda of its window
 c
 c
       subroutine feprun (args,addkey,tag)
       use boxes
       implicit none
-      integer i
-      integer ist
+      integer i,k
+      integer ist,ios
       integer istep
-      integer nrow
+      integer nrow,ncur
+      integer unit,freeunit
       integer iwin(7)
       real*8 energy
       real*8 eref
       real*8 simlmda,trial,ene,vol
       real*8 sim(7)
       real*8 tri(7)
+      real*8 cur(6),curlmda(7)
       character*1 quote
       character*(*) args,addkey,tag
       character*40 lmdakey
       character*60 label
       character*240 cmd
+      character*240 line
 c
 c
 c     the window, and both lambda values, that each row should hold
@@ -840,6 +845,7 @@ c
       data iwin  / 1, 1, 2, 2, 2, 3, 3 /
       data sim  / 1.0d0, 1.0d0, 0.5d0, 0.5d0, 0.5d0, 0.0d0, 0.0d0 /
       data tri  / 1.0d0, 0.5d0, 0.5d0, 1.0d0, 0.0d0, 0.0d0, 0.5d0 /
+      data cur  / 1.0d0, 1.0d0, 0.5d0, 0.5d0, 0.0d0, 0.0d0 /
 c
 c     run the dynamics with a sample at the end of every window
 c
@@ -895,6 +901,30 @@ c
             call assert_real (ene,eref,1.0d-5,trim(label)//' energy')
             call assert_real (vol,volbox,1.0d-3,trim(label)//' volume')
             call final
+         end do
+c
+c     each saved frame prints the lambda of the window it is in
+c
+         ncur = 0
+         unit = freeunit ()
+         open (unit=unit,file='out.txt',status='old',iostat=ios)
+         do while (ios .eq. 0)
+            read (unit,'(a)',iostat=ios)  line
+            if (ios .ne. 0)  goto 40
+            k = index(line,'Current Lambda')
+            if (k.ne.0 .and. ncur.lt.7) then
+               ncur = ncur + 1
+               read (line(k+14:240),*,iostat=ios)  curlmda(ncur)
+            end if
+         end do
+   40    continue
+         close (unit=unit)
+         call assert_int (ncur,6,'fep run '//tag//
+     &                    ' current lambda count')
+         do i = 1, min(ncur,6)
+            write (label,50)  tag,i
+   50       format ('fep run ',a,' current lambda ',i0)
+            call assert_real (curlmda(i),cur(i),1.0d-8,trim(label))
          end do
       end if
       call popdir

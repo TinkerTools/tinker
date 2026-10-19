@@ -195,6 +195,17 @@ c
             write (iout,210)  lambda
             write (iout,220)  dedl
          end if
+c
+c     print the window lambda of free energy perturbation
+c
+      else if (use_fep) then
+         if (digits .ge. 8) then
+            write (iout,110)  lambda
+         else if (digits .ge. 6) then
+            write (iout,160)  lambda
+         else
+            write (iout,210)  lambda
+         end if
       end if
 c
 c     print the acceptance of any Monte Carlo lambda moves
