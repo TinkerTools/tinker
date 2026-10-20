@@ -288,6 +288,12 @@ void dampexpl_(double* r, double* preik, double* alphai, double* alphak, double*
 // dcflux.f
 void dcflux_(double* pot, double* dcfx, double* dcfy, double* dcfz);
 #define tinker_f_dcflux dcflux_
+void dcflux0_(double* pot, double* dcfx, double* dcfy, double* dcfz);
+#define tinker_f_dcflux0 dcflux0_
+void dcfluxadd_(double* pot, double* de, double* vir);
+#define tinker_f_dcfluxadd dcfluxadd_
+void dcfluxadd0_(double* dpot, double* de, double* vir);
+#define tinker_f_dcfluxadd0 dcfluxadd0_
 
 // deflate.f
 void deflate_(int* n, int* nv, double* a, double* ev, double* vec);
@@ -1150,6 +1156,8 @@ void emreal4d_();
 #define tinker_f_emreal4d emreal4d_
 void emrecip4_();
 #define tinker_f_emrecip4 emrecip4_
+void emflux4_(double* pot, double* dlpot);
+#define tinker_f_emflux4 emflux4_
 
 // energy.f
 double energy_();

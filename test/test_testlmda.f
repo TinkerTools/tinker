@@ -21,6 +21,25 @@ c     Ewald, so the uniform background correction carries a lambda
 c     scaled net charge into the dV/dL tensor from "empole4"; case 26
 c     adds dual topology polarization alongside it
 c
+c     cases 28 to 40 cover multipoles with charge penetration and
+c     charge flux: HIPPO water, an AMOEBA+ alcohol tetramer and gas
+c     dimer, including a ligand atom whose charge flux bond reaches
+c     into the environment, and a HIPPO organic mixture without flux
+c
+c     cases 41 to 54 add polarization to the same systems, taking the
+c     single topology scalar derivative in direct, Ewald, neighbor list
+c     and zero lambda forms, and the dual topology derivatives under
+c     orthogonal space tempering
+c
+c     case 55 weights HIPPO water by atom group with charge flux, so
+c     the flux potential and its lambda derivative carry the group
+c     weight; cases 56 and 57 put the electrostatic and polarization
+c     lambdas at different values, so the flux scale switches between
+c     the two states; cases 58 and 59 use the multipole list without
+c     Ewald; cases 60 to 63 are relative legs with charge penetration
+c     and charge flux, for whole AMOEBA+ alcohols, single atoms whose
+c     flux bonds reach into the environment, and HIPPO water
+c
 c
       subroutine test_testlmda
       implicit none
@@ -58,6 +77,67 @@ c
      &                        '1e-4')
       call test_testlmda_xyz ('26_ionwat_pol_ewald_l05','ionwat','1e-4')
       call test_testlmda_case ('27_water_rels_2stg_l075','1e-4')
+      call test_testlmda_xyz ('28_hipwat_flux_l04','hipwat','1e-4')
+      call test_testlmda_xyz ('29_hipwat_flux_ewald_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('30_hipwat_flux_ewald_nlist_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('31_hipwat_flux_ewald_lin_l00','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('32_aptetra_flux_l04','aptetra','1e-4')
+      call test_testlmda_xyz ('33_aptetra_flux_ewald_l04','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('34_aptetra_flux_ewald_nlist_l04',
+     &                        'aptetra','1e-4')
+      call test_testlmda_xyz ('35_aptetra_flux_ewald_lin_l00','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('36_apgas_flux_l04','apgas','1e-4')
+      call test_testlmda_xyz ('37_apgas_cross_l04','apgas','1e-4')
+      call test_testlmda_xyz ('38_apgas_cross_lin_l00','apgas','1e-4')
+      call test_testlmda_xyz ('39_apgas_cross_ewald_l04','apgas','1e-4')
+      call test_testlmda_xyz ('40_hipmix_ewald_l04','hipmix','1e-4')
+      call test_testlmda_xyz ('41_hipwat_pol_st_l04','hipwat','1e-4')
+      call test_testlmda_xyz ('42_hipwat_pol_ewald_st_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('43_hipwat_pol_ewald_nlist_st_l04',
+     &                        'hipwat','1e-4')
+      call test_testlmda_xyz ('44_hipwat_pol_ewald_lin_st_l00','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('45_hipwat_pol_ewald_dt_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('46_aptetra_pol_st_l04','aptetra','1e-4')
+      call test_testlmda_xyz ('47_aptetra_pol_ewald_st_l04','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('48_aptetra_pol_ewald_nlist_st_l04',
+     &                        'aptetra','1e-4')
+      call test_testlmda_xyz ('49_aptetra_pol_ewald_lin_st_l00',
+     &                        'aptetra','1e-4')
+      call test_testlmda_xyz ('50_aptetra_pol_ewald_dt_l04','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('51_apgas_pol_st_l04','apgas','1e-4')
+      call test_testlmda_xyz ('52_apgas_pol_ewald_dt_l04','apgas',
+     &                        '1e-4')
+      call test_testlmda_xyz ('53_hipmix_pol_ewald_st_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('54_hipmix_pol_ewald_dt_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('55_hipwat_group_ost_l04','hipwat','1e-4')
+      call test_testlmda_xyz ('56_hipwat_pol_split_dt_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('57_hipwat_pol_split_st_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('58_hipwat_flux_mlist_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('59_aptetra_pol_mlist_dt_l04','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('60_aptetra_rel_lig1_l085','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('61_aptetra_rel_lig2_l015','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('62_aptetra_rel_cross_l085','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('63_hipwat_rel_lig1_ewald_l085','hipwat',
+     &                        '1e-4')
       return
       end
 c

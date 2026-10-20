@@ -152,9 +152,6 @@ c
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
       logical dopr,livei,doskip
       logical live(0:2)
@@ -189,9 +186,6 @@ c
       allocate (mscale(n))
       allocate (tem(3,n))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     initialize scaling, torque and potential arrays
 c
@@ -467,6 +461,10 @@ c
                   else
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
+                  end if
+                  if (use_group) then
+                     poti = fgrp * poti
+                     potk = fgrp * potk
                   end if
                   pot(i) = pot(i) + poti
                   pot(k) = pot(k) + potk
@@ -841,6 +839,10 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
+                  if (use_group) then
+                     poti = fgrp * poti
+                     potk = fgrp * potk
+                  end if
                   pot(i) = pot(i) + poti
                   pot(k) = pot(k) + potk
                end if 
@@ -1005,45 +1007,13 @@ c
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-      end if
+      if (use_chgflx)  call dcfluxadd (pot,dem,emvir)
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
       return
       end
 c
@@ -1138,9 +1108,6 @@ c
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
       logical proceed,usei,usek
       logical dopr,livei,doskip
       logical live(0:2)
@@ -1175,9 +1142,6 @@ c
       allocate (mscale(n))
       allocate (tem(3,n))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     initialize scaling, torque and potential arrays
 c
@@ -1465,6 +1429,10 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
+                  if (use_group) then
+                     poti = fgrp * poti
+                     potk = fgrp * potk
+                  end if
                   pot(i) = pot(i) + poti
                   pot(k) = pot(k) + potk
                end if 
@@ -1623,54 +1591,17 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+!$OMP END PARALLEL
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dem,emvir)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-!$OMP    END DO
-      end if
-c
-c     OpenMP directives for the major loop structure
-c
-!$OMP END PARALLEL
+      if (use_chgflx)  call dcfluxadd (pot,dem,emvir)
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
       return
       end
 c
@@ -1704,7 +1635,6 @@ c
       real*8 e,f,sum
       real*8 term,fterm
       real*8 cii,dii,qii
-      real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
       real*8 ci,dix,diy,diz
@@ -1712,15 +1642,11 @@ c
       real*8 qiyy,qiyz,qizz
       real*8 xdfield,ydfield
       real*8 zdfield
-      real*8 fx,fy,fz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
 c
 c
 c     zero out the atomic multipole energy and derivatives
@@ -1769,9 +1695,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     initialize Ewald self-energy potential array
 c
@@ -1803,46 +1726,6 @@ c
          em = em + e
          pot(i) = 2.0d0 * fterm * ci
       end do
-c
-c     modify gradient and virial for charge flux self-energy
-c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            fx = decfx(i)
-            fy = decfy(i)
-            fz = decfz(i)
-            dem(1,i) = dem(1,i) + fx
-            dem(2,i) = dem(2,i) + fy
-            dem(3,i) = dem(3,i) + fz
-            vxx = xi * fx
-            vxy = yi * fx
-            vxz = zi * fx
-            vyy = yi * fy
-            vyz = zi * fy
-            vzz = zi * fz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
 c
 c     compute the uniform background charge correction term
 c
@@ -1884,6 +1767,13 @@ c
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          e = term * (xd*xd+yd*yd+zd*zd)
          em = em + e
+         if (use_chgflx) then
+            do ii = 1, npole
+               i = ipole(ii)
+               pot(i) = pot(i) + 2.0d0*term*(xd*x(i)+yd*y(i)
+     &                                         +zd*z(i))
+            end do
+         end if
          do ii = 1, npole
             i = ipole(ii)
             dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,i)*xd
@@ -1921,6 +1811,21 @@ c
          emvir(2,3) = emvir(2,3) + vyz
          emvir(3,3) = emvir(3,3) + vzz
       end if
+c
+c     modify gradient and virial for charge flux self-energy, the
+c     uniform background charge and the cell dipole boundary term
+c
+      if (use_chgflx) then
+         do ii = 1, npole
+            i = ipole(ii)
+            pot(i) = pot(i) + 2.0d0*fterm*sum
+         end do
+         call dcfluxadd (pot,dem,emvir)
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pot)
       return
       end
 c
@@ -2015,9 +1920,6 @@ c
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
       logical dopr,livei,doskip
       logical live(0:2)
       character*6 mode
@@ -2028,9 +1930,6 @@ c
       allocate (mscale(n))
       allocate (tem(3,n))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     initialize scaling, torque and potential arrays
 c
@@ -2822,45 +2721,13 @@ c
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-      end if
+      if (use_chgflx)  call dcfluxadd (pot,dem,emvir)
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
       return
       end
 c
@@ -2894,7 +2761,6 @@ c
       real*8 e,f,sum
       real*8 term,fterm
       real*8 cii,dii,qii
-      real*8 xi,yi,zi
       real*8 xd,yd,zd
       real*8 xq,yq,zq
       real*8 ci,dix,diy,diz
@@ -2902,15 +2768,11 @@ c
       real*8 qiyy,qiyz,qizz
       real*8 xdfield,ydfield
       real*8 zdfield
-      real*8 fx,fy,fz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 tem(3),frcx(3)
       real*8 frcy(3),frcz(3)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
 c
 c
 c     zero out the atomic multipole energy and derivatives
@@ -2959,9 +2821,6 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     initialize Ewald self-energy potential array
 c
@@ -2993,46 +2852,6 @@ c
          em = em + e
          pot(i) = 2.0d0 * fterm * ci
       end do
-c
-c     modify gradient and virial for charge flux self-energy
-c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            fx = decfx(i)
-            fy = decfy(i)
-            fz = decfz(i)
-            dem(1,i) = dem(1,i) + fx
-            dem(2,i) = dem(2,i) + fy
-            dem(3,i) = dem(3,i) + fz
-            vxx = xi * fx
-            vxy = yi * fx
-            vxz = zi * fx
-            vyy = yi * fy
-            vyz = zi * fy
-            vzz = zi * fz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
 c
 c     compute the uniform background charge correction term
 c
@@ -3074,6 +2893,13 @@ c
          term = (2.0d0/3.0d0) * f * (pi/volbox)
          e = term * (xd*xd+yd*yd+zd*zd)
          em = em + e
+         if (use_chgflx) then
+            do ii = 1, npole
+               i = ipole(ii)
+               pot(i) = pot(i) + 2.0d0*term*(xd*x(i)+yd*y(i)
+     &                                         +zd*z(i))
+            end do
+         end if
          do ii = 1, npole
             i = ipole(ii)
             dem(1,i) = dem(1,i) + 2.0d0*term*rpole(1,i)*xd
@@ -3111,6 +2937,21 @@ c
          emvir(2,3) = emvir(2,3) + vyz
          emvir(3,3) = emvir(3,3) + vzz
       end if
+c
+c     modify gradient and virial for charge flux self-energy, the
+c     uniform background charge and the cell dipole boundary term
+c
+      if (use_chgflx) then
+         do ii = 1, npole
+            i = ipole(ii)
+            pot(i) = pot(i) + 2.0d0*fterm*sum
+         end do
+         call dcfluxadd (pot,dem,emvir)
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pot)
       return
       end
 c
@@ -3205,9 +3046,6 @@ c
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: tem(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
       logical dopr,livei,doskip
       logical live(0:2)
       character*6 mode
@@ -3218,9 +3056,6 @@ c
       allocate (mscale(n))
       allocate (tem(3,n))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     initialize scaling, torque and potential arrays
 c
@@ -3653,54 +3488,17 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+!$OMP END PARALLEL
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dem,emvir)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-!$OMP    END DO
-      end if
-c
-c     OpenMP directives for the major loop structure
-c
-!$OMP END PARALLEL
+      if (use_chgflx)  call dcfluxadd (pot,dem,emvir)
 c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
       deallocate (tem)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
       return
       end
 c
@@ -3759,13 +3557,11 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
-      real*8 xi,yi,zi
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
-      real*8 frcx,frcy,frcz
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
@@ -3773,9 +3569,6 @@ c
       real*8 tem(3),fix(3)
       real*8 fiy(3),fiz(3)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
 c
 c     indices into the electrostatic field array
 c
@@ -4037,9 +3830,6 @@ c     perform dynamic allocation of some local arrays
 c
       if (use_chgflx) then
          allocate (pot(n))
-         allocate (decfx(n))
-         allocate (decfy(n))
-         allocate (decfz(n))
 c
 c     modify the gradient and virial for charge flux
 c
@@ -4050,32 +3840,11 @@ c
             i = ipole(ii)
             pot(i) = cphi(1,i)
          end do
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = vxx + xi*frcx
-            vxy = vxy + yi*frcx
-            vxz = vxz + zi*frcx
-            vyy = vyy + yi*frcy
-            vyz = vyz + zi*frcy
-            vzz = vzz + zi*frcz
-         end do
+         call dcfluxadd (pot,dem,emvir)
 c
 c     perform deallocation of some local arrays
 c
          deallocate (pot)
-         deallocate (decfx)
-         deallocate (decfy)
-         deallocate (decfz)
       end if
 c
 c     increment the total internal virial tensor components

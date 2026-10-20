@@ -334,10 +334,7 @@ c
 c
 c     deallocation of global arrays from module dlmda
 c
-      if (allocated(abflxorig))  deallocate (abflxorig)
-      if (allocated(aflxorig))  deallocate (aflxorig)
       if (allocated(bdplorig))  deallocate (bdplorig)
-      if (allocated(bflxorig))  deallocate (bflxorig)
       if (allocated(dfmdl))  deallocate (dfmdl)
       if (allocated(dfpdl))  deallocate (dfpdl)
       if (allocated(dfsumdl))  deallocate (dfsumdl)
@@ -895,6 +892,8 @@ c
       if (allocated(type1))  deallocate (type1)
       if (allocated(class1))  deallocate (class1)
       if (allocated(mutg))  deallocate (mutg)
+      if (allocated(fluxsc))  deallocate (fluxsc)
+      if (allocated(pdltflx))  deallocate (pdltflx)
 c
 c     deallocation of global arrays from module neigh
 c

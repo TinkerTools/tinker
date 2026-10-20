@@ -1,0 +1,24 @@
+ Total Potential Energy :                -13.5414 Kcal/mole
+
+ EngCnt  Atomic Multipoles                       -13.5414               55
+
+ Internal Virial Tensor :                  68.664      -13.352        1.825
+                                          -13.352        7.654       -1.275
+                                            1.825       -1.275       -0.832
+
+ Cartesian Gradient Breakdown over Individual Atoms :
+
+  Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
+
+ Anlyt         1            11.1900      1.7066      2.9679       11.7020
+ Anlyt         2            20.5038    -10.8377     -2.0229       23.2799
+ Anlyt         3             3.3566     -2.5101     -0.4286        4.2132
+ Anlyt         4           -24.7714      7.3911     -2.3855       25.9604
+ Anlyt         5             0.1655      1.4341      1.2793        1.9289
+ Anlyt         6             0.4800     -2.4413     -0.3601        2.5140
+ Anlyt         7            -2.7566      0.9353      3.1494        4.2886
+ Anlyt         8            -1.1856      2.2041     -3.6241        4.4043
+ Anlyt         9            -1.5439     -3.9670     -0.1241        4.2586
+ Anlyt        10            -1.5360      2.1307      3.8990        4.7012
+ Anlyt        11            -0.8509      2.0011     -3.5488        4.1620
+ Anlyt        12            -3.0454      1.9185      1.1675        3.7839

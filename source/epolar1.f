@@ -190,9 +190,6 @@ c
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
       logical dopr,livei,doskip
       logical live(0:2)
       character*6 mode
@@ -238,9 +235,6 @@ c
       allocate (ufld(3,n))
       allocate (dufld(6,n))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -2488,36 +2482,7 @@ c
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dep(1,i) = dep(1,i) + frcx
-            dep(2,i) = dep(2,i) + frcy
-            dep(3,i) = dep(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            epvir(1,1) = epvir(1,1) + vxx
-            epvir(2,1) = epvir(2,1) + vxy
-            epvir(3,1) = epvir(3,1) + vxz
-            epvir(1,2) = epvir(1,2) + vxy
-            epvir(2,2) = epvir(2,2) + vyy
-            epvir(3,2) = epvir(3,2) + vyz
-            epvir(1,3) = epvir(1,3) + vxz
-            epvir(2,3) = epvir(2,3) + vyz
-            epvir(3,3) = epvir(3,3) + vzz
-         end do
-      end if
+      if (use_chgflx)  call dcfluxadd (pot,dep,epvir)
 c
 c     perform deallocation of some local arrays
 c
@@ -2528,9 +2493,6 @@ c
       deallocate (ufld)
       deallocate (dufld)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
       return
       end
 c
@@ -2649,9 +2611,6 @@ c
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
       logical dopr,livei,doskip
       logical live(0:2)
       character*6 mode
@@ -2697,9 +2656,6 @@ c
       allocate (ufld(3,n))
       allocate (dufld(6,n))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -3877,45 +3833,11 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+!$OMP END PARALLEL
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dep,epvir)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dep(1,i) = dep(1,i) + frcx
-            dep(2,i) = dep(2,i) + frcy
-            dep(3,i) = dep(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            epvir(1,1) = epvir(1,1) + vxx
-            epvir(2,1) = epvir(2,1) + vxy
-            epvir(3,1) = epvir(3,1) + vxz
-            epvir(1,2) = epvir(1,2) + vxy
-            epvir(2,2) = epvir(2,2) + vyy
-            epvir(3,2) = epvir(3,2) + vyz
-            epvir(1,3) = epvir(1,3) + vxz
-            epvir(2,3) = epvir(2,3) + vyz
-            epvir(3,3) = epvir(3,3) + vzz
-         end do
-!$OMP    END DO
-      end if
-c
-c     OpenMP directives for the major loop structure
-c
-!$OMP END PARALLEL
+      if (use_chgflx)  call dcfluxadd (pot,dep,epvir)
 c
 c     perform deallocation of some local arrays
 c
@@ -3926,9 +3848,6 @@ c
       deallocate (ufld)
       deallocate (dufld)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
       return
       end
 c
@@ -3980,6 +3899,7 @@ c
       real*8 vxy,vxz,vyz
       real*8 fix(3),fiy(3),fiz(3)
       real*8 tep(3)
+      real*8, allocatable :: pot(:)
 c
 c
 c     zero out the polarization energy and derivatives
@@ -4159,6 +4079,22 @@ c
          epvir(1,3) = epvir(1,3) + vxz
          epvir(2,3) = epvir(2,3) + vyz
          epvir(3,3) = epvir(3,3) + vzz
+c
+c     modify the gradient and virial for charge flux, since the
+c     boundary energy depends on the charges through the cell dipole
+c
+         if (use_chgflx) then
+            allocate (pot(n))
+            do i = 1, n
+               pot(i) = 0.0d0
+            end do
+            do ii = 1, npole
+               i = ipole(ii)
+               pot(i) = term * (x(i)*xv+y(i)*yv+z(i)*zv)
+            end do
+            call dcfluxadd (pot,dep,epvir)
+            deallocate (pot)
+         end if
       end if
       return
       end
@@ -4288,9 +4224,6 @@ c
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
       logical dopr,livei,doskip
       logical live(0:2)
       character*6 mode
@@ -4305,9 +4238,6 @@ c
       allocate (ufld(3,n))
       allocate (dufld(6,n))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -6755,36 +6685,7 @@ c
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dep(1,i) = dep(1,i) + frcx
-            dep(2,i) = dep(2,i) + frcy
-            dep(3,i) = dep(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            epvir(1,1) = epvir(1,1) + vxx
-            epvir(2,1) = epvir(2,1) + vxy
-            epvir(3,1) = epvir(3,1) + vxz
-            epvir(1,2) = epvir(1,2) + vxy
-            epvir(2,2) = epvir(2,2) + vyy
-            epvir(3,2) = epvir(3,2) + vyz
-            epvir(1,3) = epvir(1,3) + vxz
-            epvir(2,3) = epvir(2,3) + vyz
-            epvir(3,3) = epvir(3,3) + vzz
-         end do
-      end if
+      if (use_chgflx)  call dcfluxadd (pot,dep,epvir)
 c
 c     perform deallocation of some local arrays
 c
@@ -6795,9 +6696,6 @@ c
       deallocate (ufld)
       deallocate (dufld)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
       return
       end
 c
@@ -6849,6 +6747,7 @@ c
       real*8 vxy,vxz,vyz
       real*8 fix(3),fiy(3),fiz(3)
       real*8 tep(3)
+      real*8, allocatable :: pot(:)
 c
 c
 c     zero out the polarization energy and derivatives
@@ -7028,6 +6927,22 @@ c
          epvir(1,3) = epvir(1,3) + vxz
          epvir(2,3) = epvir(2,3) + vyz
          epvir(3,3) = epvir(3,3) + vzz
+c
+c     modify the gradient and virial for charge flux, since the
+c     boundary energy depends on the charges through the cell dipole
+c
+         if (use_chgflx) then
+            allocate (pot(n))
+            do i = 1, n
+               pot(i) = 0.0d0
+            end do
+            do ii = 1, npole
+               i = ipole(ii)
+               pot(i) = term * (x(i)*xv+y(i)*yv+z(i)*zv)
+            end do
+            call dcfluxadd (pot,dep,epvir)
+            deallocate (pot)
+         end if
       end if
       return
       end
@@ -7156,9 +7071,6 @@ c
       real*8, allocatable :: ufld(:,:)
       real*8, allocatable :: dufld(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
       logical dopr,livei,doskip
       logical live(0:2)
       character*6 mode
@@ -7173,9 +7085,6 @@ c
       allocate (ufld(3,n))
       allocate (dufld(6,n))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
 c
 c     set exclusion coefficients and arrays to store fields
 c
@@ -8452,45 +8361,11 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
+!$OMP END PARALLEL
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dep,epvir)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dep(1,i) = dep(1,i) + frcx
-            dep(2,i) = dep(2,i) + frcy
-            dep(3,i) = dep(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            epvir(1,1) = epvir(1,1) + vxx
-            epvir(2,1) = epvir(2,1) + vxy
-            epvir(3,1) = epvir(3,1) + vxz
-            epvir(1,2) = epvir(1,2) + vxy
-            epvir(2,2) = epvir(2,2) + vyy
-            epvir(3,2) = epvir(3,2) + vyz
-            epvir(1,3) = epvir(1,3) + vxz
-            epvir(2,3) = epvir(2,3) + vyz
-            epvir(3,3) = epvir(3,3) + vzz
-         end do
-!$OMP    END DO
-      end if
-c
-c     OpenMP directives for the major loop structure
-c
-!$OMP END PARALLEL
+      if (use_chgflx)  call dcfluxadd (pot,dep,epvir)
 c
 c     perform deallocation of some local arrays
 c
@@ -8501,9 +8376,6 @@ c
       deallocate (ufld)
       deallocate (dufld)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
       return
       end
 c
@@ -8621,13 +8493,11 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
-      real*8 xi,yi,zi
       real*8 xix,yix,zix
       real*8 xiy,yiy,ziy
       real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
-      real*8 frcx,frcy,frcz
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
@@ -8644,9 +8514,6 @@ c
       real*8, allocatable :: cphidp(:,:)
       real*8, allocatable :: qgrip(:,:,:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
 c
 c     indices into the electrostatic field array
 c
@@ -9593,9 +9460,6 @@ c     perform dynamic allocation of some local arrays
 c
       if (use_chgflx) then
          allocate (pot(n))
-         allocate (decfx(n))
-         allocate (decfy(n))
-         allocate (decfz(n))
 c
 c     modify the gradient and virial for charge flux
 c
@@ -9606,32 +9470,11 @@ c
             i = ipole(ii)
             pot(i) = cphidp(1,i)
          end do
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dep(1,i) = dep(1,i) + frcx
-            dep(2,i) = dep(2,i) + frcy
-            dep(3,i) = dep(3,i) + frcz
-            vxx = vxx + xi*frcx
-            vxy = vxy + yi*frcx
-            vxz = vxz + zi*frcx
-            vyy = vyy + yi*frcy
-            vyz = vyz + zi*frcy
-            vzz = vzz + zi*frcz
-         end do
+         call dcfluxadd (pot,dep,epvir)
 c
 c     perform deallocation of some local arrays
 c
          deallocate (pot)
-         deallocate (decfx)
-         deallocate (decfy)
-         deallocate (decfz)
       end if
 c
 c     increment the total internal virial tensor components

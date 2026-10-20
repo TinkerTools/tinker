@@ -22,6 +22,12 @@ c     the lambda cases decouple the chloride of a +2 environment on
 c     a quintic map, so the background term goes through "empole4"
 c     with a lambda scaled net charge
 c
+c     cases 08 and 09 scale the charge flux of an AMOEBA+ water
+c     hydrogen whose flux bond reaches into the environment, so the
+c     net charge changes with geometry and the background term adds
+c     a charge flux virial, through "empole4" with lambda derivatives
+c     and through "empole1" without them
+c
 c
       subroutine test_testvir
       implicit none
@@ -34,6 +40,8 @@ c
       call test_testvir_case ('05_mpole_ewald_nlist','ionwat')
       call test_testvir_case ('06_mpole_lambda_l05','ionwat')
       call test_testvir_case ('07_mpole_lambda_nlist_l05','ionwat')
+      call test_testvir_case ('08_mpole_cflux_lambda_l04','apgas')
+      call test_testvir_case ('09_mpole_cflux_l04','apgas')
       return
       end
 c

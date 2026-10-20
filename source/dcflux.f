@@ -24,6 +24,50 @@ c     Journal of Physical Chemistry Letters, 11, 419-426 (2020)
 c
 c
       subroutine dcflux (pot,dcfx,dcfy,dcfz)
+      use atoms
+      use mutant
+      implicit none
+      integer i
+      real*8 pot(*)
+      real*8 dcfx(*)
+      real*8 dcfy(*)
+      real*8 dcfz(*)
+      real*8, allocatable :: spot(:)
+c
+c
+c     get chain rule terms directly if no atom is mutated
+c
+      if (nmut .eq. 0) then
+         call dcflux0 (pot,dcfx,dcfy,dcfz)
+         return
+      end if
+c
+c     apply the lambda scale of each atom to its potential
+c
+      allocate (spot(n))
+      do i = 1, n
+         spot(i) = fluxsc(i) * pot(i)
+      end do
+      call dcflux0 (spot,dcfx,dcfy,dcfz)
+      deallocate (spot)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine dcflux0  --  unscaled charge flux chain rule  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "dcflux0" takes as input the derivative of the energy with
+c     respect to the unscaled charge flux change of each atom, and
+c     calculates gradient chain rule terms due to charge flux coupling
+c     with bond stretching and angle bending
+c
+c
+      subroutine dcflux0 (pot,dcfx,dcfy,dcfz)
       use sizes
       use angbnd
       use atoms
@@ -188,5 +232,123 @@ c
          dcfy(ic) = dcfy(ic) + fyc1 + fyc2
          dcfz(ic) = dcfz(ic) + fzc1 + fzc2
       end do
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine dcfluxadd  --  add charge flux chain rule  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "dcfluxadd" takes as input the electrostatic potential at each
+c     atomic site and adds the charge flux chain rule terms to the
+c     given gradient and virial; for a free energy calculation the
+c     potential is scaled by the lambda scale of each atom as in
+c     "dcflux"
+c
+c
+      subroutine dcfluxadd (pot,de,vir)
+      use atoms
+      use mutant
+      implicit none
+      integer i
+      real*8 pot(*)
+      real*8 de(3,*)
+      real*8 vir(3,3)
+      real*8, allocatable :: spot(:)
+c
+c
+c     add chain rule terms directly if no atom is mutated
+c
+      if (nmut .eq. 0) then
+         call dcfluxadd0 (pot,de,vir)
+         return
+      end if
+c
+c     apply the lambda scale of each atom to its potential
+c
+      allocate (spot(n))
+      do i = 1, n
+         spot(i) = fluxsc(i) * pot(i)
+      end do
+      call dcfluxadd0 (spot,de,vir)
+      deallocate (spot)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine dcfluxadd0  --  add unscaled flux chain rule  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "dcfluxadd0" takes as input the derivative of the energy with
+c     respect to the unscaled charge flux change of each atom, and
+c     adds the charge flux chain rule terms to the given gradient and
+c     virial; every atom is visited, since a flux bond or angle can
+c     move an atom that carries no multipole
+c
+c
+      subroutine dcfluxadd0 (dpot,de,vir)
+      use atoms
+      implicit none
+      integer i
+      real*8 frcx,frcy,frcz
+      real*8 vxx,vyy,vzz
+      real*8 vxy,vxz,vyz
+      real*8 dpot(*)
+      real*8 de(3,*)
+      real*8 vir(3,3)
+      real*8, allocatable :: decfx(:)
+      real*8, allocatable :: decfy(:)
+      real*8, allocatable :: decfz(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (decfx(n))
+      allocate (decfy(n))
+      allocate (decfz(n))
+c
+c     get the chain rule terms due to charge flux
+c
+      call dcflux0 (dpot,decfx,decfy,decfz)
+c
+c     increment the gradient and virial for charge flux
+c
+      do i = 1, n
+         frcx = decfx(i)
+         frcy = decfy(i)
+         frcz = decfz(i)
+         de(1,i) = de(1,i) + frcx
+         de(2,i) = de(2,i) + frcy
+         de(3,i) = de(3,i) + frcz
+         vxx = x(i) * frcx
+         vxy = y(i) * frcx
+         vxz = z(i) * frcx
+         vyy = y(i) * frcy
+         vyz = z(i) * frcy
+         vzz = z(i) * frcz
+         vir(1,1) = vir(1,1) + vxx
+         vir(2,1) = vir(2,1) + vxy
+         vir(3,1) = vir(3,1) + vxz
+         vir(1,2) = vir(1,2) + vxy
+         vir(2,2) = vir(2,2) + vyy
+         vir(3,2) = vir(3,2) + vyz
+         vir(1,3) = vir(1,3) + vxz
+         vir(2,3) = vir(2,3) + vyz
+         vir(3,3) = vir(3,3) + vzz
+      end do
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (decfx)
+      deallocate (decfy)
+      deallocate (decfz)
       return
       end

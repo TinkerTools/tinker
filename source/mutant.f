@@ -20,6 +20,8 @@ c     class1      atom class of each atom in the final state system
 c     imut        atom sites differing in initial and final state
 c     mutg        alchemical group of each atom (0=not mutated, 1=ligand
 c                   or ligand A, 2=ligand B of a relative dual topology)
+c     fluxsc      lambda scale applied to the charge flux of each atom
+c     pdltflx     unscaled charge flux change in charge of each atom
 c     type0       atom type of each atom in the initial state system
 c     type1       atom type of each atom in the final state system
 c     elambda     state weighting value for electrostatic potentials
@@ -55,6 +57,8 @@ c
       real*8 scexp
       real*8 tlambda
       real*8 vlambda
+      real*8, allocatable :: fluxsc(:)
+      real*8, allocatable :: pdltflx(:)
       logical mutfield
       logical setelambda
       logical setplambda

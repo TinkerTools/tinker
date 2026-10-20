@@ -20,6 +20,7 @@ c
       use atoms
       use dlmda
       use mpole
+      use mutant
       use repel
       implicit none
       integer i
@@ -43,6 +44,7 @@ c
             if (pollist(i) .ne. 0) then
                call rotmat (i,a,planar)
                call rotsite (i,a,planar,poleorig,rpole)
+               rpole(1,i) = rpole(1,i) + pdltflx(i)
             end if
          end do
       else if (poltype .eq. 'REPEL') then

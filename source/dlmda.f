@@ -96,7 +96,6 @@ c     depvirdl      polarization virial lambda derivative
 c     devvirdl      van der Waals virial lambda derivative
 c     dvirdl        total virial lambda derivative
 c     bdplorig      original bdpl
-c     bflxorig      original bflx
 c     lmdafhist     dU/dlambda value of each history entry
 c     lmdaflist     dU/dlambda values saved within an interval
 c     lmdafmean     mean force of each lambda bin
@@ -112,8 +111,6 @@ c     pcoreorig     original pcore
 c     polarityorig  original polarity
 c     pval0orig     original pval0
 c     pvalorig      original pval
-c     abflxorig     original abflx
-c     aflxorig      original aflx
 c     dfmdl         multipole force lambda derivative
 c     dfpdl         polarization force lambda derivative
 c     dfsumdl       total force lambda derivative
@@ -248,7 +245,6 @@ c
       real*8 devvirdl(3,3)
       real*8 dvirdl(3,3)
       real*8, allocatable :: bdplorig(:)
-      real*8, allocatable :: bflxorig(:)
       real*8, allocatable :: lmdafhist(:)
       real*8, allocatable :: lmdaflist(:)
       real*8, allocatable :: lmdafmean(:)
@@ -264,8 +260,6 @@ c
       real*8, allocatable :: polarityorig(:)
       real*8, allocatable :: pval0orig(:)
       real*8, allocatable :: pvalorig(:)
-      real*8, allocatable :: abflxorig(:,:)
-      real*8, allocatable :: aflxorig(:,:)
       real*8, allocatable :: dfmdl(:,:)
       real*8, allocatable :: dfpdl(:,:)
       real*8, allocatable :: dfsumdl(:,:)

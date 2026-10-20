@@ -1,0 +1,84 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                         Version 26.2  April 2026                         ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2026               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Free Energy Perturbation Parameters :
+
+ Number of FEP Hybrid Atoms                9
+ van der Waals Lambda Value            1.000
+ Electrostatics Lambda Value           0.317
+ Polarization Lambda Value             1.000
+ Torsion Angle Lambda Value            1.000
+
+ Free Energy Mode                   Absolute
+ Sampling Mode                           OST
+ Polarization Topology                Single
+ Main Lambda Value                     0.400
+
+ Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                        -61.678547      0.000000    -61.678547      0.000000
+
+ Numerical Lambda Derivatives :              dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                        -61.678545      0.000000    -61.678545      0.000000
+
+ Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
+                                       -113.060438      0.000000   -113.060438      0.000000
+
+ Numerical 2nd Lambda Derivatives :        d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
+                                       -113.060840      0.000000   -113.060840      0.000000
+
+ Lambda Gradient Breakdown over Individual Atoms :
+
+  Type      Atom           dFx/dL        dFy/dL        dFz/dL          Norm
+
+ Anlyt         1        21.630417      2.240480      2.218829     21.859046
+ Numer         1        21.630417      2.240480      2.218829     21.859046
+ Anlyt         2       111.804840    -56.293851     -8.309782    125.452669
+ Numer         2       111.804837    -56.293849     -8.309781    125.452666
+ Anlyt         3         5.221698     -1.721706      0.608642      5.531803
+ Numer         3         5.221698     -1.721706      0.608642      5.531803
+ Anlyt         4      -136.727209     55.854852      5.206101    147.787677
+ Numer         4      -136.727205     55.854851      5.206100    147.787674
+ Anlyt         5        24.175082     15.420451     -3.291345     28.862741
+ Numer         5        24.175081     15.420450     -3.291345     28.862740
+ Anlyt         6         0.574813      3.236411     -0.012967      3.287086
+ Numer         6         0.574813      3.236411     -0.012967      3.287086
+ Anlyt         7        -6.290440     -6.854451     -1.329302      9.397882
+ Numer         7        -6.290440     -6.854451     -1.329302      9.397881
+ Anlyt         8        -4.442069     -5.791260      0.582603      7.321891
+ Numer         8        -4.442068     -5.791260      0.582602      7.321891
+ Anlyt         9        -2.561436     -5.213790     -0.162811      5.811288
+ Numer         9        -2.561436     -5.213790     -0.162811      5.811288
+ Anlyt        10        -2.070300      2.827350      4.717933      5.876984
+ Numer        10        -2.070300      2.827350      4.717933      5.876984
+ Anlyt        11        -1.291671      2.708086     -4.363092      5.295160
+ Numer        11        -1.291671      2.708086     -4.363092      5.295160
+ Anlyt        12       -10.023724     -6.412573      4.135192     12.597458
+ Numer        12       -10.023724     -6.412572      4.135192     12.597458
+
+ Total Gradient Norm and RMS Gradient per Atom :
+
+ Anlyt      Total Gradient Norm Value              198.314967
+ Numer      Total Gradient Norm Value              198.314962
+
+ Anlyt      RMS Gradient over All Atoms             57.248600
+ Numer      RMS Gradient over All Atoms             57.248598
+
+ Analytical dV/dL :              202.573      -82.224       -3.624
+                                 -82.224       27.715        8.581
+                                  -3.624        8.581        7.524
+
+ Numerical dV/dL :               202.573      -82.224       -3.624
+                                 -82.224       27.715        8.581
+                                  -3.624        8.581        7.524

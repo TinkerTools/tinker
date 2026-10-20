@@ -30,6 +30,7 @@ c
       use iounit
       use mplpot
       use mpole
+      use mutant
       implicit none
       integer i,ii
       real*8, allocatable :: pdelta(:)
@@ -50,6 +51,16 @@ c     find charge modifications due to charge flux
 c
       call bndchg (pdelta)
       call angchg (pdelta)
+c
+c     save the unscaled change and apply the lambda scale of each
+c     atom when any atom is mutated
+c
+      if (nmut .ne. 0) then
+         do i = 1, n
+            pdltflx(i) = pdelta(i)
+            pdelta(i) = fluxsc(i) * pdelta(i)
+         end do
+      end if
 c
 c     alter atomic partial charge values for charge flux
 c

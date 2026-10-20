@@ -16,6 +16,11 @@ c     this file collects Tinker system tests that run the "testgrad"
 c     program as a subprocess and compare its output against a stored
 c     reference with a floating-point tolerance
 c
+c     cases 12 to 15 weight HIPPO water multipoles by atom group with
+c     charge flux active, so the flux potential must carry the group
+c     weight; they cover the double loop and the multipole list, with
+c     and without lambda derivatives from "empole4"
+c
 c
       subroutine test_testgrad
       implicit none
@@ -32,6 +37,11 @@ c
       call test_testgrad_case ('09_aplus_thole0','tetramer')
       call test_testgrad_case ('10_aplus_polpair','tetramer')
       call test_testgrad_case ('11_hippo_ast_l05','dmso')
+      call test_testgrad_case ('12_hipwat_group_inter','hipwat')
+      call test_testgrad_case ('13_hipwat_group_inter_mlist','hipwat')
+      call test_testgrad_case ('14_hipwat_group_ost_l04','hipwat')
+      call test_testgrad_case ('15_hipwat_group_ost_mlist_l04',
+     &                         'hipwat')
       return
       end
 c

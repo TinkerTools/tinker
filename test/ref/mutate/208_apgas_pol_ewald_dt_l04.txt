@@ -1,0 +1,52 @@
+ Total Potential Energy :                -16.3790 Kcal/mole
+
+ EngCnt  Atomic Multipoles                       -13.5414               55
+ EngCnt  Polarization                             -2.8376               52
+
+ Internal Virial Tensor :                  76.700      -16.536        1.025
+                                          -16.536        8.525       -0.336
+                                            1.025       -0.336        0.621
+
+ Cartesian Gradient Breakdown over Individual Atoms :
+
+  Type      Atom              dE/dX       dE/dY       dE/dZ          Norm
+
+ Anlyt         1            13.0548      1.5438      1.7803       13.2657
+ Anlyt         2            24.8144    -12.7788     -2.1180       27.9917
+ Anlyt         3             2.6925     -2.2204      0.2853        3.5016
+ Anlyt         4           -30.4321      9.3297     -1.9341       31.8888
+ Anlyt         5             2.1966      3.1822      1.1292        4.0282
+ Anlyt         6             0.4549     -2.1065     -0.3362        2.1811
+ Anlyt         7            -3.4307      0.1419      2.7353        4.3900
+ Anlyt         8            -1.5320      1.5194     -3.2762        3.9229
+ Anlyt         9            -1.7509     -4.2324     -0.1376        4.5824
+ Anlyt        10            -1.7247      2.2464      4.0508        4.9427
+ Anlyt        11            -0.9498      2.1223     -3.7081        4.3768
+ Anlyt        12            -3.3825      1.2204      1.4904        3.8926
+
+ Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                        -62.702366      0.000000    -55.986584     -6.715782
+
+ Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
+                                       -113.271592      0.000000   -102.078621    -11.192970
+
+ Lambda Gradient Breakdown over Individual Atoms :
+
+  Type      Atom           dFx/dL        dFy/dL        dFz/dL          Norm
+
+ Lambda         1        -5.436183      4.978745      1.165190      7.463086
+ Lambda         2       136.296062    -66.217731    -13.771570    152.154726
+ Lambda         3         2.574324      1.645137      1.821194      3.556736
+ Lambda         4      -160.054691     68.246197     14.042170    174.562968
+ Lambda         5        44.349535     22.056469     -8.417893     50.241716
+ Lambda         6        -0.568446     11.373613      0.807113     11.416376
+ Lambda         7        -3.483379    -12.339286     -7.364009     14.785821
+ Lambda         8        -4.436755    -14.219321      7.476012     16.666273
+ Lambda         9        -1.188624     -0.641527     -0.085532      1.353403
+ Lambda        10        -0.195289      0.485730     -0.276527      0.592063
+ Lambda        11        -0.195872      0.395027      0.315945      0.542433
+ Lambda        12        -7.690609    -15.729876      4.276399     18.023930
+
+ Analytical dV/dL :              146.026      -96.412       -7.856
+                                 -96.412       21.234       14.794
+                                  -7.856       14.794       10.806

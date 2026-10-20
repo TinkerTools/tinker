@@ -64,12 +64,16 @@ c
       if (allocated(type1))  deallocate (type1)
       if (allocated(class1))  deallocate (class1)
       if (allocated(mutg))  deallocate (mutg)
+      if (allocated(fluxsc))  deallocate (fluxsc)
+      if (allocated(pdltflx))  deallocate (pdltflx)
       allocate (imut(n))
       allocate (type0(n))
       allocate (class0(n))
       allocate (type1(n))
       allocate (class1(n))
       allocate (mutg(n))
+      allocate (fluxsc(n))
+      allocate (pdltflx(n))
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -105,6 +109,8 @@ c
       use_rel = .false.
       do i = 1, n
          mutg(i) = 0
+         fluxsc(i) = 1.0d0
+         pdltflx(i) = 0.0d0
       end do
       ntbnd = 0
       do i = 1, nbond
@@ -335,10 +341,8 @@ c     electrostatic, polarization and van der Waals sublambdas
 c
 c
       subroutine mutate_dlmda
-      use angbnd
       use atoms
       use bndstr
-      use cflux
       use charge
       use chgpen
       use dipole
@@ -829,9 +833,6 @@ c
       if (allocated(pvalorig))  deallocate (pvalorig)
       if (allocated(pval0orig))  deallocate (pval0orig)
       if (allocated(polarityorig))  deallocate (polarityorig)
-      if (allocated(bflxorig))  deallocate (bflxorig)
-      if (allocated(aflxorig))  deallocate (aflxorig)
-      if (allocated(abflxorig))  deallocate (abflxorig)
       if (allocated(douindorig))  deallocate (douindorig)
       allocate (pchgorig(n))
       allocate (pchg0orig(n))
@@ -841,9 +842,6 @@ c
       allocate (pvalorig(n))
       allocate (pval0orig(n))
       allocate (polarityorig(n))
-      allocate (bflxorig(nbond))
-      allocate (aflxorig(2,nangle))
-      allocate (abflxorig(2,nangle))
       allocate (douindorig(n))
 c
 c     copy original parameters for lambda derivative calculations
@@ -880,17 +878,6 @@ c
             douindorig(k) = douind(k)
          end do
       end if
-      if (use_chgflx) then
-         do i = 1, nbond
-            bflxorig(i) = bflx(i)
-         end do
-         do i = 1, nangle
-            aflxorig(1,i) = aflx(1,i)
-            aflxorig(2,i) = aflx(2,i)
-            abflxorig(1,i) = abflx(1,i)
-            abflxorig(2,i) = abflx(2,i)
-         end do
-      end if
       return
       end
 c
@@ -920,12 +907,13 @@ c
       subroutine setdlmdaterms
       use dlmda
       use mutant
+      use potent
       implicit none
 c
 c
-      use_edlmda = use_dlmda .and. use_elmdamap
-      use_pdlmda = use_dlmda .and. use_plmdamap
-      use_vdlmda = use_dlmda .and. use_vlmdamap
+      use_edlmda = use_dlmda .and. use_elmdamap .and. use_mutate
+      use_pdlmda = use_dlmda .and. use_plmdamap .and. use_mutate
+      use_vdlmda = use_dlmda .and. use_vlmdamap .and. use_mutate
       if (use_rel) then
          if (.not. (use_relstg(1) .or. use_relstg(3))) then
             use_edlmda = .false.
@@ -1556,19 +1544,21 @@ c
       end if
 c
 c     single topology currently supports the scalar derivative for
-c     mutual Thole polarization in direct and Ewald modes
+c     mutual polarization with Thole damping, as in AMOEBA and AMOEBA+,
+c     or charge penetration damping, as in HIPPO, in direct and Ewald
+c     modes
 c
       if (use_pdlmda .and. use_prst) then
-         if (poltyp.ne.'MUTUAL' .or. .not.use_thole .or. use_chgpen
+         if (poltyp.ne.'MUTUAL' .or. .not.(use_thole.or.use_chgpen)
      &          .or. use_expol .or. use_solv) then
             write (iout,30)
    30       format (/,' MUTATE_CHECK  --  Single Topology',
-     &                 ' Polarization dU/dLambda supports MUTUAL Thole',
-     &                 ' polarization only, in either direct or Ewald',
-     &                 ' mode; use POLARIZATION MUTUAL without charge',
-     &                 ' penetration, exchange polarization or',
-     &                 ' implicit solvent, or add LAMBDA-DERIV2 or',
-     &                 ' POL-DUALTOPO')
+     &                 ' Polarization dU/dLambda supports MUTUAL',
+     &                 ' polarization with Thole or charge penetration',
+     &                 ' damping only, in either direct or Ewald',
+     &                 ' mode; use POLARIZATION MUTUAL without',
+     &                 ' exchange polarization or implicit solvent,',
+     &                 ' or add LAMBDA-DERIV2 or POL-DUALTOPO')
             call fatal
          end if
       end if
@@ -1727,15 +1717,15 @@ c
          call fatal
       end if
 c
-c     the HIPPO repulsion, dispersion, charge transfer and charge
-c     penetration terms have no relative free energy treatment
+c     the HIPPO repulsion, dispersion and charge transfer terms have
+c     no relative free energy treatment
 c
-      if (use_rel .and. (use_repel .or. use_disp .or. use_chgtrn
-     &       .or. use_chgpen)) then
+      if (use_rel .and. (use_repel .or. use_disp .or. use_chgtrn))
+     &       then
          write (iout,112)
   112    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
-     &              ' Available for HIPPO Repulsion, Dispersion,',
-     &              ' Charge Transfer or Charge Penetration')
+     &              ' Available for HIPPO Repulsion, Dispersion',
+     &              ' or Charge Transfer')
          call fatal
       end if
 c
@@ -1748,25 +1738,15 @@ c
          call fatal
       end if
 c
-c     the charge flux potential and forces carry no lambda derivative
-c
-      if (use_chgflx .and. use_dlmda) then
-         write (iout,114)
-  114    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
-     &              ' Available with Charge Flux')
-         call fatal
-      end if
-c
 c     the HIPPO repulsion, dispersion and charge transfer terms are
-c     scaled by lambda but add nothing to the lambda derivative, and
-c     the charge penetration lambda derivatives are not yet validated
+c     scaled by lambda but add nothing to the lambda derivative
 c
-      if (use_dlmda .and. (use_repel .or. use_disp .or. use_chgtrn
-     &       .or. use_chgpen)) then
+      if (use_dlmda .and. (use_repel .or. use_disp .or. use_chgtrn))
+     &       then
          write (iout,115)
   115    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
-     &              ' Available for HIPPO Repulsion, Dispersion,',
-     &              ' Charge Transfer or Charge Penetration')
+     &              ' Available for HIPPO Repulsion, Dispersion',
+     &              ' or Charge Transfer')
          call fatal
       end if
 c
@@ -1882,16 +1862,17 @@ c     the site's group, so the charging ligand carries "elambda", the
 c     other ligand of a staged relative leg is annihilated, and the
 c     environment keeps its unscaled values
 c
+c     the charge flux parameters stay unscaled, and "alterchg" scales
+c     the flux change in charge of each site by the same scale, so
+c     every charge is linear in the scale of its own group
+c
 c     note charge transfer electrostatics is not treated by parameter
 c     scaling due to the functional form used, and must be done via
 c     modification of pairwise energy terms in the potential routines
 c
 c
       subroutine altelec
-      use angbnd
       use atoms
-      use bndstr
-      use cflux
       use charge
       use chgpen
       use dipole
@@ -1904,7 +1885,6 @@ c
       implicit none
       integer i,j,k
       integer k1,k2
-      integer ia,ib,ic
       real*8 sc
       real*8 emsc(0:2)
       real*8 demsc(0:2)
@@ -1964,32 +1944,11 @@ c
          end do
       end if
 c
-c     set scaled parameters for bond stretch charge flux
+c     set the scale "alterchg" applies to each charge flux change
 c
       if (use_chgflx) then
-         do i = 1, nbond
-            ia = ibnd(1,i)
-            ib = ibnd(2,i)
-            sc = 1.0d0
-            if (mutg(ia).ne.0 .and. mutg(ib).ne.0)  sc = emsc(mutg(ia))
-            bflx(i) = bflxorig(i) * sc
-         end do
-      end if
-c
-c     set scaled parameters for angle bend charge flux
-c
-      if (use_chgflx) then
-         do i = 1, nangle
-            ia = iang(1,i)
-            ib = iang(2,i)
-            ic = iang(3,i)
-            sc = 1.0d0
-            if (mutg(ia).ne.0 .and. mutg(ib).ne.0 .and.
-     &          mutg(ic).ne.0)  sc = emsc(mutg(ia))
-            aflx(1,i) = aflxorig(1,i) * sc
-            aflx(2,i) = aflxorig(2,i) * sc
-            abflx(1,i) = abflxorig(1,i) * sc
-            abflx(2,i) = abflxorig(2,i) * sc
+         do i = 1, n
+            fluxsc(i) = emsc(mutg(i))
          end do
       end if
       return
@@ -2045,13 +2004,11 @@ c     "altpolr" constructs the polarization parameters of every site
 c     from their original values and the scale that "grpscale" gives
 c     the site's group at "plambda", so the charging ligand carries
 c     "plambda" and the other ligand of a staged relative leg is
-c     annihilated
+c     annihilated; charge flux is scaled as in "altelec"
 c
 c
       subroutine altpolr
-      use angbnd
-      use bndstr
-      use cflux
+      use atoms
       use chgpen
       use dlmda
       use mplpot
@@ -2061,7 +2018,6 @@ c
       use potent
       implicit none
       integer i,j,k
-      integer ia,ib,ic
       real*8 psc
       real*8 sc(0:2)
       real*8 dsc(0:2)
@@ -2101,32 +2057,11 @@ c
          end do
       end if
 c
-c     set scaled parameters for bond stretch charge flux
+c     set the scale "alterchg" applies to each charge flux change
 c
       if (use_chgflx) then
-         do i = 1, nbond
-            ia = ibnd(1,i)
-            ib = ibnd(2,i)
-            psc = 1.0d0
-            if (mutg(ia).ne.0 .and. mutg(ib).ne.0)  psc = sc(mutg(ia))
-            bflx(i) = bflxorig(i) * psc
-         end do
-      end if
-c
-c     set scaled parameters for angle bend charge flux
-c
-      if (use_chgflx) then
-         do i = 1, nangle
-            ia = iang(1,i)
-            ib = iang(2,i)
-            ic = iang(3,i)
-            psc = 1.0d0
-            if (mutg(ia).ne.0 .and. mutg(ib).ne.0 .and.
-     &          mutg(ic).ne.0)  psc = sc(mutg(ia))
-            aflx(1,i) = aflxorig(1,i) * psc
-            aflx(2,i) = aflxorig(2,i) * psc
-            abflx(1,i) = abflxorig(1,i) * psc
-            abflx(2,i) = abflxorig(2,i) * psc
+         do i = 1, n
+            fluxsc(i) = sc(mutg(i))
          end do
       end if
 c

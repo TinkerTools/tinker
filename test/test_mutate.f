@@ -58,6 +58,9 @@ c
       call test_mutate_gate
       call test_mutate_flat
       call test_mutate_chiral
+      call test_mutate_cflux
+      call test_mutate_cpol
+      call test_mutate_crel
       return
       end
 c
@@ -2079,6 +2082,115 @@ c
       call test_mutate_calc ('ionwat','179_ionwat_ast_l05.key',
      &   '179_ionwat_ast_l05.txt','179_ionwat_ast_l05',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_cflux  --  chgpen and charge flux  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_cflux" runs fixtures 202 to 204, which take lambda
+c     derivatives of multipoles with charge penetration and charge
+c     flux: a HIPPO water pair under Ewald, a single AMOEBA+ water
+c     hydrogen whose flux bond reaches into the environment under
+c     Ewald, and an AMOEBA+ ethanol in an alcohol tetramer without
+c     a cutoff; fixture 209 repeats the water hydrogen without lambda
+c     derivatives, so the scaled flux and the geometry dependent net
+c     charge go through "empole1" instead of "empole4"
+c
+c
+      subroutine test_mutate_cflux
+      implicit none
+c
+c
+      call test_mutate_calc ('hipwat','202_hipwat_flux_ewald_l04.key',
+     &   '202_hipwat_flux_ewald_l04.txt','202_hipwat_flux_ewald_l04',
+     &   .true.,  .false., .false., .true.,  .true.)
+      call test_mutate_calc ('apgas','203_apgas_cross_ewald_l04.key',
+     &   '203_apgas_cross_ewald_l04.txt','203_apgas_cross_ewald_l04',
+     &   .true.,  .false., .false., .true.,  .true.)
+      call test_mutate_calc ('aptetra','204_aptetra_flux_l04.key',
+     &   '204_aptetra_flux_l04.txt','204_aptetra_flux_l04',
+     &   .true.,  .false., .false., .false., .true.)
+      call test_mutate_calc ('apgas',
+     &   '209_apgas_cross_ewald_nold_l04.key',
+     &   '209_apgas_cross_ewald_nold_l04.txt',
+     &   '209_apgas_cross_ewald_nold_l04',
+     &   .true.,  .false., .false., .true.,  .false.)
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_cpol  --  chgpen and flux polarize  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_cpol" runs fixtures 205 to 208, which add
+c     polarization lambda derivatives with charge penetration and
+c     charge flux: a HIPPO water pair under Ewald in single and dual
+c     topology, an AMOEBA+ ethanol in an alcohol tetramer without a
+c     cutoff in single topology, and a single AMOEBA+ water hydrogen
+c     whose flux bond reaches into the environment under Ewald in
+c     dual topology
+c
+c
+      subroutine test_mutate_cpol
+      implicit none
+c
+c
+      call test_mutate_calc ('hipwat','205_hipwat_pol_ewald_st_l04.key',
+     &   '205_hipwat_pol_ewald_st_l04.txt',
+     &   '205_hipwat_pol_ewald_st_l04',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('hipwat','206_hipwat_pol_ewald_dt_l04.key',
+     &   '206_hipwat_pol_ewald_dt_l04.txt',
+     &   '206_hipwat_pol_ewald_dt_l04',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('aptetra','207_aptetra_pol_st_l04.key',
+     &   '207_aptetra_pol_st_l04.txt','207_aptetra_pol_st_l04',
+     &   .true.,  .true.,  .false., .false., .true.)
+      call test_mutate_calc ('apgas','208_apgas_pol_ewald_dt_l04.key',
+     &   '208_apgas_pol_ewald_dt_l04.txt','208_apgas_pol_ewald_dt_l04',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_mutate_crel  --  chgpen relative legs  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_mutate_crel" runs fixtures 210 and 211, relative legs
+c     with charge penetration and charge flux: HIPPO water 1 charging
+c     into water 2 under Ewald on the first ligand stage, and an
+c     AMOEBA+ methanol into ethanol in an alcohol tetramer without a
+c     cutoff on the second ligand stage
+c
+c
+      subroutine test_mutate_crel
+      implicit none
+c
+c
+      call test_mutate_calc ('hipwat',
+     &   '210_hipwat_rel_lig1_ewald_l085.key',
+     &   '210_hipwat_rel_lig1_ewald_l085.txt',
+     &   '210_hipwat_rel_lig1_ewald_l085',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('aptetra',
+     &   '211_aptetra_rel_lig2_l015.key',
+     &   '211_aptetra_rel_lig2_l015.txt',
+     &   '211_aptetra_rel_lig2_l015',
+     &   .true.,  .true.,  .false., .false., .true.)
       return
       end
 c

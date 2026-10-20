@@ -154,9 +154,7 @@ c
       real*8, allocatable :: tem(:,:)
       real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
+      real*8, allocatable :: dlpot(:)
       logical proceed,usei,usek
       logical muti,mutk,livepr
       logical mutik,mutd2
@@ -201,9 +199,7 @@ c
       allocate (tem(3,n))
       allocate (dltem(3,nd))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
+      allocate (dlpot(n))
 c
 c     initialize scaling, torque and potential arrays
 c
@@ -213,6 +209,7 @@ c
             tem(j,i) = 0.0d0
          end do
          pot(i) = 0.0d0
+         dlpot(i) = 0.0d0
       end do
       do i = 1, nd
          do j = 1, 3
@@ -252,7 +249,7 @@ c
          qizz = rpole(13,i)
          if (use_chgpen) then
             corei = pcoreorig(i)
-            vali = pvalorig(i)
+            vali = pvalorig(i) + pdltflx(i)
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
@@ -398,7 +395,7 @@ c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
                   corek = pcoreorig(k)
-                  valk = pvalorig(k)
+                  valk = pvalorig(k) + pdltflx(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -491,8 +488,16 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  pot(i) = pot(i) + poti
-                  pot(k) = pot(k) + potk
+                  if (use_group) then
+                     poti = fgrp * poti
+                     potk = fgrp * potk
+                  end if
+                  pot(i) = pot(i) + esk*poti
+                  pot(k) = pot(k) + esi*potk
+                  if (use_d2lmda) then
+                     dlpot(i) = dlpot(i) + desk*poti
+                     dlpot(k) = dlpot(k) + desi*potk
+                  end if
                end if 
 c
 c     compute the force components for this interaction
@@ -697,7 +702,7 @@ c
          qizz = rpole(13,i)
          if (use_chgpen) then
             corei = pcoreorig(i)
-            vali = pvalorig(i)
+            vali = pvalorig(i) + pdltflx(i)
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
@@ -846,7 +851,7 @@ c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
                   corek = pcoreorig(k)
-                  valk = pvalorig(k)
+                  valk = pvalorig(k) + pdltflx(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -939,8 +944,16 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  pot(i) = pot(i) + poti
-                  pot(k) = pot(k) + potk
+                  if (use_group) then
+                     poti = fgrp * poti
+                     potk = fgrp * potk
+                  end if
+                  pot(i) = pot(i) + esk*poti
+                  pot(k) = pot(k) + esi*potk
+                  if (use_d2lmda) then
+                     dlpot(i) = dlpot(i) + desk*poti
+                     dlpot(k) = dlpot(k) + desi*potk
+                  end if
                end if 
 c
 c     compute the force components for this interaction
@@ -1144,36 +1157,7 @@ c
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-      end if
+      if (use_chgflx)  call emflux4 (pot,dlpot)
 c
 c     perform deallocation of some local arrays
 c
@@ -1181,9 +1165,7 @@ c
       deallocate (tem)
       deallocate (dltem)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
+      deallocate (dlpot)
       return
       end
 c
@@ -1287,9 +1269,7 @@ c
       real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: dlfrc(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
+      real*8, allocatable :: dlpot(:)
       logical proceed,usei,usek
       logical muti,mutk,livepr
       logical mutik,mutd2
@@ -1336,9 +1316,7 @@ c
       allocate (pot(n))
       allocate (dltem(3,nd))
       allocate (dlfrc(3,nd))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
+      allocate (dlpot(n))
 c
 c     initialize scaling, torque and potential arrays
 c
@@ -1348,6 +1326,7 @@ c
             tem(j,i) = 0.0d0
          end do
          pot(i) = 0.0d0
+         dlpot(i) = 0.0d0
       end do
       do i = 1, nd
          do j = 1, 3
@@ -1370,13 +1349,13 @@ c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcoreorig,
-!$OMP& pvalorig,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,
-!$OMP& m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
+!$OMP& pvalorig,pdltflx,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,
+!$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
 !$OMP& use_group,use_intra,use_bounds,off2,f,mutg,emsc,demsc,
 !$OMP& use_d2lmda)
-!$OMP& firstprivate(mscale) shared (em,dem,dlfrc,tem,dltem,pot,emvir,
-!$OMP& demvirdl,demdl,d2emdl2)
-!$OMP DO reduction(+:em,dem,dlfrc,tem,dltem,pot,emvir,demvirdl,
+!$OMP& firstprivate(mscale) shared (em,dem,dlfrc,tem,dltem,pot,dlpot,
+!$OMP& emvir,demvirdl,demdl,d2emdl2)
+!$OMP DO reduction(+:em,dem,dlfrc,tem,dltem,pot,dlpot,emvir,demvirdl,
 !$OMP& demdl,d2emdl2)
 c
 c     compute the multipole interaction energy and gradient
@@ -1401,7 +1380,7 @@ c
          qizz = rpole(13,i)
          if (use_chgpen) then
             corei = pcoreorig(i)
-            vali = pvalorig(i)
+            vali = pvalorig(i) + pdltflx(i)
             alphai = palpha(i)
          end if
          usei = (use(i) .or. use(iz) .or. use(ix) .or. use(iy))
@@ -1547,7 +1526,7 @@ c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
                   corek = pcoreorig(k)
-                  valk = pvalorig(k)
+                  valk = pvalorig(k) + pdltflx(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -1640,8 +1619,16 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  pot(i) = pot(i) + poti
-                  pot(k) = pot(k) + potk
+                  if (use_group) then
+                     poti = fgrp * poti
+                     potk = fgrp * potk
+                  end if
+                  pot(i) = pot(i) + esk*poti
+                  pot(k) = pot(k) + esi*potk
+                  if (use_d2lmda) then
+                     dlpot(i) = dlpot(i) + desk*poti
+                     dlpot(k) = dlpot(k) + desi*potk
+                  end if
                end if 
 c
 c     compute the force components for this interaction
@@ -1839,44 +1826,6 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-c
-c     modify the gradient and virial for charge flux
-c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dem,emvir)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-!$OMP    END DO
-      end if
-c
-c     OpenMP directives for the major loop structure
-c
 !$OMP END PARALLEL
 c
 c     add the force lambda derivative gathered over threads
@@ -1887,6 +1836,10 @@ c
          end do
       end do
 c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx)  call emflux4 (pot,dlpot)
+c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
@@ -1894,9 +1847,7 @@ c
       deallocate (dltem)
       deallocate (dlfrc)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
+      deallocate (dlpot)
       return
       end
 c
@@ -1945,7 +1896,6 @@ c
       real*8 zdfield
       real*8 dlxdfield,dlydfield
       real*8 dlzdfield
-      real*8 fx,fy,fz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 dldvxx,dldvyy,dldvzz
@@ -1955,9 +1905,7 @@ c
       real*8 dlfrcx(3),dlfrcy(3),dlfrcz(3)
       real*8 dltem(3)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
+      real*8, allocatable :: dlpot(:)
       real*8 esi,desi
       real*8 emsc(0:2),demsc(0:2)
 c
@@ -2016,14 +1964,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
+      allocate (dlpot(n))
 c
 c     initialize Ewald self-energy potential array
 c
       do i = 1, n
          pot(i) = 0.0d0
+         dlpot(i) = 0.0d0
       end do
 c
 c     compute the Ewald self-energy term over all the atoms
@@ -2053,48 +2000,9 @@ c
          if (use_d2lmda)  d2emdl2 = d2emdl2 + 2.0d0 * desi * desi * e
          e = e * esi * esi
          em = em + e
-         pot(i) = 2.0d0 * fterm * ci
+         pot(i) = 2.0d0 * esi * fterm * ci
+         dlpot(i) = 2.0d0 * desi * fterm * ci
       end do
-c
-c     modify gradient and virial for charge flux self-energy
-c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            fx = decfx(i)
-            fy = decfy(i)
-            fz = decfz(i)
-            dem(1,i) = dem(1,i) + fx
-            dem(2,i) = dem(2,i) + fy
-            dem(3,i) = dem(3,i) + fz
-            vxx = xi * fx
-            vxy = yi * fx
-            vxz = zi * fx
-            vyy = yi * fy
-            vyz = zi * fy
-            vzz = zi * fz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
 c
 c     compute the uniform background charge correction term
 c
@@ -2174,6 +2082,15 @@ c
          demdl = demdl + dle
          if (use_d2lmda) then
             d2emdl2 = d2emdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
+         end if
+         if (use_chgflx) then
+            do ii = 1, npole
+               i = ipole(ii)
+               pot(i) = pot(i) + 2.0d0*term*(xd*x(i)+yd*y(i)
+     &                                         +zd*z(i))
+               dlpot(i) = dlpot(i) + 2.0d0*term*(dlxd*x(i)
+     &                             +dlyd*y(i)+dlzd*z(i))
+            end do
          end if
          do ii = 1, npole
             i = ipole(ii)
@@ -2262,6 +2179,23 @@ c
             demvirdl(3,3) = demvirdl(3,3) + dldvzz
          end if
       end if
+c
+c     modify gradient and virial for charge flux self-energy, the
+c     uniform background charge and the cell dipole boundary term
+c
+      if (use_chgflx) then
+         do ii = 1, npole
+            i = ipole(ii)
+            pot(i) = pot(i) + 2.0d0*fterm*sum
+            dlpot(i) = dlpot(i) + 2.0d0*fterm*dlsum
+         end do
+         call emflux4 (pot,dlpot)
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pot)
+      deallocate (dlpot)
       return
       end
 c
@@ -2362,9 +2296,7 @@ c
       real*8, allocatable :: tem(:,:)
       real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
+      real*8, allocatable :: dlpot(:)
       logical muti,mutk,livepr
       logical mutik,mutd2
       character*6 mode
@@ -2381,9 +2313,7 @@ c
       allocate (tem(3,n))
       allocate (dltem(3,nd))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
+      allocate (dlpot(n))
 c
 c     initialize scaling, torque and potential arrays
 c
@@ -2393,6 +2323,7 @@ c
             tem(j,i) = 0.0d0
          end do
          pot(i) = 0.0d0
+         dlpot(i) = 0.0d0
       end do
       do i = 1, nd
          do j = 1, 3
@@ -2429,7 +2360,7 @@ c
          qizz = rpole(13,i)
          if (use_chgpen) then
             corei = pcoreorig(i)
-            vali = pvalorig(i)
+            vali = pvalorig(i) + pdltflx(i)
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
@@ -2568,7 +2499,7 @@ c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
                   corek = pcoreorig(k)
-                  valk = pvalorig(k)
+                  valk = pvalorig(k) + pdltflx(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -2671,8 +2602,12 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  pot(i) = pot(i) + poti
-                  pot(k) = pot(k) + potk
+                  pot(i) = pot(i) + esk*poti
+                  pot(k) = pot(k) + esi*potk
+                  if (use_d2lmda) then
+                     dlpot(i) = dlpot(i) + desk*poti
+                     dlpot(k) = dlpot(k) + desi*potk
+                  end if
                end if 
 c
 c     compute the force components for this interaction
@@ -2860,7 +2795,7 @@ c
          qizz = rpole(13,i)
          if (use_chgpen) then
             corei = pcoreorig(i)
-            vali = pvalorig(i)
+            vali = pvalorig(i) + pdltflx(i)
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
@@ -3003,7 +2938,7 @@ c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
                   corek = pcoreorig(k)
-                  valk = pvalorig(k)
+                  valk = pvalorig(k) + pdltflx(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -3106,8 +3041,12 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  pot(i) = pot(i) + poti
-                  pot(k) = pot(k) + potk
+                  pot(i) = pot(i) + esk*poti
+                  pot(k) = pot(k) + esi*potk
+                  if (use_d2lmda) then
+                     dlpot(i) = dlpot(i) + desk*poti
+                     dlpot(k) = dlpot(k) + desi*potk
+                  end if
                end if 
 c
 c     compute the force components for this interaction
@@ -3300,36 +3239,7 @@ c
 c
 c     modify the gradient and virial for charge flux
 c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-      end if
+      if (use_chgflx)  call emflux4 (pot,dlpot)
 c
 c     perform deallocation of some local arrays
 c
@@ -3337,9 +3247,7 @@ c
       deallocate (tem)
       deallocate (dltem)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
+      deallocate (dlpot)
       return
       end
 c
@@ -3388,7 +3296,6 @@ c
       real*8 zdfield
       real*8 dlxdfield,dlydfield
       real*8 dlzdfield
-      real*8 fx,fy,fz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 dldvxx,dldvyy,dldvzz
@@ -3398,9 +3305,7 @@ c
       real*8 dlfrcx(3),dlfrcy(3),dlfrcz(3)
       real*8 dltem(3)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
+      real*8, allocatable :: dlpot(:)
       real*8 esi,desi
       real*8 emsc(0:2),demsc(0:2)
 c
@@ -3459,14 +3364,13 @@ c
 c     perform dynamic allocation of some local arrays
 c
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
+      allocate (dlpot(n))
 c
 c     initialize Ewald self-energy potential array
 c
       do i = 1, n
          pot(i) = 0.0d0
+         dlpot(i) = 0.0d0
       end do
 c
 c     compute the Ewald self-energy term over all the atoms
@@ -3496,48 +3400,9 @@ c
          if (use_d2lmda)  d2emdl2 = d2emdl2 + 2.0d0 * desi * desi * e
          e = e * esi * esi
          em = em + e
-         pot(i) = 2.0d0 * fterm * ci
+         pot(i) = 2.0d0 * esi * fterm * ci
+         dlpot(i) = 2.0d0 * desi * fterm * ci
       end do
-c
-c     modify gradient and virial for charge flux self-energy
-c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            fx = decfx(i)
-            fy = decfy(i)
-            fz = decfz(i)
-            dem(1,i) = dem(1,i) + fx
-            dem(2,i) = dem(2,i) + fy
-            dem(3,i) = dem(3,i) + fz
-            vxx = xi * fx
-            vxy = yi * fx
-            vxz = zi * fx
-            vyy = yi * fy
-            vyz = zi * fy
-            vzz = zi * fz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-      end if
-c
-c     perform deallocation of some local arrays
-c
-      deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
 c
 c     compute the uniform background charge correction term
 c
@@ -3617,6 +3482,15 @@ c
          demdl = demdl + dle
          if (use_d2lmda) then
             d2emdl2 = d2emdl2 + 2.0d0*term*(dlxd**2+dlyd**2+dlzd**2)
+         end if
+         if (use_chgflx) then
+            do ii = 1, npole
+               i = ipole(ii)
+               pot(i) = pot(i) + 2.0d0*term*(xd*x(i)+yd*y(i)
+     &                                         +zd*z(i))
+               dlpot(i) = dlpot(i) + 2.0d0*term*(dlxd*x(i)
+     &                             +dlyd*y(i)+dlzd*z(i))
+            end do
          end if
          do ii = 1, npole
             i = ipole(ii)
@@ -3705,6 +3579,23 @@ c
             demvirdl(3,3) = demvirdl(3,3) + dldvzz
          end if
       end if
+c
+c     modify gradient and virial for charge flux self-energy, the
+c     uniform background charge and the cell dipole boundary term
+c
+      if (use_chgflx) then
+         do ii = 1, npole
+            i = ipole(ii)
+            pot(i) = pot(i) + 2.0d0*fterm*sum
+            dlpot(i) = dlpot(i) + 2.0d0*fterm*dlsum
+         end do
+         call emflux4 (pot,dlpot)
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (pot)
+      deallocate (dlpot)
       return
       end
 c
@@ -3806,9 +3697,7 @@ c
       real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: dlfrc(:,:)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
+      real*8, allocatable :: dlpot(:)
       logical muti,mutk,livepr
       logical mutik,mutd2
       character*6 mode
@@ -3827,9 +3716,7 @@ c
       allocate (dltem(3,nd))
       allocate (dlfrc(3,nd))
       allocate (pot(n))
-      allocate (decfx(n))
-      allocate (decfy(n))
-      allocate (decfz(n))
+      allocate (dlpot(n))
 c
 c     initialize scaling, torque and potential arrays
 c
@@ -3839,6 +3726,7 @@ c
             tem(j,i) = 0.0d0
          end do
          pot(i) = 0.0d0
+         dlpot(i) = 0.0d0
       end do
       do i = 1, nd
          do j = 1, 3
@@ -3860,14 +3748,14 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
-!$OMP& shared(npole,ipole,x,y,z,rpole,pcoreorig,pvalorig,palpha,n12,i12,
-!$OMP& n13,i13,n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,
-!$OMP& nelst,elst,use_chgpen,use_chgflx,use_bounds,f,off2,xaxis,
-!$OMP& yaxis,zaxis,emsc,demsc,mutg,use_d2lmda)
-!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,emvir,demvirdl,
-!$OMP& demdl,d2emdl2,dlfrc,dltem)
-!$OMP DO reduction(+:em,dem,tem,pot,emvir,demvirdl,demdl,d2emdl2,
-!$OMP& dlfrc,dltem)
+!$OMP& shared(npole,ipole,x,y,z,rpole,pcoreorig,pvalorig,pdltflx,
+!$OMP& palpha,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,
+!$OMP& m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,use_bounds,f,
+!$OMP& off2,xaxis,yaxis,zaxis,emsc,demsc,mutg,use_d2lmda)
+!$OMP& firstprivate(mscale) shared (em,dem,tem,pot,dlpot,emvir,
+!$OMP& demvirdl,demdl,d2emdl2,dlfrc,dltem)
+!$OMP DO reduction(+:em,dem,tem,pot,dlpot,emvir,demvirdl,demdl,
+!$OMP& d2emdl2,dlfrc,dltem)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -3888,7 +3776,7 @@ c
          qizz = rpole(13,i)
          if (use_chgpen) then
             corei = pcoreorig(i)
-            vali = pvalorig(i)
+            vali = pvalorig(i) + pdltflx(i)
             alphai = palpha(i)
          end if
          muti = (mutg(i) .ne. 0)
@@ -4027,7 +3915,7 @@ c     find damped multipole intermediates and energy value
 c
                if (use_chgpen) then
                   corek = pcoreorig(k)
-                  valk = pvalorig(k)
+                  valk = pvalorig(k) + pdltflx(k)
                   alphak = palpha(k)
                   term1 = corei*corek
                   term1i = corek*vali
@@ -4130,8 +4018,12 @@ c
                      poti = ck*rr1 - dkr*rr3 + qkr*rr5
                      potk = ci*rr1 + dir*rr3 + qir*rr5
                   end if
-                  pot(i) = pot(i) + poti
-                  pot(k) = pot(k) + potk
+                  pot(i) = pot(i) + esk*poti
+                  pot(k) = pot(k) + esi*potk
+                  if (use_d2lmda) then
+                     dlpot(i) = dlpot(i) + desk*poti
+                     dlpot(k) = dlpot(k) + desi*potk
+                  end if
                end if 
 c
 c     compute the force components for this interaction
@@ -4315,44 +4207,6 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-c
-c     modify the gradient and virial for charge flux
-c
-      if (use_chgflx) then
-         call dcflux (pot,decfx,decfy,decfz)
-!$OMP    DO reduction(+:dem,emvir)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = xi * frcx
-            vxy = yi * frcx
-            vxz = zi * frcx
-            vyy = yi * frcy
-            vyz = zi * frcy
-            vzz = zi * frcz
-            emvir(1,1) = emvir(1,1) + vxx
-            emvir(2,1) = emvir(2,1) + vxy
-            emvir(3,1) = emvir(3,1) + vxz
-            emvir(1,2) = emvir(1,2) + vxy
-            emvir(2,2) = emvir(2,2) + vyy
-            emvir(3,2) = emvir(3,2) + vyz
-            emvir(1,3) = emvir(1,3) + vxz
-            emvir(2,3) = emvir(2,3) + vyz
-            emvir(3,3) = emvir(3,3) + vzz
-         end do
-!$OMP    END DO
-      end if
-c
-c     OpenMP directives for the major loop structure
-c
 !$OMP END PARALLEL
 c
 c     add the force lambda derivative gathered over threads
@@ -4363,6 +4217,10 @@ c
          end do
       end do
 c
+c     modify the gradient and virial for charge flux
+c
+      if (use_chgflx)  call emflux4 (pot,dlpot)
+c
 c     perform deallocation of some local arrays
 c
       deallocate (mscale)
@@ -4370,9 +4228,7 @@ c
       deallocate (dltem)
       deallocate (dlfrc)
       deallocate (pot)
-      deallocate (decfx)
-      deallocate (decfy)
-      deallocate (decfz)
+      deallocate (dlpot)
       return
       end
 c
@@ -4435,12 +4291,10 @@ c
       real*8 f1,f2,f3
       real*8 dlh1,dlh2,dlh3
       real*8 dlf1,dlf2,dlf3
-      real*8 xi,yi,zi
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 dldvxx,dldvyy,dldvzz
       real*8 dldvxy,dldvxz,dldvyz
-      real*8 frcx,frcy,frcz
       real*8 volterm,denom
       real*8 hsq,expterm
       real*8 term,pterm
@@ -4456,9 +4310,7 @@ c
       real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 dltem(3)
       real*8, allocatable :: pot(:)
-      real*8, allocatable :: decfx(:)
-      real*8, allocatable :: decfy(:)
-      real*8, allocatable :: decfz(:)
+      real*8, allocatable :: dlpot(:)
 c
 c     indices into the electrostatic field array
 c
@@ -4893,45 +4745,25 @@ c     perform dynamic allocation of some local arrays
 c
       if (use_chgflx) then
          allocate (pot(n))
-         allocate (decfx(n))
-         allocate (decfy(n))
-         allocate (decfz(n))
+         allocate (dlpot(n))
 c
 c     modify the gradient and virial for charge flux
 c
          do i = 1, n
             pot(i) = 0.0d0
+            dlpot(i) = 0.0d0
          end do
          do ii = 1, npole
             i = ipole(ii)
             pot(i) = cphi(1,i)
+            if (use_d2lmda)  dlpot(i) = lcphi(1,i)
          end do
-         call dcflux (pot,decfx,decfy,decfz)
-         do ii = 1, npole
-            i = ipole(ii)
-            xi = x(i)
-            yi = y(i)
-            zi = z(i)
-            frcx = decfx(i)
-            frcy = decfy(i)
-            frcz = decfz(i)
-            dem(1,i) = dem(1,i) + frcx
-            dem(2,i) = dem(2,i) + frcy
-            dem(3,i) = dem(3,i) + frcz
-            vxx = vxx + xi*frcx
-            vxy = vxy + yi*frcx
-            vxz = vxz + zi*frcx
-            vyy = vyy + yi*frcy
-            vyz = vyz + zi*frcy
-            vzz = vzz + zi*frcz
-         end do
+         call emflux4 (pot,dlpot)
 c
 c     perform deallocation of some local arrays
 c
          deallocate (pot)
-         deallocate (decfx)
-         deallocate (decfy)
-         deallocate (decfz)
+         deallocate (dlpot)
       end if
 c
 c     increment the total internal virial tensor components
@@ -4954,5 +4786,70 @@ c
       demvirdl(1,3) = demvirdl(1,3) + dldvxz
       demvirdl(2,3) = demvirdl(2,3) + dldvyz
       demvirdl(3,3) = demvirdl(3,3) + dldvzz
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine emflux4  --  charge flux mpole lambda derivs  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "emflux4" adds the charge flux chain rule terms to the multipole
+c     gradient and virial, along with their lambda derivatives when
+c     these are requested
+c
+c     on input "pot" holds the potential at each site from the scaled
+c     multipoles and "dlpot" the potential from their lambda derivative;
+c     a site's charge is its scale times its unscaled charge, so the
+c     energy derivative with respect to the unscaled flux change is
+c     the site scale times "pot", and its lambda derivative follows
+c     from the product rule
+c
+c
+      subroutine emflux4 (pot,dlpot)
+      use atoms
+      use deriv
+      use dlmda
+      use mutant
+      use virial
+      implicit none
+      integer i
+      real*8 emsc(0:2)
+      real*8 demsc(0:2)
+      real*8 pot(*)
+      real*8 dlpot(*)
+      real*8, allocatable :: wpot(:)
+c
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (wpot(n))
+c
+c     get the energy derivative with respect to each flux change
+c
+      call grpscale (elambda,emsc,demsc)
+      do i = 1, n
+         wpot(i) = emsc(mutg(i)) * pot(i)
+      end do
+c
+c     modify the gradient and virial for charge flux
+c
+      call dcfluxadd0 (wpot,dem,emvir)
+c
+c     get the force and virial lambda derivatives for charge flux
+c
+      if (use_d2lmda) then
+         do i = 1, n
+            wpot(i) = demsc(mutg(i))*pot(i) + emsc(mutg(i))*dlpot(i)
+         end do
+         call dcfluxadd0 (wpot,dfmdl,demvirdl)
+      end if
+c
+c     perform deallocation of some local arrays
+c
+      deallocate (wpot)
       return
       end
