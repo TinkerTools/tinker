@@ -34,6 +34,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,iii
+      integer mutgi,mutgk
       integer iatom,jcell
       integer nlist,list(5)
       real*8 e,dedr,d2edr2
@@ -53,9 +54,12 @@ c
       real*8 taper,dtaper
       real*8 d2taper
       real*8 d2e(3,3)
+      real*8 ctsc(0:2,0:2)
+      real*8 dctsc(0:2,0:2)
+      real*8 d2ctsc(0:2,0:2)
       real*8, allocatable :: mscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical live(0:2,0:2)
       character*6 mode
 c
 c
@@ -74,6 +78,11 @@ c
       f = electric / dielec
       mode = 'CHGTRN'
       call switch (mode)
+c
+c     set the polarization lambda scale of each pair of atom groups,
+c     where a group pair is skipped once it carries no energy
+c
+      call ctlmdasc (.false.,ctsc,dctsc,d2ctsc,live)
 c
 c     check to see if the atom of interest is a site
 c
@@ -101,7 +110,7 @@ c
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          alphai2 = alphai * alphai
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -122,10 +131,12 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = 1, npole
             k = ipole(kk)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            mutgk = mutg(k)
+            proceed = live(mutgk,mutgi)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = x(k) - xi
@@ -158,11 +169,11 @@ c
                   dedr = f * dedr * mscale(k)
                   d2edr2 = f * d2edr2 * mscale(k)
 c
-c     apply lambda scaling for interaction annihilation 
+c     apply polarization lambda scaling for interaction annihilation
 c
-                  if (muti .or. mutk) then
-                     dedr = dedr * elambda
-                     d2edr2 = d2edr2 * elambda
+                  if (mutgi+mutgk .ne. 0) then
+                     dedr = dedr * ctsc(mutgk,mutgi)
+                     d2edr2 = d2edr2 * ctsc(mutgk,mutgi)
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -258,7 +269,7 @@ c
             if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             alphai2 = alphai * alphai
             usei = use(i)
-            muti = (mutg(i) .ne. 0)
+            mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -279,10 +290,12 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = 1, npole
                k = ipole(kk)
-               mutk = (mutg(k) .ne. 0)
-               proceed = .true.
-               if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-               if (.not. use_intra)  proceed = .true.
+               mutgk = mutg(k)
+               proceed = live(mutgk,mutgi)
+               if (proceed .and. use_group) then
+                  call groups (proceed,fgrp,i,k,0,0,0,0)
+                  if (.not. use_intra)  proceed = .true.
+               end if
                if (proceed)  proceed = (usei .or. use(k))
                if (proceed) then
                   do jcell = 2, ncell
@@ -317,11 +330,11 @@ c
                         dedr = f * dedr * mscale(k)
                         d2edr2 = f * d2edr2 * mscale(k)
 c
-c     apply lambda scaling for interaction annihilation 
+c     apply polarization lambda scaling for interaction annihilation
 c
-                        if (muti .or. mutk) then
-                           dedr = dedr * elambda
-                           d2edr2 = d2edr2 * elambda
+                        if (mutgi+mutgk .ne. 0) then
+                           dedr = dedr * ctsc(mutgk,mutgi)
+                           d2edr2 = d2edr2 * ctsc(mutgk,mutgi)
                         end if
 c
 c     use energy switching if near the cutoff distance

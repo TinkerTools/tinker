@@ -1,0 +1,115 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                         Version 26.2  April 2026                         ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2026               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Charge Penetration Parameters :
+
+     Atom Class           Core Chg           Damp
+
+           7                 4.090         5.3462
+          15                 9.937         3.4035
+           8                 8.689         4.5505
+          16                12.129         3.2229
+          20                 6.298         6.7554
+          21                12.760         5.6832
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha     Group Atom Types
+
+           1             1.219           2
+           2             0.143           1
+
+ Additional Exchange Polarization Parameters :
+
+     Atom Class       Spring        Size        Damp        Use
+
+           2          7.5719      1.0077      22.923         T
+           1          8.5263      0.2628       2.340         T
+           7          1.2880     14.0351       7.216         T
+          15          0.8099      2.0330       1.284         T
+           8          1.0998      6.8963       4.516         T
+          16          0.9016      2.1774       1.287         T
+
+ Free Energy Perturbation Parameters :
+
+ Number of FEP Hybrid Atoms                1
+ van der Waals Lambda Value            1.000
+ Electrostatics Lambda Value           0.000
+ Polarization Lambda Value             0.000
+ Torsion Angle Lambda Value            1.000
+
+ Free Energy Mode                   Absolute
+ Sampling Mode                  Fixed Lambda
+ Polarization Topology                Single
+ Main Lambda Value                     0.000
+
+ Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                          9.994326      0.000000     11.234119     -1.239793
+
+ Numerical Lambda Derivatives :              dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                          9.994332      0.000000     11.234119     -1.239787
+
+ Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
+                                          0.000000      0.000000      0.000000      0.000000
+
+ Numerical 2nd Lambda Derivatives :        d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
+                                          0.000000      0.000000      0.000000      0.000000
+
+ Lambda Gradient Breakdown over Individual Atoms :
+
+  Type      Atom           dFx/dL        dFy/dL        dFz/dL          Norm
+
+ Anlyt         1         0.000000      0.000000      0.000000      0.000000
+ Numer         1         0.000000      0.000000      0.000000      0.000000
+ Anlyt         2         0.000000      0.000000      0.000000      0.000000
+ Numer         2         0.000000      0.000000      0.000000      0.000000
+ Anlyt         3         0.000000      0.000000      0.000000      0.000000
+ Numer         3         0.000000      0.000000      0.000000      0.000000
+ Anlyt         4         0.000000      0.000000      0.000000      0.000000
+ Numer         4         0.000000      0.000000      0.000000      0.000000
+ Anlyt         5         0.000000      0.000000      0.000000      0.000000
+ Numer         5         0.000000      0.000000      0.000000      0.000000
+ Anlyt         6         0.000000      0.000000      0.000000      0.000000
+ Numer         6         0.000000      0.000000      0.000000      0.000000
+ Anlyt         7         0.000000      0.000000      0.000000      0.000000
+ Numer         7         0.000000      0.000000      0.000000      0.000000
+ Anlyt         8         0.000000      0.000000      0.000000      0.000000
+ Numer         8         0.000000      0.000000      0.000000      0.000000
+ Anlyt         9         0.000000      0.000000      0.000000      0.000000
+ Numer         9         0.000000      0.000000      0.000000      0.000000
+ Anlyt        10         0.000000      0.000000      0.000000      0.000000
+ Numer        10         0.000000      0.000000      0.000000      0.000000
+ Anlyt        11         0.000000      0.000000      0.000000      0.000000
+ Numer        11         0.000000      0.000000      0.000000      0.000000
+ Anlyt        12         0.000000      0.000000      0.000000      0.000000
+ Numer        12         0.000000      0.000000      0.000000      0.000000
+ Anlyt        13         0.000000      0.000000      0.000000      0.000000
+ Numer        13         0.000000      0.000000      0.000000      0.000000
+
+ Total Gradient Norm and RMS Gradient per Atom :
+
+ Anlyt      Total Gradient Norm Value                0.000000
+ Numer      Total Gradient Norm Value                0.000000
+
+ Anlyt      RMS Gradient over All Atoms              0.000000
+ Numer      RMS Gradient over All Atoms              0.000000
+
+ Analytical dV/dL :                0.000        0.000        0.000
+                                   0.000        0.000        0.000
+                                   0.000        0.000        0.000
+
+ Numerical dV/dL :                 0.000        0.000        0.000
+                                   0.000        0.000        0.000
+                                   0.000        0.000        0.000

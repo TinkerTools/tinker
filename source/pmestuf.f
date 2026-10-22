@@ -987,22 +987,26 @@ c     ##################################################################
 c
 c
 c     "grid_disp" places the damped dispersion coefficients onto
-c     the particle mesh Ewald grid
+c     the particle mesh Ewald grid; with "split" set, the sites of
+c     mutated atoms go into the imaginary part of the grid, so that
+c     one transform carries the environment and ligand separately
 c
 c     note the main loop does not need to be an OpenMP reduction
 c     since a given qgrid element is always part of the same chunk,
 c     and the code runs faster without use of a reduction
 c
 c
-      subroutine grid_disp
+      subroutine grid_disp (split)
       use atoms
       use disp
       use chunks
+      use mutant
       use pme
       implicit none
       integer i,j,k,m
       integer ii,jj,kk
       integer ichk,isite,iatm
+      integer ipart
       integer offsetx,offsety
       integer offsetz
       integer cid(3)
@@ -1011,13 +1015,15 @@ c
       integer cbound(6)
       real*8 v0,u0,t0
       real*8 term
+      logical split
 c
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,pmetable,
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
-!$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
+!$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3,
+!$OMP& split,mutg)
 !$OMP& shared(qgrid)
 !$OMP DO
 c
@@ -1052,6 +1058,10 @@ c
          do isite = 1, ndisp
             iatm = idisp(isite)
             if (pmetable(iatm,ichk) .eq. 1) then
+               ipart = 1
+               if (split) then
+                  if (mutg(iatm) .ne. 0)  ipart = 2
+               end if
                nearpt(1) = igrid(1,iatm) + grdoff
                nearpt(2) = igrid(2,iatm) + grdoff
                nearpt(3) = igrid(3,iatm) + grdoff
@@ -1083,7 +1093,8 @@ c
                         m = i + offsetx
                         if (i .lt. 1)  i = i + nfft1
                         t0 = thetai1(1,m,iatm)
-                        qgrid(1,i,j,k) = qgrid(1,i,j,k) + term*t0
+                        qgrid(ipart,i,j,k) = qgrid(ipart,i,j,k)
+     &                                    + term*t0
                      end do
                   end do
                end do

@@ -837,10 +837,12 @@ c
       use disp
       use energi
       use ewald
+      use mutant
       use pme
       implicit none
       integer i,ii
-      real*8 e
+      real*8 e,wel,wll,cpr
+      logical split
 c
 c
 c     zero out the dispersion energy and partitioning terms
@@ -868,11 +870,14 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call edrecip
 c
-c     compute the self-energy portion of the Ewald summation
+c     compute the self-energy portion of the Ewald summation,
+c     weighting each ligand site as the reciprocal space sum does
 c
+      call dspmutwt (split,wel,wll,cpr)
       do ii = 1, ndisp
          i = idisp(ii)
          e = csix(i)**2 * aewald**6 / 12.0d0
+         if (mutg(i) .ne. 0)  e = e * wll
          edsp = edsp + e
          nedsp = nedsp + 1
          aedsp(i) = aedsp(i) + e 
@@ -934,7 +939,7 @@ c
       real*8 expa,term
       real*8 damp3,damp5
       real*8 damp,scale
-      real*8 vterm,eps
+      real*8 vterm,wsc,eps
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
@@ -1073,10 +1078,13 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  wsc = 1.0d0
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
+                        wsc = vterm
                         scale = scale * vterm
                      else if (.not.muti .or. .not.mutk) then
+                        wsc = vterm
                         scale = scale * vterm
                      end if
                   end if
@@ -1093,10 +1101,11 @@ c
                      end if
                   end if
 c
-c     increment the overall dispersion energy component
+c     increment the overall dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                  scale = scale - 1.0d0
-                  e = e * (expa+scale)
+                  scale = scale - wsc
+                  e = e * (wsc*expa+scale)
                   edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large
@@ -1244,10 +1253,13 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                     wsc = 1.0d0
                      if (muti .or. mutk) then
                         if (vcouple .eq. 1) then
+                           wsc = vterm
                            scale = scale * vterm
                         else if (.not.muti .or. .not.mutk) then
+                           wsc = vterm
                            scale = scale * vterm
                         end if
                      end if
@@ -1265,10 +1277,11 @@ c
                         end if
                      end if
 c
-c     increment the overall dispersion energy component
+c     increment the overall dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                     scale = scale - 1.0d0
-                     e = e * (expa+scale)
+                     scale = scale - wsc
+                     e = e * (wsc*expa+scale)
                      edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large
@@ -1334,10 +1347,12 @@ c
       use disp
       use energi
       use ewald
+      use mutant
       use pme
       implicit none
       integer i,ii
-      real*8 e
+      real*8 e,wel,wll,cpr
+      logical split
 c
 c
 c     zero out the dispersion energy and partitioning terms
@@ -1365,11 +1380,14 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call edrecip
 c
-c     compute the self-energy portion of the Ewald summation
+c     compute the self-energy portion of the Ewald summation,
+c     weighting each ligand site as the reciprocal space sum does
 c
+      call dspmutwt (split,wel,wll,cpr)
       do ii = 1, ndisp
          i = idisp(ii)
          e = csix(i)**2 * aewald**6 / 12.0d0
+         if (mutg(i) .ne. 0)  e = e * wll
          edsp = edsp + e
          nedsp = nedsp + 1
          aedsp(i) = aedsp(i) + e 
@@ -1431,7 +1449,7 @@ c
       real*8 expa,term
       real*8 damp3,damp5
       real*8 damp,scale
-      real*8 vterm,eps
+      real*8 vterm,wsc,eps
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
@@ -1579,10 +1597,13 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  wsc = 1.0d0
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
+                        wsc = vterm
                         scale = scale * vterm
                      else if (.not.muti .or. .not.mutk) then
+                        wsc = vterm
                         scale = scale * vterm
                      end if
                   end if
@@ -1599,10 +1620,11 @@ c
                      end if
                   end if
 c
-c     increment the overall dispersion energy component
+c     increment the overall dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                  scale = scale - 1.0d0
-                  e = e * (expa+scale)
+                  scale = scale - wsc
+                  e = e * (wsc*expa+scale)
                   edsp = edsp + e
 c
 c     print a message if the energy of this interaction is large

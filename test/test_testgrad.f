@@ -21,6 +21,13 @@ c     charge flux active, so the flux potential must carry the group
 c     weight; they cover the double loop and the multipole list, with
 c     and without lambda derivatives from "empole4"
 c
+c     case 16 decouples a ligand with Ewald dispersion, whose
+c     reciprocal space part combines two rescaled sums
+c
+c     case 17 weights HIPPO water charge transfer by atom group in
+c     a box small enough for its cutoff to reach replicate cells, so
+c     the replicate loop must apply the group weight only once
+c
 c
       subroutine test_testgrad
       implicit none
@@ -42,6 +49,8 @@ c
       call test_testgrad_case ('14_hipwat_group_ost_l04','hipwat')
       call test_testgrad_case ('15_hipwat_group_ost_mlist_l04',
      &                         'hipwat')
+      call test_testgrad_case ('16_hippo_dewald_dec_l05','dmso')
+      call test_testgrad_case ('17_hipwat_group_ct_replica','hipwat')
       return
       end
 c

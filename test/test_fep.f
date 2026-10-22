@@ -155,6 +155,149 @@ c     partial charges in a periodic box
 c
       call fepcase (df,'../chglj/trp_charmm','charge.key',
      &              4,ltrial,'charge')
+c
+c     exchange polarization with charge flux and penetration, for a
+c     cluster in single and dual topology and an Ewald water box
+c
+      call fepcase (df,'../testlmda/expnaclus','expol.key',
+     &              4,ltrial,'expol')
+      call fepstate (df,'../testlmda/expnaclus','expol.key',
+     &               4,ltrial,'expol')
+      call fepcase (df,'../testlmda/expnaclus','expoldt.key',
+     &              4,ltrial,'expol dt')
+      call fepstate (df,'../testlmda/expnaclus','expoldt.key',
+     &               4,ltrial,'expol dt')
+      call fepcase (df,'../testlmda/expbox','expolbox.key',
+     &              4,ltrial,'expol box')
+      call fepstate (df,'../testlmda/expbox','expolbox.key',
+     &               4,ltrial,'expol box')
+c
+c     an annihilated ion leaves no exchange polarization behind
+c
+      call fepend (df,'../testlmda/expnaclus','expol.key',
+     &             'expwat4','expolenv.key',' ',' ',1.0d-6,'expol')
+      call fepend (df,'../testlmda/expnaclus','expoldt.key',
+     &             'expwat4','expolenv.key',' ',' ',1.0d-6,'expol dt')
+c
+c     Ewald dispersion scales the reciprocal space part of mutated
+c     pairs, so an annihilated ligand matches its removal and a
+c     decoupled one the sum of the ligand and environment apart
+c
+      call fepcase (df,'../ephippo/dmso','dispann.key',
+     &              4,ltrial,'disp ann')
+      call fepcase (df,'../ephippo/dmso','dispdec.key',
+     &              4,ltrial,'disp dec')
+      call fepend (df,'../ephippo/dmso','dispann.key',
+     &             'dmso_env','dispenv.key',' ',' ',1.0d-6,'disp ann')
+      call fepend (df,'../ephippo/dmso','dispdec.key',
+     &             'dmso_env','dispenv.key','dmso_lig','dispenv.key',
+     &             1.0d-6,'disp dec')
+c
+c     every pair with a ligand atom carries the same soft core
+c     weight, so the energy is linear in it at any lambda
+c
+      call displinear (df,'../ephippo/dmso','displin_ann.key',
+     &                 0.5d0,'disp ann')
+      call displinear (df,'../ephippo/dmso','displin_dec.key',
+     &                 0.5d0,'disp dec')
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine displinear  --  dispersion linear in weight  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "displinear" checks that the dispersion energy at a van der
+c     Waals lambda between the end states lies on the line joining
+c     them in the soft core weight, as it must when every pair with
+c     a ligand atom carries that one weight
+c
+c
+      subroutine displinear (dir,base,key,vl,tag)
+      implicit none
+      real*8 energy
+      real*8 vl,v
+      real*8 e0,e1,e
+      character*(*) dir,base,key,tag
+      character*40 addkey
+c
+c
+c     get the energies at both end states and at the given lambda
+c
+      call pushdir (dir)
+      call loadfix_keyadd (base,key,'vdw-lambda 0.0')
+      e0 = energy ()
+      call final
+      call loadfix_keyadd (base,key,'vdw-lambda 1.0')
+      e1 = energy ()
+      call final
+      write (addkey,10)  vl
+   10 format ('vdw-lambda ',f12.8)
+      call loadfix_keyadd (base,key,addkey)
+      e = energy ()
+      call final
+c
+c     compare against the line in the soft core weight
+c
+      v = vl**4 / sqrt(1.0d0+vl**2-vl**3)
+      call assert_real (e,e0+v*(e1-e0),1.0d-6,
+     &                  'fep '//tag//' linear in weight')
+      call popdir
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                            ##
+c     ##  subroutine fepend  --  annihilated trial against removal  ##
+c     ##                                                            ##
+c     ##############################################################
+c
+c
+c     "fepend" checks the trial energy at a main lambda of zero
+c     against the sum of the energies of one or two fixtures that
+c     leave the ligand out, or hold it alone, so the annihilated
+c     ligand is shown to leave no trace; a blank second base name
+c     means a single reference fixture
+c
+c
+      subroutine fepend (dir,base,key,rbase1,rkey1,rbase2,rkey2,
+     &                   eps,tag)
+      implicit none
+      real*8 energy
+      real*8 eps
+      real*8 eref
+      real*8 enative
+      real*8 ltrial(1)
+      real*8 etrial(1)
+      character*(*) dir,base,key,tag
+      character*(*) rbase1,rkey1,rbase2,rkey2
+c
+c
+c     get the trial energy of the full fixture at lambda zero
+c
+      call pushdir (dir)
+      call loadfix (base,key)
+      ltrial(1) = 0.0d0
+      call efeptrial (1,ltrial,etrial,enative)
+      call final
+c
+c     sum the energies of the fixtures without the ligand coupling
+c
+      call loadfix (rbase1,rkey1)
+      eref = energy ()
+      call final
+      if (rbase2 .ne. ' ') then
+         call loadfix (rbase2,rkey2)
+         eref = eref + energy ()
+         call final
+      end if
+      call assert_real (etrial(1),eref,eps,'fep '//tag//' endpoint')
+      call popdir
       return
       end
 c
@@ -285,10 +428,14 @@ c
       subroutine fepstate (dir,base,key,ntrial,ltrial,tag)
       use atoms
       use boxes
+      use chgpen
       use dlmda
+      use expol
       use mpole
+      use mplpot
       use mutant
       use polar
+      use polpot
       implicit none
       integer i,j
       integer ntrial
@@ -306,6 +453,7 @@ c
       real*8, allocatable :: poleold(:,:)
       real*8, allocatable :: polarold(:)
       real*8, allocatable :: uold(:,:,:)
+      real*8, allocatable :: extold(:,:)
       logical, allocatable :: douold(:)
       character*4 stageold
       character*(*) dir,base,key,tag
@@ -324,6 +472,7 @@ c
       allocate (polarold(n))
       allocate (uold(3,n,4))
       allocate (douold(n))
+      allocate (extold(3,n))
       lold(1) = lambda
       lold(2) = elambda
       lold(3) = plambda
@@ -339,6 +488,14 @@ c
          xold(3,i) = z(i)
          polarold(i) = polarity(i)
          douold(i) = douind(i)
+         extold(1,i) = 0.0d0
+         extold(2,i) = 0.0d0
+         extold(3,i) = 0.0d0
+         if (use_expol)  extold(1,i) = prepep(i)
+         if (use_chgpen) then
+            extold(2,i) = pcore(i)
+            extold(3,i) = pval(i)
+         end if
          do j = 1, 13
             poleold(j,i) = pole(j,i)
          end do
@@ -384,6 +541,16 @@ c
       call assert_int (nflip,0,'fep '//tag//' state douind')
       dmax = 0.0d0
       do i = 1, n
+         if (use_expol)  dmax = max(dmax,abs(prepep(i)-extold(1,i)))
+         if (use_chgpen) then
+            dmax = max(dmax,abs(pcore(i)-extold(2,i)))
+            dmax = max(dmax,abs(pval(i)-extold(3,i)))
+         end if
+      end do
+      call assert_real (dmax,0.0d0,0.0d0,
+     &                  'fep '//tag//' state pen expol')
+      dmax = 0.0d0
+      do i = 1, n
          do j = 1, 3
             dmax = max(dmax,abs(uind(j,i)-uold(j,i,1)))
             dmax = max(dmax,abs(uinp(j,i)-uold(j,i,2)))
@@ -400,6 +567,7 @@ c
       deallocate (polarold)
       deallocate (uold)
       deallocate (douold)
+      deallocate (extold)
       call final
       call popdir
       return

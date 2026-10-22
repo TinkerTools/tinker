@@ -32,6 +32,7 @@ c     scexp       scale factor for soft core buffered 14-7 potential
 c     tlambda     state weighting value for torsional potential
 c     vlambda     state weighting value for van der Waals potentials
 c     mutfield    flag restricting dfield to the mpoles of mutated atoms
+c     mutpsc      flag to collect the mutated partner overlap in alterpol
 c     setelambda  flag that elambda was set by its own keyword
 c     setplambda  flag that plambda was set by its own keyword
 c     setvlambda  flag that vlambda was set by its own keyword
@@ -60,6 +61,7 @@ c
       real*8, allocatable :: fluxsc(:)
       real*8, allocatable :: pdltflx(:)
       logical mutfield
+      logical mutpsc
       logical setelambda
       logical setplambda
       logical setvlambda

@@ -109,12 +109,14 @@ c     pchg0orig     original pchg0
 c     pchgorig      original pchg
 c     pcoreorig     original pcore
 c     polarityorig  original polarity
+c     prepeporig    original prepep
 c     pval0orig     original pval0
 c     pvalorig      original pval
 c     dfmdl         multipole force lambda derivative
 c     dfpdl         polarization force lambda derivative
 c     dfsumdl       total force lambda derivative
 c     dfvdl         van der Waals force lambda derivative
+c     dpscdl        exchange polarization scaling lambda derivative
 c     lcmp          cmp for lambda derivative
 c     lcphi         cphi for lambda derivative
 c     lfmp          fmp for lambda derivative
@@ -258,12 +260,14 @@ c
       real*8, allocatable :: pchgorig(:)
       real*8, allocatable :: pcoreorig(:)
       real*8, allocatable :: polarityorig(:)
+      real*8, allocatable :: prepeporig(:)
       real*8, allocatable :: pval0orig(:)
       real*8, allocatable :: pvalorig(:)
       real*8, allocatable :: dfmdl(:,:)
       real*8, allocatable :: dfpdl(:,:)
       real*8, allocatable :: dfsumdl(:,:)
       real*8, allocatable :: dfvdl(:,:)
+      real*8, allocatable :: dpscdl(:,:,:)
       real*8, allocatable :: lcmp(:,:)
       real*8, allocatable :: lcphi(:,:)
       real*8, allocatable :: lfmp(:,:)

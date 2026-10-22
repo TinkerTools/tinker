@@ -336,6 +336,8 @@ void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
 void grpscale_(double* lmda, double* sc, double* dsc);
 #define tinker_f_grpscale grpscale_
+void ctlmdasc_(int* dodl, double* sc, double* dsc, double* d2sc, int* live);
+#define tinker_f_ctlmdasc ctlmdasc_
 void eleclive_(int* live, int* doskip);
 #define tinker_f_eleclive eleclive_
 void mapsublmda_(double* lmda);
@@ -716,6 +718,10 @@ void edreal0d_();
 #define tinker_f_edreal0d edreal0d_
 void edrecip_();
 #define tinker_f_edrecip edrecip_
+void dspmutwt_(int* split, double* wel, double* wll, double* cpr);
+#define tinker_f_dspmutwt dspmutwt_
+void dspsplit_(double* qg, int* k1, int* k2, int* k3, double* ser, double* sei, double* slr, double* sli);
+#define tinker_f_dspsplit dspsplit_
 
 // edisp1.f
 void edisp1_();
@@ -2514,7 +2520,7 @@ void grid_mpole_(double* fmp, double* qg);
 #define tinker_f_grid_mpole grid_mpole_
 void grid_uind_(double* fuind, double* fuinp);
 #define tinker_f_grid_uind grid_uind_
-void grid_disp_();
+void grid_disp_(int* split);
 #define tinker_f_grid_disp grid_disp_
 void adjust_(int* offset, int* nfft, int* nchk, int* amin, int* amax, int* cmin, int* cmax);
 #define tinker_f_adjust adjust_

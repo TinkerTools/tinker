@@ -24,6 +24,7 @@ extern double TINKER_MOD(mutant, vlambda);
 extern double* TINKER_MOD(mutant, fluxsc);
 extern double* TINKER_MOD(mutant, pdltflx);
 extern int TINKER_MOD(mutant, mutfield);
+extern int TINKER_MOD(mutant, mutpsc);
 extern int TINKER_MOD(mutant, setelambda);
 extern int TINKER_MOD(mutant, setplambda);
 extern int TINKER_MOD(mutant, setvlambda);

@@ -28,6 +28,13 @@ c     net charge changes with geometry and the background term adds
 c     a charge flux virial, through "empole4" with lambda derivatives
 c     and through "empole1" without them
 c
+c     case 10 annihilates a neutral ligand with Ewald dispersion,
+c     whose reciprocal space virial combines two rescaled sums
+c
+c     case 11 scales HIPPO water charge transfer by a squared dual
+c     topology weight through "echgtrn1", in a box small enough for
+c     the cutoff to reach replicate cells
+c
 c
       subroutine test_testvir
       implicit none
@@ -42,6 +49,9 @@ c
       call test_testvir_case ('07_mpole_lambda_nlist_l05','ionwat')
       call test_testvir_case ('08_mpole_cflux_lambda_l04','apgas')
       call test_testvir_case ('09_mpole_cflux_l04','apgas')
+      call test_testvir_case ('10_disp_dewald_ann_l05',
+     &                        '../ephippo/dmso')
+      call test_testvir_case ('11_ct_lambda_l04','../testlmda/hipwat')
       return
       end
 c

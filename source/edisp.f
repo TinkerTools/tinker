@@ -676,10 +676,12 @@ c
       use disp
       use energi
       use ewald
+      use mutant
       use pme
       implicit none
       integer i,ii
-      real*8 e
+      real*8 e,wel,wll,cpr
+      logical split
 c
 c
 c     zero out the total damped dispersion energy
@@ -703,11 +705,14 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call edrecip
 c
-c     compute the self-energy portion of the Ewald summation
+c     compute the self-energy portion of the Ewald summation,
+c     weighting each ligand site as the reciprocal space sum does
 c
+      call dspmutwt (split,wel,wll,cpr)
       do ii = 1, ndisp
          i = idisp(ii)
          e = csix(i)**2 * aewald**6 / 12.0d0
+         if (mutg(i) .ne. 0)  e = e * wll
          edsp = edsp + e
       end do
       return
@@ -760,7 +765,7 @@ c
       real*8 expa,term
       real*8 damp3,damp5
       real*8 damp,scale
-      real*8 vterm,eps
+      real*8 vterm,wsc,eps
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
@@ -887,18 +892,22 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  wsc = 1.0d0
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
+                        wsc = vterm
                         scale = scale * vterm
                      else if (.not.muti .or. .not.mutk) then
+                        wsc = vterm
                         scale = scale * vterm
                      end if
                   end if
 c
-c     increment the overall dispersion energy component
+c     increment the overall dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                  scale = scale - 1.0d0
-                  e = e * (expa+scale)
+                  scale = scale - wsc
+                  e = e * (wsc*expa+scale)
                   edsp = edsp + e
                end if
             end if
@@ -1029,18 +1038,22 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                     wsc = 1.0d0
                      if (muti .or. mutk) then
                         if (vcouple .eq. 1) then
+                           wsc = vterm
                            scale = scale * vterm
                         else if (.not.muti .or. .not.mutk) then
+                           wsc = vterm
                            scale = scale * vterm
                         end if
                      end if
 c
-c     increment the overall dispersion energy component
+c     increment the overall dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                     scale = scale - 1.0d0
-                     e = e * (expa+scale)
+                     scale = scale - wsc
+                     e = e * (wsc*expa+scale)
                      if (i .eq. k)  e = 0.5d0 * e
                      edsp = edsp + e
                   end if
@@ -1086,10 +1099,12 @@ c
       use disp
       use energi
       use ewald
+      use mutant
       use pme
       implicit none
       integer i,ii
-      real*8 e
+      real*8 e,wel,wll,cpr
+      logical split
 c
 c
 c     zero out the total damped dispersion energy
@@ -1113,11 +1128,14 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call edrecip
 c
-c     compute the self-energy portion of the Ewald summation
+c     compute the self-energy portion of the Ewald summation,
+c     weighting each ligand site as the reciprocal space sum does
 c
+      call dspmutwt (split,wel,wll,cpr)
       do ii = 1, ndisp
          i = idisp(ii)
          e = csix(i)**2 * aewald**6 / 12.0d0
+         if (mutg(i) .ne. 0)  e = e * wll
          edsp = edsp + e
       end do
       return
@@ -1170,7 +1188,7 @@ c
       real*8 expa,term
       real*8 damp3,damp5
       real*8 damp,scale
-      real*8 vterm,eps
+      real*8 vterm,wsc,eps
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
@@ -1306,18 +1324,22 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  wsc = 1.0d0
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
+                        wsc = vterm
                         scale = scale * vterm
                      else if (.not.muti .or. .not.mutk) then
+                        wsc = vterm
                         scale = scale * vterm
                      end if
                   end if
 c
-c     increment the overall dispersion energy component
+c     increment the overall dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                  scale = scale - 1.0d0
-                  e = e * (expa+scale)
+                  scale = scale - wsc
+                  e = e * (wsc*expa+scale)
                   edsp = edsp + e
                end if
             end if
@@ -1361,6 +1383,10 @@ c
 c     "edrecip" evaluates the reciprocal space portion of the particle
 c     mesh Ewald energy due to damped dispersion
 c
+c     for a mutated system the environment and ligand sites fill the
+c     real and imaginary parts of one grid, and their transforms are
+c     separated by symmetry to weight each pair type by lambda
+c
 c
       subroutine edrecip
       use boxes
@@ -1385,6 +1411,9 @@ c
       real*8 h,hhh,b,bfac
       real*8 fac1,fac2,fac3
       real*8 erfcterm
+      real*8 wel,wll,cpr
+      real*8 ser,sei,slr,sli
+      logical split
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1408,7 +1437,8 @@ c
 c
 c     assign PME grid and perform 3-D FFT forward transform
 c
-      call grid_disp
+      call dspmutwt (split,wel,wll,cpr)
+      call grid_disp (split)
       call fftfront (qgrid)
 c
 c     use scalar sum to get the reciprocal space energy
@@ -1457,7 +1487,13 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
             end if
             eterm = (-fac1*erfcterm*hhh-expterm*(fac2+fac3*hsq))/denom
-            struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
+            if (split) then
+               call dspsplit (qgrid,k1,k2,k3,ser,sei,slr,sli)
+               struc2 = ser*ser + sei*sei + wll*(slr*slr+sli*sli)
+     &                     + 2.0d0*wel*(ser*slr+sei*sli)
+            else
+               struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
+            end if
             e = eterm * struc2
             edsp = edsp + e
          end if
@@ -1465,7 +1501,114 @@ c
 c
 c     account for the total energy correction term
 c
-      e = -csixpr * aewald**3 / denom0
+      e = -cpr * aewald**3 / denom0
       edsp = edsp + e
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine dspmutwt  --  mutated dispersion PME weights  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "dspmutwt" finds the lambda weights of the ligand to environment
+c     and the ligand to ligand dispersion pairs, whether the PME sum
+c     has to carry the environment and ligand separately, and the
+c     weighted pairwise sum of C6 values for the zero wavevector term
+c
+c     the soft core weight scales every pair with a ligand atom under
+c     annihilation, but only the ligand to environment pairs under
+c     decoupling, so the weights are not a product of site scales and
+c     a single real density cannot reproduce them
+c
+c
+      subroutine dspmutwt (split,wel,wll,cpr)
+      use disp
+      use mutant
+      implicit none
+      integer i,ii
+      real*8 v,wel,wll
+      real*8 cpr,sume,suml
+      logical split
+c
+c
+c     an unmutated or fully coupled system needs no split
+c
+      split = .false.
+      wel = 1.0d0
+      wll = 1.0d0
+      cpr = csixpr
+      if (nmut .eq. 0)  return
+c
+c     get the soft core weight used by the real space pairs
+c
+      v = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+      if (v .eq. 1.0d0)  return
+c
+c     set the weights for annihilation or for decoupling
+c
+      split = .true.
+      wel = v
+      if (vcouple .eq. 1)  wll = v
+c
+c     weight the environment and ligand parts of the C6 pair sum
+c
+      sume = 0.0d0
+      suml = 0.0d0
+      do ii = 1, ndisp
+         i = idisp(ii)
+         if (mutg(i) .eq. 0) then
+            sume = sume + csix(i)
+         else
+            suml = suml + csix(i)
+         end if
+      end do
+      cpr = sume*sume + 2.0d0*wel*sume*suml + wll*suml*suml
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine dspsplit  --  separate packed PME transforms  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "dspsplit" recovers the transforms of the environment and the
+c     ligand dispersion densities at one wavevector from a grid that
+c     held them as its real and imaginary parts, using the conjugate
+c     symmetry of the transform of a real density
+c
+c
+      subroutine dspsplit (qg,k1,k2,k3,ser,sei,slr,sli)
+      use pme
+      implicit none
+      integer k1,k2,k3
+      integer j1,j2,j3
+      real*8 zr,zi,yr,yi
+      real*8 ser,sei,slr,sli
+      real*8 qg(2,nfft1,nfft2,nfft3)
+c
+c
+c     find the grid point of the opposite wavevector
+c
+      j1 = mod(nfft1+1-k1,nfft1) + 1
+      j2 = mod(nfft2+1-k2,nfft2) + 1
+      j3 = mod(nfft3+1-k3,nfft3) + 1
+c
+c     split the packed values into the two separate transforms
+c
+      zr = qg(1,k1,k2,k3)
+      zi = qg(2,k1,k2,k3)
+      yr = qg(1,j1,j2,j3)
+      yi = qg(2,j1,j2,j3)
+      ser = 0.5d0 * (zr+yr)
+      sei = 0.5d0 * (zi-yi)
+      slr = 0.5d0 * (zi+yi)
+      sli = 0.5d0 * (yr-zr)
       return
       end

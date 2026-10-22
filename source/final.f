@@ -339,6 +339,7 @@ c
       if (allocated(dfpdl))  deallocate (dfpdl)
       if (allocated(dfsumdl))  deallocate (dfsumdl)
       if (allocated(dfvdl))  deallocate (dfvdl)
+      if (allocated(dpscdl))  deallocate (dpscdl)
       if (allocated(douindorig))  deallocate (douindorig)
       if (allocated(lcmp))  deallocate (lcmp)
       if (allocated(lcphi))  deallocate (lcphi)
@@ -361,6 +362,7 @@ c
       if (allocated(pcoreorig))  deallocate (pcoreorig)
       if (allocated(polarityorig))  deallocate (polarityorig)
       if (allocated(poleorig))  deallocate (poleorig)
+      if (allocated(prepeporig))  deallocate (prepeporig)
       if (allocated(pval0orig))  deallocate (pval0orig)
       if (allocated(pvalorig))  deallocate (pvalorig)
 c

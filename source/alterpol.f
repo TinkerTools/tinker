@@ -56,8 +56,10 @@ c
       use bound
       use cell
       use couple
+      use dlmda
       use expol
       use mpole
+      use mutant
       use polgrp
       use polpot
       use shunt
@@ -76,8 +78,11 @@ c
       real*8 ks2i(3,3)
       real*8 ks2k(3,3)
       real*8 taper
+      real*8 sc(0:2)
+      real*8 dsc(0:2)
       real*8, allocatable :: pscale(:)
       logical epli,eplk
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -105,6 +110,20 @@ c
          polscale(3,3,i) = 1.0d0
       end do
 c
+c     zero the overlap of mutated partners for the lambda derivative
+c
+      if (mutpsc) then
+         call grpscale (plambda,sc,dsc)
+         do ii = 1, npole
+            i = ipole(ii)
+            do j = 1, 3
+               do m = 1, 3
+                  dpscdl(m,j,i) = 0.0d0
+               end do
+            end do
+         end do
+      end if
+c
 c     set array needed to scale atom and group interactions
 c
       do i = 1, n
@@ -122,6 +141,8 @@ c
          sizi = prepep(i)
          alphai = dmppep(i)
          epli = lpep(i)
+         muti = .false.
+         if (mutpsc)  muti = (dsc(mutg(i)) .ne. 0.0d0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -159,6 +180,8 @@ c
          do kk = ii+1, npole
             k = ipole(kk)
             eplk = lpep(k)
+            mutk = .false.
+            if (mutpsc)  mutk = (dsc(mutg(k)) .ne. 0.0d0)
             if (epli .or. eplk) then
                xr = x(k) - xi
                yr = y(k) - yi
@@ -192,6 +215,31 @@ c
                         polscale(j,m,k) = polscale(j,m,k) + ks2k(j,m)
                      end do
                   end do
+c
+c     overlap at original size from partners with a lambda derivative
+c
+                  if (muti .or. mutk) then
+                     sizik = prepeporig(i) * prepeporig(k)
+                     call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                     if (r2 .gt. cut2)  s2 = s2 * taper
+                     p33i = springi * s2 * pscale(k)
+                     p33k = springk * s2 * pscale(k)
+                     call rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
+                     if (mutk) then
+                        do j = 1, 3
+                           do m = 1, 3
+                              dpscdl(j,m,i) = dpscdl(j,m,i) + ks2i(j,m)
+                           end do
+                        end do
+                     end if
+                     if (muti) then
+                        do j = 1, 3
+                           do m = 1, 3
+                              dpscdl(j,m,k) = dpscdl(j,m,k) + ks2k(j,m)
+                           end do
+                        end do
+                     end if
+                  end if
                end if
             end if
          end do
@@ -228,6 +276,8 @@ c
             sizi = prepep(i)
             alphai = dmppep(i)
             epli = lpep(i)
+            muti = .false.
+            if (mutpsc)  muti = (dsc(mutg(i)) .ne. 0.0d0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -265,6 +315,8 @@ c
             do kk = ii, npole
                k = ipole(kk)
                eplk = lpep(k)
+               mutk = .false.
+               if (mutpsc)  mutk = (dsc(mutg(k)) .ne. 0.0d0)
                if (epli .or. eplk) then
                   do jcell = 2, ncell
                      xr = x(k) - xi
@@ -305,6 +357,35 @@ c
      &                                             + ks2k(j,m)
                            end do
                         end do
+c
+c     overlap at original size from partners with a lambda derivative
+c
+                        if (muti .or. mutk) then
+                           sizik = prepeporig(i) * prepeporig(k)
+                           call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                           if (r2 .gt. cut2)  s2 = s2 * taper
+                           if (i .eq. k)  s2 = 0.5d0 * s2
+                           p33i = springi * s2 * pscale(k)
+                           p33k = springk * s2 * pscale(k)
+                           call rotexpl (r,xr,yr,zr,p33i,p33k,
+     &                                   ks2i,ks2k)
+                           if (mutk) then
+                              do j = 1, 3
+                                 do m = 1, 3
+                                    dpscdl(j,m,i) = dpscdl(j,m,i)
+     &                                                 + ks2i(j,m)
+                                 end do
+                              end do
+                           end if
+                           if (muti) then
+                              do j = 1, 3
+                                 do m = 1, 3
+                                    dpscdl(j,m,k) = dpscdl(j,m,k)
+     &                                                 + ks2k(j,m)
+                                 end do
+                              end do
+                           end if
+                        end if
                      end if
                   end do
                end if
@@ -361,8 +442,10 @@ c
       use atoms
       use bound
       use couple
+      use dlmda
       use expol
       use mpole
+      use mutant
       use neigh
       use polgrp
       use polpot
@@ -381,8 +464,11 @@ c
       real*8 ks2i(3,3)
       real*8 ks2k(3,3)
       real*8 taper
+      real*8 sc(0:2)
+      real*8 dsc(0:2)
       real*8, allocatable :: pscale(:)
       logical epli,eplk
+      logical muti,mutk
       character*6 mode
 c
 c
@@ -410,6 +496,20 @@ c
          polscale(3,3,i) = 1.0d0
       end do
 c
+c     zero the overlap of mutated partners for the lambda derivative
+c
+      if (mutpsc) then
+         call grpscale (plambda,sc,dsc)
+         do ii = 1, npole
+            i = ipole(ii)
+            do j = 1, 3
+               do m = 1, 3
+                  dpscdl(m,j,i) = 0.0d0
+               end do
+            end do
+         end do
+      end if
+c
 c     set array needed to scale atom and group interactions
 c
       do i = 1, n
@@ -422,10 +522,10 @@ c
 !$OMP& shared(npole,ipole,x,y,z,kpep,prepep,dmppep,lpep,np11,ip11,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,p2scale,p3scale,p4scale,p5scale,
 !$OMP& p2iscale,p3iscale,p4iscale,p5iscale,nelst,elst,use_bounds,
-!$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polinv)
+!$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polinv,mutg,mutpsc,dsc,prepeporig)
 !$OMP& firstprivate(pscale)
-!$OMP& shared (polscale)
-!$OMP DO reduction(+:polscale)
+!$OMP& shared (polscale,dpscdl)
+!$OMP DO reduction(+:polscale,dpscdl)
 c
 c     find the variable polarizability
 c
@@ -438,6 +538,8 @@ c
          sizi = prepep(i)
          alphai = dmppep(i)
          epli = lpep(i)
+         muti = .false.
+         if (mutpsc)  muti = (dsc(mutg(i)) .ne. 0.0d0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -475,6 +577,8 @@ c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
             eplk = lpep(k)
+            mutk = .false.
+            if (mutpsc)  mutk = (dsc(mutg(k)) .ne. 0.0d0)
             if (epli .or. eplk) then
                xr = x(k) - xi
                yr = y(k) - yi
@@ -508,6 +612,31 @@ c
                         polscale(j,m,k) = polscale(j,m,k) + ks2k(j,m)
                      end do
                   end do
+c
+c     overlap at original size from partners with a lambda derivative
+c
+                  if (muti .or. mutk) then
+                     sizik = prepeporig(i) * prepeporig(k)
+                     call dampexpl (r,sizik,alphai,alphak,s2,ds2)
+                     if (r2 .gt. cut2)  s2 = s2 * taper
+                     p33i = springi * s2 * pscale(k)
+                     p33k = springk * s2 * pscale(k)
+                     call rotexpl (r,xr,yr,zr,p33i,p33k,ks2i,ks2k)
+                     if (mutk) then
+                        do j = 1, 3
+                           do m = 1, 3
+                              dpscdl(j,m,i) = dpscdl(j,m,i) + ks2i(j,m)
+                           end do
+                        end do
+                     end if
+                     if (muti) then
+                        do j = 1, 3
+                           do m = 1, 3
+                              dpscdl(j,m,k) = dpscdl(j,m,k) + ks2k(j,m)
+                           end do
+                        end do
+                     end if
+                  end if
                end if
             end if
          end do

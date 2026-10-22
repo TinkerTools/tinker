@@ -40,6 +40,28 @@ c     Ewald; cases 60 to 63 are relative legs with charge penetration
 c     and charge flux, for whole AMOEBA+ alcohols, single atoms whose
 c     flux bonds reach into the environment, and HIPPO water
 c
+c     cases 64 and 65 drive HIPPO water polarization alone, with no
+c     electrostatic lambda map, in single and dual topology
+c
+c     cases 73 to 80 cover charge transfer, which follows the
+c     polarization lambda and is counted in dEP/dL: HIPPO water charge
+c     transfer alone in single and dual topology, with a squared dual
+c     topology weight, the multipole list and a zero lambda endpoint,
+c     then with multipoles and polarization at split lambdas, under
+c     Ewald, and for an AMOEBA+ alcohol tetramer; charge transfer
+c     scales each pair by the product of its two group scales in
+c     single topology and by the polarization weight in dual topology
+c
+c     cases 81 to 83 add replicate cells, group weights and a lambda
+c     range that leaves the ligand pairs off
+c
+c     cases 84 to 90 put charge transfer on the staged relative legs
+c     of an AMOEBA+ alcohol tetramer whose two ligands are in contact,
+c     alone on the ligand 1 and ligand 2 legs in single and dual
+c     topology and on the van der Waals leg, where it carries no
+c     lambda derivative, then with multipoles, polarization and
+c     charge flux under Ewald for the tetramer and for HIPPO water
+c
 c
       subroutine test_testlmda
       implicit none
@@ -138,6 +160,56 @@ c
      &                        '1e-4')
       call test_testlmda_xyz ('63_hipwat_rel_lig1_ewald_l085','hipwat',
      &                        '1e-4')
+      call test_testlmda_xyz ('64_hipwat_pol_only_st_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('65_hipwat_pol_only_dt_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('66_expnaclus_na_dt_l04','expnaclus',
+     &                        '1e-4')
+      call test_testlmda_xyz ('67_expnaclus_wat_dt_l04','expnaclus',
+     &                        '1e-4')
+      call test_testlmda_xyz ('68_expbox_ewald_dt_l04','expbox','1e-4')
+      call test_testlmda_xyz ('69_expnaclus_wat_st_l04','expnaclus',
+     &                        '1e-4')
+      call test_testlmda_xyz ('70_expbox_ewald_st_l04','expbox','1e-4')
+      call test_testlmda_xyz ('71_expnaclus_na_lin_st_l00','expnaclus',
+     &                        '1e-4')
+      call test_testlmda_xyz ('72_expbox_ewald_nlist_st_l04','expbox',
+     &                        '1e-4')
+      call test_testlmda_xyz ('73_hipwat_ct_only_st_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('74_hipwat_ct_only_dt_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('75_hipwat_ct_only_dtexp_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('76_hipwat_ct_mlist_dt_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('77_hipwat_ct_lin_dt_l00','hipwat','1e-4')
+      call test_testlmda_xyz ('78_hipwat_pol_ct_split_st_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('79_hipwat_pol_ct_ewald_dt_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('80_aptetra_ct_st_l04','aptetra','1e-4')
+      call test_testlmda_xyz ('81_hipwat_ct_replica_ost_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('82_hipwat_ct_group_ost_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('83_hipwat_ct_off_st_l04','hipwat',
+     &                        '1e-4')
+      call test_testlmda_xyz ('84_aptetra_ct_rel_lig1_st_l085',
+     &                        'aptetra','1e-4')
+      call test_testlmda_xyz ('85_aptetra_ct_rel_lig2_st_l015',
+     &                        'aptetra','1e-4')
+      call test_testlmda_xyz ('86_aptetra_ct_rel_lig1_dt_l080',
+     &                        'aptetra','1e-4')
+      call test_testlmda_xyz ('87_aptetra_ct_rel_lig2_dt_l020',
+     &                        'aptetra','1e-4')
+      call test_testlmda_xyz ('88_aptetra_ct_rel_vdwm_l050','aptetra',
+     &                        '1e-4')
+      call test_testlmda_xyz ('89_aptetra_pol_ct_rel_lig1_ewald_l080',
+     &                        'aptetra','1e-4')
+      call test_testlmda_xyz ('90_hipwat_pol_ct_rel_lig1_ewald_l080',
+     &                        'hipwat','1e-4')
       return
       end
 c

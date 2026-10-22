@@ -864,10 +864,12 @@ c
       use disp
       use energi
       use ewald
+      use mutant
       use pme
       implicit none
       integer i,ii
-      real*8 e
+      real*8 e,wel,wll,cpr
+      logical split
 c
 c
 c     zero out the dispersion energy and derivatives
@@ -896,11 +898,14 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call edrecip1
 c
-c     compute the self-energy portion of the Ewald summation
+c     compute the self-energy portion of the Ewald summation,
+c     weighting each ligand site as the reciprocal space sum does
 c
+      call dspmutwt (split,wel,wll,cpr)
       do ii = 1, ndisp
          i = idisp(ii)
          e = csix(i)**2 * aewald**6 / 12.0d0
+         if (mutg(i) .ne. 0)  e = e * wll
          edsp = edsp + e
       end do
       return
@@ -954,7 +959,7 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm,eps
+      real*8 vterm,wsc,eps
       real*8 ralpha2,scale
       real*8 expterm,term
       real*8 expa,rterm
@@ -1095,26 +1100,30 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  wsc = 1.0d0
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
+                        wsc = vterm
                         scale = scale * vterm
                         ddamp = ddamp * vterm
                      else if (.not.muti .or. .not.mutk) then
+                        wsc = vterm
                         scale = scale * vterm
                         ddamp = ddamp * vterm
                      end if
                   end if
 c
-c     increment the overall damped dispersion energy component
+c     increment the overall damped dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                  scale = scale - 1.0d0
-                  e = e * (expa+scale)
+                  scale = scale - wsc
+                  e = e * (wsc*expa+scale)
                   edsp = edsp + e
 c
 c     increment the damped dispersion derivative components
 c
                   rterm = -(ralpha2**3) * expterm / r
-                  de = -6.0d0*e/r2 - ci*ck*rterm/r7
+                  de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
      &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
                   dedx = de * xr
                   dedy = de * yr
@@ -1275,22 +1284,26 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                     wsc = 1.0d0
                      if (muti .or. mutk) then
                         if (vcouple .eq. 1) then
+                           wsc = vterm
                            scale = scale * vterm
                            ddamp = ddamp * vterm
                         else if (.not.muti .or. .not.mutk) then
+                           wsc = vterm
                            scale = scale * vterm
                            ddamp = ddamp * vterm
                         end if
                      end if
 c
-c     increment the overall damped dispersion energy component
+c     increment the overall damped dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                     scale = scale - 1.0d0
-                     e = e * (expa+scale)
+                     scale = scale - wsc
+                     e = e * (wsc*expa+scale)
                      rterm = -(ralpha2**3) * expterm / r
-                     de = -6.0d0*e/r2 - ci*ck*rterm/r7
+                     de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
      &                       - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
                      if (ii .eq. kk) then
                         e = 0.5d0 * e
@@ -1374,10 +1387,12 @@ c
       use disp
       use energi
       use ewald
+      use mutant
       use pme
       implicit none
       integer i,ii
-      real*8 e
+      real*8 e,wel,wll,cpr
+      logical split
 c
 c
 c     zero out the dispersion energy and derivatives
@@ -1406,11 +1421,14 @@ c     compute the reciprocal space part of the Ewald summation
 c
       call edrecip1
 c
-c     compute the self-energy portion of the Ewald summation
+c     compute the self-energy portion of the Ewald summation,
+c     weighting each ligand site as the reciprocal space sum does
 c
+      call dspmutwt (split,wel,wll,cpr)
       do ii = 1, ndisp
          i = idisp(ii)
          e = csix(i)**2 * aewald**6 / 12.0d0
+         if (mutg(i) .ne. 0)  e = e * wll
          edsp = edsp + e
       end do
       return
@@ -1464,7 +1482,7 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm,eps
+      real*8 vterm,wsc,eps
       real*8 ralpha2,scale
       real*8 expterm,term
       real*8 expa,rterm
@@ -1614,26 +1632,30 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  wsc = 1.0d0
                   if (muti .or. mutk) then
                      if (vcouple .eq. 1) then
+                        wsc = vterm
                         scale = scale * vterm
                         ddamp = ddamp * vterm
                      else if (.not.muti .or. .not.mutk) then
+                        wsc = vterm
                         scale = scale * vterm
                         ddamp = ddamp * vterm
                      end if
                   end if
 c
-c     increment the overall damped dispersion energy component
+c     increment the overall damped dispersion energy component;
+c     the lambda weight also scales the reciprocal space share
 c
-                  scale = scale - 1.0d0
-                  e = e * (expa+scale)
+                  scale = scale - wsc
+                  e = e * (wsc*expa+scale)
                   edsp = edsp + e
 c
 c     increment the damped dispersion derivative components
 c
                   rterm = -(ralpha2**3) * expterm / r
-                  de = -6.0d0*e/r2 - ci*ck*rterm/r7
+                  de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
      &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
                   dedx = de * xr
                   dedy = de * yr
@@ -1713,6 +1735,7 @@ c
       use energi
       use ewald
       use math
+      use mutant
       use pme
       use virial
       implicit none
@@ -1722,6 +1745,7 @@ c
       integer nf1,nf2,nf3
       integer nff,ntot
       integer i0,iatm,igrd0
+      integer ipart
       integer it1,it2,it3
       integer j0,jgrd0
       integer k0,kgrd0
@@ -1739,6 +1763,10 @@ c
       real*8 dn1,dn2,dn3
       real*8 dt1,dt2,dt3
       real*8 t1,t2,t3
+      real*8 wel,wll,cpr
+      real*8 ser,sei,slr,sli
+      real*8, allocatable :: qfwd(:,:,:,:)
+      logical split
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1762,8 +1790,17 @@ c
 c
 c     assign PME grid and perform 3-D FFT forward transform
 c
-      call grid_disp
+      call dspmutwt (split,wel,wll,cpr)
+      call grid_disp (split)
       call fftfront (qgrid)
+c
+c     keep the packed transform, since the grid is overwritten
+c     in place but each point needs its opposite wavevector
+c
+      if (split) then
+         allocate (qfwd(2,nfft1,nfft2,nfft3))
+         qfwd = qgrid
+      end if
 c
 c     use scalar sum to get the reciprocal space energy
 c
@@ -1803,6 +1840,7 @@ c
          term = -b*b
          eterm = 0.0d0
          denom = denom0*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+         if (split)  call dspsplit (qfwd,k1,k2,k3,ser,sei,slr,sli)
          if (term .gt. -50.0d0) then
             expterm = exp(term)
             erfcterm = erfc(b)
@@ -1814,7 +1852,12 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
             end if
             eterm = (-fac1*erfcterm*hhh - expterm*(fac2+fac3*hsq))/denom
-            struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
+            if (split) then
+               struc2 = ser*ser + sei*sei + wll*(slr*slr+sli*sli)
+     &                     + 2.0d0*wel*(ser*slr+sei*sli)
+            else
+               struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
+            end if
             vterm = 3.0d0*(fac1*erfcterm*h + fac3*expterm)*struc2/denom
             e = eterm * struc2
             edsp = edsp + e
@@ -1828,9 +1871,19 @@ c
             vir(2,3) = vir(2,3) + h3*h2*vterm
             vir(3,3) = vir(3,3) + h3*h3*vterm - e
          end if
-         qgrid(1,k1,k2,k3) = eterm * qgrid(1,k1,k2,k3) 
-         qgrid(2,k1,k2,k3) = eterm * qgrid(2,k1,k2,k3)
+c
+c     the environment potential takes the real part of the grid
+c     and the ligand potential the imaginary part
+c
+         if (split) then
+            qgrid(1,k1,k2,k3) = eterm * (ser-wel*sei+wel*slr-wll*sli)
+            qgrid(2,k1,k2,k3) = eterm * (sei+wel*ser+wel*sli+wll*slr)
+         else
+            qgrid(1,k1,k2,k3) = eterm * qgrid(1,k1,k2,k3) 
+            qgrid(2,k1,k2,k3) = eterm * qgrid(2,k1,k2,k3)
+         end if
       end do
+      if (split)  deallocate (qfwd)
 c
 c     perform the 3-D FFT backward transformation
 c
@@ -1847,6 +1900,10 @@ c
          jgrd0 = igrid(2,iatm)
          kgrd0 = igrid(3,iatm)
          fi = csix(iatm)
+         ipart = 1
+         if (split) then
+            if (mutg(iatm) .ne. 0)  ipart = 2
+         end if
          de1 = 0.0d0
          de2 = 0.0d0
          de3 = 0.0d0
@@ -1868,7 +1925,7 @@ c
                   i = i0 + 1 + (ndfft1-sign(ndfft1,i0))/2
                   t1 = thetai1(1,it1,iatm)
                   dt1 = dn1 * thetai1(2,it1,iatm)
-                  term = qgrid(1,i,j,k)
+                  term = qgrid(ipart,i,j,k)
                   de1 = de1 + 2.0d0*term*dt1*t2*t3
                   de2 = de2 + 2.0d0*term*dt2*t1*t3
                   de3 = de3 + 2.0d0*term*dt3*t1*t2
@@ -1885,7 +1942,7 @@ c
 c
 c     account for the energy and virial correction terms
 c
-      term = csixpr * aewald**3 / denom0
+      term = cpr * aewald**3 / denom0
       edsp = edsp - term
       vir(1,1) = vir(1,1) + term
       vir(2,2) = vir(2,2) + term

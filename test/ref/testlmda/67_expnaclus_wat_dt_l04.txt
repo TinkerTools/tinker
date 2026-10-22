@@ -1,0 +1,115 @@
+
+     ######################################################################
+   ##########################################################################
+  ###                                                                      ###
+ ###            Tinker  ---  Software Tools for Molecular Design            ###
+ ##                                                                          ##
+ ##                         Version 26.2  April 2026                         ##
+ ##                                                                          ##
+ ##               Copyright (c)  Jay William Ponder  1990-2026               ##
+ ###                           All Rights Reserved                          ###
+  ###                                                                      ###
+   ##########################################################################
+     ######################################################################
+
+
+ Additional Charge Penetration Parameters :
+
+     Atom Class           Core Chg           Damp
+
+           7                 4.090         5.3462
+          15                 9.937         3.4035
+           8                 8.689         4.5505
+          16                12.129         3.2229
+          20                 6.298         6.7554
+          21                12.760         5.6832
+
+ Additional Atomic Dipole Polarizability Parameters :
+
+     Atom Type           Alpha     Group Atom Types
+
+           1             1.219           2
+           2             0.143           1
+
+ Additional Exchange Polarization Parameters :
+
+     Atom Class       Spring        Size        Damp        Use
+
+           2          7.5719      1.0077      22.923         T
+           1          8.5263      0.2628       2.340         T
+           7          1.2880     14.0351       7.216         T
+          15          0.8099      2.0330       1.284         T
+           8          1.0998      6.8963       4.516         T
+          16          0.9016      2.1774       1.287         T
+
+ Free Energy Perturbation Parameters :
+
+ Number of FEP Hybrid Atoms                3
+ van der Waals Lambda Value            1.000
+ Electrostatics Lambda Value           0.317
+ Polarization Lambda Value             0.317
+ Torsion Angle Lambda Value            1.000
+
+ Free Energy Mode                   Absolute
+ Sampling Mode                           OST
+ Polarization Topology                  Dual
+ Main Lambda Value                     0.400
+
+ Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                         17.555077      0.000000     27.949188    -10.394111
+
+ Numerical Lambda Derivatives :              dE/dL        dEV/dL        dEM/dL        dEP/dL
+                                         17.555076      0.000000     27.949187    -10.394111
+
+ Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
+                                         29.258461      0.000000     46.581979    -17.323518
+
+ Numerical 2nd Lambda Derivatives :        d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
+                                         29.258541      0.000000     46.582059    -17.323518
+
+ Lambda Gradient Breakdown over Individual Atoms :
+
+  Type      Atom           dFx/dL        dFy/dL        dFz/dL          Norm
+
+ Anlyt         1         0.421856      0.163468     -0.762230      0.886385
+ Numer         1         0.421856      0.163468     -0.762230      0.886385
+ Anlyt         2        -0.415416      0.018492     -0.262107      0.491541
+ Numer         2        -0.415416      0.018492     -0.262107      0.491541
+ Anlyt         3        -0.086393      0.008785      0.096675      0.129950
+ Numer         3        -0.086393      0.008785      0.096675      0.129950
+ Anlyt         4        -6.041080      7.132082      2.038183      9.566369
+ Numer         4        -6.041079      7.132082      2.038183      9.566369
+ Anlyt         5        -1.239436     -0.458396      0.706657      1.498564
+ Numer         5        -1.239436     -0.458396      0.706657      1.498564
+ Anlyt         6        -1.108865     -0.116029     -0.756509      1.347349
+ Numer         6        -1.108865     -0.116029     -0.756509      1.347349
+ Anlyt         7        10.286436    -13.634556     17.486615     24.443682
+ Numer         7        10.286436    -13.634556     17.486615     24.443681
+ Anlyt         8         6.272866     -5.147225     -8.583302     11.811683
+ Numer         8         6.272866     -5.147225     -8.583302     11.811682
+ Anlyt         9       -18.416840     19.755542    -18.802090     32.908662
+ Numer         9       -18.416839     19.755541    -18.802090     32.908661
+ Anlyt        10        -1.242271     -0.427639      0.424768      1.380775
+ Numer        10        -1.242271     -0.427639      0.424768      1.380775
+ Anlyt        11         0.991752      0.419163     -0.592774      1.229085
+ Numer        11         0.991752      0.419163     -0.592774      1.229085
+ Anlyt        12         0.401612      0.046853      0.059939      0.408755
+ Numer        12         0.401612      0.046853      0.059939      0.408755
+ Anlyt        13        10.175778     -7.760539      8.946175     15.614303
+ Numer        13        10.175777     -7.760539      8.946175     15.614303
+
+ Total Gradient Norm and RMS Gradient per Atom :
+
+ Anlyt      Total Gradient Norm Value               46.518822
+ Numer      Total Gradient Norm Value               46.518821
+
+ Anlyt      RMS Gradient over All Atoms             12.902000
+ Numer      RMS Gradient over All Atoms             12.902000
+
+ Analytical dV/dL :                5.563       -9.783       -6.176
+                                  -9.783        9.126        3.130
+                                  -6.176        3.130       -5.098
+
+ Numerical dV/dL :                 5.563       -9.783       -6.176
+                                  -9.783        9.126        3.130
+                                  -6.176        3.130       -5.098

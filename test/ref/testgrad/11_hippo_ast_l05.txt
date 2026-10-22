@@ -26,7 +26,7 @@
  Polarization Topology                Single
  Main Lambda Value                     0.500
 
- Total Potential Energy :               -345.4356 Kcal/mole
+ Total Potential Energy :               -345.3762 Kcal/mole
 
  Potential Energy Breakdown by Individual Components :
 
@@ -39,7 +39,7 @@
             0.0000      0.0000      0.0000      0.0000      0.0000      0.0000
             0.0000      0.0000      0.0000      0.0000      0.0000      0.0000
             0.0000      0.0000      0.0000    490.5366   -188.2673      0.0000
-            0.0000      0.0000   -459.9571   -127.3666    -60.3812      0.0000
+            0.0000      0.0000   -459.9571   -127.3666    -60.3219      0.0000
             0.0000      0.0000      0.0000      0.0000
 
  Cartesian Gradient Breakdown over Individual Atoms :
@@ -48,24 +48,24 @@
 
  Anlyt         1            -2.7882     -0.9211     -7.1379        7.7182
  Numer         1            -2.7882     -0.9211     -7.1379        7.7182
- Anlyt         2            23.6493     -1.4936    -13.5942       27.3189
- Numer         2            23.6493     -1.4936    -13.5942       27.3189
+ Anlyt         2            23.7104     -1.4616    -13.6220       27.3839
+ Numer         2            23.7103     -1.4616    -13.6220       27.3838
  Anlyt         3            -5.0137      7.4502     12.4533       15.3535
  Numer         3            -5.0137      7.4502     12.4533       15.3535
  Anlyt         4             4.7378     -0.4743      5.2198        7.0652
  Numer         4             4.7378     -0.4743      5.2198        7.0652
- Anlyt         5            -1.6503     -1.1587     -0.5025        2.0781
- Numer         5            -1.6503     -1.1587     -0.5025        2.0781
- Anlyt         6            -1.2458      0.0803     -0.4876        1.3402
- Numer         6            -1.2458      0.0803     -0.4876        1.3402
- Anlyt         7            -2.8644      1.3794      5.8159        6.6281
- Numer         7            -2.8643      1.3794      5.8159        6.6281
- Anlyt         8             0.1240     -2.4810      3.2547        4.0943
- Numer         8             0.1240     -2.4810      3.2547        4.0943
- Anlyt         9            -7.4660      0.7393      0.4333        7.5150
- Numer         9            -7.4659      0.7393      0.4333        7.5150
- Anlyt        10             0.1837      1.7208      4.0613        4.4147
- Numer        10             0.1837      1.7208      4.0613        4.4147
+ Anlyt         5            -1.6915     -1.1794     -0.5537        2.1351
+ Numer         5            -1.6915     -1.1794     -0.5537        2.1351
+ Anlyt         6            -1.2633      0.0787     -0.4967        1.3597
+ Numer         6            -1.2633      0.0787     -0.4967        1.3597
+ Anlyt         7            -2.8905      1.3786      5.7716        6.6005
+ Numer         7            -2.8905      1.3787      5.7715        6.6005
+ Anlyt         8             0.1363     -2.4948      3.3208        4.1558
+ Numer         8             0.1363     -2.4948      3.3208        4.1558
+ Anlyt         9            -7.4499      0.7443      0.4808        7.5024
+ Numer         9            -7.4498      0.7443      0.4808        7.5024
+ Anlyt        10             0.1792      1.7205      4.0802        4.4318
+ Numer        10             0.1792      1.7205      4.0802        4.4318
  Anlyt        11             0.9944     -5.9787      6.1477        8.6330
  Numer        11             0.9944     -5.9787      6.1477        8.6330
  Anlyt        12            -3.6363      3.5192     10.6389       11.7811
@@ -349,8 +349,8 @@
 
  Total Gradient Norm and RMS Gradient per Atom :
 
- Anlyt      Total Gradient Norm Value              105.4968
- Numer      Total Gradient Norm Value              105.4968
+ Anlyt      Total Gradient Norm Value              105.5156
+ Numer      Total Gradient Norm Value              105.5155
 
- Anlyt      RMS Gradient over All Atoms              8.6138
- Numer      RMS Gradient over All Atoms              8.6138
+ Anlyt      RMS Gradient over All Atoms              8.6153
+ Numer      RMS Gradient over All Atoms              8.6153

@@ -13,12 +13,22 @@ c     ################################################################
 c
 c
 c     "echgtrn1" calculates the charge transfer energy and first
-c     derivatives with respect to Cartesian coordinates
+c     derivatives with respect to Cartesian coordinates, along with
+c     the lambda derivatives when polarization carries one
+c
+c     charge transfer is a pairwise sum that is linear in its lambda
+c     scale from "ctlmdasc", so the lambda derivatives are the unscaled
+c     pair energy, force and virial of the mutated pairs times the
+c     first or second derivative of that scale; they are added to the
+c     polarization lambda derivatives, which "gradient" zeroes before
+c     it calls the polarization routines and then this one
 c
 c
       subroutine echgtrn1
       use limits
+      use virial
       implicit none
+      integer i,j
 c
 c
 c     choose method for summing over charge transfer interactions
@@ -28,6 +38,14 @@ c
       else
          call echgtrn1a
       end if
+c
+c     add the charge transfer virial to main virial
+c
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + ectvir(j,i)
+         end do
+      end do
       return
       end
 c
@@ -39,8 +57,8 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "echgtrn1a" calculates the charge transfer interaction energy
-c     and first derivatives using a double loop
+c     "echgtrn1a" calculates the charge transfer interaction energy,
+c     first derivatives and lambda derivatives using a double loop
 c
 c
       subroutine echgtrn1a
@@ -52,6 +70,7 @@ c
       use couple
       use ctrpot
       use deriv
+      use dlmda
       use energi
       use group
       use mplpot
@@ -63,6 +82,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk
+      integer mutgi,mutgk
       integer jcell
       real*8 e,de,f,fgrp
       real*8 rr1,r,r2
@@ -79,19 +99,32 @@ c
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 taper,dtaper
+      real*8 dlfrcx,dlfrcy,dlfrcz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
+      real*8 scik,dscik
+      real*8 ctsc(0:2,0:2)
+      real*8 dctsc(0:2,0:2)
+      real*8 d2ctsc(0:2,0:2)
       real*8, allocatable :: mscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical live(0:2,0:2)
+      logical dodl,dod2
       character*6 mode
 c
 c
-c     zero out the charge transfer energy and first derivatives
+c     zero out the charge transfer energy, derivatives and virial
 c
       ect = 0.0d0
       do i = 1, n
          dect(1,i) = 0.0d0
          dect(2,i) = 0.0d0
          dect(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            ectvir(j,i) = 0.0d0
+         end do
       end do
       if (nct .eq. 0)  return
 c
@@ -111,6 +144,16 @@ c
       mode = 'CHGTRN'
       call switch (mode)
 c
+c     set the polarization lambda scale of each pair of atom groups,
+c     taking lambda derivatives whenever polarization has one, since
+c     "lmdachain" zeroes them while the polarization map is flat; a
+c     group pair is skipped once it carries neither energy nor a
+c     needed lambda derivative
+c
+      dodl = use_pdlmda
+      dod2 = (dodl .and. use_d2lmda)
+      call ctlmdasc (dodl,ctsc,dctsc,d2ctsc,live)
+c
 c     calculate the charge transfer energy and derivatives
 c
       do ii = 1, npole-1
@@ -122,7 +165,7 @@ c
          alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -143,10 +186,12 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            mutgk = mutg(k)
+            proceed = live(mutgk,mutgi)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = x(k) - xi
@@ -175,13 +220,6 @@ c
                   e = f * e * mscale(k)
                   de = f * de * mscale(k)
 c
-c     apply lambda scaling for interaction annihilation 
-c
-                  if (muti .or. mutk) then
-                     e = e * elambda
-                     de = de * elambda
-                  end if
-c
 c     use energy switching if near the cutoff distance
 c
                   if (r2 .gt. cut2) then
@@ -201,6 +239,45 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
+                  end if
+c
+c     increment the polarization lambda derivatives from the
+c     unscaled pair terms, then apply polarization lambda scaling
+c     for interaction annihilation
+c
+                  if (mutgi+mutgk .ne. 0) then
+                     scik = ctsc(mutgk,mutgi)
+                     dscik = dctsc(mutgk,mutgi)
+                     if (dodl)  depdl = depdl + dscik*e
+                     if (dod2) then
+                        d2epdl2 = d2epdl2 + d2ctsc(mutgk,mutgi)*e
+                        dlfrcx = dscik * de * xr * rr1
+                        dlfrcy = dscik * de * yr * rr1
+                        dlfrcz = dscik * de * zr * rr1
+                        dfpdl(1,i) = dfpdl(1,i) - dlfrcx
+                        dfpdl(2,i) = dfpdl(2,i) - dlfrcy
+                        dfpdl(3,i) = dfpdl(3,i) - dlfrcz
+                        dfpdl(1,k) = dfpdl(1,k) + dlfrcx
+                        dfpdl(2,k) = dfpdl(2,k) + dlfrcy
+                        dfpdl(3,k) = dfpdl(3,k) + dlfrcz
+                        dldvxx = xr * dlfrcx
+                        dldvxy = yr * dlfrcx
+                        dldvxz = zr * dlfrcx
+                        dldvyy = yr * dlfrcy
+                        dldvyz = zr * dlfrcy
+                        dldvzz = zr * dlfrcz
+                        depvirdl(1,1) = depvirdl(1,1) + dldvxx
+                        depvirdl(2,1) = depvirdl(2,1) + dldvxy
+                        depvirdl(3,1) = depvirdl(3,1) + dldvxz
+                        depvirdl(1,2) = depvirdl(1,2) + dldvxy
+                        depvirdl(2,2) = depvirdl(2,2) + dldvyy
+                        depvirdl(3,2) = depvirdl(3,2) + dldvyz
+                        depvirdl(1,3) = depvirdl(1,3) + dldvxz
+                        depvirdl(2,3) = depvirdl(2,3) + dldvyz
+                        depvirdl(3,3) = depvirdl(3,3) + dldvzz
+                     end if
+                     e = e * scik
+                     de = de * scik
                   end if
 c
 c     compute the force components for this interaction
@@ -227,15 +304,15 @@ c
                   vyy = yr * frcy
                   vyz = zr * frcy
                   vzz = zr * frcz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vxy
-                  vir(3,1) = vir(3,1) + vxz
-                  vir(1,2) = vir(1,2) + vxy
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vyz
-                  vir(1,3) = vir(1,3) + vxz
-                  vir(2,3) = vir(2,3) + vyz
-                  vir(3,3) = vir(3,3) + vzz
+                  ectvir(1,1) = ectvir(1,1) + vxx
+                  ectvir(2,1) = ectvir(2,1) + vxy
+                  ectvir(3,1) = ectvir(3,1) + vxz
+                  ectvir(1,2) = ectvir(1,2) + vxy
+                  ectvir(2,2) = ectvir(2,2) + vyy
+                  ectvir(3,2) = ectvir(3,2) + vyz
+                  ectvir(1,3) = ectvir(1,3) + vxz
+                  ectvir(2,3) = ectvir(2,3) + vyz
+                  ectvir(3,3) = ectvir(3,3) + vzz
                end if
             end if
          end do
@@ -272,7 +349,7 @@ c
             alphai = dmpct(i)
             if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             usei = use(i)
-            muti = (mutg(i) .ne. 0)
+            mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -293,10 +370,12 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               mutk = (mutg(k) .ne. 0)
-               proceed = .true.
-               if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-               if (.not. use_intra)  proceed = .true.
+               mutgk = mutg(k)
+               proceed = live(mutgk,mutgi)
+               if (proceed .and. use_group) then
+                  call groups (proceed,fgrp,i,k,0,0,0,0)
+                  if (.not. use_intra)  proceed = .true.
+               end if
                if (proceed)  proceed = (usei .or. use(k))
                if (proceed) then
                   do jcell = 2, ncell
@@ -323,22 +402,11 @@ c
                            e = -chgik * expik
                            de = -e * alphaik
                         end if
-                        if (use_group) then
-                           e = e * fgrp
-                           de = de * fgrp
-                        end if
                         e = f * e * mscale(k)
                         de = f * de * mscale(k)
                         if (i .eq. k) then
                            e = 0.5d0 * e
                            de = 0.5d0 * de
-                        end if
-c
-c     apply lambda scaling for interaction annihilation 
-c
-                        if (muti .or. mutk) then
-                           e = e * elambda
-                           de = de * elambda
                         end if
 c
 c     use energy switching if near the cutoff distance
@@ -360,6 +428,45 @@ c
                         if (use_group) then
                            e = e * fgrp
                            de = de * fgrp
+                        end if
+c
+c     increment the polarization lambda derivatives from the
+c     unscaled pair terms, then apply polarization lambda scaling
+c     for interaction annihilation
+c
+                        if (mutgi+mutgk .ne. 0) then
+                           scik = ctsc(mutgk,mutgi)
+                           dscik = dctsc(mutgk,mutgi)
+                           if (dodl)  depdl = depdl + dscik*e
+                           if (dod2) then
+                              d2epdl2 = d2epdl2 + d2ctsc(mutgk,mutgi)*e
+                              dlfrcx = dscik * de * xr * rr1
+                              dlfrcy = dscik * de * yr * rr1
+                              dlfrcz = dscik * de * zr * rr1
+                              dfpdl(1,i) = dfpdl(1,i) - dlfrcx
+                              dfpdl(2,i) = dfpdl(2,i) - dlfrcy
+                              dfpdl(3,i) = dfpdl(3,i) - dlfrcz
+                              dfpdl(1,k) = dfpdl(1,k) + dlfrcx
+                              dfpdl(2,k) = dfpdl(2,k) + dlfrcy
+                              dfpdl(3,k) = dfpdl(3,k) + dlfrcz
+                              dldvxx = xr * dlfrcx
+                              dldvxy = yr * dlfrcx
+                              dldvxz = zr * dlfrcx
+                              dldvyy = yr * dlfrcy
+                              dldvyz = zr * dlfrcy
+                              dldvzz = zr * dlfrcz
+                              depvirdl(1,1) = depvirdl(1,1) + dldvxx
+                              depvirdl(2,1) = depvirdl(2,1) + dldvxy
+                              depvirdl(3,1) = depvirdl(3,1) + dldvxz
+                              depvirdl(1,2) = depvirdl(1,2) + dldvxy
+                              depvirdl(2,2) = depvirdl(2,2) + dldvyy
+                              depvirdl(3,2) = depvirdl(3,2) + dldvyz
+                              depvirdl(1,3) = depvirdl(1,3) + dldvxz
+                              depvirdl(2,3) = depvirdl(2,3) + dldvyz
+                              depvirdl(3,3) = depvirdl(3,3) + dldvzz
+                           end if
+                           e = e * scik
+                           de = de * scik
                         end if
 c
 c     compute the force components for this interaction
@@ -386,15 +493,15 @@ c
                         vyy = yr * frcy
                         vyz = zr * frcy
                         vzz = zr * frcz
-                        vir(1,1) = vir(1,1) + vxx
-                        vir(2,1) = vir(2,1) + vxy
-                        vir(3,1) = vir(3,1) + vxz
-                        vir(1,2) = vir(1,2) + vxy
-                        vir(2,2) = vir(2,2) + vyy
-                        vir(3,2) = vir(3,2) + vyz
-                        vir(1,3) = vir(1,3) + vxz
-                        vir(2,3) = vir(2,3) + vyz
-                        vir(3,3) = vir(3,3) + vzz
+                        ectvir(1,1) = ectvir(1,1) + vxx
+                        ectvir(2,1) = ectvir(2,1) + vxy
+                        ectvir(3,1) = ectvir(3,1) + vxz
+                        ectvir(1,2) = ectvir(1,2) + vxy
+                        ectvir(2,2) = ectvir(2,2) + vyy
+                        ectvir(3,2) = ectvir(3,2) + vyz
+                        ectvir(1,3) = ectvir(1,3) + vxz
+                        ectvir(2,3) = ectvir(2,3) + vyz
+                        ectvir(3,3) = ectvir(3,3) + vzz
                      end if
                   end do
                end if
@@ -431,8 +538,8 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "echgtrn1b" calculates the charge transfer energy and first
-c     derivatives using a pairwise neighbor list
+c     "echgtrn1b" calculates the charge transfer energy, first
+c     derivatives and lambda derivatives using a pairwise neighbor list
 c
 c
       subroutine echgtrn1b
@@ -444,6 +551,7 @@ c
       use couple
       use ctrpot
       use deriv
+      use dlmda
       use energi
       use group
       use mplpot
@@ -456,6 +564,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
+      integer mutgi,mutgk
       real*8 e,de,f,fgrp
       real*8 rr1,r,r2
       real*8 r3,r4,r5
@@ -471,19 +580,32 @@ c
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 taper,dtaper
+      real*8 dlfrcx,dlfrcy,dlfrcz
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvxy,dldvxz,dldvyz
+      real*8 scik,dscik
+      real*8 ctsc(0:2,0:2)
+      real*8 dctsc(0:2,0:2)
+      real*8 d2ctsc(0:2,0:2)
       real*8, allocatable :: mscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical live(0:2,0:2)
+      logical dodl,dod2
       character*6 mode
 c
 c
-c     zero out the charge transfer energy and first derivatives
+c     zero out the charge transfer energy, derivatives and virial
 c
       ect = 0.0d0
       do i = 1, n
          dect(1,i) = 0.0d0
          dect(2,i) = 0.0d0
          dect(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            ectvir(j,i) = 0.0d0
+         end do
       end do
       if (nct .eq. 0)  return
 c
@@ -503,15 +625,27 @@ c
       mode = 'CHGTRN'
       call switch (mode)
 c
+c     set the polarization lambda scale of each pair of atom groups,
+c     taking lambda derivatives whenever polarization has one, since
+c     "lmdachain" zeroes them while the polarization map is flat; a
+c     group pair is skipped once it carries neither energy nor a
+c     needed lambda derivative
+c
+      dodl = use_pdlmda
+      dod2 = (dodl .and. use_d2lmda)
+      call ctlmdasc (dodl,ctsc,dctsc,d2ctsc,live)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,chgct,dmpct,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
 !$OMP& elst,use,use_group,use_intra,use_bounds,ctrntyp,f,off2,
-!$OMP& elambda,mutg,cut2,c0,c1,c2,c3,c4,c5)
-!$OMP& firstprivate(mscale) shared(ect,dect,vir)
-!$OMP DO reduction(+:ect,dect,vir)
+!$OMP& ctsc,dctsc,d2ctsc,live,dodl,dod2,mutg,cut2,c0,c1,c2,c3,
+!$OMP& c4,c5)
+!$OMP& firstprivate(mscale) shared(ect,dect,ectvir,depdl,d2epdl2,
+!$OMP& depvirdl,dfpdl)
+!$OMP DO reduction(+:ect,dect,ectvir,depdl,d2epdl2,depvirdl,dfpdl)
 c
 c     compute the charge transfer energy and derivatives
 c
@@ -524,7 +658,7 @@ c
          alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -545,10 +679,12 @@ c     evaluate all sites within the cutoff distance
 c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            mutgk = mutg(k)
+            proceed = live(mutgk,mutgi)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = x(k) - xi
@@ -577,13 +713,6 @@ c
                   e = f * e * mscale(k)
                   de = f * de * mscale(k)
 c
-c     apply lambda scaling for interaction annihilation 
-c
-                  if (muti .or. mutk) then
-                     e = e * elambda
-                     de = de * elambda
-                  end if
-c
 c     use energy switching if near the cutoff distance
 c
                   if (r2 .gt. cut2) then
@@ -603,6 +732,45 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
+                  end if
+c
+c     increment the polarization lambda derivatives from the
+c     unscaled pair terms, then apply polarization lambda scaling
+c     for interaction annihilation
+c
+                  if (mutgi+mutgk .ne. 0) then
+                     scik = ctsc(mutgk,mutgi)
+                     dscik = dctsc(mutgk,mutgi)
+                     if (dodl)  depdl = depdl + dscik*e
+                     if (dod2) then
+                        d2epdl2 = d2epdl2 + d2ctsc(mutgk,mutgi)*e
+                        dlfrcx = dscik * de * xr * rr1
+                        dlfrcy = dscik * de * yr * rr1
+                        dlfrcz = dscik * de * zr * rr1
+                        dfpdl(1,i) = dfpdl(1,i) - dlfrcx
+                        dfpdl(2,i) = dfpdl(2,i) - dlfrcy
+                        dfpdl(3,i) = dfpdl(3,i) - dlfrcz
+                        dfpdl(1,k) = dfpdl(1,k) + dlfrcx
+                        dfpdl(2,k) = dfpdl(2,k) + dlfrcy
+                        dfpdl(3,k) = dfpdl(3,k) + dlfrcz
+                        dldvxx = xr * dlfrcx
+                        dldvxy = yr * dlfrcx
+                        dldvxz = zr * dlfrcx
+                        dldvyy = yr * dlfrcy
+                        dldvyz = zr * dlfrcy
+                        dldvzz = zr * dlfrcz
+                        depvirdl(1,1) = depvirdl(1,1) + dldvxx
+                        depvirdl(2,1) = depvirdl(2,1) + dldvxy
+                        depvirdl(3,1) = depvirdl(3,1) + dldvxz
+                        depvirdl(1,2) = depvirdl(1,2) + dldvxy
+                        depvirdl(2,2) = depvirdl(2,2) + dldvyy
+                        depvirdl(3,2) = depvirdl(3,2) + dldvyz
+                        depvirdl(1,3) = depvirdl(1,3) + dldvxz
+                        depvirdl(2,3) = depvirdl(2,3) + dldvyz
+                        depvirdl(3,3) = depvirdl(3,3) + dldvzz
+                     end if
+                     e = e * scik
+                     de = de * scik
                   end if
 c
 c     compute the force components for this interaction
@@ -629,15 +797,15 @@ c
                   vyy = yr * frcy
                   vyz = zr * frcy
                   vzz = zr * frcz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vxy
-                  vir(3,1) = vir(3,1) + vxz
-                  vir(1,2) = vir(1,2) + vxy
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vyz
-                  vir(1,3) = vir(1,3) + vxz
-                  vir(2,3) = vir(2,3) + vyz
-                  vir(3,3) = vir(3,3) + vzz
+                  ectvir(1,1) = ectvir(1,1) + vxx
+                  ectvir(2,1) = ectvir(2,1) + vxy
+                  ectvir(3,1) = ectvir(3,1) + vxz
+                  ectvir(1,2) = ectvir(1,2) + vxy
+                  ectvir(2,2) = ectvir(2,2) + vyy
+                  ectvir(3,2) = ectvir(3,2) + vyz
+                  ectvir(1,3) = ectvir(1,3) + vxz
+                  ectvir(2,3) = ectvir(2,3) + vyz
+                  ectvir(3,3) = ectvir(3,3) + vzz
                end if
             end if
          end do

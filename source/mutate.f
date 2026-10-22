@@ -347,12 +347,14 @@ c
       use chgpen
       use dipole
       use dlmda
+      use expol
       use iounit
       use keys
       use mplpot
       use mpole
       use mutant
       use polar
+      use polpot
       use potent
       implicit none
       integer i,j,k
@@ -834,6 +836,8 @@ c
       if (allocated(pval0orig))  deallocate (pval0orig)
       if (allocated(polarityorig))  deallocate (polarityorig)
       if (allocated(douindorig))  deallocate (douindorig)
+      if (allocated(prepeporig))  deallocate (prepeporig)
+      if (allocated(dpscdl))  deallocate (dpscdl)
       allocate (pchgorig(n))
       allocate (pchg0orig(n))
       allocate (bdplorig(nbond))
@@ -843,6 +847,8 @@ c
       allocate (pval0orig(n))
       allocate (polarityorig(n))
       allocate (douindorig(n))
+      allocate (prepeporig(n))
+      allocate (dpscdl(3,3,n))
 c
 c     copy original parameters for lambda derivative calculations
 c
@@ -876,6 +882,7 @@ c
             k = ipole(i)
             polarityorig(k) = polarity(k)
             douindorig(k) = douind(k)
+            if (use_expol)  prepeporig(k) = prepep(k)
          end do
       end if
       return
@@ -1545,20 +1552,20 @@ c
 c
 c     single topology currently supports the scalar derivative for
 c     mutual polarization with Thole damping, as in AMOEBA and AMOEBA+,
-c     or charge penetration damping, as in HIPPO, in direct and Ewald
-c     modes
+c     or charge penetration damping, as in HIPPO, with or without
+c     exchange polarization, in direct and Ewald modes
 c
       if (use_pdlmda .and. use_prst) then
          if (poltyp.ne.'MUTUAL' .or. .not.(use_thole.or.use_chgpen)
-     &          .or. use_expol .or. use_solv) then
+     &          .or. use_solv) then
             write (iout,30)
    30       format (/,' MUTATE_CHECK  --  Single Topology',
      &                 ' Polarization dU/dLambda supports MUTUAL',
      &                 ' polarization with Thole or charge penetration',
      &                 ' damping only, in either direct or Ewald',
      &                 ' mode; use POLARIZATION MUTUAL without',
-     &                 ' exchange polarization or implicit solvent,',
-     &                 ' or add LAMBDA-DERIV2 or POL-DUALTOPO')
+     &                 ' implicit solvent, or add LAMBDA-DERIV2 or',
+     &                 ' POL-DUALTOPO')
             call fatal
          end if
       end if
@@ -1717,15 +1724,13 @@ c
          call fatal
       end if
 c
-c     the HIPPO repulsion, dispersion and charge transfer terms have
-c     no relative free energy treatment
+c     the HIPPO repulsion and dispersion terms have no relative free
+c     energy treatment
 c
-      if (use_rel .and. (use_repel .or. use_disp .or. use_chgtrn))
-     &       then
+      if (use_rel .and. (use_repel .or. use_disp)) then
          write (iout,112)
   112    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
-     &              ' Available for HIPPO Repulsion, Dispersion',
-     &              ' or Charge Transfer')
+     &              ' Available for HIPPO Repulsion or Dispersion')
          call fatal
       end if
 c
@@ -1738,15 +1743,13 @@ c
          call fatal
       end if
 c
-c     the HIPPO repulsion, dispersion and charge transfer terms are
-c     scaled by lambda but add nothing to the lambda derivative
+c     the HIPPO repulsion and dispersion terms are scaled by lambda
+c     but add nothing to the lambda derivative
 c
-      if (use_dlmda .and. (use_repel .or. use_disp .or. use_chgtrn))
-     &       then
+      if (use_dlmda .and. (use_repel .or. use_disp)) then
          write (iout,115)
   115    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
-     &              ' Available for HIPPO Repulsion, Dispersion',
-     &              ' or Charge Transfer')
+     &              ' Available for HIPPO Repulsion or Dispersion')
          call fatal
       end if
 c
@@ -1866,9 +1869,20 @@ c     the charge flux parameters stay unscaled, and "alterchg" scales
 c     the flux change in charge of each site by the same scale, so
 c     every charge is linear in the scale of its own group
 c
+c     the exchange polarization size "prepep" is scaled linearly with
+c     the polarizability, so each pairwise overlap carries the product
+c     of the two group scales and vanishes for an annihilated site
+c
 c     note charge transfer electrostatics is not treated by parameter
-c     scaling due to the functional form used, and must be done via
-c     modification of pairwise energy terms in the potential routines
+c     scaling due to the functional form used; instead the potential
+c     routines scale each pair by the product of the "grpscale" scales
+c     of its two groups at the polarization lambda, as the multipoles
+c     are, or under dual topology by the polarization weight between
+c     the pair scales of the two endpoint states, as given by
+c     "ctlmdasc"; the staged relative legs follow from the group
+c     scales, and the lambda derivative is added to that of the
+c     polarization term; pairs within the ligand are always
+c     annihilated, whatever the van der Waals coupling
 c
 c
       subroutine altelec
@@ -1877,10 +1891,12 @@ c
       use chgpen
       use dipole
       use dlmda
+      use expol
       use mplpot
       use mpole
       use mutant
       use polar
+      use polpot
       use potent
       implicit none
       integer i,j,k
@@ -1941,6 +1957,7 @@ c
             polarity(k) = polarityorig(k) * sc
             douind(k) = douindorig(k)
             if (sc .eq. 0.0d0)  douind(k) = .false.
+            if (use_expol)  prepep(k) = prepeporig(k) * sc
          end do
       end if
 c
@@ -2004,17 +2021,20 @@ c     "altpolr" constructs the polarization parameters of every site
 c     from their original values and the scale that "grpscale" gives
 c     the site's group at "plambda", so the charging ligand carries
 c     "plambda" and the other ligand of a staged relative leg is
-c     annihilated; charge flux is scaled as in "altelec"
+c     annihilated; charge flux and the exchange polarization size are
+c     scaled as in "altelec"
 c
 c
       subroutine altpolr
       use atoms
       use chgpen
       use dlmda
+      use expol
       use mplpot
       use mpole
       use mutant
       use polar
+      use polpot
       use potent
       implicit none
       integer i,j,k
@@ -2054,6 +2074,7 @@ c
             polarity(k) = polarityorig(k) * psc
             douind(k) = douindorig(k)
             if (psc .eq. 0.0d0)  douind(k) = .false.
+            if (use_expol)  prepep(k) = prepeporig(k) * psc
          end do
       end if
 c

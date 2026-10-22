@@ -196,6 +196,7 @@ c
 c     flag for use of lambda derivative
 c
       mutfield = .false.
+      mutpsc = .false.
       use_abf = .false.
       use_abfdyn = .false.
       use_d2lmda = .false.

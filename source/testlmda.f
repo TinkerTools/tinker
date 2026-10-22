@@ -253,7 +253,8 @@ c
             end do
          end if
 c
-c     compute the numerical lambda derivatives
+c     compute the numerical lambda derivatives, where charge transfer
+c     follows the polarization lambda and is counted with polarization
 c
          if (donumer .and. keylmda) then
             use_dlmda = .false.
@@ -268,18 +269,18 @@ c
             esum2 = energy ()
             ev2 = ev
             em2 = em
-            ep2 = ep
+            ep2 = ep + ect
             call settestlmda (use_mainlmda,lmda0-eps,oldvdl-eps,
      &                        oldeml-eps,oldepl-eps)
             esum0 = energy ()
             ev0 = ev
             em0 = em
-            ep0 = ep
+            ep0 = ep + ect
             call settestlmda (use_mainlmda,lmda0,oldvdl,oldeml,oldepl)
             esum1 = energy ()
             ev1 = ev
             em1 = em
-            ep1 = ep
+            ep1 = ep + ect
             ndedl = (esum2 - esum0) / (2.0d0 * eps)
             ndevdl = (ev2 - ev0) / (2.0d0 * eps)
             ndemdl = (em2 - em0) / (2.0d0 * eps)
@@ -296,13 +297,13 @@ c
                   ndfsumdl(j,i) = derivs(j,i)
                   ndfvdl(j,i) = dev(j,i)
                   ndfmdl(j,i) = dem(j,i)
-                  ndfpdl(j,i) = dep(j,i)
+                  ndfpdl(j,i) = dep(j,i) + dect(j,i)
                end do
             end do
             do i = 1, 3
                do j = 1, 3
                   ndvirdl(j,i) = vir(j,i)
-                  ndepvirdl(j,i) = epvir(j,i)
+                  ndepvirdl(j,i) = epvir(j,i) + ectvir(j,i)
                   ndemvirdl(j,i) = emvir(j,i)
                   ndevvirdl(j,i) = evvir(j,i)
                end do
@@ -316,15 +317,16 @@ c
      &                                                 / (2.0d0 * eps)
                   ndfvdl(j,i) = (ndfvdl(j,i)-dev(j,i)) / (2.0d0 * eps)
                   ndfmdl(j,i) = (ndfmdl(j,i)-dem(j,i)) / (2.0d0 * eps)
-                  ndfpdl(j,i) = (ndfpdl(j,i)-dep(j,i)) / (2.0d0 * eps)
+                  ndfpdl(j,i) = (ndfpdl(j,i)-dep(j,i)-dect(j,i))
+     &                                                 / (2.0d0 * eps)
                end do
             end do
             do i = 1, 3
                do j = 1, 3
                   ndvirdl(j,i) = (ndvirdl(j,i) - vir(j,i))
      &                         / (2.0d0 * eps)
-                  ndepvirdl(j,i) = (ndepvirdl(j,i)-epvir(j,i))
-     &                           / (2.0d0 * eps)
+                  ndepvirdl(j,i) = (ndepvirdl(j,i)-epvir(j,i)
+     &                              -ectvir(j,i)) / (2.0d0 * eps)
                   ndemvirdl(j,i) = (ndemvirdl(j,i)-emvir(j,i))
      &                           / (2.0d0 * eps)
                   ndevvirdl(j,i) = (ndevvirdl(j,i)-evvir(j,i))

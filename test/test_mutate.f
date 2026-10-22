@@ -61,6 +61,8 @@ c
       call test_mutate_cflux
       call test_mutate_cpol
       call test_mutate_crel
+      call test_mutate_ctscale
+      call test_mutate_ctrel
       return
       end
 c
@@ -2138,7 +2140,13 @@ c     charge flux: a HIPPO water pair under Ewald in single and dual
 c     topology, an AMOEBA+ ethanol in an alcohol tetramer without a
 c     cutoff in single topology, and a single AMOEBA+ water hydrogen
 c     whose flux bond reaches into the environment under Ewald in
-c     dual topology
+c     dual topology; fixture 212 puts the HIPPO water pair at different
+c     electrostatic and polarization lambdas without lambda
+c     derivatives, so "epolar1p" rescales the multipoles to the
+c     polarization lambda; fixture 213 adds charge transfer to 212,
+c     which follows the polarization lambda, and fixture 214 takes
+c     charge transfer alone under orthogonal space tempering with a
+c     squared dual topology weight
 c
 c
       subroutine test_mutate_cpol
@@ -2159,6 +2167,19 @@ c
       call test_mutate_calc ('apgas','208_apgas_pol_ewald_dt_l04.key',
      &   '208_apgas_pol_ewald_dt_l04.txt','208_apgas_pol_ewald_dt_l04',
      &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('hipwat',
+     &   '212_hipwat_pol_split_nold_l04.key',
+     &   '212_hipwat_pol_split_nold_l04.txt',
+     &   '212_hipwat_pol_split_nold_l04',
+     &   .true.,  .true.,  .false., .true.,  .false.)
+      call test_mutate_calc ('hipwat',
+     &   '213_hipwat_pol_ct_split_nold_l04.key',
+     &   '213_hipwat_pol_ct_split_nold_l04.txt',
+     &   '213_hipwat_pol_ct_split_nold_l04',
+     &   .true.,  .true.,  .false., .true.,  .false.)
+      call test_mutate_calc ('hipwat','214_hipwat_ct_dtexp_l04.key',
+     &   '214_hipwat_ct_dtexp_l04.txt','214_hipwat_ct_dtexp_l04',
+     &   .false., .false., .false., .false., .true.)
       return
       end
 c
@@ -2191,6 +2212,196 @@ c
      &   '211_aptetra_rel_lig2_l015.txt',
      &   '211_aptetra_rel_lig2_l015',
      &   .true.,  .true.,  .false., .false., .true.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_ctscale  --  CT group pair scales  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_ctscale" checks the charge transfer lambda scale;
+c     fixtures 215 to 217 mutate the whole AMOEBA+ water and ethanol
+c     gas dimer, so every pair lies within the ligand, and at a half
+c     polarization lambda single topology must give a quarter of the
+c     coupled charge transfer energy, from the product of the two
+c     group scales, while dual topology must give half of it, from the
+c     linear endpoint weight; fixtures 218 to 221 annihilate the
+c     ethanol of an AMOEBA+ alcohol tetramer, whose environment keeps
+c     its own charge transfer, and hold single and dual topology to
+c     one reference at each end of the main lambda, since the two
+c     paths differ only in between
+c
+c
+      subroutine test_mutate_ctscale
+      use energi
+      implicit none
+      real*8 energy
+      real*8 e,e1,e05
+      logical skiptest
+c
+c
+      if (.not. skiptest('test_mutate_ctscale','mutate')) then
+         call pushdir ('file/mutate')
+c
+c     the coupled energy of the dimer with every pair in the ligand
+c
+         call loadfix ('apgas','215_apgas_ct_all_st_p10.key')
+         e = energy ()
+         e1 = ect
+         call final
+c
+c     single topology scales a ligand pair by the square of lambda
+c
+         call loadfix ('apgas','216_apgas_ct_all_st_p05.key')
+         e = energy ()
+         e05 = ect
+         call final
+         call assert_real (e05,0.25d0*e1,1.0d-10,
+     &                     'ctscale single topology ligand pair')
+c
+c     dual topology scales a ligand pair by the endpoint weight
+c
+         call loadfix ('apgas','217_apgas_ct_all_dt_p05.key')
+         e = energy ()
+         e05 = ect
+         call final
+         call assert_real (e05,0.5d0*e1,1.0d-10,
+     &                     'ctscale dual topology ligand pair')
+         call popdir
+      end if
+c
+c     single and dual topology share both end states
+c
+      call test_mutate_calc ('aptetra','218_aptetra_ct_st_l00.key',
+     &   '218_aptetra_ct_st_l00.txt','218_aptetra_ct_st_l00',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra','219_aptetra_ct_dt_l00.key',
+     &   '218_aptetra_ct_st_l00.txt','219_aptetra_ct_dt_l00',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra','220_aptetra_ct_st_l10.key',
+     &   '220_aptetra_ct_st_l10.txt','220_aptetra_ct_st_l10',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra','221_aptetra_ct_dt_l10.key',
+     &   '220_aptetra_ct_st_l10.txt','221_aptetra_ct_dt_l10',
+     &   .false., .false., .false., .false., .false.)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_mutate_ctrel  --  CT on relative legs  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_mutate_ctrel" runs charge transfer alone on the staged
+c     relative legs of an AMOEBA+ alcohol tetramer, with a methanol
+c     as ligand 1 and an ethanol as ligand 2 in contact with it;
+c     fixture 222 is the ligand 1 leg in dual topology with its own
+c     reference, and fixtures 223 to 232 hold each end state of the
+c     schedule to an absolute fixture of the same physics, so main
+c     lambda 1.0 matches ligand 2 annihilated, 0.0 matches ligand 1
+c     annihilated, and the van der Waals leg and the four leg
+c     junctions, reached from either side, match both annihilated
+c
+c     inside the ligand 1 leg, ligand 2 must contribute nothing at all,
+c     so the charge transfer energy at main lambda 0.85, in single and
+c     dual topology, must equal that of the tetramer with the ethanol
+c     deleted, mutated as an absolute ligand at the same polarization
+c     lambda
+c
+c
+      subroutine test_mutate_ctrel
+      use energi
+      use mutant
+      implicit none
+      real*8 energy
+      real*8 e,erel,plmda
+      logical skiptest
+c
+c
+      if (.not. skiptest('test_mutate_ctrel','mutate')) then
+         call pushdir ('file/mutate')
+c
+c     the ligand 1 leg leaves ligand 2 out in single topology
+c
+         call loadfix ('aptetra','233_aptetra_ct_rel_lig1_st_l085.key')
+         e = energy ()
+         erel = ect
+         plmda = plambda
+         call final
+         call loadfix ('aptno2','234_aptno2_ct_abs1_st.key')
+         plambda = plmda
+         e = energy ()
+         call final
+         call assert_real (ect,erel,1.0d-10,
+     &                     'ctrel single topology without ligand 2')
+c
+c     the ligand 1 leg leaves ligand 2 out in dual topology
+c
+         call loadfix ('aptetra','222_aptetra_ct_rel_lig1_dt_l085.key')
+         e = energy ()
+         erel = ect
+         plmda = plambda
+         call final
+         call loadfix ('aptno2','235_aptno2_ct_abs1_dt.key')
+         plambda = plmda
+         e = energy ()
+         call final
+         call assert_real (ect,erel,1.0d-10,
+     &                     'ctrel dual topology without ligand 2')
+         call popdir
+      end if
+c
+c     the ligand 1 leg with lambda derivatives
+c
+      call test_mutate_calc ('aptetra',
+     &   '222_aptetra_ct_rel_lig1_dt_l085.key',
+     &   '222_aptetra_ct_rel_lig1_dt_l085.txt',
+     &   '222_aptetra_ct_rel_lig1_dt_l085',
+     &   .false., .false., .false., .false., .true.)
+c
+c     the end states of the schedule match absolute fixtures
+c
+      call test_mutate_calc ('aptetra','224_aptetra_ct_abs2_l00.key',
+     &   '224_aptetra_ct_abs2_l00.txt','224_aptetra_ct_abs2_l00',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra','223_aptetra_ct_rel_l100.key',
+     &   '224_aptetra_ct_abs2_l00.txt','223_aptetra_ct_rel_l100',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra','226_aptetra_ct_abs1_l00.key',
+     &   '226_aptetra_ct_abs1_l00.txt','226_aptetra_ct_abs1_l00',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra','225_aptetra_ct_rel_l000.key',
+     &   '226_aptetra_ct_abs1_l00.txt','225_aptetra_ct_rel_l000',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra','228_aptetra_ct_abs12_l00.key',
+     &   '228_aptetra_ct_abs12_l00.txt','228_aptetra_ct_abs12_l00',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra','227_aptetra_ct_rel_l050.key',
+     &   '228_aptetra_ct_abs12_l00.txt','227_aptetra_ct_rel_l050',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra',
+     &   '229_aptetra_ct_rel_lig2_l030.key',
+     &   '228_aptetra_ct_abs12_l00.txt','229_aptetra_ct_rel_lig2_l030',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra',
+     &   '230_aptetra_ct_rel_vdwm_l030.key',
+     &   '228_aptetra_ct_abs12_l00.txt','230_aptetra_ct_rel_vdwm_l030',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra',
+     &   '231_aptetra_ct_rel_vdwm_l070.key',
+     &   '228_aptetra_ct_abs12_l00.txt','231_aptetra_ct_rel_vdwm_l070',
+     &   .false., .false., .false., .false., .false.)
+      call test_mutate_calc ('aptetra',
+     &   '232_aptetra_ct_rel_lig1_l070.key',
+     &   '228_aptetra_ct_abs12_l00.txt','232_aptetra_ct_rel_lig1_l070',
+     &   .false., .false., .false., .false., .false.)
       return
       end
 c

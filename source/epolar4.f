@@ -83,16 +83,19 @@ c
       use atoms
       use chgpot
       use dlmda
+      use expol
       use extfld
       use limits
       use mpole
       use mutant
       use polar
+      use polpot
       implicit none
-      integer i,j,ii
+      integer i,j,m,ii
       real*8 plmda
-      real*8 fldd,fldp
       real*8 term
+      real*8 fldd(3),fldp(3)
+      real*8 pfldd,pfldp
       real*8, allocatable :: dfldd(:,:)
       real*8, allocatable :: dfldp(:,:)
       real*8, allocatable :: field0(:,:)
@@ -106,11 +109,14 @@ c
 c
 c     compute the polarization energy and gradient at plambda; the
 c     "gradient" routine only calls "epolar4" when polarization
-c     follows the main lambda
+c     follows the main lambda, and "alterpol" collects the exchange
+c     polarization overlap of the mutated partners along the way
 c
       plmda = plambda
       call altepset (same)
+      mutpsc = use_expol
       call epolar1calc
+      mutpsc = .false.
 c
 c     only the charging ligand carries a polarizability derivative
 c
@@ -175,17 +181,40 @@ c
          i = ipole(ii)
          do j = 1, 3
             term = term + uinp(j,i)*dfldd(j,i) + uind(j,i)*dfldp(j,i)
-            if (dsc(mutg(i)).ne.0.0d0 .and. douindorig(i)) then
-               if (atzero) then
-                  fldd = field0(j,i) + ufield(j,i)
-                  fldp = fieldp0(j,i) + ufieldp(j,i)
-               else
-                  fldd = udir(j,i)/polarity(i) + ufield(j,i)
-                  fldp = udirp(j,i)/polarity(i) + ufieldp(j,i)
-               end if
-               term = term + polarityorig(i)*fldd*fldp
-            end if
          end do
+         if (dsc(mutg(i)).ne.0.0d0 .and. douindorig(i)) then
+            do j = 1, 3
+               if (atzero) then
+                  fldd(j) = field0(j,i) + ufield(j,i)
+                  fldp(j) = fieldp0(j,i) + ufieldp(j,i)
+               else
+                  fldd(j) = udir(j,i)/polarity(i) + ufield(j,i)
+                  fldp(j) = udirp(j,i)/polarity(i) + ufieldp(j,i)
+               end if
+            end do
+            if (use_expol) then
+               do j = 1, 3
+                  pfldd = polinv(j,1,i)*fldd(1) + polinv(j,2,i)*fldd(2)
+     &                       + polinv(j,3,i)*fldd(3)
+                  pfldp = polinv(j,1,i)*fldp(1) + polinv(j,2,i)*fldp(2)
+     &                       + polinv(j,3,i)*fldp(3)
+                  term = term + polarityorig(i)*pfldd*pfldp
+               end do
+            else
+               do j = 1, 3
+                  term = term + polarityorig(i)*fldd(j)*fldp(j)
+               end do
+            end if
+         end if
+         if (use_expol .and. douindorig(i)
+     &          .and. polarityorig(i).ne.0.0d0) then
+            do j = 1, 3
+               do m = 1, 3
+                  term = term - uind(j,i)*dpscdl(j,m,i)*uinp(m,i)
+     &                             / polarityorig(i)
+               end do
+            end do
+         end if
       end do
       depdl = -0.5d0 * (electric/dielec) * term
 c

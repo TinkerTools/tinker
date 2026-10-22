@@ -62,6 +62,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk
+      integer mutgi,mutgk
       integer jcell
       real*8 e,f,fgrp
       real*8 r,r2,r3
@@ -74,9 +75,12 @@ c
       real*8 expi,expk
       real*8 expik
       real*8 taper
+      real*8 ctsc(0:2,0:2)
+      real*8 dctsc(0:2,0:2)
+      real*8 d2ctsc(0:2,0:2)
       real*8, allocatable :: mscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical live(0:2,0:2)
       character*6 mode
 c
 c
@@ -101,6 +105,11 @@ c
       mode = 'CHGTRN'
       call switch (mode)
 c
+c     set the polarization lambda scale of each pair of atom groups,
+c     where a group pair is skipped once it carries no energy
+c
+      call ctlmdasc (.false.,ctsc,dctsc,d2ctsc,live)
+c
 c     calculate the charge transfer energy term
 c
       do ii = 1, npole-1
@@ -112,7 +121,7 @@ c
          alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -133,10 +142,12 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, npole
             k = ipole(kk)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            mutgk = mutg(k)
+            proceed = live(mutgk,mutgi)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = x(k) - xi
@@ -160,10 +171,10 @@ c
                   end if
                   e = f * e * mscale(k)
 c
-c     apply lambda scaling for interaction annihilation 
+c     apply polarization lambda scaling for interaction annihilation
 c
-                  if (muti .or. mutk) then
-                     e = e * elambda
+                  if (mutgi+mutgk .ne. 0) then
+                     e = e * ctsc(mutgk,mutgi)
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -220,7 +231,7 @@ c
             alphai = dmpct(i)
             if (alphai .eq. 0.0d0)  alphai = 1000.0d0
             usei = use(i)
-            muti = (mutg(i) .ne. 0)
+            mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -241,10 +252,12 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, npole
                k = ipole(kk)
-               mutk = (mutg(k) .ne. 0)
-               proceed = .true.
-               if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-               if (.not. use_intra)  proceed = .true.
+               mutgk = mutg(k)
+               proceed = live(mutgk,mutgi)
+               if (proceed .and. use_group) then
+                  call groups (proceed,fgrp,i,k,0,0,0,0)
+                  if (.not. use_intra)  proceed = .true.
+               end if
                if (proceed)  proceed = (usei .or. use(k))
                if (proceed) then
                   do jcell = 2, ncell
@@ -269,10 +282,10 @@ c
                         end if
                         e = f * e * mscale(k)
 c
-c     apply lambda scaling for interaction annihilation 
+c     apply polarization lambda scaling for interaction annihilation
 c
-                        if (muti .or. mutk) then
-                           e = e * elambda
+                        if (mutgi+mutgk .ne. 0) then
+                           e = e * ctsc(mutgk,mutgi)
                         end if
 c
 c     use energy switching if near the cutoff distance
@@ -354,6 +367,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk
+      integer mutgi,mutgk
       integer kgy,kgz
       integer start,stop
       real*8 e,f,fgrp
@@ -367,13 +381,16 @@ c
       real*8 expi,expk
       real*8 expik
       real*8 taper
+      real*8 ctsc(0:2,0:2)
+      real*8 dctsc(0:2,0:2)
+      real*8 d2ctsc(0:2,0:2)
       real*8, allocatable :: mscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)
       logical proceed,usei
       logical unique,repeat
-      logical muti,mutk
+      logical live(0:2,0:2)
       character*6 mode
 c
 c
@@ -401,6 +418,11 @@ c
       mode = 'CHGTRN'
       call switch (mode)
 c
+c     set the polarization lambda scale of each pair of atom groups,
+c     where a group pair is skipped once it carries no energy
+c
+      call ctlmdasc (.false.,ctsc,dctsc,d2ctsc,live)
+c
 c     transfer the interaction site coordinates to sorting arrays
 c
       do ii = 1, npole
@@ -426,7 +448,7 @@ c
          alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -470,13 +492,15 @@ c
                if (kgz.lt.kbz(ii) .and. kgz.gt.kez(ii))  goto 20
             end if
             k = ipole(kk-((kk-1)/npole)*npole)
-            mutk = (mutg(k) .ne. 0)
+            mutgk = mutg(k)
 c
 c     decide whether to compute the current interaction
 c
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            proceed = live(mutgk,mutgi)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = x(k) - xi
@@ -512,10 +536,10 @@ c
                   end if
                   e = f * e * mscale(k)
 c
-c     apply lambda scaling for interaction annihilation 
+c     apply polarization lambda scaling for interaction annihilation
 c
-                  if (muti .or. mutk) then
-                     e = e * elambda
+                  if (mutgi+mutgk .ne. 0) then
+                     e = e * ctsc(mutgk,mutgi)
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -602,6 +626,7 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
+      integer mutgi,mutgk
       real*8 e,f,fgrp
       real*8 r,r2,r3
       real*8 r4,r5
@@ -613,9 +638,12 @@ c
       real*8 expi,expk
       real*8 expik
       real*8 taper
+      real*8 ctsc(0:2,0:2)
+      real*8 dctsc(0:2,0:2)
+      real*8 d2ctsc(0:2,0:2)
       real*8, allocatable :: mscale(:)
       logical proceed,usei
-      logical muti,mutk
+      logical live(0:2,0:2)
       character*6 mode
 c
 c     zero out the charge transfer energy
@@ -639,13 +667,18 @@ c
       mode = 'CHGTRN'
       call switch (mode)
 c
+c     set the polarization lambda scale of each pair of atom groups,
+c     where a group pair is skipped once it carries no energy
+c
+      call ctlmdasc (.false.,ctsc,dctsc,d2ctsc,live)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,chgct,dmpct,n12,i12,n13,i13,
 !$OMP& n14,i14,n15,i15,m2scale,m3scale,m4scale,m5scale,nelst,
 !$OMP& elst,use,use_group,use_intra,use_bounds,ctrntyp,f,cut2,
-!$OMP& off2,elambda,mutg,c0,c1,c2,c3,c4,c5)
+!$OMP& off2,ctsc,live,mutg,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(mscale) shared(ect)
 !$OMP DO reduction(+:ect)
 c
@@ -660,7 +693,7 @@ c
          alphai = dmpct(i)
          if (alphai .eq. 0.0d0)  alphai = 1000.0d0
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -681,10 +714,12 @@ c     evaluate all sites within the cutoff distance
 c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            mutgk = mutg(k)
+            proceed = live(mutgk,mutgi)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = x(k) - xi
@@ -708,10 +743,10 @@ c
                   end if
                   e = f * e * mscale(k)
 c
-c     apply lambda scaling for interaction annihilation 
+c     apply polarization lambda scaling for interaction annihilation
 c
-                  if (muti .or. mutk) then
-                     e = e * elambda
+                  if (mutgi+mutgk .ne. 0) then
+                     e = e * ctsc(mutgk,mutgi)
                   end if
 c
 c     use energy switching if near the cutoff distance
