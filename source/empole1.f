@@ -98,9 +98,6 @@ c
       real*8 e,de,f,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 xix,yix,zix
-      real*8 xiy,yiy,ziy
-      real*8 xiz,yiz,ziz
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9,rr11
       real*8 rr1i,rr3i,rr5i,rr7i
@@ -970,39 +967,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = abs(yaxis(i))
-         if (iz .eq. 0)  iz = i
-         if (ix .eq. 0)  ix = i
-         if (iy .eq. 0)  iy = i
-         xiz = x(iz) - x(i)
-         yiz = y(iz) - y(i)
-         ziz = z(iz) - z(i)
-         xix = x(ix) - x(i)
-         yix = y(ix) - y(i)
-         zix = z(ix) - z(i)
-         xiy = x(iy) - x(i)
-         yiy = y(iy) - y(i)
-         ziy = z(iy) - z(i)
-         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
-         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
-         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         emvir(1,1) = emvir(1,1) + vxx
-         emvir(2,1) = emvir(2,1) + vxy
-         emvir(3,1) = emvir(3,1) + vxz
-         emvir(1,2) = emvir(1,2) + vxy
-         emvir(2,2) = emvir(2,2) + vyy
-         emvir(3,2) = emvir(3,2) + vyz
-         emvir(1,3) = emvir(1,3) + vxz
-         emvir(2,3) = emvir(2,3) + vyz
-         emvir(3,3) = emvir(3,3) + vzz
+         call torqvir (i,fix,fiy,fiz,emvir)
       end do
 c
 c     modify the gradient and virial for charge flux
@@ -1054,9 +1019,6 @@ c
       real*8 e,de,f,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 xix,yix,zix
-      real*8 xiy,yiy,ziy
-      real*8 xiz,yiz,ziz
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9,rr11
       real*8 rr1i,rr3i,rr5i,rr7i
@@ -1553,39 +1515,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = abs(yaxis(i))
-         if (iz .eq. 0)  iz = i
-         if (ix .eq. 0)  ix = i
-         if (iy .eq. 0)  iy = i
-         xiz = x(iz) - x(i)
-         yiz = y(iz) - y(i)
-         ziz = z(iz) - z(i)
-         xix = x(ix) - x(i)
-         yix = y(ix) - y(i)
-         zix = z(ix) - z(i)
-         xiy = x(iy) - x(i)
-         yiy = y(iy) - y(i)
-         ziy = z(iy) - z(i)
-         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
-         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
-         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         emvir(1,1) = emvir(1,1) + vxx
-         emvir(2,1) = emvir(2,1) + vxy
-         emvir(3,1) = emvir(3,1) + vxz
-         emvir(1,2) = emvir(1,2) + vxy
-         emvir(2,2) = emvir(2,2) + vyy
-         emvir(3,2) = emvir(3,2) + vyz
-         emvir(1,3) = emvir(1,3) + vxz
-         emvir(2,3) = emvir(2,3) + vyz
-         emvir(3,3) = emvir(3,3) + vzz
+         call torqvir (i,fix,fiy,fiz,emvir)
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1861,14 +1791,10 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,jcell
-      integer ix,iy,iz
       real*8 e,de,f
       real*8 scalek
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 xix,yix,zix
-      real*8 xiy,yiy,ziy
-      real*8 xiz,yiz,ziz
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9,rr11
       real*8 rr1i,rr3i,rr5i,rr7i
@@ -2684,39 +2610,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = abs(yaxis(i))
-         if (iz .eq. 0)  iz = i
-         if (ix .eq. 0)  ix = i
-         if (iy .eq. 0)  iy = i
-         xiz = x(iz) - x(i)
-         yiz = y(iz) - y(i)
-         ziz = z(iz) - z(i)
-         xix = x(ix) - x(i)
-         yix = y(ix) - y(i)
-         zix = z(ix) - z(i)
-         xiy = x(iy) - x(i)
-         yiy = y(iy) - y(i)
-         ziy = z(iy) - z(i)
-         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
-         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
-         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         emvir(1,1) = emvir(1,1) + vxx
-         emvir(2,1) = emvir(2,1) + vxy
-         emvir(3,1) = emvir(3,1) + vxz
-         emvir(1,2) = emvir(1,2) + vxy
-         emvir(2,2) = emvir(2,2) + vyy
-         emvir(3,2) = emvir(3,2) + vyz
-         emvir(1,3) = emvir(1,3) + vxz
-         emvir(2,3) = emvir(2,3) + vyz
-         emvir(3,3) = emvir(3,3) + vzz
+         call torqvir (i,fix,fiy,fiz,emvir)
       end do
 c
 c     modify the gradient and virial for charge flux
@@ -2987,14 +2881,10 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      integer ix,iy,iz
       real*8 e,de,f
       real*8 scalek
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 xix,yix,zix
-      real*8 xiy,yiy,ziy
-      real*8 xiz,yiz,ziz
       real*8 r,r2,rr1,rr3
       real*8 rr5,rr7,rr9,rr11
       real*8 rr1i,rr3i,rr5i,rr7i
@@ -3450,39 +3340,7 @@ c
       do ii = 1, npole
          i = ipole(ii)
          call torque (i,tem(1,i),fix,fiy,fiz,dem)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = abs(yaxis(i))
-         if (iz .eq. 0)  iz = i
-         if (ix .eq. 0)  ix = i
-         if (iy .eq. 0)  iy = i
-         xiz = x(iz) - x(i)
-         yiz = y(iz) - y(i)
-         ziz = z(iz) - z(i)
-         xix = x(ix) - x(i)
-         yix = y(ix) - y(i)
-         zix = z(ix) - z(i)
-         xiy = x(iy) - x(i)
-         yiy = y(iy) - y(i)
-         ziy = z(iy) - z(i)
-         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
-         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
-         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         emvir(1,1) = emvir(1,1) + vxx
-         emvir(2,1) = emvir(2,1) + vxy
-         emvir(3,1) = emvir(3,1) + vxz
-         emvir(1,2) = emvir(1,2) + vxy
-         emvir(2,2) = emvir(2,2) + vyy
-         emvir(3,2) = emvir(3,2) + vyz
-         emvir(1,3) = emvir(1,3) + vxz
-         emvir(2,3) = emvir(2,3) + vyz
-         emvir(3,3) = emvir(3,3) + vzz
+         call torqvir (i,fix,fiy,fiz,emvir)
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -3547,7 +3405,6 @@ c
       integer i,j,k,ii
       integer k1,k2,k3
       integer m1,m2,m3
-      integer ix,iy,iz
       integer ntot,nff
       integer nf1,nf2,nf3
       integer deriv1(10)
@@ -3557,9 +3414,6 @@ c
       real*8 r1,r2,r3
       real*8 h1,h2,h3
       real*8 f1,f2,f3
-      real*8 xix,yix,zix
-      real*8 xiy,yiy,ziy
-      real*8 xiz,yiz,ziz
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
       real*8 volterm,denom
@@ -3800,30 +3654,7 @@ c
      &               + cmp(8,i)*cphi(5,i) + cmp(10,i)*cphi(9,i)
      &               - cmp(8,i)*cphi(6,i) - cmp(9,i)*cphi(10,i)
          call torque (i,tem,fix,fiy,fiz,dem)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = abs(yaxis(i))
-         if (iz .eq. 0)  iz = ii
-         if (ix .eq. 0)  ix = ii
-         if (iy .eq. 0)  iy = ii
-         xiz = x(iz) - x(i)
-         yiz = y(iz) - y(i)
-         ziz = z(iz) - z(i)
-         xix = x(ix) - x(i)
-         yix = y(ix) - y(i)
-         zix = z(ix) - z(i)
-         xiy = x(iy) - x(i)
-         yiy = y(iy) - y(i)
-         ziy = z(iy) - z(i)
-         vxx = vxx + xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = vxy + 0.5d0*(yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                        + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = vxz + 0.5d0*(zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                        + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
-         vyy = vyy + yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = vyz + 0.5d0*(zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                        + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
-         vzz = vzz + zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
+         call torqvir (i,fix,fiy,fiz,emvir)
       end do
 c
 c     perform dynamic allocation of some local arrays

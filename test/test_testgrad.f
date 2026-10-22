@@ -28,6 +28,10 @@ c     case 17 weights HIPPO water charge transfer by atom group in
 c     a box small enough for its cutoff to reach replicate cells, so
 c     the replicate loop must apply the group weight only once
 c
+c     case 18 decouples a HIPPO DMSO from its liquid through Pauli
+c     repulsion alone, with a non-integer REPEL-SOFTCORE exponent and
+c     shift shape, by neighbor list
+c
 c
       subroutine test_testgrad
       implicit none
@@ -51,6 +55,7 @@ c
      &                         'hipwat')
       call test_testgrad_case ('16_hippo_dewald_dec_l05','dmso')
       call test_testgrad_case ('17_hipwat_group_ct_replica','hipwat')
+      call test_testgrad_case ('18_hippo_rep_sc_real_l04','dmso')
       return
       end
 c

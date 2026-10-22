@@ -13,7 +13,9 @@ c     ###############################################################
 c
 c
 c     "erepel1" calculates the Pauli repulsion energy and first
-c     derivatives with respect to Cartesian coordinates
+c     derivatives with respect to Cartesian coordinates, and lambda
+c     derivatives of the soft core scaling of mutated pairs while
+c     the van der Waals lambda map has slope or curvature
 c
 c     literature reference:
 c
@@ -24,7 +26,9 @@ c
 c
       subroutine erepel1
       use limits
+      use virial
       implicit none
+      integer i,j
 c
 c
 c     choose the method for summing over pairwise interactions
@@ -34,6 +38,14 @@ c
       else
          call erepel1a
       end if
+c
+c     add the Pauli repulsion virial to main virial
+c
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + ervir(j,i)
+         end do
+      end do
       return
       end
 c
@@ -45,9 +57,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "erepel1a" calculates the Pauli repulsion energy and first
-c     derivatives with respect to Cartesian coordinates using a
-c     pairwise double loop
+c     "erepel1a" calculates the Pauli repulsion energy, first
+c     derivatives with respect to Cartesian coordinates and lambda
+c     derivatives using a pairwise double loop
 c
 c
       subroutine erepel1a
@@ -56,6 +68,7 @@ c
       use cell
       use couple
       use deriv
+      use dlmda
       use energi
       use group
       use mpole
@@ -68,14 +81,10 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,jcell
-      integer ix,iy,iz
       real*8 e,fgrp
       real*8 eterm,de
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 xix,yix,zix
-      real*8 xiy,yiy,ziy
-      real*8 xiz,yiz,ziz
       real*8 r,r2,r3,r4,r5
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9,rr11
@@ -106,13 +115,22 @@ c
       real*8 dqikx,dqiky,dqikz
       real*8 term1,term2,term3
       real*8 term4,term5,term6
-      real*8 vlambda3,vlambda4
-      real*8 vlambda5
+      real*8 rlsc,rshf
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
       real*8 frcx,frcy,frcz
-      real*8 term,soft,dsoft
+      real*8 soft,dsoft
+      real*8 dsdl,d2sdl2,d2sdldr
+      real*8 dle,dle2
+      real*8 dldsoft,dldtaper
+      real*8 rlsc1,rlsc2
+      real*8 rshf1,rshf2
+      real*8 dlfrcx,dlfrcy,dlfrcz
+      real*8 dlvxx,dlvyy,dlvzz
+      real*8 dlvxy,dlvxz,dlvyz
+      real*8 dlttri(3),dlttrk(3)
+      real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 taper,dtaper
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -121,8 +139,10 @@ c
       real*8 dmpik(11)
       real*8, allocatable :: rscale(:)
       real*8, allocatable :: ter(:,:)
+      real*8, allocatable :: dlter(:,:)
       logical proceed,usei
       logical muti,mutk,mutik
+      logical dodl,dod2,mutdl,mutd2
       character*6 mode
 c
 c
@@ -133,6 +153,11 @@ c
          der(1,i) = 0.0d0
          der(2,i) = 0.0d0
          der(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            ervir(j,i) = 0.0d0
+         end do
       end do
       if (nrep .eq. 0)  return
 c
@@ -148,6 +173,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (rscale(n))
       allocate (ter(3,n))
+      allocate (dlter(3,n))
 c
 c     initialize connected atom scaling and torque arrays
 c
@@ -155,15 +181,23 @@ c
          rscale(i) = 1.0d0
          do j = 1, 3
             ter(j,i) = 0.0d0
+            dlter(j,i) = 0.0d0
          end do
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set lambda scaling values for mutated interactions, along with
+c     their lambda derivative factors while the van der Waals lambda
+c     map has slope or curvature, as in the "gradient" routine
 c
+      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
+     &          .or. d2vldlmda2.ne.0.0d0)
+      dod2 = (dodl .and. use_d2lmda)
       if (nmut .ne. 0) then
-         vlambda3 = vlambda**3
-         vlambda4 = vlambda3 * vlambda
-         vlambda5 = vlambda4 * vlambda
+         if (dodl) then
+            call repsc4 (rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2)
+         else
+            call repsc (rlsc,rshf)
+         end if
       end if
 c
 c     set cutoff distances and switching coefficients
@@ -428,13 +462,31 @@ c
                         mutik = .true.
                      end if
                   end if
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
 c
-c     get energy and force via soft core lambda scaling
+c     get energy and force via soft core lambda scaling, along with
+c     their lambda derivatives from the unscaled pair terms
 c
+                  if (mutdl) then
+                     call erepsc4 (r,rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2,
+     &                             soft,dsoft,dsdl,d2sdl2,d2sdldr)
+                     dle = dsdl * e
+                     if (mutd2) then
+                        dle2 = d2sdl2 * e
+                        dldsoft = d2sdldr * rr1 * e
+                        dlfrcx = frcx*dsdl - dldsoft*xr
+                        dlfrcy = frcy*dsdl - dldsoft*yr
+                        dlfrcz = frcz*dsdl - dldsoft*zr
+                        do j = 1, 3
+                           dlttri(j) = ttri(j) * dsdl
+                           dlttrk(j) = ttrk(j) * dsdl
+                        end do
+                     end if
+                  else if (mutik) then
+                     call erepsc (r,rlsc,rshf,soft,dsoft)
+                  end if
                   if (mutik) then
-                     term = vlambda3 - vlambda4 + r2
-                     soft = vlambda5 * r / sqrt(term)
-                     dsoft = soft * (rr1-r/term)
                      dsoft = dsoft * rr1 * e
                      frcx = frcx*soft - dsoft*xr
                      frcy = frcy*soft - dsoft*yr
@@ -456,6 +508,18 @@ c
      &                          + c2*r2 + c1*r + c0
                      dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
      &                           + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                     if (mutd2) then
+                        dldtaper = dtaper * dle * rr1
+                        dlfrcx = dlfrcx*taper - dldtaper*xr
+                        dlfrcy = dlfrcy*taper - dldtaper*yr
+                        dlfrcz = dlfrcz*taper - dldtaper*zr
+                        do j = 1, 3
+                           dlttri(j) = dlttri(j) * taper
+                           dlttrk(j) = dlttrk(j) * taper
+                        end do
+                        dle2 = dle2 * taper
+                     end if
+                     if (mutdl)  dle = dle * taper
                      dtaper = dtaper * e * rr1
                      e = e * taper
                      frcx = frcx*taper - dtaper*xr
@@ -497,15 +561,48 @@ c
                   vyy = -yr * frcy
                   vyz = -0.5d0 * (zr*frcy+yr*frcz)
                   vzz = -zr * frcz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vxy
-                  vir(3,1) = vir(3,1) + vxz
-                  vir(1,2) = vir(1,2) + vxy
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vyz
-                  vir(1,3) = vir(1,3) + vxz
-                  vir(2,3) = vir(2,3) + vyz
-                  vir(3,3) = vir(3,3) + vzz
+                  ervir(1,1) = ervir(1,1) + vxx
+                  ervir(2,1) = ervir(2,1) + vxy
+                  ervir(3,1) = ervir(3,1) + vxz
+                  ervir(1,2) = ervir(1,2) + vxy
+                  ervir(2,2) = ervir(2,2) + vyy
+                  ervir(3,2) = ervir(3,2) + vyz
+                  ervir(1,3) = ervir(1,3) + vxz
+                  ervir(2,3) = ervir(2,3) + vyz
+                  ervir(3,3) = ervir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient,
+c     torque and virial for a mutated pair
+c
+                  if (mutdl)  devdl = devdl + dle
+                  if (mutd2) then
+                     d2evdl2 = d2evdl2 + dle2
+                     dfvdl(1,i) = dfvdl(1,i) + dlfrcx
+                     dfvdl(2,i) = dfvdl(2,i) + dlfrcy
+                     dfvdl(3,i) = dfvdl(3,i) + dlfrcz
+                     dfvdl(1,k) = dfvdl(1,k) - dlfrcx
+                     dfvdl(2,k) = dfvdl(2,k) - dlfrcy
+                     dfvdl(3,k) = dfvdl(3,k) - dlfrcz
+                     do j = 1, 3
+                        dlter(j,i) = dlter(j,i) + dlttri(j)
+                        dlter(j,k) = dlter(j,k) + dlttrk(j)
+                     end do
+                     dlvxx = -xr * dlfrcx
+                     dlvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                     dlvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                     dlvyy = -yr * dlfrcy
+                     dlvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                     dlvzz = -zr * dlfrcz
+                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dlvxy
+                     devvirdl(3,1) = devvirdl(3,1) + dlvxz
+                     devvirdl(1,2) = devvirdl(1,2) + dlvxy
+                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dlvyz
+                     devvirdl(1,3) = devvirdl(1,3) + dlvxz
+                     devvirdl(2,3) = devvirdl(2,3) + dlvyz
+                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                  end if
                end if
             end if
          end do
@@ -789,13 +886,32 @@ c
                               mutik = .true.
                            end if
                         end if
+                        mutdl = mutik .and. dodl
+                        mutd2 = mutik .and. dod2
 c
-c     get energy and force via soft core lambda scaling
+c     get energy and force via soft core lambda scaling, along with
+c     their lambda derivatives from the unscaled pair terms
 c
+                        if (mutdl) then
+                           call erepsc4 (r,rlsc,rshf,rlsc1,rlsc2,rshf1,
+     &                                   rshf2,soft,dsoft,dsdl,d2sdl2,
+     &                                   d2sdldr)
+                           dle = dsdl * e
+                           if (mutd2) then
+                              dle2 = d2sdl2 * e
+                              dldsoft = d2sdldr * rr1 * e
+                              dlfrcx = frcx*dsdl - dldsoft*xr
+                              dlfrcy = frcy*dsdl - dldsoft*yr
+                              dlfrcz = frcz*dsdl - dldsoft*zr
+                              do j = 1, 3
+                                 dlttri(j) = ttri(j) * dsdl
+                                 dlttrk(j) = ttrk(j) * dsdl
+                              end do
+                           end if
+                        else if (mutik) then
+                           call erepsc (r,rlsc,rshf,soft,dsoft)
+                        end if
                         if (mutik) then
-                           term = vlambda3 - vlambda4 + r2
-                           soft = vlambda5 * r / sqrt(term)
-                           dsoft = soft * (rr1-r/term)
                            dsoft = dsoft * rr1 * e
                            frcx = frcx*soft - dsoft*xr
                            frcy = frcy*soft - dsoft*yr
@@ -817,6 +933,18 @@ c
      &                                + c2*r2 + c1*r + c0
                            dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
      &                                 + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                           if (mutd2) then
+                              dldtaper = dtaper * dle * rr1
+                              dlfrcx = dlfrcx*taper - dldtaper*xr
+                              dlfrcy = dlfrcy*taper - dldtaper*yr
+                              dlfrcz = dlfrcz*taper - dldtaper*zr
+                              do j = 1, 3
+                                 dlttri(j) = dlttri(j) * taper
+                                 dlttrk(j) = dlttrk(j) * taper
+                              end do
+                              dle2 = dle2 * taper
+                           end if
+                           if (mutdl)  dle = dle * taper
                            dtaper = dtaper * e * rr1
                            e = e * taper
                            frcx = frcx*taper - dtaper*xr
@@ -839,6 +967,17 @@ c
                               ttri(j) = 0.5d0 * ttri(j)
                               ttrk(j) = 0.5d0 * ttrk(j)
                            end do
+                           if (mutdl)  dle = 0.5d0 * dle
+                           if (mutd2) then
+                              dle2 = 0.5d0 * dle2
+                              dlfrcx = 0.5d0 * dlfrcx
+                              dlfrcy = 0.5d0 * dlfrcy
+                              dlfrcz = 0.5d0 * dlfrcz
+                              do j = 1, 3
+                                 dlttri(j) = 0.5d0 * dlttri(j)
+                                 dlttrk(j) = 0.5d0 * dlttrk(j)
+                              end do
+                           end if
                         end if
                         er = er + e
 c
@@ -868,15 +1007,48 @@ c
                         vyy = -yr * frcy
                         vyz = -0.5d0 * (zr*frcy+yr*frcz)
                         vzz = -zr * frcz
-                        vir(1,1) = vir(1,1) + vxx
-                        vir(2,1) = vir(2,1) + vxy
-                        vir(3,1) = vir(3,1) + vxz
-                        vir(1,2) = vir(1,2) + vxy
-                        vir(2,2) = vir(2,2) + vyy
-                        vir(3,2) = vir(3,2) + vyz
-                        vir(1,3) = vir(1,3) + vxz
-                        vir(2,3) = vir(2,3) + vyz
-                        vir(3,3) = vir(3,3) + vzz
+                        ervir(1,1) = ervir(1,1) + vxx
+                        ervir(2,1) = ervir(2,1) + vxy
+                        ervir(3,1) = ervir(3,1) + vxz
+                        ervir(1,2) = ervir(1,2) + vxy
+                        ervir(2,2) = ervir(2,2) + vyy
+                        ervir(3,2) = ervir(3,2) + vyz
+                        ervir(1,3) = ervir(1,3) + vxz
+                        ervir(2,3) = ervir(2,3) + vyz
+                        ervir(3,3) = ervir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient,
+c     torque and virial for a mutated pair
+c
+                        if (mutdl)  devdl = devdl + dle
+                        if (mutd2) then
+                           d2evdl2 = d2evdl2 + dle2
+                           dfvdl(1,i) = dfvdl(1,i) + dlfrcx
+                           dfvdl(2,i) = dfvdl(2,i) + dlfrcy
+                           dfvdl(3,i) = dfvdl(3,i) + dlfrcz
+                           dfvdl(1,k) = dfvdl(1,k) - dlfrcx
+                           dfvdl(2,k) = dfvdl(2,k) - dlfrcy
+                           dfvdl(3,k) = dfvdl(3,k) - dlfrcz
+                           do j = 1, 3
+                              dlter(j,i) = dlter(j,i) + dlttri(j)
+                              dlter(j,k) = dlter(j,k) + dlttrk(j)
+                           end do
+                           dlvxx = -xr * dlfrcx
+                           dlvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                           dlvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                           dlvyy = -yr * dlfrcy
+                           dlvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                           dlvzz = -zr * dlfrcz
+                           devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                           devvirdl(2,1) = devvirdl(2,1) + dlvxy
+                           devvirdl(3,1) = devvirdl(3,1) + dlvxz
+                           devvirdl(1,2) = devvirdl(1,2) + dlvxy
+                           devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                           devvirdl(3,2) = devvirdl(3,2) + dlvyz
+                           devvirdl(1,3) = devvirdl(1,3) + dlvxz
+                           devvirdl(2,3) = devvirdl(2,3) + dlvyz
+                           devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                        end if
                      end if
                   end do
                end if
@@ -904,45 +1076,18 @@ c
       do ii = 1, nrep
          i = irep(ii)
          call torque (i,ter(1,i),fix,fiy,fiz,der)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = abs(yaxis(i))
-         if (iz .eq. 0)  iz = i
-         if (ix .eq. 0)  ix = i
-         if (iy .eq. 0)  iy = i
-         xiz = x(iz) - x(i)
-         yiz = y(iz) - y(i)
-         ziz = z(iz) - z(i)
-         xix = x(ix) - x(i)
-         yix = y(ix) - y(i)
-         zix = z(ix) - z(i)
-         xiy = x(iy) - x(i)
-         yiy = y(iy) - y(i)
-         ziy = z(iy) - z(i)
-         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
-         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
-         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         vir(1,1) = vir(1,1) + vxx
-         vir(2,1) = vir(2,1) + vxy
-         vir(3,1) = vir(3,1) + vxz
-         vir(1,2) = vir(1,2) + vxy
-         vir(2,2) = vir(2,2) + vyy
-         vir(3,2) = vir(3,2) + vyz
-         vir(1,3) = vir(1,3) + vxz
-         vir(2,3) = vir(2,3) + vyz
-         vir(3,3) = vir(3,3) + vzz
+         if (dod2) then
+            call torque (i,dlter(1,i),dlfix,dlfiy,dlfiz,dfvdl)
+            call torqvir (i,dlfix,dlfiy,dlfiz,devvirdl)
+         end if
+         call torqvir (i,fix,fiy,fiz,ervir)
       end do
 c
 c     perform deallocation of some local arrays
 c
       deallocate (rscale)
       deallocate (ter)
+      deallocate (dlter)
       return
       end
 c
@@ -954,9 +1099,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "erepel1b" calculates the Pauli repulsion energy and first
-c     derivatives with respect to Cartesian coordinates using a
-c     pariwise neighbor list
+c     "erepel1b" calculates the Pauli repulsion energy, first
+c     derivatives with respect to Cartesian coordinates and lambda
+c     derivatives using a pairwise neighbor list
 c
 c
       subroutine erepel1b
@@ -964,6 +1109,7 @@ c
       use bound
       use couple
       use deriv
+      use dlmda
       use energi
       use group
       use inform
@@ -978,14 +1124,10 @@ c
       implicit none
       integer i,j,k
       integer ii,kk,kkk
-      integer ix,iy,iz
       real*8 e,fgrp
       real*8 eterm,de
       real*8 xi,yi,zi
       real*8 xr,yr,zr
-      real*8 xix,yix,zix
-      real*8 xiy,yiy,ziy
-      real*8 xiz,yiz,ziz
       real*8 r,r2,r3,r4,r5
       real*8 rr1,rr3,rr5
       real*8 rr7,rr9,rr11
@@ -1016,13 +1158,22 @@ c
       real*8 dqikx,dqiky,dqikz
       real*8 term1,term2,term3
       real*8 term4,term5,term6
-      real*8 vlambda3,vlambda4
-      real*8 vlambda5
+      real*8 rlsc,rshf
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
       real*8 frcx,frcy,frcz
-      real*8 term,soft,dsoft
+      real*8 soft,dsoft
+      real*8 dsdl,d2sdl2,d2sdldr
+      real*8 dle,dle2
+      real*8 dldsoft,dldtaper
+      real*8 rlsc1,rlsc2
+      real*8 rshf1,rshf2
+      real*8 dlfrcx,dlfrcy,dlfrcz
+      real*8 dlvxx,dlvyy,dlvzz
+      real*8 dlvxy,dlvxz,dlvyz
+      real*8 dlttri(3),dlttrk(3)
+      real*8 dlfix(3),dlfiy(3),dlfiz(3)
       real*8 taper,dtaper
       real*8 vxx,vyy,vzz
       real*8 vxy,vxz,vyz
@@ -1031,8 +1182,10 @@ c
       real*8 dmpik(11)
       real*8, allocatable :: rscale(:)
       real*8, allocatable :: ter(:,:)
+      real*8, allocatable :: dlter(:,:)
       logical proceed,usei
       logical muti,mutk,mutik
+      logical dodl,dod2,mutdl,mutd2
       character*6 mode
 c
 c
@@ -1043,6 +1196,11 @@ c
          der(1,i) = 0.0d0
          der(2,i) = 0.0d0
          der(3,i) = 0.0d0
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            ervir(j,i) = 0.0d0
+         end do
       end do
 c
 c     check the sign of multipole components at chiral sites
@@ -1057,6 +1215,7 @@ c     perform dynamic allocation of some local arrays
 c
       allocate (rscale(n))
       allocate (ter(3,n))
+      allocate (dlter(3,n))
 c
 c     initialize connected atom scaling and torque arrays
 c
@@ -1064,15 +1223,23 @@ c
          rscale(i) = 1.0d0
          do j = 1, 3
             ter(j,i) = 0.0d0
+            dlter(j,i) = 0.0d0
          end do
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set lambda scaling values for mutated interactions, along with
+c     their lambda derivative factors while the van der Waals lambda
+c     map has slope or curvature, as in the "gradient" routine
 c
+      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
+     &          .or. d2vldlmda2.ne.0.0d0)
+      dod2 = (dodl .and. use_d2lmda)
       if (nmut .ne. 0) then
-         vlambda3 = vlambda**3
-         vlambda4 = vlambda3 * vlambda
-         vlambda5 = vlambda4 * vlambda
+         if (dodl) then
+            call repsc4 (rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2)
+         else
+            call repsc (rlsc,rshf)
+         end if
       end if
 c
 c     set cutoff distances and switching coefficients
@@ -1086,10 +1253,12 @@ c
 !$OMP& shared(nrep,irep,x,y,z,sizpr,dmppr,elepr,rrepole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
 !$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,
-!$OMP& vlambda3,vlambda4,vlambda5,mutg,cut2,off2,xaxis,yaxis,zaxis,
-!$OMP& c0,c1,c2,c3,c4,c5)
-!$OMP& firstprivate(rscale) shared (er,der,ter,vir)
-!$OMP DO reduction(+:er,der,ter,vir)
+!$OMP& rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2,mutg,cut2,off2,xaxis,
+!$OMP& yaxis,zaxis,c0,c1,c2,c3,c4,c5,dodl,dod2)
+!$OMP& firstprivate(rscale) shared (er,der,ter,ervir,dlter,devdl,
+!$OMP& d2evdl2,dfvdl,devvirdl)
+!$OMP DO reduction(+:er,der,ter,ervir,dlter,devdl,d2evdl2,dfvdl,
+!$OMP& devvirdl)
 c
 c     calculate the Pauli repulsion energy and derivatives
 c
@@ -1349,13 +1518,31 @@ c
                         mutik = .true.
                      end if
                   end if
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
 c
-c     get energy and force via soft core lambda scaling
+c     get energy and force via soft core lambda scaling, along with
+c     their lambda derivatives from the unscaled pair terms
 c
+                  if (mutdl) then
+                     call erepsc4 (r,rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2,
+     &                             soft,dsoft,dsdl,d2sdl2,d2sdldr)
+                     dle = dsdl * e
+                     if (mutd2) then
+                        dle2 = d2sdl2 * e
+                        dldsoft = d2sdldr * rr1 * e
+                        dlfrcx = frcx*dsdl - dldsoft*xr
+                        dlfrcy = frcy*dsdl - dldsoft*yr
+                        dlfrcz = frcz*dsdl - dldsoft*zr
+                        do j = 1, 3
+                           dlttri(j) = ttri(j) * dsdl
+                           dlttrk(j) = ttrk(j) * dsdl
+                        end do
+                     end if
+                  else if (mutik) then
+                     call erepsc (r,rlsc,rshf,soft,dsoft)
+                  end if
                   if (mutik) then
-                     term = vlambda3 - vlambda4 + r2
-                     soft = vlambda5 * r / sqrt(term)
-                     dsoft = soft * (rr1-r/term)
                      dsoft = dsoft * rr1 * e
                      frcx = frcx*soft - dsoft*xr
                      frcy = frcy*soft - dsoft*yr
@@ -1377,6 +1564,18 @@ c
      &                          + c2*r2 + c1*r + c0
                      dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
      &                           + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                     if (mutd2) then
+                        dldtaper = dtaper * dle * rr1
+                        dlfrcx = dlfrcx*taper - dldtaper*xr
+                        dlfrcy = dlfrcy*taper - dldtaper*yr
+                        dlfrcz = dlfrcz*taper - dldtaper*zr
+                        do j = 1, 3
+                           dlttri(j) = dlttri(j) * taper
+                           dlttrk(j) = dlttrk(j) * taper
+                        end do
+                        dle2 = dle2 * taper
+                     end if
+                     if (mutdl)  dle = dle * taper
                      dtaper = dtaper * e * rr1
                      e = e * taper
                      frcx = frcx*taper - dtaper*xr
@@ -1418,15 +1617,48 @@ c
                   vyy = -yr * frcy
                   vyz = -0.5d0 * (zr*frcy+yr*frcz)
                   vzz = -zr * frcz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vxy
-                  vir(3,1) = vir(3,1) + vxz
-                  vir(1,2) = vir(1,2) + vxy
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vyz
-                  vir(1,3) = vir(1,3) + vxz
-                  vir(2,3) = vir(2,3) + vyz
-                  vir(3,3) = vir(3,3) + vzz
+                  ervir(1,1) = ervir(1,1) + vxx
+                  ervir(2,1) = ervir(2,1) + vxy
+                  ervir(3,1) = ervir(3,1) + vxz
+                  ervir(1,2) = ervir(1,2) + vxy
+                  ervir(2,2) = ervir(2,2) + vyy
+                  ervir(3,2) = ervir(3,2) + vyz
+                  ervir(1,3) = ervir(1,3) + vxz
+                  ervir(2,3) = ervir(2,3) + vyz
+                  ervir(3,3) = ervir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient,
+c     torque and virial for a mutated pair
+c
+                  if (mutdl)  devdl = devdl + dle
+                  if (mutd2) then
+                     d2evdl2 = d2evdl2 + dle2
+                     dfvdl(1,i) = dfvdl(1,i) + dlfrcx
+                     dfvdl(2,i) = dfvdl(2,i) + dlfrcy
+                     dfvdl(3,i) = dfvdl(3,i) + dlfrcz
+                     dfvdl(1,k) = dfvdl(1,k) - dlfrcx
+                     dfvdl(2,k) = dfvdl(2,k) - dlfrcy
+                     dfvdl(3,k) = dfvdl(3,k) - dlfrcz
+                     do j = 1, 3
+                        dlter(j,i) = dlter(j,i) + dlttri(j)
+                        dlter(j,k) = dlter(j,k) + dlttrk(j)
+                     end do
+                     dlvxx = -xr * dlfrcx
+                     dlvxy = -0.5d0 * (yr*dlfrcx+xr*dlfrcy)
+                     dlvxz = -0.5d0 * (zr*dlfrcx+xr*dlfrcz)
+                     dlvyy = -yr * dlfrcy
+                     dlvyz = -0.5d0 * (zr*dlfrcy+yr*dlfrcz)
+                     dlvzz = -zr * dlfrcz
+                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dlvxy
+                     devvirdl(3,1) = devvirdl(3,1) + dlvxz
+                     devvirdl(1,2) = devvirdl(1,2) + dlvxy
+                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dlvyz
+                     devvirdl(1,3) = devvirdl(1,3) + dlvxz
+                     devvirdl(2,3) = devvirdl(2,3) + dlvyz
+                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                  end if
                end if
             end if
          end do
@@ -1450,46 +1682,18 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:der,vir)
+!$OMP DO reduction(+:der,ervir,dfvdl,devvirdl)
 c
 c     resolve site torques then increment forces and virial
 c
       do ii = 1, nrep
          i = irep(ii)
          call torque (i,ter(1,i),fix,fiy,fiz,der)
-         iz = zaxis(i)
-         ix = xaxis(i)
-         iy = abs(yaxis(i))
-         if (iz .eq. 0)  iz = i
-         if (ix .eq. 0)  ix = i
-         if (iy .eq. 0)  iy = i
-         xiz = x(iz) - x(i)
-         yiz = y(iz) - y(i)
-         ziz = z(iz) - z(i)
-         xix = x(ix) - x(i)
-         yix = y(ix) - y(i)
-         zix = z(ix) - z(i)
-         xiy = x(iy) - x(i)
-         yiy = y(iy) - y(i)
-         ziy = z(iy) - z(i)
-         vxx = xix*fix(1) + xiy*fiy(1) + xiz*fiz(1)
-         vxy = 0.5d0 * (yix*fix(1) + yiy*fiy(1) + yiz*fiz(1)
-     &                    + xix*fix(2) + xiy*fiy(2) + xiz*fiz(2))
-         vxz = 0.5d0 * (zix*fix(1) + ziy*fiy(1) + ziz*fiz(1)
-     &                    + xix*fix(3) + xiy*fiy(3) + xiz*fiz(3)) 
-         vyy = yix*fix(2) + yiy*fiy(2) + yiz*fiz(2)
-         vyz = 0.5d0 * (zix*fix(2) + ziy*fiy(2) + ziz*fiz(2)
-     &                    + yix*fix(3) + yiy*fiy(3) + yiz*fiz(3))
-         vzz = zix*fix(3) + ziy*fiy(3) + ziz*fiz(3)
-         vir(1,1) = vir(1,1) + vxx
-         vir(2,1) = vir(2,1) + vxy
-         vir(3,1) = vir(3,1) + vxz
-         vir(1,2) = vir(1,2) + vxy
-         vir(2,2) = vir(2,2) + vyy
-         vir(3,2) = vir(3,2) + vyz
-         vir(1,3) = vir(1,3) + vxz
-         vir(2,3) = vir(2,3) + vyz
-         vir(3,3) = vir(3,3) + vzz
+         if (dod2) then
+            call torque (i,dlter(1,i),dlfix,dlfiy,dlfiz,dfvdl)
+            call torqvir (i,dlfix,dlfiy,dlfiz,devvirdl)
+         end if
+         call torqvir (i,fix,fiy,fiz,ervir)
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1501,5 +1705,6 @@ c     perform deallocation of some local arrays
 c
       deallocate (rscale)
       deallocate (ter)
+      deallocate (dlter)
       return
       end

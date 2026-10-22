@@ -17,6 +17,7 @@ c     epvir       polarization virial (needed for dual topology)
 c     emvir       electrostatics virial
 c     evvir       van der Waals virial
 c     ectvir      charge transfer virial
+c     ervir       Pauli repulsion virial
 c     use_virial  logical flag governing use of virial computation
 c
 c
@@ -27,6 +28,7 @@ c
       real*8 emvir(3,3)
       real*8 evvir(3,3)
       real*8 ectvir(3,3)
+      real*8 ervir(3,3)
       logical use_virial
       save
       end

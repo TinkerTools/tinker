@@ -54,6 +54,7 @@ c
       call test_mutate_ion
       call test_mutate_overlap
       call test_mutate_scexp
+      call test_mutate_repsc
       call test_mutate_epdtsave
       call test_mutate_gate
       call test_mutate_flat
@@ -2608,6 +2609,108 @@ c
          call assert_logical (want,.true.,label//' bound')
       else
          call assert_logical (found,.false.,label//' runs')
+      end if
+      call execute_command_line ('rm -f out.txt')
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_mutate_repsc  --  repulsion soft core gate  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "test_mutate_repsc" runs "analyze" on HIPPO water keyfiles with
+c     soft core Pauli repulsion parameters outside the allowed limits;
+c     each such parameter is reset to its default, so all must run,
+c     including an exponent below two or a one minus lambda shift
+c     exponent between one and two with "lambda-deriv2"; repulsion
+c     runs with lambda derivatives, but dispersion must still stop
+c
+c
+      subroutine test_mutate_repsc
+      implicit none
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_repsc','mutate'))  return
+      call pushdir ('file/mutate')
+      call test_mutate_repsccase ('rsoft_a_neg_d1.key','',
+     &   'test_mutate_repsc alpha')
+      call test_mutate_repsccase ('rsoft_n05_d1.key','',
+     &   'test_mutate_repsc n05')
+      call test_mutate_repsccase ('rsoft_n15_m3_d1.key','',
+     &   'test_mutate_repsc n15 m3')
+      call test_mutate_repsccase ('rsoft_m_neg_d1.key','',
+     &   'test_mutate_repsc m negative')
+      call test_mutate_repsccase ('rsoft_p05_d1.key','',
+     &   'test_mutate_repsc p05')
+      call test_mutate_repsccase ('rsoft_n18_d2.key','',
+     &   'test_mutate_repsc n18 deriv2')
+      call test_mutate_repsccase ('rsoft_p15_d2.key','',
+     &   'test_mutate_repsc p15 deriv2')
+      call test_mutate_repsccase ('rsoft_n18_d1.key','',
+     &   'test_mutate_repsc n18 deriv')
+      call test_mutate_repsccase ('rsoft_p15_d1.key','',
+     &   'test_mutate_repsc p15 deriv')
+      call test_mutate_repsccase ('rsoft_default_d2.key','',
+     &   'test_mutate_repsc repulsion deriv2')
+      call test_mutate_repsccase ('rsoft_disp_d2.key',
+     &   'not Available for HIPPO Dispersion',
+     &   'test_mutate_repsc dispersion deriv2')
+      call popdir
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_repsccase  --  one soft core gate  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_repsccase" runs "analyze" on one HIPPO water keyfile
+c     and checks for the setup error containing "phrase", or that no
+c     setup error is printed if "phrase" is blank
+c
+c
+      subroutine test_mutate_repsccase (key,phrase,label)
+      implicit none
+      integer ist,iout
+      logical found,halted
+      character*(*) key,phrase,label
+      character*240 line
+      character*512 args
+c
+c
+      call execute_command_line ('rm -f out.txt')
+      args = '-k '//key//' hipwat.xyz E'
+      call run_prog ('analyze',trim(args),'out.txt',ist)
+      if (ist .eq. -1)  return
+c
+c     find any setup error and the phrase it must contain
+c
+      found = .false.
+      halted = .false.
+      open (newunit=iout,file='out.txt',status='old')
+      do while (.true.)
+         read (iout,'(a)',end=10)  line
+         if (index(line,'MUTATE_CHECK') .ne. 0) then
+            halted = .true.
+            if (len(phrase) .gt. 0) then
+               if (index(line,phrase) .ne. 0)  found = .true.
+            end if
+         end if
+      end do
+   10 continue
+      close (unit=iout)
+      if (len(phrase) .gt. 0) then
+         call assert_logical (found,.true.,label//' stops')
+      else
+         call assert_logical (halted,.false.,label//' runs')
       end if
       call execute_command_line ('rm -f out.txt')
       return

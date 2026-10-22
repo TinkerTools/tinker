@@ -93,8 +93,7 @@ c
       real*8 diqk,dkqi,qiqk
       real*8 term1,term2,term3
       real*8 term4,term5
-      real*8 vlambda3,vlambda4
-      real*8 vlambda5
+      real*8 rlsc,rshf
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
@@ -130,9 +129,7 @@ c
 c     set lambda scaling values for mutated interactions
 c
       if (nmut .ne. 0) then
-         vlambda3 = vlambda**3
-         vlambda4 = vlambda3 * vlambda
-         vlambda5 = vlambda4 * vlambda
+         call repsc (rlsc,rshf)
       end if
 c
 c     initialize connected atom exclusion coefficients
@@ -285,8 +282,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     e = vlambda5 * sizik * eterm
-     &                      / sqrt(vlambda3-vlambda4+r2)
+                     e = rlsc * sizik * eterm
+     &                      / sqrt(rshf+r2)
                   else
                      e = sizik * eterm * rr1
                   end if
@@ -492,8 +489,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                         if (mutik) then
-                           e = vlambda5 * sizik * eterm
-     &                            / sqrt(vlambda3-vlambda4+r2)
+                           e = rlsc * sizik * eterm
+     &                            / sqrt(rshf+r2)
                         else
                            e = sizik * eterm * rr1
                         end if
@@ -632,8 +629,7 @@ c
       real*8 diqk,dkqi,qiqk
       real*8 term1,term2,term3
       real*8 term4,term5
-      real*8 vlambda3,vlambda4
-      real*8 vlambda5
+      real*8 rlsc,rshf
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
@@ -669,9 +665,7 @@ c
 c     set lambda scaling values for mutated interactions
 c
       if (nmut .ne. 0) then
-         vlambda3 = vlambda**3
-         vlambda4 = vlambda3 * vlambda
-         vlambda5 = vlambda4 * vlambda
+         call repsc (rlsc,rshf)
       end if
 c
 c     initialize connected atom exclusion coefficients
@@ -701,8 +695,8 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(nrep,irep,x,y,z,sizpr,dmppr,elepr,rrepole,uind,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,vlambda3,
-!$OMP& vlambda4,vlambda5,mutg,cut2,off2,c0,c1,c2,c3,c4,c5,molcule,name,
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,rlsc,
+!$OMP& rshf,mutg,cut2,off2,c0,c1,c2,c3,c4,c5,molcule,name,
 !$OMP& verbose,debug,header,iout)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er,ner,aer,einter)
@@ -837,8 +831,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     e = vlambda5 * sizik * eterm
-     &                      / sqrt(vlambda3-vlambda4+r2)
+                     e = rlsc * sizik * eterm
+     &                      / sqrt(rshf+r2)
                   else
                      e = sizik * eterm * rr1
                   end if

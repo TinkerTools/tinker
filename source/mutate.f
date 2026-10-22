@@ -102,6 +102,13 @@ c
       scexp = 5.0d0
       scalphav = 0.7d0
 c
+c     set defaults for soft core Pauli repulsion
+c
+      scalphar = 1.0d0
+      scexpr = 5.0d0
+      scexprm = 3.0d0
+      scexprp = 1.0d0
+c
 c     zero out number of hybrid atoms and mutated torsions
 c
       nmut = 0
@@ -144,6 +151,10 @@ c
          else if (keyword(1:13) .eq. 'VDW-SOFTCORE ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  scalphav,scexp
+         else if (keyword(1:15) .eq. 'REPEL-SOFTCORE ') then
+            string = record(next:240)
+            read (string,*,err=30,end=30)  scalphar,scexpr,
+     &                                     scexprm,scexprp
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  tlambda
@@ -1550,6 +1561,25 @@ c
          call fatal
       end if
 c
+c     reset any soft core Pauli repulsion parameter outside its allowed
+c     range to the default value, where the lambda exponent must outrun
+c     the vanishing shift so the pair energy stays bounded as lambda
+c     goes to zero, and the second lambda derivative diverges at an
+c     endpoint unless the exponent is at least two and the one minus
+c     lambda shift exponent is one or at least two
+c
+      if (scalphar .lt. 0.0d0)  scalphar = 1.0d0
+      if (scexpr .lt. 1.0d0)  scexpr = 5.0d0
+      if (scexprm .lt. 0.0d0)  scexprm = 3.0d0
+      if (scexprp .lt. 1.0d0)  scexprp = 1.0d0
+      if (use_d2lmda .and. scexpr.lt.2.0d0)  scexpr = 5.0d0
+      if (use_d2lmda .and. scexprp.ne.1.0d0 .and. scexprp.lt.2.0d0)
+     &   scexprp = 1.0d0
+      if (scalphar.gt.0.0d0 .and. scexpr.le.0.5d0*scexprm) then
+         scexpr = 5.0d0
+         scexprm = 3.0d0
+      end if
+c
 c     single topology currently supports the scalar derivative for
 c     mutual polarization with Thole damping, as in AMOEBA and AMOEBA+,
 c     or charge penetration damping, as in HIPPO, with or without
@@ -1743,13 +1773,13 @@ c
          call fatal
       end if
 c
-c     the HIPPO repulsion and dispersion terms are scaled by lambda
-c     but add nothing to the lambda derivative
+c     the HIPPO dispersion term is scaled by lambda but adds nothing
+c     to the lambda derivative
 c
-      if (use_dlmda .and. (use_repel .or. use_disp)) then
+      if (use_dlmda .and. use_disp) then
          write (iout,115)
   115    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
-     &              ' Available for HIPPO Repulsion or Dispersion')
+     &              ' Available for HIPPO Dispersion')
          call fatal
       end if
 c

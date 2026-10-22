@@ -278,7 +278,6 @@ add_library (tinkerObjF OBJECT
 ../source/ehal1.f
 ../source/ehal2.f
 ../source/ehal3.f
-../source/ehal4.f
 ../source/ehalsc.f
 ../source/eimprop.f
 ../source/eimprop1.f
@@ -329,6 +328,7 @@ add_library (tinkerObjF OBJECT
 ../source/erepel1.f
 ../source/erepel2.f
 ../source/erepel3.f
+../source/erepsc.f
 ../source/erf.f
 ../source/erxnfld.f
 ../source/erxnfld1.f

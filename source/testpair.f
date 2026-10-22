@@ -20,6 +20,7 @@ c
       program testpair
       use atoms
       use deriv
+      use dlmda
       use energi
       use inform
       use iounit
@@ -230,6 +231,8 @@ c
       allocate (dem(3,n))
       allocate (dep(3,n))
       allocate (dect(3,n))
+      allocate (dfvdl(3,n))
+      allocate (dfpdl(3,n))
 c
 c     zero out each of the energy and gradient components
 c

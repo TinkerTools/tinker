@@ -27,8 +27,12 @@ c     type1       atom type of each atom in the final state system
 c     elambda     state weighting value for electrostatic potentials
 c     lambda      generic weighting between initial and final states
 c     plambda     state weighting value for polarization potentials
+c     scalphar    shift scale for soft core Pauli repulsion in Ang^2
 c     scalphav    scale factor for soft core buffered 14-7 potential
 c     scexp       scale factor for soft core buffered 14-7 potential
+c     scexpr      lambda exponent for soft core Pauli repulsion
+c     scexprm     lambda exponent of soft core repulsion shift
+c     scexprp     one minus lambda exponent of soft core repulsion shift
 c     tlambda     state weighting value for torsional potential
 c     vlambda     state weighting value for van der Waals potentials
 c     mutfield    flag restricting dfield to the mpoles of mutated atoms
@@ -54,8 +58,12 @@ c
       real*8 elambda
       real*8 lambda
       real*8 plambda
+      real*8 scalphar
       real*8 scalphav
       real*8 scexp
+      real*8 scexpr
+      real*8 scexprm
+      real*8 scexprp
       real*8 tlambda
       real*8 vlambda
       real*8, allocatable :: fluxsc(:)

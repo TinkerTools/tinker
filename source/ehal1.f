@@ -13,10 +13,13 @@ c     ################################################################
 c
 c
 c     "ehal1" calculates the buffered 14-7 van der Waals energy and
-c     its first derivatives with respect to Cartesian coordinates
+c     its first derivatives with respect to Cartesian coordinates,
+c     and lambda derivatives while the van der Waals lambda map has
+c     slope or curvature
 c
 c
       subroutine ehal1
+      use dlmda
       use energi
       use limits
       use vdwpot
@@ -25,8 +28,16 @@ c
       integer i,j
       real*8 elrc,vlrc
       real*8 delrc,dvlrc
+      logical dodl,dod2
       character*6 mode
 c
+c
+c     take lambda derivatives while the van der Waals lambda map
+c     has slope or curvature, as in the "gradient" routine
+c
+      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
+     &          .or. d2vldlmda2.ne.0.0d0)
+      dod2 = (dodl .and. use_d2lmda)
 c
 c     choose the method for summing over pairwise interactions
 c
@@ -38,15 +49,18 @@ c
          call ehal1a
       end if
 c
-c     apply the long range van der Waals correction if used
+c     apply the long range van der Waals correction if used,
+c     along with its lambda derivative
 c
       if (use_vcorr) then
          mode = 'VDW'
          call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
          ev = ev + elrc
-         evvir(1,1) = evvir(1,1) + vlrc
-         evvir(2,2) = evvir(2,2) + vlrc
-         evvir(3,3) = evvir(3,3) + vlrc
+         if (dodl)  devdl = devdl + delrc
+         do i = 1, 3
+            evvir(i,i) = evvir(i,i) + vlrc
+            if (dod2)  devvirdl(i,i) = devvirdl(i,i) + dvlrc
+         end do
       end if
 c
 c     add the van der Waals virial to main virial
@@ -67,9 +81,9 @@ c     ##                                                             ##
 c     #################################################################
 c
 c
-c     "ehal1a" calculates the buffered 14-7 van der Waals energy and
-c     its first derivatives with respect to Cartesian coordinates
-c     using a pairwise double loop
+c     "ehal1a" calculates the buffered 14-7 van der Waals energy,
+c     its first derivatives with respect to Cartesian coordinates,
+c     and lambda derivatives using a pairwise double loop
 c
 c
       subroutine ehal1a
@@ -79,6 +93,7 @@ c
       use cell
       use couple
       use deriv
+      use dlmda
       use energi
       use group
       use mutant
@@ -94,7 +109,8 @@ c
       integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
-      real*8 vlsc(2),vscal(2)
+      real*8 vlsc(2),vlsc1(2),vlsc2(2)
+      real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -103,6 +119,9 @@ c
       real*8 dedx,dedy,dedz
       real*8 rho
       real*8 tau,tau7
+      real*8 dlambda,dlambda2
+      real*8 dlde
+      real*8 dldedx,dldedy,dldedz
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -110,9 +129,12 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical muti,mutk,mutik
+      logical dodl,dod2,mutdl,mutd2
       character*6 mode
 c
 c
@@ -148,9 +170,21 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group
+c     take lambda derivatives while the van der Waals lambda map
+c     has slope or curvature, as in the "gradient" routine
 c
-      call halsc (vlsc,vscal)
+      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
+     &          .or. d2vldlmda2.ne.0.0d0)
+      dod2 = (dodl .and. use_d2lmda)
+c
+c     set the soft core lambda terms for each ligand group, along
+c     with their lambda derivative factors as needed
+c
+      if (dodl) then
+         call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
+      else
+         call halsc (vlsc,vscal)
+      end if
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -235,13 +269,19 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = (muti.or.mutk) .and.
      &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
-                  if (mutik) then
+                  if (mutdl) then
 c
 c     take the soft core terms of the ligand group in this pair
 c
+                     ig = max(mutgi,mutgk)
+                     call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
+     &                             dvscal,e,de,dlambda,dlambda2,dlde)
+                  else if (mutik) then
                      ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
@@ -269,6 +309,11 @@ c
      &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
                      de = e*dtaper + de*taper
                      e = e * taper
+                     if (mutd2) then
+                        dlde = dlambda * dtaper + dlde * taper
+                        dlambda2 = dlambda2 * taper
+                     end if
+                     if (mutdl)  dlambda = dlambda * taper
                   end if
 c
 c     scale the interaction based on its group membership
@@ -276,6 +321,11 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
+                     if (mutdl)  dlambda = dlambda * fgrp
+                     if (mutd2) then
+                        dlambda2 = dlambda2 * fgrp
+                        dlde = dlde * fgrp
+                     end if
                   end if
 c
 c     find the chain rule terms for derivative components; atoms at
@@ -293,10 +343,25 @@ c
 c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
+                  if (mutd2) then
+                     if (rik .ne. 0.0d0) then
+                        dlde = dlde / rik
+                     else
+                        dlde = 0.0d0
+                     end if
+                     dldedx = dlde * xr
+                     dldedy = dlde * yr
+                     dldedz = dlde * zr
+                  end if
                   if (i .eq. iv) then
                      dev(1,i) = dev(1,i) + dedx
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
+                     if (mutd2) then
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz
+                     end if
                   else
                      dev(1,i) = dev(1,i) + dedx*redi
                      dev(2,i) = dev(2,i) + dedy*redi
@@ -304,11 +369,24 @@ c
                      dev(1,iv) = dev(1,iv) + dedx*rediv
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
+                     if (mutd2) then
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
+                        dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
+                        dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
+                        dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
+                     end if
                   end if
                   if (k .eq. kv) then
                      dev(1,k) = dev(1,k) - dedx
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
+                     if (mutd2) then
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz
+                     end if
                   else
                      redk = kred(k)
                      redkv = 1.0d0 - redk
@@ -318,7 +396,17 @@ c
                      dev(1,kv) = dev(1,kv) - dedx*redkv
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
+                     if (mutd2) then
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
+                        dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
+                        dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
+                        dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
+                     end if
                   end if
+                  if (mutdl)  devdl = devdl + dlambda
+                  if (mutd2)  d2evdl2 = d2evdl2 + dlambda2
 c
 c     increment the internal virial tensor components
 c
@@ -337,6 +425,23 @@ c
                   evvir(1,3) = evvir(1,3) + vzx
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
+                  if (mutd2) then
+                     dldvxx = xr * dldedx
+                     dldvyx = yr * dldedx
+                     dldvzx = zr * dldedx
+                     dldvyy = yr * dldedy
+                     dldvzy = zr * dldedy
+                     dldvzz = zr * dldedz
+                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
+                  end if
                end if
             end if
          end do
@@ -439,13 +544,20 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                      mutik = (muti.or.mutk) .and.
      &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutdl = mutik .and. dodl
+                     mutd2 = mutik .and. dod2
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
-                     if (mutik) then
+                     if (mutdl) then
 c
 c     take the soft core terms of the ligand group in this pair
 c
+                        ig = max(mutgi,mutgk)
+                        call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,
+     &                                vscal,dvscal,e,de,dlambda,
+     &                                dlambda2,dlde)
+                     else if (mutik) then
                         ig = max(mutgi,mutgk)
                         call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                      else
@@ -473,6 +585,11 @@ c
      &                              + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
                         de = e*dtaper + de*taper
                         e = e * taper
+                        if (mutd2) then
+                           dlde = dlambda * dtaper + dlde * taper
+                           dlambda2 = dlambda2 * taper
+                        end if
+                        if (mutdl)  dlambda = dlambda * taper
                      end if
 c
 c     scale the interaction based on its group membership
@@ -480,6 +597,11 @@ c
                      if (use_group) then
                         e = e * fgrp
                         de = de * fgrp
+                        if (mutdl)  dlambda = dlambda * fgrp
+                        if (mutd2) then
+                           dlambda2 = dlambda2 * fgrp
+                           dlde = dlde * fgrp
+                        end if
                      end if
 c
 c     find the chain rule terms for derivative components; atoms at
@@ -498,10 +620,25 @@ c     increment the total van der Waals energy and derivatives
 c
                      if (i .eq. k)  e = 0.5d0 * e
                      ev = ev + e
+                     if (mutd2) then
+                        if (rik .ne. 0.0d0) then
+                           dlde = dlde / rik
+                        else
+                           dlde = 0.0d0
+                        end if
+                        dldedx = dlde * xr
+                        dldedy = dlde * yr
+                        dldedz = dlde * zr
+                     end if
                      if (i .eq. iv) then
                         dev(1,i) = dev(1,i) + dedx
                         dev(2,i) = dev(2,i) + dedy
                         dev(3,i) = dev(3,i) + dedz
+                        if (mutd2) then
+                           dfvdl(1,i) = dfvdl(1,i) + dldedx
+                           dfvdl(2,i) = dfvdl(2,i) + dldedy
+                           dfvdl(3,i) = dfvdl(3,i) + dldedz
+                        end if
                      else
                         dev(1,i) = dev(1,i) + dedx*redi
                         dev(2,i) = dev(2,i) + dedy*redi
@@ -509,12 +646,25 @@ c
                         dev(1,iv) = dev(1,iv) + dedx*rediv
                         dev(2,iv) = dev(2,iv) + dedy*rediv
                         dev(3,iv) = dev(3,iv) + dedz*rediv
+                        if (mutd2) then
+                           dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
+                           dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
+                           dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
+                           dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
+                           dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
+                           dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
+                        end if
                      end if
                      if (i .ne. k) then
                         if (k .eq. kv) then
                            dev(1,k) = dev(1,k) - dedx
                            dev(2,k) = dev(2,k) - dedy
                            dev(3,k) = dev(3,k) - dedz
+                           if (mutd2) then
+                              dfvdl(1,k) = dfvdl(1,k) - dldedx
+                              dfvdl(2,k) = dfvdl(2,k) - dldedy
+                              dfvdl(3,k) = dfvdl(3,k) - dldedz
+                           end if
                         else
                            redk = kred(k)
                            redkv = 1.0d0 - redk
@@ -524,7 +674,23 @@ c
                            dev(1,kv) = dev(1,kv) - dedx*redkv
                            dev(2,kv) = dev(2,kv) - dedy*redkv
                            dev(3,kv) = dev(3,kv) - dedz*redkv
+                           if (mutd2) then
+                              dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
+                              dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
+                              dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
+                              dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
+                              dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
+                              dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
+                           end if
                         end if
+                     end if
+                     if (mutdl) then
+                        if (i .eq. k)  dlambda = 0.5d0 * dlambda
+                        devdl = devdl + dlambda
+                     end if
+                     if (mutd2) then
+                        if (i .eq. k)  dlambda2 = 0.5d0 * dlambda2
+                        d2evdl2 = d2evdl2 + dlambda2
                      end if
 c
 c     increment the internal virial tensor components
@@ -544,6 +710,23 @@ c
                      evvir(1,3) = evvir(1,3) + vzx
                      evvir(2,3) = evvir(2,3) + vzy
                      evvir(3,3) = evvir(3,3) + vzz
+                     if (mutd2) then
+                        dldvxx = xr * dldedx
+                        dldvyx = yr * dldedx
+                        dldvzx = zr * dldedx
+                        dldvyy = yr * dldedy
+                        dldvzy = zr * dldedy
+                        dldvzz = zr * dldedz
+                        devvirdl(1,1) = devvirdl(1,1) + dldvxx
+                        devvirdl(2,1) = devvirdl(2,1) + dldvyx
+                        devvirdl(3,1) = devvirdl(3,1) + dldvzx
+                        devvirdl(1,2) = devvirdl(1,2) + dldvyx
+                        devvirdl(2,2) = devvirdl(2,2) + dldvyy
+                        devvirdl(3,2) = devvirdl(3,2) + dldvzy
+                        devvirdl(1,3) = devvirdl(1,3) + dldvzx
+                        devvirdl(2,3) = devvirdl(2,3) + dldvzy
+                        devvirdl(3,3) = devvirdl(3,3) + dldvzz
+                     end if
                   end if
                end do
             end if
@@ -580,9 +763,9 @@ c     ##                                                              ##
 c     ##################################################################
 c
 c
-c     "ehal1b" calculates the buffered 14-7 van der Waals energy and
-c     its first derivatives with respect to Cartesian coordinates
-c     using the method of lights
+c     "ehal1b" calculates the buffered 14-7 van der Waals energy,
+c     its first derivatives with respect to Cartesian coordinates,
+c     and lambda derivatives using the method of lights
 c
 c
       subroutine ehal1b
@@ -593,6 +776,7 @@ c
       use cell
       use couple
       use deriv
+      use dlmda
       use energi
       use group
       use light
@@ -611,7 +795,8 @@ c
       integer start,stop
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
-      real*8 vlsc(2),vscal(2)
+      real*8 vlsc(2),vlsc1(2),vlsc2(2)
+      real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -620,6 +805,9 @@ c
       real*8 dedx,dedy,dedz
       real*8 rho
       real*8 tau,tau7
+      real*8 dlambda,dlambda2
+      real*8 dlde
+      real*8 dldedx,dldedy,dldedz
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -627,6 +815,8 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -634,6 +824,7 @@ c
       logical proceed,usei,prime
       logical unique,repeat
       logical muti,mutk,mutik
+      logical dodl,dod2,mutdl,mutd2
       character*6 mode
 c
 c
@@ -672,9 +863,21 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group
+c     take lambda derivatives while the van der Waals lambda map
+c     has slope or curvature, as in the "gradient" routine
 c
-      call halsc (vlsc,vscal)
+      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
+     &          .or. d2vldlmda2.ne.0.0d0)
+      dod2 = (dodl .and. use_d2lmda)
+c
+c     set the soft core lambda terms for each ligand group, along
+c     with their lambda derivative factors as needed
+c
+      if (dodl) then
+         call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
+      else
+         call halsc (vlsc,vscal)
+      end if
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -813,13 +1016,19 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = (muti.or.mutk) .and.
      &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
-                  if (mutik) then
+                  if (mutdl) then
 c
 c     take the soft core terms of the ligand group in this pair
 c
+                     ig = max(mutgi,mutgk)
+                     call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
+     &                             dvscal,e,de,dlambda,dlambda2,dlde)
+                  else if (mutik) then
                      ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
@@ -847,6 +1056,11 @@ c
      &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
                      de = e*dtaper + de*taper
                      e = e * taper
+                     if (mutd2) then
+                        dlde = dlambda * dtaper + dlde * taper
+                        dlambda2 = dlambda2 * taper
+                     end if
+                     if (mutdl)  dlambda = dlambda * taper
                   end if
 c
 c     scale the interaction based on its group membership
@@ -854,6 +1068,11 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
+                     if (mutdl)  dlambda = dlambda * fgrp
+                     if (mutd2) then
+                        dlambda2 = dlambda2 * fgrp
+                        dlde = dlde * fgrp
+                     end if
                   end if
 c
 c     find the chain rule terms for derivative components; atoms at
@@ -871,10 +1090,25 @@ c
 c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
+                  if (mutd2) then
+                     if (rik .ne. 0.0d0) then
+                        dlde = dlde / rik
+                     else
+                        dlde = 0.0d0
+                     end if
+                     dldedx = dlde * xr
+                     dldedy = dlde * yr
+                     dldedz = dlde * zr
+                  end if
                   if (i .eq. iv) then
                      dev(1,i) = dev(1,i) + dedx
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
+                     if (mutd2) then
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz
+                     end if
                   else
                      dev(1,i) = dev(1,i) + dedx*redi
                      dev(2,i) = dev(2,i) + dedy*redi
@@ -882,11 +1116,24 @@ c
                      dev(1,iv) = dev(1,iv) + dedx*rediv
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
+                     if (mutd2) then
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
+                        dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
+                        dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
+                        dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
+                     end if
                   end if
                   if (k .eq. kv) then
                      dev(1,k) = dev(1,k) - dedx
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
+                     if (mutd2) then
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz
+                     end if
                   else
                      redk = kred(k)
                      redkv = 1.0d0 - redk
@@ -896,7 +1143,17 @@ c
                      dev(1,kv) = dev(1,kv) - dedx*redkv
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
+                     if (mutd2) then
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
+                        dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
+                        dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
+                        dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
+                     end if
                   end if
+                  if (mutdl)  devdl = devdl + dlambda
+                  if (mutd2)  d2evdl2 = d2evdl2 + dlambda2
 c
 c     increment the internal virial tensor components
 c
@@ -915,6 +1172,23 @@ c
                   evvir(1,3) = evvir(1,3) + vzx
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
+                  if (mutd2) then
+                     dldvxx = xr * dldedx
+                     dldvyx = yr * dldedx
+                     dldvzx = zr * dldedx
+                     dldvyy = yr * dldedy
+                     dldvzy = zr * dldedy
+                     dldvzz = zr * dldedz
+                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
+                  end if
                end if
             end if
    20       continue
@@ -960,9 +1234,9 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "ehal1c" calculates the buffered 14-7 van der Waals energy and
-c     its first derivatives with respect to Cartesian coordinates
-c     using a pairwise neighbor list
+c     "ehal1c" calculates the buffered 14-7 van der Waals energy,
+c     its first derivatives with respect to Cartesian coordinates,
+c     and lambda derivatives using a pairwise neighbor list
 c
 c
       subroutine ehal1c
@@ -971,6 +1245,7 @@ c
       use bound
       use couple
       use deriv
+      use dlmda
       use energi
       use group
       use mutant
@@ -987,7 +1262,8 @@ c
       integer mutgi,mutgk,ig
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
-      real*8 vlsc(2),vscal(2)
+      real*8 vlsc(2),vlsc1(2),vlsc2(2)
+      real*8 vscal(2),dvscal(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -996,6 +1272,9 @@ c
       real*8 dedx,dedy,dedz
       real*8 rho
       real*8 tau,tau7
+      real*8 dlambda,dlambda2
+      real*8 dlde
+      real*8 dldedx,dldedy,dldedz
       real*8 dtau,gtau
       real*8 taper,dtaper
       real*8 rik,rik2,rik3
@@ -1003,9 +1282,12 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
+      real*8 dldvxx,dldvyy,dldvzz
+      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical muti,mutk,mutik
+      logical dodl,dod2,mutdl,mutd2
       character*6 mode
 c
 c
@@ -1041,9 +1323,21 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     set the soft core lambda terms for each ligand group
+c     take lambda derivatives while the van der Waals lambda map
+c     has slope or curvature, as in the "gradient" routine
 c
-      call halsc (vlsc,vscal)
+      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
+     &          .or. d2vldlmda2.ne.0.0d0)
+      dod2 = (dodl .and. use_d2lmda)
+c
+c     set the soft core lambda terms for each ligand group, along
+c     with their lambda derivative factors as needed
+c
+      if (dodl) then
+         call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
+      else
+         call halsc (vlsc,vscal)
+      end if
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -1062,10 +1356,11 @@ c
 !$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
-!$OMP& dhal,cut2,vcouple,vlsc,vscal,mutg,c0,c1,
-!$OMP& c2,c3,c4,c5)
-!$OMP& firstprivate(vscale,iv14) shared(ev,dev,evvir)
-!$OMP DO reduction(+:ev,dev,evvir)
+!$OMP& dhal,cut2,vcouple,mutg,vlsc,vlsc1,vlsc2,vscal,dvscal,
+!$OMP& dodl,dod2,c0,c1,c2,c3,c4,c5)
+!$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfvdl,devdl,d2evdl2,
+!$OMP& evvir,devvirdl)
+!$OMP DO reduction(+:ev,dev,dfvdl,devdl,d2evdl2,evvir,devvirdl)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c
@@ -1139,13 +1434,19 @@ c     set use of lambda scaling for decoupling or annihilation
 c
                   mutik = (muti.or.mutk) .and.
      &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
-                  if (mutik) then
+                  if (mutdl) then
 c
 c     take the soft core terms of the ligand group in this pair
 c
+                     ig = max(mutgi,mutgk)
+                     call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
+     &                             dvscal,e,de,dlambda,dlambda2,dlde)
+                  else if (mutik) then
                      ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
@@ -1173,6 +1474,11 @@ c
      &                           + 3.0d0*c3*rik2 + 2.0d0*c2*rik + c1
                      de = e*dtaper + de*taper
                      e = e * taper
+                     if (mutd2) then
+                        dlde = dlambda * dtaper + dlde * taper
+                        dlambda2 = dlambda2 * taper
+                     end if
+                     if (mutdl)  dlambda = dlambda * taper
                   end if
 c
 c     scale the interaction based on its group membership
@@ -1180,6 +1486,11 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
+                     if (mutdl)  dlambda = dlambda * fgrp
+                     if (mutd2) then
+                        dlambda2 = dlambda2 * fgrp
+                        dlde = dlde * fgrp
+                     end if
                   end if
 c
 c     find the chain rule terms for derivative components; atoms at
@@ -1197,10 +1508,25 @@ c
 c     increment the total van der Waals energy and derivatives
 c
                   ev = ev + e
+                  if (mutd2) then
+                     if (rik .ne. 0.0d0) then
+                        dlde = dlde / rik
+                     else
+                        dlde = 0.0d0
+                     end if
+                     dldedx = dlde * xr
+                     dldedy = dlde * yr
+                     dldedz = dlde * zr
+                  end if
                   if (i .eq. iv) then
                      dev(1,i) = dev(1,i) + dedx
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
+                     if (mutd2) then
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz
+                     end if
                   else
                      dev(1,i) = dev(1,i) + dedx*redi
                      dev(2,i) = dev(2,i) + dedy*redi
@@ -1208,11 +1534,24 @@ c
                      dev(1,iv) = dev(1,iv) + dedx*rediv
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
+                     if (mutd2) then
+                        dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
+                        dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
+                        dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
+                        dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
+                        dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
+                        dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
+                     end if
                   end if
                   if (k .eq. kv) then
                      dev(1,k) = dev(1,k) - dedx
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
+                     if (mutd2) then
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz
+                     end if
                   else
                      redk = kred(k)
                      redkv = 1.0d0 - redk
@@ -1222,7 +1561,17 @@ c
                      dev(1,kv) = dev(1,kv) - dedx*redkv
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
+                     if (mutd2) then
+                        dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
+                        dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
+                        dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
+                        dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
+                        dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
+                        dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
+                     end if
                   end if
+                  if (mutdl)  devdl = devdl + dlambda
+                  if (mutd2)  d2evdl2 = d2evdl2 + dlambda2
 c
 c     increment the internal virial tensor components
 c
@@ -1241,6 +1590,23 @@ c
                   evvir(1,3) = evvir(1,3) + vzx
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
+                  if (mutd2) then
+                     dldvxx = xr * dldedx
+                     dldvyx = yr * dldedx
+                     dldvzx = zr * dldedx
+                     dldvyy = yr * dldedy
+                     dldvzy = zr * dldedy
+                     dldvzz = zr * dldedz
+                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
+                  end if
                end if
             end if
          end do

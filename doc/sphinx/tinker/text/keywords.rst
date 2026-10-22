@@ -738,11 +738,11 @@ FREE ENERGY PERTURBATION KEYWORDS
      - LIGAND
    * -
      - MUTATE
+     - REPEL-SOFTCORE
      - VDW-ANNIHILATE
-     - VDW-LAMBDA
    * -
+     - VDW-LAMBDA
      - VDW-SOFTCORE
-     -
      -
 
 POTENTIAL SMOOTHING KEYWORDS
@@ -2845,6 +2845,12 @@ REP-14-SCALE [real]
 
 REP-15-SCALE [real]
    Provides a multiplicative scale factor that is applied to Pauli repulsion interactions between 1-5 connected atoms, i.e., atoms separated by three covalent bonds. The default value of 1.0 is used, if the REP-15-SCALE keyword is not given in either the parameter file or the keyfile.
+
+.. index:: REPEL-SOFTCORE
+.. _KEY-REPEL-SOFTCORE:
+
+REPEL-SOFTCORE [2-4 reals]
+   Sets the soft-core scaling of HIPPO Pauli repulsion interactions involving mutated atoms during free energy calculations, where each such pair energy is multiplied by lambda^n * r / sqrt(alpha * lambda^m * (1-lambda)^p + r^2) with lambda the van der Waals lambda and r the distance in Angstroms. The four real-number modifiers are the alpha shift in square Angstroms, the lambda exponent n, and the optional shift exponents m and p. Alpha and m must be nonnegative, p must be at least 1.0, and n must be at least 1.0 and, for a nonzero alpha, greater than m/2. When second lambda derivatives are used by orthogonal space tempering or the LAMBDA-DERIV2 keyword, n must be at least 2.0, and p must be 1.0 or at least 2.0. Any value outside these limits is reset to its default, with n and m both reset if n is not greater than m/2. The default values in the absence of the REPEL-SOFTCORE keyword are 1.0, 5.0, 3.0 and 1.0, respectively.
 
 .. index:: REPULS-CUTOFF
 .. _KEY-REPULS-CUTOFF:

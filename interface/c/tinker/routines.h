@@ -867,16 +867,6 @@ void ehal3b_();
 void ehal3c_();
 #define tinker_f_ehal3c ehal3c_
 
-// ehal4.f
-void ehal4_();
-#define tinker_f_ehal4 ehal4_
-void ehal4a_();
-#define tinker_f_ehal4a ehal4a_
-void ehal4b_();
-#define tinker_f_ehal4b ehal4b_
-void ehal4c_();
-#define tinker_f_ehal4c ehal4c_
-
 // ehalsc.f
 void halsc_(double* vlsc, double* vscal);
 #define tinker_f_halsc halsc_
@@ -1432,6 +1422,16 @@ void erepel3a_();
 #define tinker_f_erepel3a erepel3a_
 void erepel3b_();
 #define tinker_f_erepel3b erepel3b_
+
+// erepsc.f
+void repsc_(double* rlsc, double* rshf);
+#define tinker_f_repsc repsc_
+void repsc4_(double* rlsc, double* rshf, double* rlsc1, double* rlsc2, double* rshf1, double* rshf2);
+#define tinker_f_repsc4 repsc4_
+void erepsc_(double* r, double* rlsc, double* rshf, double* soft, double* dsoft);
+#define tinker_f_erepsc erepsc_
+void erepsc4_(double* r, double* rlsc, double* rshf, double* rlsc1, double* rlsc2, double* rshf1, double* rshf2, double* soft, double* dsoft, double* dsdl, double* d2sdl2, double* d2sdldr);
+#define tinker_f_erepsc4 erepsc4_
 
 // erf.f
 double erf_(double* x);

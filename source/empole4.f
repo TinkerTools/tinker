@@ -156,7 +156,9 @@ c
       real*8, allocatable :: pot(:)
       real*8, allocatable :: dlpot(:)
       logical proceed,usei,usek
-      logical muti,mutk,livepr
+      logical muti,mutk
+      logical dopr,livei,doskip
+      logical live(0:2)
       logical mutik,mutd2
       character*6 mode
 c
@@ -227,6 +229,10 @@ c     get the multipole scale and lambda derivative of each group
 c
       call grpscale (elambda,emsc,demsc)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     compute the multipole interaction energy and gradient
 c
       do ii = 1, npole-1
@@ -256,6 +262,7 @@ c
          muti = (mutg(i) .ne. 0)
          esi = emsc(mutg(i))
          desi = demsc(mutg(i))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -283,20 +290,19 @@ c
             mutk = (mutg(k) .ne. 0)
             esk = emsc(mutg(k))
             desk = demsc(mutg(k))
-            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
-     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
-            if (.not. livepr)  proceed = .false.
             if (.not. proceed)  goto 10
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -709,6 +715,7 @@ c
          muti = (mutg(i) .ne. 0)
          esi = emsc(mutg(i))
          desi = demsc(mutg(i))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -736,12 +743,9 @@ c
             mutk = (mutg(k) .ne. 0)
             esk = emsc(mutg(k))
             desk = demsc(mutg(k))
-            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
-     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
-            if (.not. livepr)  proceed = .false.
             if (.not. proceed)  goto 20
             do jcell = 2, ncell
             xr = x(k) - xi
@@ -752,7 +756,9 @@ c
             if (.not. (use_polymer .and. r2.le.polycut2)) then
                mscale(k) = 1.0d0
             end if
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -1271,7 +1277,9 @@ c
       real*8, allocatable :: pot(:)
       real*8, allocatable :: dlpot(:)
       logical proceed,usei,usek
-      logical muti,mutk,livepr
+      logical muti,mutk
+      logical dopr,livei,doskip
+      logical live(0:2)
       logical mutik,mutd2
       character*6 mode
 c
@@ -1345,14 +1353,18 @@ c     get the multipole scale and lambda derivative of each group
 c
       call grpscale (elambda,emsc,demsc)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,xaxis,yaxis,zaxis,rpole,pcoreorig,
 !$OMP& pvalorig,pdltflx,palpha,use,n12,i12,n13,i13,n14,i14,n15,i15,
 !$OMP& m2scale,m3scale,m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,
-!$OMP& use_group,use_intra,use_bounds,off2,f,mutg,emsc,demsc,
-!$OMP& use_d2lmda)
+!$OMP& use_group,use_intra,use_bounds,off2,f,mutg,emsc,demsc,live,
+!$OMP& doskip,use_d2lmda)
 !$OMP& firstprivate(mscale) shared (em,dem,dlfrc,tem,dltem,pot,dlpot,
 !$OMP& emvir,demvirdl,demdl,d2emdl2)
 !$OMP DO reduction(+:em,dem,dlfrc,tem,dltem,pot,dlpot,emvir,demvirdl,
@@ -1387,6 +1399,7 @@ c
          muti = (mutg(i) .ne. 0)
          esi = emsc(mutg(i))
          desi = demsc(mutg(i))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1414,20 +1427,19 @@ c
             mutk = (mutg(k) .ne. 0)
             esk = emsc(mutg(k))
             desk = demsc(mutg(k))
-            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
-     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (.not. use_intra)  proceed = .true.
             if (proceed)  proceed = (usei .or. usek)
-            if (.not. livepr)  proceed = .false.
             if (.not. proceed)  goto 10
             xr = x(k) - xi
             yr = y(k) - yi
             zr = z(k) - zi
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2 .le. off2) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -2297,7 +2309,9 @@ c
       real*8, allocatable :: dltem(:,:)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: dlpot(:)
-      logical muti,mutk,livepr
+      logical muti,mutk
+      logical dopr,livei,doskip
+      logical live(0:2)
       logical mutik,mutd2
       character*6 mode
 c
@@ -2341,6 +2355,10 @@ c     get the multipole scale and lambda derivative of each group
 c
       call grpscale (elambda,emsc,demsc)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     compute the real space portion of the Ewald summation
 c
       do ii = 1, npole-1
@@ -2366,6 +2384,7 @@ c
          muti = (mutg(i) .ne. 0)
          esi = emsc(mutg(i))
          desi = demsc(mutg(i))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2392,11 +2411,11 @@ c
             mutk = (mutg(k) .ne. 0)
             esk = emsc(mutg(k))
             desk = demsc(mutg(k))
-            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
-     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2.le.off2 .and. livepr) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -2801,6 +2820,7 @@ c
          muti = (mutg(i) .ne. 0)
          esi = emsc(mutg(i))
          desi = demsc(mutg(i))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -2828,14 +2848,14 @@ c
             mutk = (mutg(k) .ne. 0)
             esk = emsc(mutg(k))
             desk = demsc(mutg(k))
-            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
-     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             call imager (xr,yr,zr,jcell)
             r2 = xr*xr + yr*yr + zr*zr
             if (.not. (use_polymer .and. r2.le.polycut2)) then
                mscale(k) = 1.0d0
             end if
-            if (r2.le.off2 .and. livepr) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)
@@ -3698,7 +3718,9 @@ c
       real*8, allocatable :: dlfrc(:,:)
       real*8, allocatable :: pot(:)
       real*8, allocatable :: dlpot(:)
-      logical muti,mutk,livepr
+      logical muti,mutk
+      logical dopr,livei,doskip
+      logical live(0:2)
       logical mutik,mutd2
       character*6 mode
 c
@@ -3745,13 +3767,18 @@ c     get the multipole scale and lambda derivative of each group
 c
       call grpscale (elambda,emsc,demsc)
 c
+c     flag the atom groups that take part in pair interactions
+c
+      call eleclive (live,doskip)
+c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private)
 !$OMP& shared(npole,ipole,x,y,z,rpole,pcoreorig,pvalorig,pdltflx,
 !$OMP& palpha,n12,i12,n13,i13,n14,i14,n15,i15,m2scale,m3scale,
 !$OMP& m4scale,m5scale,nelst,elst,use_chgpen,use_chgflx,use_bounds,f,
-!$OMP& off2,xaxis,yaxis,zaxis,emsc,demsc,mutg,use_d2lmda)
+!$OMP& off2,xaxis,yaxis,zaxis,emsc,demsc,mutg,live,doskip,
+!$OMP& use_d2lmda)
 !$OMP& firstprivate(mscale) shared (em,dem,tem,pot,dlpot,emvir,
 !$OMP& demvirdl,demdl,d2emdl2,dlfrc,dltem)
 !$OMP DO reduction(+:em,dem,tem,pot,dlpot,emvir,demvirdl,demdl,
@@ -3782,6 +3809,7 @@ c
          muti = (mutg(i) .ne. 0)
          esi = emsc(mutg(i))
          desi = demsc(mutg(i))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -3808,11 +3836,11 @@ c
             mutk = (mutg(k) .ne. 0)
             esk = emsc(mutg(k))
             desk = demsc(mutg(k))
-            livepr = ((esi.ne.0.0d0 .or. desi.ne.0.0d0) .and.
-     &                (esk.ne.0.0d0 .or. desk.ne.0.0d0))
             if (use_bounds)  call image (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
-            if (r2.le.off2 .and. livepr) then
+            dopr = (r2 .le. off2)
+            if (dopr .and. doskip)  dopr = (livei .and. live(mutg(k)))
+            if (dopr) then
                r = sqrt(r2)
                ck = rpole(1,k)
                dkx = rpole(2,k)

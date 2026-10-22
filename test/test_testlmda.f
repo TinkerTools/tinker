@@ -62,6 +62,14 @@ c     topology and on the van der Waals leg, where it carries no
 c     lambda derivative, then with multipoles, polarization and
 c     charge flux under Ewald for the tetramer and for HIPPO water
 c
+c     cases 91 to 100 cover HIPPO Pauli repulsion, which follows the
+c     van der Waals lambda and is counted in dEV/dL, for a pentane and
+c     acetamide mixture: the default soft core by double loop and by
+c     neighbor list, annihilation, an early taper, the shift shapes
+c     (1-lambda)^2 and a non-integer one from REPEL-SOFTCORE, both
+c     lambda endpoints, and first derivatives alone with an exponent
+c     below two
+c
 c
       subroutine test_testlmda
       implicit none
@@ -210,6 +218,20 @@ c
      &                        'aptetra','1e-4')
       call test_testlmda_xyz ('90_hipwat_pol_ct_rel_lig1_ewald_l080',
      &                        'hipwat','1e-4')
+      call test_testlmda_xyz ('91_hipmix_rep_l04','hipmix','1e-4')
+      call test_testlmda_xyz ('92_hipmix_rep_nlist_l04','hipmix','1e-4')
+      call test_testlmda_xyz ('93_hipmix_rep_annih_l04','hipmix','1e-4')
+      call test_testlmda_xyz ('94_hipmix_rep_taper_l04','hipmix','1e-4')
+      call test_testlmda_xyz ('95_hipmix_rep_sc_m0p2_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('96_hipmix_rep_sc_real_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('97_hipmix_rep_l00','hipmix','1e-4')
+      call test_testlmda_xyz ('98_hipmix_rep_l10','hipmix','1e-4')
+      call test_testlmda_xyz ('99_hipmix_rep_sc_m0p2_l10','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('100_hipmix_rep_d1_n12_l04','hipmix',
+     &                        '1e-4')
       return
       end
 c

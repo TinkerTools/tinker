@@ -33,7 +33,7 @@ c
       integer i,j
       real*8 energy,cutoff
       real*8 derivs(3,*)
-      logical edrv,pdrv,vdrv
+      logical edrv,pdrv
 c
 c
 c     refresh sublambdas from the active main lambda
@@ -43,14 +43,13 @@ c
 c     a term takes its lambda derivative routine only while its map
 c     has slope or curvature; a flat map, such as a quintic taper away
 c     from its window, zeroes the chain rule and the plain routine
-c     gives the same energy and gradient for less work
+c     gives the same energy and gradient for less work; the van der
+c     Waals and repulsion routines make the same test internally
 c
       edrv = use_edlmda .and. (deldlmda.ne.0.0d0
      &          .or. d2eldlmda2.ne.0.0d0)
       pdrv = use_pdlmda .and. (dpldlmda.ne.0.0d0
      &          .or. d2pldlmda2.ne.0.0d0)
-      vdrv = use_vdlmda .and. (dvldlmda.ne.0.0d0
-     &          .or. d2vldlmda2.ne.0.0d0)
 c
 c     zero out each of the potential energy components
 c
@@ -238,6 +237,7 @@ c
             emvir(j,i) = 0.0d0
             evvir(j,i) = 0.0d0
             ectvir(j,i) = 0.0d0
+            ervir(j,i) = 0.0d0
          end do
       end do
       einter = 0.0d0
@@ -312,13 +312,7 @@ c
          if (vdwtyp .eq. 'LENNARD-JONES')  call elj1
          if (vdwtyp .eq. 'BUCKINGHAM')  call ebuck1
          if (vdwtyp .eq. 'MM3-HBOND')  call emm3hb1
-         if (vdwtyp .eq. 'BUFFERED-14-7') then
-            if (vdrv) then
-               call ehal4
-            else
-               call ehal1
-            end if
-         end if
+         if (vdwtyp .eq. 'BUFFERED-14-7')  call ehal1
          if (vdwtyp .eq. 'GAUSSIAN')  call egauss1
       end if
       if (use_repel)  call erepel1

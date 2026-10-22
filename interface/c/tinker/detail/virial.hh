@@ -10,6 +10,7 @@ extern double TINKER_MOD(virial, epvir)[3][3];
 extern double TINKER_MOD(virial, emvir)[3][3];
 extern double TINKER_MOD(virial, evvir)[3][3];
 extern double TINKER_MOD(virial, ectvir)[3][3];
+extern double TINKER_MOD(virial, ervir)[3][3];
 extern int TINKER_MOD(virial, use_virial);
 #ifdef __cplusplus
 }
