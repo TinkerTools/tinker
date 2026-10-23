@@ -34,6 +34,7 @@ c
       real*8 energy,cutoff
       real*8 derivs(3,*)
       logical edrv,pdrv
+      logical lmdadrv
 c
 c
 c     refresh sublambdas from the active main lambda
@@ -41,15 +42,15 @@ c
       call refreshsublmda
 c
 c     a term takes its lambda derivative routine only while its map
-c     has slope or curvature; a flat map, such as a quintic taper away
-c     from its window, zeroes the chain rule and the plain routine
-c     gives the same energy and gradient for less work; the van der
-c     Waals and repulsion routines make the same test internally
+c     has slope, or curvature with second derivatives, as "lmdadrv"
+c     decides; a flat map, such as a quintic taper away from its
+c     window, zeroes the chain rule and the plain routine gives the
+c     same energy and gradient for less work; the van der Waals,
+c     repulsion, dispersion and charge transfer routines make the
+c     same test internally
 c
-      edrv = use_edlmda .and. (deldlmda.ne.0.0d0
-     &          .or. d2eldlmda2.ne.0.0d0)
-      pdrv = use_pdlmda .and. (dpldlmda.ne.0.0d0
-     &          .or. d2pldlmda2.ne.0.0d0)
+      edrv = lmdadrv (use_edlmda,deldlmda,d2eldlmda2)
+      pdrv = lmdadrv (use_pdlmda,dpldlmda,d2pldlmda2)
 c
 c     zero out each of the potential energy components
 c

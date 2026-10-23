@@ -20,6 +20,8 @@ extern double TINKER_MOD(mutant, plambda);
 extern double TINKER_MOD(mutant, scalphar);
 extern double TINKER_MOD(mutant, scalphav);
 extern double TINKER_MOD(mutant, scexp);
+extern double TINKER_MOD(mutant, scexpm);
+extern double TINKER_MOD(mutant, scexpp);
 extern double TINKER_MOD(mutant, scexpr);
 extern double TINKER_MOD(mutant, scexprm);
 extern double TINKER_MOD(mutant, scexprp);

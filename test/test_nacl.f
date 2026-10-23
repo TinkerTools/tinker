@@ -107,10 +107,10 @@ c
 c
       call test_nacl_vdw_case ('nacl1','nacl_vdw_corr.key',
      &   'nacl_ehal_evcorr_full',52.0802d0,1,184.4899d0,
-     &   -408.398d0,-2.521d0,-2.521d0,.true.)
+     &   -406.534d0,-0.656d0,-0.656d0,.true.)
       call test_nacl_vdw_case ('nacl1','nacl_vdw_corr.key',
      &   'nacl_ehal_evcorr_full',52.0802d0,1,184.4899d0,
-     &   -408.398d0,-2.521d0,-2.521d0,.false.)
+     &   -406.534d0,-0.656d0,-0.656d0,.false.)
       return
       end
 c
@@ -127,11 +127,11 @@ c
 c
 c
       call test_nacl_vdw_case ('nacl1','nacl_vdw_lambda.key',
-     &   'nacl_ehal_evcorr_lambda',25.8947d0,1,81.9570d0,
-     &   -182.721d0,-2.415d0,-2.415d0,.true.)
+     &   'nacl_ehal_evcorr_lambda',25.8220d0,1,81.9570d0,
+     &   -180.865d0,-0.560d0,-0.560d0,.true.)
       call test_nacl_vdw_case ('nacl1','nacl_vdw_lambda.key',
-     &   'nacl_ehal_evcorr_lambda',25.8947d0,1,81.9570d0,
-     &   -182.721d0,-2.415d0,-2.415d0,.false.)
+     &   'nacl_ehal_evcorr_lambda',25.8220d0,1,81.9570d0,
+     &   -180.865d0,-0.560d0,-0.560d0,.false.)
       return
       end
 c

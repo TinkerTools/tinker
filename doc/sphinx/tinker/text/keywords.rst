@@ -3399,8 +3399,8 @@ VDW-LIST
 .. index:: VDW-SOFTCORE
 .. _KEY-VDW-SOFTCORE:
 
-VDW-SOFTCORE [2 reals]
-   Sets the alpha offset and lambda exponent used by the soft-core buffered 14-7 van der Waals potential during free energy calculations. The first real-number modifier is the nonnegative soft-core alpha value, and the second is the lambda exponent, which must be at least 1.0, or at least 2.0 when second lambda derivatives are used by orthogonal space tempering or the LAMBDA-DERIV2 keyword. The default values in the absence of the VDW-SOFTCORE keyword are 0.7 and 5.0, respectively.
+VDW-SOFTCORE [2-4 reals]
+   Sets the soft-core scaling of buffered 14-7 van der Waals interactions involving mutated atoms during free energy calculations, where each such pair energy is multiplied by lambda^n and the softening alpha * lambda^m * (1-lambda)^p is added to both denominators of the reduced buffered 14-7 form, with lambda the van der Waals lambda. The four real-number modifiers are the alpha softening, the lambda exponent n, and the optional softening exponents m and p. Alpha and m must be nonnegative, and n and p must be at least 1.0. When second lambda derivatives are used by orthogonal space tempering or the LAMBDA-DERIV2 keyword, n must be at least 2.0, and p must be 1.0 or at least 2.0. Any value outside these limits is reset to its default. With the VDW-CORRECTION keyword, the long range correction weights each mutated pair by lambda^n alone, since the softening is negligible beyond the cutoff. The default values in the absence of the VDW-SOFTCORE keyword are 0.7, 5.0, 0.0 and 2.0, respectively.
 
 .. index:: VDW-TAPER
 .. _KEY-VDW-TAPER:

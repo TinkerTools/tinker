@@ -30,7 +30,6 @@ c
       use limits
       use math
       use mutant
-      use potent
       use shunt
       use vdw
       use vdwpot
@@ -47,8 +46,8 @@ c
       real*8 fie,fia,fib
       real*8 fke,fka,fkb
       real*8 ee,ea,eb,aa,bb
-      real*8 e,eps,vlam1
-      real*8 vlw,vlq
+      real*8 e,eps
+      real*8 vlw,vlb
       real*8 offset,taper
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
@@ -56,8 +55,14 @@ c
       real*8 cik,p,p6,p12
       real*8 rho,tau,tau7
       real*8 expterm
+      logical dsp
       character*6 mode
 c
+c
+c     choose the dispersion correction by mode, since a system may
+c     carry both van der Waals and dispersion terms
+c
+      dsp = (mode .eq. 'DISP')
 c
 c     zero out the long range van der Waals correction
 c
@@ -78,13 +83,22 @@ c
       ndelta = int(dble(nstep)*(range-cut))
       rdelta = (range-cut) / dble(ndelta)
       offset = cut - 0.5d0*rdelta
-      vlam1 = 1.0d0 - vlambda
+c
+c     the soft core buffered 14-7 potential scales a mutated pair by
+c     the soft core power of its group lambda, and its softening is
+c     negligible against the buffered distance beyond the cutoff
+c
+      vlw = vlambda
+      vlb = 1.0d0 - vlambda
+      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7') then
+         vlw = vlambda**scexp
+         vlb = (1.0d0-vlambda)**scexp
+      end if
 c
 c     beyond its switch radius the soft core of the damped dispersion
 c     leaves only its lambda power on a mutated pair
 c
-      vlw = vlambda
-      if (use_disp)  call dspsc (vlw,vlq)
+      if (dsp)  vlw = vlambda**scexpd
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -97,8 +111,11 @@ c     count the number of types and their frequencies
 c
       nvt = 0
       do i = 1, n
-         if (use_vdw)  it = jvdw(i)
-         if (use_disp)  it = class(i)
+         if (dsp) then
+            it = class(i)
+         else
+            it = jvdw(i)
+         end if
          do k = 1, nvt
             if (ivt(k) .eq. it) then
                jvt(k) = jvt(k) + 1
@@ -142,12 +159,12 @@ c
             aa = fia * fka
             bb = fib * fkb
             if (vcouple .eq. 0) then
-               fik = ee + aa + bb + vlw*ea + vlam1*eb
+               fik = ee + aa + bb + vlw*ea + vlb*eb
             else
-               fik = ee + vlw*(ea+aa) + vlam1*(eb+bb)
+               fik = ee + vlw*(ea+aa) + vlb*(eb+bb)
             end if
             if (k .eq. i)  fik = 0.5d0 * fik
-            if (use_disp) then
+            if (dsp) then
                cik = dspsix(it) * dspsix(kt)
             else
                rv = radmin(kt,it)
@@ -164,7 +181,7 @@ c
                r6 = r3 * r3
                r7 = r6 * r
                e = 0.0d0
-               if (use_disp) then
+               if (dsp) then
                   e = -cik / r6
                else if (vdwtyp .eq. 'LENNARD-JONES') then
                   p6 = rv6 / r6
@@ -214,9 +231,9 @@ c     ###############################################################
 c
 c
 c     "evcorr1" computes a long range correction for van der Waals
-c     or dispersion energy and virial via numerical integration,
-c     along with the derivatives of both with respect to "vlambda"
-c     and the second derivative of the energy
+c     or dispersion energy via numerical integration, along with its
+c     first and second derivatives with respect to "vlambda", and the
+c     virial and its "vlambda" derivative from the energy
 c
 c     literature reference:
 c
@@ -229,11 +246,11 @@ c
       use atoms
       use bound
       use boxes
+      use dlmda
       use kdsp
       use limits
       use math
       use mutant
-      use potent
       use shunt
       use vdw
       use vdwpot
@@ -247,27 +264,34 @@ c
       real*8 elrc,vlrc
       real*8 delrc,dvlrc
       real*8 d2elrc
-      real*8 etot,vtot
+      real*8 etot
       real*8 range,rdelta
       real*8 fi,fk,fik
       real*8 dfik,d2fik
       real*8 fie,fia,fib
       real*8 fke,fka,fkb
       real*8 ee,ea,eb,aa,bb
-      real*8 e,de,eps
-      real*8 offset,vlam1
-      real*8 vlw,vlq,dvlw
-      real*8 vlq1,vlw2,vlq2
-      real*8 taper,dtaper
+      real*8 e,eps
+      real*8 offset
+      real*8 vlw,dvlw,vlw2
+      real*8 vlb,dvlb,vlb2
+      real*8 taper
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
       real*8 r5,r6,r7
       real*8 cik,p,p6,p12
       real*8 rho,tau,tau7
-      real*8 dtau,gtau
-      real*8 rvterm,expterm
+      real*8 expterm
+      logical dsp
       character*6 mode
+c     real*8 vtot,de,dtaper
+c     real*8 dtau,gtau,rvterm
 c
+c
+c     choose the dispersion correction by mode, since a system may
+c     carry both van der Waals and dispersion terms
+c
+      dsp = (mode .eq. 'DISP')
 c
 c     zero out the long range van der Waals corrections
 c
@@ -292,15 +316,27 @@ c
       ndelta = int(dble(nstep)*(range-cut))
       rdelta = (range-cut) / dble(ndelta)
       offset = cut - 0.5d0*rdelta
-      vlam1 = 1.0d0 - vlambda
 c
-c     beyond its switch radius the soft core of the damped dispersion
-c     leaves only its lambda power on a mutated pair
+c     the soft core buffered 14-7 potential scales a mutated pair by
+c     the soft core power of its group lambda, and its softening is
+c     negligible against the buffered distance beyond the cutoff
 c
       vlw = vlambda
       dvlw = 1.0d0
       vlw2 = 0.0d0
-      if (use_disp)  call dspsc4 (vlw,vlq,dvlw,vlq1,vlw2,vlq2)
+      vlb = 1.0d0 - vlambda
+      dvlb = -1.0d0
+      vlb2 = 0.0d0
+      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7') then
+         call lmdapwr (vlambda,scexp,use_d2lmda,vlw,dvlw,vlw2)
+         call lmdapwr (1.0d0-vlambda,scexp,use_d2lmda,vlb,dvlb,vlb2)
+         dvlb = -dvlb
+      end if
+c
+c     beyond its switch radius the soft core of the damped dispersion
+c     leaves only its lambda power on a mutated pair
+c
+      if (dsp)  call lmdapwr (vlambda,scexpd,use_d2lmda,vlw,dvlw,vlw2)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -313,8 +349,11 @@ c     count the number of vdw types and their frequencies
 c
       nvt = 0
       do i = 1, n
-         if (use_vdw)  it = jvdw(i)
-         if (use_disp)  it = class(i)
+         if (dsp) then
+            it = class(i)
+         else
+            it = jvdw(i)
+         end if
          do k = 1, nvt
             if (ivt(k) .eq. it) then
                jvt(k) = jvt(k) + 1
@@ -360,20 +399,20 @@ c
             aa = fia * fka
             bb = fib * fkb
             if (vcouple .eq. 0) then
-               fik = ee + aa + bb + vlw*ea + vlam1*eb
-               dfik = dvlw*ea - eb
-               d2fik = vlw2 * ea
+               fik = ee + aa + bb + vlw*ea + vlb*eb
+               dfik = dvlw*ea + dvlb*eb
+               d2fik = vlw2*ea + vlb2*eb
             else
-               fik = ee + vlw*(ea+aa) + vlam1*(eb+bb)
-               dfik = dvlw*(ea+aa) - eb - bb
-               d2fik = vlw2 * (ea+aa)
+               fik = ee + vlw*(ea+aa) + vlb*(eb+bb)
+               dfik = dvlw*(ea+aa) + dvlb*(eb+bb)
+               d2fik = vlw2*(ea+aa) + vlb2*(eb+bb)
             end if
             if (k .eq. i) then
                fik = 0.5d0 * fik
                dfik = 0.5d0 * dfik
                d2fik = 0.5d0 * d2fik
             end if
-            if (use_disp) then
+            if (dsp) then
                cik = dspsix(it) * dspsix(kt)
             else
                rv = radmin(kt,it)
@@ -383,7 +422,7 @@ c
                rv7 = rv6 * rv
             end if
             etot = 0.0d0
-            vtot = 0.0d0
+c           vtot = 0.0d0
             do j = 1, ndelta
                r = offset + dble(j)*rdelta
                r2 = r * r
@@ -391,56 +430,66 @@ c
                r6 = r3 * r3
                r7 = r6 * r
                e = 0.0d0
-               de = 0.0d0
-               if (use_disp) then
+c              de = 0.0d0
+               if (dsp) then
                   e = -cik / r6
-                  de = 6.0d0 * cik / r7
+c                 de = 6.0d0 * cik / r7
                else if (vdwtyp .eq. 'LENNARD-JONES') then
                   p6 = rv6 / r6
                   p12 = p6 * p6
                   e = eps * (p12 - 2.0d0*p6)
-                  de = eps * (p12-p6) * (-12.0d0/r)
+c                 de = eps * (p12-p6) * (-12.0d0/r)
                else if (vdwtyp .eq. 'BUFFERED-14-7') then
                   rho = r7 + ghal*rv7
                   tau = (dhal+1.0d0) / (r+dhal*rv)
                   tau7 = tau**7
-                  dtau = tau / (dhal+1.0d0)
-                  gtau = eps*tau7*r6*(ghal+1.0d0)*(rv7/rho)**2
+c                 dtau = tau / (dhal+1.0d0)
+c                 gtau = eps*tau7*r6*(ghal+1.0d0)*(rv7/rho)**2
                   e = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
-                  de = -7.0d0 * (dtau*e+gtau)
+c                 de = -7.0d0 * (dtau*e+gtau)
                else if (vdwtyp.eq.'BUCKINGHAM' .or.
      &                  vdwtyp.eq.'MM3-HBOND') then
                   p = sqrt(rv2/r2)
                   p6 = rv6 / r6
-                  rvterm = -bbuck / rv
+c                 rvterm = -bbuck / rv
                   expterm = abuck * exp(-bbuck/p)
                   e = eps * (expterm - cbuck*p6)
-                  de = eps * (rvterm*expterm+6.0d0*cbuck*p6/r)
+c                 de = eps * (rvterm*expterm+6.0d0*cbuck*p6/r)
                end if
                if (r .lt. off) then
                   r4 = r2 * r2
                   r5 = r2 * r3
                   taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
-                  dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
-     &                        + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
-                  de = de*(1.0d0-taper) - e*dtaper
+c                 dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
+c    &                        + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+c                 de = de*(1.0d0-taper) - e*dtaper
                   e = e*(1.0d0-taper)
                end if
                etot = etot + e*rdelta*r2
-               vtot = vtot + de*rdelta*r3
+c              vtot = vtot + de*rdelta*r3
             end do
             elrc = elrc + fik*etot
-            vlrc = vlrc + fik*vtot
+c           vlrc = vlrc + fik*vtot
             delrc = delrc + dfik*etot
-            dvlrc = dvlrc + dfik*vtot
+c           dvlrc = dvlrc + dfik*vtot
             d2elrc = d2elrc + d2fik*etot
          end do
       end do
       elrc = elrc / volbox
-      vlrc = vlrc / (3.0d0*volbox)
+c     vlrc = vlrc / (3.0d0*volbox)
       delrc = delrc / volbox
-      dvlrc = dvlrc / (3.0d0*volbox)
+c     dvlrc = dvlrc / (3.0d0*volbox)
       d2elrc = d2elrc / volbox
+c
+c     the correction energy is a constant over the box volume, so
+c     its derivative under a strain of the box, which is its virial,
+c     is minus the energy itself; the separate quadrature of r^3 dE/dr
+c     kept above in comments gives the same value only in the limit
+c     of a fine grid, and broke this by up to tens of percent across
+c     the taper window at the grid spacing used here
+c
+      vlrc = -elrc
+      dvlrc = -delrc
 c
 c     perform deallocation of some local arrays
 c

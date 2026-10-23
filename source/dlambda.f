@@ -80,6 +80,33 @@ c
       end
 c
 c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  function lmdadrv  --  lambda derivative of a term used  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "lmdadrv" tests whether a term whose lambda derivatives are
+c     enabled by "use" must compute them, given the first and second
+c     derivatives "dl" and "d2l" of its sublambda map; they are needed
+c     while the map has slope, or curvature when second derivatives
+c     are requested, since the chain rule zeroes them otherwise
+c
+c
+      function lmdadrv (use,dl,d2l)
+      use dlmda
+      implicit none
+      real*8 dl,d2l
+      logical use,lmdadrv
+c
+c
+      lmdadrv = use .and. (dl.ne.0.0d0
+     &             .or. (use_d2lmda .and. d2l.ne.0.0d0))
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine vdlflags  --  van der Waals lambda deriv use  ##
@@ -88,22 +115,95 @@ c     ###############################################################
 c
 c
 c     "vdlflags" sets whether the terms that follow the van der Waals
-c     lambda compute their first lambda derivatives, which they need
-c     while the van der Waals lambda map has slope or curvature, and
-c     whether they also compute the second, force and virial ones
+c     lambda compute their first lambda derivatives, as "lmdadrv"
+c     decides, and whether they also compute the second, force and
+c     virial ones
 c
 c
       subroutine vdlflags (dodl,dod2)
       use dlmda
       implicit none
       logical dodl,dod2
+      logical lmdadrv
 c
 c
 c     the second derivatives are only needed alongside the first
 c
-      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
-     &          .or. d2vldlmda2.ne.0.0d0)
+      dodl = lmdadrv (use_vdlmda,dvldlmda,d2vldlmda2)
       dod2 = (dodl .and. use_d2lmda)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine dlcpair  --  pair lambda force and virial  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "dlcpair" adds the lambda derivative "dldx", "dldy", "dldz" of
+c     the gradient of a central pair of atoms "i" and "k" separated
+c     by "xr", "yr", "zr" to the force array "dfl" and its virial to
+c     "dvir"
+c
+c
+      subroutine dlcpair (i,k,xr,yr,zr,dldx,dldy,dldz,dfl,dvir)
+      implicit none
+      integer i,k
+      real*8 xr,yr,zr
+      real*8 dldx,dldy,dldz
+      real*8 dfl(3,*)
+      real*8 dvir(3,3)
+c
+c
+      dfl(1,i) = dfl(1,i) + dldx
+      dfl(2,i) = dfl(2,i) + dldy
+      dfl(3,i) = dfl(3,i) + dldz
+      dfl(1,k) = dfl(1,k) - dldx
+      dfl(2,k) = dfl(2,k) - dldy
+      dfl(3,k) = dfl(3,k) - dldz
+      call dlcvir (xr,yr,zr,dldx,dldy,dldz,dvir)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine dlcvir  --  pair lambda derivative virial  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "dlcvir" adds to "dvir" the virial of the lambda derivative
+c     "dldx", "dldy", "dldz" of the gradient of a central pair whose
+c     separation is "xr", "yr", "zr"
+c
+c
+      subroutine dlcvir (xr,yr,zr,dldx,dldy,dldz,dvir)
+      implicit none
+      real*8 xr,yr,zr
+      real*8 dldx,dldy,dldz
+      real*8 vxx,vyx,vzx
+      real*8 vyy,vzy,vzz
+      real*8 dvir(3,3)
+c
+c
+      vxx = xr * dldx
+      vyx = yr * dldx
+      vzx = zr * dldx
+      vyy = yr * dldy
+      vzy = zr * dldy
+      vzz = zr * dldz
+      dvir(1,1) = dvir(1,1) + vxx
+      dvir(2,1) = dvir(2,1) + vyx
+      dvir(3,1) = dvir(3,1) + vzx
+      dvir(1,2) = dvir(1,2) + vyx
+      dvir(2,2) = dvir(2,2) + vyy
+      dvir(3,2) = dvir(3,2) + vzy
+      dvir(1,3) = dvir(1,3) + vzx
+      dvir(2,3) = dvir(2,3) + vzy
+      dvir(3,3) = dvir(3,3) + vzz
       return
       end
 c
@@ -147,7 +247,7 @@ c
 c     dual topology interpolates the pair scales of the endpoints
 c
       if (use_epdt) then
-         call relpowerwt (plambda,epdtexp,w,dw,d2w)
+         call lmdapwr (plambda,dble(epdtexp),.true.,w,dw,d2w)
          call grpscale (0.0d0,g0,dg0)
          call grpscale (1.0d0,g1,dg1)
          do i = 0, 2
@@ -216,6 +316,7 @@ c
       logical live(0:2)
       logical doskip
       logical edrv,pdrv,dead
+      logical lmdadrv
 c
 c
 c     a program that bypasses the mutation setup has no ligand groups,
@@ -231,13 +332,11 @@ c
          end do
       end if
 c
-c     a term keeps its lambda derivative while its map has slope
-c     or curvature, as in the "gradient" routine
+c     a term keeps its lambda derivative as "lmdadrv" decides, as in
+c     the "gradient" routine
 c
-      edrv = use_edlmda .and. (deldlmda.ne.0.0d0
-     &          .or. d2eldlmda2.ne.0.0d0)
-      pdrv = use_pdlmda .and. (dpldlmda.ne.0.0d0
-     &          .or. d2pldlmda2.ne.0.0d0)
+      edrv = lmdadrv (use_edlmda,deldlmda,d2eldlmda2)
+      pdrv = lmdadrv (use_pdlmda,dpldlmda,d2pldlmda2)
       dead = (elambda.eq.0.0d0 .and. plambda.eq.0.0d0
      &           .and. .not.edrv .and. .not.pdrv)
 c
@@ -335,7 +434,7 @@ c
 c
 c
       if (map .eq. 'EXP') then
-         call sublmdaexp (lmda,nexp,sub,dsub,d2sub)
+         call lmdapwr (lmda,dble(nexp),.true.,sub,dsub,d2sub)
       else if (map .eq. 'INV') then
          call sublmdainvpower (lmda,invn,inveps,sub,dsub,d2sub)
       else if (map .eq. 'APM') then
@@ -500,33 +599,84 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine relpowerwt -- power law weight and derivs  ##
-c     ##                                                        ##
-c     ############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine lmdapwr  --  lambda power and its derivs  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
-c     "relpowerwt" evaluates the power law interpolation weight "x" to
-c     the "nexp" and its first two derivatives, the linear case being
-c     taken separately so that a zero sublambda never reaches a zero
-c     power
+c     "lmdapwr" evaluates "x" to the power "a" along with its first
+c     derivative with respect to "x", and its second derivative only
+c     if "do2" is set; a derivative whose coefficient vanishes is set
+c     to zero, so that a zero "x" never reaches a negative power in
+c     the constant or linear case
 c
 c
-      subroutine relpowerwt (x,nexp,w,dw,d2w)
+      subroutine lmdapwr (x,a,do2,f,df,d2f)
       implicit none
-      integer nexp
-      real*8 x,w,dw,d2w
+      real*8 x,a
+      real*8 f,df,d2f
+      logical do2
 c
 c
-      w = x**nexp
-      dw = 0.0d0
-      d2w = 0.0d0
-      if (nexp .eq. 1) then
-         dw = 1.0d0
-      else if (nexp .ge. 2) then
-         dw = dble(nexp) * x**(nexp-1)
-         d2w = dble(nexp) * dble(nexp-1) * x**(nexp-2)
+      f = x**a
+      df = 0.0d0
+      d2f = 0.0d0
+      if (a .ne. 0.0d0)  df = a * x**(a-1.0d0)
+      if (do2 .and. a.ne.0.0d0 .and. a.ne.1.0d0) then
+         d2f = a * (a-1.0d0) * x**(a-2.0d0)
+      end if
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine lmdapow  --  soft core shift and its derivs  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "lmdapow" evaluates the soft core shift "c" times "x" to the "a"
+c     times one minus "x" to the "b", along with "x" times its first
+c     derivative and, only if "do2" is set, "x" squared times its
+c     second derivative; scaling by powers of "x" keeps both finite at
+c     zero for any nonnegative "a", and a term whose coefficient
+c     vanishes is skipped, so that neither factor reaches a negative
+c     power at an endpoint
+c
+c
+      subroutine lmdapow (x,c,a,b,do2,f,f1,f2)
+      implicit none
+      real*8 x,c,a,b
+      real*8 f,f1,f2
+      real*8 omx
+      real*8 xa,xa1,xa2
+      logical do2
+c
+c
+c     find the shift along with its scaled lambda derivatives
+c
+      omx = 1.0d0 - x
+      xa = c * x**a
+      xa1 = xa * x
+      xa2 = xa1 * x
+      f = xa * omx**b
+      f1 = 0.0d0
+      if (a .ne. 0.0d0)  f1 = a * xa * omx**b
+      if (b .ne. 0.0d0)  f1 = f1 - b*xa1*omx**(b-1.0d0)
+      f2 = 0.0d0
+      if (do2) then
+         if (a .ne. 0.0d0) then
+            f2 = a*(a-1.0d0) * xa * omx**b
+            if (b .ne. 0.0d0) then
+               f2 = f2 - 2.0d0*a*b * xa1 * omx**(b-1.0d0)
+            end if
+         end if
+         if (b.ne.0.0d0 .and. b.ne.1.0d0) then
+            f2 = f2 + b*(b-1.0d0) * xa2 * omx**(b-2.0d0)
+         end if
       end if
       return
       end
@@ -543,21 +693,25 @@ c     "relneed" decides which of the two dual topology endpoint states
 c     a term has to build, given its interpolation weight "w", the first
 c     and second derivatives "dw" and "d2w" of that weight with respect
 c     to its sublambda, and the chain rule factors "chain" and "d2chain"
-c     carrying the sublambda back to the main lambda
+c     carrying the sublambda back to the main lambda; the curvature
+c     only matters when second derivatives are requested
 c
 c
       subroutine relneed (w,dw,d2w,chain,d2chain,need0,need1)
+      use dlmda
       implicit none
       real*8 w,dw,d2w
       real*8 chain,d2chain
       real*8 c1,c2
       logical need0,need1
+      logical slope
 c
 c
       c1 = dw * chain
       c2 = d2w*chain*chain + dw*d2chain
-      need1 = (w .ne. 0.0d0) .or. (c1 .ne. 0.0d0) .or. (c2 .ne. 0.0d0)
-      need0 = (w .ne. 1.0d0) .or. (c1 .ne. 0.0d0) .or. (c2 .ne. 0.0d0)
+      slope = (c1.ne.0.0d0 .or. (use_d2lmda .and. c2.ne.0.0d0))
+      need1 = (w.ne.0.0d0 .or. slope)
+      need0 = (w.ne.1.0d0 .or. slope)
       return
       end
 c
@@ -607,45 +761,6 @@ c
       taper = 1.0d0 - u2*u*(10.0d0-15.0d0*u+6.0d0*u2)
       dtaper = -30.0d0 * u2 * v * v * rinv
       d2taper = -60.0d0 * u * v * (1.0d0-2.0d0*u) * rinv * rinv
-      return
-      end
-c
-c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine sublmdaexp -- exponential sublambda mapping  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "sublmdaexp" maps from main lambda to a sublambda using a
-c     power law and returns the first and second lambda derivatives
-c
-c
-      subroutine sublmdaexp (x,exponent,lmda,dlmda,d2lmda)
-      implicit none
-      integer exponent
-      real*8 x
-      real*8 lmda
-      real*8 dlmda
-      real*8 d2lmda
-      real*8 expnt
-c
-c
-c     compute map
-c
-      lmda = x**exponent
-      if (exponent .eq. 1) then
-         dlmda = 1.0d0
-         d2lmda = 0.0d0
-      else if (exponent .eq. 2) then
-         dlmda = 2.0d0 * x
-         d2lmda = 2.0d0
-      else
-         expnt = dble(exponent)
-         dlmda = expnt * x**(exponent-1)
-         d2lmda = expnt * (expnt-1.0d0) * x**(exponent-2)
-      end if
       return
       end
 c
@@ -758,6 +873,13 @@ c
      &           + right*xval**(n+1)/(rn+1.0d0)) / denom
       dlmda = (1.0d0 + left*omx**n + right*xval**n) / denom
       d2lmda = rn * (right*xval**(n-1)-left*omx**(n-1)) / denom
+c
+c     the end states map exactly onto themselves, since rounding can
+c     put the sublambda an ulp past one, where a soft core power of
+c     one minus the sublambda is undefined
+c
+      if (xval .eq. 0.0d0)  lmda = 0.0d0
+      if (xval .eq. 1.0d0)  lmda = 1.0d0
       return
       end
 c

@@ -172,6 +172,7 @@ c
 c     apply polarization lambda scaling for interaction annihilation
 c
                   if (mutgi+mutgk .ne. 0) then
+                     e = e * ctsc(mutgk,mutgi)
                      dedr = dedr * ctsc(mutgk,mutgi)
                      d2edr2 = d2edr2 * ctsc(mutgk,mutgi)
                   end if
@@ -188,7 +189,8 @@ c
      &                           + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
                      d2taper = 20.0d0*c5*r3 + 12.0d0*c4*r2
      &                            + 6.0d0*c3*r + 2.0d0*c2
-                     d2e = e*d2taper + 2.0d0*dedr*dtaper + d2edr2*taper
+                     d2edr2 = e*d2taper + 2.0d0*dedr*dtaper
+     &                           + d2edr2*taper
                      dedr = e*dtaper + dedr*taper
                   end if
 c
@@ -333,6 +335,7 @@ c
 c     apply polarization lambda scaling for interaction annihilation
 c
                         if (mutgi+mutgk .ne. 0) then
+                           e = e * ctsc(mutgk,mutgi)
                            dedr = dedr * ctsc(mutgk,mutgi)
                            d2edr2 = d2edr2 * ctsc(mutgk,mutgi)
                         end if
@@ -349,8 +352,8 @@ c
      &                                 + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
                            d2taper = 20.0d0*c5*r3 + 12.0d0*c4*r2
      &                                  + 6.0d0*c3*r + 2.0d0*c2
-                           d2e = e*d2taper + 2.0d0*dedr*dtaper
-     &                              + d2edr2*taper
+                           d2edr2 = e*d2taper + 2.0d0*dedr*dtaper
+     &                                 + d2edr2*taper
                            dedr = e*dtaper + dedr*taper
                         end if
 c

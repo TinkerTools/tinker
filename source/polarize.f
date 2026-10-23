@@ -51,6 +51,10 @@ c
       call kmpole
       call kpolar
       call kchgtrn
+c
+c     no implicit solvation is set up, so mutation must not scale it
+c
+      use_solv = .false.
       call mutate
 c
 c     sum atomic polarizabilities to get additive molecular value

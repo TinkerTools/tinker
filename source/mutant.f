@@ -30,6 +30,8 @@ c     plambda     state weighting value for polarization potentials
 c     scalphar    shift scale for soft core Pauli repulsion in Ang^2
 c     scalphav    scale factor for soft core buffered 14-7 potential
 c     scexp       scale factor for soft core buffered 14-7 potential
+c     scexpm      lambda exponent of soft core buffered 14-7 shift
+c     scexpp      one minus lambda exponent of soft core 14-7 shift
 c     scexpr      lambda exponent for soft core Pauli repulsion
 c     scexprm     lambda exponent of soft core repulsion shift
 c     scexprp     one minus lambda exponent of soft core repulsion shift
@@ -64,6 +66,8 @@ c
       real*8 scalphar
       real*8 scalphav
       real*8 scexp
+      real*8 scexpm
+      real*8 scexpp
       real*8 scexpr
       real*8 scexprm
       real*8 scexprp

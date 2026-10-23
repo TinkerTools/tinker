@@ -47,8 +47,6 @@ c
       real*8 em2,em1,em0
       real*8 ep2,ep1,ep0
       real*8 ev2,ev1,ev0
-      real*8 oldvdl,oldeml
-      real*8 oldepl
       real*8 denorm,ndenorm
       real*8 totnorm,ntotnorm,rms,nrms
       real*8 advirdl(3,3)
@@ -199,7 +197,6 @@ c
          if (doanalyt .and. keylmda) then
             use_dlmda = .true.
             call setdlmdaterms
-            call altelec
             call gradient (eval,derivs)
             adedl = dedl
             adevdl = devdl
@@ -261,24 +258,18 @@ c
          if (donumer .and. keylmda) then
             use_dlmda = .false.
             call setdlmdaterms
-            oldvdl = vlambda
-            oldeml = elambda
-            oldepl = plambda
-            lmda0 = 0.0d0
-            if (use_mainlmda)  lmda0 = lambda
-            call settestlmda (use_mainlmda,lmda0+eps,oldvdl+eps,
-     &                        oldeml+eps,oldepl+eps)
+            lmda0 = lambda
+            call settestlmda (lmda0+eps)
             esum2 = energy ()
             ev2 = ev + er + edsp
             em2 = em
             ep2 = ep + ect
-            call settestlmda (use_mainlmda,lmda0-eps,oldvdl-eps,
-     &                        oldeml-eps,oldepl-eps)
+            call settestlmda (lmda0-eps)
             esum0 = energy ()
             ev0 = ev + er + edsp
             em0 = em
             ep0 = ep + ect
-            call settestlmda (use_mainlmda,lmda0,oldvdl,oldeml,oldepl)
+            call settestlmda (lmda0)
             esum1 = energy ()
             ev1 = ev + er + edsp
             em1 = em
@@ -291,8 +282,7 @@ c
             nd2evdl2 = (ev2 - 2.0d0 * ev1 + ev0) / (eps*eps)
             nd2emdl2 = (em2 - 2.0d0 * em1 + em0) / (eps*eps)
             nd2epdl2 = (ep2 - 2.0d0 * ep1 + ep0) / (eps*eps)
-            call settestlmda (use_mainlmda,lmda0+eps,oldvdl+eps,
-     &                        oldeml+eps,oldepl+eps)
+            call settestlmda (lmda0+eps)
             call gradient (eval,derivs)
             do i = 1, n
                do j = 1, 3
@@ -311,8 +301,7 @@ c
      &                                + edspvir(j,i)
                end do
             end do
-            call settestlmda (use_mainlmda,lmda0-eps,oldvdl-eps,
-     &                        oldeml-eps,oldepl-eps)
+            call settestlmda (lmda0-eps)
             call gradient (eval,derivs)
             do i = 1, n
                do j = 1, 3
@@ -340,39 +329,6 @@ c
                end do
             end do
 c
-c     apply the chain rule to direct sublambda finite differences
-c
-            if (.not. use_mainlmda) then
-               nd2epdl2 = nd2epdl2 * dpldlmda*dpldlmda
-     &                           + ndepdl * d2pldlmda2
-               ndepdl = ndepdl * dpldlmda
-               nd2evdl2 = nd2evdl2 * dvldlmda*dvldlmda
-     &                           + ndevdl * d2vldlmda2
-               ndevdl = ndevdl * dvldlmda
-               nd2emdl2 = nd2emdl2 * deldlmda*deldlmda
-     &                           + ndemdl * d2eldlmda2
-               ndemdl = ndemdl * deldlmda
-               ndedl = ndepdl + ndevdl + ndemdl
-               nd2edl2 = nd2epdl2 + nd2evdl2 + nd2emdl2
-               do i = 1, n
-                  do j = 1, 3
-                     ndfpdl(j,i) = ndfpdl(j,i) * dpldlmda
-                     ndfmdl(j,i) = ndfmdl(j,i) * deldlmda
-                     ndfvdl(j,i) = ndfvdl(j,i) * dvldlmda
-                     ndfsumdl(j,i) = ndfpdl(j,i)+ndfmdl(j,i)+ndfvdl(j,i)
-                  end do
-               end do
-               do i = 1, 3
-                  do j = 1, 3
-                     ndepvirdl(j,i) = ndepvirdl(j,i) * dpldlmda
-                     ndemvirdl(j,i) = ndemvirdl(j,i) * deldlmda
-                     ndevvirdl(j,i) = ndevvirdl(j,i) * dvldlmda
-                     ndvirdl(j,i) = ndepvirdl(j,i) + ndemvirdl(j,i)
-     &                            + ndevvirdl(j,i)
-                  end do
-               end do
-            end if
-c
 c     zero d2edl2 and dfdl unless second lambda derivs are requested
 c
             if (.not. use_d2lmda) then
@@ -397,7 +353,7 @@ c
                   end do
                end do
             end if
-            call settestlmda (use_mainlmda,lmda0,oldvdl,oldeml,oldepl)
+            call settestlmda (lmda0)
          end if
 c
 c     print the analytical lambda derivatives
@@ -564,26 +520,18 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "settestlmda" sets either the main lambda owned by the active
-c     method or the explicit sublambdas, then updates scaled parameters
+c     "settestlmda" sets the main lambda, which a lambda derivative
+c     always has, and maps it onto the sublambdas and the scaled
+c     parameters
 c
 c
-      subroutine settestlmda (mainlmda,lmda,vlmda,elmda,plmda)
-      use dlmda
+      subroutine settestlmda (lmda)
       use mutant
       implicit none
-      real*8 lmda,vlmda,elmda,plmda
-      logical mainlmda
+      real*8 lmda
 c
 c
-      if (mainlmda) then
-         lambda = lmda
-         call refreshsublmda
-      else
-         vlambda = vlmda
-         elambda = elmda
-         plambda = plmda
-         call altelec
-      end if
+      lambda = lmda
+      call refreshsublmda
       return
       end

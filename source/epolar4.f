@@ -75,8 +75,11 @@ c     electrostatic parameters of the charging ligand linearly, so it is
 c     just the field of those multipoles held at their unscaled values,
 c     and the other ligand of a staged leg is annihilated and adds
 c     nothing; the inverse-polarizability derivative of the charging
-c     ligand is evaluated from the local total fields, which remains
-c     finite at plambda equal to zero
+c     ligand needs its local total fields, which the converged induced
+c     dipoles give as the dipole over the polarizability, or through
+c     the inverse exchange polarization scale, without a further field
+c     evaluation; at plambda equal to zero that polarizability vanishes,
+c     so the fields are then built from the permanent and mutual fields
 c
 c
       subroutine epolar4s
@@ -127,8 +130,6 @@ c
       atzero = (plmda .eq. 0.0d0)
       allocate (dfldd(3,n))
       allocate (dfldp(3,n))
-      allocate (ufield(3,n))
-      allocate (ufieldp(3,n))
       call altepdt (1.0d0)
       mutfield = .true.
       if (use_ewald) then
@@ -141,21 +142,21 @@ c
       mutfield = .false.
       call altepdt (plmda)
 c
-c     get the mutual fields from the converged dipoles
-c
-      if (use_ewald) then
-         call ufield0c (ufield,ufieldp)
-      else if (use_mlist) then
-         call ufield0b (ufield,ufieldp)
-      else
-         call ufield0a (ufield,ufieldp)
-      end if
-c
-c     pol vanishes at plmda=0, so compute the permanent field
+c     the polarizability vanishes at plmda=0, so compute the
+c     permanent field and the mutual field of the converged dipoles
 c
       if (atzero) then
          allocate (field0(3,n))
          allocate (fieldp0(3,n))
+         allocate (ufield(3,n))
+         allocate (ufieldp(3,n))
+         if (use_ewald) then
+            call ufield0c (ufield,ufieldp)
+         else if (use_mlist) then
+            call ufield0b (ufield,ufieldp)
+         else
+            call ufield0a (ufield,ufieldp)
+         end if
          if (use_ewald) then
             call dfield0c (field0,fieldp0)
          else if (use_mlist) then
@@ -182,15 +183,23 @@ c
          do j = 1, 3
             term = term + uinp(j,i)*dfldd(j,i) + uind(j,i)*dfldp(j,i)
          end do
-         if (dsc(mutg(i)).ne.0.0d0 .and. douindorig(i)) then
+c
+c     away from plmda=0 the converged dipole is the polarizability
+c     times the total field, scaled by the inverse exchange
+c     polarization factor if present, so the dipoles give the term
+c
+         if (dsc(mutg(i)).ne.0.0d0 .and. douindorig(i)
+     &          .and. .not.atzero) then
+            if (polarity(i) .ne. 0.0d0) then
+               do j = 1, 3
+                  term = term + polarityorig(i)*uind(j,i)*uinp(j,i)
+     &                             / polarity(i)**2
+               end do
+            end if
+         else if (dsc(mutg(i)).ne.0.0d0 .and. douindorig(i)) then
             do j = 1, 3
-               if (atzero) then
-                  fldd(j) = field0(j,i) + ufield(j,i)
-                  fldp(j) = fieldp0(j,i) + ufieldp(j,i)
-               else
-                  fldd(j) = udir(j,i)/polarity(i) + ufield(j,i)
-                  fldp(j) = udirp(j,i)/polarity(i) + ufieldp(j,i)
-               end if
+               fldd(j) = field0(j,i) + ufield(j,i)
+               fldp(j) = fieldp0(j,i) + ufieldp(j,i)
             end do
             if (use_expol) then
                do j = 1, 3
@@ -216,17 +225,17 @@ c
             end do
          end if
       end do
-      depdl = -0.5d0 * (electric/dielec) * term
+      depdl = depdl - 0.5d0*(electric/dielec)*term
 c
 c     perform deallocation of local arrays
 c
       deallocate (dfldd)
       deallocate (dfldp)
-      deallocate (ufield)
-      deallocate (ufieldp)
       if (atzero) then
          deallocate (field0)
          deallocate (fieldp0)
+         deallocate (ufield)
+         deallocate (ufieldp)
       end if
 c
 c     restore the electrostatic parameter state for subsequent terms,
@@ -268,7 +277,8 @@ c
 c     an endpoint is live when it carries weight or a lambda derivative
 c
       plambdaorig = plambda
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &                 dpldlmda,d2pldlmda2,need0,need1)
 c
@@ -282,23 +292,24 @@ c
 c     a single state carries all of the weight and no lambda
 c     derivative, and is already in place
 c
-      depdl = 0.0d0
       if (need0 .and. need1) then
 c
-c     compute lambda derivative, along with the second, force and
+c     add the lambda derivative, along with the second, force and
 c     virial lambda derivatives only when they are requested
 c
-         depdl = dweight1 * (ep - ep0)
+         depdl = depdl + dweight1*(ep-ep0)
          if (use_d2lmda) then
-            d2epdl2 = d2weight1 * (ep - ep0)
+            d2epdl2 = d2epdl2 + d2weight1*(ep-ep0)
             do i = 1, n
                do j = 1, 3
-                  dfpdl(j,i) = dweight1 * (dep(j,i) - dep0(j,i))
+                  dfpdl(j,i) = dfpdl(j,i)
+     &                            + dweight1*(dep(j,i)-dep0(j,i))
                end do
             end do
             do i = 1, 3
                do j = 1, 3
-                  depvirdl(j,i) = dweight1 * (epvir(j,i)-epvir0(j,i))
+                  depvirdl(j,i) = depvirdl(j,i)
+     &                               + dweight1*(epvir(j,i)-epvir0(j,i))
                end do
             end do
          end if

@@ -259,10 +259,10 @@
  Anlyt      RMS Gradient over All Atoms              0.191559
  Numer      RMS Gradient over All Atoms              0.191559
 
- Analytical dV/dL :                6.396        2.191        0.055
-                                   2.191        7.370       -1.041
-                                   0.055       -1.041        4.699
+ Analytical dV/dL :                6.397        2.191        0.055
+                                   2.191        7.371       -1.041
+                                   0.055       -1.041        4.700
 
- Numerical dV/dL :                 6.396        2.191        0.055
-                                   2.191        7.370       -1.041
-                                   0.055       -1.041        4.699
+ Numerical dV/dL :                 6.397        2.191        0.055
+                                   2.191        7.371       -1.041
+                                   0.055       -1.041        4.700

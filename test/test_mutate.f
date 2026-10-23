@@ -56,6 +56,10 @@ c
       call test_mutate_scexp
       call test_mutate_repsc
       call test_mutate_dspsc
+      call test_mutate_unsup
+      call test_mutate_sampreset
+      call test_mutate_rpolesave
+      call test_mutate_cthess
       call test_mutate_epdtsave
       call test_mutate_gate
       call test_mutate_flat
@@ -2477,11 +2481,12 @@ c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "test_mutate_scexp" runs "analyze" on keyfiles with a softcore
-c     exponent below the allowed limits; an exponent of 0.5 must stop
-c     in any mode, 1.5 must stop with "lambda-deriv2" or OST since the
-c     second lambda derivative diverges at the endpoint, and 1.5 with
-c     TI must run
+c     "test_mutate_scexp" runs "analyze" on keyfiles with buffered
+c     14-7 soft core parameters outside the allowed limits; each such
+c     parameter is reset to its default, so all must run with the
+c     energy of a keyfile holding the reset values, including an
+c     exponent of 1.5 or a one minus lambda shift exponent of 1.5 with
+c     "lambda-deriv2" or OST, while an exponent of 1.5 with TI runs
 c
 c
       subroutine test_mutate_scexp
@@ -2491,14 +2496,30 @@ c
 c
       if (skiptest('test_mutate_scexp','mutate'))  return
       call pushdir ('file/mutate')
-      call test_mutate_scexpcase ('vsoft_n05_d1.key','one',
-     &                            'test_mutate_scexp n05 deriv')
-      call test_mutate_scexpcase ('vsoft_n15_d2.key','two',
-     &                            'test_mutate_scexp n15 deriv2')
-      call test_mutate_scexpcase ('vsoft_n15_ost.key','two',
-     &                            'test_mutate_scexp n15 ost')
-      call test_mutate_scexpcase ('175_water_vsoft_n15_ti_l00.key',
-     &                            '','test_mutate_scexp n15 ti')
+      call test_mutate_sccase ('vsoft_n05_d1.key',
+     &   'vsoft_default_d1.key','water2','',
+     &   'test_mutate_scexp n05 deriv')
+      call test_mutate_sccase ('vsoft_n15_d2.key',
+     &   'vsoft_default_d2.key','water2','',
+     &   'test_mutate_scexp n15 deriv2')
+      call test_mutate_sccase ('vsoft_n15_ost.key',
+     &   'vsoft_default_ost.key','water2','',
+     &   'test_mutate_scexp n15 ost')
+      call test_mutate_sccase ('vsoft_a_neg_d1.key',
+     &   'vsoft_a07_d1.key','water2','',
+     &   'test_mutate_scexp alpha')
+      call test_mutate_sccase ('vsoft_m_neg_d1.key',
+     &   'vsoft_default_d1.key','water2','',
+     &   'test_mutate_scexp m')
+      call test_mutate_sccase ('vsoft_p05_d1.key',
+     &   'vsoft_default_d1.key','water2','',
+     &   'test_mutate_scexp p05')
+      call test_mutate_sccase ('vsoft_p15_d2.key',
+     &   'vsoft_default_d2.key','water2','',
+     &   'test_mutate_scexp p15 deriv2')
+      call test_mutate_sccase ('175_water_vsoft_n15_ti_l00.key',
+     &   '175_water_vsoft_n15_ti_l00.key','water2','',
+     &   'test_mutate_scexp n15 ti')
       call popdir
       call test_mutate_scexpti
       return
@@ -2559,59 +2580,6 @@ c
       deallocate (refg)
       call popdir
       call final
-      return
-      end
-c
-c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine test_mutate_scexpcase  --  one exponent keyfile  ##
-c     ##                                                              ##
-c     ##################################################################
-c
-c
-c     "test_mutate_scexpcase" runs "analyze" on one keyfile and checks
-c     the exponent error it prints, where "limit" names the violated
-c     lower bound, or is blank if the run must not stop
-c
-c
-      subroutine test_mutate_scexpcase (key,limit,label)
-      implicit none
-      integer ist,iout
-      logical found,want
-      character*(*) key,limit,label
-      character*240 line
-      character*512 args
-c
-c
-      call execute_command_line ('rm -f out.txt')
-      args = '-k '//key//' water2.xyz E'
-      call run_prog ('analyze',trim(args),'out.txt',ist)
-      if (ist .eq. -1)  return
-c
-c     find the exponent error and the bound it names
-c
-      found = .false.
-      want = .false.
-      open (newunit=iout,file='out.txt',status='old')
-      do while (.true.)
-         read (iout,'(a)',end=10)  line
-         if (index(line,'VDW-SOFTCORE exponent') .ne. 0) then
-            found = .true.
-            if (len(limit) .gt. 0) then
-               want = (index(line,'equal to '//limit) .ne. 0)
-            end if
-         end if
-      end do
-   10 continue
-      close (unit=iout)
-      if (len(limit) .gt. 0) then
-         call assert_logical (found,.true.,label//' stops')
-         call assert_logical (want,.true.,label//' bound')
-      else
-         call assert_logical (found,.false.,label//' runs')
-      end if
-      call execute_command_line ('rm -f out.txt')
       return
       end
 c
@@ -2742,77 +2710,377 @@ c
 c
       if (skiptest('test_mutate_dspsc','mutate'))  return
       call pushdir ('file/mutate')
-      call test_mutate_dspsccase ('dsoft_rs_neg_d1.key',
-     &   'dsoft_default_d1.key','','test_mutate_dspsc radius')
-      call test_mutate_dspsccase ('dsoft_n05_d1.key',
-     &   'dsoft_default_d1.key','','test_mutate_dspsc n05')
-      call test_mutate_dspsccase ('dsoft_q0_d1.key',
-     &   'dsoft_default_d1.key','','test_mutate_dspsc q0')
-      call test_mutate_dspsccase ('dsoft_n15_d2.key',
-     &   'dsoft_default_d1.key','','test_mutate_dspsc n15 deriv2')
-      call test_mutate_dspsccase ('dsoft_n1_q05_d2.key',
-     &   'dsoft_n1_d1.key','','test_mutate_dspsc n1 q05 deriv2')
-      call test_mutate_dspsccase ('dsoft_rs_big_d1.key',
-     &   'dsoft_box_d1.key','','test_mutate_dspsc radius cutoff')
-      call test_mutate_dspsccase ('dsoft_rs_taper_d0.key',
-     &   'dsoft_box_dcorr_d0.key','','test_mutate_dspsc radius taper')
-      call test_mutate_dspsccase ('dsoft_dcorr_d1.key',
-     &   'dsoft_dcorr_d0.key','','test_mutate_dspsc correction deriv')
+      call test_mutate_sccase ('dsoft_rs_neg_d1.key',
+     &   'dsoft_default_d1.key','hipwat','',
+     &   'test_mutate_dspsc radius')
+      call test_mutate_sccase ('dsoft_n05_d1.key',
+     &   'dsoft_default_d1.key','hipwat','',
+     &   'test_mutate_dspsc n05')
+      call test_mutate_sccase ('dsoft_q0_d1.key',
+     &   'dsoft_default_d1.key','hipwat','',
+     &   'test_mutate_dspsc q0')
+      call test_mutate_sccase ('dsoft_n15_d2.key',
+     &   'dsoft_default_d1.key','hipwat','',
+     &   'test_mutate_dspsc n15 deriv2')
+      call test_mutate_sccase ('dsoft_n1_q05_d2.key',
+     &   'dsoft_n1_d1.key','hipwat','',
+     &   'test_mutate_dspsc n1 q05 deriv2')
+      call test_mutate_sccase ('dsoft_rs_big_d1.key',
+     &   'dsoft_box_d1.key','hipwat','',
+     &   'test_mutate_dspsc radius cutoff')
+      call test_mutate_sccase ('dsoft_rs_taper_d0.key',
+     &   'dsoft_box_dcorr_d0.key','hipwat','',
+     &   'test_mutate_dspsc radius taper')
+      call test_mutate_sccase ('dsoft_dcorr_d1.key',
+     &   'dsoft_dcorr_d0.key','hipwat','',
+     &   'test_mutate_dspsc correction deriv')
       call popdir
       return
       end
 c
 c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine test_mutate_dspsccase  --  one dispersion gate  ##
-c     ##                                                             ##
-c     #################################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_mutate_unsup  --  unsupported setups  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "test_mutate_dspsccase" runs "analyze" on one HIPPO water keyfile
-c     and checks for the setup error containing "phrase", or, if
-c     "phrase" is blank, that no setup error is printed and the total
-c     energy matches that from the reference keyfile
+c     "test_mutate_unsup" runs "analyze" on keyfiles that mutate atoms
+c     under a van der Waals form with no lambda scaling, that ask for
+c     lambda derivatives of Lennard-Jones van der Waals or partial
+c     charge electrostatics, which have none, that ask for lambda
+c     derivatives or lambda dynamics with implicit solvation, whose
+c     parameters are scaled once at setup, or that ask for a lambda
+c     derivative across a quintic map of zero width; each must stop
+c     with its setup error, while lambda keywords given without a
+c     value are skipped, a negative sublambda is taken as zero and one
+c     above one as one, where a non-integer soft core shift exponent
+c     would otherwise find no power of a negative base, leaving the
+c     energy of the keyfile without them
 c
 c
-      subroutine test_mutate_dspsccase (key,refkey,phrase,label)
+      subroutine test_mutate_unsup
+      implicit none
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_unsup','mutate'))  return
+      call pushdir ('file/mutate')
+      call test_mutate_sccase ('mut_buck_fatal.key','','water2',
+     &   'Buffered 14-7 and Lennard-Jones',
+     &   'test_mutate_unsup buckingham')
+      call test_mutate_sccase ('mut_solv_ti_fatal.key','','water2',
+     &   'Available with Implicit Solvation',
+     &   'test_mutate_unsup solvation ti')
+      call test_mutate_sccase ('mut_solv_deriv_fatal.key','','water2',
+     &   'Available with Implicit Solvation',
+     &   'test_mutate_unsup solvation deriv')
+      call test_mutate_sccase ('mut_lj_deriv_fatal.key','',
+     &   '../chglj/trp_charmm','Buffered 14-7 van der Waals',
+     &   'test_mutate_unsup lennard-jones deriv')
+      call test_mutate_sccase ('mut_chg_deriv_fatal.key','',
+     &   '../chglj/trp_charmm','Partial Charge or Bond Dipole',
+     &   'test_mutate_unsup partial charge deriv')
+      call test_mutate_sccase ('mut_bare_kw.key','vsoft_default_d1.key',
+     &   'water2','','test_mutate_unsup bare keywords')
+      call test_mutate_sccase ('mut_elam_neg.key',
+     &   'vsoft_default_d1.key','water2','',
+     &   'test_mutate_unsup negative sublambda')
+      call test_mutate_sccase ('mut_lam_big.key','mut_lam_one.key',
+     &   'water2','','test_mutate_unsup sublambda above one')
+      call test_mutate_sccase ('mut_ost_reset.key',
+     &   'vsoft_default_ost.key','water2','',
+     &   'test_mutate_unsup ost sample interval')
+      call test_mutate_sccase ('mut_qnt_step_fatal.key','','water2',
+     &   'range of nonzero width','test_mutate_unsup qnt step')
+      call popdir
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_mutate_sampreset  --  sampling defaults  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_mutate_sampreset" sets up keyfiles whose lambda sampling
+c     parameters are out of range, a TI block, window equilibration
+c     ratio and FEP interval below their limits, and OST equilibration
+c     ratios that leave no samples with an interval too short for its
+c     three phases, and checks that each is reset to its default
+c
+c
+      subroutine test_mutate_sampreset
+      use dlmda
+      use fep
+      use thrmint
+      implicit none
+      logical skiptest
+      character*(*) tname
+      parameter (tname='test_mutate_sampreset')
+c
+c
+      if (skiptest(tname,'mutate'))  return
+      call pushdir ('file/mutate')
+      call loadfix ('water2','mut_ti_reset.key')
+      call assert_int (tinstepavg,100,tname//' ti block')
+      call assert_real (lmdawinratio,0.5d0,0.0d0,
+     &                  tname//' window ratio')
+      call assert_int (fepintv,1000,tname//' fep interval')
+      call final
+      call loadfix ('water2','mut_ost_reset.key')
+      call assert_int (lmdaintv,100,tname//' ost interval')
+      call assert_real (lmdaparatio,0.3d0,0.0d0,
+     &                  tname//' ost propagation ratio')
+      call assert_real (lmdapbratio,0.3d0,0.0d0,
+     &                  tname//' ost equilibration ratio')
+      call assert_int (lmdanpa+lmdanpb+lmdanpc,100,
+     &                 tname//' ost phases')
+      call final
+      call popdir
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_rpolesave  --  saved multipoles  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_rpolesave" takes a gradient of HIPPO water with an
+c     electrostatic lambda derivative, which rotates the unscaled
+c     multipoles; when a dipole is to be saved, the global frame
+c     multipoles left behind must be the scaled ones that "rotpole"
+c     installs, while without a save they are left unscaled
+c
+c
+      subroutine test_mutate_rpolesave
+      use atoms
+      use mpole
+      use output
+      implicit none
+      integer i,j
+      real*8 e,dmax
+      real*8, allocatable :: derivs(:,:)
+      real*8, allocatable :: rsave(:,:)
+      logical skiptest
+      character*(*) tname
+      parameter (tname='test_mutate_rpolesave')
+c
+c
+      if (skiptest(tname,'mutate'))  return
+      call pushdir ('file/mutate')
+      call loadfix ('hipwat','mpole_save_dl.key')
+      allocate (derivs(3,n))
+      allocate (rsave(maxpole,n))
+c
+c     with no dipole save the unscaled multipoles stay in place
+c
+      ustcsave = .false.
+      uchgsave = .false.
+      usyssave = .false.
+      call gradient (e,derivs)
+      rsave = rpole
+      call rotpole ('MPOLE')
+      dmax = 0.0d0
+      do i = 1, n
+         do j = 1, maxpole
+            dmax = max(dmax,abs(rpole(j,i)-rsave(j,i)))
+         end do
+      end do
+      call assert_logical (dmax.gt.1.0d-6,.true.,
+     &                     tname//' unscaled without save')
+c
+c     a saved system dipole needs the scaled multipoles
+c
+      usyssave = .true.
+      call gradient (e,derivs)
+      rsave = rpole
+      call rotpole ('MPOLE')
+      dmax = 0.0d0
+      do i = 1, n
+         do j = 1, maxpole
+            dmax = max(dmax,abs(rpole(j,i)-rsave(j,i)))
+         end do
+      end do
+      call assert_real (dmax,0.0d0,0.0d0,tname//' scaled with save')
+      usyssave = .false.
+      deallocate (derivs)
+      deallocate (rsave)
+      call popdir
+      call final
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_mutate_cthess  --  charge transfer Hessian  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "test_mutate_cthess" compares the charge transfer Hessian of
+c     HIPPO water with a partly decoupled ligand against central
+c     differences of the gradient, with a cutoff whose taper window
+c     holds ligand pairs, so that both the taper terms and the lambda
+c     scaled pair energy enter the Hessian
+c
+c
+      subroutine test_mutate_cthess
+      use atoms
+      use hessn
+      use mutant
+      implicit none
+      integer i,j,k,m
+      integer nwin
+      real*8 e,h,r,old
+      real*8 xr,yr,zr
+      real*8 dmax
+      real*8, allocatable :: g0(:,:)
+      real*8, allocatable :: g1(:,:)
+      real*8, allocatable :: hnum(:,:)
+      logical skiptest
+      character*(*) tname
+      parameter (tname='test_mutate_cthess')
+c
+c
+      if (skiptest(tname,'mutate'))  return
+      call pushdir ('file/mutate')
+      call loadfix ('hipwat','ct_hess_taper.key')
+      allocate (g0(3,n))
+      allocate (g1(3,n))
+      allocate (hnum(3,n))
+      if (allocated(hessx))  deallocate (hessx)
+      if (allocated(hessy))  deallocate (hessy)
+      if (allocated(hessz))  deallocate (hessz)
+      allocate (hessx(3,n))
+      allocate (hessy(3,n))
+      allocate (hessz(3,n))
+c
+c     the check needs ligand and environment pairs in the taper window
+c
+      nwin = 0
+      do i = 1, n-1
+         do k = i+1, n
+            if ((mutg(i).eq.0) .neqv. (mutg(k).eq.0)) then
+               xr = x(i) - x(k)
+               yr = y(i) - y(k)
+               zr = z(i) - z(k)
+               call image (xr,yr,zr)
+               r = sqrt(xr*xr+yr*yr+zr*zr)
+               if (r.gt.3.0d0 .and. r.lt.4.0d0)  nwin = nwin + 1
+            end if
+         end do
+      end do
+      call assert_logical (nwin.gt.0,.true.,tname//' taper pairs')
+c
+c     compare each Hessian row with central differences of the gradient
+c
+      h = 1.0d-5
+      dmax = 0.0d0
+      do i = 1, n
+         do k = 1, n
+            do j = 1, 3
+               hessx(j,k) = 0.0d0
+               hessy(j,k) = 0.0d0
+               hessz(j,k) = 0.0d0
+            end do
+         end do
+         call echgtrn2 (i)
+         do m = 1, 3
+            if (m .eq. 1)  old = x(i)
+            if (m .eq. 2)  old = y(i)
+            if (m .eq. 3)  old = z(i)
+            if (m .eq. 1)  x(i) = old + h
+            if (m .eq. 2)  y(i) = old + h
+            if (m .eq. 3)  z(i) = old + h
+            call gradient (e,g1)
+            if (m .eq. 1)  x(i) = old - h
+            if (m .eq. 2)  y(i) = old - h
+            if (m .eq. 3)  z(i) = old - h
+            call gradient (e,g0)
+            if (m .eq. 1)  x(i) = old
+            if (m .eq. 2)  y(i) = old
+            if (m .eq. 3)  z(i) = old
+            do k = 1, n
+               do j = 1, 3
+                  hnum(j,k) = (g1(j,k)-g0(j,k)) / (2.0d0*h)
+                  if (m .eq. 1)  r = hessx(j,k)
+                  if (m .eq. 2)  r = hessy(j,k)
+                  if (m .eq. 3)  r = hessz(j,k)
+                  dmax = max(dmax,abs(r-hnum(j,k)))
+               end do
+            end do
+         end do
+      end do
+      call assert_real (dmax,0.0d0,1.0d-5,tname//' analytic vs numer')
+      deallocate (g0)
+      deallocate (g1)
+      deallocate (hnum)
+      call popdir
+      call final
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_mutate_sccase  --  one soft core gate  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_mutate_sccase" runs "analyze" on one keyfile with the
+c     coordinates "xyz" and checks for the setup error containing
+c     "phrase", or, if "phrase" is blank, that no setup error is
+c     printed and the total energy matches that from the reference
+c     keyfile
+c
+c
+      subroutine test_mutate_sccase (key,refkey,xyz,phrase,label)
       implicit none
       real*8 e,eref
       logical found,halted
-      character*(*) key,refkey,phrase,label
+      character*(*) key,refkey,xyz,phrase,label
 c
 c
-      call test_mutate_dspscrun (key,phrase,e,found,halted)
+      call test_mutate_scrun (key,xyz,phrase,e,found,halted)
       if (len(phrase) .gt. 0) then
          call assert_logical (found,.true.,label//' stops')
       else
          call assert_logical (halted,.false.,label//' runs')
-         call test_mutate_dspscrun (refkey,phrase,eref,found,halted)
+         call test_mutate_scrun (refkey,xyz,phrase,eref,found,halted)
          call assert_real (e,eref,0.0d0,label//' reset')
       end if
       return
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine test_mutate_dspscrun  --  energy and errors  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine test_mutate_scrun  --  energy and errors  ##
+c     ##                                                       ##
+c     ###########################################################
 c
 c
-c     "test_mutate_dspscrun" runs "analyze" on one HIPPO water keyfile
-c     and returns the total potential energy, whether any setup error
-c     is printed, and whether one contains "phrase"
+c     "test_mutate_scrun" runs "analyze" on one keyfile with the
+c     coordinates "xyz" and returns the total potential energy,
+c     whether any setup error is printed, and whether one contains
+c     "phrase"
 c
 c
-      subroutine test_mutate_dspscrun (key,phrase,e,found,halted)
+      subroutine test_mutate_scrun (key,xyz,phrase,e,found,halted)
       implicit none
       integer ist,iout,k
       real*8 e
       logical found,halted
-      character*(*) key,phrase
+      character*(*) key,xyz,phrase
       character*240 line
       character*512 args
 c
@@ -2821,7 +3089,7 @@ c
       found = .false.
       halted = .false.
       call execute_command_line ('rm -f out.txt')
-      args = '-k '//key//' hipwat.xyz E'
+      args = '-k '//key//' '//xyz//'.xyz E'
       call run_prog ('analyze',trim(args),'out.txt',ist)
       if (ist .eq. -1)  return
 c

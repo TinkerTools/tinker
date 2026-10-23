@@ -35,6 +35,10 @@ c     case 11 scales HIPPO water charge transfer by a squared dual
 c     topology weight through "echgtrn1", in a box small enough for
 c     the cutoff to reach replicate cells
 c
+c     case 12 adds the long range dispersion correction with a wide
+c     taper window, whose virial must be minus its energy, as the
+c     lattice derivative of a constant over the volume finds it
+c
 c
       subroutine test_testvir
       implicit none
@@ -52,6 +56,7 @@ c
       call test_testvir_case ('10_disp_dewald_ann_l05',
      &                        '../ephippo/dmso')
       call test_testvir_case ('11_ct_lambda_l04','../testlmda/hipwat')
+      call test_testvir_case ('12_disp_corr','../testlmda/hipmix')
       return
       end
 c

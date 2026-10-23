@@ -2142,7 +2142,8 @@ c
 c     only the endpoint states that carry weight are needed
 c
       plambdaorig = plambda
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       need0 = (weight1 .ne. 1.0d0)
       need1 = (weight1 .ne. 0.0d0)
 c

@@ -1565,10 +1565,11 @@ c
       subroutine dspmutwt4 (split,wel,wll,cpr,dwel,dwll,dcpr,
      &                      d2wel,d2wll,d2cpr)
       use disp
+      use dlmda
       use mutant
       implicit none
       integer i,ii
-      real*8 v,vq,v1,vq1,v2,vq2
+      real*8 v,v1,v2
       real*8 wel,wll,cpr
       real*8 dwel,dwll,dcpr
       real*8 d2wel,d2wll,d2cpr
@@ -1593,7 +1594,7 @@ c
 c     set the weights and their derivatives for annihilation or for
 c     decoupling from the lambda power of the soft core
 c
-      call dspsc4 (v,vq,v1,vq1,v2,vq2)
+      call lmdapwr (vlambda,scexpd,use_d2lmda,v,v1,v2)
       split = .true.
       wel = v
       dwel = v1

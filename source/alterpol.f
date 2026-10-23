@@ -467,14 +467,23 @@ c
       real*8 sc(0:2)
       real*8 dsc(0:2)
       real*8, allocatable :: pscale(:)
+      real*8, allocatable :: dpl(:,:,:)
       logical epli,eplk
       logical muti,mutk
       character*6 mode
 c
 c
-c     perform dynamic allocation of some local arrays
+c     perform dynamic allocation of some local arrays, where the
+c     partner overlap is reduced over threads in a local array that
+c     only has full size when it is collected
 c
       allocate (pscale(n))
+      if (mutpsc) then
+         allocate (dpl(3,3,n))
+      else
+         allocate (dpl(3,3,1))
+      end if
+      dpl = 0.0d0
 c
 c     set the switching function coefficients
 c
@@ -524,8 +533,8 @@ c
 !$OMP& p2iscale,p3iscale,p4iscale,p5iscale,nelst,elst,use_bounds,
 !$OMP& cut2,off2,c0,c1,c2,c3,c4,c5,polinv,mutg,mutpsc,dsc,prepeporig)
 !$OMP& firstprivate(pscale)
-!$OMP& shared (polscale,dpscdl)
-!$OMP DO reduction(+:polscale,dpscdl)
+!$OMP& shared (polscale,dpl)
+!$OMP DO reduction(+:polscale,dpl)
 c
 c     find the variable polarizability
 c
@@ -625,14 +634,14 @@ c
                      if (mutk) then
                         do j = 1, 3
                            do m = 1, 3
-                              dpscdl(j,m,i) = dpscdl(j,m,i) + ks2i(j,m)
+                              dpl(j,m,i) = dpl(j,m,i) + ks2i(j,m)
                            end do
                         end do
                      end if
                      if (muti) then
                         do j = 1, 3
                            do m = 1, 3
-                              dpscdl(j,m,k) = dpscdl(j,m,k) + ks2k(j,m)
+                              dpl(j,m,k) = dpl(j,m,k) + ks2k(j,m)
                            end do
                         end do
                      end if
@@ -673,9 +682,23 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
+c     add the overlap of mutated partners to the global array
+c
+      if (mutpsc) then
+         do ii = 1, npole
+            i = ipole(ii)
+            do j = 1, 3
+               do m = 1, 3
+                  dpscdl(m,j,i) = dpscdl(m,j,i) + dpl(m,j,i)
+               end do
+            end do
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (pscale)
+      deallocate (dpl)
       return
       end
 c

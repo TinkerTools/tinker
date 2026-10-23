@@ -1245,8 +1245,10 @@ c
 c
 c     "test_bar_ref" runs mode 2 at 1 atm on the two BAR files of the
 c     water trajectories that "test_bar_case" builds in mode 1, and
-c     checks every value found from all of the frames against those
-c     of Tinker9, which keeps the same values in its own test
+c     checks every value found from all of the frames against its
+c     reference; the first file has the ligand van der Waals at an
+c     intermediate lambda, so its values follow the soft core power
+c     in the long range correction, which Tinker9 does not yet use
 c
 c
       subroutine test_bar_ref
@@ -1269,9 +1271,9 @@ c
      &              'Enthalpy via Backward FEP',
      &              'Enthalpy via BAR Estimate',
      &              'BAR Estimate -T*dS Value' /
-      data expect  / -0.0282d0, -0.2117d0, -0.2072d0, -0.0009d0,
-     &               -18.5438d0, -161.2045d0, -348.4886d0,
-     &               -342.1090d0, 341.9018d0,
+      data expect  / -0.0211d0, -0.2047d0, -0.2001d0, -0.0009d0,
+     &               -18.5368d0, -161.1690d0, -348.4671d0,
+     &               -342.0582d0, 341.8581d0,
      &               1.1255d0, 1.5060d0, 1.3773d0, 0.0002d0,
      &               -31.5853d0, 268.6882d0, 290.2645d0,
      &               398.8347d0, -397.4574d0 /

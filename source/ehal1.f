@@ -33,8 +33,8 @@ c
       character*6 mode
 c
 c
-c     take lambda derivatives while the van der Waals lambda map
-c     has slope or curvature, as in the "gradient" routine
+c     take lambda derivatives as "vdlflags" sets for the van der
+c     Waals lambda
 c
       call vdlflags (dodl,dod2)
 c
@@ -110,7 +110,7 @@ c
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
       real*8 vlsc(2),vlsc1(2),vlsc2(2)
-      real*8 vscal(2),dvscal(2)
+      real*8 vscal(2),vscal1(2),vscal2(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -129,8 +129,6 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 dldvxx,dldvyy,dldvzz
-      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
       logical proceed,usei
       logical muti,mutk,mutik
@@ -170,8 +168,8 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     take lambda derivatives while the van der Waals lambda map
-c     has slope or curvature, as in the "gradient" routine
+c     take lambda derivatives as "vdlflags" sets for the van der
+c     Waals lambda
 c
       call vdlflags (dodl,dod2)
 c
@@ -179,7 +177,7 @@ c     set the soft core lambda terms for each ligand group, along
 c     with their lambda derivative factors as needed
 c
       if (dodl) then
-         call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
+         call halsc4 (vlsc,vscal,vlsc1,vlsc2,vscal1,vscal2)
       else
          call halsc (vlsc,vscal)
       end if
@@ -278,7 +276,8 @@ c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
                      call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
-     &                             dvscal,e,de,dlambda,dlambda2,dlde)
+     &                             vscal1,vscal2,e,de,dlambda,dlambda2,
+     &                             dlde)
                   else if (mutik) then
                      ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
@@ -424,21 +423,8 @@ c
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
                   if (mutd2) then
-                     dldvxx = xr * dldedx
-                     dldvyx = yr * dldedx
-                     dldvzx = zr * dldedx
-                     dldvyy = yr * dldedy
-                     dldvzy = zr * dldedy
-                     dldvzz = zr * dldedz
-                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
-                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
-                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
-                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
-                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
-                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
-                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
-                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
-                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
+                     call dlcvir (xr,yr,zr,dldedx,dldedy,dldedz,
+     &                             devvirdl)
                   end if
                end if
             end if
@@ -553,7 +539,7 @@ c     take the soft core terms of the ligand group in this pair
 c
                         ig = max(mutgi,mutgk)
                         call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,
-     &                                vscal,dvscal,e,de,dlambda,
+     &                                vscal,vscal1,vscal2,e,de,dlambda,
      &                                dlambda2,dlde)
                      else if (mutik) then
                         ig = max(mutgi,mutgk)
@@ -709,21 +695,8 @@ c
                      evvir(2,3) = evvir(2,3) + vzy
                      evvir(3,3) = evvir(3,3) + vzz
                      if (mutd2) then
-                        dldvxx = xr * dldedx
-                        dldvyx = yr * dldedx
-                        dldvzx = zr * dldedx
-                        dldvyy = yr * dldedy
-                        dldvzy = zr * dldedy
-                        dldvzz = zr * dldedz
-                        devvirdl(1,1) = devvirdl(1,1) + dldvxx
-                        devvirdl(2,1) = devvirdl(2,1) + dldvyx
-                        devvirdl(3,1) = devvirdl(3,1) + dldvzx
-                        devvirdl(1,2) = devvirdl(1,2) + dldvyx
-                        devvirdl(2,2) = devvirdl(2,2) + dldvyy
-                        devvirdl(3,2) = devvirdl(3,2) + dldvzy
-                        devvirdl(1,3) = devvirdl(1,3) + dldvzx
-                        devvirdl(2,3) = devvirdl(2,3) + dldvzy
-                        devvirdl(3,3) = devvirdl(3,3) + dldvzz
+                        call dlcvir (xr,yr,zr,dldedx,dldedy,dldedz,
+     &                                devvirdl)
                      end if
                   end if
                end do
@@ -794,7 +767,7 @@ c
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
       real*8 vlsc(2),vlsc1(2),vlsc2(2)
-      real*8 vscal(2),dvscal(2)
+      real*8 vscal(2),vscal1(2),vscal2(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -813,8 +786,6 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 dldvxx,dldvyy,dldvzz
-      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
       real*8, allocatable :: xsort(:)
       real*8, allocatable :: ysort(:)
@@ -861,8 +832,8 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     take lambda derivatives while the van der Waals lambda map
-c     has slope or curvature, as in the "gradient" routine
+c     take lambda derivatives as "vdlflags" sets for the van der
+c     Waals lambda
 c
       call vdlflags (dodl,dod2)
 c
@@ -870,7 +841,7 @@ c     set the soft core lambda terms for each ligand group, along
 c     with their lambda derivative factors as needed
 c
       if (dodl) then
-         call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
+         call halsc4 (vlsc,vscal,vlsc1,vlsc2,vscal1,vscal2)
       else
          call halsc (vlsc,vscal)
       end if
@@ -1023,7 +994,8 @@ c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
                      call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
-     &                             dvscal,e,de,dlambda,dlambda2,dlde)
+     &                             vscal1,vscal2,e,de,dlambda,dlambda2,
+     &                             dlde)
                   else if (mutik) then
                      ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
@@ -1169,21 +1141,8 @@ c
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
                   if (mutd2) then
-                     dldvxx = xr * dldedx
-                     dldvyx = yr * dldedx
-                     dldvzx = zr * dldedx
-                     dldvyy = yr * dldedy
-                     dldvzy = zr * dldedy
-                     dldvzz = zr * dldedz
-                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
-                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
-                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
-                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
-                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
-                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
-                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
-                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
-                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
+                     call dlcvir (xr,yr,zr,dldedx,dldedy,dldedz,
+     &                             devvirdl)
                   end if
                end if
             end if
@@ -1259,7 +1218,7 @@ c
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
       real*8 vlsc(2),vlsc1(2),vlsc2(2)
-      real*8 vscal(2),dvscal(2)
+      real*8 vscal(2),vscal1(2),vscal2(2)
       real*8 fgrp,rv,rv7
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -1278,9 +1237,8 @@ c
       real*8 rik6,rik7
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
-      real*8 dldvxx,dldvyy,dldvzz
-      real*8 dldvyx,dldvzx,dldvzy
       real*8, allocatable :: vscale(:)
+      real*8, allocatable :: dfl(:,:)
       logical proceed,usei
       logical muti,mutk,mutik
       logical dodl,dod2,mutdl,mutd2
@@ -1319,8 +1277,8 @@ c
       mode = 'VDW'
       call switch (mode)
 c
-c     take lambda derivatives while the van der Waals lambda map
-c     has slope or curvature, as in the "gradient" routine
+c     take lambda derivatives as "vdlflags" sets for the van der
+c     Waals lambda
 c
       call vdlflags (dodl,dod2)
 c
@@ -1328,10 +1286,20 @@ c     set the soft core lambda terms for each ligand group, along
 c     with their lambda derivative factors as needed
 c
       if (dodl) then
-         call halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
+         call halsc4 (vlsc,vscal,vlsc1,vlsc2,vscal1,vscal2)
       else
          call halsc (vlsc,vscal)
       end if
+c
+c     the lambda derivative of the force is reduced over threads in
+c     a local array that only has full size when it is needed
+c
+      if (dod2) then
+         allocate (dfl(3,n))
+      else
+         allocate (dfl(3,1))
+      end if
+      dfl = 0.0d0
 c
 c     apply any reduction factor to the atomic coordinates
 c
@@ -1350,11 +1318,11 @@ c
 !$OMP& kred,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
-!$OMP& dhal,cut2,vcouple,mutg,vlsc,vlsc1,vlsc2,vscal,dvscal,
+!$OMP& dhal,cut2,vcouple,mutg,vlsc,vlsc1,vlsc2,vscal,vscal1,vscal2,
 !$OMP& dodl,dod2,c0,c1,c2,c3,c4,c5)
-!$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfvdl,devdl,d2evdl2,
+!$OMP& firstprivate(vscale,iv14) shared(ev,dev,dfl,devdl,d2evdl2,
 !$OMP& evvir,devvirdl)
-!$OMP DO reduction(+:ev,dev,dfvdl,devdl,d2evdl2,evvir,devvirdl)
+!$OMP DO reduction(+:ev,dev,dfl,devdl,d2evdl2,evvir,devvirdl)
 c
 c     find van der Waals energy and derivatives via neighbor list
 c
@@ -1439,7 +1407,8 @@ c     take the soft core terms of the ligand group in this pair
 c
                      ig = max(mutgi,mutgk)
                      call ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,
-     &                             dvscal,e,de,dlambda,dlambda2,dlde)
+     &                             vscal1,vscal2,e,de,dlambda,dlambda2,
+     &                             dlde)
                   else if (mutik) then
                      ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
@@ -1517,9 +1486,9 @@ c
                      dev(2,i) = dev(2,i) + dedy
                      dev(3,i) = dev(3,i) + dedz
                      if (mutd2) then
-                        dfvdl(1,i) = dfvdl(1,i) + dldedx
-                        dfvdl(2,i) = dfvdl(2,i) + dldedy
-                        dfvdl(3,i) = dfvdl(3,i) + dldedz
+                        dfl(1,i) = dfl(1,i) + dldedx
+                        dfl(2,i) = dfl(2,i) + dldedy
+                        dfl(3,i) = dfl(3,i) + dldedz
                      end if
                   else
                      dev(1,i) = dev(1,i) + dedx*redi
@@ -1529,12 +1498,12 @@ c
                      dev(2,iv) = dev(2,iv) + dedy*rediv
                      dev(3,iv) = dev(3,iv) + dedz*rediv
                      if (mutd2) then
-                        dfvdl(1,i) = dfvdl(1,i) + dldedx*redi
-                        dfvdl(2,i) = dfvdl(2,i) + dldedy*redi
-                        dfvdl(3,i) = dfvdl(3,i) + dldedz*redi
-                        dfvdl(1,iv) = dfvdl(1,iv) + dldedx*rediv
-                        dfvdl(2,iv) = dfvdl(2,iv) + dldedy*rediv
-                        dfvdl(3,iv) = dfvdl(3,iv) + dldedz*rediv
+                        dfl(1,i) = dfl(1,i) + dldedx*redi
+                        dfl(2,i) = dfl(2,i) + dldedy*redi
+                        dfl(3,i) = dfl(3,i) + dldedz*redi
+                        dfl(1,iv) = dfl(1,iv) + dldedx*rediv
+                        dfl(2,iv) = dfl(2,iv) + dldedy*rediv
+                        dfl(3,iv) = dfl(3,iv) + dldedz*rediv
                      end if
                   end if
                   if (k .eq. kv) then
@@ -1542,9 +1511,9 @@ c
                      dev(2,k) = dev(2,k) - dedy
                      dev(3,k) = dev(3,k) - dedz
                      if (mutd2) then
-                        dfvdl(1,k) = dfvdl(1,k) - dldedx
-                        dfvdl(2,k) = dfvdl(2,k) - dldedy
-                        dfvdl(3,k) = dfvdl(3,k) - dldedz
+                        dfl(1,k) = dfl(1,k) - dldedx
+                        dfl(2,k) = dfl(2,k) - dldedy
+                        dfl(3,k) = dfl(3,k) - dldedz
                      end if
                   else
                      redk = kred(k)
@@ -1556,12 +1525,12 @@ c
                      dev(2,kv) = dev(2,kv) - dedy*redkv
                      dev(3,kv) = dev(3,kv) - dedz*redkv
                      if (mutd2) then
-                        dfvdl(1,k) = dfvdl(1,k) - dldedx*redk
-                        dfvdl(2,k) = dfvdl(2,k) - dldedy*redk
-                        dfvdl(3,k) = dfvdl(3,k) - dldedz*redk
-                        dfvdl(1,kv) = dfvdl(1,kv) - dldedx*redkv
-                        dfvdl(2,kv) = dfvdl(2,kv) - dldedy*redkv
-                        dfvdl(3,kv) = dfvdl(3,kv) - dldedz*redkv
+                        dfl(1,k) = dfl(1,k) - dldedx*redk
+                        dfl(2,k) = dfl(2,k) - dldedy*redk
+                        dfl(3,k) = dfl(3,k) - dldedz*redk
+                        dfl(1,kv) = dfl(1,kv) - dldedx*redkv
+                        dfl(2,kv) = dfl(2,kv) - dldedy*redkv
+                        dfl(3,kv) = dfl(3,kv) - dldedz*redkv
                      end if
                   end if
                   if (mutdl)  devdl = devdl + dlambda
@@ -1585,21 +1554,8 @@ c
                   evvir(2,3) = evvir(2,3) + vzy
                   evvir(3,3) = evvir(3,3) + vzz
                   if (mutd2) then
-                     dldvxx = xr * dldedx
-                     dldvyx = yr * dldedx
-                     dldvzx = zr * dldedx
-                     dldvyy = yr * dldedy
-                     dldvzy = zr * dldedy
-                     dldvzz = zr * dldedz
-                     devvirdl(1,1) = devvirdl(1,1) + dldvxx
-                     devvirdl(2,1) = devvirdl(2,1) + dldvyx
-                     devvirdl(3,1) = devvirdl(3,1) + dldvzx
-                     devvirdl(1,2) = devvirdl(1,2) + dldvyx
-                     devvirdl(2,2) = devvirdl(2,2) + dldvyy
-                     devvirdl(3,2) = devvirdl(3,2) + dldvzy
-                     devvirdl(1,3) = devvirdl(1,3) + dldvzx
-                     devvirdl(2,3) = devvirdl(2,3) + dldvzy
-                     devvirdl(3,3) = devvirdl(3,3) + dldvzz
+                     call dlcvir (xr,yr,zr,dldedx,dldedy,dldedz,
+     &                             devvirdl)
                   end if
                end if
             end if
@@ -1626,9 +1582,20 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
+c     add the lambda derivative of the force to the global array
+c
+      if (dod2) then
+         do i = 1, n
+            dfvdl(1,i) = dfvdl(1,i) + dfl(1,i)
+            dfvdl(2,i) = dfvdl(2,i) + dfl(2,i)
+            dfvdl(3,i) = dfvdl(3,i) + dfl(3,i)
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (iv14)
       deallocate (vscale)
+      deallocate (dfl)
       return
       end

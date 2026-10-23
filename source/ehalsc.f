@@ -14,7 +14,8 @@ c
 c
 c     "halsc" sets the soft core scale "vlsc" and softening "vscal"
 c     of the buffered 14-7 potential for each ligand group, where a
-c     second ligand group couples as the complement of vlambda
+c     second ligand group couples as the complement of vlambda, and
+c     the softening is alpha*lambda^m*(1-lambda)^p
 c
 c
       subroutine halsc (vlsc,vscal)
@@ -22,6 +23,7 @@ c
       implicit none
       integer ig
       real*8 vlmd
+      real*8 vscal1,vscal2
       real*8 vlsc(2)
       real*8 vscal(2)
 c
@@ -32,7 +34,8 @@ c
          vlmd = vlambda
          if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
          vlsc(ig) = vlmd**scexp
-         vscal(ig) = scalphav * (1.0d0-vlmd)**2
+         call lmdapow (vlmd,scalphav,scexpm,scexpp,.false.,
+     &                 vscal(ig),vscal1,vscal2)
       end do
       return
       end
@@ -48,11 +51,14 @@ c
 c     "halsc4" sets the soft core terms of the buffered 14-7 potential
 c     for each ligand group along with the factors needed for their
 c     first and second derivatives with respect to the group lambda,
-c     where the second derivative factor is only set when requested
-c     since it diverges at the endpoint for exponents below two
+c     where "vlsc1" and "vlsc2" hold the scale over lambda and lambda
+c     squared, and "vscal1" and "vscal2" hold lambda and lambda squared
+c     times the softening derivatives, so that no power of lambda goes
+c     negative; the second derivative factors are only set when they
+c     are requested
 c
 c
-      subroutine halsc4 (vlsc,vscal,vlsc1,vlsc2,dvscal)
+      subroutine halsc4 (vlsc,vscal,vlsc1,vlsc2,vscal1,vscal2)
       use dlmda
       use mutant
       implicit none
@@ -62,19 +68,21 @@ c
       real*8 vscal(2)
       real*8 vlsc1(2)
       real*8 vlsc2(2)
-      real*8 dvscal(2)
+      real*8 vscal1(2)
+      real*8 vscal2(2)
 c
 c
 c     set the soft core terms and their lambda derivative factors
 c
-      call halsc (vlsc,vscal)
       do ig = 1, 2
          vlmd = vlambda
          if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc1(ig) = vlmd**(scexp-1)
+         vlsc(ig) = vlmd**scexp
+         vlsc1(ig) = vlmd**(scexp-1.0d0)
          vlsc2(ig) = 0.0d0
-         if (use_d2lmda)  vlsc2(ig) = vlmd**(scexp-2)
-         dvscal(ig) = 2.0d0 * scalphav * (1.0d0-vlmd)
+         if (use_d2lmda)  vlsc2(ig) = vlmd**(scexp-2.0d0)
+         call lmdapow (vlmd,scalphav,scexpm,scexpp,use_d2lmda,
+     &                 vscal(ig),vscal1(ig),vscal2(ig))
       end do
       return
       end
@@ -140,9 +148,15 @@ c     first lambda derivative "dlambda" and, if second derivatives are
 c     requested, the second lambda derivative "dlambda2" and the lambda
 c     derivative "dlde" of the distance derivative
 c
+c     the pair energy is eps * lambda^n * T(scal) with T = t1*(t2-2),
+c     so each lambda derivative is a power of lambda times derivatives
+c     of T with respect to the softening "scal", weighted by the scaled
+c     softening derivatives from "halsc4", and no power of lambda goes
+c     negative
 c
-      subroutine ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,dvscal,
-     &                    e,de,dlambda,dlambda2,dlde)
+c
+      subroutine ehalsc4 (rik,rv,eps,ig,vlsc,vlsc1,vlsc2,vscal,vscal1,
+     &                    vscal2,e,de,dlambda,dlambda2,dlde)
       use dlmda
       use mutant
       use vdwpot
@@ -151,32 +165,29 @@ c
       real*8 rik,rv,eps
       real*8 e,de,dlambda
       real*8 dlambda2,dlde
-      real*8 vsgn,epsl
-      real*8 scal,dscal
+      real*8 vsgn,epsl,scal
+      real*8 sc1,sc2
       real*8 dhal17,ghal1
       real*8 rho,rho6,rho7
       real*8 rhopdhal,rhopdhal6,rhopdhal7
       real*8 s1,s2,t1,t2,t2m2
       real*8 dt1drho,dt2drho
-      real*8 dt0dl,dt1dl,dt2dl
-      real*8 ds1dl,ds2dl
-      real*8 d2t0dl2,d2t1dl2,d2t2dl2
-      real*8 d2t1dldrho,d2t2dldrho
+      real*8 tt,ts,tss
+      real*8 tr,trs
       real*8 vlsc(2),vlsc1(2)
       real*8 vlsc2(2),vscal(2)
-      real*8 dvscal(2)
+      real*8 vscal1(2),vscal2(2)
 c
 c
-c     the second ligand group couples as the complement of vlambda,
-c     which flips the sign of its odd lambda derivatives
+c     the second ligand group couples as one minus lambda
 c
       vsgn = 1.0d0
       if (ig .eq. 2)  vsgn = -1.0d0
-      dhal17 = (1.0d0+dhal)**7
-      ghal1 = 1.0d0 + ghal
 c
 c     get the soft core energy and its distance derivative
 c
+      dhal17 = (1.0d0+dhal)**7
+      ghal1 = 1.0d0 + ghal
       rho = rik / rv
       rho6 = rho**6
       rho7 = rho6 * rho
@@ -195,44 +206,34 @@ c
       e = epsl * t1 * t2m2
       de = epsl * (dt1drho*t2m2+t1*dt2drho) / rv
 c
+c     get T and its derivative with respect to the softening, where
+c     t1 and t2 change as minus t1*s1 and minus t2*s2
+c
+      sc1 = vscal1(ig)
+      tt = t1 * t2m2
+      ts = -t1*s1*t2m2 - t1*t2*s2
+c
 c     get the first lambda derivative of the energy
 c
-      dt0dl = eps * scexp * vlsc1(ig)
-      dscal = dvscal(ig)
-      ds1dl = dscal * s1 * s1
-      ds2dl = dscal * s2 * s2
-      dt1dl = dhal17 * ds1dl
-      dt2dl = ghal1 * ds2dl
-      dlambda = dt0dl * t1 * t2m2
-     &             + epsl * dt1dl * t2m2
-     &             + epsl * t1 * dt2dl
+      dlambda = eps * vlsc1(ig) * (scexp*tt+sc1*ts)
       dlambda = vsgn * dlambda
 c
-c     get the second lambda derivative of the energy and the lambda
-c     derivative of its distance derivative
+c     get the second lambda derivative, then the lambda derivative of
+c     the distance derivative from the distance derivative of T and its
+c     own softening derivative
 c
       dlambda2 = 0.0d0
       dlde = 0.0d0
       if (use_d2lmda) then
-         d2t0dl2 = eps*scexp*(scexp-1) * vlsc2(ig)
-         d2t1dl2 = dhal17 * (-2.0d0*scalphav*s1*s1
-     &                + 2.0d0*dscal*s1*ds1dl)
-         d2t2dl2 = ghal1 * (-2.0d0*scalphav*s2*s2
-     &                + 2.0d0*dscal*s2*ds2dl)
-         dlambda2 = d2t0dl2*t1*t2m2
-     &                 + epsl*d2t1dl2*t2m2
-     &                 + epsl*t1*d2t2dl2
-     &                 + 2.0d0*dt0dl*dt1dl*t2m2
-     &                 + 2.0d0*dt0dl*t1*dt2dl
-     &                 + 2.0d0*epsl*dt1dl*dt2dl
-         d2t1dldrho = -14.0d0*dhal17*s1*ds1dl*rhopdhal6
-         d2t2dldrho = -14.0d0*ghal1*s2*ds2dl*rho6
-         dlde = scexp*vlsc1(ig)
-     &             * (dt1drho*t2m2 + t1*dt2drho)
-     &             + vlsc(ig)
-     &             * (d2t1dldrho*t2m2 + t1*d2t2dldrho
-     &             + dt1dl*dt2drho + dt1drho*dt2dl)
-         dlde = eps / rv * dlde
+         sc2 = vscal2(ig)
+         tss = 2.0d0*t1*s1*s1*t2m2 + 2.0d0*t1*t2*s1*s2
+     &            + 2.0d0*t1*t2*s2*s2
+         dlambda2 = eps * vlsc2(ig) * (scexp*(scexp-1.0d0)*tt
+     &                 + 2.0d0*scexp*sc1*ts + sc1*sc1*tss + sc2*ts)
+         tr = dt1drho*t2m2 + t1*dt2drho
+         trs = -dt1drho*(2.0d0*s1*t2m2+t2*s2)
+     &            - t1*dt2drho*(s1+2.0d0*s2)
+         dlde = eps * vlsc1(ig) * (scexp*tr+sc1*trs) / rv
          dlde = vsgn * dlde
       end if
       return

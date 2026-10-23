@@ -27,16 +27,16 @@
  Main Lambda Value                     0.500
 
  Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                         -0.010192     -0.010192      0.000000      0.000000
+                                         -0.002320     -0.002320      0.000000      0.000000
 
  Numerical Lambda Derivatives :              dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                         -0.010192     -0.010192      0.000000      0.000000
+                                         -0.002320     -0.002320      0.000000      0.000000
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                          4.150613      4.150613      0.000000      0.000000
+                                          4.121985      4.121985      0.000000      0.000000
 
  Numerical 2nd Lambda Derivatives :        d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                          4.150614      4.150614      0.000000      0.000000
+                                          4.121986      4.121986      0.000000      0.000000
 
  Lambda Gradient Breakdown over Individual Atoms :
 
@@ -111,10 +111,10 @@
  Anlyt      RMS Gradient over All Atoms              0.208515
  Numer      RMS Gradient over All Atoms              0.208515
 
- Analytical dV/dL :               -1.061        0.309       -0.082
-                                   0.309       -0.695       -0.169
-                                  -0.082       -0.169       -1.767
+ Analytical dV/dL :               -1.066        0.309       -0.082
+                                   0.309       -0.699       -0.169
+                                  -0.082       -0.169       -1.771
 
- Numerical dV/dL :                -1.061        0.309       -0.082
-                                   0.309       -0.695       -0.169
-                                  -0.082       -0.169       -1.767
+ Numerical dV/dL :                -1.066        0.309       -0.082
+                                   0.309       -0.699       -0.169
+                                  -0.082       -0.169       -1.771

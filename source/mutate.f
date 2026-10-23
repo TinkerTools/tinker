@@ -101,6 +101,8 @@ c
       vcouple = 0
       scexp = 5.0d0
       scalphav = 0.7d0
+      scexpm = 0.0d0
+      scexpp = 2.0d0
 c
 c     set defaults for soft core Pauli repulsion
 c
@@ -140,23 +142,24 @@ c
          call upcase (keyword)
          if (keyword(1:7) .eq. 'LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=30)  lambda
+            read (string,*,err=30,end=30)  lambda
             use_mainlmda = .true.
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=30)  elambda
+            read (string,*,err=30,end=30)  elambda
             setelambda = .true.
          else if (keyword(1:11) .eq. 'POL-LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=30)  plambda
+            read (string,*,err=30,end=30)  plambda
             setplambda = .true.
          else if (keyword(1:11) .eq. 'VDW-LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=30)  vlambda
+            read (string,*,err=30,end=30)  vlambda
             setvlambda = .true.
          else if (keyword(1:13) .eq. 'VDW-SOFTCORE ') then
             string = record(next:240)
-            read (string,*,err=30,end=30)  scalphav,scexp
+            read (string,*,err=30,end=30)  scalphav,scexp,
+     &                                     scexpm,scexpp
          else if (keyword(1:15) .eq. 'REPEL-SOFTCORE ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  scalphar,scexpr,
@@ -166,12 +169,12 @@ c
             read (string,*,err=30,end=30)  scrdsp,scexpd,scexpdq
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
-            read (string,*,err=30)  tlambda
+            read (string,*,err=30,end=30)  tlambda
          else if (keyword(1:15) .eq. 'VDW-ANNIHILATE ') then
             vcouple = 1
          else if (keyword(1:7) .eq. 'MUTATE ') then
             string = record(next:240)
-            read (string,*,err=30)  ihyb,it0,it1
+            read (string,*,err=30,end=30)  ihyb,it0,it1
             nmut = nmut + 1
             imut(nmut) = ihyb
             mutg(ihyb) = 1
@@ -224,14 +227,17 @@ c
    30    continue
       end do
 c
+c     keep the main lambda and the sublambdas within the physical
+c     lambda range
+c
+      lambda = min(1.0d0,max(0.0d0,lambda))
+      elambda = min(1.0d0,max(0.0d0,elambda))
+      plambda = min(1.0d0,max(0.0d0,plambda))
+      vlambda = min(1.0d0,max(0.0d0,vlambda))
+c
 c     set plambda to elambda if no values given
 c
       if (.not. setplambda)  plambda = elambda
-c
-c     keep the main lambda within the physical lambda range
-c
-      if (lambda .lt. 0.0d0)  lambda = 0.0d0
-      if (lambda .gt. 1.0d0)  lambda = 1.0d0
 c
 c     turn off hybrid potentials if no sites are mutated
 c
@@ -523,25 +529,25 @@ c
             call upcase (lmdasampmode)
          else if (keyword(1:16) .eq. 'LAMBDA-INTERVAL ') then
             string = record(next:240)
-            read (string,*,err=10)  lmdaintv
+            read (string,*,err=10,end=10)  lmdaintv
          else if (keyword(1:15) .eq. 'LAMBDA-EQRATIO ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  lmdaparatio,lmdapbratio
          else if (keyword(1:10) .eq. 'LAMBDA-DT ') then
             string = record(next:240)
-            read (string,*,err=10)  lmdadt
+            read (string,*,err=10,end=10)  lmdadt
          else if (keyword(1:12) .eq. 'LAMBDA-MASS ') then
             string = record(next:240)
-            read (string,*,err=10)  lmdamass
+            read (string,*,err=10,end=10)  lmdamass
          else if (keyword(1:16) .eq. 'LAMBDA-FRICTION ') then
             string = record(next:240)
-            read (string,*,err=10)  lmdafric
+            read (string,*,err=10,end=10)  lmdafric
          else if (keyword(1:17) .eq. 'LAMBDA-THETA-MAP ') then
             call getword (record,lmdathmap,next)
             call upcase (lmdathmap)
          else if (keyword(1:19) .eq. 'LAMBDA-THETA-ALPHA ') then
             string = record(next:240)
-            read (string,*,err=10)  lmdathalpha
+            read (string,*,err=10,end=10)  lmdathalpha
          else if (keyword(1:17) .eq. 'LAMBDA-PROPAGATE ') then
             call getword (record,propword,next)
             call upcase (propword)
@@ -557,13 +563,13 @@ c
             end if
          else if (keyword(1:16) .eq. 'LAMBDA-MC-TRIAL ') then
             string = record(next:240)
-            read (string,*,err=10)  lmdamctrial
+            read (string,*,err=10,end=10)  lmdamctrial
          else if (keyword(1:15) .eq. 'LAMBDA-MC-MOVE ') then
             string = record(next:240)
-            read (string,*,err=10)  lmdamcmove
+            read (string,*,err=10,end=10)  lmdamcmove
          else if (keyword(1:12) .eq. 'LAMBDA-NBIN ') then
             string = record(next:240)
-            read (string,*,err=10)  nlmda
+            read (string,*,err=10,end=10)  nlmda
          else if (keyword(1:15) .eq. 'LAMBDA-CONVCRI ') then
             use_lmdacv = .true.
             string = record(next:240)
@@ -572,16 +578,16 @@ c
             use_epdt = .true.
          else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
-            read (string,*,err=10)  epdtexp
+            read (string,*,err=10,end=10)  epdtexp
          else if (keyword(1:15) .eq. 'ELE-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=10)  qntelmda0, qntelmda1
+            read (string,*,err=10,end=10)  qntelmda0, qntelmda1
          else if (keyword(1:15) .eq. 'POL-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=10)  qntplmda0, qntplmda1
+            read (string,*,err=10,end=10)  qntplmda0, qntplmda1
          else if (keyword(1:15) .eq. 'VDW-LMDA-RANGE ') then
             string = record(next:240)
-            read (string,*,err=10)  qntvlmda0, qntvlmda1
+            read (string,*,err=10,end=10)  qntvlmda0, qntvlmda1
          else if (keyword(1:13) .eq. 'ELE-LMDA-MAP ') then
             use_elmdamap = .true.
             call getword (record,elmdamap,next)
@@ -596,31 +602,31 @@ c
             call upcase (vlmdamap)
          else if (keyword(1:13) .eq. 'ELE-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=10)  elmdaexp
+            read (string,*,err=10,end=10)  elmdaexp
          else if (keyword(1:13) .eq. 'POL-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=10)  plmdaexp
+            read (string,*,err=10,end=10)  plmdaexp
          else if (keyword(1:13) .eq. 'VDW-LMDA-EXP ') then
             string = record(next:240)
-            read (string,*,err=10)  vlmdaexp
+            read (string,*,err=10,end=10)  vlmdaexp
          else if (keyword(1:15) .eq. 'ELE-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=10)  elmdainvn
+            read (string,*,err=10,end=10)  elmdainvn
          else if (keyword(1:15) .eq. 'POL-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=10)  plmdainvn
+            read (string,*,err=10,end=10)  plmdainvn
          else if (keyword(1:15) .eq. 'VDW-LMDA-INV-N ') then
             string = record(next:240)
-            read (string,*,err=10)  vlmdainvn
+            read (string,*,err=10,end=10)  vlmdainvn
          else if (keyword(1:17) .eq. 'ELE-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=10)  elmdainveps
+            read (string,*,err=10,end=10)  elmdainveps
          else if (keyword(1:17) .eq. 'POL-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=10)  plmdainveps
+            read (string,*,err=10,end=10)  plmdainveps
          else if (keyword(1:17) .eq. 'VDW-LMDA-INV-EPS ') then
             string = record(next:240)
-            read (string,*,err=10)  vlmdainveps
+            read (string,*,err=10,end=10)  vlmdainveps
          else if (keyword(1:10) .eq. 'REL-STAGE ') then
             use_rel = .true.
             use_mainlmda = .true.
@@ -848,23 +854,19 @@ c
 c     perform dynamic allocation of some global arrays
 c
       if (allocated(pchgorig))  deallocate (pchgorig)
-      if (allocated(pchg0orig))  deallocate (pchg0orig)
       if (allocated(bdplorig))  deallocate (bdplorig)
       if (allocated(poleorig))  deallocate (poleorig)
       if (allocated(pcoreorig))  deallocate (pcoreorig)
       if (allocated(pvalorig))  deallocate (pvalorig)
-      if (allocated(pval0orig))  deallocate (pval0orig)
       if (allocated(polarityorig))  deallocate (polarityorig)
       if (allocated(douindorig))  deallocate (douindorig)
       if (allocated(prepeporig))  deallocate (prepeporig)
       if (allocated(dpscdl))  deallocate (dpscdl)
       allocate (pchgorig(n))
-      allocate (pchg0orig(n))
       allocate (bdplorig(nbond))
       allocate (poleorig(maxpole,n))
       allocate (pcoreorig(n))
       allocate (pvalorig(n))
-      allocate (pval0orig(n))
       allocate (polarityorig(n))
       allocate (douindorig(n))
       allocate (prepeporig(n))
@@ -876,7 +878,6 @@ c
          do i = 1, nion
             k = iion(i)
             pchgorig(k) = pchg(k)
-            pchg0orig(k) = pchg0(k)
          end do
       end if
       if (use_dipole) then
@@ -893,7 +894,6 @@ c
             if (use_chgpen) then
                pcoreorig(k) = pcore(k)
                pvalorig(k) = pval(k)
-               pval0orig(k) = pval0(k)
             end if
          end do
       end if
@@ -1012,22 +1012,22 @@ c
          call upcase (keyword)
          if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
             string = record(next:240)
-            read (string,*,err=10)  wflmda
+            read (string,*,err=10,end=10)  wflmda
          else if (keyword(1:7) .eq. 'WLHIST ') then
             string = record(next:240)
-            read (string,*,err=10)  wlhist
+            read (string,*,err=10,end=10)  wlhist
          else if (keyword(1:7) .eq. 'WFHIST ') then
             string = record(next:240)
-            read (string,*,err=10)  wfhist
+            read (string,*,err=10,end=10)  wfhist
          else if (keyword(1:11) .eq. 'OST-STDDEV ') then
             string = record(next:240)
-            read (string,*,err=10)  oststdev
+            read (string,*,err=10,end=10)  oststdev
          else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
             ostinterpol = .true.
             fastkernel = .true.
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
-            read (string,*,err=10)  hbias
+            read (string,*,err=10,end=10)  hbias
          else if (keyword(1:18) .eq. 'OST-TEMPER-GLOBAL ') then
             use_ostgtemp = .true.
             string = record(next:240)
@@ -1332,8 +1332,9 @@ c
       nwin = 0
       nwinset = .false.
 c
-c     search keywords for lambda window options; a value that
-c     cannot be read is left invalid and is rejected below
+c     search keywords for lambda window options; a window value
+c     that cannot be read is left invalid and is rejected below, while
+c     an equilibration ratio that cannot be read keeps its default
 c
       do i = 1, nkey
          next = 1
@@ -1353,21 +1354,16 @@ c
             if (.not. (frac .gt. 0.0d0))  frac = 0.0d0
             lmdawinfrac(nwin) = frac
          else if (keyword(1:15) .eq. 'LAMBDA-EQRATIO ') then
-            lmdawinratio = -1.0d0
             read (string,*,err=10,end=10)  lmdawinratio
          end if
    10    continue
       end do
 c
-c     some of each window must be left after the equilibration
+c     some of each window must be left after the equilibration, so
+c     an equilibration ratio outside [0,1) is reset to its default
 c
       if (.not. (lmdawinratio.ge.0.0d0 .and.
-     &           lmdawinratio.lt.1.0d0)) then
-         write (iout,20)
-   20    format (/,' MUTATE_WINDOW  --  The first LAMBDA-EQRATIO',
-     &              ' value must be in [0,1)')
-         call fatal
-      end if
+     &           lmdawinratio.lt.1.0d0))  lmdawinratio = 0.5d0
 c
 c     build the schedule of lambda windows from the values found
 c
@@ -1398,7 +1394,6 @@ c
 c
       subroutine mutate_ti
       use dlmda
-      use iounit
       use keys
       use thrmint
       implicit none
@@ -1417,7 +1412,7 @@ c
       tinstepavg = 100
 c
 c     search keywords for thermodynamic integration options; a
-c     value that cannot be read is left invalid and rejected below
+c     value that cannot be read keeps its default
 c
       do i = 1, nkey
          next = 1
@@ -1425,21 +1420,17 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:12) .eq. 'TI-NSTEPAVG ') then
-            tinstepavg = 0
             string = record(next:240)
             read (string,*,err=10,end=10)  tinstepavg
          end if
    10    continue
       end do
 c
-c     each block average must hold at least one dynamics step
+c     each block average must hold at least one dynamics step, so
+c     a smaller block is reset to its default
 c
       if (use_ti) then
-         if (tinstepavg .lt. 1) then
-            write (iout,20)
-   20       format (/,' MUTATE_TI  --  TI-NSTEPAVG must be positive')
-            call fatal
-         end if
+         if (tinstepavg .lt. 1)  tinstepavg = 100
 c
 c     allocate the dU/dlambda block buffer
 c
@@ -1469,7 +1460,6 @@ c
       subroutine mutate_fep
       use dlmda
       use fep
-      use iounit
       use keys
       implicit none
       integer i
@@ -1487,7 +1477,7 @@ c
       fepintv = 1000
 c
 c     search keywords for free energy perturbation options; a
-c     value that cannot be read is left invalid and rejected below
+c     value that cannot be read keeps its default
 c
       do i = 1, nkey
          next = 1
@@ -1495,20 +1485,16 @@ c
          call gettext (record,keyword,next)
          call upcase (keyword)
          if (keyword(1:16) .eq. 'LAMBDA-INTERVAL ') then
-            fepintv = 0
             string = record(next:240)
             read (string,*,err=10,end=10)  fepintv
          end if
    10    continue
       end do
 c
-c     the samples must be at least one dynamics step apart
+c     the samples must be at least one dynamics step apart, so a
+c     smaller interval is reset to its default
 c
-      if (use_fep .and. fepintv.lt.1) then
-         write (iout,20)
-   20    format (/,' MUTATE_FEP  --  LAMBDA-INTERVAL must be positive')
-         call fatal
-      end if
+      if (fepintv .lt. 1)  fepintv = 1000
       return
       end
 c
@@ -1541,36 +1527,25 @@ c
       integer nstg
       real*8 eps,temp
       real*8 dspcut
-      logical polsave
+      logical polsave,qntstep
       character*20 keyword
       character*240 record
 c
 c
-c     enforce the allowed soft core van der Waals parameters
+c     reset any soft core buffered 14-7 parameter outside its allowed
+c     range to the default value, where the second lambda derivative
+c     diverges at an endpoint unless the lambda exponent is at least
+c     two and the one minus lambda shift exponent is one or at least
+c     two; the buffering constants keep the pair energy bounded as the
+c     shift vanishes, so the shift exponents need no further limit
 c
-      if (scalphav .lt. 0.0d0) then
-         write (iout,5)
-    5    format (/,' MUTATE_CHECK  --  VDW-SOFTCORE alpha must be',
-     &              ' greater than or equal to zero')
-         call fatal
-      end if
-      if (scexp .lt. 1.0d0) then
-         write (iout,6)
-    6    format (/,' MUTATE_CHECK  --  VDW-SOFTCORE exponent must be',
-     &              ' greater than or equal to one')
-         call fatal
-      end if
-c
-c     the second lambda derivative diverges at the endpoint unless
-c     the soft core exponent is at least two
-c
-      if (use_d2lmda .and. scexp.lt.2.0d0) then
-         write (iout,7)
-    7    format (/,' MUTATE_CHECK  --  VDW-SOFTCORE exponent must be',
-     &              ' greater than or equal to two with OST or',
-     &              ' LAMBDA-DERIV2')
-         call fatal
-      end if
+      if (scalphav .lt. 0.0d0)  scalphav = 0.7d0
+      if (scexp .lt. 1.0d0)  scexp = 5.0d0
+      if (scexpm .lt. 0.0d0)  scexpm = 0.0d0
+      if (scexpp .lt. 1.0d0)  scexpp = 2.0d0
+      if (use_d2lmda .and. scexp.lt.2.0d0)  scexp = 5.0d0
+      if (use_d2lmda .and. scexpp.ne.1.0d0 .and. scexpp.lt.2.0d0)
+     &   scexpp = 2.0d0
 c
 c     reset any soft core Pauli repulsion parameter outside its allowed
 c     range to the default value, where the lambda exponent must outrun
@@ -1610,22 +1585,33 @@ c
      &   scexpd = 4.0d0
       if (use_d2lmda .and. scexpd+scexpdq.lt.2.0d0)  scexpdq = 1.0d0
 c
+c     the implicit solvation parameters are scaled once at setup and
+c     carry no lambda derivative, so they cannot follow a lambda that
+c     moves by its derivative or by Monte Carlo
+c
+      if (use_solv .and. (use_dlmda.or.use_lmdamc)) then
+         write (iout,20)
+   20    format (/,' MUTATE_CHECK  --  Lambda Dynamics, Lambda',
+     &              ' Derivatives and Lambda Monte Carlo are not',
+     &              ' Available with Implicit Solvation')
+         call fatal
+      end if
+c
 c     single topology currently supports the scalar derivative for
 c     mutual polarization with Thole damping, as in AMOEBA and AMOEBA+,
 c     or charge penetration damping, as in HIPPO, with or without
 c     exchange polarization, in direct and Ewald modes
 c
       if (use_pdlmda .and. use_prst) then
-         if (poltyp.ne.'MUTUAL' .or. .not.(use_thole.or.use_chgpen)
-     &          .or. use_solv) then
+         if (poltyp.ne.'MUTUAL' .or.
+     &       .not.(use_thole.or.use_chgpen)) then
             write (iout,30)
    30       format (/,' MUTATE_CHECK  --  Single Topology',
      &                 ' Polarization dU/dLambda supports MUTUAL',
      &                 ' polarization with Thole or charge penetration',
      &                 ' damping only, in either direct or Ewald',
-     &                 ' mode; use POLARIZATION MUTUAL without',
-     &                 ' implicit solvent, or add LAMBDA-DERIV2 or',
-     &                 ' POL-DUALTOPO')
+     &                 ' mode; use POLARIZATION MUTUAL, or add',
+     &                 ' LAMBDA-DERIV2 or POL-DUALTOPO')
             call fatal
          end if
       end if
@@ -1639,6 +1625,29 @@ c
      &              ' a main lambda; add the LAMBDA keyword and a map',
      &              ' for each driven sublambda')
          call fatal
+      end if
+c
+c     a quintic taper over an empty window is a step in the sublambda,
+c     whose lambda derivative is undefined at the step
+c
+      if (use_dlmda .and. use_mainlmda .and. .not.use_rel) then
+         qntstep = .false.
+         if (use_elmdamap .and. qntelmda1-qntelmda0.lt.1.0d-8 .and.
+     &       elmdamap.ne.'EXP' .and. elmdamap.ne.'INV' .and.
+     &       elmdamap.ne.'APM')  qntstep = .true.
+         if (use_plmdamap .and. qntplmda1-qntplmda0.lt.1.0d-8 .and.
+     &       plmdamap.ne.'EXP' .and. plmdamap.ne.'INV' .and.
+     &       plmdamap.ne.'APM')  qntstep = .true.
+         if (use_vlmdamap .and. qntvlmda1-qntvlmda0.lt.1.0d-8 .and.
+     &       vlmdamap.ne.'EXP' .and. vlmdamap.ne.'INV' .and.
+     &       vlmdamap.ne.'APM')  qntstep = .true.
+         if (qntstep) then
+            write (iout,55)
+   55       format (/,' MUTATE_CHECK  --  A Lambda Derivative requires',
+     &                 ' a sublambda range of nonzero width for each',
+     &                 ' QNT map')
+            call fatal
+         end if
       end if
 c
 c     the staged relative schedule maps every sublambda on its own,
@@ -1762,6 +1771,38 @@ c
          call fatal
       end if
 c
+c     only the buffered 14-7 and Lennard-Jones van der Waals forms
+c     scale a mutated pair with lambda
+c
+      if (use_mutate .and. use_vdw .and. vdwtyp.ne.'BUFFERED-14-7'
+     &       .and. vdwtyp.ne.'LENNARD-JONES') then
+         write (iout,109)
+  109    format (/,' MUTATE_CHECK  --  Mutated Atoms are only',
+     &              ' Available for the Buffered 14-7 and',
+     &              ' Lennard-Jones van der Waals Potentials')
+         call fatal
+      end if
+c
+c     only the buffered 14-7 van der Waals potential and the atomic
+c     multipole electrostatics carry a lambda derivative
+c
+      if (use_vdlmda .and. use_vdw .and.
+     &    vdwtyp.ne.'BUFFERED-14-7') then
+         write (iout,106)
+  106    format (/,' MUTATE_CHECK  --  Lambda Derivatives are only',
+     &              ' Available for the Buffered 14-7 van der Waals',
+     &              ' Potential')
+         call fatal
+      end if
+      if (use_edlmda .and.
+     &    (use_charge.or.use_dipole.or.use_chgdpl)) then
+         write (iout,107)
+  107    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
+     &              ' Available for Partial Charge or Bond Dipole',
+     &              ' Electrostatics')
+         call fatal
+      end if
+c
 c     relative free energy handles only the buffered 14-7 form of
 c     the van der Waals potential
 c
@@ -1804,22 +1845,17 @@ c
       end if
 c
 c     the ost and abf sample interval must keep a propagation phase,
-c     an equilibration phase and samples to average at the fixed lambda
+c     an equilibration phase and samples to average at the fixed
+c     lambda, so equilibration ratios that leave too few samples or an
+c     interval too short for all three phases are reset to defaults
 c
-      if ((use_ost .or. use_abf) .and.
-     &    lmdaparatio+lmdapbratio.ge.0.9d0) then
-         write (iout,120)
-  120    format (/,' MUTATE_CHECK  --  The two LAMBDA-EQRATIO values',
-     &              ' must sum to less than 0.9 to leave samples for',
-     &              ' the fixed lambda average')
-         call fatal
-      end if
-      if ((use_ost .or. use_abf) .and. lmdaintv.lt.3) then
-         write (iout,130)
-  130    format (/,' MUTATE_CHECK  --  LAMBDA-INTERVAL must be at',
-     &              ' least 3 to hold a propagation, equilibration',
-     &              ' and averaging phase')
-         call fatal
+      if (use_ost .or. use_abf) then
+         if (lmdaparatio+lmdapbratio .ge. 0.9d0) then
+            lmdaparatio = 0.3d0
+            lmdapbratio = 0.3d0
+         end if
+         if (lmdaintv .lt. 3)  lmdaintv = 100
+         call setlmdaphase
       end if
 c
 c     dual topology leaves the induced dipoles of the last end state
@@ -1936,22 +1972,14 @@ c     annihilated, whatever the van der Waals coupling
 c
 c
       subroutine altelec
-      use atoms
       use charge
-      use chgpen
       use dipole
       use dlmda
-      use expol
-      use mplpot
-      use mpole
       use mutant
-      use polar
-      use polpot
       use potent
       implicit none
-      integer i,j,k
+      integer i,k
       integer k1,k2
-      real*8 sc
       real*8 emsc(0:2)
       real*8 demsc(0:2)
 c
@@ -1980,44 +2008,9 @@ c
          end do
       end if
 c
-c     set scaled parameters for atomic multipole models
+c     set scaled multipole, polarizability and charge flux parameters
 c
-      if (use_mpole .or. use_polar) then
-         do i = 1, npole
-            k = ipole(i)
-            sc = emsc(mutg(k))
-            do j = 1, 13
-               pole(j,k) = poleorig(j,k) * sc
-            end do
-            mono0(k) = pole(1,k)
-            if (use_chgpen) then
-               pcore(k) = pcoreorig(k) * sc
-               pval(k) = pvalorig(k) * sc
-               pval0(k) = pval(k)
-            end if
-         end do
-      end if
-c
-c     set scaled parameters for atomic polarizability models
-c
-      if (use_polar) then
-         do i = 1, npole
-            k = ipole(i)
-            sc = emsc(mutg(k))
-            polarity(k) = polarityorig(k) * sc
-            douind(k) = douindorig(k)
-            if (sc .eq. 0.0d0)  douind(k) = .false.
-            if (use_expol)  prepep(k) = prepeporig(k) * sc
-         end do
-      end if
-c
-c     set the scale "alterchg" applies to each charge flux change
-c
-      if (use_chgflx) then
-         do i = 1, n
-            fluxsc(i) = emsc(mutg(i))
-         end do
-      end if
+      call altgrpsc (emsc,use_mpole.or.use_polar)
       return
       end
 c
@@ -2076,6 +2069,43 @@ c     scaled as in "altelec"
 c
 c
       subroutine altpolr
+      use mutant
+      use potent
+      implicit none
+      real*8 sc(0:2)
+      real*8 dsc(0:2)
+c
+c
+c     get the polarization scale of the environment and each ligand
+c
+      call grpscale (plambda,sc,dsc)
+c
+c     set scaled multipole, polarizability and charge flux parameters
+c
+      call altgrpsc (sc,use_polar)
+c
+c     update monopoles for charge flux at the requested lambda state
+c
+      if (use_chgflx)  call alterchg
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine altgrpsc  --  install group scaled parameters  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "altgrpsc" constructs the multipole, charge penetration,
+c     polarizability, exchange polarization size and charge flux
+c     scale of every site from their original values and the scale
+c     "sc" of the site's group, where the multipoles are only set if
+c     "dopole" is true
+c
+c
+      subroutine altgrpsc (sc,dopole)
       use atoms
       use chgpen
       use dlmda
@@ -2090,16 +2120,12 @@ c
       integer i,j,k
       real*8 psc
       real*8 sc(0:2)
-      real*8 dsc(0:2)
+      logical dopole
 c
-c
-c     get the polarization scale of the environment and each ligand
-c
-      call grpscale (plambda,sc,dsc)
 c
 c     set scaled parameters for atomic multipole models
 c
-      if (use_polar) then
+      if (dopole) then
          do i = 1, npole
             k = ipole(i)
             psc = sc(mutg(k))
@@ -2135,10 +2161,6 @@ c
             fluxsc(i) = sc(mutg(i))
          end do
       end if
-c
-c     update monopoles for charge flux at the requested lambda state
-c
-      if (use_chgflx)  call alterchg
       return
       end
 c

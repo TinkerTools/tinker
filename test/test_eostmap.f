@@ -340,7 +340,8 @@ c
       plmdamap = 'QNT'
       lambda = 0.1d0
       call mapsublmda (lambda)
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &              dpldlmda,d2pldlmda2,need0,need1)
       call assert_logical (need0,.true.,
@@ -349,7 +350,8 @@ c
      &                     'mapsublmda qnt pol need1 below window')
       lambda = 0.5d0
       call mapsublmda (lambda)
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &              dpldlmda,d2pldlmda2,need0,need1)
       call assert_logical (need0,.true.,
@@ -358,7 +360,8 @@ c
      &                     'mapsublmda qnt pol need1 mid window')
       lambda = 0.9d0
       call mapsublmda (lambda)
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &              dpldlmda,d2pldlmda2,need0,need1)
       call assert_logical (need0,.false.,
@@ -371,7 +374,8 @@ c     contribute, since plambda has not yet pinned to zero or one
 c
       lambda = 0.65d0
       call mapsublmda (lambda)
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &              dpldlmda,d2pldlmda2,need0,need1)
       call assert_logical (need0,.true.,
@@ -380,7 +384,8 @@ c
      &                     'mapsublmda qnt pol need1 upper ramp')
       lambda = 0.30d0
       call mapsublmda (lambda)
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &              dpldlmda,d2pldlmda2,need0,need1)
       call assert_logical (need0,.true.,
@@ -393,7 +398,8 @@ c     on either edge must keep both endpoint states
 c
       lambda = qntplmda1
       call mapsublmda (lambda)
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &              dpldlmda,d2pldlmda2,need0,need1)
       call assert_logical (need0,.false.,
@@ -402,7 +408,8 @@ c
      &                     'mapsublmda qnt pol need1 at upper bound')
       lambda = qntplmda0
       call mapsublmda (lambda)
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &              dpldlmda,d2pldlmda2,need0,need1)
       call assert_logical (need0,.true.,
@@ -511,7 +518,8 @@ c
      &                     'mapsublmda exp ele need0')
       call assert_logical (need1,.true.,
      &                     'mapsublmda exp ele need1')
-      call relpowerwt (plambda,epdtexp,weight1,dweight1,d2weight1)
+      call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
+     &              dweight1,d2weight1)
       call relneed (weight1,dweight1,d2weight1,
      &              dpldlmda,d2pldlmda2,need0,need1)
       call assert_logical (need0,.true.,
@@ -544,47 +552,47 @@ c
 c     at and below x=0 the exponential map is zero, but the first
 c     and second derivatives survive for exponents of one and two
 c
-      call sublmdaexp (0.0d0,1,lmda,dlmda,d2lmda)
+      call lmdapwr (0.0d0,1.0d0,.true.,lmda,dlmda,d2lmda)
       call assert_real (lmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=1 lmda')
+     &                  'lmdapwr x=0 n=1 lmda')
       call assert_real (dlmda,1.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=1 dlmda')
+     &                  'lmdapwr x=0 n=1 dlmda')
       call assert_real (d2lmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=1 d2lmda')
-      call sublmdaexp (0.0d0,2,lmda,dlmda,d2lmda)
+     &                  'lmdapwr x=0 n=1 d2lmda')
+      call lmdapwr (0.0d0,2.0d0,.true.,lmda,dlmda,d2lmda)
       call assert_real (lmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=2 lmda')
+     &                  'lmdapwr x=0 n=2 lmda')
       call assert_real (dlmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=2 dlmda')
+     &                  'lmdapwr x=0 n=2 dlmda')
       call assert_real (d2lmda,2.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=2 d2lmda')
-      call sublmdaexp (0.0d0,3,lmda,dlmda,d2lmda)
+     &                  'lmdapwr x=0 n=2 d2lmda')
+      call lmdapwr (0.0d0,3.0d0,.true.,lmda,dlmda,d2lmda)
       call assert_real (lmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=3 lmda')
+     &                  'lmdapwr x=0 n=3 lmda')
       call assert_real (dlmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=3 dlmda')
+     &                  'lmdapwr x=0 n=3 dlmda')
       call assert_real (d2lmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp x=0 n=3 d2lmda')
+     &                  'lmdapwr x=0 n=3 d2lmda')
 c
 c     at and above x=1 the exponential map saturates with the
 c     analytic power law derivatives
 c
-      call sublmdaexp (1.0d0,3,lmda,dlmda,d2lmda)
+      call lmdapwr (1.0d0,3.0d0,.true.,lmda,dlmda,d2lmda)
       call assert_real (lmda,1.0d0,1.0d-12,
-     &                  'sublmdaexp x=1 n=3 lmda')
+     &                  'lmdapwr x=1 n=3 lmda')
       call assert_real (dlmda,3.0d0,1.0d-12,
-     &                  'sublmdaexp x=1 n=3 dlmda')
+     &                  'lmdapwr x=1 n=3 dlmda')
       call assert_real (d2lmda,6.0d0,1.0d-12,
-     &                  'sublmdaexp x=1 n=3 d2lmda')
+     &                  'lmdapwr x=1 n=3 d2lmda')
 c
 c     the interior exponential map is continuous with the x=1
 c     endpoint for an exponent of one
 c
-      call sublmdaexp (0.5d0,1,lmda,dlmda,d2lmda)
+      call lmdapwr (0.5d0,1.0d0,.true.,lmda,dlmda,d2lmda)
       call assert_real (lmda,0.5d0,1.0d-12,
-     &                  'sublmdaexp interior n=1 lmda')
+     &                  'lmdapwr interior n=1 lmda')
       call assert_real (d2lmda,0.0d0,1.0d-12,
-     &                  'sublmdaexp interior n=1 d2lmda')
+     &                  'lmdapwr interior n=1 d2lmda')
 c
 c     an inverse power of one or less is the identity map
 c

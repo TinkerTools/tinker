@@ -105,12 +105,10 @@ c     lmdalhist     lambda value of each history entry
 c     lmdallist     lambda values saved within an interval
 c     lmdawinfrac   fraction of the run spent in each lambda window
 c     lmdawinlist   main lambda of each window in schedule order
-c     pchg0orig     original pchg0
 c     pchgorig      original pchg
 c     pcoreorig     original pcore
 c     polarityorig  original polarity
 c     prepeporig    original prepep
-c     pval0orig     original pval0
 c     pvalorig      original pval
 c     dfmdl         multipole force lambda derivative
 c     dfpdl         polarization force lambda derivative
@@ -256,12 +254,10 @@ c
       real*8, allocatable :: lmdallist(:)
       real*8, allocatable :: lmdawinfrac(:)
       real*8, allocatable :: lmdawinlist(:)
-      real*8, allocatable :: pchg0orig(:)
       real*8, allocatable :: pchgorig(:)
       real*8, allocatable :: pcoreorig(:)
       real*8, allocatable :: polarityorig(:)
       real*8, allocatable :: prepeporig(:)
-      real*8, allocatable :: pval0orig(:)
       real*8, allocatable :: pvalorig(:)
       real*8, allocatable :: dfmdl(:,:)
       real*8, allocatable :: dfpdl(:,:)

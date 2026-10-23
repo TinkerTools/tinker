@@ -357,13 +357,11 @@ c
       if (allocated(lmdawinfrac))  deallocate (lmdawinfrac)
       if (allocated(lmdawinlist))  deallocate (lmdawinlist)
       if (allocated(lqgrid))  deallocate (lqgrid)
-      if (allocated(pchg0orig))  deallocate (pchg0orig)
       if (allocated(pchgorig))  deallocate (pchgorig)
       if (allocated(pcoreorig))  deallocate (pcoreorig)
       if (allocated(polarityorig))  deallocate (polarityorig)
       if (allocated(poleorig))  deallocate (poleorig)
       if (allocated(prepeporig))  deallocate (prepeporig)
-      if (allocated(pval0orig))  deallocate (pval0orig)
       if (allocated(pvalorig))  deallocate (pvalorig)
 c
 c     deallocation of global arrays from module domega

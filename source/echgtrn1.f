@@ -110,6 +110,7 @@ c
       logical proceed,usei
       logical live(0:2,0:2)
       logical dodl,dod2
+      logical lmdadrv
       character*6 mode
 c
 c
@@ -145,12 +146,11 @@ c
       call switch (mode)
 c
 c     set the polarization lambda scale of each pair of atom groups,
-c     taking lambda derivatives whenever polarization has one, since
-c     "lmdachain" zeroes them while the polarization map is flat; a
-c     group pair is skipped once it carries neither energy nor a
+c     taking lambda derivatives as "lmdadrv" decides for polarization;
+c     a group pair is skipped once it carries neither energy nor a
 c     needed lambda derivative
 c
-      dodl = use_pdlmda
+      dodl = lmdadrv (use_pdlmda,dpldlmda,d2pldlmda2)
       dod2 = (dodl .and. use_d2lmda)
       call ctlmdasc (dodl,ctsc,dctsc,d2ctsc,live)
 c
@@ -591,6 +591,7 @@ c
       logical proceed,usei
       logical live(0:2,0:2)
       logical dodl,dod2
+      logical lmdadrv
       character*6 mode
 c
 c
@@ -626,12 +627,11 @@ c
       call switch (mode)
 c
 c     set the polarization lambda scale of each pair of atom groups,
-c     taking lambda derivatives whenever polarization has one, since
-c     "lmdachain" zeroes them while the polarization map is flat; a
-c     group pair is skipped once it carries neither energy nor a
+c     taking lambda derivatives as "lmdadrv" decides for polarization;
+c     a group pair is skipped once it carries neither energy nor a
 c     needed lambda derivative
 c
-      dodl = use_pdlmda
+      dodl = lmdadrv (use_pdlmda,dpldlmda,d2pldlmda2)
       dod2 = (dodl .and. use_d2lmda)
       call ctlmdasc (dodl,ctsc,dctsc,d2ctsc,live)
 c

@@ -5,8 +5,8 @@
  EngCnt  Polarization                            -13.2594              582
  EngCnt  Charge Transfer                         -12.1039              446
 
- Internal Virial Tensor :                 -46.587       -8.286       -1.499
-                                           -8.286      -34.342      -10.491
+ Internal Virial Tensor :                 -46.588       -8.286       -1.499
+                                           -8.286      -34.343      -10.491
                                            -1.499      -10.491      -31.819
 
  Cartesian Gradient Breakdown over Individual Atoms :

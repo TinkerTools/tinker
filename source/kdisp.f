@@ -30,10 +30,10 @@ c
       use potent
       use sizes
       implicit none
-      integer i,k,ii,kk
+      integer i,k,ii
       integer ia,ic,next
       real*8 cs,adsp
-      real*8 csixi
+      real*8 csum
       logical header
       character*20 keyword
       character*240 record
@@ -146,18 +146,17 @@ c
          end if
       end do
 c
-c     compute pairwise sum of C6 coefficients needed for PME
+c     compute pairwise sum of C6 coefficients needed for PME, which
+c     is the square of their sum
 c
       csixpr = 0.0d0
       if (use_dewald) then
+         csum = 0.0d0
          do ii = 1, ndisp
             i = idisp(ii)
-            csixi = csix(i)
-            do kk = 1, ndisp
-               k = idisp(kk)
-               csixpr = csixpr + csixi*csix(k)
-            end do
+            csum = csum + csix(i)
          end do
+         csixpr = csum * csum
       end if
 c
 c     turn off the dispersion potential if not used

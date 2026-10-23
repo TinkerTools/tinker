@@ -336,8 +336,14 @@ void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
 void grpscale_(double* lmda, double* sc, double* dsc);
 #define tinker_f_grpscale grpscale_
+int lmdadrv_(int* use, double* dl, double* d2l);
+#define tinker_f_lmdadrv lmdadrv_
 void vdlflags_(int* dodl, int* dod2);
 #define tinker_f_vdlflags vdlflags_
+void dlcpair_(int* i, int* k, double* xr, double* yr, double* zr, double* dldx, double* dldy, double* dldz, double* dfl, double* dvir);
+#define tinker_f_dlcpair dlcpair_
+void dlcvir_(double* xr, double* yr, double* zr, double* dldx, double* dldy, double* dldz, double* dvir);
+#define tinker_f_dlcvir dlcvir_
 void ctlmdasc_(int* dodl, double* sc, double* dsc, double* d2sc, int* live);
 #define tinker_f_ctlmdasc ctlmdasc_
 void eleclive_(int* live, int* doskip);
@@ -352,14 +358,14 @@ void maprelstage_(double* lmda);
 #define tinker_f_maprelstage maprelstage_
 void relstgloc_(double* lmda, double* s, double* ds);
 #define tinker_f_relstgloc relstgloc_
-void relpowerwt_(double* x, int* nexp, double* w, double* dw, double* d2w);
-#define tinker_f_relpowerwt relpowerwt_
+void lmdapwr_(double* x, double* a, int* do2, double* f, double* df, double* d2f);
+#define tinker_f_lmdapwr lmdapwr_
+void lmdapow_(double* x, double* c, double* a, double* b, int* do2, double* f, double* f1, double* f2);
+#define tinker_f_lmdapow lmdapow_
 void relneed_(double* w, double* dw, double* d2w, double* chain, double* d2chain, int* need0, int* need1);
 #define tinker_f_relneed relneed_
 void quintaper_(double* x, double* cut, double* off, double* taper, double* dtaper, double* d2taper);
 #define tinker_f_quintaper quintaper_
-void sublmdaexp_(double* x, int* exponent, double* lmda, double* dlmda, double* d2lmda);
-#define tinker_f_sublmdaexp sublmdaexp_
 void sublmdainvpower_(double* x, int* n, double* eps, double* lmda, double* dlmda, double* d2lmda);
 #define tinker_f_sublmdainvpower sublmdainvpower_
 void sublmdaapm_(double* x, int* n, double* rho, double* lmda, double* dlmda, double* d2lmda);
@@ -886,11 +892,11 @@ void ehal3c_();
 // ehalsc.f
 void halsc_(double* vlsc, double* vscal);
 #define tinker_f_halsc halsc_
-void halsc4_(double* vlsc, double* vscal, double* vlsc1, double* vlsc2, double* dvscal);
+void halsc4_(double* vlsc, double* vscal, double* vlsc1, double* vlsc2, double* vscal1, double* vscal2);
 #define tinker_f_halsc4 halsc4_
 void ehalsc_(double* rik, double* rv, double* eps, int* ig, double* vlsc, double* vscal, double* e, double* de);
 #define tinker_f_ehalsc ehalsc_
-void ehalsc4_(double* rik, double* rv, double* eps, int* ig, double* vlsc, double* vlsc1, double* vlsc2, double* vscal, double* dvscal, double* e, double* de, double* dlambda, double* dlambda2, double* dlde);
+void ehalsc4_(double* rik, double* rv, double* eps, int* ig, double* vlsc, double* vlsc1, double* vlsc2, double* vscal, double* vscal1, double* vscal2, double* e, double* de, double* dlambda, double* dlambda2, double* dlde);
 #define tinker_f_ehalsc4 ehalsc4_
 
 // eimprop.f
@@ -2352,6 +2358,8 @@ void altemdt_(double* elmda);
 #define tinker_f_altemdt altemdt_
 void altpolr_();
 #define tinker_f_altpolr altpolr_
+void altgrpsc_(double* sc, int* dopole);
+#define tinker_f_altgrpsc altgrpsc_
 void altepdt_(double* plmda);
 #define tinker_f_altepdt altepdt_
 void altepset_(int* same);

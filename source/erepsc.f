@@ -21,12 +21,14 @@ c
       use mutant
       implicit none
       real*8 rlsc,rshf
+      real*8 rshf1,rshf2
 c
 c
 c     set the soft core lambda terms of the Pauli repulsion
 c
       rlsc = vlambda**scexpr
-      rshf = scalphar * vlambda**scexprm * (1.0d0-vlambda)**scexprp
+      call lmdapow (vlambda,scalphar,scexprm,scexprp,.false.,
+     &              rshf,rshf1,rshf2)
       return
       end
 c
@@ -53,40 +55,16 @@ c
       real*8 rlsc,rshf
       real*8 rlsc1,rlsc2
       real*8 rshf1,rshf2
-      real*8 vlm,omvl
-      real*8 alm,alm1,alm2
 c
 c
-c     set the soft core terms and their lambda derivative factors,
-c     skipping any shift term whose coefficient vanishes, so that no
-c     power of one minus lambda goes negative
+c     set the soft core terms and their lambda derivative factors
 c
-      call repsc (rlsc,rshf)
-      vlm = vlambda
-      omvl = 1.0d0 - vlambda
-      alm = scalphar * vlm**scexprm
-      alm1 = alm * vlm
-      alm2 = alm1 * vlm
-      rlsc1 = vlm**(scexpr-1.0d0)
-      rshf1 = 0.0d0
-      if (scexprm .ne. 0.0d0) then
-         rshf1 = scexprm * alm * omvl**scexprp
-      end if
-      rshf1 = rshf1 - scexprp*alm1*omvl**(scexprp-1.0d0)
+      rlsc = vlambda**scexpr
+      rlsc1 = vlambda**(scexpr-1.0d0)
       rlsc2 = 0.0d0
-      rshf2 = 0.0d0
-      if (use_d2lmda) then
-         rlsc2 = vlm**(scexpr-2.0d0)
-         if (scexprm .ne. 0.0d0) then
-            rshf2 = scexprm*(scexprm-1.0d0) * alm * omvl**scexprp
-     &                 - 2.0d0*scexprm*scexprp * alm1
-     &                      * omvl**(scexprp-1.0d0)
-         end if
-         if (scexprp .ne. 1.0d0) then
-            rshf2 = rshf2 + scexprp*(scexprp-1.0d0) * alm2
-     &                         * omvl**(scexprp-2.0d0)
-         end if
-      end if
+      if (use_d2lmda)  rlsc2 = vlambda**(scexpr-2.0d0)
+      call lmdapow (vlambda,scalphar,scexprm,scexprp,use_d2lmda,
+     &              rshf,rshf1,rshf2)
       return
       end
 c

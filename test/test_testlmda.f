@@ -82,6 +82,23 @@ c
 c     cases 111 and 112 cover Ewald dispersion in replicate cells, for
 c     two DMSO molecules in a small box, and under atom group weights
 c
+c     cases 113 to 116 add the long range dispersion correction to a
+c     soft core with a 2.5 Angstrom switch radius, alone and under
+c     annihilation, with a lambda exponent of one, and with an exponent
+c     of two at zero lambda
+c
+c     case 117 drives repulsion through a cubic van der Waals lambda
+c     map, so both map derivatives enter the chain rule, which every
+c     linear map case leaves at one and zero
+c
+c     cases 118 and 119 give the buffered 14-7 soft core a softening
+c     of alpha*lambda^m*(1-lambda)^p from VDW-SOFTCORE, with m of 1.5
+c     and p of 3, then a non-integer m of 0.5 and p of one
+c
+c     case 120 drives Ewald dispersion through the same cubic map, so
+c     the soft core powers of the real space, reciprocal space and self
+c     terms all carry both map derivatives
+c
 c
       subroutine test_testlmda
       implicit none
@@ -274,6 +291,12 @@ c
       call test_testlmda_xyz ('115_hipmix_dsp_corr_n1_l04','hipmix',
      &                        '1e-4')
       call test_testlmda_xyz ('116_hipmix_dsp_corr_n2_l00','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('117_hipmix_rep_exp3_l08','hipmix',
+     &                        '1e-4')
+      call test_testlmda_case ('118_water_vsoft_m15_p3_l05','1e-4')
+      call test_testlmda_case ('119_water_vsoft_m05_p1_l03','1e-4')
+      call test_testlmda_xyz ('120_hipmix_dsp_ewald_exp3_l08','hipmix',
      &                        '1e-4')
       return
       end

@@ -40,8 +40,8 @@ c
       character*6 mode
 c
 c
-c     take lambda derivatives while the van der Waals lambda map
-c     has slope or curvature, as in the "gradient" routine
+c     take lambda derivatives as "vdlflags" sets for the van der
+c     Waals lambda
 c
       call vdlflags (dodl,dod2)
 c
@@ -143,8 +143,6 @@ c
       real*8 d2sdl2,d2sdldr
       real*8 dle,dle2,dlde
       real*8 dldx,dldy,dldz
-      real*8 dlvxx,dlvyy,dlvzz
-      real*8 dlvyx,dlvzx,dlvzy
       real*8 taper,dtaper
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
@@ -178,8 +176,8 @@ c
       end do
 c
 c     set soft core lambda scaling values for mutated interactions,
-c     along with their lambda derivative factors while the van der
-c     Waals lambda map has slope or curvature, as in "gradient"
+c     along with their lambda derivative factors as "vdlflags" sets
+c     for the van der Waals lambda
 c
       call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
@@ -188,7 +186,9 @@ c
          else
             call dspsc (dlsc,dlsq)
             dlsc1 = 0.0d0
+            dlsq1 = 0.0d0
             dlsc2 = 0.0d0
+            dlsq2 = 0.0d0
          end if
       end if
       rs2 = scrdsp * scrdsp
@@ -407,27 +407,8 @@ c
                      dldx = dlde * xr/r
                      dldy = dlde * yr/r
                      dldz = dlde * zr/r
-                     dfvdl(1,i) = dfvdl(1,i) + dldx
-                     dfvdl(2,i) = dfvdl(2,i) + dldy
-                     dfvdl(3,i) = dfvdl(3,i) + dldz
-                     dfvdl(1,k) = dfvdl(1,k) - dldx
-                     dfvdl(2,k) = dfvdl(2,k) - dldy
-                     dfvdl(3,k) = dfvdl(3,k) - dldz
-                     dlvxx = xr * dldx
-                     dlvyx = yr * dldx
-                     dlvzx = zr * dldx
-                     dlvyy = yr * dldy
-                     dlvzy = zr * dldy
-                     dlvzz = zr * dldz
-                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
-                     devvirdl(2,1) = devvirdl(2,1) + dlvyx
-                     devvirdl(3,1) = devvirdl(3,1) + dlvzx
-                     devvirdl(1,2) = devvirdl(1,2) + dlvyx
-                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
-                     devvirdl(3,2) = devvirdl(3,2) + dlvzy
-                     devvirdl(1,3) = devvirdl(1,3) + dlvzx
-                     devvirdl(2,3) = devvirdl(2,3) + dlvzy
-                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                     call dlcpair (i,k,xr,yr,zr,dldx,dldy,dldz,dfvdl,
+     &                              devvirdl)
                   end if
                end if
             end if
@@ -671,27 +652,8 @@ c
                         dldx = dlde * xr/r
                         dldy = dlde * yr/r
                         dldz = dlde * zr/r
-                        dfvdl(1,i) = dfvdl(1,i) + dldx
-                        dfvdl(2,i) = dfvdl(2,i) + dldy
-                        dfvdl(3,i) = dfvdl(3,i) + dldz
-                        dfvdl(1,k) = dfvdl(1,k) - dldx
-                        dfvdl(2,k) = dfvdl(2,k) - dldy
-                        dfvdl(3,k) = dfvdl(3,k) - dldz
-                        dlvxx = xr * dldx
-                        dlvyx = yr * dldx
-                        dlvzx = zr * dldx
-                        dlvyy = yr * dldy
-                        dlvzy = zr * dldy
-                        dlvzz = zr * dldz
-                        devvirdl(1,1) = devvirdl(1,1) + dlvxx
-                        devvirdl(2,1) = devvirdl(2,1) + dlvyx
-                        devvirdl(3,1) = devvirdl(3,1) + dlvzx
-                        devvirdl(1,2) = devvirdl(1,2) + dlvyx
-                        devvirdl(2,2) = devvirdl(2,2) + dlvyy
-                        devvirdl(3,2) = devvirdl(3,2) + dlvzy
-                        devvirdl(1,3) = devvirdl(1,3) + dlvzx
-                        devvirdl(2,3) = devvirdl(2,3) + dlvzy
-                        devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                        call dlcpair (i,k,xr,yr,zr,dldx,dldy,dldz,dfvdl,
+     &                                 devvirdl)
                      end if
                   end if
                end do
@@ -777,13 +739,12 @@ c
       real*8 d2sdl2,d2sdldr
       real*8 dle,dle2,dlde
       real*8 dldx,dldy,dldz
-      real*8 dlvxx,dlvyy,dlvzz
-      real*8 dlvyx,dlvzx,dlvzy
       real*8 taper,dtaper
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
       real*8 vyx,vzx,vzy
       real*8, allocatable :: dspscale(:)
+      real*8, allocatable :: dfl(:,:)
       logical proceed,usei
       logical muti,mutk
       logical mutik,mutdl,mutd2
@@ -812,17 +773,29 @@ c
       end do
 c
 c     set soft core lambda scaling values for mutated interactions,
-c     along with their lambda derivative factors while the van der
-c     Waals lambda map has slope or curvature, as in "gradient"
+c     along with their lambda derivative factors as "vdlflags" sets
+c     for the van der Waals lambda
 c
       call vdlflags (dodl,dod2)
+c
+c     the lambda derivative of the force is reduced over threads in
+c     a local array that only has full size when it is needed
+c
+      if (dod2) then
+         allocate (dfl(3,n))
+      else
+         allocate (dfl(3,1))
+      end if
+      dfl = 0.0d0
       if (nmut .ne. 0) then
          if (dodl) then
             call dspsc4 (dlsc,dlsq,dlsc1,dlsq1,dlsc2,dlsq2)
          else
             call dspsc (dlsc,dlsq)
             dlsc1 = 0.0d0
+            dlsq1 = 0.0d0
             dlsc2 = 0.0d0
+            dlsq2 = 0.0d0
          end if
       end if
       rs2 = scrdsp * scrdsp
@@ -841,8 +814,8 @@ c
 !$OMP& c0,c1,c2,c3,c4,c5,vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,
 !$OMP& dodl,dod2,eps)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,edspvir,devdl,
-!$OMP& d2evdl2,dfvdl,devvirdl)
-!$OMP DO reduction(+:edsp,dedsp,edspvir,devdl,d2evdl2,dfvdl,devvirdl)
+!$OMP& d2evdl2,dfl,devvirdl)
+!$OMP DO reduction(+:edsp,dedsp,edspvir,devdl,d2evdl2,dfl,devvirdl)
 c
 c     find dispersion energy and derivatives via neighbor list
 c
@@ -1052,27 +1025,8 @@ c
                      dldx = dlde * xr/r
                      dldy = dlde * yr/r
                      dldz = dlde * zr/r
-                     dfvdl(1,i) = dfvdl(1,i) + dldx
-                     dfvdl(2,i) = dfvdl(2,i) + dldy
-                     dfvdl(3,i) = dfvdl(3,i) + dldz
-                     dfvdl(1,k) = dfvdl(1,k) - dldx
-                     dfvdl(2,k) = dfvdl(2,k) - dldy
-                     dfvdl(3,k) = dfvdl(3,k) - dldz
-                     dlvxx = xr * dldx
-                     dlvyx = yr * dldx
-                     dlvzx = zr * dldx
-                     dlvyy = yr * dldy
-                     dlvzy = zr * dldy
-                     dlvzz = zr * dldz
-                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
-                     devvirdl(2,1) = devvirdl(2,1) + dlvyx
-                     devvirdl(3,1) = devvirdl(3,1) + dlvzx
-                     devvirdl(1,2) = devvirdl(1,2) + dlvyx
-                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
-                     devvirdl(3,2) = devvirdl(3,2) + dlvzy
-                     devvirdl(1,3) = devvirdl(1,3) + dlvzx
-                     devvirdl(2,3) = devvirdl(2,3) + dlvzy
-                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                     call dlcpair (i,k,xr,yr,zr,dldx,dldy,dldz,dfl,
+     &                              devvirdl)
                   end if
                end if
             end if
@@ -1099,9 +1053,20 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
+c     add the lambda derivative of the force to the global array
+c
+      if (dod2) then
+         do i = 1, n
+            dfvdl(1,i) = dfvdl(1,i) + dfl(1,i)
+            dfvdl(2,i) = dfvdl(2,i) + dfl(2,i)
+            dfvdl(3,i) = dfvdl(3,i) + dfl(3,i)
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (dspscale)
+      deallocate (dfl)
       return
       end
 c
@@ -1220,8 +1185,6 @@ c
       real*8 d2sdl2,d2sdldr
       real*8 dle,dle2,dlde
       real*8 dldx,dldy,dldz
-      real*8 dlvxx,dlvyy,dlvzz
-      real*8 dlvyx,dlvzx,dlvzy
       real*8 sc,dscale
       real*8 ralpha2,scale
       real*8 expterm,term
@@ -1248,8 +1211,8 @@ c
       end do
 c
 c     set soft core lambda scaling values for mutated interactions,
-c     along with their lambda derivative factors while the van der
-c     Waals lambda map has slope or curvature, as in "gradient"
+c     along with their lambda derivative factors as "vdlflags" sets
+c     for the van der Waals lambda
 c
       call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
@@ -1258,7 +1221,9 @@ c
          else
             call dspsc (dlsc,dlsq)
             dlsc1 = 0.0d0
+            dlsq1 = 0.0d0
             dlsc2 = 0.0d0
+            dlsq2 = 0.0d0
          end if
       end if
       rs2 = scrdsp * scrdsp
@@ -1465,27 +1430,8 @@ c
                      dldx = dlde * xr
                      dldy = dlde * yr
                      dldz = dlde * zr
-                     dfvdl(1,i) = dfvdl(1,i) + dldx
-                     dfvdl(2,i) = dfvdl(2,i) + dldy
-                     dfvdl(3,i) = dfvdl(3,i) + dldz
-                     dfvdl(1,k) = dfvdl(1,k) - dldx
-                     dfvdl(2,k) = dfvdl(2,k) - dldy
-                     dfvdl(3,k) = dfvdl(3,k) - dldz
-                     dlvxx = xr * dldx
-                     dlvyx = yr * dldx
-                     dlvzx = zr * dldx
-                     dlvyy = yr * dldy
-                     dlvzy = zr * dldy
-                     dlvzz = zr * dldz
-                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
-                     devvirdl(2,1) = devvirdl(2,1) + dlvyx
-                     devvirdl(3,1) = devvirdl(3,1) + dlvzx
-                     devvirdl(1,2) = devvirdl(1,2) + dlvyx
-                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
-                     devvirdl(3,2) = devvirdl(3,2) + dlvzy
-                     devvirdl(1,3) = devvirdl(1,3) + dlvzx
-                     devvirdl(2,3) = devvirdl(2,3) + dlvzy
-                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                     call dlcpair (i,k,xr,yr,zr,dldx,dldy,dldz,dfvdl,
+     &                              devvirdl)
                   end if
                end if
             end if
@@ -1721,27 +1667,8 @@ c
                         dldx = dlde * xr
                         dldy = dlde * yr
                         dldz = dlde * zr
-                        dfvdl(1,i) = dfvdl(1,i) + dldx
-                        dfvdl(2,i) = dfvdl(2,i) + dldy
-                        dfvdl(3,i) = dfvdl(3,i) + dldz
-                        dfvdl(1,k) = dfvdl(1,k) - dldx
-                        dfvdl(2,k) = dfvdl(2,k) - dldy
-                        dfvdl(3,k) = dfvdl(3,k) - dldz
-                        dlvxx = xr * dldx
-                        dlvyx = yr * dldx
-                        dlvzx = zr * dldx
-                        dlvyy = yr * dldy
-                        dlvzy = zr * dldy
-                        dlvzz = zr * dldz
-                        devvirdl(1,1) = devvirdl(1,1) + dlvxx
-                        devvirdl(2,1) = devvirdl(2,1) + dlvyx
-                        devvirdl(3,1) = devvirdl(3,1) + dlvzx
-                        devvirdl(1,2) = devvirdl(1,2) + dlvyx
-                        devvirdl(2,2) = devvirdl(2,2) + dlvyy
-                        devvirdl(3,2) = devvirdl(3,2) + dlvzy
-                        devvirdl(1,3) = devvirdl(1,3) + dlvzx
-                        devvirdl(2,3) = devvirdl(2,3) + dlvzy
-                        devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                        call dlcpair (i,k,xr,yr,zr,dldx,dldy,dldz,dfvdl,
+     &                                 devvirdl)
                      end if
                   end if
                end do
@@ -1885,8 +1812,6 @@ c
       real*8 d2sdl2,d2sdldr
       real*8 dle,dle2,dlde
       real*8 dldx,dldy,dldz
-      real*8 dlvxx,dlvyy,dlvzz
-      real*8 dlvyx,dlvzx,dlvzy
       real*8 sc,dscale
       real*8 ralpha2,scale
       real*8 expterm,term
@@ -1895,6 +1820,7 @@ c
       real*8 vxx,vyx,vzx
       real*8 vyy,vzy,vzz
       real*8, allocatable :: dspscale(:)
+      real*8, allocatable :: dfl(:,:)
       logical proceed,usei
       logical muti,mutk
       logical mutik,mutdl,mutd2
@@ -1913,17 +1839,29 @@ c
       end do
 c
 c     set soft core lambda scaling values for mutated interactions,
-c     along with their lambda derivative factors while the van der
-c     Waals lambda map has slope or curvature, as in "gradient"
+c     along with their lambda derivative factors as "vdlflags" sets
+c     for the van der Waals lambda
 c
       call vdlflags (dodl,dod2)
+c
+c     the lambda derivative of the force is reduced over threads in
+c     a local array that only has full size when it is needed
+c
+      if (dod2) then
+         allocate (dfl(3,n))
+      else
+         allocate (dfl(3,1))
+      end if
+      dfl = 0.0d0
       if (nmut .ne. 0) then
          if (dodl) then
             call dspsc4 (dlsc,dlsq,dlsc1,dlsq1,dlsc2,dlsq2)
          else
             call dspsc (dlsc,dlsq)
             dlsc1 = 0.0d0
+            dlsq1 = 0.0d0
             dlsc2 = 0.0d0
+            dlsq2 = 0.0d0
          end if
       end if
       rs2 = scrdsp * scrdsp
@@ -1941,8 +1879,8 @@ c
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,aewald,
 !$OMP& vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,dodl,dod2,eps)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,edspvir,devdl,
-!$OMP& d2evdl2,dfvdl,devvirdl)
-!$OMP DO reduction(+:edsp,dedsp,edspvir,devdl,d2evdl2,dfvdl,devvirdl)
+!$OMP& d2evdl2,dfl,devvirdl)
+!$OMP DO reduction(+:edsp,dedsp,edspvir,devdl,d2evdl2,dfl,devvirdl)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -2140,27 +2078,8 @@ c
                      dldx = dlde * xr
                      dldy = dlde * yr
                      dldz = dlde * zr
-                     dfvdl(1,i) = dfvdl(1,i) + dldx
-                     dfvdl(2,i) = dfvdl(2,i) + dldy
-                     dfvdl(3,i) = dfvdl(3,i) + dldz
-                     dfvdl(1,k) = dfvdl(1,k) - dldx
-                     dfvdl(2,k) = dfvdl(2,k) - dldy
-                     dfvdl(3,k) = dfvdl(3,k) - dldz
-                     dlvxx = xr * dldx
-                     dlvyx = yr * dldx
-                     dlvzx = zr * dldx
-                     dlvyy = yr * dldy
-                     dlvzy = zr * dldy
-                     dlvzz = zr * dldz
-                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
-                     devvirdl(2,1) = devvirdl(2,1) + dlvyx
-                     devvirdl(3,1) = devvirdl(3,1) + dlvzx
-                     devvirdl(1,2) = devvirdl(1,2) + dlvyx
-                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
-                     devvirdl(3,2) = devvirdl(3,2) + dlvzy
-                     devvirdl(1,3) = devvirdl(1,3) + dlvzx
-                     devvirdl(2,3) = devvirdl(2,3) + dlvzy
-                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                     call dlcpair (i,k,xr,yr,zr,dldx,dldy,dldz,dfl,
+     &                              devvirdl)
                   end if
                end if
             end if
@@ -2187,9 +2106,20 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
+c     add the lambda derivative of the force to the global array
+c
+      if (dod2) then
+         do i = 1, n
+            dfvdl(1,i) = dfvdl(1,i) + dfl(1,i)
+            dfvdl(2,i) = dfvdl(2,i) + dfl(2,i)
+            dfvdl(3,i) = dfvdl(3,i) + dfl(3,i)
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (dspscale)
+      deallocate (dfl)
       return
       end
 c

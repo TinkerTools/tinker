@@ -186,8 +186,8 @@ c
       end do
 c
 c     set lambda scaling values for mutated interactions, along with
-c     their lambda derivative factors while the van der Waals lambda
-c     map has slope or curvature, as in the "gradient" routine
+c     their lambda derivative factors as "vdlflags" sets for the van
+c     der Waals lambda
 c
       call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
@@ -1169,6 +1169,7 @@ c
       real*8, allocatable :: rscale(:)
       real*8, allocatable :: ter(:,:)
       real*8, allocatable :: dlter(:,:)
+      real*8, allocatable :: dfl(:,:)
       logical proceed,usei
       logical muti,mutk,mutik
       logical dodl,dod2,mutdl,mutd2
@@ -1197,11 +1198,25 @@ c     rotate the multipole components into the global frame
 c
       call rotpole ('REPEL')
 c
-c     perform dynamic allocation of some local arrays
+c     find which lambda derivatives the van der Waals lambda needs
+c
+      call vdlflags (dodl,dod2)
+c
+c     perform dynamic allocation of some local arrays, where the lambda
+c     derivatives of the torque and force are reduced over threads in
+c     local arrays that only have full size when they are needed
 c
       allocate (rscale(n))
       allocate (ter(3,n))
-      allocate (dlter(3,n))
+      if (dod2) then
+         allocate (dlter(3,n))
+         allocate (dfl(3,n))
+      else
+         allocate (dlter(3,1))
+         allocate (dfl(3,1))
+      end if
+      dlter = 0.0d0
+      dfl = 0.0d0
 c
 c     initialize connected atom scaling and torque arrays
 c
@@ -1209,15 +1224,12 @@ c
          rscale(i) = 1.0d0
          do j = 1, 3
             ter(j,i) = 0.0d0
-            dlter(j,i) = 0.0d0
          end do
       end do
 c
 c     set lambda scaling values for mutated interactions, along with
-c     their lambda derivative factors while the van der Waals lambda
-c     map has slope or curvature, as in the "gradient" routine
+c     their lambda derivative factors as needed
 c
-      call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
          if (dodl) then
             call repsc4 (rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2)
@@ -1240,8 +1252,8 @@ c
 !$OMP& rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2,mutg,cut2,off2,xaxis,
 !$OMP& yaxis,zaxis,c0,c1,c2,c3,c4,c5,dodl,dod2)
 !$OMP& firstprivate(rscale) shared (er,der,ter,ervir,dlter,devdl,
-!$OMP& d2evdl2,dfvdl,devvirdl)
-!$OMP DO reduction(+:er,der,ter,ervir,dlter,devdl,d2evdl2,dfvdl,
+!$OMP& d2evdl2,dfl,devvirdl)
+!$OMP DO reduction(+:er,der,ter,ervir,dlter,devdl,d2evdl2,dfl,
 !$OMP& devvirdl)
 c
 c     calculate the Pauli repulsion energy and derivatives
@@ -1611,12 +1623,12 @@ c
                   if (mutdl)  devdl = devdl + dle
                   if (mutd2) then
                      d2evdl2 = d2evdl2 + dle2
-                     dfvdl(1,i) = dfvdl(1,i) + dlfrcx
-                     dfvdl(2,i) = dfvdl(2,i) + dlfrcy
-                     dfvdl(3,i) = dfvdl(3,i) + dlfrcz
-                     dfvdl(1,k) = dfvdl(1,k) - dlfrcx
-                     dfvdl(2,k) = dfvdl(2,k) - dlfrcy
-                     dfvdl(3,k) = dfvdl(3,k) - dlfrcz
+                     dfl(1,i) = dfl(1,i) + dlfrcx
+                     dfl(2,i) = dfl(2,i) + dlfrcy
+                     dfl(3,i) = dfl(3,i) + dlfrcz
+                     dfl(1,k) = dfl(1,k) - dlfrcx
+                     dfl(2,k) = dfl(2,k) - dlfrcy
+                     dfl(3,k) = dfl(3,k) - dlfrcz
                      do j = 1, 3
                         dlter(j,i) = dlter(j,i) + dlttri(j)
                         dlter(j,k) = dlter(j,k) + dlttrk(j)
@@ -1660,7 +1672,7 @@ c
 c     OpenMP directives for the major loop structure
 c
 !$OMP END DO
-!$OMP DO reduction(+:der,ervir,dfvdl,devvirdl)
+!$OMP DO reduction(+:der,ervir,dfl,devvirdl)
 c
 c     resolve site torques then increment forces and virial
 c
@@ -1668,7 +1680,7 @@ c
          i = irep(ii)
          call torque (i,ter(1,i),fix,fiy,fiz,der)
          if (dod2) then
-            call torque (i,dlter(1,i),dlfix,dlfiy,dlfiz,dfvdl)
+            call torque (i,dlter(1,i),dlfix,dlfiy,dlfiz,dfl)
             call torqvir (i,dlfix,dlfiy,dlfiz,devvirdl)
          end if
          call torqvir (i,fix,fiy,fiz,ervir)
@@ -1679,10 +1691,21 @@ c
 !$OMP END DO
 !$OMP END PARALLEL
 c
+c     add the lambda derivative of the force to the global array
+c
+      if (dod2) then
+         do i = 1, n
+            dfvdl(1,i) = dfvdl(1,i) + dfl(1,i)
+            dfvdl(2,i) = dfvdl(2,i) + dfl(2,i)
+            dfvdl(3,i) = dfvdl(3,i) + dfl(3,i)
+         end do
+      end if
+c
 c     perform deallocation of some local arrays
 c
       deallocate (rscale)
       deallocate (ter)
       deallocate (dlter)
+      deallocate (dfl)
       return
       end

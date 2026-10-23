@@ -75,6 +75,7 @@ c
       integer ii,kk
       integer jcell
       real*8 e,eterm
+      real*8 soft,dsoft
       real*8 fgrp,taper
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -275,11 +276,10 @@ c
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
+                  e = sizik * eterm * rr1
                   if (mutik) then
-                     e = rlsc * sizik * eterm
-     &                      / sqrt(rshf+r2)
-                  else
-                     e = sizik * eterm * rr1
+                     call erepsc (r,rlsc,rshf,soft,dsoft)
+                     e = soft * e
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -476,11 +476,10 @@ c
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
+                        e = sizik * eterm * rr1
                         if (mutik) then
-                           e = rlsc * sizik * eterm
-     &                            / sqrt(rshf+r2)
-                        else
-                           e = sizik * eterm * rr1
+                           call erepsc (r,rlsc,rshf,soft,dsoft)
+                           e = soft * e
                         end if
 c
 c     use energy switching if near the cutoff distance
@@ -599,6 +598,7 @@ c
       integer i,j,k
       integer ii,kk,kkk
       real*8 e,eterm
+      real*8 soft,dsoft
       real*8 fgrp,taper
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -812,11 +812,10 @@ c
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
+                  e = sizik * eterm * rr1
                   if (mutik) then
-                     e = rlsc * sizik * eterm
-     &                      / sqrt(rshf+r2)
-                  else
-                     e = sizik * eterm * rr1
+                     call erepsc (r,rlsc,rshf,soft,dsoft)
+                     e = soft * e
                   end if
 c
 c     use energy switching if near the cutoff distance

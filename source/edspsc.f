@@ -53,26 +53,12 @@ c
       real*8 dlsc,dlsq
       real*8 dlsc1,dlsq1
       real*8 dlsc2,dlsq2
-      real*8 vlm,sexp
 c
 c
-c     set the soft core terms and their lambda derivatives, skipping
-c     any term whose coefficient vanishes, so that no power of lambda
-c     goes negative
+c     set the soft core terms and their lambda derivatives
 c
-      call dspsc (dlsc,dlsq)
-      vlm = vlambda
-      sexp = scexpd + scexpdq
-      dlsc1 = scexpd * vlm**(scexpd-1.0d0)
-      dlsq1 = sexp * vlm**(sexp-1.0d0)
-      dlsc2 = 0.0d0
-      dlsq2 = 0.0d0
-      if (use_d2lmda) then
-         if (scexpd .ne. 1.0d0) then
-            dlsc2 = scexpd * (scexpd-1.0d0) * vlm**(scexpd-2.0d0)
-         end if
-         dlsq2 = sexp * (sexp-1.0d0) * vlm**(sexp-2.0d0)
-      end if
+      call lmdapwr (vlambda,scexpd,use_d2lmda,dlsc,dlsc1,dlsc2)
+      call lmdapwr (vlambda,scexpd+scexpdq,use_d2lmda,dlsq,dlsq1,dlsq2)
       return
       end
 c

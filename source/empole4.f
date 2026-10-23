@@ -20,6 +20,7 @@ c
       subroutine empole4
       use extfld
       use limits
+      use output
       use virial
       implicit none
       integer i,j
@@ -44,6 +45,12 @@ c
 c     get contribution from external electric field if used
 c
       if (use_exfld)  call exfield4
+c
+c     the lambda derivative leaves the unscaled multipoles in the
+c     global frame, so put back the scaled ones when a saved dipole
+c     will be built from them
+c
+      if (ustcsave .or. uchgsave .or. usyssave)  call rotpole ('MPOLE')
 c
 c     add the electrostatic virial to main virial
 c
