@@ -13,7 +13,7 @@ c     ##################################################
 c
 c
 c     "test_disp" checks the HIPPO dispersion cases exercised by
-c     the tinker-gpu disp.cpp tests
+c     the tinker-gpu disp.cpp tests, then the replicate cell loops
 c
 c
       subroutine test_disp
@@ -22,6 +22,7 @@ c
 c
       call test_disp_nonewald
       call test_disp_dewald
+      call test_disp_replica
       return
       end
 c
@@ -68,6 +69,76 @@ c
      &                     'disp_zeroc6',.true.,1.0d-4,1.0d-4,1.0d-3)
       call test_disp_case ('dewald_zeroc6','disp.3.txt',
      &                     'disp_zeroc6',.false.,1.0d-4,1.0d-4,1.0d-3)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_disp_replica  --  replicate cell paths  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_disp_replica" checks that the energy, gradient and analysis
+c     routines give the same dispersion energy for two DMSO molecules
+c     in a box small enough for the cutoff to reach replicate cells,
+c     where images of bonded partners lie inside the cutoff, with and
+c     without Ewald summation and with one molecule decoupled under
+c     the soft core
+c
+c
+      subroutine test_disp_replica
+      implicit none
+c
+c
+      call test_disp_replcase ('replica_cut','disp_replica_cut')
+      call test_disp_replcase ('replica_ewald','disp_replica_ewald')
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_disp_replcase  --  one replicate system  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+      subroutine test_disp_replcase (key,tname)
+      use action
+      use atoms
+      use energi
+      implicit none
+      integer nsave
+      real*8 energy,e,e0,e1
+      real*8, allocatable :: derivs(:,:)
+      logical skiptest
+      character*(*) key,tname
+      character*48 cname
+c
+c
+      cname = 'test_'//trim(tname)
+      if (skiptest(cname,'hippo'))  return
+      call pushdir ('file/disp')
+      call loadfix ('../testgrad/dmso2',key//'.key')
+      allocate (derivs(3,n))
+c
+c     compare the energy from each of the three routines
+c
+      e = energy ()
+      e0 = edsp
+      call gradient (e,derivs)
+      e1 = edsp
+      call assert_real (e1,e0,1.0d-8,trim(cname)//' gradient')
+      call analysis (e)
+      nsave = nedsp
+      call assert_real (edsp,e0,1.0d-8,trim(cname)//' analysis')
+      call assert_logical (nsave.gt.0,.true.,
+     &                     trim(cname)//' analysis count')
+      deallocate (derivs)
+      call popdir
+      call final
       return
       end
 c

@@ -109,6 +109,12 @@ c
       scexprm = 3.0d0
       scexprp = 1.0d0
 c
+c     set defaults for soft core damped dispersion
+c
+      scrdsp = 2.0d0
+      scexpd = 4.0d0
+      scexpdq = 1.0d0
+c
 c     zero out number of hybrid atoms and mutated torsions
 c
       nmut = 0
@@ -155,6 +161,9 @@ c
             string = record(next:240)
             read (string,*,err=30,end=30)  scalphar,scexpr,
      &                                     scexprm,scexprp
+         else if (keyword(1:14) .eq. 'DISP-SOFTCORE ') then
+            string = record(next:240)
+            read (string,*,err=30,end=30)  scrdsp,scexpd,scexpdq
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30)  tlambda
@@ -1518,6 +1527,7 @@ c
 c
       subroutine mutate_check
       use dlmda
+      use dsppot
       use iounit
       use keys
       use limits
@@ -1530,6 +1540,7 @@ c
       integer i,k,next
       integer nstg
       real*8 eps,temp
+      real*8 dspcut
       logical polsave
       character*20 keyword
       character*240 record
@@ -1579,6 +1590,25 @@ c
          scexpr = 5.0d0
          scexprm = 3.0d0
       end if
+c
+c     reset any soft core damped dispersion parameter outside its
+c     allowed range to the default value, where the switch radius must
+c     lie inside the dispersion cutoff, or inside the start of its
+c     taper when the long range correction fills the taper window, so
+c     that reciprocal space and the long range correction see only the
+c     plain lambda power, and the second lambda derivative diverges at
+c     zero lambda unless the exponent is one or at least two and the
+c     sum of the exponents is at least two
+c
+      dspcut = dispcut
+      if (use_dcorr)  dspcut = disptaper
+      if (use_dewald)  dspcut = dewaldcut
+      if (scrdsp.lt.0.0d0 .or. scrdsp.ge.dspcut)  scrdsp = 2.0d0
+      if (scexpd .lt. 1.0d0)  scexpd = 4.0d0
+      if (scexpdq .le. 0.0d0)  scexpdq = 1.0d0
+      if (use_d2lmda .and. scexpd.ne.1.0d0 .and. scexpd.lt.2.0d0)
+     &   scexpd = 4.0d0
+      if (use_d2lmda .and. scexpd+scexpdq.lt.2.0d0)  scexpdq = 1.0d0
 c
 c     single topology currently supports the scalar derivative for
 c     mutual polarization with Thole damping, as in AMOEBA and AMOEBA+,
@@ -1773,13 +1803,13 @@ c
          call fatal
       end if
 c
-c     the HIPPO dispersion term is scaled by lambda but adds nothing
-c     to the lambda derivative
+c     the long range dispersion correction is scaled by lambda but
+c     adds nothing to the lambda derivative
 c
-      if (use_dlmda .and. use_disp) then
+      if (use_dlmda .and. use_disp .and. use_dcorr) then
          write (iout,115)
   115    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
-     &              ' Available for HIPPO Dispersion')
+     &              ' Available with DISP-CORRECTION')
          call fatal
       end if
 c

@@ -255,8 +255,8 @@ c
 c
 c     compute the numerical lambda derivatives, where charge transfer
 c     follows the polarization lambda and is counted with polarization,
-c     and Pauli repulsion follows the van der Waals lambda and is
-c     counted with van der Waals
+c     and Pauli repulsion and damped dispersion follow the van der
+c     Waals lambda and are counted with van der Waals
 c
          if (donumer .and. keylmda) then
             use_dlmda = .false.
@@ -269,18 +269,18 @@ c
             call settestlmda (use_mainlmda,lmda0+eps,oldvdl+eps,
      &                        oldeml+eps,oldepl+eps)
             esum2 = energy ()
-            ev2 = ev + er
+            ev2 = ev + er + edsp
             em2 = em
             ep2 = ep + ect
             call settestlmda (use_mainlmda,lmda0-eps,oldvdl-eps,
      &                        oldeml-eps,oldepl-eps)
             esum0 = energy ()
-            ev0 = ev + er
+            ev0 = ev + er + edsp
             em0 = em
             ep0 = ep + ect
             call settestlmda (use_mainlmda,lmda0,oldvdl,oldeml,oldepl)
             esum1 = energy ()
-            ev1 = ev + er
+            ev1 = ev + er + edsp
             em1 = em
             ep1 = ep + ect
             ndedl = (esum2 - esum0) / (2.0d0 * eps)
@@ -297,7 +297,7 @@ c
             do i = 1, n
                do j = 1, 3
                   ndfsumdl(j,i) = derivs(j,i)
-                  ndfvdl(j,i) = dev(j,i) + der(j,i)
+                  ndfvdl(j,i) = dev(j,i) + der(j,i) + dedsp(j,i)
                   ndfmdl(j,i) = dem(j,i)
                   ndfpdl(j,i) = dep(j,i) + dect(j,i)
                end do
@@ -308,6 +308,7 @@ c
                   ndepvirdl(j,i) = epvir(j,i) + ectvir(j,i)
                   ndemvirdl(j,i) = emvir(j,i)
                   ndevvirdl(j,i) = evvir(j,i) + ervir(j,i)
+     &                                + edspvir(j,i)
                end do
             end do
             call settestlmda (use_mainlmda,lmda0-eps,oldvdl-eps,
@@ -317,7 +318,8 @@ c
                do j = 1, 3
                   ndfsumdl(j,i) = (ndfsumdl(j,i)-derivs(j,i))
      &                                                 / (2.0d0 * eps)
-                  ndfvdl(j,i) = (ndfvdl(j,i)-dev(j,i)-der(j,i))
+                  ndfvdl(j,i) = (ndfvdl(j,i)-dev(j,i)-der(j,i)
+     &                              -dedsp(j,i))
      &                                                 / (2.0d0 * eps)
                   ndfmdl(j,i) = (ndfmdl(j,i)-dem(j,i)) / (2.0d0 * eps)
                   ndfpdl(j,i) = (ndfpdl(j,i)-dep(j,i)-dect(j,i))
@@ -333,7 +335,8 @@ c
                   ndemvirdl(j,i) = (ndemvirdl(j,i)-emvir(j,i))
      &                           / (2.0d0 * eps)
                   ndevvirdl(j,i) = (ndevvirdl(j,i)-evvir(j,i)
-     &                              -ervir(j,i)) / (2.0d0 * eps)
+     &                              -ervir(j,i)-edspvir(j,i))
+     &                                 / (2.0d0 * eps)
                end do
             end do
 c

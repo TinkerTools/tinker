@@ -48,6 +48,7 @@ c
       real*8 fke,fka,fkb
       real*8 ee,ea,eb,aa,bb
       real*8 e,eps,vlam1
+      real*8 vlw,vlq
       real*8 offset,taper
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
@@ -78,6 +79,12 @@ c
       rdelta = (range-cut) / dble(ndelta)
       offset = cut - 0.5d0*rdelta
       vlam1 = 1.0d0 - vlambda
+c
+c     beyond its switch radius the soft core of the damped dispersion
+c     leaves only its lambda power on a mutated pair
+c
+      vlw = vlambda
+      if (use_disp)  call dspsc (vlw,vlq)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -135,9 +142,9 @@ c
             aa = fia * fka
             bb = fib * fkb
             if (vcouple .eq. 0) then
-               fik = ee + aa + bb + vlambda*ea + vlam1*eb
+               fik = ee + aa + bb + vlw*ea + vlam1*eb
             else
-               fik = ee + vlambda*(ea+aa) + vlam1*(eb+bb)
+               fik = ee + vlw*(ea+aa) + vlam1*(eb+bb)
             end if
             if (k .eq. i)  fik = 0.5d0 * fik
             if (use_disp) then
@@ -246,6 +253,8 @@ c
       real*8 ee,ea,eb,aa,bb
       real*8 e,de,eps
       real*8 offset,vlam1
+      real*8 vlw,vlq,dvlw
+      real*8 vlq1,vlw2,vlq2
       real*8 taper,dtaper
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
@@ -280,6 +289,13 @@ c
       rdelta = (range-cut) / dble(ndelta)
       offset = cut - 0.5d0*rdelta
       vlam1 = 1.0d0 - vlambda
+c
+c     beyond its switch radius the soft core of the damped dispersion
+c     leaves only its lambda power on a mutated pair
+c
+      vlw = vlambda
+      dvlw = 1.0d0
+      if (use_disp)  call dspsc4 (vlw,vlq,dvlw,vlq1,vlw2,vlq2)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -338,11 +354,11 @@ c
             aa = fia * fka
             bb = fib * fkb
             if (vcouple .eq. 0) then
-               fik = ee + aa + bb + vlambda*ea + vlam1*eb
-               dfik = ea - eb
+               fik = ee + aa + bb + vlw*ea + vlam1*eb
+               dfik = dvlw*ea - eb
             else
-               fik = ee + vlambda*(ea+aa) + vlam1*(eb+bb)
-               dfik = ea + aa - eb - bb
+               fik = ee + vlw*(ea+aa) + vlam1*(eb+bb)
+               dfik = dvlw*(ea+aa) - eb - bb
             end if
             if (k .eq. i) then
                fik = 0.5d0 * fik

@@ -733,17 +733,17 @@ FREE ENERGY PERTURBATION KEYWORDS
    :header-rows: 0
 
    * -
+     - DISP-SOFTCORE
      - ELE-LAMBDA
      - LAMBDA
-     - LIGAND
    * -
+     - LIGAND
      - MUTATE
      - REPEL-SOFTCORE
-     - VDW-ANNIHILATE
    * -
+     - VDW-ANNIHILATE
      - VDW-LAMBDA
      - VDW-SOFTCORE
-     -
 
 POTENTIAL SMOOTHING KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -1625,6 +1625,12 @@ DISP-CUTOFF [real]
 
 DISP-LIST
    Turns on the use of pairwise neighbor lists for dispersion interactions. This method will yield identical energetic results to the standard double loop method.
+
+.. index:: DISP-SOFTCORE
+.. _KEY-DISP-SOFTCORE:
+
+DISP-SOFTCORE [1-3 reals]
+   Sets the soft-core scaling of HIPPO damped dispersion interactions involving mutated atoms during free energy calculations, where each such pair energy is multiplied by lambda^n * (1-S) + lambda^(n+q) * S with lambda the van der Waals lambda and S = (1-r^2/rs^2)^3 a switch that falls from one at contact to zero at the switch radius rs, and is zero beyond it. Beyond rs every mutated pair carries lambda^n alone, which also weights the reciprocal space part of dispersion particle mesh Ewald and the long range dispersion correction, so only real space pairs closer than rs are softened. The three real-number modifiers are the switch radius rs in Angstroms, the lambda exponent n, and the optional lambda exponent q added at contact. The switch radius must be nonnegative and less than the dispersion cutoff, or less than the start of the dispersion taper when the DISP-CORRECTION keyword is used, n must be at least 1.0, and q must be positive. When second lambda derivatives are used by orthogonal space tempering or the LAMBDA-DERIV2 keyword, n must be 1.0 or at least 2.0, and n+q must be at least 2.0. Any value outside these limits is reset to its default. A switch radius of zero leaves the plain lambda^n weight on every mutated pair. Lambda derivatives are not available together with the DISP-CORRECTION keyword. The default values in the absence of the DISP-SOFTCORE keyword are 2.0, 4.0 and 1.0, respectively.
 
 .. index:: DISP-TAPER
 .. _KEY-DISP-TAPER:

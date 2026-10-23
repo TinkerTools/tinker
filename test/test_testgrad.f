@@ -32,6 +32,17 @@ c     case 18 decouples a HIPPO DMSO from its liquid through Pauli
 c     repulsion alone, with a non-integer REPEL-SOFTCORE exponent and
 c     shift shape, by neighbor list
 c
+c     case 19 decouples a HIPPO DMSO from its liquid through damped
+c     dispersion alone, with a DISP-SOFTCORE switch radius that reaches
+c     the closest mutated pairs and non-integer exponents, under Ewald
+c     summation by neighbor list
+c
+c     case 20 puts two HIPPO DMSO molecules in a box small enough for
+c     the Ewald dispersion cutoff to reach replicate cells holding
+c     images of bonded partners, which must not carry the exclusion
+c     scale, and case 21 weights a DMSO by atom group under Ewald
+c     dispersion, which must scale the damping derivative as well
+c
 c
       subroutine test_testgrad
       implicit none
@@ -56,6 +67,9 @@ c
       call test_testgrad_case ('16_hippo_dewald_dec_l05','dmso')
       call test_testgrad_case ('17_hipwat_group_ct_replica','hipwat')
       call test_testgrad_case ('18_hippo_rep_sc_real_l04','dmso')
+      call test_testgrad_case ('19_hippo_disp_sc_l04','dmso')
+      call test_testgrad_case ('20_hippo_dewald_replica_l04','dmso2')
+      call test_testgrad_case ('21_hippo_dewald_group_l04','dmso')
       return
       end
 c

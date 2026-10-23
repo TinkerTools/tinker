@@ -35,9 +35,7 @@ c
 c     take lambda derivatives while the van der Waals lambda map
 c     has slope or curvature, as in the "gradient" routine
 c
-      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
-     &          .or. d2vldlmda2.ne.0.0d0)
-      dod2 = (dodl .and. use_d2lmda)
+      call vdlflags (dodl,dod2)
 c
 c     choose the method for summing over pairwise interactions
 c
@@ -173,9 +171,7 @@ c
 c     take lambda derivatives while the van der Waals lambda map
 c     has slope or curvature, as in the "gradient" routine
 c
-      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
-     &          .or. d2vldlmda2.ne.0.0d0)
-      dod2 = (dodl .and. use_d2lmda)
+      call vdlflags (dodl,dod2)
 c
 c     set the soft core lambda terms for each ligand group, along
 c     with their lambda derivative factors as needed
@@ -866,9 +862,7 @@ c
 c     take lambda derivatives while the van der Waals lambda map
 c     has slope or curvature, as in the "gradient" routine
 c
-      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
-     &          .or. d2vldlmda2.ne.0.0d0)
-      dod2 = (dodl .and. use_d2lmda)
+      call vdlflags (dodl,dod2)
 c
 c     set the soft core lambda terms for each ligand group, along
 c     with their lambda derivative factors as needed
@@ -1326,9 +1320,7 @@ c
 c     take lambda derivatives while the van der Waals lambda map
 c     has slope or curvature, as in the "gradient" routine
 c
-      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
-     &          .or. d2vldlmda2.ne.0.0d0)
-      dod2 = (dodl .and. use_d2lmda)
+      call vdlflags (dodl,dod2)
 c
 c     set the soft core lambda terms for each ligand group, along
 c     with their lambda derivative factors as needed

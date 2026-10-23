@@ -70,6 +70,18 @@ c     (1-lambda)^2 and a non-integer one from REPEL-SOFTCORE, both
 c     lambda endpoints, and first derivatives alone with an exponent
 c     below two
 c
+c     cases 101 to 110 cover HIPPO damped dispersion, whose soft core
+c     also follows the van der Waals lambda and is counted in dEV/dL,
+c     for the same mixture: the default soft core, then a switch radius
+c     that reaches the closest mutated pairs by neighbor list, under
+c     annihilation and with an early taper, Ewald summation by double
+c     loop and by neighbor list with annihilation, non-integer soft
+c     core exponents, both lambda endpoints under Ewald, and first
+c     derivatives alone with a lambda exponent of one
+c
+c     cases 111 and 112 cover Ewald dispersion in replicate cells, for
+c     two DMSO molecules in a small box, and under atom group weights
+c
 c
       subroutine test_testlmda
       implicit none
@@ -232,6 +244,29 @@ c
      &                        '1e-4')
       call test_testlmda_xyz ('100_hipmix_rep_d1_n12_l04','hipmix',
      &                        '1e-4')
+      call test_testlmda_xyz ('101_hipmix_dsp_l04','hipmix','1e-4')
+      call test_testlmda_xyz ('102_hipmix_dsp_nlist_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('103_hipmix_dsp_annih_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('104_hipmix_dsp_taper_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('105_hipmix_dsp_ewald_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('106_hipmix_dsp_ewald_nlist_annih_l04',
+     &                        'hipmix','1e-4')
+      call test_testlmda_xyz ('107_hipmix_dsp_sc_real_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('108_hipmix_dsp_ewald_n2_l00','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('109_hipmix_dsp_ewald_l10','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('110_hipmix_dsp_d1_n1_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('111_dmso2_dsp_ewald_replica_l04',
+     &                        '../testgrad/dmso2','1e-4')
+      call test_testlmda_xyz ('112_hipmix_dsp_ewald_group_l04',
+     &                        'hipmix','1e-4')
       return
       end
 c

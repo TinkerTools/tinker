@@ -132,11 +132,14 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,taper
-      real*8 vterm,eps
+      real*8 dlsc,dlsq
+      real*8 soft,dsoft,eps
+      real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical header,huge
       logical muti,mutk
+      logical mutik
       character*6 mode
 c
 c
@@ -159,11 +162,10 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set soft core lambda scaling values for mutated interactions
 c
-      if (nmut .ne. 0) then
-         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
-      end if
+      if (nmut .ne. 0)  call dspsc (dlsc,dlsq)
+      rs2 = scrdsp * scrdsp
 c
 c     set damping tolerance, cutoff and switching coefficients
 c
@@ -277,12 +279,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        e = e * vterm
-                     else if (.not.muti .or. .not.mutk) then
-                        e = e * vterm
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  if (mutik) then
+                     soft = dlsc
+                     if (r2 .lt. rs2) then
+                        call edspsc (r,dlsc,dlsq,soft,dsoft)
                      end if
+                     e = e * soft
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -414,6 +418,13 @@ c
                      expi = exp(-di)
                      expk = exp(-dk)
                      if (abs(ai-ak) .lt. eps) then
+                        di4 = di2 * di2
+                        di5 = di2 * di3
+                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+                     else
                         ai2 = ai * ai
                         ak2 = ak * ak
                         dk2 = dk * dk
@@ -432,13 +443,6 @@ c
      &                                       +dk3/6.0d0)*expk
      &                           - 2.0d0*ti2*tk*(1.0+di+di2/3.0d0)*expi
      &                           - 2.0d0*tk2*ti*(1.0+dk+dk2/3.0d0)*expk
-                     else
-                        di4 = di2 * di2
-                        di5 = di2 * di3
-                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
 c
@@ -453,12 +457,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     if (muti .or. mutk) then
-                        if (vcouple .eq. 1) then
-                           e = e * vterm
-                        else if (.not.muti .or. .not.mutk) then
-                           e = e * vterm
+                     mutik = (muti.or.mutk) .and.
+     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     if (mutik) then
+                        soft = dlsc
+                        if (r2 .lt. rs2) then
+                           call edspsc (r,dlsc,dlsq,soft,dsoft)
                         end if
+                        e = e * soft
                      end if
 c
 c     use energy switching if near the cutoff distance
@@ -584,11 +590,14 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,taper
-      real*8 vterm,eps
+      real*8 dlsc,dlsq
+      real*8 soft,dsoft,eps
+      real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical header,huge
       logical muti,mutk
+      logical mutik
       character*6 mode
 c
 c
@@ -611,11 +620,10 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set soft core lambda scaling values for mutated interactions
 c
-      if (nmut .ne. 0) then
-         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
-      end if
+      if (nmut .ne. 0)  call dspsc (dlsc,dlsq)
+      rs2 = scrdsp * scrdsp
 c
 c     set damping tolerance, cutoff and switching coefficients
 c
@@ -639,7 +647,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,cut2,c0,c1,
-!$OMP& c2,c3,c4,c5,vcouple,vterm,eps,molcule,name,verbose,debug,
+!$OMP& c2,c3,c4,c5,vcouple,dlsc,dlsq,rs2,eps,molcule,name,verbose,debug,
 !$OMP& header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter)
@@ -736,12 +744,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        e = e * vterm
-                     else if (.not.muti .or. .not.mutk) then
-                        e = e * vterm
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  if (mutik) then
+                     soft = dlsc
+                     if (r2 .lt. rs2) then
+                        call edspsc (r,dlsc,dlsq,soft,dsoft)
                      end if
+                     e = e * soft
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -837,12 +847,9 @@ c
       use disp
       use energi
       use ewald
-      use mutant
       use pme
       implicit none
-      integer i,ii
-      real*8 e,wel,wll,cpr
-      logical split
+      integer i
 c
 c
 c     zero out the dispersion energy and partitioning terms
@@ -871,17 +878,9 @@ c
       call edrecip
 c
 c     compute the self-energy portion of the Ewald summation,
-c     weighting each ligand site as the reciprocal space sum does
+c     along with its partitioning over atoms
 c
-      call dspmutwt (split,wel,wll,cpr)
-      do ii = 1, ndisp
-         i = idisp(ii)
-         e = csix(i)**2 * aewald**6 / 12.0d0
-         if (mutg(i) .ne. 0)  e = e * wll
-         edsp = edsp + e
-         nedsp = nedsp + 1
-         aedsp(i) = aedsp(i) + e 
-      end do
+      call dspself (.false.,.true.)
       return
       end
 c
@@ -939,10 +938,13 @@ c
       real*8 expa,term
       real*8 damp3,damp5
       real*8 damp,scale
-      real*8 vterm,wsc,eps
+      real*8 dlsc,dlsq,wsc
+      real*8 soft,dsoft,eps
+      real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
+      logical mutik
       logical header,huge
       character*6 mode
 c
@@ -957,11 +959,10 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set soft core lambda scaling values for mutated interactions
 c
-      if (nmut .ne. 0) then
-         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
-      end if
+      if (nmut .ne. 0)  call dspsc (dlsc,dlsq)
+      rs2 = scrdsp * scrdsp
 c
 c     set damping tolerance, cutoff and switching coefficients
 c
@@ -1078,15 +1079,16 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
                   wsc = 1.0d0
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        wsc = vterm
-                        scale = scale * vterm
-                     else if (.not.muti .or. .not.mutk) then
-                        wsc = vterm
-                        scale = scale * vterm
+                  if (mutik) then
+                     soft = dlsc
+                     if (r2 .lt. rs2) then
+                        call edspsc (r,dlsc,dlsq,soft,dsoft)
                      end if
+                     wsc = dlsc
+                     scale = scale * soft
                   end if
 c     
 c     compute the full undamped energy for this interaction
@@ -1200,6 +1202,7 @@ c
                   if (r2 .le. off2) then
                      r = sqrt(r2)
                      r6 = r2**3
+                     e = -ci * ck / r6
                      ralpha2 = r2 * aewald**2
                      term = 1.0d0 + ralpha2 + 0.5d0*ralpha2**2
                      expa = exp(-ralpha2) * term
@@ -1253,15 +1256,16 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                     mutik = (muti.or.mutk) .and.
+     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
                      wsc = 1.0d0
-                     if (muti .or. mutk) then
-                        if (vcouple .eq. 1) then
-                           wsc = vterm
-                           scale = scale * vterm
-                        else if (.not.muti .or. .not.mutk) then
-                           wsc = vterm
-                           scale = scale * vterm
+                     if (mutik) then
+                        soft = dlsc
+                        if (r2 .lt. rs2) then
+                           call edspsc (r,dlsc,dlsq,soft,dsoft)
                         end if
+                        wsc = dlsc
+                        scale = scale * soft
                      end if
 c     
 c     compute the full undamped energy for this interaction
@@ -1347,12 +1351,9 @@ c
       use disp
       use energi
       use ewald
-      use mutant
       use pme
       implicit none
-      integer i,ii
-      real*8 e,wel,wll,cpr
-      logical split
+      integer i
 c
 c
 c     zero out the dispersion energy and partitioning terms
@@ -1381,17 +1382,9 @@ c
       call edrecip
 c
 c     compute the self-energy portion of the Ewald summation,
-c     weighting each ligand site as the reciprocal space sum does
+c     along with its partitioning over atoms
 c
-      call dspmutwt (split,wel,wll,cpr)
-      do ii = 1, ndisp
-         i = idisp(ii)
-         e = csix(i)**2 * aewald**6 / 12.0d0
-         if (mutg(i) .ne. 0)  e = e * wll
-         edsp = edsp + e
-         nedsp = nedsp + 1
-         aedsp(i) = aedsp(i) + e 
-      end do
+      call dspself (.false.,.true.)
       return
       end
 c
@@ -1449,10 +1442,13 @@ c
       real*8 expa,term
       real*8 damp3,damp5
       real*8 damp,scale
-      real*8 vterm,wsc,eps
+      real*8 dlsc,dlsq,wsc
+      real*8 soft,dsoft,eps
+      real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
+      logical mutik
       logical header,huge
       character*6 mode
 c
@@ -1467,11 +1463,10 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set soft core lambda scaling values for mutated interactions
 c
-      if (nmut .ne. 0) then
-         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
-      end if
+      if (nmut .ne. 0)  call dspsc (dlsc,dlsq)
+      rs2 = scrdsp * scrdsp
 c
 c     set damping tolerance, cutoff and switching coefficients
 c
@@ -1495,7 +1490,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,aewald,
-!$OMP& molcule,vcouple,vterm,eps,name,verbose,debug,header,iout)
+!$OMP& molcule,vcouple,dlsc,dlsq,rs2,eps,name,verbose,debug,header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter)
 c
@@ -1597,15 +1592,16 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
                   wsc = 1.0d0
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        wsc = vterm
-                        scale = scale * vterm
-                     else if (.not.muti .or. .not.mutk) then
-                        wsc = vterm
-                        scale = scale * vterm
+                  if (mutik) then
+                     soft = dlsc
+                     if (r2 .lt. rs2) then
+                        call edspsc (r,dlsc,dlsq,soft,dsoft)
                      end if
+                     wsc = dlsc
+                     scale = scale * soft
                   end if
 c     
 c     compute the full undamped energy for this interaction

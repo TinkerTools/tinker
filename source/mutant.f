@@ -33,6 +33,9 @@ c     scexp       scale factor for soft core buffered 14-7 potential
 c     scexpr      lambda exponent for soft core Pauli repulsion
 c     scexprm     lambda exponent of soft core repulsion shift
 c     scexprp     one minus lambda exponent of soft core repulsion shift
+c     scrdsp      switch radius for soft core damped dispersion in Ang
+c     scexpd      lambda exponent for soft core damped dispersion
+c     scexpdq     added lambda exponent of soft core dispersion at r=0
 c     tlambda     state weighting value for torsional potential
 c     vlambda     state weighting value for van der Waals potentials
 c     mutfield    flag restricting dfield to the mpoles of mutated atoms
@@ -64,6 +67,9 @@ c
       real*8 scexpr
       real*8 scexprm
       real*8 scexprp
+      real*8 scrdsp
+      real*8 scexpd
+      real*8 scexpdq
       real*8 tlambda
       real*8 vlambda
       real*8, allocatable :: fluxsc(:)

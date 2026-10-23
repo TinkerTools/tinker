@@ -246,14 +246,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -424,14 +418,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                        mutik = .false.
-                        if (muti .or. mutk) then
-                           if (vcouple .eq. 1) then
-                              mutik = .true.
-                           else if (.not.muti .or. .not.mutk) then
-                              mutik = .true.
-                           end if
-                        end if
+                        mutik = (muti.or.mutk) .and.
+     &                          (vcouple.eq.1 .or. .not.(muti.and.mutk))
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -713,14 +701,8 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c

@@ -55,6 +55,7 @@ c
       call test_mutate_overlap
       call test_mutate_scexp
       call test_mutate_repsc
+      call test_mutate_dspsc
       call test_mutate_epdtsave
       call test_mutate_gate
       call test_mutate_flat
@@ -2627,7 +2628,7 @@ c     soft core Pauli repulsion parameters outside the allowed limits;
 c     each such parameter is reset to its default, so all must run,
 c     including an exponent below two or a one minus lambda shift
 c     exponent between one and two with "lambda-deriv2"; repulsion
-c     runs with lambda derivatives, but dispersion must still stop
+c     and dispersion both run with lambda derivatives
 c
 c
       subroutine test_mutate_repsc
@@ -2657,8 +2658,7 @@ c
      &   'test_mutate_repsc p15 deriv')
       call test_mutate_repsccase ('rsoft_default_d2.key','',
      &   'test_mutate_repsc repulsion deriv2')
-      call test_mutate_repsccase ('rsoft_disp_d2.key',
-     &   'not Available for HIPPO Dispersion',
+      call test_mutate_repsccase ('rsoft_disp_d2.key','',
      &   'test_mutate_repsc dispersion deriv2')
       call popdir
       return
@@ -2712,6 +2712,138 @@ c
       else
          call assert_logical (halted,.false.,label//' runs')
       end if
+      call execute_command_line ('rm -f out.txt')
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_dspsc  --  dispersion soft core  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_dspsc" runs "analyze" on HIPPO water keyfiles with
+c     soft core damped dispersion parameters outside the allowed limits,
+c     including a switch radius beyond the dispersion cutoff, or beyond
+c     the start of its taper with the long range correction, and, with
+c     "lambda-deriv2", an exponent between one and two or an exponent
+c     sum below two; each such parameter is reset to its default, so
+c     the energy must match that of a keyfile holding the reset values,
+c     while lambda derivatives with the long range dispersion correction
+c     must stop
+c
+c
+      subroutine test_mutate_dspsc
+      implicit none
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_dspsc','mutate'))  return
+      call pushdir ('file/mutate')
+      call test_mutate_dspsccase ('dsoft_rs_neg_d1.key',
+     &   'dsoft_default_d1.key','','test_mutate_dspsc radius')
+      call test_mutate_dspsccase ('dsoft_n05_d1.key',
+     &   'dsoft_default_d1.key','','test_mutate_dspsc n05')
+      call test_mutate_dspsccase ('dsoft_q0_d1.key',
+     &   'dsoft_default_d1.key','','test_mutate_dspsc q0')
+      call test_mutate_dspsccase ('dsoft_n15_d2.key',
+     &   'dsoft_default_d1.key','','test_mutate_dspsc n15 deriv2')
+      call test_mutate_dspsccase ('dsoft_n1_q05_d2.key',
+     &   'dsoft_n1_d1.key','','test_mutate_dspsc n1 q05 deriv2')
+      call test_mutate_dspsccase ('dsoft_rs_big_d1.key',
+     &   'dsoft_box_d1.key','','test_mutate_dspsc radius cutoff')
+      call test_mutate_dspsccase ('dsoft_rs_taper_d0.key',
+     &   'dsoft_box_dcorr_d0.key','','test_mutate_dspsc radius taper')
+      call test_mutate_dspsccase ('dsoft_dcorr_d1.key',' ',
+     &   'Available with DISP-CORRECTION',
+     &   'test_mutate_dspsc correction deriv')
+      call popdir
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_mutate_dspsccase  --  one dispersion gate  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_mutate_dspsccase" runs "analyze" on one HIPPO water keyfile
+c     and checks for the setup error containing "phrase", or, if
+c     "phrase" is blank, that no setup error is printed and the total
+c     energy matches that from the reference keyfile
+c
+c
+      subroutine test_mutate_dspsccase (key,refkey,phrase,label)
+      implicit none
+      real*8 e,eref
+      logical found,halted
+      character*(*) key,refkey,phrase,label
+c
+c
+      call test_mutate_dspscrun (key,phrase,e,found,halted)
+      if (len(phrase) .gt. 0) then
+         call assert_logical (found,.true.,label//' stops')
+      else
+         call assert_logical (halted,.false.,label//' runs')
+         call test_mutate_dspscrun (refkey,phrase,eref,found,halted)
+         call assert_real (e,eref,0.0d0,label//' reset')
+      end if
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_dspscrun  --  energy and errors  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_dspscrun" runs "analyze" on one HIPPO water keyfile
+c     and returns the total potential energy, whether any setup error
+c     is printed, and whether one contains "phrase"
+c
+c
+      subroutine test_mutate_dspscrun (key,phrase,e,found,halted)
+      implicit none
+      integer ist,iout,k
+      real*8 e
+      logical found,halted
+      character*(*) key,phrase
+      character*240 line
+      character*512 args
+c
+c
+      e = 0.0d0
+      found = .false.
+      halted = .false.
+      call execute_command_line ('rm -f out.txt')
+      args = '-k '//key//' hipwat.xyz E'
+      call run_prog ('analyze',trim(args),'out.txt',ist)
+      if (ist .eq. -1)  return
+c
+c     find the total energy, any setup error and its phrase
+c
+      open (newunit=iout,file='out.txt',status='old')
+      do while (.true.)
+         read (iout,'(a)',end=10)  line
+         if (index(line,'MUTATE_CHECK') .ne. 0) then
+            halted = .true.
+            if (len(phrase) .gt. 0) then
+               if (index(line,phrase) .ne. 0)  found = .true.
+            end if
+         end if
+         if (index(line,'Total Potential Energy') .ne. 0) then
+            k = index(line,':')
+            read (line(k+1:),*)  e
+         end if
+      end do
+   10 continue
+      close (unit=iout)
       call execute_command_line ('rm -f out.txt')
       return
       end

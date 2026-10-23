@@ -29,6 +29,7 @@ c
       use limits
       use virial
       implicit none
+      integer i,j
       real*8 elrc,vlrc
       real*8 delrc,dvlrc
       character*6 mode
@@ -56,10 +57,18 @@ c
          mode = 'DISP'
          call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
          edsp = edsp + elrc
-         vir(1,1) = vir(1,1) + vlrc
-         vir(2,2) = vir(2,2) + vlrc
-         vir(3,3) = vir(3,3) + vlrc
+         edspvir(1,1) = edspvir(1,1) + vlrc
+         edspvir(2,2) = edspvir(2,2) + vlrc
+         edspvir(3,3) = edspvir(3,3) + vlrc
       end if
+c
+c     add the damped dispersion virial to main virial
+c
+      do i = 1, 3
+         do j = 1, 3
+            vir(j,i) = vir(j,i) + edspvir(j,i)
+         end do
+      end do
       return
       end
 c
@@ -83,6 +92,7 @@ c
       use couple
       use deriv
       use disp
+      use dlmda
       use dsppot
       use energi
       use group
@@ -110,7 +120,17 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm,eps
+      real*8 eps
+      real*8 dlsc,dlsq
+      real*8 dlsc1,dlsq1
+      real*8 dlsc2,dlsq2
+      real*8 soft,dsoft,dsdl
+      real*8 rs2
+      real*8 d2sdl2,d2sdldr
+      real*8 dle,dle2,dlde
+      real*8 dldx,dldy,dldz
+      real*8 dlvxx,dlvyy,dlvzz
+      real*8 dlvyx,dlvzx,dlvzy
       real*8 taper,dtaper
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
@@ -118,6 +138,8 @@ c
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
+      logical mutik,mutdl,mutd2
+      logical dodl,dod2
       character*6 mode
 c
 c
@@ -141,11 +163,21 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set soft core lambda scaling values for mutated interactions,
+c     along with their lambda derivative factors while the van der
+c     Waals lambda map has slope or curvature, as in "gradient"
 c
+      call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
-         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+         if (dodl) then
+            call dspsc4 (dlsc,dlsq,dlsc1,dlsq1,dlsc2,dlsq2)
+         else
+            call dspsc (dlsc,dlsq)
+            dlsc1 = 0.0d0
+            dlsc2 = 0.0d0
+         end if
       end if
+      rs2 = scrdsp * scrdsp
 c
 c     set damping tolerance, cutoff and switching coefficients
 c
@@ -250,18 +282,6 @@ c
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c
-c     set use of lambda scaling for decoupling or annihilation
-c
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        de = de * vterm
-                        e = e * vterm
-                     else if (.not.muti .or. .not.mutk) then
-                        de = de * vterm
-                        e = e * vterm
-                     end if
-                  end if
-c
 c     apply damping and scaling factors for this interaction
 c
                   de = de*damp**2 + 2.0d0*e*damp*ddamp
@@ -271,6 +291,44 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
+                  end if
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
+c
+c     get energy and derivative via soft core lambda scaling, along
+c     with their lambda derivatives from the unscaled pair terms
+c
+                  if (mutik) then
+                     soft = dlsc
+                     dsoft = 0.0d0
+                     dsdl = dlsc1
+                     d2sdl2 = dlsc2
+                     d2sdldr = 0.0d0
+                     if (r2 .lt. rs2) then
+                        if (mutdl) then
+                           call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+     &                                   dlsc2,dlsq2,soft,dsoft,
+     &                                   dsdl,d2sdl2,d2sdldr)
+                        else
+                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        end if
+                     end if
+                  end if
+                  if (mutdl) then
+                     dle = dsdl * e
+                     if (mutd2) then
+                        dle2 = d2sdl2 * e
+                        dlde = dsdl*de + d2sdldr*e
+                     end if
+                  end if
+                  if (mutik) then
+                     de = soft*de + dsoft*e
+                     e = soft * e
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -283,6 +341,11 @@ c
      &                          + c2*r2 + c1*r + c0
                      dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
      &                           + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                     if (mutd2) then
+                        dlde = dle*dtaper + dlde*taper
+                        dle2 = dle2 * taper
+                     end if
+                     if (mutdl)  dle = dle * taper
                      de = e*dtaper + de*taper
                      e = e * taper
                   end if
@@ -311,15 +374,47 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  edspvir(1,1) = edspvir(1,1) + vxx
+                  edspvir(2,1) = edspvir(2,1) + vyx
+                  edspvir(3,1) = edspvir(3,1) + vzx
+                  edspvir(1,2) = edspvir(1,2) + vyx
+                  edspvir(2,2) = edspvir(2,2) + vyy
+                  edspvir(3,2) = edspvir(3,2) + vzy
+                  edspvir(1,3) = edspvir(1,3) + vzx
+                  edspvir(2,3) = edspvir(2,3) + vzy
+                  edspvir(3,3) = edspvir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient
+c     and virial for a mutated pair
+c
+                  if (mutdl)  devdl = devdl + dle
+                  if (mutd2) then
+                     d2evdl2 = d2evdl2 + dle2
+                     dldx = dlde * xr/r
+                     dldy = dlde * yr/r
+                     dldz = dlde * zr/r
+                     dfvdl(1,i) = dfvdl(1,i) + dldx
+                     dfvdl(2,i) = dfvdl(2,i) + dldy
+                     dfvdl(3,i) = dfvdl(3,i) + dldz
+                     dfvdl(1,k) = dfvdl(1,k) - dldx
+                     dfvdl(2,k) = dfvdl(2,k) - dldy
+                     dfvdl(3,k) = dfvdl(3,k) - dldz
+                     dlvxx = xr * dldx
+                     dlvyx = yr * dldx
+                     dlvzx = zr * dldx
+                     dlvyy = yr * dldy
+                     dlvzy = zr * dldy
+                     dlvzz = zr * dldz
+                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dlvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dlvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dlvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dlvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dlvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dlvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                  end if
                end if
             end if
          end do
@@ -443,18 +538,6 @@ c
                      end if
                      damp = 1.5d0*damp5 - 0.5d0*damp3
 c
-c     set use of lambda scaling for decoupling or annihilation
-c
-                     if (muti .or. mutk) then
-                        if (vcouple .eq. 1) then
-                           de = de * vterm
-                           e = e * vterm
-                        else if (.not.muti .or. .not.mutk) then
-                           de = de * vterm
-                           e = e * vterm
-                        end if
-                     end if
-c
 c     apply damping and scaling factors for this interaction
 c
                      de = de*damp**2 + 2.0d0*e*damp*ddamp
@@ -474,6 +557,44 @@ c
                         de = 0.5d0 * de
                      end if
 c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                     mutik = (muti.or.mutk) .and.
+     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutdl = mutik .and. dodl
+                     mutd2 = mutik .and. dod2
+c
+c     get energy and derivative via soft core lambda scaling, along
+c     with their lambda derivatives from the unscaled pair terms
+c
+                     if (mutik) then
+                        soft = dlsc
+                        dsoft = 0.0d0
+                        dsdl = dlsc1
+                        d2sdl2 = dlsc2
+                        d2sdldr = 0.0d0
+                        if (r2 .lt. rs2) then
+                           if (mutdl) then
+                              call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+     &                                      dlsc2,dlsq2,soft,dsoft,
+     &                                      dsdl,d2sdl2,d2sdldr)
+                           else
+                              call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           end if
+                        end if
+                     end if
+                     if (mutdl) then
+                        dle = dsdl * e
+                        if (mutd2) then
+                           dle2 = d2sdl2 * e
+                           dlde = dsdl*de + d2sdldr*e
+                        end if
+                     end if
+                     if (mutik) then
+                        de = soft*de + dsoft*e
+                        e = soft * e
+                     end if
+c
 c     use energy switching if near the cutoff distance
 c
                      if (r2 .gt. cut2) then
@@ -484,6 +605,11 @@ c
      &                             + c2*r2 + c1*r + c0
                         dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
      &                              + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                        if (mutd2) then
+                           dlde = dle*dtaper + dlde*taper
+                           dle2 = dle2 * taper
+                        end if
+                        if (mutdl)  dle = dle * taper
                         de = e*dtaper + de*taper
                         e = e * taper
                      end if
@@ -512,15 +638,47 @@ c
                      vyy = yr * dedy
                      vzy = zr * dedy
                      vzz = zr * dedz
-                     vir(1,1) = vir(1,1) + vxx
-                     vir(2,1) = vir(2,1) + vyx
-                     vir(3,1) = vir(3,1) + vzx
-                     vir(1,2) = vir(1,2) + vyx
-                     vir(2,2) = vir(2,2) + vyy
-                     vir(3,2) = vir(3,2) + vzy
-                     vir(1,3) = vir(1,3) + vzx
-                     vir(2,3) = vir(2,3) + vzy
-                     vir(3,3) = vir(3,3) + vzz
+                     edspvir(1,1) = edspvir(1,1) + vxx
+                     edspvir(2,1) = edspvir(2,1) + vyx
+                     edspvir(3,1) = edspvir(3,1) + vzx
+                     edspvir(1,2) = edspvir(1,2) + vyx
+                     edspvir(2,2) = edspvir(2,2) + vyy
+                     edspvir(3,2) = edspvir(3,2) + vzy
+                     edspvir(1,3) = edspvir(1,3) + vzx
+                     edspvir(2,3) = edspvir(2,3) + vzy
+                     edspvir(3,3) = edspvir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient
+c     and virial for a mutated pair
+c
+                     if (mutdl)  devdl = devdl + dle
+                     if (mutd2) then
+                        d2evdl2 = d2evdl2 + dle2
+                        dldx = dlde * xr/r
+                        dldy = dlde * yr/r
+                        dldz = dlde * zr/r
+                        dfvdl(1,i) = dfvdl(1,i) + dldx
+                        dfvdl(2,i) = dfvdl(2,i) + dldy
+                        dfvdl(3,i) = dfvdl(3,i) + dldz
+                        dfvdl(1,k) = dfvdl(1,k) - dldx
+                        dfvdl(2,k) = dfvdl(2,k) - dldy
+                        dfvdl(3,k) = dfvdl(3,k) - dldz
+                        dlvxx = xr * dldx
+                        dlvyx = yr * dldx
+                        dlvzx = zr * dldx
+                        dlvyy = yr * dldy
+                        dlvzy = zr * dldy
+                        dlvzz = zr * dldz
+                        devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                        devvirdl(2,1) = devvirdl(2,1) + dlvyx
+                        devvirdl(3,1) = devvirdl(3,1) + dlvzx
+                        devvirdl(1,2) = devvirdl(1,2) + dlvyx
+                        devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                        devvirdl(3,2) = devvirdl(3,2) + dlvzy
+                        devvirdl(1,3) = devvirdl(1,3) + dlvzx
+                        devvirdl(2,3) = devvirdl(2,3) + dlvzy
+                        devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                     end if
                   end if
                end do
             end if
@@ -568,6 +726,7 @@ c
       use couple
       use deriv
       use disp
+      use dlmda
       use dsppot
       use energi
       use group
@@ -595,7 +754,17 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm,eps
+      real*8 eps
+      real*8 dlsc,dlsq
+      real*8 dlsc1,dlsq1
+      real*8 dlsc2,dlsq2
+      real*8 soft,dsoft,dsdl
+      real*8 rs2
+      real*8 d2sdl2,d2sdldr
+      real*8 dle,dle2,dlde
+      real*8 dldx,dldy,dldz
+      real*8 dlvxx,dlvyy,dlvzz
+      real*8 dlvyx,dlvzx,dlvzy
       real*8 taper,dtaper
       real*8 dedx,dedy,dedz
       real*8 vxx,vyy,vzz
@@ -603,6 +772,8 @@ c
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
+      logical mutik,mutdl,mutd2
+      logical dodl,dod2
       character*6 mode
 c
 c
@@ -626,11 +797,21 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set soft core lambda scaling values for mutated interactions,
+c     along with their lambda derivative factors while the van der
+c     Waals lambda map has slope or curvature, as in "gradient"
 c
+      call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
-         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+         if (dodl) then
+            call dspsc4 (dlsc,dlsq,dlsc1,dlsq1,dlsc2,dlsq2)
+         else
+            call dspsc (dlsc,dlsq)
+            dlsc1 = 0.0d0
+            dlsc2 = 0.0d0
+         end if
       end if
+      rs2 = scrdsp * scrdsp
 c
 c     set damping tolerance, cutoff and switching coefficients
 c
@@ -643,9 +824,11 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,cut2,
-!$OMP& c0,c1,c2,c3,c4,c5,vcouple,vterm,eps)
-!$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
-!$OMP DO reduction(+:edsp,dedsp,vir)
+!$OMP& c0,c1,c2,c3,c4,c5,vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,
+!$OMP& dodl,dod2,eps)
+!$OMP& firstprivate(dspscale) shared(edsp,dedsp,edspvir,devdl,
+!$OMP& d2evdl2,dfvdl,devvirdl)
+!$OMP DO reduction(+:edsp,dedsp,edspvir,devdl,d2evdl2,dfvdl,devvirdl)
 c
 c     find dispersion energy and derivatives via neighbor list
 c
@@ -744,18 +927,6 @@ c
                   end if
                   damp = 1.5d0*damp5 - 0.5d0*damp3
 c
-c     set use of lambda scaling for decoupling or annihilation
-c
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        de = de * vterm
-                        e = e * vterm
-                     else if (.not.muti .or. .not.mutk) then
-                        de = de * vterm
-                        e = e * vterm
-                     end if
-                  end if
-c
 c     apply damping and scaling factors for this interaction
 c
                   de = de*damp**2 + 2.0d0*e*damp*ddamp
@@ -765,6 +936,44 @@ c
                   if (use_group) then
                      e = e * fgrp
                      de = de * fgrp
+                  end if
+c
+c     set use of lambda scaling for decoupling or annihilation
+c
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
+c
+c     get energy and derivative via soft core lambda scaling, along
+c     with their lambda derivatives from the unscaled pair terms
+c
+                  if (mutik) then
+                     soft = dlsc
+                     dsoft = 0.0d0
+                     dsdl = dlsc1
+                     d2sdl2 = dlsc2
+                     d2sdldr = 0.0d0
+                     if (r2 .lt. rs2) then
+                        if (mutdl) then
+                           call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+     &                                   dlsc2,dlsq2,soft,dsoft,
+     &                                   dsdl,d2sdl2,d2sdldr)
+                        else
+                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        end if
+                     end if
+                  end if
+                  if (mutdl) then
+                     dle = dsdl * e
+                     if (mutd2) then
+                        dle2 = d2sdl2 * e
+                        dlde = dsdl*de + d2sdldr*e
+                     end if
+                  end if
+                  if (mutik) then
+                     de = soft*de + dsoft*e
+                     e = soft * e
                   end if
 c
 c     use energy switching if near the cutoff distance
@@ -777,6 +986,11 @@ c
      &                          + c2*r2 + c1*r + c0
                      dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
      &                           + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
+                     if (mutd2) then
+                        dlde = dle*dtaper + dlde*taper
+                        dle2 = dle2 * taper
+                     end if
+                     if (mutdl)  dle = dle * taper
                      de = e*dtaper + de*taper
                      e = e * taper
                   end if
@@ -805,15 +1019,47 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  edspvir(1,1) = edspvir(1,1) + vxx
+                  edspvir(2,1) = edspvir(2,1) + vyx
+                  edspvir(3,1) = edspvir(3,1) + vzx
+                  edspvir(1,2) = edspvir(1,2) + vyx
+                  edspvir(2,2) = edspvir(2,2) + vyy
+                  edspvir(3,2) = edspvir(3,2) + vzy
+                  edspvir(1,3) = edspvir(1,3) + vzx
+                  edspvir(2,3) = edspvir(2,3) + vzy
+                  edspvir(3,3) = edspvir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient
+c     and virial for a mutated pair
+c
+                  if (mutdl)  devdl = devdl + dle
+                  if (mutd2) then
+                     d2evdl2 = d2evdl2 + dle2
+                     dldx = dlde * xr/r
+                     dldy = dlde * yr/r
+                     dldz = dlde * zr/r
+                     dfvdl(1,i) = dfvdl(1,i) + dldx
+                     dfvdl(2,i) = dfvdl(2,i) + dldy
+                     dfvdl(3,i) = dfvdl(3,i) + dldz
+                     dfvdl(1,k) = dfvdl(1,k) - dldx
+                     dfvdl(2,k) = dfvdl(2,k) - dldy
+                     dfvdl(3,k) = dfvdl(3,k) - dldz
+                     dlvxx = xr * dldx
+                     dlvyx = yr * dldx
+                     dlvzx = zr * dldx
+                     dlvyy = yr * dldy
+                     dlvzy = zr * dldy
+                     dlvzz = zr * dldz
+                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dlvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dlvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dlvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dlvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dlvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dlvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                  end if
                end if
             end if
          end do
@@ -864,12 +1110,9 @@ c
       use disp
       use energi
       use ewald
-      use mutant
       use pme
       implicit none
-      integer i,ii
-      real*8 e,wel,wll,cpr
-      logical split
+      integer i
 c
 c
 c     zero out the dispersion energy and derivatives
@@ -899,15 +1142,9 @@ c
       call edrecip1
 c
 c     compute the self-energy portion of the Ewald summation,
-c     weighting each ligand site as the reciprocal space sum does
+c     along with its lambda derivatives
 c
-      call dspmutwt (split,wel,wll,cpr)
-      do ii = 1, ndisp
-         i = idisp(ii)
-         e = csix(i)**2 * aewald**6 / 12.0d0
-         if (mutg(i) .ne. 0)  e = e * wll
-         edsp = edsp + e
-      end do
+      call dspself (.true.,.false.)
       return
       end
 c
@@ -931,6 +1168,7 @@ c
       use couple
       use cell
       use disp
+      use dlmda
       use dsppot
       use deriv
       use energi
@@ -959,7 +1197,18 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm,wsc,eps
+      real*8 wsc,eps
+      real*8 dlsc,dlsq
+      real*8 dlsc1,dlsq1
+      real*8 dlsc2,dlsq2
+      real*8 soft,dsoft,dsdl
+      real*8 rs2
+      real*8 d2sdl2,d2sdldr
+      real*8 dle,dle2,dlde
+      real*8 dldx,dldy,dldz
+      real*8 dlvxx,dlvyy,dlvzz
+      real*8 dlvyx,dlvzx,dlvzy
+      real*8 sc,dscale
       real*8 ralpha2,scale
       real*8 expterm,term
       real*8 expa,rterm
@@ -969,6 +1218,8 @@ c
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
+      logical mutik,mutdl,mutd2
+      logical dodl,dod2
       character*6 mode
 c
 c
@@ -982,11 +1233,21 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set soft core lambda scaling values for mutated interactions,
+c     along with their lambda derivative factors while the van der
+c     Waals lambda map has slope or curvature, as in "gradient"
 c
+      call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
-         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+         if (dodl) then
+            call dspsc4 (dlsc,dlsq,dlsc1,dlsq1,dlsc2,dlsq2)
+         else
+            call dspsc (dlsc,dlsq)
+            dlsc1 = 0.0d0
+            dlsc2 = 0.0d0
+         end if
       end if
+      rs2 = scrdsp * scrdsp
 c
 c     set damping tolerance, cutoff and switching coefficients
 c
@@ -1095,36 +1356,64 @@ c
 c
 c     apply damping and scaling factors for this interaction
 c
-                  scale = dspscale(k) * damp**2
-                  if (use_group)  scale = scale * fgrp
+                  sc = dspscale(k)
+                  if (use_group)  sc = sc * fgrp
+                  scale = sc * damp**2
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
+c
+c     get the soft core scaling and its lambda derivatives, where
+c     the lambda power of the soft core weights the reciprocal space
+c     share as it does in the reciprocal space sum
+c
                   wsc = 1.0d0
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        wsc = vterm
-                        scale = scale * vterm
-                        ddamp = ddamp * vterm
-                     else if (.not.muti .or. .not.mutk) then
-                        wsc = vterm
-                        scale = scale * vterm
-                        ddamp = ddamp * vterm
+                  soft = 1.0d0
+                  dsoft = 0.0d0
+                  if (mutik) then
+                     wsc = dlsc
+                     soft = dlsc
+                     dsdl = dlsc1
+                     d2sdl2 = dlsc2
+                     d2sdldr = 0.0d0
+                     if (r2 .lt. rs2) then
+                        if (mutdl) then
+                           call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+     &                                   dlsc2,dlsq2,soft,dsoft,
+     &                                   dsdl,d2sdl2,d2sdldr)
+                        else
+                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        end if
                      end if
                   end if
+                  rterm = -(ralpha2**3) * expterm / r
+                  if (mutdl) then
+                     dle = e * (dsdl*scale+dlsc1*(expa-1.0d0))
+                     if (mutd2) then
+                        dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
+                        dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
+     &                      - 2.0d0*ci*ck*sc*damp*ddamp*dsdl/r7
+     &                      - ci*ck*scale*d2sdldr/r7
+                     end if
+                  end if
+                  dscale = scale * dsoft
 c
 c     increment the overall damped dispersion energy component;
 c     the lambda weight also scales the reciprocal space share
 c
-                  scale = scale - wsc
+                  scale = soft*scale - wsc
                   e = e * (wsc*expa+scale)
                   edsp = edsp + e
 c
 c     increment the damped dispersion derivative components
 c
-                  rterm = -(ralpha2**3) * expterm / r
                   de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
-     &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
+     &                    - 2.0d0*ci*ck*sc*damp*ddamp*soft/r7
+     &                    - ci*ck*dscale/r7
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
@@ -1143,15 +1432,47 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  edspvir(1,1) = edspvir(1,1) + vxx
+                  edspvir(2,1) = edspvir(2,1) + vyx
+                  edspvir(3,1) = edspvir(3,1) + vzx
+                  edspvir(1,2) = edspvir(1,2) + vyx
+                  edspvir(2,2) = edspvir(2,2) + vyy
+                  edspvir(3,2) = edspvir(3,2) + vzy
+                  edspvir(1,3) = edspvir(1,3) + vzx
+                  edspvir(2,3) = edspvir(2,3) + vzy
+                  edspvir(3,3) = edspvir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient
+c     and virial for a mutated pair
+c
+                  if (mutdl)  devdl = devdl + dle
+                  if (mutd2) then
+                     d2evdl2 = d2evdl2 + dle2
+                     dldx = dlde * xr
+                     dldy = dlde * yr
+                     dldz = dlde * zr
+                     dfvdl(1,i) = dfvdl(1,i) + dldx
+                     dfvdl(2,i) = dfvdl(2,i) + dldy
+                     dfvdl(3,i) = dfvdl(3,i) + dldz
+                     dfvdl(1,k) = dfvdl(1,k) - dldx
+                     dfvdl(2,k) = dfvdl(2,k) - dldy
+                     dfvdl(3,k) = dfvdl(3,k) - dldz
+                     dlvxx = xr * dldx
+                     dlvyx = yr * dldx
+                     dlvzx = zr * dldx
+                     dlvyy = yr * dldy
+                     dlvzy = zr * dldy
+                     dlvzz = zr * dldz
+                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dlvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dlvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dlvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dlvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dlvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dlvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                  end if
                end if
             end if
          end do
@@ -1279,35 +1600,71 @@ c
 c
 c     apply damping and scaling factors for this interaction
 c
-                     scale = dspscale(k) * damp**2
-                     if (use_group)  scale = scale * fgrp
+                     sc = 1.0d0
+                     if (use_group)  sc = sc * fgrp
+                     if (use_polymer) then
+                        if (r2 .le. polycut2)  sc = sc * dspscale(k)
+                     end if
+                     scale = sc * damp**2
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                     mutik = (muti.or.mutk) .and.
+     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutdl = mutik .and. dodl
+                     mutd2 = mutik .and. dod2
+c
+c     get the soft core scaling and its lambda derivatives, where
+c     the lambda power of the soft core weights the reciprocal space
+c     share as it does in the reciprocal space sum
+c
                      wsc = 1.0d0
-                     if (muti .or. mutk) then
-                        if (vcouple .eq. 1) then
-                           wsc = vterm
-                           scale = scale * vterm
-                           ddamp = ddamp * vterm
-                        else if (.not.muti .or. .not.mutk) then
-                           wsc = vterm
-                           scale = scale * vterm
-                           ddamp = ddamp * vterm
+                     soft = 1.0d0
+                     dsoft = 0.0d0
+                     if (mutik) then
+                        wsc = dlsc
+                        soft = dlsc
+                        dsdl = dlsc1
+                        d2sdl2 = dlsc2
+                        d2sdldr = 0.0d0
+                        if (r2 .lt. rs2) then
+                           if (mutdl) then
+                              call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+     &                                      dlsc2,dlsq2,soft,dsoft,
+     &                                      dsdl,d2sdl2,d2sdldr)
+                           else
+                              call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           end if
                         end if
                      end if
+                     rterm = -(ralpha2**3) * expterm / r
+                     if (mutdl) then
+                        dle = e * (dsdl*scale+dlsc1*(expa-1.0d0))
+                        if (mutd2) then
+                           dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
+                           dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
+     &                      - 2.0d0*ci*ck*sc*damp*ddamp*dsdl/r7
+     &                      - ci*ck*scale*d2sdldr/r7
+                        end if
+                     end if
+                     dscale = scale * dsoft
 c
 c     increment the overall damped dispersion energy component;
 c     the lambda weight also scales the reciprocal space share
 c
-                     scale = scale - wsc
+                     scale = soft*scale - wsc
                      e = e * (wsc*expa+scale)
-                     rterm = -(ralpha2**3) * expterm / r
                      de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
-     &                       - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
+     &                      - 2.0d0*ci*ck*sc*damp*ddamp*soft/r7
+     &                      - ci*ck*dscale/r7
                      if (ii .eq. kk) then
                         e = 0.5d0 * e
                         de = 0.5d0 * de
+                        if (mutdl)  dle = 0.5d0 * dle
+                        if (mutd2) then
+                           dle2 = 0.5d0 * dle2
+                           dlde = 0.5d0 * dlde
+                        end if
                      end if
                      edsp = edsp + e
 c
@@ -1331,15 +1688,47 @@ c
                      vyy = yr * dedy
                      vzy = zr * dedy
                      vzz = zr * dedz
-                     vir(1,1) = vir(1,1) + vxx
-                     vir(2,1) = vir(2,1) + vyx
-                     vir(3,1) = vir(3,1) + vzx
-                     vir(1,2) = vir(1,2) + vyx
-                     vir(2,2) = vir(2,2) + vyy
-                     vir(3,2) = vir(3,2) + vzy
-                     vir(1,3) = vir(1,3) + vzx
-                     vir(2,3) = vir(2,3) + vzy
-                     vir(3,3) = vir(3,3) + vzz
+                     edspvir(1,1) = edspvir(1,1) + vxx
+                     edspvir(2,1) = edspvir(2,1) + vyx
+                     edspvir(3,1) = edspvir(3,1) + vzx
+                     edspvir(1,2) = edspvir(1,2) + vyx
+                     edspvir(2,2) = edspvir(2,2) + vyy
+                     edspvir(3,2) = edspvir(3,2) + vzy
+                     edspvir(1,3) = edspvir(1,3) + vzx
+                     edspvir(2,3) = edspvir(2,3) + vzy
+                     edspvir(3,3) = edspvir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient
+c     and virial for a mutated pair
+c
+                     if (mutdl)  devdl = devdl + dle
+                     if (mutd2) then
+                        d2evdl2 = d2evdl2 + dle2
+                        dldx = dlde * xr
+                        dldy = dlde * yr
+                        dldz = dlde * zr
+                        dfvdl(1,i) = dfvdl(1,i) + dldx
+                        dfvdl(2,i) = dfvdl(2,i) + dldy
+                        dfvdl(3,i) = dfvdl(3,i) + dldz
+                        dfvdl(1,k) = dfvdl(1,k) - dldx
+                        dfvdl(2,k) = dfvdl(2,k) - dldy
+                        dfvdl(3,k) = dfvdl(3,k) - dldz
+                        dlvxx = xr * dldx
+                        dlvyx = yr * dldx
+                        dlvzx = zr * dldx
+                        dlvyy = yr * dldy
+                        dlvzy = zr * dldy
+                        dlvzz = zr * dldz
+                        devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                        devvirdl(2,1) = devvirdl(2,1) + dlvyx
+                        devvirdl(3,1) = devvirdl(3,1) + dlvzx
+                        devvirdl(1,2) = devvirdl(1,2) + dlvyx
+                        devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                        devvirdl(3,2) = devvirdl(3,2) + dlvzy
+                        devvirdl(1,3) = devvirdl(1,3) + dlvzx
+                        devvirdl(2,3) = devvirdl(2,3) + dlvzy
+                        devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                     end if
                   end if
                end do
             end if
@@ -1364,7 +1753,6 @@ c
 c     perform deallocation of some local arrays
 c
       deallocate (dspscale)
-      stop
       return
       end
 c
@@ -1387,12 +1775,9 @@ c
       use disp
       use energi
       use ewald
-      use mutant
       use pme
       implicit none
-      integer i,ii
-      real*8 e,wel,wll,cpr
-      logical split
+      integer i
 c
 c
 c     zero out the dispersion energy and derivatives
@@ -1422,15 +1807,9 @@ c
       call edrecip1
 c
 c     compute the self-energy portion of the Ewald summation,
-c     weighting each ligand site as the reciprocal space sum does
+c     along with its lambda derivatives
 c
-      call dspmutwt (split,wel,wll,cpr)
-      do ii = 1, ndisp
-         i = idisp(ii)
-         e = csix(i)**2 * aewald**6 / 12.0d0
-         if (mutg(i) .ne. 0)  e = e * wll
-         edsp = edsp + e
-      end do
+      call dspself (.true.,.false.)
       return
       end
 c
@@ -1455,6 +1834,7 @@ c
       use cell
       use deriv
       use disp
+      use dlmda
       use dsppot
       use energi
       use ewald
@@ -1482,7 +1862,18 @@ c
       real*8 expi,expk
       real*8 damp3,damp5
       real*8 damp,ddamp
-      real*8 vterm,wsc,eps
+      real*8 wsc,eps
+      real*8 dlsc,dlsq
+      real*8 dlsc1,dlsq1
+      real*8 dlsc2,dlsq2
+      real*8 soft,dsoft,dsdl
+      real*8 rs2
+      real*8 d2sdl2,d2sdldr
+      real*8 dle,dle2,dlde
+      real*8 dldx,dldy,dldz
+      real*8 dlvxx,dlvyy,dlvzz
+      real*8 dlvyx,dlvzx,dlvzy
+      real*8 sc,dscale
       real*8 ralpha2,scale
       real*8 expterm,term
       real*8 expa,rterm
@@ -1492,6 +1883,8 @@ c
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical muti,mutk
+      logical mutik,mutdl,mutd2
+      logical dodl,dod2
       character*6 mode
 c
 c
@@ -1505,11 +1898,21 @@ c
          dspscale(i) = 1.0d0
       end do
 c
-c     set lambda scaling values for mutated interactions
+c     set soft core lambda scaling values for mutated interactions,
+c     along with their lambda derivative factors while the van der
+c     Waals lambda map has slope or curvature, as in "gradient"
 c
+      call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
-         vterm = vlambda**4 / sqrt(1.0d0+vlambda**2-vlambda**3)
+         if (dodl) then
+            call dspsc4 (dlsc,dlsq,dlsc1,dlsq1,dlsc2,dlsq2)
+         else
+            call dspsc (dlsc,dlsq)
+            dlsc1 = 0.0d0
+            dlsc2 = 0.0d0
+         end if
       end if
+      rs2 = scrdsp * scrdsp
 c
 c     set damping tolerance, cutoff and switching coefficients
 c
@@ -1522,9 +1925,10 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,aewald,
-!$OMP& vcouple,vterm,eps)
-!$OMP& firstprivate(dspscale) shared(edsp,dedsp,vir)
-!$OMP DO reduction(+:edsp,dedsp,vir)
+!$OMP& vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,dodl,dod2,eps)
+!$OMP& firstprivate(dspscale) shared(edsp,dedsp,edspvir,devdl,
+!$OMP& d2evdl2,dfvdl,devvirdl)
+!$OMP DO reduction(+:edsp,dedsp,edspvir,devdl,d2evdl2,dfvdl,devvirdl)
 c
 c     compute the real space portion of the Ewald summation
 c
@@ -1627,36 +2031,64 @@ c
 c
 c     apply damping and scaling factors for this interaction
 c
-                  scale = dspscale(k) * damp**2
-                  if (use_group)  scale = scale * fgrp
+                  sc = dspscale(k)
+                  if (use_group)  sc = sc * fgrp
+                  scale = sc * damp**2
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutdl = mutik .and. dodl
+                  mutd2 = mutik .and. dod2
+c
+c     get the soft core scaling and its lambda derivatives, where
+c     the lambda power of the soft core weights the reciprocal space
+c     share as it does in the reciprocal space sum
+c
                   wsc = 1.0d0
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        wsc = vterm
-                        scale = scale * vterm
-                        ddamp = ddamp * vterm
-                     else if (.not.muti .or. .not.mutk) then
-                        wsc = vterm
-                        scale = scale * vterm
-                        ddamp = ddamp * vterm
+                  soft = 1.0d0
+                  dsoft = 0.0d0
+                  if (mutik) then
+                     wsc = dlsc
+                     soft = dlsc
+                     dsdl = dlsc1
+                     d2sdl2 = dlsc2
+                     d2sdldr = 0.0d0
+                     if (r2 .lt. rs2) then
+                        if (mutdl) then
+                           call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+     &                                   dlsc2,dlsq2,soft,dsoft,
+     &                                   dsdl,d2sdl2,d2sdldr)
+                        else
+                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        end if
                      end if
                   end if
+                  rterm = -(ralpha2**3) * expterm / r
+                  if (mutdl) then
+                     dle = e * (dsdl*scale+dlsc1*(expa-1.0d0))
+                     if (mutd2) then
+                        dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
+                        dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
+     &                      - 2.0d0*ci*ck*sc*damp*ddamp*dsdl/r7
+     &                      - ci*ck*scale*d2sdldr/r7
+                     end if
+                  end if
+                  dscale = scale * dsoft
 c
 c     increment the overall damped dispersion energy component;
 c     the lambda weight also scales the reciprocal space share
 c
-                  scale = scale - wsc
+                  scale = soft*scale - wsc
                   e = e * (wsc*expa+scale)
                   edsp = edsp + e
 c
 c     increment the damped dispersion derivative components
 c
-                  rterm = -(ralpha2**3) * expterm / r
                   de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
-     &                    - 2.0d0*ci*ck*dspscale(k)*damp*ddamp/r7
+     &                    - 2.0d0*ci*ck*sc*damp*ddamp*soft/r7
+     &                    - ci*ck*dscale/r7
                   dedx = de * xr
                   dedy = de * yr
                   dedz = de * zr
@@ -1675,15 +2107,47 @@ c
                   vyy = yr * dedy
                   vzy = zr * dedy
                   vzz = zr * dedz
-                  vir(1,1) = vir(1,1) + vxx
-                  vir(2,1) = vir(2,1) + vyx
-                  vir(3,1) = vir(3,1) + vzx
-                  vir(1,2) = vir(1,2) + vyx
-                  vir(2,2) = vir(2,2) + vyy
-                  vir(3,2) = vir(3,2) + vzy
-                  vir(1,3) = vir(1,3) + vzx
-                  vir(2,3) = vir(2,3) + vzy
-                  vir(3,3) = vir(3,3) + vzz
+                  edspvir(1,1) = edspvir(1,1) + vxx
+                  edspvir(2,1) = edspvir(2,1) + vyx
+                  edspvir(3,1) = edspvir(3,1) + vzx
+                  edspvir(1,2) = edspvir(1,2) + vyx
+                  edspvir(2,2) = edspvir(2,2) + vyy
+                  edspvir(3,2) = edspvir(3,2) + vzy
+                  edspvir(1,3) = edspvir(1,3) + vzx
+                  edspvir(2,3) = edspvir(2,3) + vzy
+                  edspvir(3,3) = edspvir(3,3) + vzz
+c
+c     increment the lambda derivatives of the energy, gradient
+c     and virial for a mutated pair
+c
+                  if (mutdl)  devdl = devdl + dle
+                  if (mutd2) then
+                     d2evdl2 = d2evdl2 + dle2
+                     dldx = dlde * xr
+                     dldy = dlde * yr
+                     dldz = dlde * zr
+                     dfvdl(1,i) = dfvdl(1,i) + dldx
+                     dfvdl(2,i) = dfvdl(2,i) + dldy
+                     dfvdl(3,i) = dfvdl(3,i) + dldz
+                     dfvdl(1,k) = dfvdl(1,k) - dldx
+                     dfvdl(2,k) = dfvdl(2,k) - dldy
+                     dfvdl(3,k) = dfvdl(3,k) - dldz
+                     dlvxx = xr * dldx
+                     dlvyx = yr * dldx
+                     dlvzx = zr * dldx
+                     dlvyy = yr * dldy
+                     dlvzy = zr * dldy
+                     dlvzz = zr * dldz
+                     devvirdl(1,1) = devvirdl(1,1) + dlvxx
+                     devvirdl(2,1) = devvirdl(2,1) + dlvyx
+                     devvirdl(3,1) = devvirdl(3,1) + dlvzx
+                     devvirdl(1,2) = devvirdl(1,2) + dlvyx
+                     devvirdl(2,2) = devvirdl(2,2) + dlvyy
+                     devvirdl(3,2) = devvirdl(3,2) + dlvzy
+                     devvirdl(1,3) = devvirdl(1,3) + dlvzx
+                     devvirdl(2,3) = devvirdl(2,3) + dlvzy
+                     devvirdl(3,3) = devvirdl(3,3) + dlvzz
+                  end if
                end if
             end if
          end do
@@ -1732,6 +2196,7 @@ c
       use bound
       use disp
       use deriv
+      use dlmda
       use energi
       use ewald
       use math
@@ -1764,9 +2229,16 @@ c
       real*8 dt1,dt2,dt3
       real*8 t1,t2,t3
       real*8 wel,wll,cpr
+      real*8 dwel,dwll,dcpr
+      real*8 d2wel,d2wll,d2cpr
       real*8 ser,sei,slr,sli
+      real*8 strucd,strucd2
+      real*8 edl,vtermd
+      real*8 dl1,dl2,dl3
       real*8, allocatable :: qfwd(:,:,:,:)
+      real*8, allocatable :: qdl(:,:,:,:)
       logical split
+      logical dodl,dod2
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1788,9 +2260,20 @@ c
       call bspline_fill
       call table_fill
 c
+c     get the mutated pair weights, along with their lambda
+c     derivatives while the van der Waals lambda map has slope or
+c     curvature, as in "edreal1c"
+c
+      call vdlflags (dodl,dod2)
+      if (dodl) then
+         call dspmutwt4 (split,wel,wll,cpr,dwel,dwll,dcpr,
+     &                   d2wel,d2wll,d2cpr)
+      else
+         call dspmutwt (split,wel,wll,cpr)
+      end if
+c
 c     assign PME grid and perform 3-D FFT forward transform
 c
-      call dspmutwt (split,wel,wll,cpr)
       call grid_disp (split)
       call fftfront (qgrid)
 c
@@ -1800,6 +2283,14 @@ c
       if (split) then
          allocate (qfwd(2,nfft1,nfft2,nfft3))
          qfwd = qgrid
+      end if
+c
+c     the lambda derivative of the potential uses a second grid
+c
+      if (dod2) then
+         allocate (qdl(2,nfft1,nfft2,nfft3))
+         qdl(1,1,1,1) = 0.0d0
+         qdl(2,1,1,1) = 0.0d0
       end if
 c
 c     use scalar sum to get the reciprocal space energy
@@ -1861,15 +2352,41 @@ c
             vterm = 3.0d0*(fac1*erfcterm*h + fac3*expterm)*struc2/denom
             e = eterm * struc2
             edsp = edsp + e
-            vir(1,1) = vir(1,1) + h1*h1*vterm - e
-            vir(2,1) = vir(2,1) + h1*h2*vterm
-            vir(3,1) = vir(3,1) + h1*h3*vterm
-            vir(1,2) = vir(1,2) + h2*h1*vterm
-            vir(2,2) = vir(2,2) + h2*h2*vterm - e
-            vir(3,2) = vir(3,2) + h2*h3*vterm
-            vir(1,3) = vir(1,3) + h3*h1*vterm
-            vir(2,3) = vir(2,3) + h3*h2*vterm
-            vir(3,3) = vir(3,3) + h3*h3*vterm - e
+            edspvir(1,1) = edspvir(1,1) + h1*h1*vterm - e
+            edspvir(2,1) = edspvir(2,1) + h1*h2*vterm
+            edspvir(3,1) = edspvir(3,1) + h1*h3*vterm
+            edspvir(1,2) = edspvir(1,2) + h2*h1*vterm
+            edspvir(2,2) = edspvir(2,2) + h2*h2*vterm - e
+            edspvir(3,2) = edspvir(3,2) + h2*h3*vterm
+            edspvir(1,3) = edspvir(1,3) + h3*h1*vterm
+            edspvir(2,3) = edspvir(2,3) + h3*h2*vterm
+            edspvir(3,3) = edspvir(3,3) + h3*h3*vterm - e
+c
+c     get the lambda derivatives of the energy and virial from the
+c     derivatives of the pair weights
+c
+            if (dodl) then
+               strucd = dwll*(slr*slr+sli*sli)
+     &                     + 2.0d0*dwel*(ser*slr+sei*sli)
+               devdl = devdl + eterm*strucd
+            end if
+            if (dod2) then
+               strucd2 = d2wll*(slr*slr+sli*sli)
+     &                      + 2.0d0*d2wel*(ser*slr+sei*sli)
+               d2evdl2 = d2evdl2 + eterm*strucd2
+               vtermd = 3.0d0 * (fac1*erfcterm*h+fac3*expterm)
+     &                     * strucd / denom
+               edl = eterm * strucd
+               devvirdl(1,1) = devvirdl(1,1) + h1*h1*vtermd - edl
+               devvirdl(2,1) = devvirdl(2,1) + h1*h2*vtermd
+               devvirdl(3,1) = devvirdl(3,1) + h1*h3*vtermd
+               devvirdl(1,2) = devvirdl(1,2) + h2*h1*vtermd
+               devvirdl(2,2) = devvirdl(2,2) + h2*h2*vtermd - edl
+               devvirdl(3,2) = devvirdl(3,2) + h2*h3*vtermd
+               devvirdl(1,3) = devvirdl(1,3) + h3*h1*vtermd
+               devvirdl(2,3) = devvirdl(2,3) + h3*h2*vtermd
+               devvirdl(3,3) = devvirdl(3,3) + h3*h3*vtermd - edl
+            end if
          end if
 c
 c     the environment potential takes the real part of the grid
@@ -1882,12 +2399,21 @@ c
             qgrid(1,k1,k2,k3) = eterm * qgrid(1,k1,k2,k3) 
             qgrid(2,k1,k2,k3) = eterm * qgrid(2,k1,k2,k3)
          end if
+c
+c     the lambda derivative of the potential packs the environment
+c     and ligand parts with the derivatives of the pair weights
+c
+         if (dod2) then
+            qdl(1,k1,k2,k3) = eterm * (dwel*slr-dwel*sei-dwll*sli)
+            qdl(2,k1,k2,k3) = eterm * (dwel*ser+dwel*sli+dwll*slr)
+         end if
       end do
       if (split)  deallocate (qfwd)
 c
 c     perform the 3-D FFT backward transformation
 c
       call fftback (qgrid)
+      if (dod2)  call fftback (qdl)
 c
 c     get first derivatives of the reciprocal space energy 
 c
@@ -1907,6 +2433,9 @@ c
          de1 = 0.0d0
          de2 = 0.0d0
          de3 = 0.0d0
+         dl1 = 0.0d0
+         dl2 = 0.0d0
+         dl3 = 0.0d0
          k0 = kgrd0
          do it3 = 1, bsorder
             k0 = k0 + 1
@@ -1929,6 +2458,12 @@ c
                   de1 = de1 + 2.0d0*term*dt1*t2*t3
                   de2 = de2 + 2.0d0*term*dt2*t1*t3
                   de3 = de3 + 2.0d0*term*dt3*t1*t2
+                  if (dod2) then
+                     term = qdl(ipart,i,j,k)
+                     dl1 = dl1 + 2.0d0*term*dt1*t2*t3
+                     dl2 = dl2 + 2.0d0*term*dt2*t1*t3
+                     dl3 = dl3 + 2.0d0*term*dt3*t1*t2
+                  end if
                end do
             end do
          end do
@@ -1938,14 +2473,33 @@ c
      &                            +recip(2,2)*de2+recip(2,3)*de3)
          dedsp(3,iatm) = dedsp(3,iatm) + fi*(recip(3,1)*de1
      &                            +recip(3,2)*de2+recip(3,3)*de3)
+         if (dod2) then
+            dfvdl(1,iatm) = dfvdl(1,iatm) + fi*(recip(1,1)*dl1
+     &                         +recip(1,2)*dl2+recip(1,3)*dl3)
+            dfvdl(2,iatm) = dfvdl(2,iatm) + fi*(recip(2,1)*dl1
+     &                         +recip(2,2)*dl2+recip(2,3)*dl3)
+            dfvdl(3,iatm) = dfvdl(3,iatm) + fi*(recip(3,1)*dl1
+     &                         +recip(3,2)*dl2+recip(3,3)*dl3)
+         end if
       end do
+      if (dod2)  deallocate (qdl)
 c
 c     account for the energy and virial correction terms
 c
       term = cpr * aewald**3 / denom0
       edsp = edsp - term
-      vir(1,1) = vir(1,1) + term
-      vir(2,2) = vir(2,2) + term
-      vir(3,3) = vir(3,3) + term
+      edspvir(1,1) = edspvir(1,1) + term
+      edspvir(2,2) = edspvir(2,2) + term
+      edspvir(3,3) = edspvir(3,3) + term
+      if (dodl) then
+         term = dcpr * aewald**3 / denom0
+         devdl = devdl - term
+         if (dod2) then
+            d2evdl2 = d2evdl2 - d2cpr*aewald**3/denom0
+            devvirdl(1,1) = devvirdl(1,1) + term
+            devvirdl(2,2) = devvirdl(2,2) + term
+            devvirdl(3,3) = devvirdl(3,3) + term
+         end if
+      end if
       return
       end

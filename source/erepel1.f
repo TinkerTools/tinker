@@ -189,9 +189,7 @@ c     set lambda scaling values for mutated interactions, along with
 c     their lambda derivative factors while the van der Waals lambda
 c     map has slope or curvature, as in the "gradient" routine
 c
-      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
-     &          .or. d2vldlmda2.ne.0.0d0)
-      dod2 = (dodl .and. use_d2lmda)
+      call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
          if (dodl) then
             call repsc4 (rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2)
@@ -454,14 +452,8 @@ c
 c
 c     set lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
                   mutdl = mutik .and. dodl
                   mutd2 = mutik .and. dod2
 c
@@ -878,14 +870,8 @@ c
 c
 c     set lambda scaling for decoupling or annihilation
 c
-                        mutik = .false.
-                        if (muti .or. mutk) then
-                           if (vcouple .eq. 1) then
-                              mutik = .true.
-                           else if (.not.muti .or. .not.mutk) then
-                              mutik = .true.
-                           end if
-                        end if
+                        mutik = (muti.or.mutk) .and.
+     &                          (vcouple.eq.1 .or. .not.(muti.and.mutk))
                         mutdl = mutik .and. dodl
                         mutd2 = mutik .and. dod2
 c
@@ -1123,7 +1109,7 @@ c
       use virial
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer ii,kkk
       real*8 e,fgrp
       real*8 eterm,de
       real*8 xi,yi,zi
@@ -1231,9 +1217,7 @@ c     set lambda scaling values for mutated interactions, along with
 c     their lambda derivative factors while the van der Waals lambda
 c     map has slope or curvature, as in the "gradient" routine
 c
-      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
-     &          .or. d2vldlmda2.ne.0.0d0)
-      dod2 = (dodl .and. use_d2lmda)
+      call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
          if (dodl) then
             call repsc4 (rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2)
@@ -1510,14 +1494,8 @@ c
 c
 c     set lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (muti.or.mutk) .and.
+     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
                   mutdl = mutik .and. dodl
                   mutd2 = mutik .and. dod2
 c

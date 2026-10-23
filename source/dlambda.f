@@ -80,6 +80,34 @@ c
       end
 c
 c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine vdlflags  --  van der Waals lambda deriv use  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "vdlflags" sets whether the terms that follow the van der Waals
+c     lambda compute their first lambda derivatives, which they need
+c     while the van der Waals lambda map has slope or curvature, and
+c     whether they also compute the second, force and virial ones
+c
+c
+      subroutine vdlflags (dodl,dod2)
+      use dlmda
+      implicit none
+      logical dodl,dod2
+c
+c
+c     the second derivatives are only needed alongside the first
+c
+      dodl = use_vdlmda .and. (dvldlmda.ne.0.0d0
+     &          .or. d2vldlmda2.ne.0.0d0)
+      dod2 = (dodl .and. use_d2lmda)
+      return
+      end
+c
+c
 c     #############################################################
 c     ##                                                         ##
 c     ##  subroutine ctlmdasc  --  charge transfer lambda scale  ##

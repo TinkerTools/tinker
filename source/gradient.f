@@ -238,6 +238,7 @@ c
             evvir(j,i) = 0.0d0
             ectvir(j,i) = 0.0d0
             ervir(j,i) = 0.0d0
+            edspvir(j,i) = 0.0d0
          end do
       end do
       einter = 0.0d0

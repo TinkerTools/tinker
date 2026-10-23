@@ -336,6 +336,8 @@ void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
 void grpscale_(double* lmda, double* sc, double* dsc);
 #define tinker_f_grpscale grpscale_
+void vdlflags_(int* dodl, int* dod2);
+#define tinker_f_vdlflags vdlflags_
 void ctlmdasc_(int* dodl, double* sc, double* dsc, double* d2sc, int* live);
 #define tinker_f_ctlmdasc ctlmdasc_
 void eleclive_(int* live, int* doskip);
@@ -720,6 +722,10 @@ void edrecip_();
 #define tinker_f_edrecip edrecip_
 void dspmutwt_(int* split, double* wel, double* wll, double* cpr);
 #define tinker_f_dspmutwt dspmutwt_
+void dspmutwt4_(int* split, double* wel, double* wll, double* cpr, double* dwel, double* dwll, double* dcpr, double* d2wel, double* d2wll, double* d2cpr);
+#define tinker_f_dspmutwt4 dspmutwt4_
+void dspself_(int* deriv, int* part);
+#define tinker_f_dspself dspself_
 void dspsplit_(double* qg, int* k1, int* k2, int* k3, double* ser, double* sei, double* slr, double* sli);
 #define tinker_f_dspsplit dspsplit_
 
@@ -760,6 +766,16 @@ void edisp3d_();
 #define tinker_f_edisp3d edisp3d_
 void edreal3d_();
 #define tinker_f_edreal3d edreal3d_
+
+// edspsc.f
+void dspsc_(double* dlsc, double* dlsq);
+#define tinker_f_dspsc dspsc_
+void dspsc4_(double* dlsc, double* dlsq, double* dlsc1, double* dlsq1, double* dlsc2, double* dlsq2);
+#define tinker_f_dspsc4 dspsc4_
+void edspsc_(double* r, double* dlsc, double* dlsq, double* soft, double* dsoft);
+#define tinker_f_edspsc edspsc_
+void edspsc4_(double* r, double* dlsc, double* dlsq, double* dlsc1, double* dlsq1, double* dlsc2, double* dlsq2, double* soft, double* dsoft, double* dsdl, double* d2sdl2, double* d2sdldr);
+#define tinker_f_edspsc4 edspsc4_
 
 // efep.f
 void efeptrial_(int* ntrial, double* ltrial, double* etrial, double* enative);

@@ -265,6 +265,7 @@ add_library (tinkerObjF OBJECT
 ../source/edisp1.f
 ../source/edisp2.f
 ../source/edisp3.f
+../source/edspsc.f
 ../source/efep.f
 ../source/egauss.f
 ../source/egauss1.f

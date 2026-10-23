@@ -193,8 +193,9 @@ c
      &             'dmso_env','dispenv.key','dmso_lig','dispenv.key',
      &             1.0d-6,'disp dec')
 c
-c     every pair with a ligand atom carries the same soft core
-c     weight, so the energy is linear in it at any lambda
+c     with the soft core switch turned off, every pair with a ligand
+c     atom carries the same lambda power, so the energy is linear in
+c     it at any lambda
 c
       call displinear (df,'../ephippo/dmso','displin_ann.key',
      &                 0.5d0,'disp ann')
@@ -213,8 +214,9 @@ c
 c
 c     "displinear" checks that the dispersion energy at a van der
 c     Waals lambda between the end states lies on the line joining
-c     them in the soft core weight, as it must when every pair with
-c     a ligand atom carries that one weight
+c     them in the lambda power of the soft core, as it must when the
+c     switch radius is zero and every pair with a ligand atom carries
+c     that one weight
 c
 c
       subroutine displinear (dir,base,key,vl,tag)
@@ -241,9 +243,9 @@ c
       e = energy ()
       call final
 c
-c     compare against the line in the soft core weight
+c     compare against the line in the lambda power of the soft core
 c
-      v = vl**4 / sqrt(1.0d0+vl**2-vl**3)
+      v = vl**4
       call assert_real (e,e0+v*(e1-e0),1.0d-6,
      &                  'fep '//tag//' linear in weight')
       call popdir
