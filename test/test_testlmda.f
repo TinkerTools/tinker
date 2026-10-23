@@ -267,6 +267,14 @@ c
      &                        '../testgrad/dmso2','1e-4')
       call test_testlmda_xyz ('112_hipmix_dsp_ewald_group_l04',
      &                        'hipmix','1e-4')
+      call test_testlmda_xyz ('113_hipmix_dsp_corr_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('114_hipmix_dsp_corr_annih_l04',
+     &                        'hipmix','1e-4')
+      call test_testlmda_xyz ('115_hipmix_dsp_corr_n1_l04','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('116_hipmix_dsp_corr_n2_l00','hipmix',
+     &                        '1e-4')
       return
       end
 c

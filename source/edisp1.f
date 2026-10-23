@@ -13,7 +13,9 @@ c     ################################################################
 c
 c
 c     "edisp1" calculates the damped dispersion energy and first
-c     derivatives with respect to Cartesian coordinates
+c     derivatives with respect to Cartesian coordinates, and lambda
+c     derivatives while the van der Waals lambda map has slope or
+c     curvature
 c
 c     literature reference:
 c
@@ -23,6 +25,7 @@ c     Summation", Journal of Chemical Physics, 149, 084115 (2018)
 c
 c
       subroutine edisp1
+      use dlmda
       use dsppot
       use energi
       use ewald
@@ -32,8 +35,15 @@ c
       integer i,j
       real*8 elrc,vlrc
       real*8 delrc,dvlrc
+      real*8 d2elrc
+      logical dodl,dod2
       character*6 mode
 c
+c
+c     take lambda derivatives while the van der Waals lambda map
+c     has slope or curvature, as in the "gradient" routine
+c
+      call vdlflags (dodl,dod2)
 c
 c     choose the method for summing over pairwise interactions
 c
@@ -51,15 +61,19 @@ c
          end if
       end if
 c
-c     apply long range dispersion correction if desired
+c     apply long range dispersion correction if desired, along
+c     with its lambda derivatives
 c
       if (use_dcorr .and. .not.use_dewald) then
          mode = 'DISP'
-         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
+         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc,d2elrc)
          edsp = edsp + elrc
-         edspvir(1,1) = edspvir(1,1) + vlrc
-         edspvir(2,2) = edspvir(2,2) + vlrc
-         edspvir(3,3) = edspvir(3,3) + vlrc
+         if (dodl)  devdl = devdl + delrc
+         if (dod2)  d2evdl2 = d2evdl2 + d2elrc
+         do i = 1, 3
+            edspvir(i,i) = edspvir(i,i) + vlrc
+            if (dod2)  devvirdl(i,i) = devvirdl(i,i) + dvlrc
+         end do
       end if
 c
 c     add the damped dispersion virial to main virial

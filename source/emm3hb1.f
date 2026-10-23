@@ -35,6 +35,7 @@ c
       implicit none
       real*8 elrc,vlrc
       real*8 delrc,dvlrc
+      real*8 d2elrc
       character*6 mode
 c
 c
@@ -52,7 +53,7 @@ c     apply the long range van der Waals correction if used
 c
       if (use_vcorr) then
          mode = 'VDW'
-         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
+         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc,d2elrc)
          ev = ev + elrc
          vir(1,1) = vir(1,1) + vlrc
          vir(2,2) = vir(2,2) + vlrc

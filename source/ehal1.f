@@ -28,6 +28,7 @@ c
       integer i,j
       real*8 elrc,vlrc
       real*8 delrc,dvlrc
+      real*8 d2elrc
       logical dodl,dod2
       character*6 mode
 c
@@ -52,9 +53,10 @@ c     along with its lambda derivative
 c
       if (use_vcorr) then
          mode = 'VDW'
-         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
+         call evcorr1 (mode,elrc,vlrc,delrc,dvlrc,d2elrc)
          ev = ev + elrc
          if (dodl)  devdl = devdl + delrc
+         if (dod2)  d2evdl2 = d2evdl2 + d2elrc
          do i = 1, 3
             evvir(i,i) = evvir(i,i) + vlrc
             if (dod2)  devvirdl(i,i) = devvirdl(i,i) + dvlrc

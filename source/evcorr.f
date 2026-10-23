@@ -216,6 +216,7 @@ c
 c     "evcorr1" computes a long range correction for van der Waals
 c     or dispersion energy and virial via numerical integration,
 c     along with the derivatives of both with respect to "vlambda"
+c     and the second derivative of the energy
 c
 c     literature reference:
 c
@@ -223,7 +224,7 @@ c     M. P. Allen and D. J. Tildesley, "Computer Simulation of
 c     Liquids, 2nd Ed.", Oxford University Press, 2017, Section 2.8
 c
 c
-      subroutine evcorr1 (mode,elrc,vlrc,delrc,dvlrc)
+      subroutine evcorr1 (mode,elrc,vlrc,delrc,dvlrc,d2elrc)
       use atomid
       use atoms
       use bound
@@ -245,9 +246,11 @@ c
       integer, allocatable :: bvt(:)
       real*8 elrc,vlrc
       real*8 delrc,dvlrc
+      real*8 d2elrc
       real*8 etot,vtot
       real*8 range,rdelta
-      real*8 fi,fk,fik,dfik
+      real*8 fi,fk,fik
+      real*8 dfik,d2fik
       real*8 fie,fia,fib
       real*8 fke,fka,fkb
       real*8 ee,ea,eb,aa,bb
@@ -272,6 +275,7 @@ c
       vlrc = 0.0d0
       delrc = 0.0d0
       dvlrc = 0.0d0
+      d2elrc = 0.0d0
 c
 c     only applicable if periodic boundaries are in use
 c
@@ -295,6 +299,7 @@ c     leaves only its lambda power on a mutated pair
 c
       vlw = vlambda
       dvlw = 1.0d0
+      vlw2 = 0.0d0
       if (use_disp)  call dspsc4 (vlw,vlq,dvlw,vlq1,vlw2,vlq2)
 c
 c     perform dynamic allocation of some local arrays
@@ -346,7 +351,8 @@ c
 c     split the pair count into environment and ligand group
 c     classes, with ligand 2 coupling as the complement of vlambda
 c     and no interaction between the two ligand groups, and get the
-c     derivative of the pair weight with respect to lambda
+c     first and second derivatives of the pair weight with respect
+c     to lambda
 c
             ee = fie * fke
             ea = fie*fka + fia*fke
@@ -356,13 +362,16 @@ c
             if (vcouple .eq. 0) then
                fik = ee + aa + bb + vlw*ea + vlam1*eb
                dfik = dvlw*ea - eb
+               d2fik = vlw2 * ea
             else
                fik = ee + vlw*(ea+aa) + vlam1*(eb+bb)
                dfik = dvlw*(ea+aa) - eb - bb
+               d2fik = vlw2 * (ea+aa)
             end if
             if (k .eq. i) then
                fik = 0.5d0 * fik
                dfik = 0.5d0 * dfik
+               d2fik = 0.5d0 * d2fik
             end if
             if (use_disp) then
                cik = dspsix(it) * dspsix(kt)
@@ -424,12 +433,14 @@ c
             vlrc = vlrc + fik*vtot
             delrc = delrc + dfik*etot
             dvlrc = dvlrc + dfik*vtot
+            d2elrc = d2elrc + d2fik*etot
          end do
       end do
       elrc = elrc / volbox
       vlrc = vlrc / (3.0d0*volbox)
       delrc = delrc / volbox
       dvlrc = dvlrc / (3.0d0*volbox)
+      d2elrc = d2elrc / volbox
 c
 c     perform deallocation of some local arrays
 c

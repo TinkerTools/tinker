@@ -1692,9 +1692,9 @@ void evcorr_(char* mode, double* elrc, tinker_fchar_len_t mode_cap);
 inline void tinker_f_evcorr(tinker_fchars mode, double* elrc) {
     return evcorr_(mode.string, elrc, mode.capacity);
 }
-void evcorr1_(char* mode, double* elrc, double* vlrc, double* delrc, double* dvlrc, tinker_fchar_len_t mode_cap);
-inline void tinker_f_evcorr1(tinker_fchars mode, double* elrc, double* vlrc, double* delrc, double* dvlrc) {
-    return evcorr1_(mode.string, elrc, vlrc, delrc, dvlrc, mode.capacity);
+void evcorr1_(char* mode, double* elrc, double* vlrc, double* delrc, double* dvlrc, double* d2elrc, tinker_fchar_len_t mode_cap);
+inline void tinker_f_evcorr1(tinker_fchars mode, double* elrc, double* vlrc, double* delrc, double* dvlrc, double* d2elrc) {
+    return evcorr1_(mode.string, elrc, vlrc, delrc, dvlrc, d2elrc, mode.capacity);
 }
 
 // exfield.f

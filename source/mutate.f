@@ -1803,16 +1803,6 @@ c
          call fatal
       end if
 c
-c     the long range dispersion correction is scaled by lambda but
-c     adds nothing to the lambda derivative
-c
-      if (use_dlmda .and. use_disp .and. use_dcorr) then
-         write (iout,115)
-  115    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
-     &              ' Available with DISP-CORRECTION')
-         call fatal
-      end if
-c
 c     the ost and abf sample interval must keep a propagation phase,
 c     an equilibration phase and samples to average at the fixed lambda
 c

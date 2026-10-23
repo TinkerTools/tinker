@@ -2731,8 +2731,8 @@ c     the start of its taper with the long range correction, and, with
 c     "lambda-deriv2", an exponent between one and two or an exponent
 c     sum below two; each such parameter is reset to its default, so
 c     the energy must match that of a keyfile holding the reset values,
-c     while lambda derivatives with the long range dispersion correction
-c     must stop
+c     and lambda derivatives with the long range dispersion correction
+c     must run and leave the energy unchanged
 c
 c
       subroutine test_mutate_dspsc
@@ -2756,9 +2756,8 @@ c
      &   'dsoft_box_d1.key','','test_mutate_dspsc radius cutoff')
       call test_mutate_dspsccase ('dsoft_rs_taper_d0.key',
      &   'dsoft_box_dcorr_d0.key','','test_mutate_dspsc radius taper')
-      call test_mutate_dspsccase ('dsoft_dcorr_d1.key',' ',
-     &   'Available with DISP-CORRECTION',
-     &   'test_mutate_dspsc correction deriv')
+      call test_mutate_dspsccase ('dsoft_dcorr_d1.key',
+     &   'dsoft_dcorr_d0.key','','test_mutate_dspsc correction deriv')
       call popdir
       return
       end
