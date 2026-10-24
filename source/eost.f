@@ -54,7 +54,7 @@ c
       else
          call egkernel (egbias,dgdl,dgdfl)
       end if
-      call efreelmda (eostlmda,dfdl)
+      call efreelmda (lambda,eostlmda,dfdl)
       esum = esum + egbias - eostlmda
       lmdavbias = egbias - eostlmda
       ostbdgdl = dgdl

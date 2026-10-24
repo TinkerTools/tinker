@@ -1560,7 +1560,7 @@ c
       do i = 2, nbin
          lmdawinend(i) = lmdawinend(i-1) + steps(i)
       end do
-      call setlmdawin
+      call lmdawinsize (lmdawin,lmdawinlen,lmdawineq)
       call settiblocks
       return
       end

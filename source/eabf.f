@@ -24,13 +24,14 @@ c
       subroutine eabfbias
       use dlmda
       use energi
+      use mutant
       implicit none
       real*8 eabflmda,dfdl
 c
 c
 c     free energy and its lambda derivative from the mean force
 c
-      call efreelmda (eabflmda,dfdl)
+      call efreelmda (lambda,eabflmda,dfdl)
       esum = esum - eabflmda
       lmdavbias = -eabflmda
       lmdadfdl = dfdl

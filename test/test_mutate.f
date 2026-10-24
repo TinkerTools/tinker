@@ -2419,16 +2419,21 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_overlap" runs fixtures 180-188, where an annihilated
-c     ligand sits exactly on other atoms; 180-183 are two waters with
-c     the second a ghost on the first or 1.0d-6 Ang off it, at fixed
-c     lambdas and with van der Waals on the main lambda, and every
-c     term is zero so no energy component is listed; 184 repeats 181
-c     under Ewald; 185 and 186 place ligand 2 of the staged relative
-c     water on ligand 1, as the Ewald ligand 1 leg of 120 and the
-c     cutoff ligand 2 leg of 157, where the charging ligand keeps its
-c     lambda derivative; 187 and 188 are the middle leg of 116, with
-c     both ligands uncharged, on that geometry and 1.0d-6 Ang off it
+c     "test_mutate_overlap" runs fixtures 180-188 and 236-239, where
+c     an annihilated ligand sits exactly on other atoms; 180-183 are
+c     two waters with the second a ghost on the first or 1.0d-6 Ang
+c     off it, at fixed lambdas and with van der Waals on the main
+c     lambda, and every term is zero so no energy component is listed;
+c     184 repeats 181 under Ewald; 185 and 186 place ligand 2 of the
+c     staged relative water on ligand 1, as the Ewald ligand 1 leg of
+c     120 and the cutoff ligand 2 leg of 157, where the charging ligand
+c     keeps its lambda derivative; 187 and 188 are the middle leg of
+c     116, with both ligands uncharged, on that geometry and 1.0d-6 Ang
+c     off it; 236-239 repeat the ghost with charge penetration, charge
+c     flux and charge transfer: 236 is the HIPPO water pair at zero
+c     elambda and plambda, 237 the same at lambda zero under dual
+c     topology polarization, 238 the AMOEBA+ Ewald water box with a
+c     ghost water, and 239 the HIPPO ligand 1 leg of 185
 c
 c
       subroutine test_mutate_overlap
@@ -2470,6 +2475,21 @@ c
      &   '188_water2near_rels_ye_vdwm_exp_l050.txt',
      &   '188_water2near_rels_ye_vdwm_exp_l050',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+      call test_mutate_calc ('wat2ovl','236_wat2ovl_hip_m00p00.key',
+     &   '236_wat2ovl_hip_m00p00.txt','236_wat2ovl_hip_m00p00',
+     &   .false., .false., .false., .true.,  .false.)
+      call test_mutate_calc ('wat2ovl',
+     &   '237_wat2ovl_hip_m00_d2_l00.key',
+     &   '237_wat2ovl_hip_m00_d2_l00.txt','237_wat2ovl_hip_m00_d2_l00',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2ovl','238_water2ovl_ap_m00p00.key',
+     &   '238_water2ovl_ap_m00p00.txt','238_water2ovl_ap_m00p00',
+     &   .true.,  .true.,  .false., .true.,  .false.)
+      call test_mutate_calc ('water2ovl',
+     &   '239_water2ovl_hip_rels_lig1_ex3_l085.key',
+     &   '239_water2ovl_hip_rels_lig1_ex3_l085.txt',
+     &   '239_water2ovl_hip_rels_lig1_ex3_l085',
+     &   .true.,  .true.,  .false., .true.,  .true.)
       return
       end
 c

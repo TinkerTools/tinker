@@ -4,9 +4,9 @@
  EngCnt  Atomic Multipoles                       -25.6937              388
  EngCnt  Polarization                             -8.9177              388
 
- Internal Virial Tensor :                  21.721        4.542       10.827
-                                            4.542       -1.202        3.337
-                                           10.827        3.337       26.858
+ Internal Virial Tensor :                  21.726        4.542       10.827
+                                            4.542       -1.197        3.337
+                                           10.827        3.337       26.864
 
  Cartesian Gradient Breakdown over Individual Atoms :
 

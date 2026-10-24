@@ -1061,7 +1061,7 @@ c
          lmdafmean(i) = dble(i-1) * wlmda
       end do
       lambda = 0.375d0
-      call efreelmda (eostlmda,dfdl)
+      call efreelmda (lambda,eostlmda,dfdl)
       expected = 0.5d0 * lambda * lambda
       call assert_real (eostlmda,expected,1.0d-12,
      &                  'efreelmda DeltaG lambda=.375')
@@ -1080,13 +1080,13 @@ c     at and below lambda = 0 the free energy is zero and the
 c     derivative comes from the first lambda bin
 c
       lambda = 0.0d0
-      call efreelmda (eostlmda,dfdl)
+      call efreelmda (lambda,eostlmda,dfdl)
       call assert_real (eostlmda,0.0d0,1.0d-12,
      &                  'efreelmda DeltaG lambda=0')
       call assert_real (dfdl,1.0d0,1.0d-12,
      &                  'efreelmda dDeltaG/dlambda lambda=0')
       lambda = -0.25d0
-      call efreelmda (eostlmda,dfdl)
+      call efreelmda (lambda,eostlmda,dfdl)
       call assert_real (eostlmda,0.0d0,1.0d-12,
      &                  'efreelmda DeltaG lambda below 0')
       call assert_real (dfdl,1.0d0,1.0d-12,
@@ -1096,13 +1096,13 @@ c     at lambda = 1 the last interval is integrated in full, and
 c     beyond lambda = 1 the loop falls through to the same result
 c
       lambda = 1.0d0
-      call efreelmda (eostlmda,dfdl)
+      call efreelmda (lambda,eostlmda,dfdl)
       call assert_real (eostlmda,1.5d0,1.0d-12,
      &                  'efreelmda DeltaG lambda=1')
       call assert_real (dfdl,2.0d0,1.0d-12,
      &                  'efreelmda dDeltaG/dlambda lambda=1')
       lambda = 1.25d0
-      call efreelmda (eostlmda,dfdl)
+      call efreelmda (lambda,eostlmda,dfdl)
       call assert_real (eostlmda,1.5d0,1.0d-12,
      &                  'efreelmda DeltaG lambda above 1')
       call assert_real (dfdl,2.0d0,1.0d-12,

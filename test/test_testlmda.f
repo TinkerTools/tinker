@@ -99,6 +99,16 @@ c     case 120 drives Ewald dispersion through the same cubic map, so
 c     the soft core powers of the real space, reciprocal space and self
 c     terms all carry both map derivatives
 c
+c     case 121 drives case 113 through the cubic map, so the long range
+c     dispersion correction carries both map derivatives as well
+c
+c     cases 122 to 125 take the other van der Waals map shapes: 122 and
+c     123 drive the repulsion of case 117 through a quintic taper over
+c     0.2 to 0.9 and an inverse power map with n of 3, 124 drives the
+c     dispersion correction of case 113 through the same taper, and 125
+c     the Ewald dispersion of case 120 through an inverse power map with
+c     n of 2, so the curvature of each map enters with its own sign
+c
 c
       subroutine test_testlmda
       implicit none
@@ -297,6 +307,16 @@ c
       call test_testlmda_case ('118_water_vsoft_m15_p3_l05','1e-4')
       call test_testlmda_case ('119_water_vsoft_m05_p1_l03','1e-4')
       call test_testlmda_xyz ('120_hipmix_dsp_ewald_exp3_l08','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('121_hipmix_dsp_corr_exp3_l06','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('122_hipmix_rep_qnt_l045','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('123_hipmix_rep_inv_l03','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('124_hipmix_dsp_corr_qnt_l06','hipmix',
+     &                        '1e-4')
+      call test_testlmda_xyz ('125_hipmix_dsp_ewald_inv_l04','hipmix',
      &                        '1e-4')
       return
       end

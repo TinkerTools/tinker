@@ -313,6 +313,7 @@ c
       use mutant
       implicit none
       integer i
+      real*8 g(0:2),dg(0:2)
       logical live(0:2)
       logical doskip
       logical edrv,pdrv,dead
@@ -340,15 +341,14 @@ c
       dead = (elambda.eq.0.0d0 .and. plambda.eq.0.0d0
      &           .and. .not.edrv .and. .not.pdrv)
 c
-c     the first ligand group charges unless the leg charges the second
+c     the environment is always live, and a ligand group only if it
+c     is the one that charges, as "grpscale" sets it
 c
+      call grpscale (1.0d0,g,dg)
       live(0) = .true.
-      live(1) = .not. dead
-      live(2) = .false.
-      if (use_rel .and. relstage.eq.'LIG2') then
-         live(1) = .false.
-         live(2) = .not. dead
-      end if
+      do i = 1, 2
+         live(i) = (g(i).ne.0.0d0 .and. .not.dead)
+      end do
 c
 c     the pair loops test group membership only when some atom
 c     belongs to a group that is not live
@@ -496,31 +496,33 @@ c
      &                    vlmdaapmn,vlmdaapmrho,0.0d0,1.0d0,
      &                    vlambda,dvldlmda,d2vldlmda2)
 c
-c     the ligand 1 leg charges ligand 1 with ligand 2 annihilated and
-c     van der Waals already morphed onto ligand 1
-c
-      else if (relstage .eq. 'LIG1') then
-         call sublmdamap (s,elmdamap,elmdaexp,elmdainvn,elmdainveps,
-     &                    elmdaapmn,elmdaapmrho,0.0d0,1.0d0,
-     &                    elambda,deldlmda,d2eldlmda2)
-         vlambda = 1.0d0
-         dvldlmda = 0.0d0
-         d2vldlmda2 = 0.0d0
-c
-c     the ligand 2 leg discharges ligand 2 as the main lambda rises, so
-c     its weight is the complement of the map, with van der Waals still
-c     on it
+c     the ligand legs follow the electrostatic map across the leg
 c
       else
          call sublmdamap (s,elmdamap,elmdaexp,elmdainvn,elmdainveps,
      &                    elmdaapmn,elmdaapmrho,0.0d0,1.0d0,
      &                    elambda,deldlmda,d2eldlmda2)
-         elambda = 1.0d0 - elambda
-         deldlmda = -deldlmda
-         d2eldlmda2 = -d2eldlmda2
-         vlambda = 0.0d0
-         dvldlmda = 0.0d0
-         d2vldlmda2 = 0.0d0
+c
+c     the ligand 1 leg charges ligand 1 with ligand 2 annihilated and
+c     van der Waals already morphed onto ligand 1
+c
+         if (relstage .eq. 'LIG1') then
+            vlambda = 1.0d0
+            dvldlmda = 0.0d0
+            d2vldlmda2 = 0.0d0
+c
+c     the ligand 2 leg discharges ligand 2 as the main lambda rises, so
+c     its weight is the complement of the map, with van der Waals still
+c     on it
+c
+         else
+            elambda = 1.0d0 - elambda
+            deldlmda = -deldlmda
+            d2eldlmda2 = -d2eldlmda2
+            vlambda = 0.0d0
+            dvldlmda = 0.0d0
+            d2vldlmda2 = 0.0d0
+         end if
       end if
 c
 c     numerical guard on the map complement
@@ -698,18 +700,18 @@ c     only matters when second derivatives are requested
 c
 c
       subroutine relneed (w,dw,d2w,chain,d2chain,need0,need1)
-      use dlmda
       implicit none
       real*8 w,dw,d2w
       real*8 chain,d2chain
       real*8 c1,c2
       logical need0,need1
       logical slope
+      logical lmdadrv
 c
 c
       c1 = dw * chain
       c2 = d2w*chain*chain + dw*d2chain
-      slope = (c1.ne.0.0d0 .or. (use_d2lmda .and. c2.ne.0.0d0))
+      slope = lmdadrv (.true.,c1,c2)
       need1 = (w.ne.0.0d0 .or. slope)
       need0 = (w.ne.1.0d0 .or. slope)
       return
@@ -785,7 +787,6 @@ c
       real*8 lmda
       real*8 dlmda
       real*8 d2lmda
-      real*8 xval
       real*8 shift
       real*8 power
       real*8 root0
@@ -795,9 +796,8 @@ c
 c
 c     compute map
 c
-      xval = x
       if (n .le. 1) then
-         lmda = xval
+         lmda = x
          dlmda = 1.0d0
          d2lmda = 0.0d0
          return
@@ -810,7 +810,7 @@ c
       power = 1.0d0 / dble(n)
       root0 = shift**power
       denom = (1.0d0+shift)**power - root0
-      base = xval + shift
+      base = x + shift
       lmda = (base**power-root0) / denom
       dlmda = power * base**(power-1.0d0) / denom
       d2lmda = power * (power-1.0d0)
@@ -843,7 +843,6 @@ c
       real*8 lmda
       real*8 dlmda
       real*8 d2lmda
-      real*8 xval
       real*8 omx
       real*8 rn
       real*8 left
@@ -854,9 +853,8 @@ c
 c     a flat slope ratio or a degenerate power gives the identity map,
 c     the upper bound holding the normalization off of its pole
 c
-      xval = x
       if (n.lt.2 .or. rho.le.1.0d0 .or. rho.ge.dble(n)) then
-         lmda = xval
+         lmda = x
          dlmda = 1.0d0
          d2lmda = 0.0d0
          return
@@ -868,18 +866,18 @@ c
       left = rn * (rho-1.0d0) / (rn-rho)
       right = left / rn
       denom = 1.0d0 + right
-      omx = 1.0d0 - xval
-      lmda = (xval + left*(1.0d0-omx**(n+1))/(rn+1.0d0)
-     &           + right*xval**(n+1)/(rn+1.0d0)) / denom
-      dlmda = (1.0d0 + left*omx**n + right*xval**n) / denom
-      d2lmda = rn * (right*xval**(n-1)-left*omx**(n-1)) / denom
+      omx = 1.0d0 - x
+      lmda = (x + left*(1.0d0-omx**(n+1))/(rn+1.0d0)
+     &           + right*x**(n+1)/(rn+1.0d0)) / denom
+      dlmda = (1.0d0 + left*omx**n + right*x**n) / denom
+      d2lmda = rn * (right*x**(n-1)-left*omx**(n-1)) / denom
 c
 c     the end states map exactly onto themselves, since rounding can
 c     put the sublambda an ulp past one, where a soft core power of
 c     one minus the sublambda is undefined
 c
-      if (xval .eq. 0.0d0)  lmda = 0.0d0
-      if (xval .eq. 1.0d0)  lmda = 1.0d0
+      if (x .eq. 0.0d0)  lmda = 0.0d0
+      if (x .eq. 1.0d0)  lmda = 1.0d0
       return
       end
 c
@@ -1087,80 +1085,68 @@ c
       real*8 lmdamass0,lmdafric0,lmdadt0
       real*8 lmdadeltag0,oststdev0
       real*8 kelvin0
+      logical abfhead
       character*240 record
       character*(*) histfile
       character*(*) title
 c
 c
-c     read the title and the integer state label records
+c     read the title and the integer state label records; an abf
+c     history keeps only the sample and lambda particle state
 c
-      read (ihis,10,err=90,end=90)  record
-      title = record
-      read (ihis,10,err=90,end=90)  record
-c
-c     an abf history keeps only the sample and lambda particle state
-c
-      if (index(title,abftitle(1:trimtext(abftitle))) .gt. 0) then
-         read (ihis,10,err=90,end=90)  record
-         read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
-     &      nlmda0,nlmdahist0
-         read (ihis,10,err=90,end=90)  record
-         if (index(record,'Lambda State') .eq. 0)  goto 90
-         read (ihis,10,err=90,end=90)  record
-         read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0
-         read (ihis,10,err=90,end=90)  record
-         if (nlmda0 .lt. 2)  goto 90
-         if (lmdaintv0 .lt. 1)  goto 90
-         if (nlmdahist0 .lt. 0)  goto 90
-c
-c     set the abf scalar state, deriving the bin width and storage
-c
-         lmdastep = lmdastep0
-         lmdaintv = lmdaintv0
-         call setlmdaphase
-         nlmda = nlmda0
-         nlmdahist = nlmdahist0
-         sizelmdahist = max(1,nlmdahist)
-         wlmda = 1.0d0 / dble(nlmda-1)
-         wlmda2 = 0.5d0 * wlmda
-         lambda = lambda0
-         lmdaavg = 0.0d0
-         lmdastd = 0.0d0
-         dedlavg = 0.0d0
-         dedlstd = 0.0d0
-         lmdatheta = lmdatheta0
-         lmdavtheta = lmdavtheta0
-         return
-      end if
-c
-c     otherwise read the remaining records of an ost history
-c
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
-     &   nlmda0,nflmda0,fli00,nlmdahist0,sizelmdahist0
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  wlmda0,wflmda0,oststdev0,
-     &   kelvin0
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0,
-     &   lmdamass0,lmdafric0,lmdadt0,lmdadeltag0
       read (ihis,10,err=90,end=90)  record
    10 format (a240)
+      title = record
+      abfhead = (index(title,abftitle(1:trimtext(abftitle))) .gt. 0)
+      read (ihis,10,err=90,end=90)  record
+c
+c     read the integer state, and the grid state of an ost history
+c
+      read (ihis,10,err=90,end=90)  record
+      if (abfhead) then
+         read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
+     &      nlmda0,nlmdahist0
+         sizelmdahist0 = nlmdahist0
+      else
+         read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
+     &      nlmda0,nflmda0,fli00,nlmdahist0,sizelmdahist0
+         read (ihis,10,err=90,end=90)  record
+         read (ihis,10,err=90,end=90)  record
+         read (record,*,err=90,end=90)  wlmda0,wflmda0,oststdev0,
+     &      kelvin0
+      end if
+c
+c     read the lambda particle state and the history label
+c
+      read (ihis,10,err=90,end=90)  record
+      if (index(record,'Lambda State') .eq. 0)  goto 90
+      read (ihis,10,err=90,end=90)  record
+      if (abfhead) then
+         read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0
+      else
+         read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0,
+     &      lmdamass0,lmdafric0,lmdadt0,lmdadeltag0
+      end if
+      read (ihis,10,err=90,end=90)  record
 c
 c     validate the stored dimensions
 c
       if (nlmda0 .lt. 2)  goto 90
       if (lmdaintv0 .lt. 1)  goto 90
-      if (kelvin0 .le. 0.0d0)  goto 90
       if (nlmdahist0 .lt. 0)  goto 90
       if (sizelmdahist0 .lt. nlmdahist0)  sizelmdahist0 = nlmdahist0
       if (sizelmdahist0 .lt. 1)  sizelmdahist0 = 1
-      if (use_ost) then
-         if (nflmda0 .lt. 1)  goto 90
-         if (fli00 .lt. 1 .or. fli00 .gt. nflmda0)  goto 90
+      if (.not. abfhead) then
+         if (kelvin0 .le. 0.0d0)  goto 90
+         if (use_ost) then
+            if (nflmda0 .lt. 1)  goto 90
+            if (fli00 .lt. 1 .or. fli00 .gt. nflmda0)  goto 90
+         end if
       end if
+c
+c     an abf history derives its bin width from the bin count
+c
+      if (abfhead)  wlmda0 = 1.0d0 / dble(nlmda0-1)
 c
 c     set scalar state from the history file
 c
@@ -1179,6 +1165,10 @@ c
       dedlstd = 0.0d0
       lmdatheta = lmdatheta0
       lmdavtheta = lmdavtheta0
+      if (abfhead)  return
+c
+c     set the lambda particle dynamics state kept only by ost
+c
       lmdamass = lmdamass0
       lmdafric = lmdafric0
       lmdadt = lmdadt0
@@ -1210,47 +1200,63 @@ c
 c
 c     #############################################################
 c     ##                                                         ##
-c     ##  subroutine prtbiashead  --  output lambda bias header  ##
+c     ##  subroutine fmtbiashead  --  format lambda bias header  ##
 c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "prtbiashead" writes the fixed-size lambda bias history header
-c     under the given title and history label; an abf title writes
-c     only the sample and lambda particle state, otherwise the full
-c     ost histogram state is written
+c     "fmtbiashead" formats the "nrec" records of the fixed-size
+c     lambda bias history header under the given title and history
+c     label; an abf title keeps only the sample and lambda particle
+c     state, otherwise the full ost histogram state is formatted
 c
 c
-      subroutine prtbiashead (ihis,title,label)
+      subroutine fmtbiashead (title,label,nrec,record)
       use bath
       use dlmda
       use mutant
       use ost
       implicit none
-      integer ihis
+      integer nrec
       integer trimtext
+      logical abfhead
+      character*240 record(*)
       character*(*) title
       character*(*) label
 c
 c
-c     write the title and the scalar histogram state
+c     format the title and the scalar histogram state
 c
-      write (ihis,10)  title(1:trimtext(title))
-      write (ihis,20)
-      if (index(title,abftitle(1:trimtext(abftitle))) .gt. 0) then
-         write (ihis,80)  lmdastep,lmdaintv,nlmda,nlmdahist
-         write (ihis,60)
-         write (ihis,90)  lambda,lmdatheta,lmdavtheta
+      abfhead = (index(title,abftitle(1:trimtext(abftitle))) .gt. 0)
+      nrec = 1
+      write (record(nrec),10)  title
+      nrec = nrec + 1
+      write (record(nrec),20)
+      nrec = nrec + 1
+      if (abfhead) then
+         write (record(nrec),80)  lmdastep,lmdaintv,nlmda,nlmdahist
       else
-         write (ihis,30)  lmdastep,lmdaintv,nlmda,nflmda,
-     &                    fli0,nlmdahist,sizelmdahist
-         write (ihis,40)
-         write (ihis,50)  wlmda,wflmda,oststdev,kelvin
-         write (ihis,60)
-         write (ihis,70)  lambda,lmdatheta,lmdavtheta,
-     &                    lmdamass,lmdafric,lmdadt,lmdadeltag
+         write (record(nrec),30)  lmdastep,lmdaintv,nlmda,nflmda,
+     &                            fli0,nlmdahist,sizelmdahist
+         nrec = nrec + 1
+         write (record(nrec),40)
+         nrec = nrec + 1
+         write (record(nrec),50)  wlmda,wflmda,oststdev,kelvin
       end if
-      write (ihis,10)  label(1:trimtext(label))
+c
+c     format the lambda particle state and the history label
+c
+      nrec = nrec + 1
+      write (record(nrec),60)
+      nrec = nrec + 1
+      if (abfhead) then
+         write (record(nrec),90)  lambda,lmdatheta,lmdavtheta
+      else
+         write (record(nrec),70)  lambda,lmdatheta,lmdavtheta,
+     &                            lmdamass,lmdafric,lmdadt,lmdadeltag
+      end if
+      nrec = nrec + 1
+      write (record(nrec),10)  label
    10 format (a)
    20 format (' Integer State :')
    30 format (7i12)
@@ -1266,85 +1272,84 @@ c
 c
 c     #############################################################
 c     ##                                                         ##
+c     ##  subroutine prtbiashead  --  output lambda bias header  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "prtbiashead" writes the fixed-size lambda bias history header
+c     under the given title and history label, as "fmtbiashead"
+c     formats it
+c
+c
+      subroutine prtbiashead (ihis,title,label)
+      implicit none
+      integer i,ihis
+      integer nrec
+      integer trimtext
+      character*240 record(8)
+      character*(*) title
+      character*(*) label
+c
+c
+c     write the formatted header records
+c
+      call fmtbiashead (title,label,nrec,record)
+      do i = 1, nrec
+         write (ihis,10)  record(i)(1:trimtext(record(i)))
+   10    format (a)
+      end do
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
 c     ##  subroutine updbiashead  --  update lambda bias header  ##
 c     ##                                                         ##
 c     #############################################################
 c
 c
 c     "updbiashead" overwrites the fixed-size lambda bias history
-c     header in place under the given title and history label;
-c     unformatted stream output avoids truncating the appended history;
-c     an abf title keeps only the sample and lambda particle state
+c     header in place under the given title and history label, as
+c     "fmtbiashead" formats it; unformatted stream output avoids
+c     truncating the appended history
 c
 c
       subroutine updbiashead (ihis,title,label)
-      use bath
-      use dlmda
-      use mutant
-      use ost
       implicit none
-      integer ihis
+      integer i,ihis
       integer ieol
       integer leol
+      integer nrec
       integer trimtext
-      logical abfhead
-      character*240 record
+      character*240 record(8)
       character*2 newline
       character*(*) title
       character*(*) label
 c
+c
 c     preserve the file's existing line-ending convention
 c
-      read (ihis,pos=1)  record
-      ieol = index(record,achar(10))
+      read (ihis,pos=1)  record(1)
+      ieol = index(record(1),achar(10))
       newline = achar(10)//' '
       leol = 1
       if (ieol .gt. 1) then
-         if (record(ieol-1:ieol-1) .eq. achar(13)) then
+         if (record(1)(ieol-1:ieol-1) .eq. achar(13)) then
             newline = achar(13)//achar(10)
             leol = 2
          end if
       end if
 c
-c     format each header record internally and write its raw bytes
+c     write the raw bytes of each formatted header record
 c
-      abfhead = (index(title,abftitle(1:trimtext(abftitle))) .gt. 0)
-      write (record,10)  title
-      write (ihis,pos=1)  record(1:len_trim(record)),newline(1:leol)
-      write (record,20)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      if (abfhead) then
-         write (record,80)  lmdastep,lmdaintv,nlmda,nlmdahist
-         write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      else
-         write (record,30)  lmdastep,lmdaintv,nlmda,nflmda,
-     &                      fli0,nlmdahist,sizelmdahist
-         write (ihis)  record(1:len_trim(record)),newline(1:leol)
-         write (record,40)
-         write (ihis)  record(1:len_trim(record)),newline(1:leol)
-         write (record,50)  wlmda,wflmda,oststdev,kelvin
-         write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      end if
-      write (record,60)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      if (abfhead) then
-         write (record,90)  lambda,lmdatheta,lmdavtheta
-      else
-         write (record,70)  lambda,lmdatheta,lmdavtheta,
-     &                      lmdamass,lmdafric,lmdadt,lmdadeltag
-      end if
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,10)  label
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-   10 format (a)
-   20 format (' Integer State :')
-   30 format (7i12)
-   40 format (' Grid State :')
-   50 format (4d26.16)
-   60 format (' Lambda State :')
-   70 format (7d26.16)
-   80 format (4i12)
-   90 format (3d26.16)
+      call fmtbiashead (title,label,nrec,record)
+      write (ihis,pos=1)  record(1)(1:trimtext(record(1))),
+     &                    newline(1:leol)
+      do i = 2, nrec
+         write (ihis)  record(i)(1:trimtext(record(i))),newline(1:leol)
+      end do
       return
       end
 c
@@ -1436,7 +1441,7 @@ c
       use mutant
       use ost
       implicit none
-      integer isamp,istep
+      integer isamp
       integer nskip
       logical depcriteria
 c
@@ -1464,19 +1469,14 @@ c     save all values in the interval, but average only after the
 c     propagation and equilibration phases; only ost and abf keep
 c     dU/dlambda, which they average at a fixed lambda
 c
-      istep = mod(lmdastep,lmdaintv)
-      if (istep .eq. 0) then
-         isamp = lmdaintv
-      else
-         isamp = istep
-      end if
+      isamp = mod(lmdastep-1,lmdaintv) + 1
       lmdallist(isamp) = lambda
       if (use_ost .or. use_abf)  lmdaflist(isamp) = dedl
 c
 c     deposit the interval average every lmdaintv steps; an ost or
 c     abf interval is kept only when its samples are converged
 c
-      if (istep .eq. 0) then
+      if (isamp .eq. lmdaintv) then
          nskip = lmdanpa + lmdanpb
          call avgstd (lmdallist,nskip+1,lmdanpc,lmdaavg,lmdastd)
          if (use_ost .or. use_abf) then
@@ -1624,7 +1624,7 @@ c
 c
 c
       if (use_abfdyn) then
-         call efreelmda (vbias,slope)
+         call efreelmda (lambda,vbias,slope)
          vbias = -vbias
       else
          call emetabias (lambda,vbias,slope)
@@ -1678,8 +1678,7 @@ c
       use units
       use virial
       implicit none
-      integer i,j
-      integer istep,isamp
+      integer isamp
       real*8 epot
       real*8 eold,enew
       real*8 de,kt
@@ -1693,14 +1692,8 @@ c
       real*8, allocatable :: dtrial(:,:)
       real*8, allocatable :: desumold(:,:)
       real*8, allocatable :: rpoleold(:,:)
-      real*8, allocatable :: uindold(:,:)
-      real*8, allocatable :: uinpold(:,:)
-      real*8, allocatable :: udirold(:,:)
-      real*8, allocatable :: udirpold(:,:)
-      real*8, allocatable :: uindsold(:,:)
-      real*8, allocatable :: uinpsold(:,:)
-      real*8, allocatable :: udirsold(:,:)
-      real*8, allocatable :: udirpsold(:,:)
+      real*8, allocatable :: polold(:,:,:)
+      real*8, allocatable :: solvold(:,:,:)
       logical accept,stale
       logical savepol,savesolv
       logical savepole
@@ -1710,12 +1703,7 @@ c
 c     ost and abf move lambda only in the propagation phase of the
 c     sample interval, while metadynamics moves it at any step
 c
-      istep = mod(lmdastep,lmdaintv)
-      if (istep .eq. 0) then
-         isamp = lmdaintv
-      else
-         isamp = istep
-      end if
+      isamp = mod(lmdastep-1,lmdaintv) + 1
       if (use_ostdyn .or. use_abfdyn) then
          if (isamp .gt. lmdanpa)  return
       end if
@@ -1743,7 +1731,7 @@ c
          if (barostat.eq.'BERENDSEN' .or. barostat.eq.'BUSSI')
      &      stale = .true.
       end if
-      if (use_ostdyn .and. istep.eq.0)  stale = .true.
+      if (use_ostdyn .and. isamp.eq.lmdaintv)  stale = .true.
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -1756,18 +1744,8 @@ c
          allocate (desumold(3,n))
       end if
       if (savepole)  allocate (rpoleold(maxpole,n))
-      if (savepol) then
-         allocate (uindold(3,n))
-         allocate (uinpold(3,n))
-         allocate (udirold(3,n))
-         allocate (udirpold(3,n))
-      end if
-      if (savesolv) then
-         allocate (uindsold(3,n))
-         allocate (uinpsold(3,n))
-         allocate (udirsold(3,n))
-         allocate (udirpsold(3,n))
-      end if
+      if (savepol)  allocate (polold(3,n,4))
+      if (savesolv)  allocate (solvold(3,n,4))
 c
 c     save the native lambda state before any energy is found, so
 c     that a rejected move restores just what the step has left
@@ -1779,24 +1757,20 @@ c
       dfdlold = lmdadfdl
       bdgdlold = ostbdgdl
       bdgdflold = ostbdgdfl
-      do i = 1, 3
-         do j = 1, 3
-            virsave(j,i) = vir(j,i)
-         end do
-      end do
+      virsave = vir
       if (use_ostdyn)  desumold = desum
       if (savepole)  rpoleold = rpole
       if (savepol) then
-         uindold = uind
-         uinpold = uinp
-         udirold = udir
-         udirpold = udirp
+         polold(:,:,1) = uind
+         polold(:,:,2) = uinp
+         polold(:,:,3) = udir
+         polold(:,:,4) = udirp
       end if
       if (savesolv) then
-         uindsold = uinds
-         uinpsold = uinps
-         udirsold = udirs
-         udirpsold = udirps
+         solvold(:,:,1) = uinds
+         solvold(:,:,2) = uinps
+         solvold(:,:,3) = udirs
+         solvold(:,:,4) = udirps
       end if
 c
 c     get the old energy at the native lambda, using the energy of
@@ -1866,16 +1840,16 @@ c
          ostbdgdl = bdgdlold
          ostbdgdfl = bdgdflold
          if (savepol) then
-            uind = uindold
-            uinp = uinpold
-            udir = udirold
-            udirp = udirpold
+            uind = polold(:,:,1)
+            uinp = polold(:,:,2)
+            udir = polold(:,:,3)
+            udirp = polold(:,:,4)
          end if
          if (savesolv) then
-            uinds = uindsold
-            uinps = uinpsold
-            udirs = udirsold
-            udirps = udirpsold
+            uinds = solvold(:,:,1)
+            uinps = solvold(:,:,2)
+            udirs = solvold(:,:,3)
+            udirps = solvold(:,:,4)
          end if
 c
 c     reinstall the native lambda dependent parameters, along with
@@ -1894,11 +1868,7 @@ c
 c
 c     the virial of the completed step is left in place
 c
-      do i = 1, 3
-         do j = 1, 3
-            vir(j,i) = virsave(j,i)
-         end do
-      end do
+      vir = virsave
 c
 c     perform deallocation of some local arrays
 c
@@ -1907,18 +1877,8 @@ c
          deallocate (desumold)
       end if
       if (savepole)  deallocate (rpoleold)
-      if (savepol) then
-         deallocate (uindold)
-         deallocate (uinpold)
-         deallocate (udirold)
-         deallocate (udirpold)
-      end if
-      if (savesolv) then
-         deallocate (uindsold)
-         deallocate (uinpsold)
-         deallocate (udirsold)
-         deallocate (udirpsold)
-      end if
+      if (savepol)  deallocate (polold)
+      if (savesolv)  deallocate (solvold)
       return
       end
 c
@@ -2005,16 +1965,16 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "efreelmda" computes the free energy at the current lambda by
+c     "efreelmda" computes the free energy at lambda "lmda" by
 c     integrating the mean force of the lambda bins with linear
 c     interpolation, and also returns its lambda derivative
 c
 c
-      subroutine efreelmda (eflmda,dfdl)
+      subroutine efreelmda (lmda,eflmda,dfdl)
       use dlmda
-      use mutant
       implicit none
       integer ilmda0,ilmda1
+      real*8 lmda
       real*8 eflmda,dfdl
       real*8 fl0,fl1
       real*8 lmda0,lmda1
@@ -2029,7 +1989,7 @@ c
 c
 c     handle endpoint at lambda = 0
 c
-      if (lambda .le. 0.0d0) then
+      if (lmda .le. 0.0d0) then
          dfdl = lmdafmean(1)
          return
       end if
@@ -2044,10 +2004,10 @@ c
          fl1 = lmdafmean(ilmda1)
          slope = (fl1-fl0) / wlmda
 c
-c     integrate only to lambda if it lies in this interval
+c     integrate only to lambda if it lies inside this interval
 c
-         if (lambda .le. lmda1) then
-            x = lambda - lmda0
+         if (lmda .lt. lmda1) then
+            x = lmda - lmda0
             eflmda = eflmda + fl0*x + 0.5d0*slope*x*x
             dfdl = fl0 + slope*x
             return
@@ -2074,27 +2034,17 @@ c     ##############################################################
 c
 c
 c     "efreetot" computes the total free energy change by integrating
-c     the mean force of the lambda bins over lambda using the
-c     trapezoid rule
+c     the mean force of the lambda bins over the whole lambda range,
+c     which "efreelmda" does by the trapezoid rule
 c
 c
       function efreetot ()
-      use dlmda
       implicit none
-      integer ilmda
       real*8 efreetot
+      real*8 dfdl
 c
 c
-c     initialize free energy
-c
-      efreetot = 0.0d0
-c
-c     integrate over lambda bins
-c
-      do ilmda = 1, nlmda-1
-         efreetot = efreetot + 0.5d0
-     &                *(lmdafmean(ilmda)+lmdafmean(ilmda+1))*wlmda
-      end do
+      call efreelmda (1.0d0,efreetot,dfdl)
       return
       end
 c
@@ -2161,23 +2111,11 @@ c
 c     compact the parsed values down to the number of windows
 c
          allocate (tlist(nlmdawin))
-         do i = 1, nlmdawin
-            tlist(i) = lmdawinlist(i)
-         end do
-         deallocate (lmdawinlist)
-         allocate (lmdawinlist(nlmdawin))
-         do i = 1, nlmdawin
-            lmdawinlist(i) = tlist(i)
-         end do
-         do i = 1, nlmdawin
-            tlist(i) = lmdawinfrac(i)
-         end do
-         deallocate (lmdawinfrac)
-         allocate (lmdawinfrac(nlmdawin))
-         do i = 1, nlmdawin
-            lmdawinfrac(i) = tlist(i)
-         end do
-         deallocate (tlist)
+         tlist = lmdawinlist(1:nlmdawin)
+         call move_alloc (tlist,lmdawinlist)
+         allocate (tlist(nlmdawin))
+         tlist = lmdawinfrac(1:nlmdawin)
+         call move_alloc (tlist,lmdawinfrac)
 c
 c     a time share that was given must be a positive fraction
 c
@@ -2318,29 +2256,6 @@ c     start the schedule at its first window
 c
       lmdawin = 1
       lambda = lmdawinlist(1)
-      call setlmdawin
-      return
-      end
-c
-c
-c     #################################################################
-c     ##                                                             ##
-c     ##  subroutine setlmdawin  --  size the current lambda window  ##
-c     ##                                                             ##
-c     #################################################################
-c
-c
-c     "setlmdawin" sets the step count and equilibration length of
-c     the lambda window that is currently active
-c
-c
-      subroutine setlmdawin
-      use dlmda
-      implicit none
-c
-c
-c     get the length and the equilibration of the current window
-c
       call lmdawinsize (lmdawin,lmdawinlen,lmdawineq)
       return
       end
@@ -2486,7 +2401,7 @@ c
       lmdawin = lmdawin + 1
       if (lmdawin .le. nlmdawin) then
          lambda = lmdawinlist(lmdawin)
-         call setlmdawin
+         call lmdawinsize (lmdawin,lmdawinlen,lmdawineq)
       end if
       return
       end

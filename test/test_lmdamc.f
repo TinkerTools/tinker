@@ -239,7 +239,7 @@ c
 c
 c
       if (mode .eq. 'abf') then
-         call efreelmda (vbias,dvdl)
+         call efreelmda (lambda,vbias,dvdl)
          epot = energy () - vbias
       else if (mode .eq. 'ost') then
          allocate (derivs(3,n))

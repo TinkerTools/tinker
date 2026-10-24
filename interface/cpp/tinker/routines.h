@@ -380,6 +380,10 @@ void rdbiashead_(int* ihis, char* histfile, char* title, tinker_fchar_len_t hist
 inline void tinker_f_rdbiashead(int* ihis, tinker_fchars histfile, tinker_fchars title) {
     return rdbiashead_(ihis, histfile.string, title.string, histfile.capacity, title.capacity);
 }
+void fmtbiashead_(char* title, char* label, int* nrec, char* record, tinker_fchar_len_t title_cap, tinker_fchar_len_t label_cap, tinker_fchar_len_t record_cap);
+inline void tinker_f_fmtbiashead(tinker_fchars title, tinker_fchars label, int* nrec, tinker_fchars record) {
+    return fmtbiashead_(title.string, label.string, nrec, record.string, title.capacity, label.capacity, record.capacity);
+}
 void prtbiashead_(int* ihis, char* title, char* label, tinker_fchar_len_t title_cap, tinker_fchar_len_t label_cap);
 inline void tinker_f_prtbiashead(int* ihis, tinker_fchars title, tinker_fchars label) {
     return prtbiashead_(ihis, title.string, label.string, title.capacity, label.capacity);
@@ -406,7 +410,7 @@ void lmdathetamap_(double* theta, double* lmda, double* dldth);
 #define tinker_f_lmdathetamap lmdathetamap_
 void lmdathetainv_(double* lmda, double* theta);
 #define tinker_f_lmdathetainv lmdathetainv_
-void efreelmda_(double* eflmda, double* dfdl);
+void efreelmda_(double* lmda, double* eflmda, double* dfdl);
 #define tinker_f_efreelmda efreelmda_
 double efreetot_();
 #define tinker_f_efreetot efreetot_
@@ -414,8 +418,6 @@ void setlmdasched_(int* nwin, int* nwinset);
 #define tinker_f_setlmdasched setlmdasched_
 void initlmdawin_(int* nstep);
 #define tinker_f_initlmdawin initlmdawin_
-void setlmdawin_();
-#define tinker_f_setlmdawin setlmdawin_
 void lmdawinsize_(int* iwin, int* nlen, int* neq);
 #define tinker_f_lmdawinsize lmdawinsize_
 void lmdawinphase_(int* istep, int* iprod);
