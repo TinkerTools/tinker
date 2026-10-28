@@ -44,6 +44,7 @@ c
       call test_thermint_trailing
       call test_thermint_save
       call test_thermint_stop
+      call test_thermint_up
       call clearti
       call final
       return
@@ -1273,6 +1274,90 @@ c
       end
 c
 c
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine test_thermint_up  --  climbing TI run  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+c     "test_thermint_up" runs a short thermodynamic integration whose
+c     LAMBDA of zero turns three evenly spaced windows around to climb
+c     from zero, checks the lambda of each block average written, and
+c     checks that "analyzelmda" finds a free energy from the file
+c
+c
+      subroutine test_thermint_up
+      implicit none
+      integer i,ist
+      integer nrow
+      real*8 lam
+      real*8 value,err
+      real*8 ref(6)
+      logical found
+      character*40 label
+      data ref  / 0.0d0, 0.0d0, 0.5d0, 0.5d0, 1.0d0, 1.0d0 /
+c
+c
+c     three windows of twenty steps hold two blocks of ten each
+c
+      call tiupprep ('thermint_up')
+      call pushdir ('file/thermint_up')
+      call run_prog ('dynamic','water2 60 0.1 0.001 2 298',
+     &               'out.txt',ist)
+      if (ist .ne. -1) then
+         call assert_int (ist,0,'tiup status')
+         call ticount ('water2.ti',nrow)
+         call assert_int (nrow,6,'tiup blocks')
+         do i = 1, 6
+            call tirowlmda ('water2.ti',i,lam)
+            write (label,10)  i
+   10       format ('tiup block ',i0,' lambda')
+            call assert_real (lam,ref(i),1.0d-8,label)
+         end do
+c
+c     the analysis puts the windows in order whichever way they ran
+c
+         call run_prog ('analyzelmda','5 water2','out2.txt',ist)
+         call assert_int (ist,0,'tiup analysis status')
+         call barfind ('water2.freeenergy','TI Full Sample',found,
+     &                 value,err)
+         call assert_logical (found,.true.,'tiup analysis total')
+      end if
+      call popdir
+      call tnist_clean ('thermint_up')
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine tiupprep  --  fixture for a climbing TI run  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "tiupprep" creates a scratch directory holding a small water box
+c     whose keyfile has a LAMBDA of zero and three evenly spaced lambda
+c     windows with no equilibration and blocks of ten steps
+c
+c
+      subroutine tiupprep (work)
+      implicit none
+      character*(*) work
+c
+c
+c     add the evenly spaced window schedule to the copied box
+c
+      call tiprepbase (work)
+      call pushdir ('file/'//trim(work))
+      call tnist_append ('water2.key','lambda-nwindow 3')
+      call tnist_append ('water2.key','ti-nstepavg 10')
+      call popdir
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine tistopprep  --  fixture for a stopped TI run  ##
@@ -1291,6 +1376,37 @@ c
       integer iend
       integer freeunit
       character*(*) work,nstepavg
+c
+c
+c     add the window schedule and the request to stop the run
+c
+      call tiprepbase (work)
+      call pushdir ('file/'//trim(work))
+      call tnist_append ('water2.key','lambda-window 1.0')
+      call tnist_append ('water2.key','ti-nstepavg '//nstepavg)
+      iend = freeunit ()
+      open (unit=iend,file='water2.end',status='new')
+      close (unit=iend)
+      call popdir
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine tiprepbase  --  scratch box for a TI fixture  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "tiprepbase" creates a scratch directory holding a small water
+c     box whose keyfile has a LAMBDA of zero, the Verlet integrator
+c     and no equilibration, ready for a window schedule to be added
+c
+c
+      subroutine tiprepbase (work)
+      implicit none
+      character*(*) work
       character*512 cmd
 c
 c
@@ -1304,16 +1420,11 @@ c
       call execute_command_line (cmd)
       call popdir
 c
-c     add the window schedule and the request to stop the run
+c     add the options shared by every TI fixture
 c
       call pushdir ('file/'//trim(work))
       call tnist_append ('water2.key','integrator verlet')
-      call tnist_append ('water2.key','lambda-window 1.0')
       call tnist_append ('water2.key','lambda-eqratio 0.0')
-      call tnist_append ('water2.key','ti-nstepavg '//nstepavg)
-      iend = freeunit ()
-      open (unit=iend,file='water2.end',status='new')
-      close (unit=iend)
       call popdir
       return
       end

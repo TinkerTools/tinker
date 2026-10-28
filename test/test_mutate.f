@@ -58,6 +58,7 @@ c
       call test_mutate_dspsc
       call test_mutate_unsup
       call test_mutate_sampreset
+      call test_mutate_lmdastart
       call test_mutate_rpolesave
       call test_mutate_cthess
       call test_mutate_epdtsave
@@ -2814,6 +2815,9 @@ c
      &   'test_mutate_unsup ost sample interval')
       call test_mutate_sccase ('mut_qnt_step_fatal.key','','water2',
      &   'range of nonzero width','test_mutate_unsup qnt step')
+      call test_mutate_sccase ('mut_nwin_mid_fatal.key','','water2',
+     &   'Evenly spaced lambda windows start',
+     &   'test_mutate_unsup nwindow interior start')
       call popdir
       return
       end
@@ -2859,6 +2863,90 @@ c
      &                  tname//' ost equilibration ratio')
       call assert_int (lmdanpa+lmdanpb+lmdanpc,100,
      &                 tname//' ost phases')
+      call final
+      call popdir
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_mutate_lmdastart  --  schedule start  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_mutate_lmdastart" checks that a LAMBDA of zero turns the
+c     evenly spaced TI and FEP windows around to climb from zero over
+c     the same lambda values as the default descending schedule, and
+c     that a LAMBDA of one keeps the descending schedule
+c
+c
+      subroutine test_mutate_lmdastart
+      use dlmda
+      use mutant
+      implicit none
+      integer i
+      real*8 up(21)
+      logical skiptest
+      logical rising
+      logical mirror
+      character*(*) tname
+      parameter (tname='test_mutate_lmdastart')
+c
+c
+      if (skiptest(tname,'mutate'))  return
+      call pushdir ('file/mutate')
+c
+c     a zero LAMBDA climbs over the default number of windows
+c
+      call loadfix ('water2','mut_ti_reset.key')
+      call assert_int (nlmdawin,21,tname//' ti up count')
+      call assert_real (lambda,0.0d0,0.0d0,tname//' ti up start')
+      call assert_real (lmdawinlist(1),0.0d0,0.0d0,
+     &                  tname//' ti up first')
+      call assert_real (lmdawinlist(21),1.0d0,0.0d0,
+     &                  tname//' ti up last')
+      rising = .true.
+      do i = 2, 21
+         if (lmdawinlist(i) .le. lmdawinlist(i-1))  rising = .false.
+      end do
+      call assert_logical (rising,.true.,tname//' ti up rising')
+c
+c     the climbing windows mirror the descending ones exactly
+c
+      do i = 1, 21
+         up(i) = lmdawinlist(i)
+      end do
+      call setlmdasched (0,.false.)
+      mirror = .true.
+      do i = 1, 21
+         if (up(i) .ne. lmdawinlist(22-i))  mirror = .false.
+      end do
+      call assert_logical (mirror,.true.,tname//' ti up mirror')
+      call final
+c
+c     a LAMBDA of one keeps the descending schedule
+c
+      call loadfix_keyadd ('water2','mut_ti_reset.key','lambda 1.0')
+      call assert_int (nlmdawin,21,tname//' ti down count')
+      call assert_real (lambda,1.0d0,0.0d0,tname//' ti down start')
+      call assert_real (lmdawinlist(21),0.0d0,0.0d0,
+     &                  tname//' ti down last')
+      call final
+c
+c     free energy perturbation climbs the same way
+c
+      call loadfix ('water2','mut_fep_up.key')
+      call assert_logical (use_fep,.true.,tname//' fep mode')
+      call assert_int (nlmdawin,3,tname//' fep up count')
+      call assert_real (lambda,0.0d0,0.0d0,tname//' fep up start')
+      call assert_real (lmdawinlist(1),0.0d0,0.0d0,
+     &                  tname//' fep up 1')
+      call assert_real (lmdawinlist(2),0.5d0,1.0d-12,
+     &                  tname//' fep up 2')
+      call assert_real (lmdawinlist(3),1.0d0,0.0d0,
+     &                  tname//' fep up 3')
       call final
       call popdir
       return
@@ -3091,8 +3179,8 @@ c
 c
 c     "test_mutate_scrun" runs "analyze" on one keyfile with the
 c     coordinates "xyz" and returns the total potential energy,
-c     whether any setup error is printed, and whether one contains
-c     "phrase"
+c     whether any setup error from "mutate_check" or "mutate_window"
+c     is printed, and whether one contains "phrase"
 c
 c
       subroutine test_mutate_scrun (key,xyz,phrase,e,found,halted)
@@ -3118,7 +3206,8 @@ c
       open (newunit=iout,file='out.txt',status='old')
       do while (.true.)
          read (iout,'(a)',end=10)  line
-         if (index(line,'MUTATE_CHECK') .ne. 0) then
+         if (index(line,'MUTATE_CHECK').ne.0 .or.
+     &       index(line,'MUTATE_WINDOW').ne.0) then
             halted = .true.
             if (len(phrase) .gt. 0) then
                if (index(line,phrase) .ne. 0)  found = .true.

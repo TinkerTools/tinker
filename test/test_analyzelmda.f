@@ -324,11 +324,12 @@ c
 c
 c     "test_lmda_ti" analyzes hand made TI files; a derivative linear
 c     in lambda and constant within each window, written from lambda
-c     1 down to 0, gives a trapezoid total of exactly 4 Kcal/mol with
-c     no error; two blocks per window at 0, 0.5 and 1 with means 2, 4
-c     and 5 and standard errors 1, 2 and 0 give 3.75 +/- sqrt(1.0625);
-c     windows short of lambda 1, or fewer than the file header gives,
-c     leave the totals out, and a single window stops with a message
+c     1 down to 0 or from 0 up to 1, gives a trapezoid total of
+c     exactly 4 Kcal/mol with no error; two blocks per window at 0,
+c     0.5 and 1 with means 2, 4 and 5 and standard errors 1, 2 and 0
+c     give 3.75 +/- sqrt(1.0625); windows short of lambda 1, or fewer
+c     than the file header gives, leave the totals out, and a single
+c     window stops with a message
 c
 c
       subroutine test_lmda_ti
@@ -367,6 +368,24 @@ c
       call assert_real (value,50.0d0,0.0d0,
      &                  'test_analyzelmda ti trials given')
       call lmdawipe ('ti_linear')
+c
+c     the same windows written from lambda 0 up to 1 give the same
+c     totals, since the windows are sorted by lambda either way
+c
+      call lmdawipe ('ti_linear_up')
+      call run_prog ('analyzelmda','5 ti_linear_up','out.txt',ist)
+      call assert_int (ist,0,'test_analyzelmda ti up status')
+      call barfind ('ti_linear_up.freeenergy','TI Full Sample',found,
+     &              value,err)
+      call assert_real (value,4.0d0,eps,
+     &                  'test_analyzelmda ti up total')
+      call assert_real (err,0.0d0,eps,
+     &                  'test_analyzelmda ti up error')
+      call barfind ('ti_linear_up.freeenergy','TI Bootstrap',found,
+     &              value,err)
+      call assert_real (value,4.0d0,eps,
+     &                  'test_analyzelmda ti up bootstrap')
+      call lmdawipe ('ti_linear_up')
 c
 c     standard errors from the spread of the block averages
 c

@@ -2192,7 +2192,7 @@ ISORATIO [real]
 .. _KEY-LAMBDA:
 
 LAMBDA [real]
-   Sets the value of the lambda scaling parameters for electrostatic, vdw and torsional interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords.
+   Sets the value of the lambda scaling parameters for electrostatic, vdw and torsional interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords. When lambda is sampled by LAMBDA-MODE OST, META or ABF, the value sets the starting lambda, with a default of 1. For TI or FEP, a LAMBDA value of 0 starts the evenly spaced LAMBDA-NWINDOW schedule at lambda equal to 0, while an explicit LAMBDA-WINDOW schedule always starts at its first window.
 
 .. index:: LAMBDA-CONVCRI
 .. _KEY-LAMBDA-CONVCRI:
@@ -2270,7 +2270,7 @@ LAMBDA-NBIN [integer]
 .. _KEY-LAMBDA-NWINDOW:
 
 LAMBDA-NWINDOW [integer]
-   Sets the number of lambda windows for thermodynamic integration or free energy perturbation over lambda windows when LAMBDA-WINDOW is not used. The windows are spaced evenly from lambda equal to 1 down to 0 and are given equal shares of the dynamics run. At least two windows are required, LAMBDA-NWINDOW cannot be combined with LAMBDA-WINDOW, and the default in the absence of the keyword is 21 windows.
+   Sets the number of lambda windows for thermodynamic integration or free energy perturbation over lambda windows when LAMBDA-WINDOW is not used. The windows are spaced evenly from lambda equal to 1 down to 0, or from 0 up to 1 when the LAMBDA keyword is set to 0, and are given equal shares of the dynamics run. Any LAMBDA value other than 0 or 1 is an error with this schedule. At least two windows are required, LAMBDA-NWINDOW cannot be combined with LAMBDA-WINDOW, and the default in the absence of the keyword is 21 windows.
 
 .. index:: LAMBDA-PROPAGATE
 .. _KEY-LAMBDA-PROPAGATE:
@@ -2294,7 +2294,7 @@ LAMBDA-THETA-MAP [SIN / TRI]
 .. _KEY-LAMBDA-WINDOW:
 
 LAMBDA-WINDOW [1 or 2 reals]
-   Adds one lambda window to the schedule of thermodynamic integration or free energy perturbation, with one keyword line for each window in the order the windows are visited. The first modifier gives the lambda value of the window, between 0 and 1, and the optional second modifier gives its positive share of the dynamics run. The lambda values must increase or decrease steadily, windows without a share split the time left over equally, and all shares are rescaled to cover the whole run. Free energy perturbation requires at least two windows, and LAMBDA-WINDOW cannot be combined with LAMBDA-NWINDOW.
+   Adds one lambda window to the schedule of thermodynamic integration or free energy perturbation, with one keyword line for each window in the order the windows are visited. The first modifier gives the lambda value of the window, between 0 and 1, and the optional second modifier gives its positive share of the dynamics run. The first window sets the starting lambda, and any LAMBDA value is ignored. The lambda values must increase or decrease steadily, windows without a share split the time left over equally, and all shares are rescaled to cover the whole run. Free energy perturbation requires at least two windows, and LAMBDA-WINDOW cannot be combined with LAMBDA-NWINDOW.
 
 .. index:: LBFGS-VECTORS
 .. _KEY-LBFGS-VECTORS:

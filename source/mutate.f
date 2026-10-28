@@ -1284,17 +1284,25 @@ c     "LAMBDA-WINDOW" values or from the "LAMBDA-NWINDOW" count of
 c     evenly spaced windows; the first "LAMBDA-EQRATIO" value is the
 c     fraction of each window discarded as equilibration
 c
+c     note "LAMBDA" gives the starting lambda, so evenly spaced windows
+c     climb from zero when it is zero and otherwise descend from one,
+c     while explicit windows start at the first value listed
+c
 c
       subroutine mutate_window
       use dlmda
+      use inform
       use iounit
       use keys
+      use mutant
       implicit none
       integer i
       integer next
       integer nwin
       real*8 frac
+      real*8 lmda0,eps
       logical nwinset
+      logical setlmda
       character*20 keyword
       character*240 record
       character*240 string
@@ -1307,6 +1315,12 @@ c
       lmdawinlen = 0
       nlmdawin = 21
       lmdawinratio = 0.5d0
+c
+c     keep the starting lambda before the schedule replaces it
+c
+      lmda0 = lambda
+      eps = 1.0d-8
+      setlmda = .false.
 c
 c     only a sequential lambda method visits the lambda windows
 c
@@ -1348,6 +1362,8 @@ c
             lmdawinfrac(nwin) = frac
          else if (keyword(1:15) .eq. 'LAMBDA-EQRATIO ') then
             read (string,*,err=10,end=10)  lmdawinratio
+         else if (keyword(1:7) .eq. 'LAMBDA ') then
+            setlmda = .true.
          end if
    10    continue
       end do
@@ -1358,9 +1374,39 @@ c
       if (.not. (lmdawinratio.ge.0.0d0 .and.
      &           lmdawinratio.lt.1.0d0))  lmdawinratio = 0.5d0
 c
+c     evenly spaced windows can only start from an end point
+c
+      if (nwin.eq.0 .and. setlmda .and. lmda0.gt.eps .and.
+     &    lmda0.lt.1.0d0-eps) then
+         write (iout,20)  lmda0
+   20    format (/,' MUTATE_WINDOW  --  Evenly spaced lambda windows',
+     &              ' start at LAMBDA 0 or 1, not',f10.6,
+     &           /,'                   use LAMBDA-WINDOW values to',
+     &              ' start anywhere else')
+         call fatal
+      end if
+c
 c     build the schedule of lambda windows from the values found
 c
       call setlmdasched (nwin,nwinset)
+c
+c     reverse evenly spaced windows to climb from a zero lambda; the
+c     reversal gives the same lambda values as the descending order
+c
+      if (nwin.eq.0 .and. setlmda .and. lmda0.le.eps) then
+         lmdawinlist = lmdawinlist(nlmdawin:1:-1)
+         lambda = lmdawinlist(1)
+c
+c     explicit windows start at their first value whatever LAMBDA is
+c
+      else if (nwin.gt.0 .and. setlmda .and.
+     &         abs(lmda0-lmdawinlist(1)).gt.eps) then
+         if (.not. silent) then
+            write (iout,25)  lmdawinlist(1),lmda0
+   25       format (/,' Lambda Windows Start at',f10.6,
+     &                 '; LAMBDA Value',f10.6,' is Ignored')
+         end if
+      end if
 c
 c     free energy perturbation needs a neighbor for each window
 c
