@@ -1062,9 +1062,11 @@ c
 c     "rdbiashead" reads the fixed-size header of a lambda bias history
 c     file from an open unit into the scalar histogram and lambda
 c     particle state; an abf header holds only the sample and lambda
-c     particle state, while an ost header also sets the flambda grid;
-c     the title record is returned so the caller can tell which method
-c     wrote the file, and the caller reads the rows
+c     particle state, a metadynamics header holds the gaussian counts,
+c     the bin width, the gaussian cutoff and the temperature, while an
+c     ost header also sets the flambda grid; the title record is
+c     returned so the caller can tell which method wrote the file, and
+c     the caller reads the rows
 c
 c
       subroutine rdbiashead (ihis,histfile,title)
@@ -1086,6 +1088,7 @@ c
       real*8 lmdadeltag0,oststdev0
       real*8 kelvin0
       logical abfhead
+      logical metahdr
       character*240 record
       character*(*) histfile
       character*(*) title
@@ -1098,15 +1101,27 @@ c
    10 format (a240)
       title = record
       abfhead = (index(title,abftitle(1:trimtext(abftitle))) .gt. 0)
+      metahdr = (index(title,metatitle(1:trimtext(metatitle))) .gt. 0)
       read (ihis,10,err=90,end=90)  record
 c
-c     read the integer state, and the grid state of an ost history
+c     read the integer state, and the grid state of a metadynamics
+c     or an ost history; a metadynamics history stores only the bin
+c     width, so recover the bin count that goes with it
 c
       read (ihis,10,err=90,end=90)  record
       if (abfhead) then
          read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
      &      nlmda0,nlmdahist0
          sizelmdahist0 = nlmdahist0
+      else if (metahdr) then
+         read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
+     &      nlmdahist0,sizelmdahist0
+         read (ihis,10,err=90,end=90)  record
+         read (ihis,10,err=90,end=90)  record
+         read (record,*,err=90,end=90)  wlmda0,oststdev0,kelvin0
+         if (.not. (wlmda0 .gt. 0.0d0))  goto 90
+         if (.not. (oststdev0 .gt. 0.0d0))  goto 90
+         nlmda0 = max(2,nint(1.0d0/wlmda0)+1)
       else
          read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
      &      nlmda0,nflmda0,fli00,nlmdahist0,sizelmdahist0
@@ -1138,7 +1153,7 @@ c
       if (sizelmdahist0 .lt. 1)  sizelmdahist0 = 1
       if (.not. abfhead) then
          if (kelvin0 .le. 0.0d0)  goto 90
-         if (use_ost) then
+         if (use_ost .and. .not.metahdr) then
             if (nflmda0 .lt. 1)  goto 90
             if (fli00 .lt. 1 .or. fli00 .gt. nflmda0)  goto 90
          end if
@@ -1154,8 +1169,13 @@ c
       lmdaintv = lmdaintv0
       call setlmdaphase
       nlmda = nlmda0
-      nlmdahist = nlmdahist0
-      sizelmdahist = sizelmdahist0
+      if (metahdr) then
+         nmetahist = nlmdahist0
+         sizemetahist = sizelmdahist0
+      else
+         nlmdahist = nlmdahist0
+         sizelmdahist = sizelmdahist0
+      end if
       wlmda = wlmda0
       wlmda2 = 0.5d0 * wlmda
       lambda = lambda0
@@ -1167,13 +1187,18 @@ c
       lmdavtheta = lmdavtheta0
       if (abfhead)  return
 c
-c     set the lambda particle dynamics state kept only by ost
+c     set the lambda particle dynamics state kept by ost and by
+c     metadynamics
 c
       lmdamass = lmdamass0
       lmdafric = lmdafric0
       lmdadt = lmdadt0
       lmdadeltag = lmdadeltag0
       kelvin = kelvin0
+      if (metahdr) then
+         oststdev = oststdev0
+         return
+      end if
 c
 c     set the flambda grid and gaussian cutoff used only by ost
 c
@@ -1208,7 +1233,9 @@ c
 c     "fmtbiashead" formats the "nrec" records of the fixed-size
 c     lambda bias history header under the given title and history
 c     label; an abf title keeps only the sample and lambda particle
-c     state, otherwise the full ost histogram state is formatted
+c     state, a metadynamics title keeps the gaussian counts, the bin
+c     width, the gaussian cutoff and the temperature, otherwise the
+c     full ost histogram state is formatted
 c
 c
       subroutine fmtbiashead (title,label,nrec,record)
@@ -1220,6 +1247,7 @@ c
       integer nrec
       integer trimtext
       logical abfhead
+      logical metahdr
       character*240 record(*)
       character*(*) title
       character*(*) label
@@ -1228,6 +1256,7 @@ c
 c     format the title and the scalar histogram state
 c
       abfhead = (index(title,abftitle(1:trimtext(abftitle))) .gt. 0)
+      metahdr = (index(title,metatitle(1:trimtext(metatitle))) .gt. 0)
       nrec = 1
       write (record(nrec),10)  title
       nrec = nrec + 1
@@ -1235,6 +1264,13 @@ c
       nrec = nrec + 1
       if (abfhead) then
          write (record(nrec),80)  lmdastep,lmdaintv,nlmda,nlmdahist
+      else if (metahdr) then
+         write (record(nrec),80)  lmdastep,lmdaintv,nmetahist,
+     &                            sizemetahist
+         nrec = nrec + 1
+         write (record(nrec),40)
+         nrec = nrec + 1
+         write (record(nrec),100)  wlmda,oststdev,kelvin
       else
          write (record(nrec),30)  lmdastep,lmdaintv,nlmda,nflmda,
      &                            fli0,nlmdahist,sizelmdahist
@@ -1266,6 +1302,7 @@ c
    70 format (7d26.16)
    80 format (4i12)
    90 format (3d26.16)
+  100 format (3d26.16)
       return
       end
 c
@@ -1322,6 +1359,7 @@ c
       integer ieol
       integer leol
       integer nrec
+      integer nsize
       integer trimtext
       character*240 record(8)
       character*2 newline
@@ -1329,9 +1367,13 @@ c
       character*(*) label
 c
 c
-c     preserve the file's existing line-ending convention
+c     preserve the file's existing line-ending convention, reading
+c     no further than the end of a short header-only file
 c
-      read (ihis,pos=1)  record(1)
+      inquire (unit=ihis,size=nsize)
+      nsize = min(nsize,len(record(1)))
+      record(1) = ' '
+      if (nsize .gt. 0)  read (ihis,pos=1)  record(1)(1:nsize)
       ieol = index(record(1),achar(10))
       newline = achar(10)//' '
       leol = 1
@@ -1883,6 +1925,85 @@ c
       end
 c
 c
+c     #######################################################
+c     ##                                                   ##
+c     ##  function lmdanbin  --  odd count of lambda bins  ##
+c     ##                                                   ##
+c     #######################################################
+c
+c
+c     "lmdanbin" returns the requested number of lambda bins kept to
+c     an odd count of at least three, so bins are always centered at
+c     lambda values of 0, 0.5 and 1
+c
+c
+      function lmdanbin (n)
+      implicit none
+      integer n,lmdanbin
+c
+c
+      lmdanbin = max(3,n)
+      if (mod(lmdanbin,2) .eq. 0)  lmdanbin = lmdanbin + 1
+      return
+      end
+c
+c
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine lmdathkey  --  get theta map keywords  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+c     "lmdathkey" sets the theta map of the lambda particle and its
+c     sharpness from the keyfile, replacing an unknown map or a
+c     sharpness outside (0,1) by the defaults
+c
+c
+      subroutine lmdathkey
+      use dlmda
+      use keys
+      implicit none
+      integer i,next
+      character*20 keyword
+      character*240 record
+      character*240 string
+c
+c
+c     set the default smoothed triangle map and its sharpness
+c
+      lmdathmap = 'TRI'
+      lmdathalpha = 0.999999999d0
+c
+c     search keywords for the theta map options
+c
+      do i = 1, nkey
+         next = 1
+         record = keyline(i)
+         call gettext (record,keyword,next)
+         call upcase (keyword)
+         string = record(next:240)
+         if (keyword(1:17) .eq. 'LAMBDA-THETA-MAP ') then
+            call getword (record,lmdathmap,next)
+            call upcase (lmdathmap)
+         else if (keyword(1:19) .eq. 'LAMBDA-THETA-ALPHA ') then
+            read (string,*,err=10,end=10)  lmdathalpha
+         end if
+   10    continue
+      end do
+c
+c     validate the theta map of the lambda particle
+c
+      if (lmdathmap.ne.'SIN' .and. lmdathmap.ne.'TRI') then
+         lmdathmap = 'TRI'
+      end if
+      if (lmdathalpha.le.0.0d0 .or. lmdathalpha.ge.1.0d0) then
+         lmdathalpha = 0.999999999d0
+      end if
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine lmdathetamap  --  map theta onto main lambda  ##
@@ -1954,6 +2075,92 @@ c
       else
          theta = asin(sqrt(lclip))
       end if
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  function lmdathjac  --  smoothed theta map lambda density  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "lmdathjac" returns the factor dtheta/dlambda of the theta map,
+c     by which the lambda particle visits each lambda, smoothed by a
+c     normalized gaussian of width "sig" centered at lambda "lmda" and
+c     cut off at the distance "cut", along with its two images
+c     reflected at the lambda end points, as a metadynamics gaussian
+c     deposited at "lmda" sees it
+c
+c     note dtheta/dlambda is infinite at the ends, but written as an
+c     integral over theta the smoothed factor is finite, and it is
+c     found by Simpson's rule over the theta range of each image
+c
+c
+      function lmdathjac (lmda,sig,cut)
+      use math
+      implicit none
+      integer i,img
+      integer nstep
+      parameter (nstep=1000)
+      real*8 lmdathjac
+      real*8 lmda,sig,cut
+      real*8 lo,hi
+      real*8 th0,th1,h
+      real*8 theta,lth,dldth
+      real*8 src,delta
+      real*8 pref,wt,total
+c
+c
+c     a zero width gaussian gives no smoothed factor
+c
+      lmdathjac = 0.0d0
+      if (sig .le. 0.0d0)  return
+      pref = 1.0d0 / (sig*sqrt(2.0d0*pi))
+c
+c     find the lambda window whose image lies within the cutoff
+c
+      do img = 1, 3
+         if (img .eq. 1) then
+            lo = lmda - cut
+            hi = lmda + cut
+         else if (img .eq. 2) then
+            lo = -lmda - cut
+            hi = -lmda + cut
+         else
+            lo = 2.0d0 - lmda - cut
+            hi = 2.0d0 - lmda + cut
+         end if
+         lo = max(0.0d0,lo)
+         hi = min(1.0d0,hi)
+c
+c     integrate the gaussian over the theta range of the window
+c
+         if (lo .lt. hi) then
+            call lmdathetainv (lo,th0)
+            call lmdathetainv (hi,th1)
+            h = (th1-th0) / dble(nstep)
+            total = 0.0d0
+            do i = 0, nstep
+               theta = th0 + dble(i)*h
+               call lmdathetamap (theta,lth,dldth)
+               if (img .eq. 1) then
+                  src = lth
+               else if (img .eq. 2) then
+                  src = -lth
+               else
+                  src = 2.0d0 - lth
+               end if
+               delta = lmda - src
+               wt = 2.0d0
+               if (mod(i,2) .eq. 1)  wt = 4.0d0
+               if (i.eq.0 .or. i.eq.nstep)  wt = 1.0d0
+               total = total + wt*exp(-0.5d0*delta*delta/(sig*sig))
+            end do
+            lmdathjac = lmdathjac + pref*total*h/3.0d0
+         end if
+      end do
       return
       end
 c

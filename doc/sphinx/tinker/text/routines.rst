@@ -83,6 +83,10 @@ The distribution version of the Tinker package contains over 1000 separate progr
 
 "analyze" computes and displays the total potential energy; options are provided to display system and force field info, partition the energy by atom or by potential function type, show force field parameters by atom; output the large energy interactions and find electrostatic and inertial properties
 
+**ANALYZELMDA Program**
+
+"analyzelmda" finds the free energy along lambda from the file written by dynamics for the method chosen by the user; for an orthogonal space tempering, metadynamics or adaptive biasing force history, it writes the saved history and the final free energy, along with the g kernel for orthogonal space tempering, to separate files; for sequential free energy perturbation or thermodynamic integration over lambda windows, it writes the free energy of each window and the totals to a file
+
 **ANGCHG Subroutine**
 
 "angchg" computes modifications to atomic partial charges or monopoles due to angle bending using a charge flux formulation
@@ -2136,7 +2140,7 @@ in small rings and removes constraints that are redundant
 
 **FEPCALC Subroutine**
 
-"fepcalc" reads the trial lambda energies of a Tinker FEP file written by dynamics over a schedule of lambda windows, finds the free energy change between each pair of adjacent windows via the FEP and BAR methods, and sums them over the whole schedule
+"fepcalc" reads the trial lambda energies of a Tinker FEP file written by dynamics over a schedule of lambda windows, finds the free energy change between each pair of adjacent windows via the FEP and BAR methods, sums them over the whole schedule, and writes the values to a file
 
 **FFTBACK Subroutine**
 
@@ -4194,6 +4198,10 @@ in small rings and removes constraints that are redundant
 **TETTORS Subroutine**
 
 "tettors" finds the total number of tetratorsions as tuples of adjacent torsional angles, and the numbers of the seven atoms defining each tetratorsion
+
+**TICALC Subroutine**
+
+"ticalc" reads the block averaged lambda derivatives of a Tinker TI file written by dynamics over a schedule of lambda windows, integrates the mean derivative of each window over lambda by the trapezoid rule, and writes the free energy of each window and the totals to a file
 
 **TIMER Program**
 

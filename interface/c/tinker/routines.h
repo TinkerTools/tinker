@@ -406,10 +406,16 @@ void elmdabias_(double* vbias, double* slope);
 #define tinker_f_elmdabias elmdabias_
 void lmdamonte_(double* epot);
 #define tinker_f_lmdamonte lmdamonte_
+int lmdanbin_(int* n);
+#define tinker_f_lmdanbin lmdanbin_
+void lmdathkey_();
+#define tinker_f_lmdathkey lmdathkey_
 void lmdathetamap_(double* theta, double* lmda, double* dldth);
 #define tinker_f_lmdathetamap lmdathetamap_
 void lmdathetainv_(double* lmda, double* theta);
 #define tinker_f_lmdathetainv lmdathetainv_
+double lmdathjac_(double* lmda, double* sig, double* cut);
+#define tinker_f_lmdathjac lmdathjac_
 void efreelmda_(double* lmda, double* eflmda, double* dfdl);
 #define tinker_f_efreelmda efreelmda_
 double efreetot_();
@@ -1236,6 +1242,8 @@ void emetabiasinterpolate_(double* lambda, double* vbias, double* dvdl);
 #define tinker_f_emetabiasinterpolate emetabiasinterpolate_
 void addmetagrid_(int* ihist);
 #define tinker_f_addmetagrid addmetagrid_
+void buildmetaindex_();
+#define tinker_f_buildmetaindex buildmetaindex_
 double metadeltag_();
 #define tinker_f_metadeltag metadeltag_
 void resizemeta_();
@@ -1260,11 +1268,9 @@ void updategkernel_();
 #define tinker_f_updategkernel updategkernel_
 void updatekernels_();
 #define tinker_f_updatekernels updatekernels_
-void addgkernelhist_(int* ihist);
-#define tinker_f_addgkernelhist addgkernelhist_
-void addkernelhist_(int* ihist);
+void addkernelhist_(int* ihist, int* dofkern);
 #define tinker_f_addkernelhist addkernelhist_
-void addkernelpoint_(int* ilmda, int* iflmda, double* e, double* ldelta, double* fldelta, double* sigl2, double* sigf2);
+void addkernelpoint_(int* ilmda, int* iflmda, double* e, double* ldelta, double* fldelta, double* sigl2, double* sigf2, double* rt);
 #define tinker_f_addkernelpoint addkernelpoint_
 void buildfkernel_();
 #define tinker_f_buildfkernel buildfkernel_
@@ -1290,8 +1296,10 @@ void initmetafile_();
 #define tinker_f_initmetafile initmetafile_
 void savemeta_();
 #define tinker_f_savemeta savemeta_
-void rdmeta_();
-#define tinker_f_rdmeta rdmeta_
+void rdmetahist_(int* ihis, char* metafile, tinker_fchar_len_t metafile_cap);
+inline void tinker_f_rdmetahist(int* ihis, tinker_fchars metafile) {
+    return rdmetahist_(ihis, metafile.string, metafile.capacity);
+}
 void prtmeta_(int* ihis);
 #define tinker_f_prtmeta prtmeta_
 void prtmetahead_(int* ihis);
@@ -1300,6 +1308,12 @@ void updmetahead_(int* ihis);
 #define tinker_f_updmetahead updmetahead_
 void prtmetahist_(int* ihis, int* ifirst, int* ilast);
 #define tinker_f_prtmetahist prtmetahist_
+int nbincut_(double* cut, double* width);
+#define tinker_f_nbincut nbincut_
+void lmdaimgbin_(int* lcenter, int* lcount, int* nimg);
+#define tinker_f_lmdaimgbin lmdaimgbin_
+double lmdaimgsrc_(int* lcenter, int* img, double* lsrc);
+#define tinker_f_lmdaimgsrc lmdaimgsrc_
 void ij_to_k_(int* i, int* j, int* nrow, int* k);
 #define tinker_f_ij_to_k ij_to_k_
 void k_to_ij_(int* k, int* nrow, int* i, int* j);

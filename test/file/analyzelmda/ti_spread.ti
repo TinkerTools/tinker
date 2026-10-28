@@ -1,0 +1,19 @@
+
+ Thermodynamic Integration Parameters :
+
+ Number of Lambda Windows                  3
+ Steps per Block Average                 100
+ Equilibration Ratio Value             0.500
+ Number of Dynamics Steps                600
+ Total Number of Block Averages            6
+
+ Block Averaged Lambda Derivatives :
+
+    Index        Lambda               dE/dL               StDev
+
+        1    0.00000000    1.0000000000E+00    1.0000000000E-01
+        2    0.00000000    3.0000000000E+00    1.0000000000E-01
+        3    0.50000000    2.0000000000E+00    1.0000000000E-01
+        4    0.50000000    6.0000000000E+00    1.0000000000E-01
+        5    1.00000000    5.0000000000E+00    1.0000000000E-01
+        6    1.00000000    5.0000000000E+00    1.0000000000E-01

@@ -32,6 +32,7 @@ c
       call test_eostmap_lmdachain
       call test_eostmap_relstage
       call test_eostmap_theta
+      call test_eostmap_thjac
       call final
       return
       end
@@ -1605,6 +1606,136 @@ c
          call assert_logical (inrange,.true.,
      &                        'lmdalangevin theta stays in [0,pi)')
       end do
+c
+c     restore the default map for later tests
+c
+      lmdathmap = 'TRI'
+      lmdathalpha = 0.999999999d0
+      return
+      end
+c
+c
+c     #####################################################################
+c     ##                                                                 ##
+c     ##  subroutine test_eostmap_thjac  --  smoothed theta map density  ##
+c     ##                                                                 ##
+c     #####################################################################
+c
+c
+c     "test_eostmap_thjac" checks the theta map lambda density factor
+c     smoothed by a metadynamics gaussian against the bare factor
+c     away from the ends, the end point symmetry of both maps, the
+c     flat smoothed triangle map, and an independent quadrature of a
+c     wide gaussian with its images
+c
+c
+      subroutine test_eostmap_thjac
+      use dlmda
+      use math
+      implicit none
+      integer i,j,img
+      integer nstep
+      real*8 sig,cut,mass
+      real*8 lmda,jac,jac0,jac1
+      real*8 theta,dldth
+      real*8 expected
+      real*8 u,du,umax
+      real*8 lp,src,delta
+      real*8 total
+      real*8 lmdathjac
+      real*8 llist(3)
+      real*8 alist(2)
+      character*3 maps(2)
+c
+c
+c     a narrow gaussian away from the ends gives the bare factor
+c     1/(2 sqrt(lambda(1-lambda))) of the sine squared map, times
+c     the weight kept within the cutoff
+c
+      lmdathmap = 'SIN'
+      sig = 1.0d-4
+      cut = 4.0d0 * sig
+      mass = erf(4.0d0/sqrt(2.0d0))
+      llist(1) = 0.25d0
+      llist(2) = 0.5d0
+      llist(3) = 0.8d0
+      do i = 1, 3
+         lmda = llist(i)
+         jac = lmdathjac (lmda,sig,cut)
+         expected = mass / (2.0d0*sqrt(lmda*(1.0d0-lmda)))
+         call assert_real (jac/expected,1.0d0,1.0d-6,
+     &                     'lmdathjac sin narrow interior')
+      end do
+c
+c     both maps give the same smoothed factor at the two ends
+c
+      maps(1) = 'SIN'
+      maps(2) = 'TRI'
+      alist(1) = 0.9d0
+      alist(2) = 0.999999999d0
+      sig = 0.02d0
+      cut = 4.0d0 * sig
+      do j = 1, 2
+         lmdathmap = maps(j)
+         lmdathalpha = alist(j)
+         jac0 = lmdathjac (0.0d0,sig,cut)
+         jac1 = lmdathjac (1.0d0,sig,cut)
+         call assert_real (jac1/jac0,1.0d0,1.0d-12,
+     &                     'lmdathjac end point symmetry')
+      end do
+c
+c     the sharp smoothed triangle map is flat inside, where the
+c     smoothed factor is the bare one, close to pi/2
+c
+      lmdathmap = 'TRI'
+      lmdathalpha = 0.999999999d0
+      sig = 0.005d0
+      cut = 4.0d0 * sig
+      mass = erf(4.0d0/sqrt(2.0d0))
+      do i = 1, 3
+         call lmdathetainv (llist(i),theta)
+         call lmdathetamap (theta,lmda,dldth)
+         jac = lmdathjac (llist(i),sig,cut)
+         call assert_real (jac*dldth/mass,1.0d0,1.0d-8,
+     &                     'lmdathjac tri flat interior')
+         call assert_real (jac,0.5d0*pi,1.0d-3,
+     &                     'lmdathjac tri near pi/2')
+      end do
+c
+c     a wide gaussian near an end, with all three images, matches a
+c     midpoint sum over lambda = u**2 and lambda = 1-u**2, where the
+c     sine squared map density times the change of variable is the
+c     smooth 1/sqrt(1-u**2)
+c
+      lmdathmap = 'SIN'
+      sig = 0.2d0
+      cut = 4.0d0 * sig
+      lmda = 0.1d0
+      nstep = 200000
+      umax = sqrt(0.5d0)
+      du = umax / dble(nstep)
+      total = 0.0d0
+      do j = 1, 2
+         do i = 1, nstep
+            u = (dble(i)-0.5d0) * du
+            lp = u * u
+            if (j .eq. 2)  lp = 1.0d0 - lp
+            do img = 1, 3
+               src = lp
+               if (img .eq. 2)  src = -lp
+               if (img .eq. 3)  src = 2.0d0 - lp
+               delta = lmda - src
+               if (abs(delta) .le. cut) then
+                  total = total + exp(-0.5d0*delta*delta/(sig*sig))
+     &                               / sqrt(1.0d0-u*u)
+               end if
+            end do
+         end do
+      end do
+      expected = total * du / (sig*sqrt(2.0d0*pi))
+      jac = lmdathjac (lmda,sig,cut)
+      call assert_real (jac/expected,1.0d0,1.0d-6,
+     &                  'lmdathjac wide gaussian quadrature')
 c
 c     restore the default map for later tests
 c

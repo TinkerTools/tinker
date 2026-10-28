@@ -745,6 +745,70 @@ FREE ENERGY PERTURBATION KEYWORDS
      - VDW-LAMBDA
      - VDW-SOFTCORE
 
+ADAPTIVE LAMBDA BIAS KEYWORDS
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 10 30 30 30
+   :header-rows: 0
+
+   * -
+     - FLAMBDA-WIDTH
+     - HBIAS
+     - LAMBDA-INTERVAL
+   * -
+     - LAMBDA-MODE
+     - LAMBDA-NBIN
+     - OST-INTERPOLATE
+   * -
+     - OST-STDDEV
+     - OST-TEMPER-GLOBAL
+     - OST-TEMPER-LOCAL
+   * -
+     - WFHIST
+     - WLHIST
+     -
+
+LAMBDA PARTICLE KEYWORDS
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 10 30 30 30
+   :header-rows: 0
+
+   * -
+     - LAMBDA-CONVCRI
+     - LAMBDA-DERIV
+     - LAMBDA-DERIV2
+   * -
+     - LAMBDA-DT
+     - LAMBDA-EQRATIO
+     - LAMBDA-FRICTION
+   * -
+     - LAMBDA-MASS
+     - LAMBDA-MC-MOVE
+     - LAMBDA-MC-TRIAL
+   * -
+     - LAMBDA-PROPAGATE
+     - LAMBDA-THETA-ALPHA
+     - LAMBDA-THETA-MAP
+
+LAMBDA WINDOW KEYWORDS
+^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+   :widths: 10 30 30 30
+   :header-rows: 0
+
+   * -
+     - LAMBDA-EQRATIO
+     - LAMBDA-INTERVAL
+     - LAMBDA-NWINDOW
+   * -
+     - LAMBDA-WINDOW
+     - TI-NSTEPAVG
+     -
+
 POTENTIAL SMOOTHING KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -1877,6 +1941,12 @@ FIX-TORSION
 
 FIX-UREY
 
+.. index:: FLAMBDA-WIDTH
+.. _KEY-FLAMBDA-WIDTH:
+
+FLAMBDA-WIDTH [real]
+   Sets the bin width in Kcal/mol along the dU/dlambda axis of the orthogonal space tempering bias grid. The keyword is only used with LAMBDA-MODE OST. The default in the absence of the FLAMBDA-WIDTH keyword is 1.0 Kcal/mol.
+
 .. index:: FORCEFIELD
 .. _KEY-FORCEFIELD:
 
@@ -1988,6 +2058,12 @@ GROUP-MOLECULE
 
 GROUP-SELECT [2 integers, real]
    Assigns a weight in the final potential energy of a specified set of intra- or intergroup interactions. The integer modifiers give the group numbers of the groups involved. If the two numbers are the same, then an intragroup set of interactions is specified. The real modifier gives the weight by which all energetic interactions in this set will be multiplied before incorporation into the final potential energy. If omitted as a keyword modifier, the weight will be set to 1.0 by default. If any SELECT-GROUP keywords are present, then any set of interactions not specified in a SELECT-GROUP keyword is given a zero weight. The default when no SELECT-GROUP keywords are specified is to use all intergroup interactions with a weight of 1.0 and to set all intragroup interactions to zero.
+
+.. index:: HBIAS
+.. _KEY-HBIAS:
+
+HBIAS [real]
+   Sets the weight of each gaussian deposited by orthogonal space tempering or metadynamics. The gaussians are normalized, so the peak height is HBIAS/(sigma*sqrt(2*pi)) for metadynamics and HBIAS/(2*pi*sigma_lambda*sigma_dU/dlambda) for orthogonal space tempering, with the widths set by WLHIST and WFHIST; the weight is lowered further when OST-TEMPER-GLOBAL or OST-TEMPER-LOCAL is used. A negative value is replaced by its absolute value. The default in the absence of the HBIAS keyword is 0.00001.
 
 .. index:: HBOND
 .. _KEY-HBOND:
@@ -2117,6 +2193,108 @@ ISORATIO [real]
 
 LAMBDA [real]
    Sets the value of the lambda scaling parameters for electrostatic, vdw and torsional interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords.
+
+.. index:: LAMBDA-CONVCRI
+.. _KEY-LAMBDA-CONVCRI:
+
+LAMBDA-CONVCRI [2 reals]
+   Turns on a convergence gate for the samples of each sampling interval of orthogonal space tempering and the adaptive biasing force. An interval is accepted only when the standard deviation of dU/dlambda over its averaging phase is smaller than the first modifier plus the second modifier times the absolute value of the average, both in Kcal/mol; a rejected interval deposits nothing. The modifiers default to 50.0 and 0.5, and negative values are replaced by their absolute values. Metadynamics ignores the gate, and without the LAMBDA-CONVCRI keyword every interval is accepted.
+
+.. index:: LAMBDA-DERIV
+.. _KEY-LAMBDA-DERIV:
+
+LAMBDA-DERIV
+   Turns on computation of the derivative of the potential energy with respect to lambda, dU/dlambda, at each energy and gradient evaluation, which dynamics then prints for a run at fixed lambda. The derivative is computed automatically when LAMBDA-MODE selects OST, META, ABF or TI.
+
+.. index:: LAMBDA-DERIV2
+.. _KEY-LAMBDA-DERIV2:
+
+LAMBDA-DERIV2
+   Turns on computation of the second lambda derivative of the potential energy and of the lambda derivatives of the forces and the virial, along with dU/dlambda as for LAMBDA-DERIV. These derivatives are computed automatically for orthogonal space tempering.
+
+.. index:: LAMBDA-DT
+.. _KEY-LAMBDA-DT:
+
+LAMBDA-DT [real]
+   Sets the time step in picoseconds used to propagate the lambda particle of orthogonal space tempering, metadynamics or the adaptive biasing force. A value that is not positive stops the Langevin propagation of the lambda particle. The default in the absence of the LAMBDA-DT keyword is 0.001 picoseconds.
+
+.. index:: LAMBDA-EQRATIO
+.. _KEY-LAMBDA-EQRATIO:
+
+LAMBDA-EQRATIO [1 or 2 reals]
+   For the adaptive lambda bias methods, the two modifiers set the fractions of each sampling interval given to the propagation phase and to the equilibration phase, with the averaging phase taking the rest; the defaults are 0.3 and 0.3, negative values are reset to zero, and the phases are adjusted to keep at least one propagation step and at least two samples to average. For thermodynamic integration and free energy perturbation over lambda windows, the first modifier sets the fraction of each window discarded as equilibration before its samples are used; the default is 0.5, and a value outside the range from 0 up to 1 is reset to the default.
+
+.. index:: LAMBDA-FRICTION
+.. _KEY-LAMBDA-FRICTION:
+
+LAMBDA-FRICTION [real]
+   Sets the Langevin friction coefficient in inverse picoseconds acting on the lambda particle. A value of zero, or a negative value, gives frictionless motion with no random kicks. The default in the absence of the LAMBDA-FRICTION keyword is 0.01 per picosecond.
+
+.. index:: LAMBDA-INTERVAL
+.. _KEY-LAMBDA-INTERVAL:
+
+LAMBDA-INTERVAL [integer]
+   Sets the number of dynamics steps in each sampling interval of an adaptive lambda bias method selected by LAMBDA-MODE OST, META or ABF. LAMBDA-EQRATIO divides each interval into a propagation phase in which lambda moves, an equilibration phase whose samples are discarded, and an averaging phase of at least two steps. Orthogonal space tempering and the adaptive biasing force hold lambda fixed after the propagation phase and average dU/dlambda over the averaging phase, then deposit one gaussian (OST) or one mean force sample (ABF) at the end of the interval if LAMBDA-CONVCRI accepts the average. Metadynamics moves lambda at every step, averages lambda over the averaging phase, and always deposits one gaussian at the end of the interval. Values below one are reset to one, and the default in the absence of the LAMBDA-INTERVAL keyword is 100 steps. The interval is saved in the history file, and continuing an existing ABF history requires the same interval. With LAMBDA-MODE FEP, the keyword instead sets the number of dynamics steps between samples of the trial lambda energies, with a default of 1000 steps; thermodynamic integration does not use it, and averages its blocks over TI-NSTEPAVG steps.
+
+.. index:: LAMBDA-MASS
+.. _KEY-LAMBDA-MASS:
+
+LAMBDA-MASS [real]
+   Sets the mass of the lambda particle, which moves along an angle theta mapped onto lambda by LAMBDA-THETA-MAP, in units of Kcal/mol*ps^2. A value that is not positive stops the Langevin propagation of the lambda particle. The default in the absence of the LAMBDA-MASS keyword is 25.0.
+
+.. index:: LAMBDA-MC-MOVE
+.. _KEY-LAMBDA-MC-MOVE:
+
+LAMBDA-MC-MOVE [real]
+   Sets the largest change in lambda of a Monte Carlo lambda move made with LAMBDA-PROPAGATE MC. Each trial value is drawn uniformly within this distance of the current lambda and reflected back into the range from 0 to 1. The absolute value is used, capped at 1.0, and the default in the absence of the LAMBDA-MC-MOVE keyword is 0.02.
+
+.. index:: LAMBDA-MC-TRIAL
+.. _KEY-LAMBDA-MC-TRIAL:
+
+LAMBDA-MC-TRIAL [integer]
+   Sets the average number of dynamics steps between Monte Carlo lambda moves made with LAMBDA-PROPAGATE MC, as a move is attempted at each step with a probability of one over the modifier. Orthogonal space tempering and the adaptive biasing force attempt moves only during the propagation phase of each sampling interval. Values below one are reset to one, and the default in the absence of the LAMBDA-MC-TRIAL keyword is 10.
+
+.. index:: LAMBDA-MODE
+.. _KEY-LAMBDA-MODE:
+
+LAMBDA-MODE [OST / META / ABF / TI / FEP]
+   Selects the lambda sampling method of a free energy calculation over the groups given by LIGAND or MUTATE. OST uses orthogonal space tempering, META uses metadynamics along lambda and ABF uses an adaptive biasing force, each of which moves lambda continuously during dynamics; TI uses thermodynamic integration and FEP uses free energy perturbation, each of which steps lambda through a schedule of lambda windows. The history written by dynamics, in a file with the extension .ost, .meta, .abf, .ti or .fep, is analyzed with the ANALYZELMDA program. In the absence of the LAMBDA-MODE keyword, lambda stays at the value set by LAMBDA.
+
+.. index:: LAMBDA-NBIN
+.. _KEY-LAMBDA-NBIN:
+
+LAMBDA-NBIN [integer]
+   Sets the number of bins spanning lambda from 0 to 1 in the bias grids of orthogonal space tempering, metadynamics and the adaptive biasing force. An even number is increased by one and a value below three is reset to three, so bins are always centered at lambda values of 0, 0.5 and 1. The default in the absence of the LAMBDA-NBIN keyword is 201 bins, a bin width of 0.005. When analyzing a saved history, LAMBDA-NBIN in the keyfile of ANALYZELMDA rebuilds the history on a different lambda grid.
+
+.. index:: LAMBDA-NWINDOW
+.. _KEY-LAMBDA-NWINDOW:
+
+LAMBDA-NWINDOW [integer]
+   Sets the number of lambda windows for thermodynamic integration or free energy perturbation over lambda windows when LAMBDA-WINDOW is not used. The windows are spaced evenly from lambda equal to 1 down to 0 and are given equal shares of the dynamics run. At least two windows are required, LAMBDA-NWINDOW cannot be combined with LAMBDA-WINDOW, and the default in the absence of the keyword is 21 windows.
+
+.. index:: LAMBDA-PROPAGATE
+.. _KEY-LAMBDA-PROPAGATE:
+
+LAMBDA-PROPAGATE [LANGEVIN / MC]
+   Selects how the lambda particle of orthogonal space tempering, metadynamics or the adaptive biasing force moves. LANGEVIN propagates it by Langevin dynamics along the angle theta, controlled by LAMBDA-MASS, LAMBDA-FRICTION and LAMBDA-DT, while MC moves lambda by Monte Carlo trial moves controlled by LAMBDA-MC-MOVE and LAMBDA-MC-TRIAL. Any other modifier stops the calculation, and the default in the absence of the LAMBDA-PROPAGATE keyword is LANGEVIN.
+
+.. index:: LAMBDA-THETA-ALPHA
+.. _KEY-LAMBDA-THETA-ALPHA:
+
+LAMBDA-THETA-ALPHA [real]
+   Sets the sharpness a of the smoothed triangle map chosen by LAMBDA-THETA-MAP TRI, which must lie between 0 and 1. Values near 0 approach the sine squared map, and values near 1 approach a triangle wave that moves the lambda particle evenly in lambda. A value outside this range is replaced by the default, which is 0.999999999 in the absence of the LAMBDA-THETA-ALPHA keyword.
+
+.. index:: LAMBDA-THETA-MAP
+.. _KEY-LAMBDA-THETA-MAP:
+
+LAMBDA-THETA-MAP [SIN / TRI]
+   Selects the map from the angle theta of the lambda particle onto lambda. SIN uses lambda = sin^2(theta), while TRI uses the smoothed triangle lambda = 1/2 - asin(a*cos(2*theta))/(2*asin(a)), with the sharpness a set by LAMBDA-THETA-ALPHA; both maps have a period of pi in theta. Any other modifier selects TRI, which is also the default in the absence of the LAMBDA-THETA-MAP keyword.
+
+.. index:: LAMBDA-WINDOW
+.. _KEY-LAMBDA-WINDOW:
+
+LAMBDA-WINDOW [1 or 2 reals]
+   Adds one lambda window to the schedule of thermodynamic integration or free energy perturbation, with one keyword line for each window in the order the windows are visited. The first modifier gives the lambda value of the window, between 0 and 1, and the optional second modifier gives its positive share of the dynamics run. The lambda values must increase or decrease steadily, windows without a share split the time left over equally, and all shares are rescaled to cover the whole run. Free energy perturbation requires at least two windows, and LAMBDA-WINDOW cannot be combined with LAMBDA-NWINDOW.
 
 .. index:: LBFGS-VECTORS
 .. _KEY-LBFGS-VECTORS:
@@ -2506,6 +2684,30 @@ OPENMP-THREADS [integer]
 .. _KEY-OPT-COEFF:
 
 OPT-COEFF
+
+.. index:: OST-INTERPOLATE
+.. _KEY-OST-INTERPOLATE:
+
+OST-INTERPOLATE
+   Evaluates the orthogonal space tempering or metadynamics bias by cubic Hermite interpolation of the values stored at the bin centers, over lambda and dU/dlambda for orthogonal space tempering and over lambda for metadynamics, instead of summing the deposited gaussians directly. Interpolation is faster for long histories, while its accuracy depends on the bin width relative to the gaussian widths. ANALYZELMDA also reads this keyword when analyzing a metadynamics history.
+
+.. index:: OST-STDDEV
+.. _KEY-OST-STDDEV:
+
+OST-STDDEV [real]
+   Sets the cutoff, in gaussian widths, beyond which a deposited gaussian and its mirror images at lambda values of 0 and 1 make no contribution to the orthogonal space tempering or metadynamics bias. The value is saved in the history file, so analysis uses the same cutoff. The default in the absence of the OST-STDDEV keyword is 4.0 widths.
+
+.. index:: OST-TEMPER-GLOBAL
+.. _KEY-OST-TEMPER-GLOBAL:
+
+OST-TEMPER-GLOBAL [2 reals]
+   Turns on global tempering of the gaussian weight for orthogonal space tempering and metadynamics. The path bias level is the smallest bias over the lambda bins, taking for orthogonal space tempering the largest bias of each lambda bin along dU/dlambda. Once this level exceeds the threshold given in Kcal/mol by the first modifier, each new weight is HBIAS multiplied by exp(-(level-threshold)/(RT*gamma)), where gamma is the second modifier. Each modifier defaults to 1.0, a zero value is replaced by its default and a negative value by its absolute value.
+
+.. index:: OST-TEMPER-LOCAL
+.. _KEY-OST-TEMPER-LOCAL:
+
+OST-TEMPER-LOCAL [2 reals]
+   Turns on local tempering of the gaussian weight for orthogonal space tempering. Once the largest bias of the lambda bin of a new gaussian exceeds the path bias level of OST-TEMPER-GLOBAL by more than the threshold given in Kcal/mol by the first modifier, the weight is multiplied by exp(-(excess-threshold)/(RT*gamma)), where gamma is the second modifier. The keyword is ignored for metadynamics, whose free energy is read from the bias itself, since a local factor would keep the bias from filling barriers higher than the threshold. Each modifier defaults to 1.0, a zero value is replaced by its default and a negative value by its absolute value.
 
 .. index:: OVERWRITE
 .. _KEY-OVERWRITE:
@@ -3192,6 +3394,12 @@ TCG-PEEK
 THERMOSTAT [BUSSI / BERENDSEN / ANDERSEN / NOSE-HOOVER]
    Selects a thermostat algorithm for use during molecular dynamics. Four modifiers are available: BERENSDEN invokes a simple velocity scaling method, BUSSI is a stochastic velocity rescaling (SVR) method, ANDERSEN is a method baseed on stochastic collisions, and NOSE-HOOVER is an extended variable chain method. The default in the absence of the THERMOSTAT keyword is to use the BUSSI method.
 
+.. index:: TI-NSTEPAVG
+.. _KEY-TI-NSTEPAVG:
+
+TI-NSTEPAVG [integer]
+   Sets the number of dynamics steps averaged into each block of dU/dlambda values written by thermodynamic integration. Blocks are recorded only over the production portion of each lambda window, and a window too short for a single block records nothing. Values below one are reset to the default of 100 steps used in the absence of the TI-NSTEPAVG keyword.
+
 .. index:: TORS-LAMBDA
 .. _KEY-TORS-LAMBDA:
 
@@ -3477,6 +3685,18 @@ VOLUME-TRIAL [integer]
 
 WALL [real]
    Sets the radius of a spherical boundary used to maintain droplet boundary conditions. The real modifier specifies the desired approximate radius of the droplet. In practice, an artificial van der Waals wall is constructed at a fixed buffer distance of 2.5 Angstroms outside the specified radius. The effect is that atoms which attempt to move outside the region defined by the droplet radius will be forced toward the center.
+
+.. index:: WFHIST
+.. _KEY-WFHIST:
+
+WFHIST [real]
+   Sets the width in Kcal/mol along dU/dlambda of the gaussians deposited by orthogonal space tempering. A zero value is replaced by the default and a negative value by its absolute value. The default in the absence of the WFHIST keyword is 1.0 Kcal/mol.
+
+.. index:: WLHIST
+.. _KEY-WLHIST:
+
+WLHIST [real]
+   Sets the width along lambda of the gaussians deposited by orthogonal space tempering and metadynamics. A zero value is replaced by the default and a negative value by its absolute value. The default in the absence of the WLHIST keyword is 0.005, equal to the default bin width set by LAMBDA-NBIN.
 
 .. index:: WRAP-COORDS
 .. _WRAP-COORDS:

@@ -67,6 +67,22 @@ The .frc file contains the components of the force on the atoms. It consists of 
 
 The .uind file contains the components of the induced dipole vector on the atoms. It consists of a title line followed by one line for each atom in the structure. Each line contains: the sequential number within the structure, an atomic symbol or name, X-, Y-, and Z-components of the induced dipole in units of Debye, the force field atom type number of the atom, and a list of the atoms connected to the current atom. As controlled by keywords, this file type is optionally written during Tinker optimization or molecular dynamics calculations using polarizable force fields.
 
+**SAMPLE.OST, SAMPLE.META, SAMPLE.ABF**
+
+These files hold the bias history written by dynamics with LAMBDA-MODE OST, META or ABF, for orthogonal space tempering, metadynamics or the adaptive biasing force. Each begins with a fixed-size header naming the method, followed by the integer state (the step count, LAMBDA-INTERVAL, the lambda grid and the number of saved entries), for orthogonal space tempering and metadynamics a grid state (the bin widths, the gaussian cutoff and the temperature), and the state of the lambda particle; the header is rewritten in place as the run proceeds. One line is then appended for each deposited entry: for .ost the step, its packed lambda and dU/dlambda bin, the lambda and dU/dlambda centers, the height and the two gaussian widths; for .meta the step, the lambda center, the height and the width; and for .abf the step, the interval average lambda and the interval average dU/dlambda. Each orthogonal space tempering or metadynamics run starts a new version of its file, while an adaptive biasing force run continues an existing .abf history with the same LAMBDA-NBIN and LAMBDA-INTERVAL values. These files are analyzed with the ANALYZELMDA program.
+
+**SAMPLE.TI**
+
+The .ti file is written by dynamics with LAMBDA-MODE TI, for thermodynamic integration over a schedule of lambda windows. After the Tinker banner, a header gives the number of lambda windows, the steps per block average set by TI-NSTEPAVG, the equilibration ratio, the number of dynamics steps and the total number of block averages. Each following line holds one block average from the production portion of a window: its index, the window lambda, the mean dU/dlambda over the block and the standard deviation within the block. The file is analyzed with the ANALYZELMDA program.
+
+**SAMPLE.FEP**
+
+The .fep file is written by dynamics with LAMBDA-MODE FEP, for free energy perturbation over a schedule of lambda windows. After the Tinker banner, a header gives the number of lambda windows, the steps between samples set by LAMBDA-INTERVAL, the equilibration ratio, the number of dynamics steps, the total number of energy values, the simulation temperature and, for an isobaric simulation, the pressure. Each sample over the production portion of a window then adds one line at the window lambda followed by one line at the lambda of each neighboring window, holding the step, the simulation lambda, the trial lambda, the potential energy at the trial lambda and the box volume. The file is analyzed with the ANALYZELMDA program.
+
+**SAMPLE.SERIES, SAMPLE.FREEENERGY, SAMPLE.GKERNEL**
+
+These files are written by the ANALYZELMDA program. The .series file lists the saved history of an orthogonal space tempering, metadynamics or adaptive biasing force run along with the free energy estimate after each entry. The .freeenergy file gives the final free energy along with its profile over lambda for those methods, or the free energy of each lambda window and the totals over the schedule for free energy perturbation and thermodynamic integration. The .gkernel file holds the orthogonal space tempering bias on its lambda and dU/dlambda grid. Each analysis writes the next free version of these files, so earlier results are kept.
+
 **PARAMETER FILES (*.PRM)**
 
 The potential energy parameter files distributed with the Tinker package end in the extension .prm, although this is not required by the programs themselves. Each of these files contains a definition of the potential energy functional forms for that force field as well as values for individual energy parameters. For example, the mm3pro.prm file contains the energy parameters and definitions needed for a protein-specific version of the MM3 force field.

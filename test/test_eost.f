@@ -50,6 +50,7 @@ c
       call test_eost_metaimage
       call test_eost_metadyn
       call test_eost_metatemper
+      call test_eost_metacut
       call test_eost_temperkeys
       call final
       return
@@ -451,42 +452,42 @@ c
       call sethist (1,0.50d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
 c
-c     addgkernelhist from a single interior gaussian
+c     addkernelhist g from a single interior gaussian
 c
-      call addgkernelhist (1)
+      call addkernelhist (1,.false.)
       call assert_real (gkernel(3,3),1.0d0,1.0d-12,
-     &                  'addgkernelhist center value')
+     &                  'addkernelhist g center value')
       expected = exp(-1.0d0)
       call assert_real (gkernel(4,4),expected,1.0d-12,
-     &                  'addgkernelhist off-center value')
+     &                  'addkernelhist g off-center value')
 c
-c     addgkernelhist includes left-boundary mirror image
+c     addkernelhist g includes left-boundary mirror image
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
       nlmdahist = 1
       call sethist (1,0.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
-      call addgkernelhist (1)
+      call addkernelhist (1,.false.)
       call assert_real (gkernel(1,3),2.0d0,1.0d-12,
-     &                  'addgkernelhist left mirror center')
+     &                  'addkernelhist g left mirror center')
       expected = 2.0d0 * exp(-0.5d0)
       call assert_real (gkernel(2,3),expected,1.0d-12,
-     &                  'addgkernelhist left mirror neighbor')
+     &                  'addkernelhist g left mirror neighbor')
 c
-c     addgkernelhist includes right-boundary mirror image
+c     addkernelhist g includes right-boundary mirror image
 c
       call resetost (5,5,3)
       height = 2.0d0 * pi * wlmda * wflmda
       nlmdahist = 1
       call sethist (1,1.0d0,0.0d0,height,wlmda,wflmda)
       call buildostindex
-      call addgkernelhist (1)
+      call addkernelhist (1,.false.)
       call assert_real (gkernel(5,3),2.0d0,1.0d-12,
-     &                  'addgkernelhist right mirror center')
+     &                  'addkernelhist g right mirror center')
       expected = 2.0d0 * exp(-0.5d0)
       call assert_real (gkernel(4,3),expected,1.0d-12,
-     &                  'addgkernelhist right mirror neighbor')
+     &                  'addkernelhist g right mirror neighbor')
 c
 c     rebuild the original interior gaussian for later checks
 c
@@ -1164,6 +1165,12 @@ c
       metawhist(1) = 0.25d0
       pref = metahhist(1) / (metawhist(1)*sqrt(2.0d0*pi))
 c
+c     a cutoff of many widths keeps every image term
+c
+      oststdev = 100.0d0
+      maxwlhist = metawhist(1)
+      call buildmetaindex
+c
 c     a gaussian centered midway is symmetric in its two images
 c
       call emetabias (0.5d0,vbias,dvdl)
@@ -1182,10 +1189,27 @@ c
       call assert_real (dvdl,expected,1.0d-12,
      &                  'emetabias off-center derivative')
 c
-c     symmetric gaussian has zero endpoint free energy difference
+c     symmetric gaussian has zero endpoint free energy difference,
+c     read from the end points of the bias grid
 c
+      call addmetagrid (1)
+      call assert_real (vmetagrid(1),pref*(2.0d0*exp(-2.0d0)
+     &                  +exp(-18.0d0)),1.0d-12,
+     &                  'metadeltag grid end point bias')
       call assert_real (metadeltag(),0.0d0,1.0d-12,
      &                  'metadeltag symmetric gaussian')
+c
+c     a four width cutoff drops the image five widths away
+c
+      oststdev = 4.0d0
+      call emetabias (0.75d0,vbias,dvdl)
+      expected = pref * (exp(-0.5d0)+exp(-4.5d0))
+      call assert_real (vbias,expected,1.0d-12,
+     &                  'emetabias cutoff value')
+      expected = -16.0d0 * pref
+     &              * (0.25d0*exp(-0.5d0) - 0.75d0*exp(-4.5d0))
+      call assert_real (dvdl,expected,1.0d-12,
+     &                  'emetabias cutoff derivative')
 c
 c     resizing preserves old metadynamics history and zeros new slots
 c
@@ -1200,6 +1224,8 @@ c
      &                  'resizemeta preserve metalhist(2)')
       call assert_real (metalhist(3),0.0d0,1.0d-12,
      &                  'resizemeta init metalhist(3)')
+      call assert_int (size(metanext),4,
+     &                 'resizemeta resizes the bin links')
       return
       end
 c
@@ -1561,6 +1587,9 @@ c
       metalhist(1) = 0.1d0
       metahhist(1) = 2.0d0
       metawhist(1) = 0.25d0
+      oststdev = 100.0d0
+      maxwlhist = metawhist(1)
+      call buildmetaindex
       pref = metahhist(1) / (metawhist(1)*sqrt(2.0d0*pi))
       sig2 = metawhist(1) * metawhist(1)
       src(1) = 0.1d0
@@ -1633,6 +1662,8 @@ c
       lmdanpc = 2
       hbias = 2.0d0
       wlmda = 0.25d0
+      wlhist = 0.3d0
+      maxwlhist = wlhist
       dedl = 0.0d0
       lmdadt = 0.0d0
       lmdastep = 0
@@ -1654,7 +1685,7 @@ c
      &                  'elmdadyn meta gaussian center')
       call assert_real (metahhist(1),hbias,1.0d-12,
      &                  'elmdadyn meta gaussian height')
-      call assert_real (metawhist(1),wlmda,1.0d-12,
+      call assert_real (metawhist(1),wlhist,1.0d-12,
      &                  'elmdadyn meta gaussian width')
       call assert_int (metaihist(1),lmdaintv,
      &                 'elmdadyn meta gaussian step stamp')
@@ -1696,8 +1727,9 @@ c     #############################################################
 c
 c
 c     "test_eost_metatemper" drives several deposit intervals with
-c     tempering enabled and checks the deposited heights and the
-c     accumulated metadynamics grid
+c     tempering enabled and checks the deposited heights and widths
+c     and the accumulated metadynamics grid; a local tempering request
+c     must not change the heights, which follow the global level only
 c
 c
       subroutine test_eost_metatemper
@@ -1731,6 +1763,15 @@ c
       use_ostgtemp = .true.
       ostgthresh = 0.5d0
       ostgtempgamma = 1.0d0
+      wlhist = 0.3d0
+      maxwlhist = wlhist
+      oststdev = 100.0d0
+c
+c     a low local threshold would lower the heights if it were used
+c
+      use_ostltemp = .true.
+      ostlthresh = 0.01d0
+      ostltempgamma = 1.0d0
       lmdastep = 0
       do istep = 1, ndep*lmdaintv
          lambda = 0.5d0
@@ -1753,7 +1794,10 @@ c
      &                     1.0d-12,'elmdadyn meta tempered height')
          call assert_logical (metahhist(k).lt.metahhist(k-1),.true.,
      &                        'elmdadyn meta heights decay')
+         call assert_real (metawhist(k),wlhist,1.0d-12,
+     &                     'elmdadyn meta width from wlhist')
       end do
+      use_ostltemp = .false.
 c
 c     the grid matches the direct sum at each bin center, and the
 c     interpolation reproduces it exactly at those nodes
@@ -1825,6 +1869,156 @@ c
          else
             refvstar = min(refvstar,v)
          end if
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_eost_metacut  --  metadynamics bin lookup  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_eost_metacut" spreads gaussians of several widths over the
+c     lambda range, including the end bins, and checks that the bias
+c     found through the bin lookup, the grid built bin by bin and the
+c     bias of a partly replayed history all match a direct sum over
+c     every gaussian and image within the cutoff
+c
+c
+      subroutine test_eost_metacut
+      use dlmda
+      use ost
+      implicit none
+      integer i,t
+      integer il,ng
+      real*8 lmda
+      real*8 vbias,dvdl
+      real*8 vref,dref
+      real*8 dvmax,ddmax
+      real*8 cen(6),hgt(6),wid(6)
+      data cen / 0.0d0,0.02d0,0.33d0,0.5d0,0.97d0,1.0d0 /
+      data hgt / 1.0d0,2.0d0,0.5d0,3.0d0,1.5d0,0.7d0 /
+      data wid / 0.05d0,0.1d0,0.2d0,0.08d0,0.15d0,0.03d0 /
+c
+c
+c     six gaussians on a grid of 21 lambda bins with a cutoff of three
+c     widths, which reaches across several bins for the widest
+c
+      call resetost (21,5,1)
+      ng = 6
+      call resetmeta (ng)
+      nmetahist = ng
+      maxwlhist = 0.0d0
+      do i = 1, ng
+         metalhist(i) = cen(i)
+         metahhist(i) = hgt(i)
+         metawhist(i) = wid(i)
+         metaihist(i) = i
+         maxwlhist = max(maxwlhist,wid(i))
+      end do
+      oststdev = 3.0d0
+      ostinterpol = .false.
+      call buildmetaindex
+c
+c     the lookup sum matches the direct sum across lambda
+c
+      dvmax = 0.0d0
+      ddmax = 0.0d0
+      do t = 0, 40
+         lmda = 0.025d0 * dble(t)
+         call emetabias (lmda,vbias,dvdl)
+         call brutemeta (lmda,ng,vref,dref)
+         dvmax = max(dvmax,abs(vbias-vref))
+         ddmax = max(ddmax,abs(dvdl-dref))
+      end do
+      call assert_real (dvmax,0.0d0,1.0d-11,
+     &                  'emetabias lookup matches direct value')
+      call assert_real (ddmax,0.0d0,1.0d-10,
+     &                  'emetabias lookup matches direct slope')
+c
+c     the grid built within the cutoff matches the direct sum
+c
+      do il = 1, nlmda
+         vmetagrid(il) = 0.0d0
+         dvmetagrid(il) = 0.0d0
+      end do
+      do i = 1, ng
+         call addmetagrid (i)
+      end do
+      dvmax = 0.0d0
+      ddmax = 0.0d0
+      do il = 1, nlmda
+         lmda = dble(il-1) * wlmda
+         call brutemeta (lmda,ng,vref,dref)
+         dvmax = max(dvmax,abs(vmetagrid(il)-vref))
+         ddmax = max(ddmax,abs(dvmetagrid(il)-dref))
+      end do
+      call assert_real (dvmax,0.0d0,1.0d-11,
+     &                  'addmetagrid cutoff matches direct value')
+      call assert_real (ddmax,0.0d0,1.0d-10,
+     &                  'addmetagrid cutoff matches direct slope')
+c
+c     a partly replayed history counts only its first gaussians
+c
+      nmetahist = 3
+      dvmax = 0.0d0
+      do t = 0, 40
+         lmda = 0.025d0 * dble(t)
+         call emetabias (lmda,vbias,dvdl)
+         call brutemeta (lmda,3,vref,dref)
+         dvmax = max(dvmax,abs(vbias-vref))
+      end do
+      call assert_real (dvmax,0.0d0,1.0d-11,
+     &                  'emetabias partial history value')
+      nmetahist = ng
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine brutemeta  --  direct metadynamics cutoff  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "brutemeta" sums the first "upto" saved metadynamics gaussians
+c     and their two images directly at one lambda, keeping only the
+c     terms within the cutoff of "oststdev" widths
+c
+c
+      subroutine brutemeta (lmda,upto,v,d)
+      use math
+      use ost
+      implicit none
+      integer upto
+      integer j,m
+      real*8 lmda,v,d
+      real*8 delta,bias
+      real*8 sig,sig2,pref
+      real*8 src(3)
+c
+c
+      v = 0.0d0
+      d = 0.0d0
+      do j = 1, upto
+         sig = metawhist(j)
+         sig2 = sig * sig
+         pref = metahhist(j) / (sig*sqrt(2.0d0*pi))
+         src(1) = metalhist(j)
+         src(2) = -metalhist(j)
+         src(3) = 2.0d0 - metalhist(j)
+         do m = 1, 3
+            delta = lmda - src(m)
+            if (abs(delta) .le. oststdev*sig) then
+               bias = pref * exp(-0.5d0*delta*delta/sig2)
+               v = v + bias
+               d = d - delta*bias/sig2
+            end if
+         end do
       end do
       return
       end
@@ -2480,8 +2674,8 @@ c     ##                                                ##
 c     ####################################################
 c
 c
-c     "resetmeta" allocates metadynamics history arrays
-c     and clears their contents for a test case
+c     "resetmeta" allocates metadynamics history arrays and the bin
+c     lookup, and clears their contents for a test case
 c
 c
       subroutine resetmeta (nhist)
@@ -2498,6 +2692,8 @@ c
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
+      if (allocated(metanext))  deallocate (metanext)
+      if (allocated(metahead))  deallocate (metahead)
       if (allocated(vmetagrid))  deallocate (vmetagrid)
       if (allocated(dvmetagrid))  deallocate (dvmetagrid)
       sizemetahist = nhist
@@ -2506,6 +2702,8 @@ c
       allocate (metalhist(sizemetahist))
       allocate (metahhist(sizemetahist))
       allocate (metawhist(sizemetahist))
+      allocate (metanext(sizemetahist))
+      allocate (metahead(nlmda))
       allocate (vmetagrid(nlmda))
       allocate (dvmetagrid(nlmda))
       do i = 1, sizemetahist
@@ -2513,8 +2711,10 @@ c
          metalhist(i) = 0.0d0
          metahhist(i) = 0.0d0
          metawhist(i) = 0.0d0
+         metanext(i) = 0
       end do
       do i = 1, nlmda
+         metahead(i) = 0
          vmetagrid(i) = 0.0d0
          dvmetagrid(i) = 0.0d0
       end do

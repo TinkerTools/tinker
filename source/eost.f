@@ -148,27 +148,41 @@ c
 c
 c     "metadeposit" records one interval of lambda metadynamics as a
 c     gaussian centered on the interval lambda average, then updates
-c     the bias grid and the free energy estimate
+c     the bin lookup, the bias grid and the free energy estimate
+c
+c     note only the global tempering factor is applied, since the
+c     free energy is read from the bias itself, and a local factor
+c     would keep the bias from filling barriers above its threshold
 c
 c
       subroutine metadeposit
       use dlmda
       use ost
       implicit none
+      integer ilmda
+      integer lmdabin
+      real*8 vglobal
       real*8 metadeltag
       real*8 metavminimax
       real*8 temperedheight
 c
 c
-c     save the new gaussian and add it to the bias grid
+c     save the new gaussian with the global tempering factor alone
 c
       nmetahist = nmetahist + 1
       if (nmetahist .gt. sizemetahist)  call resizemeta
+      vglobal = metavminimax ()
       metalhist(nmetahist) = lmdaavg
-      metahhist(nmetahist) = temperedheight(metavminimax(),
-     &                                      metavminimax())
-      metawhist(nmetahist) = wlmda
+      metahhist(nmetahist) = temperedheight(vglobal,vglobal)
+      metawhist(nmetahist) = wlhist
       metaihist(nmetahist) = lmdastep
+      maxwlhist = max(maxwlhist,wlhist)
+c
+c     link the gaussian into its lambda bin, then add it to the grid
+c
+      ilmda = lmdabin(lmdaavg)
+      metanext(nmetahist) = metahead(ilmda)
+      metahead(ilmda) = nmetahist
       call addmetagrid (nmetahist)
       lmdadeltag = metadeltag()
       return
@@ -302,18 +316,31 @@ c     sum of one-dimensional normalized metadynamics gaussians, each
 c     counted along with its two images reflected at the lambda end
 c     points so that the bias has no gradient through the walls
 c
+c     note only gaussians in the lambda bins within the cutoff of
+c     "oststdev" widths are visited, through the bin lookup, and only
+c     the first "nmetahist" gaussians are counted, so a history being
+c     replayed gaussian by gaussian gives the bias at each stage
+c
 c
       subroutine emetabias (lambda,vbias,dvdl)
+      use dlmda
       use math
       use ost
       implicit none
-      integer ihist,img
+      integer ihist
+      integer img,nimg
+      integer ilmda,klmda
+      integer lcenter,lcount
+      integer nlcut
+      integer lmdabin
+      integer nbincut
       real*8 lambda
       real*8 vbias,dvdl
       real*8 delta
       real*8 sig,sig2
       real*8 bias,pref
-      real*8 src(3)
+      real*8 source
+      real*8 lmdaimgsrc
 c
 c
 c     initialize metadynamics bias and derivative
@@ -328,21 +355,37 @@ c
          return
       end if
 c
-c     loop over saved metadynamics gaussians and their images
+c     use the largest gaussian width for a conservative bin cutoff
 c
-      do ihist = 1, nmetahist
-         sig = metawhist(ihist)
-         if (sig .gt. 0.0d0) then
-            sig2 = sig * sig
-            pref = metahhist(ihist) / (sig*sqrt(2.0d0*pi))
-            src(1) = metalhist(ihist)
-            src(2) = -metalhist(ihist)
-            src(3) = 2.0d0 - metalhist(ihist)
-            do img = 1, 3
-               delta = lambda - src(img)
-               bias = pref * exp(-0.5d0*delta*delta/sig2)
-               vbias = vbias + bias
-               dvdl = dvdl - delta*bias/sig2
+      ilmda = lmdabin(lambda)
+      nlcut = nbincut(oststdev*maxwlhist,wlmda) + 1
+c
+c     loop over nearby lambda bins and their mirror images
+c
+      do klmda = -nlcut, nlcut
+         lcenter = ilmda + klmda
+         call lmdaimgbin (lcenter,lcount,nimg)
+c
+c     add each gaussian of the bin with the image it stands for
+c
+         if (lcount.ge.1 .and. lcount.le.nlmda) then
+            ihist = metahead(lcount)
+            do while (ihist .ne. 0)
+               sig = metawhist(ihist)
+               if (ihist.le.nmetahist .and. sig.gt.0.0d0) then
+                  sig2 = sig * sig
+                  pref = metahhist(ihist) / (sig*sqrt(2.0d0*pi))
+                  do img = 1, nimg
+                     source = lmdaimgsrc(lcenter,img,metalhist(ihist))
+                     delta = lambda - source
+                     if (abs(delta) .le. oststdev*sig) then
+                        bias = pref * exp(-0.5d0*delta*delta/sig2)
+                        vbias = vbias + bias
+                        dvdl = dvdl - delta*bias/sig2
+                     end if
+                  end do
+               end if
+               ihist = metanext(ihist)
             end do
          end if
       end do
@@ -431,7 +474,7 @@ c
 c
 c     "addmetagrid" adds one deposited metadynamics gaussian and its
 c     two reflected images to the bias and derivative values stored
-c     at the lambda bin centers
+c     at the lambda bin centers within the cutoff of "oststdev" widths
 c
 c
       subroutine addmetagrid (ihist)
@@ -441,9 +484,11 @@ c
       implicit none
       integer ihist
       integer il,img
+      integer il1,il2
       real*8 lambda,delta
       real*8 sig,sig2
       real*8 bias,pref
+      real*8 cut,x1,x2
       real*8 src(3)
 c
 c
@@ -453,20 +498,71 @@ c
       if (sig .le. 0.0d0)  return
       sig2 = sig * sig
       pref = metahhist(ihist) / (sig*sqrt(2.0d0*pi))
+      cut = oststdev * sig
       src(1) = metalhist(ihist)
       src(2) = -metalhist(ihist)
       src(3) = 2.0d0 - metalhist(ihist)
 c
-c     spread the gaussian over every lambda bin center
+c     spread the gaussian and its images over the bin centers
+c     within the cutoff
 c
-      do il = 1, nlmda
-         lambda = dble(il-1) * wlmda
-         do img = 1, 3
-            delta = lambda - src(img)
-            bias = pref * exp(-0.5d0*delta*delta/sig2)
-            vmetagrid(il) = vmetagrid(il) + bias
-            dvmetagrid(il) = dvmetagrid(il) - delta*bias/sig2
-         end do
+      do img = 1, 3
+         x1 = (src(img)-cut)/wlmda + 1.0d0
+         x2 = (src(img)+cut)/wlmda + 1.0d0
+         if (x1.le.dble(nlmda) .and. x2.ge.1.0d0) then
+            il1 = int(max(1.0d0,x1))
+            il2 = min(nlmda,int(min(dble(nlmda),x2))+1)
+            do il = il1, il2
+               lambda = dble(il-1) * wlmda
+               delta = lambda - src(img)
+               if (abs(delta) .le. cut) then
+                  bias = pref * exp(-0.5d0*delta*delta/sig2)
+                  vmetagrid(il) = vmetagrid(il) + bias
+                  dvmetagrid(il) = dvmetagrid(il) - delta*bias/sig2
+               end if
+            end do
+         end if
+      end do
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine buildmetaindex -- build metadynamics bin lookup  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "buildmetaindex" rebuilds the linked-list lookup of the saved
+c     metadynamics gaussians by lambda bin, in the order deposited
+c
+c
+      subroutine buildmetaindex
+      use dlmda
+      use ost
+      implicit none
+      integer i
+      integer ihist
+      integer ilmda
+      integer lmdabin
+c
+c
+c     clear the bin heads and next links
+c
+      do i = 1, nlmda
+         metahead(i) = 0
+      end do
+      do i = 1, sizemetahist
+         metanext(i) = 0
+      end do
+c
+c     insert each saved gaussian into its lambda bin
+c
+      do ihist = 1, nmetahist
+         ilmda = lmdabin(metalhist(ihist))
+         metanext(ihist) = metahead(ilmda)
+         metahead(ilmda) = ihist
       end do
       return
       end
@@ -481,19 +577,22 @@ c
 c
 c     "metadeltag" returns G(1)-G(0) = -Vbias(1) + Vbias(0)
 c
+c     note the end point bias is read from the grid, which holds the
+c     exact bias at the bin centers for every gaussian added so far
+c
 c
       function metadeltag ()
+      use dlmda
+      use ost
       implicit none
       real*8 metadeltag
-      real*8 vbias0,vbias1
-      real*8 dvdl
 c
 c
-c     evaluate endpoint metadynamics bias values
+c     take the end point metadynamics bias values from the grid
 c
-      call emetabias (0.0d0,vbias0,dvdl)
-      call emetabias (1.0d0,vbias1,dvdl)
-      metadeltag = -vbias1 + vbias0
+      metadeltag = 0.0d0
+      if (.not. allocated(vmetagrid))  return
+      metadeltag = -vmetagrid(nlmda) + vmetagrid(1)
       return
       end
 c
@@ -511,56 +610,36 @@ c
       subroutine resizemeta
       use ost
       implicit none
-      integer i
       integer oldsize,newsize
-      integer, allocatable :: metaihist0(:)
-      real*8, allocatable :: metalhist0(:)
-      real*8, allocatable :: metahhist0(:)
-      real*8, allocatable :: metawhist0(:)
+      integer, allocatable :: itmp(:)
+      real*8, allocatable :: rtmp(:)
 c
 c
-c     save old metadynamics history
+c     grow each array, keeping the saved entries and zeroing the rest
 c
       oldsize = sizemetahist
       newsize = 2 * oldsize
-      allocate (metalhist0(oldsize))
-      allocate (metahhist0(oldsize))
-      allocate (metawhist0(oldsize))
-      allocate (metaihist0(oldsize))
-      do i = 1, oldsize
-         metalhist0(i) = metalhist(i)
-         metahhist0(i) = metahhist(i)
-         metawhist0(i) = metawhist(i)
-         metaihist0(i) = metaihist(i)
-      end do
-c
-c     allocate resized metadynamics history
-c
-      deallocate (metalhist)
-      deallocate (metahhist)
-      deallocate (metawhist)
-      deallocate (metaihist)
+      allocate (rtmp(newsize))
+      rtmp(1:oldsize) = metalhist(1:oldsize)
+      rtmp(oldsize+1:newsize) = 0.0d0
+      call move_alloc (rtmp,metalhist)
+      allocate (rtmp(newsize))
+      rtmp(1:oldsize) = metahhist(1:oldsize)
+      rtmp(oldsize+1:newsize) = 0.0d0
+      call move_alloc (rtmp,metahhist)
+      allocate (rtmp(newsize))
+      rtmp(1:oldsize) = metawhist(1:oldsize)
+      rtmp(oldsize+1:newsize) = 0.0d0
+      call move_alloc (rtmp,metawhist)
+      allocate (itmp(newsize))
+      itmp(1:oldsize) = metaihist(1:oldsize)
+      itmp(oldsize+1:newsize) = 0
+      call move_alloc (itmp,metaihist)
+      allocate (itmp(newsize))
+      itmp(1:oldsize) = metanext(1:oldsize)
+      itmp(oldsize+1:newsize) = 0
+      call move_alloc (itmp,metanext)
       sizemetahist = newsize
-      allocate (metalhist(sizemetahist))
-      allocate (metahhist(sizemetahist))
-      allocate (metawhist(sizemetahist))
-      allocate (metaihist(sizemetahist))
-      do i = 1, oldsize
-         metalhist(i) = metalhist0(i)
-         metahhist(i) = metahhist0(i)
-         metawhist(i) = metawhist0(i)
-         metaihist(i) = metaihist0(i)
-      end do
-      do i = oldsize+1, newsize
-         metalhist(i) = 0.0d0
-         metahhist(i) = 0.0d0
-         metawhist(i) = 0.0d0
-         metaihist(i) = 0
-      end do
-      deallocate (metalhist0)
-      deallocate (metahhist0)
-      deallocate (metawhist0)
-      deallocate (metaihist0)
       return
       end
 c
@@ -607,10 +686,7 @@ c     include the full gaussian tail plus a buffer on each side
 c
       nchunk = 100
       nbuffer = nchunk
-      nfcut = int(oststdev*maxwfhist/wflmda)
-      if (dble(nfcut)*wflmda .lt. oststdev*maxwfhist+wflmda2)
-     &   nfcut = nfcut + 1
-      nfcut = nfcut + nbuffer
+      nfcut = int(oststdev*maxwfhist/wflmda) + 1 + nbuffer
       if (iflmda-nfcut .ge. 1 .and.
      &    iflmda+nfcut .le. nflmda)  return
 c
@@ -710,7 +786,8 @@ c
       integer flcenter
       integer nlcut,nfcut
       integer img,nimg
-      integer lmdabin,flambdabin
+      integer lmdabin
+      integer nbincut
       real*8 egbias,dgdl,dgdfl
       real*8 sigl,sigf
       real*8 sigl2,sigf2
@@ -720,6 +797,8 @@ c
       real*8 ldelta,ldelta2
       real*8 fldelta,fldelta2
       real*8 bias,expl,expfl
+      real*8 lmdaimgsrc
+      logical getexpfl
 c
 c
 c     initialize bias and derivatives
@@ -736,25 +815,14 @@ c
 c
 c     use max gaussian widths for conservative bin cutoffs
 c
-      nlcut = int(oststdev*maxwlhist/wlmda)
-      if (dble(nlcut)*wlmda .lt. oststdev*maxwlhist)
-     &   nlcut = nlcut + 1
-      nlcut = nlcut + 1
-      nfcut = int(oststdev*maxwfhist/wflmda)
-      if (dble(nfcut)*wflmda .lt. oststdev*maxwfhist)
-     &   nfcut = nfcut + 1
-      nfcut = nfcut + 1
+      nlcut = nbincut(oststdev*maxwlhist,wlmda) + 1
+      nfcut = nbincut(oststdev*maxwfhist,wflmda) + 1
 c
 c     loop over nearby lambda bins and their mirror images
 c
       do klmda = -nlcut, nlcut
          lcenter = ilmda + klmda
-         lcount = lcenter
-         if (lcount .lt. 1) then
-            lcount = 2 - lcount
-         else if (lcount .gt. nlmda) then
-            lcount = 2*nlmda - lcount
-         end if
+         call lmdaimgbin (lcenter,lcount,nimg)
 c
 c     loop over nearby flambda bins without mirror images
 c
@@ -775,27 +843,20 @@ c
                         sigf2inv = 1.0d0 / sigf2
                         pref = osthhist(ihist)
      &                            / (2.0d0*pi*sigl*sigf)
-                        fldelta2 = fldelta * fldelta
-                        expfl = exp(-0.5d0*fldelta2*sigf2inv)
-                        nimg = 1
-                        if (lcenter .eq. 1 .or.
-     &                      lcenter .eq. nlmda)  nimg = 2
+                        getexpfl = .true.
                         do img = 1, nimg
-                           if (lcenter .lt. 1) then
-                              sourcel = -lmdalhist(ihist)
-                           else if (lcenter .gt. nlmda) then
-                              sourcel = 2.0d0 - lmdalhist(ihist)
-                           else if (img .eq. 2 .and.
-     &                              lcenter .eq. 1) then
-                              sourcel = -lmdalhist(ihist)
-                           else if (img .eq. 2 .and.
-     &                              lcenter .eq. nlmda) then
-                              sourcel = 2.0d0 - lmdalhist(ihist)
-                           else
-                              sourcel = lmdalhist(ihist)
-                           end if
+                           sourcel = lmdaimgsrc(lcenter,img,
+     &                                          lmdalhist(ihist))
                            ldelta = lambda - sourcel
                            if (abs(ldelta) .le. oststdev*sigl) then
+c
+c     the flambda factor is found once, when an image first counts
+c
+                              if (getexpfl) then
+                                 fldelta2 = fldelta * fldelta
+                                 expfl = exp(-0.5d0*fldelta2*sigf2inv)
+                                 getexpfl = .false.
+                              end if
                               ldelta2 = ldelta * ldelta
                               expl = exp(-0.5d0*ldelta2*sigl2inv)
                               bias = pref * expl * expfl
@@ -972,92 +1033,49 @@ c
       use dlmda
       use ost
       implicit none
-      integer i
       integer oldsize
       integer newsize
-      integer, allocatable :: osthist0(:)
-      integer, allocatable :: lmdaihist0(:)
-      integer, allocatable :: ostnext0(:)
-      real*8, allocatable :: lmdalhist0(:)
-      real*8, allocatable :: lmdafhist0(:)
-      real*8, allocatable :: osthhist0(:)
-      real*8, allocatable :: ostwlhist0(:)
-      real*8, allocatable :: ostwfhist0(:)
+      integer, allocatable :: itmp(:)
+      real*8, allocatable :: rtmp(:)
 c
 c
-c     save the old histogram data and set the new size
+c     grow each array, keeping the saved entries and zeroing the rest
 c
       oldsize = sizelmdahist
       newsize = 2 * oldsize
-      allocate (osthist0(oldsize))
-      allocate (lmdaihist0(oldsize))
-      allocate (ostnext0(oldsize))
-      allocate (lmdalhist0(oldsize))
-      allocate (lmdafhist0(oldsize))
-      allocate (osthhist0(oldsize))
-      allocate (ostwlhist0(oldsize))
-      allocate (ostwfhist0(oldsize))
-      do i = 1, oldsize
-         osthist0(i) = osthist(i)
-         lmdaihist0(i) = lmdaihist(i)
-         ostnext0(i) = ostnext(i)
-         lmdalhist0(i) = lmdalhist(i)
-         lmdafhist0(i) = lmdafhist(i)
-         osthhist0(i) = osthhist(i)
-         ostwlhist0(i) = ostwlhist(i)
-         ostwfhist0(i) = ostwfhist(i)
-      end do
-c
-c     allocate and initialize the resized histogram arrays
-c
-      deallocate (osthist)
-      deallocate (lmdaihist)
-      deallocate (ostnext)
-      deallocate (lmdalhist)
-      deallocate (lmdafhist)
-      deallocate (osthhist)
-      deallocate (ostwlhist)
-      deallocate (ostwfhist)
+      allocate (itmp(newsize))
+      itmp(1:oldsize) = osthist(1:oldsize)
+      itmp(oldsize+1:newsize) = 0
+      call move_alloc (itmp,osthist)
+      allocate (itmp(newsize))
+      itmp(1:oldsize) = lmdaihist(1:oldsize)
+      itmp(oldsize+1:newsize) = 0
+      call move_alloc (itmp,lmdaihist)
+      allocate (itmp(newsize))
+      itmp(1:oldsize) = ostnext(1:oldsize)
+      itmp(oldsize+1:newsize) = 0
+      call move_alloc (itmp,ostnext)
+      allocate (rtmp(newsize))
+      rtmp(1:oldsize) = lmdalhist(1:oldsize)
+      rtmp(oldsize+1:newsize) = 0.0d0
+      call move_alloc (rtmp,lmdalhist)
+      allocate (rtmp(newsize))
+      rtmp(1:oldsize) = lmdafhist(1:oldsize)
+      rtmp(oldsize+1:newsize) = 0.0d0
+      call move_alloc (rtmp,lmdafhist)
+      allocate (rtmp(newsize))
+      rtmp(1:oldsize) = osthhist(1:oldsize)
+      rtmp(oldsize+1:newsize) = 0.0d0
+      call move_alloc (rtmp,osthhist)
+      allocate (rtmp(newsize))
+      rtmp(1:oldsize) = ostwlhist(1:oldsize)
+      rtmp(oldsize+1:newsize) = 0.0d0
+      call move_alloc (rtmp,ostwlhist)
+      allocate (rtmp(newsize))
+      rtmp(1:oldsize) = ostwfhist(1:oldsize)
+      rtmp(oldsize+1:newsize) = 0.0d0
+      call move_alloc (rtmp,ostwfhist)
       sizelmdahist = newsize
-      allocate (osthist(sizelmdahist))
-      allocate (lmdaihist(sizelmdahist))
-      allocate (ostnext(sizelmdahist))
-      allocate (lmdalhist(sizelmdahist))
-      allocate (lmdafhist(sizelmdahist))
-      allocate (osthhist(sizelmdahist))
-      allocate (ostwlhist(sizelmdahist))
-      allocate (ostwfhist(sizelmdahist))
-c
-c     restore old histogram data into the resized arrays
-c
-      do i = 1, oldsize
-         osthist(i) = osthist0(i)
-         lmdaihist(i) = lmdaihist0(i)
-         ostnext(i) = ostnext0(i)
-         lmdalhist(i) = lmdalhist0(i)
-         lmdafhist(i) = lmdafhist0(i)
-         osthhist(i) = osthhist0(i)
-         ostwlhist(i) = ostwlhist0(i)
-         ostwfhist(i) = ostwfhist0(i)
-      end do
-      do i = oldsize+1, newsize
-         osthist(i) = 0
-         lmdaihist(i) = 0
-         ostnext(i) = 0
-         lmdalhist(i) = 0.0d0
-         lmdafhist(i) = 0.0d0
-         osthhist(i) = 0.0d0
-         ostwlhist(i) = 0.0d0
-         ostwfhist(i) = 0.0d0
-      end do
-      deallocate (osthist0)
-      deallocate (lmdaihist0)
-      deallocate (ostnext0)
-      deallocate (lmdalhist0)
-      deallocate (lmdafhist0)
-      deallocate (osthhist0)
-      deallocate (ostwlhist0)
-      deallocate (ostwfhist0)
       return
       end
 c
@@ -1141,7 +1159,7 @@ c
 c     loop over saved histogram sources
 c
       do ihist = 1, nlmdahist
-         call addgkernelhist (ihist)
+         call addkernelhist (ihist,.false.)
       end do
       return
       end
@@ -1184,7 +1202,7 @@ c
 c     loop over saved histogram sources
 c
       do ihist = 1, nlmdahist
-         call addkernelhist (ihist)
+         call addkernelhist (ihist,.true.)
       end do
       return
       end
@@ -1208,7 +1226,7 @@ c
 c
 c     add the most recently saved histogram source
 c
-      if (nlmdahist .gt. 0)  call addgkernelhist (nlmdahist)
+      if (nlmdahist .gt. 0)  call addkernelhist (nlmdahist,.false.)
       return
       end
 c
@@ -1231,108 +1249,7 @@ c
 c
 c     add the most recently saved histogram source
 c
-      if (nlmdahist .gt. 0)  call addkernelhist (nlmdahist)
-      return
-      end
-c
-c
-c     #############################################################
-c     ##                                                         ##
-c     ##  subroutine addgkernelhist -- add one histogram source  ##
-c     ##                                                         ##
-c     #############################################################
-c
-c
-c     "addgkernelhist" spreads one saved histogram source to the
-c     ost g kernel using normalized gaussian biasing functions
-c
-c
-      subroutine addgkernelhist (ihist)
-      use dlmda
-      use ost
-      use math
-      implicit none
-      integer ihist
-      integer k
-      integer lsrc,fsrc
-      integer ilmda,iflmda
-      integer img,llog
-      integer ilmda1,ilmda2
-      integer iflmda1,iflmda2
-      integer nlcut,nfcut
-      real*8 sigl,sigf
-      real*8 sigl2,sigf2
-      real*8 pref
-      real*8 sourcel,sourcefl
-      real*8 targetl,targetf
-      real*8 ldelta,ldelta2
-      real*8 fldelta,fldelta2
-      real*8 e,expl,expfl
-c
-c
-c     unpack saved source location and get gaussian parameters
-c
-      k = osthist(ihist)
-      call k_to_ij (k,nlmda,lsrc,fsrc)
-      sigl = ostwlhist(ihist)
-      sigf = ostwfhist(ihist)
-      sigl2 = sigl * sigl
-      sigf2 = sigf * sigf
-      pref = osthhist(ihist) / (2.0d0*pi*sigl*sigf)
-      sourcefl = lmdafhist(ihist)
-c
-c     include target bins out to the requested gaussian cutoff
-c
-      nlcut = int(oststdev*sigl/wlmda)
-      if (dble(nlcut)*wlmda .lt. oststdev*sigl+wlmda2)
-     &   nlcut = nlcut + 1
-      nfcut = int(oststdev*sigf/wflmda)
-      if (dble(nfcut)*wflmda .lt. oststdev*sigf+wflmda2)
-     &   nfcut = nfcut + 1
-      iflmda1 = max(1,fsrc-nfcut)
-      iflmda2 = min(nflmda,fsrc+nfcut)
-c
-c     use the physical lambda source plus its two mirror images
-c
-      do img = 1, 3
-         if (img .eq. 1) then
-            llog = lsrc
-            sourcel = lmdalhist(ihist)
-         else if (img .eq. 2) then
-            llog = 2 - lsrc
-            sourcel = -lmdalhist(ihist)
-         else
-            llog = 2*nlmda - lsrc
-            sourcel = 2.0d0 - lmdalhist(ihist)
-         end if
-c
-c     only target bins within the gaussian cutoff receive a contribution
-c
-         ilmda1 = max(1,llog-nlcut)
-         ilmda2 = min(nlmda,llog+nlcut)
-         if (ilmda1 .le. ilmda2) then
-            do ilmda = ilmda1, ilmda2
-               targetl = dble(ilmda-1) * wlmda
-               ldelta = targetl - sourcel
-               if (abs(ldelta) .gt. oststdev*sigl)  goto 10
-               ldelta2 = ldelta*ldelta
-               expl = exp(-ldelta2 / (2.0d0*sigl2))
-               do iflmda = iflmda1, iflmda2
-                  targetf = dble(iflmda-fli0) * wflmda
-                  fldelta = targetf - sourcefl
-                  if (abs(fldelta) .gt. oststdev*sigf)  goto 20
-                  fldelta2 = fldelta*fldelta
-                  expfl = exp(-fldelta2 / (2.0d0*sigf2))
-                  e = pref * expl * expfl
-                  gkernel(ilmda,iflmda) = gkernel(ilmda,iflmda) + e
-                  vkernelmax(ilmda) = max(vkernelmax(ilmda),
-     &                                    gkernel(ilmda,iflmda))
-   20             continue
-               end do
-   10          continue
-            end do
-         end if
-      end do
+      if (nlmdahist .gt. 0)  call addkernelhist (nlmdahist,.true.)
       return
       end
 c
@@ -1344,14 +1261,19 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "addkernelhist" spreads one saved histogram source to the
-c     ost g kernel and updates the f kernel accumulators
+c     "addkernelhist" spreads one saved histogram source to the ost
+c     g kernel using normalized gaussian biasing functions; when
+c     "dofkern" is set it also updates the g kernel derivatives and
+c     the f kernel accumulators, otherwise only the g kernel and its
+c     running maxima
 c
 c
-      subroutine addkernelhist (ihist)
+      subroutine addkernelhist (ihist,dofkern)
+      use bath
       use dlmda
       use ost
       use math
+      use units
       implicit none
       integer ihist
       integer k
@@ -1361,14 +1283,16 @@ c
       integer ilmda1,ilmda2
       integer iflmda1,iflmda2
       integer nlcut,nfcut
+      integer nbincut
       real*8 sigl,sigf
       real*8 sigl2,sigf2
-      real*8 pref
+      real*8 pref,rt
       real*8 sourcel,sourcefl
       real*8 targetl,targetf
       real*8 ldelta,ldelta2
       real*8 fldelta,fldelta2
       real*8 e,expl,expfl
+      logical dofkern
 c
 c
 c     unpack saved source location and get gaussian parameters
@@ -1381,15 +1305,12 @@ c
       sigf2 = sigf * sigf
       pref = osthhist(ihist) / (2.0d0*pi*sigl*sigf)
       sourcefl = lmdafhist(ihist)
+      rt = gasconst * kelvin
 c
 c     include target bins out to the requested gaussian cutoff
 c
-      nlcut = int(oststdev*sigl/wlmda)
-      if (dble(nlcut)*wlmda .lt. oststdev*sigl+wlmda2)
-     &   nlcut = nlcut + 1
-      nfcut = int(oststdev*sigf/wflmda)
-      if (dble(nfcut)*wflmda .lt. oststdev*sigf+wflmda2)
-     &   nfcut = nfcut + 1
+      nlcut = nbincut(oststdev*sigl,wlmda)
+      nfcut = nbincut(oststdev*sigf,wflmda)
       iflmda1 = max(1,fsrc-nfcut)
       iflmda2 = min(nflmda,fsrc+nfcut)
 c
@@ -1411,27 +1332,41 @@ c     only target bins within the gaussian cutoff receive a contribution
 c
          ilmda1 = max(1,llog-nlcut)
          ilmda2 = min(nlmda,llog+nlcut)
-         if (ilmda1 .le. ilmda2) then
-            do ilmda = ilmda1, ilmda2
-               targetl = dble(ilmda-1) * wlmda
-               ldelta = targetl - sourcel
-               if (abs(ldelta) .gt. oststdev*sigl)  goto 10
-               ldelta2 = ldelta*ldelta
-               expl = exp(-ldelta2 / (2.0d0*sigl2))
-               do iflmda = iflmda1, iflmda2
-                  targetf = dble(iflmda-fli0) * wflmda
-                  fldelta = targetf - sourcefl
-                  if (abs(fldelta) .gt. oststdev*sigf)  goto 20
-                  fldelta2 = fldelta*fldelta
-                  expfl = exp(-fldelta2 / (2.0d0*sigf2))
-                  e = pref * expl * expfl
+         do ilmda = ilmda1, ilmda2
+            targetl = dble(ilmda-1) * wlmda
+            ldelta = targetl - sourcel
+            if (abs(ldelta) .gt. oststdev*sigl)  goto 10
+            ldelta2 = ldelta*ldelta
+            expl = exp(-ldelta2 / (2.0d0*sigl2))
+            do iflmda = iflmda1, iflmda2
+               targetf = dble(iflmda-fli0) * wflmda
+               fldelta = targetf - sourcefl
+               if (abs(fldelta) .gt. oststdev*sigf)  goto 20
+               fldelta2 = fldelta*fldelta
+               expfl = exp(-fldelta2 / (2.0d0*sigf2))
+               e = pref * expl * expfl
+               if (dofkern) then
                   call addkernelpoint (ilmda,iflmda,e,ldelta,
-     &                                 fldelta,sigl2,sigf2)
-   20             continue
-               end do
-   10          continue
+     &                                 fldelta,sigl2,sigf2,rt)
+               else
+                  gkernel(ilmda,iflmda) = gkernel(ilmda,iflmda) + e
+                  vkernelmax(ilmda) = max(vkernelmax(ilmda),
+     &                                    gkernel(ilmda,iflmda))
+               end if
+   20          continue
             end do
-         end if
+c
+c     set the mean force of the row once all its points are added
+c
+            if (dofkern) then
+               if (lmdafwt(ilmda) .eq. 0.0d0) then
+                  lmdafmean(ilmda) = 0.0d0
+               else
+                  lmdafmean(ilmda) = lmdafsum(ilmda) / lmdafwt(ilmda)
+               end if
+            end if
+   10       continue
+         end do
       end do
       return
       end
@@ -1445,18 +1380,17 @@ c     ##############################################################
 c
 c
 c     "addkernelpoint" updates one g kernel cell and the associated
-c     f kernel numerator and partition-function accumulator
+c     f kernel numerator and partition-function accumulator, given
+c     the thermal energy "rt"; the caller sets the row mean force
 c
 c
       subroutine addkernelpoint (ilmda,iflmda,e,ldelta,
-     &                           fldelta,sigl2,sigf2)
-      use bath
+     &                           fldelta,sigl2,sigf2,rt)
       use dlmda
       use ost
-      use units
       implicit none
       integer ilmda,iflmda
-      real*8 e
+      real*8 e,rt
       real*8 ldelta,fldelta
       real*8 sigl2,sigf2
       real*8 flmda
@@ -1465,6 +1399,7 @@ c
       real*8 delweight
       real*8 scale,vmax
       real*8 dgdl,dgdfl,d2gdlfl
+      logical raised
 c
 c
 c     update the g kernel and adjust the f kernel accumulators
@@ -1473,11 +1408,13 @@ c
       newg = oldg + e
 c
 c     the accumulators carry the largest bias in the row as a common
-c     factor, so they are rescaled whenever this point raises it
+c     factor, so they are rescaled whenever this point raises it, and
+c     the new point then has unit weight
 c
       vmax = vkernelmax(ilmda)
-      if (newg .gt. vmax) then
-         scale = exp((vmax-newg)/(gasconst*kelvin))
+      raised = (newg .gt. vmax)
+      if (raised) then
+         scale = exp((vmax-newg)/rt)
          lmdafsum(ilmda) = lmdafsum(ilmda) * scale
          lmdafwt(ilmda) = lmdafwt(ilmda) * scale
          vmax = newg
@@ -1485,9 +1422,13 @@ c
       if (oldg .eq. 0.0d0) then
          oldweight = 0.0d0
       else
-         oldweight = exp((oldg-vmax)/(gasconst*kelvin))
+         oldweight = exp((oldg-vmax)/rt)
       end if
-      newweight = exp((newg-vmax)/(gasconst*kelvin))
+      if (raised) then
+         newweight = 1.0d0
+      else
+         newweight = exp((newg-vmax)/rt)
+      end if
       delweight = newweight - oldweight
       flmda = dble(iflmda-fli0) * wflmda
       dgdl = -ldelta * e / sigl2
@@ -1500,11 +1441,6 @@ c
       glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
       lmdafsum(ilmda) = lmdafsum(ilmda) + flmda*delweight
       lmdafwt(ilmda) = lmdafwt(ilmda) + delweight
-      if (lmdafwt(ilmda) .eq. 0.0d0) then
-         lmdafmean(ilmda) = 0.0d0
-      else
-         lmdafmean(ilmda) = lmdafsum(ilmda) / lmdafwt(ilmda)
-      end if
       return
       end
 c
@@ -1809,10 +1745,11 @@ c
          ostwfhist(i) = 0.0d0
       end do
 c
-c     start the gaussian width maxima from the keyfile widths
+c     start the gaussian width maxima from the widths saved with
+c     each gaussian
 c
-      maxwlhist = wlhist
-      maxwfhist = wfhist
+      maxwlhist = 0.0d0
+      maxwfhist = 0.0d0
 c
 c     read saved gaussian histogram entries
 c
@@ -2048,74 +1985,31 @@ c
       end
 c
 c
-c     #######################################################
-c     ##                                                   ##
-c     ##  subroutine rdmeta -- input metadynamics history  ##
-c     ##                                                   ##
-c     #######################################################
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine rdmetahist  --  input metadynamics history  ##
+c     ##                                                         ##
+c     #############################################################
 c
 c
-c     "rdmeta" reads a saved metadynamics bias history from the
-c     external .meta file; used for analysis, not to restart a run
+c     "rdmetahist" reads the gaussian history entries that follow the
+c     header of an open .meta file, then closes the file and rebuilds
+c     the bin lookup and the metadynamics bias grid
 c
 c
-      subroutine rdmeta
+      subroutine rdmetahist (ihis,metafile)
       use dlmda
-      use files
       use inform
       use iounit
-      use mutant
       use ost
       implicit none
       integer i,ihis
       integer ihist
-      integer freeunit
       integer trimtext
-      integer lmdastep0,lmdaintv0
-      integer nmetahist0,sizemetahist0
-      real*8 wlmda0
-      real*8 lambda0
-      real*8 lmdatheta0,lmdavtheta0
-      real*8 lmdamass0,lmdafric0,lmdadt0
-      real*8 lmdadeltag0
       real*8 metadeltag
-      logical exist
-      character*240 metafile
       character*240 record
+      character*(*) metafile
 c
-c
-c     return unless a metadynamics history file is present
-c
-      metafile = metasavefile
-      inquire (file=metafile,exist=exist)
-      if (.not. exist)  return
-      ihis = freeunit ()
-      open (unit=ihis,file=metafile,status='old')
-      rewind (unit=ihis)
-c
-c     read scalar metadynamics state
-c
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  lmdastep0,lmdaintv0,
-     &   nmetahist0,sizemetahist0
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  wlmda0
-      read (ihis,10,err=90,end=90)  record
-      read (ihis,10,err=90,end=90)  record
-      read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0,
-     &   lmdamass0,lmdafric0,lmdadt0,lmdadeltag0
-   10 format (a240)
-c
-c     validate the stored dimensions
-c
-      if (lmdaintv0 .lt. 1)  goto 90
-      if (nmetahist0 .lt. 0)  goto 90
-      if (sizemetahist0 .lt. nmetahist0)
-     &   sizemetahist0 = nmetahist0
-      if (sizemetahist0 .lt. 1)  sizemetahist0 = 1
 c
 c     reallocate metadynamics arrays to match the history file
 c
@@ -2123,69 +2017,55 @@ c
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
       if (allocated(metaihist))  deallocate (metaihist)
+      if (allocated(metanext))  deallocate (metanext)
+      if (allocated(metahead))  deallocate (metahead)
       if (allocated(lmdallist))  deallocate (lmdallist)
-      allocate (metalhist(sizemetahist0))
-      allocate (metahhist(sizemetahist0))
-      allocate (metawhist(sizemetahist0))
-      allocate (metaihist(sizemetahist0))
-      allocate (lmdallist(lmdaintv0))
-c
-c     set scalar metadynamics state from the history file; only the
-c     bin width is stored, so recover the bin count that goes with it
-c
-      lmdastep = lmdastep0
-      lmdaintv = lmdaintv0
-      call setlmdaphase
-      nmetahist = nmetahist0
-      sizemetahist = sizemetahist0
-      wlmda = wlmda0
-      wlmda2 = 0.5d0 * wlmda
-      nlmda = nint(1.0d0/wlmda) + 1
-      nlmda = max(2,nlmda)
-c
-c     reallocate the metadynamics grid for the restored bin count
-c
       if (allocated(vmetagrid))  deallocate (vmetagrid)
       if (allocated(dvmetagrid))  deallocate (dvmetagrid)
+      allocate (metalhist(sizemetahist))
+      allocate (metahhist(sizemetahist))
+      allocate (metawhist(sizemetahist))
+      allocate (metaihist(sizemetahist))
+      allocate (metanext(sizemetahist))
+      allocate (metahead(nlmda))
+      allocate (lmdallist(lmdaintv))
       allocate (vmetagrid(nlmda))
       allocate (dvmetagrid(nlmda))
+c
+c     initialize metadynamics arrays
+c
       do i = 1, nlmda
          vmetagrid(i) = 0.0d0
          dvmetagrid(i) = 0.0d0
       end do
-      lambda = lambda0
-      lmdaavg = 0.0d0
-      lmdatheta = lmdatheta0
-      lmdavtheta = lmdavtheta0
-      lmdamass = lmdamass0
-      lmdafric = lmdafric0
-      lmdadt = lmdadt0
-      lmdadeltag = lmdadeltag0
-c
-c     initialize metadynamics arrays
-c
+      do i = 1, lmdaintv
+         lmdallist(i) = 0.0d0
+      end do
       do i = 1, sizemetahist
          metalhist(i) = 0.0d0
          metahhist(i) = 0.0d0
          metawhist(i) = 0.0d0
          metaihist(i) = 0
       end do
-      do i = 1, lmdaintv
-         lmdallist(i) = 0.0d0
-      end do
 c
 c     read saved metadynamics gaussian entries
 c
-      read (ihis,10,err=90,end=90)  record
       do ihist = 1, nmetahist
          read (ihis,10,err=90,end=90)  record
          read (record,*,err=90,end=90)  metaihist(ihist),
      &      metalhist(ihist),metahhist(ihist),metawhist(ihist)
       end do
+   10 format (a240)
       close (unit=ihis)
 c
-c     replay the saved gaussians onto the metadynamics grid
+c     take the gaussian width maximum from the widths saved with each
+c     gaussian, then rebuild the bin lookup and the grid from them
 c
+      maxwlhist = 0.0d0
+      do ihist = 1, nmetahist
+         maxwlhist = max(maxwlhist,metawhist(ihist))
+      end do
+      call buildmetaindex
       do ihist = 1, nmetahist
          call addmetagrid (ihist)
       end do
@@ -2202,9 +2082,9 @@ c
    90 continue
       close (unit=ihis)
       write (iout,30)  metafile(1:trimtext(metafile))
-   30 format (/,' RDMETA  --  Error while Reading Metadynamics',
-     &           ' History File',/,'             File Name :  ',a)
-      use_meta = .false.
+   30 format (/,' RDMETAHIST  --  Error while Reading Metadynamics',
+     &           ' History File',
+     &        /,'                 File Name :  ',a)
       call fatal
       end
 c
@@ -2244,32 +2124,14 @@ c     "prtmetahead" writes the fixed-size metadynamics history header
 c
 c
       subroutine prtmetahead (ihis)
-      use dlmda
-      use mutant
       use ost
       implicit none
       integer ihis
 c
 c
-c     write scalar metadynamics state
+c     write the header under the metadynamics title
 c
-      write (ihis,10)
-      write (ihis,20)
-      write (ihis,30)  lmdastep,lmdaintv,nmetahist,sizemetahist
-      write (ihis,40)
-      write (ihis,50)  wlmda
-      write (ihis,60)
-      write (ihis,70)  lambda,lmdatheta,lmdavtheta,
-     &                 lmdamass,lmdafric,lmdadt,lmdadeltag
-      write (ihis,80)
-   10 format (' Metadynamics History :')
-   20 format (' Integer State :')
-   30 format (4i12)
-   40 format (' Grid State :')
-   50 format (1d26.16)
-   60 format (' Lambda State :')
-   70 format (7d26.16)
-   80 format (' Gaussian History :')
+      call prtbiashead (ihis,metatitle,metalabel)
       return
       end
 c
@@ -2286,56 +2148,14 @@ c     place; unformatted stream output avoids truncating the history
 c
 c
       subroutine updmetahead (ihis)
-      use dlmda
-      use mutant
       use ost
       implicit none
       integer ihis
-      integer ieol
-      integer leol
-      character*240 record
-      character*2 newline
 c
-c     preserve the file's existing line-ending convention
 c
-      read (ihis,pos=1)  record
-      ieol = index(record,achar(10))
-      newline = achar(10)//' '
-      leol = 1
-      if (ieol .gt. 1) then
-         if (record(ieol-1:ieol-1) .eq. achar(13)) then
-            newline = achar(13)//achar(10)
-            leol = 2
-         end if
-      end if
+c     update the header under the metadynamics title
 c
-c     format each header record internally and write its raw bytes
-c
-      write (record,10)
-      write (ihis,pos=1)  record(1:len_trim(record)),newline(1:leol)
-      write (record,20)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,30)  lmdastep,lmdaintv,nmetahist,sizemetahist
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,40)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,50)  wlmda
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,60)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,70)  lambda,lmdatheta,lmdavtheta,
-     &                   lmdamass,lmdafric,lmdadt,lmdadeltag
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-      write (record,80)
-      write (ihis)  record(1:len_trim(record)),newline(1:leol)
-   10 format (' Metadynamics History :')
-   20 format (' Integer State :')
-   30 format (4i12)
-   40 format (' Grid State :')
-   50 format (1d26.16)
-   60 format (' Lambda State :')
-   70 format (7d26.16)
-   80 format (' Gaussian History :')
+      call updbiashead (ihis,metatitle,metalabel)
       return
       end
 c
@@ -2365,6 +2185,104 @@ c
      &      metahhist(ihist),metawhist(ihist)
       end do
    10 format (i12,3d26.16)
+      return
+      end
+c
+c
+c     ####################################################
+c     ##                                                ##
+c     ##  function nbincut -- bins spanned by a cutoff  ##
+c     ##                                                ##
+c     ####################################################
+c
+c
+c     "nbincut" returns the smallest number of bins of the given
+c     width that together span the given cutoff distance
+c
+c
+      function nbincut (cut,width)
+      implicit none
+      integer nbincut
+      real*8 cut,width
+c
+c
+c     round the cutoff in bin widths up to a whole number
+c
+      nbincut = int(cut/width)
+      if (dble(nbincut)*width .lt. cut)  nbincut = nbincut + 1
+      return
+      end
+c
+c
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine lmdaimgbin -- lambda bin of an image  ##
+c     ##                                                   ##
+c     #######################################################
+c
+c
+c     "lmdaimgbin" maps a lambda bin index "lcenter", which may lie
+c     beyond either end of the lambda range, onto the bin "lcount"
+c     whose gaussians have their mirror image in it, and returns in
+c     "nimg" the number of images to count there, two in each end
+c     bin for the gaussian and its reflection, otherwise one
+c
+c
+      subroutine lmdaimgbin (lcenter,lcount,nimg)
+      use dlmda
+      implicit none
+      integer lcenter,lcount
+      integer nimg
+c
+c
+c     reflect the bin index at the lambda end points
+c
+      lcount = lcenter
+      if (lcount .lt. 1) then
+         lcount = 2 - lcount
+      else if (lcount .gt. nlmda) then
+         lcount = 2*nlmda - lcount
+      end if
+      nimg = 1
+      if (lcenter.eq.1 .or. lcenter.eq.nlmda)  nimg = 2
+      return
+      end
+c
+c
+c     ########################################################
+c     ##                                                    ##
+c     ##  function lmdaimgsrc -- lambda center of an image  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+c     "lmdaimgsrc" returns the lambda center of image "img" of a
+c     gaussian centered at "lsrc", as counted in lambda bin "lcenter"
+c     by "lmdaimgbin"; beyond the ends it is the reflected center,
+c     and in an end bin the second image is the reflected one
+c
+c
+      function lmdaimgsrc (lcenter,img,lsrc)
+      use dlmda
+      implicit none
+      integer lcenter,img
+      real*8 lmdaimgsrc
+      real*8 lsrc
+c
+c
+c     choose the physical center or its reflection at an end point
+c
+      if (lcenter .lt. 1) then
+         lmdaimgsrc = -lsrc
+      else if (lcenter .gt. nlmda) then
+         lmdaimgsrc = 2.0d0 - lsrc
+      else if (img.eq.2 .and. lcenter.eq.1) then
+         lmdaimgsrc = -lsrc
+      else if (img.eq.2 .and. lcenter.eq.nlmda) then
+         lmdaimgsrc = 2.0d0 - lsrc
+      else
+         lmdaimgsrc = lsrc
+      end if
       return
       end
 c

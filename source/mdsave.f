@@ -156,12 +156,21 @@ c
       else if (use_metadyn) then
          if (digits .ge. 8) then
             write (iout,110)  lambda
+            write (iout,120)  dedl
+            write (iout,135)  ostbdgdl
+  135       format (' Current dV/dLambda',2x,f19.8,' Kcal/mole')
             write (iout,150)  lmdadeltag
          else if (digits .ge. 6) then
             write (iout,160)  lambda
+            write (iout,170)  dedl
+            write (iout,185)  ostbdgdl
+  185       format (' Current dV/dLambda',2x,f17.6,' Kcal/mole')
             write (iout,200)  lmdadeltag
          else
             write (iout,210)  lambda
+            write (iout,220)  dedl
+            write (iout,235)  ostbdgdl
+  235       format (' Current dV/dLambda',2x,f15.4,' Kcal/mole')
             write (iout,250)  lmdadeltag
          end if
       else if (use_abf) then

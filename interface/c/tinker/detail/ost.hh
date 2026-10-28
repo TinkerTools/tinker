@@ -11,6 +11,8 @@ extern int TINKER_MOD(ost, nmetahist);
 extern int TINKER_MOD(ost, nmethistsave);
 extern int TINKER_MOD(ost, sizemetahist);
 extern int* TINKER_MOD(ost, metaihist);
+extern int* TINKER_MOD(ost, metanext);
+extern int* TINKER_MOD(ost, metahead);
 extern int* TINKER_MOD(ost, osthist);
 extern int* TINKER_MOD(ost, ostnext);
 extern int* TINKER_MOD(ost, osthead);

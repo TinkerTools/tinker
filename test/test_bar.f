@@ -18,17 +18,18 @@ c     energies for each, and checks each generated file against its
 c     stored reference with the tolerant "assert_files" comparison;
 c     it then checks the shared FEP and BAR calculation directly,
 c     including that frame volumes do not change the free energy,
-c     the free energy found in mode 3 from FEP files built so that
+c     the free energy found in FEP mode from FEP files built so that
 c     the results do not depend on the random bootstrap samples, the
 c     frame selection of mode 2, the PV term in the enthalpy at a
 c     given pressure, bootstrap errors on data with constant energy
 c     differences, the input errors that stop mode 2, the volumes
-c     and pressure read in mode 3, the BAR enthalpy for trajectories
+c     and pressure read in FEP mode, the BAR enthalpy for trajectories
 c     with different numbers of frames and the shift of Bennett, the
-c     bootstrap versions of the estimators, the errors of the mode 3
+c     bootstrap versions of the estimators, the errors of the FEP mode
 c     totals, mode 2 on the water trajectories, exponents that would
 c     overflow, bootstrap trials that fail, and mode 1 energies taken
-c     from trajectory logs
+c     from trajectory logs; the FEP mode that reads Tinker FEP files
+c     is mode 4 of the "analyzelmda" program
 c
 c
       subroutine test_bar
@@ -101,11 +102,11 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
+c     ################################################################
+c     ##                                                            ##
 c     ##  subroutine test_bar_vol  --  volumes in FEP and BAR sums  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ##                                                            ##
+c     ################################################################
 c
 c
 c     "test_bar_vol" checks that frame volumes, which vary from frame
@@ -209,10 +210,10 @@ c
       call assert_real (dgfep(3),-2000.0d0,1.0d-6,
      &                  'test_bar overlap back FEP')
 c
-c     mode 3 marks the pair and mode 2 stops with a message
+c     FEP mode marks the pair and mode 2 stops with a message
 c
-      call barrun3 ('overlap.fep','overlap.out',
-     &              'test_bar overlap mode 3')
+      call fepcalcrun ('overlap.fep','overlap.out',
+     &                 'test_bar overlap FEP mode')
       call pushdir ('file/bar')
       call execute_command_line ('rm -f out.txt')
       call run_prog ('bar','2 overlap.bar 0 0 0 0 0 0','out.txt',ist)
@@ -236,7 +237,7 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "test_bar_fep" runs "bar" in mode 3 on FEP files with a constant
+c     "test_bar_fep" runs the FEP mode on FEP files with a constant
 c     energy within each window and a constant energy difference over
 c     each pair, so that every estimate is exact and every error is
 c     zero; also checks a given number of bootstrap trials, a window
@@ -248,31 +249,31 @@ c
       implicit none
 c
 c
-      call barrun3 ('analytic.fep','analytic.out',
-     &              'test_bar fep analytic')
-      call barrun3 ('analytic.fep 500','analytic-boot.out',
-     &              'test_bar fep bootstrap trials')
-      call barrun3 ('gap.fep','gap.out',
-     &              'test_bar fep missing window')
-      call barrun3 ('gap6.fep','gap6.out',
-     &              'test_bar fep header mismatch')
+      call fepcalcrun ('analytic.fep','analytic.out',
+     &                 'test_bar fep analytic')
+      call fepcalcrun ('analytic.fep 500','analytic-boot.out',
+     &                 'test_bar fep bootstrap trials')
+      call fepcalcrun ('gap.fep','gap.out',
+     &                 'test_bar fep missing window')
+      call fepcalcrun ('gap6.fep','gap6.out',
+     &                 'test_bar fep header mismatch')
       return
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine test_bar_cross  --  mode 2 agrees with mode 3  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_bar_cross  --  mode 2 agrees with FEP mode  ##
+c     ##                                                              ##
+c     ##################################################################
 c
 c
 c     "test_bar_cross" runs the same pair of states through mode 2
-c     from a BAR file and through mode 3 from an FEP file, and checks
+c     from a BAR file and through FEP mode from an FEP file, and checks
 c     that both give the same BAR iteration value and analytical error,
-c     which mode 3 gives for each pair, as its total error comes from
+c     which FEP mode gives for each pair, as its total error comes from
 c     the bootstrap; state 0 of the BAR file is at lambda 1 and the
-c     FEP file runs from lambda 1 to 0, while mode 3 always reports
+c     FEP file runs from lambda 1 to 0, while FEP mode always reports
 c     lambda 0 --> 1, so its value has the opposite sign
 c
 c
@@ -296,7 +297,7 @@ c
          call popdir
          return
       end if
-      call run_prog ('bar','3 cross.fep','out3.txt',ist)
+      call fepjoin ('cross.fep','out3.txt',ist)
       if (ist .eq. -1) then
          call popdir
          return
@@ -310,7 +311,7 @@ c
       call assert_logical (found,.true.,'test_bar cross mode 2')
       call barfind ('out3.txt','Free Energy via BAR Iteration',found,
      &              val3,err3)
-      call assert_logical (found,.true.,'test_bar cross mode 3')
+      call assert_logical (found,.true.,'test_bar cross FEP mode')
       call assert_real (val3,-val2,eps,'test_bar cross BAR value')
 c
 c     read the analytical error from the row of the only pair
@@ -751,21 +752,21 @@ c
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine test_bar_fepvol  --  volumes in mode 3 files  ##
-c     ##                                                           ##
-c     ###############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_bar_fepvol  --  volumes in FEP mode files  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "test_bar_fepvol" runs mode 3 on a two-window FEP file holding
+c     "test_bar_fepvol" runs FEP mode on a two-window FEP file holding
 c     the same frames and volumes as "test_bar_pv", so the totals must
 c     match the mode 2 values found there; the file is then written
 c     again without the pressure line, so the volumes are ignored and
 c     the enthalpies are those without the PV term; with the pressure
 c     line but only zero volumes, the PV terms are dropped with a note
 c     and the values match those without the pressure line, and with
-c     one volume missing among the others, mode 3 stops with a message
+c     one volume missing among the others, FEP mode stops with a message
 c
 c
       subroutine test_bar_fepvol
@@ -852,7 +853,7 @@ c
             write (unit,40)  n+i,1.0d0,0.0d0,0.0d0,v
          end do
          close (unit=unit)
-         call run_prog ('bar','3 fepvol.fep','out.txt',ist)
+         call fepjoin ('fepvol.fep','out.txt',ist)
          if (ist .eq. -1)  goto 50
 c
 c     zero volumes give a note, and a missing volume stops the run
@@ -1161,14 +1162,14 @@ c
       end
 c
 c
-c     ##################################################################
-c     ##                                                              ##
-c     ##  subroutine test_bar_chain  --  mode 3 errors of the totals  ##
-c     ##                                                              ##
-c     ##################################################################
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_bar_chain  --  errors of the FEP totals  ##
+c     ##                                                           ##
+c     ###############################################################
 c
 c
-c     "test_bar_chain" runs mode 3 on five harmonic windows with 100
+c     "test_bar_chain" runs FEP mode on five harmonic windows with 100
 c     samples each, U = (x-lambda*s)**2/2 + 2*lambda with beta*s**2
 c     equal to 9, so the total free energy change is 2 Kcal/mol; the
 c     samples come from a normal generator with seed 4, and pairs
@@ -1189,7 +1190,7 @@ c
 c
       call pushdir ('file/bar')
       call execute_command_line ('rm -f out.txt')
-      call run_prog ('bar','3 chain.fep','out.txt',ist)
+      call fepjoin ('chain.fep','out.txt',ist)
       if (ist .eq. -1) then
          call popdir
          return
@@ -1603,37 +1604,77 @@ c
       end
 c
 c
-c     ############################################################
-c     ##                                                        ##
-c     ##  subroutine barrun3  --  one mode 3 output regression  ##
-c     ##                                                        ##
-c     ############################################################
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine fepcalcrun  --  one FEP mode output regression  ##
+c     ##                                                             ##
+c     #################################################################
 c
 c
-c     "barrun3" runs "bar 3" with the given arguments from the fixture
-c     directory and compares its output to the named reference
+c     "fepcalcrun" runs "analyzelmda" in FEP mode with the given
+c     arguments from the fixture directory and compares the free
+c     energy file it writes to the named reference
 c
 c
-      subroutine barrun3 (args,refname,label)
+      subroutine fepcalcrun (args,refname,label)
       implicit none
-      integer ist
+      integer k,ist
       real*8 eps
       character*(*) args,refname,label
+      character*240 base
       character*240 rpath
 c
 c
       eps = 1.0d-4
+      k = index(args,'.fep')
+      base = args(1:k-1)
       call pushdir ('file/bar')
-      call execute_command_line ('rm -f out.txt')
-      call run_prog ('bar','3 '//trim(args),'out.txt',ist)
-      if (ist .eq. -1) then
-         call popdir
-         return
+      call execute_command_line ('rm -f out.txt '//trim(base)//
+     &                           '.freeenergy*')
+      call run_prog ('analyzelmda','4 '//trim(args),'out.txt',ist)
+      if (ist .ne. -1) then
+         call refpath ('bar',refname,rpath)
+         call assert_files (rpath,trim(base)//'.freeenergy',eps,label)
       end if
-      call refpath ('bar',refname,rpath)
-      call assert_files (rpath,'out.txt',eps,label)
-      call execute_command_line ('rm -f out.txt')
+      call execute_command_line ('rm -f out.txt '//trim(base)//
+     &                           '.freeenergy*')
       call popdir
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine fepjoin  --  run FEP mode into one output  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "fepjoin" runs "analyzelmda" in FEP mode with the given arguments
+c     in the current directory, and joins its screen output and the
+c     free energy file it writes into one output file, so the notes
+c     and stops on the screen and the values in the file can all be
+c     found by "barfind"
+c
+c
+      subroutine fepjoin (args,outfile,ist)
+      implicit none
+      integer k,ist
+      character*(*) args,outfile
+      character*240 base
+c
+c
+      k = index(args,'.fep')
+      base = args(1:k-1)
+      call execute_command_line ('rm -f fepscr.txt '//trim(outfile)//
+     &                           ' '//trim(base)//'.freeenergy*')
+      call run_prog ('analyzelmda','4 '//trim(args),'fepscr.txt',ist)
+      if (ist .eq. -1)  return
+      call execute_command_line ('cat fepscr.txt '//trim(base)//
+     &                           '.freeenergy > '//trim(outfile)//
+     &                           ' 2> /dev/null')
+      call execute_command_line ('rm -f fepscr.txt '//trim(base)//
+     &                           '.freeenergy*')
       return
       end
 c

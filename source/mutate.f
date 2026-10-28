@@ -385,6 +385,7 @@ c
       implicit none
       integer i,j,k
       integer next
+      integer lmdanbin
       real*8 temp
       real*8 lo,hi
       character*4 legword
@@ -490,8 +491,6 @@ c
       lmdamass = 25.0d0
       lmdafric = 0.01d0
       lmdadt = 0.001d0
-      lmdathmap = 'TRI'
-      lmdathalpha = 0.999999999d0
 c
 c     set defaults for the Monte Carlo lambda trial moves
 c
@@ -542,12 +541,6 @@ c
          else if (keyword(1:16) .eq. 'LAMBDA-FRICTION ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  lmdafric
-         else if (keyword(1:17) .eq. 'LAMBDA-THETA-MAP ') then
-            call getword (record,lmdathmap,next)
-            call upcase (lmdathmap)
-         else if (keyword(1:19) .eq. 'LAMBDA-THETA-ALPHA ') then
-            string = record(next:240)
-            read (string,*,err=10,end=10)  lmdathalpha
          else if (keyword(1:17) .eq. 'LAMBDA-PROPAGATE ') then
             call getword (record,propword,next)
             call upcase (propword)
@@ -667,8 +660,7 @@ c
 c
 c     keep an odd lambda grid and define the lambda bin width
 c
-      if (nlmda .lt. 3)  nlmda = 3
-      if (mod(nlmda,2) .eq. 0)  nlmda = nlmda + 1
+      nlmda = lmdanbin(nlmda)
       wlmda = 1.0d0 / dble(nlmda-1)
       wlmda2 = 0.5d0 * wlmda
 c
@@ -690,14 +682,9 @@ c
       if (lmdamctrial .lt. 1)  lmdamctrial = 1
       lmdamcmove = min(1.0d0,abs(lmdamcmove))
 c
-c     validate the theta map of the lambda particle
+c     get and validate the theta map of the lambda particle
 c
-      if (lmdathmap.ne.'SIN' .and. lmdathmap.ne.'TRI') then
-         lmdathmap = 'TRI'
-      end if
-      if (lmdathalpha.le.0.0d0 .or. lmdathalpha.ge.1.0d0) then
-         lmdathalpha = 0.999999999d0
-      end if
+      call lmdathkey
 c
 c     start the lambda particle from the current main lambda
 c
@@ -1226,8 +1213,8 @@ c     ###########################################################
 c
 c
 c     "mutate_meta" allocates the history of gaussians deposited along
-c     the main lambda coordinate and the grid holding the accumulated
-c     metadynamics bias
+c     the main lambda coordinate, their lookup by lambda bin and the
+c     grid holding the accumulated metadynamics bias
 c
 c
       subroutine mutate_meta
@@ -1249,6 +1236,8 @@ c
          if (allocated(metahhist))  deallocate (metahhist)
          if (allocated(metawhist))  deallocate (metawhist)
          if (allocated(metaihist))  deallocate (metaihist)
+         if (allocated(metanext))  deallocate (metanext)
+         if (allocated(metahead))  deallocate (metahead)
          if (allocated(lmdallist))  deallocate (lmdallist)
          if (allocated(vmetagrid))  deallocate (vmetagrid)
          if (allocated(dvmetagrid))  deallocate (dvmetagrid)
@@ -1257,6 +1246,8 @@ c
          allocate (metahhist(sizemetahist))
          allocate (metawhist(sizemetahist))
          allocate (metaihist(sizemetahist))
+         allocate (metanext(sizemetahist))
+         allocate (metahead(nlmda))
          allocate (lmdallist(lmdaintv))
          allocate (vmetagrid(nlmda))
          allocate (dvmetagrid(nlmda))
@@ -1265,11 +1256,13 @@ c
             metahhist(i) = 0.0d0
             metawhist(i) = 0.0d0
             metaihist(i) = 0
+            metanext(i) = 0
          end do
          do i = 1, lmdaintv
             lmdallist(i) = 0.0d0
          end do
          do i = 1, nlmda
+            metahead(i) = 0
             vmetagrid(i) = 0.0d0
             dvmetagrid(i) = 0.0d0
          end do
@@ -1453,8 +1446,8 @@ c
 c
 c     "mutate_fep" sets the number of dynamics steps between the
 c     samples of the trial lambda energies found during free energy
-c     perturbation over lambda windows, which is taken from the first
-c     "LAMBDA-INTERVAL" value
+c     perturbation over lambda windows, which is taken from the last
+c     "LAMBDA-INTERVAL" value given
 c
 c
       subroutine mutate_fep

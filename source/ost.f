@@ -18,6 +18,8 @@ c     nmetahist      total number of metadynamics gaussians
 c     nmethistsave   number of metadynamics gaussians written to file
 c     sizemetahist   current allocation size for metadynamics gaussians
 c     metaihist      lmdastep step at which each gaussian was added
+c     metanext       next metadynamics gaussian in the same lambda bin
+c     metahead       first metadynamics gaussian for each lambda bin
 c     osthist        packed lambda/flambda bin for saved gaussians
 c     ostnext        next histogram index in the same lambda/flambda bin
 c     osthead        first histogram index for each lambda/flambda bin
@@ -54,6 +56,8 @@ c     ostinterpol    flag to interpolate ost g kernel from grid
 c     use_ostgtemp   flag to temper heights by the global bias level
 c     use_ostltemp   flag to temper heights by the lambda bin excess
 c     metasavefile   name of the file holding the metadynamics history
+c     metalabel      history label record of the metadynamics history file
+c     metatitle      title record of the metadynamics history file
 c     ostlabel       history label record of the ost history file
 c     osttitle       title record of the ost history file
 c
@@ -66,6 +70,8 @@ c
       integer nmethistsave
       integer sizemetahist
       integer, allocatable :: metaihist(:)
+      integer, allocatable :: metanext(:)
+      integer, allocatable :: metahead(:)
       integer, allocatable :: osthist(:)
       integer, allocatable :: ostnext(:)
       integer, allocatable :: osthead(:,:)
@@ -101,9 +107,13 @@ c
       logical ostinterpol
       logical use_ostgtemp
       logical use_ostltemp
+      character*40 metalabel
+      character*40 metatitle
       character*40 ostlabel
       character*40 osttitle
       character*240 metasavefile
+      parameter (metalabel=' Gaussian History :')
+      parameter (metatitle=' Metadynamics History :')
       parameter (ostlabel=' Gaussian History :')
       parameter (osttitle=' Orthogonal Space Tempering History :')
       save

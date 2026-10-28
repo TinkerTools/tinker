@@ -103,8 +103,9 @@ TINKERLIB := $(TINKERSRC)/libtinker.a
 ##  Should not be Necessary to Change Things Below this Point  ##
 #################################################################
 
-COMMON := assert.o test_amoeba.o test_angle.o test_angtor.o test_aplusgas.o \
- test_aplusliquid.o test_bar.o test_barostat.o test_bond.o test_bounds.o \
+COMMON := assert.o test_amoeba.o test_analyzelmda.o test_angle.o \
+ test_angtor.o test_aplusgas.o test_aplusliquid.o test_bar.o \
+ test_barostat.o test_bond.o test_bounds.o \
  test_box.o test_chglj.o test_chgtrn.o test_disp.o test_eabf.o \
  test_emhippo.o test_eost.o test_eostmap.o test_ephippo.o test_expol.o \
  test_extfield.o test_fep.o test_geom.o test_improp.o test_imptor.o \

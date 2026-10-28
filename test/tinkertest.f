@@ -102,6 +102,7 @@ c
 c
 c     run program tests
 c
+      call test_analyzelmda
       call test_bar
       call test_potential
       call test_pdbxyz
