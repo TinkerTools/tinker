@@ -19,6 +19,7 @@ c
       subroutine ehal3
       use analyz
       use atoms
+      use dsppot
       use energi
       use inform
       use iounit
@@ -40,9 +41,10 @@ c
          call ehal3a
       end if
 c
-c     apply the long range van der Waals correction if used
+c     apply the long range van der Waals correction if used,
+c     unless an Ewald dispersion sum carries the hal tail
 c
-      if (use_vcorr) then
+      if (use_vcorr .and. .not.use_dhal) then
          mode = 'VDW'
          call evcorr (mode,elrc)
          ev = ev + elrc

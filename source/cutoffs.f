@@ -20,12 +20,15 @@ c
       subroutine cutoffs
       use atoms
       use bound
+      use dsppot
       use hescut
       use keys
       use limits
       use neigh
       use polpot
+      use potent
       use tarray
+      use vdwpot
       implicit none
       integer i,next
       integer limit
@@ -232,6 +235,14 @@ c
          chgcut = ewaldcut
          mpolecut = ewaldcut
       end if
+c
+c     a buffered 14-7 vdw with dispersion Ewald hands the tail past
+c     its switch to an undamped Ewald dispersion sum, whose real space
+c     must reach every pair inside the vdw cutoff
+c
+      use_dhal = (use_bounds .and. use_dewald .and. use_vdw .and.
+     &               use_disp .and. vdwtyp.eq.'BUFFERED-14-7')
+      if (use_dhal)  dewaldcut = max(dewaldcut,vdwcut)
       if (use_dewald) then
          dispcut = dewaldcut
       end if
@@ -276,15 +287,14 @@ c
 c     specify maximum size for each of the neighbor lists
 c
       maxvlst = 2500
-      if (vdwcut.ne.big .and. dispcut.ne.big) then
-         limit = int(sqrt(max(vbuf2,dbuf2))**3) + 100
-         maxvlst = min(limit,maxvlst)
-      else if (vdwcut .ne. big) then
+      if (vdwcut .ne. big) then
          limit = int(sqrt(vbuf2)**3) + 100
          maxvlst = min(limit,maxvlst)
-      else if (dispcut .ne. big) then
+      end if
+      maxdlst = 2500
+      if (dispcut .ne. big) then
          limit = int(sqrt(dbuf2)**3) + 100
-         maxvlst = min(limit,maxvlst)
+         maxdlst = min(limit,maxdlst)
       end if
       maxelst = 2500
       if (chgcut.ne.big .and. mpolecut.ne.big) then
@@ -303,7 +313,7 @@ c
 c
 c     perform dynamic allocation of some global arrays
 c
-      if (use_vlist .or. use_dlist) then
+      if (use_vlist) then
          if (allocated(nvlst))  deallocate (nvlst)
          if (allocated(vlst))  deallocate (vlst)
          if (allocated(xvold))  deallocate (xvold)
@@ -314,6 +324,18 @@ c
          allocate (xvold(n))
          allocate (yvold(n))
          allocate (zvold(n))
+      end if
+      if (use_dlist) then
+         if (allocated(ndlst))  deallocate (ndlst)
+         if (allocated(dlst))  deallocate (dlst)
+         if (allocated(xdold))  deallocate (xdold)
+         if (allocated(ydold))  deallocate (ydold)
+         if (allocated(zdold))  deallocate (zdold)
+         allocate (ndlst(n))
+         allocate (dlst(maxdlst,n))
+         allocate (xdold(n))
+         allocate (ydold(n))
+         allocate (zdold(n))
       end if
       if (use_clist .or. use_mlist) then
          if (allocated(nelst))  deallocate (nelst)

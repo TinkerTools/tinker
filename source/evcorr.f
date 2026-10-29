@@ -51,10 +51,10 @@ c
       real*8 offset,taper
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
-      real*8 r5,r6,r7
+      real*8 r5,r6
       real*8 cik,p,p6,p12
-      real*8 rho,tau,tau7
       real*8 expterm
+      real*8 ehalpr
       logical dsp
       character*6 mode
 c
@@ -179,7 +179,6 @@ c
                r2 = r * r
                r3 = r2 * r
                r6 = r3 * r3
-               r7 = r6 * r
                e = 0.0d0
                if (dsp) then
                   e = -cik / r6
@@ -188,11 +187,7 @@ c
                   p12 = p6 * p6
                   e = eps * (p12 - 2.0d0*p6)
                else if (vdwtyp .eq. 'BUFFERED-14-7') then
-                  rho = r7 + ghal*rv7
-                  tau = (dhal+1.0d0) / (r+dhal*rv)
-                  tau7 = tau**7
-                  e = eps * rv7 * tau7
-     &                   * ((ghal+1.0d0)*rv7/rho-2.0d0)
+                  e = ehalpr (r,rv,rv7,eps)
                else if (vdwtyp.eq.'BUCKINGHAM' .or.
      &                  vdwtyp.eq.'MM3-HBOND') then
                   p = sqrt(rv2/r2)
@@ -278,13 +273,14 @@ c
       real*8 taper
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
-      real*8 r5,r6,r7
+      real*8 r5,r6
       real*8 cik,p,p6,p12
-      real*8 rho,tau,tau7
       real*8 expterm
+      real*8 ehalpr
       logical dsp
       character*6 mode
 c     real*8 vtot,de,dtaper
+c     real*8 r7,rho,tau,tau7
 c     real*8 dtau,gtau,rvterm
 c
 c
@@ -428,7 +424,7 @@ c           vtot = 0.0d0
                r2 = r * r
                r3 = r2 * r
                r6 = r3 * r3
-               r7 = r6 * r
+c              r7 = r6 * r
                e = 0.0d0
 c              de = 0.0d0
                if (dsp) then
@@ -440,12 +436,12 @@ c                 de = 6.0d0 * cik / r7
                   e = eps * (p12 - 2.0d0*p6)
 c                 de = eps * (p12-p6) * (-12.0d0/r)
                else if (vdwtyp .eq. 'BUFFERED-14-7') then
-                  rho = r7 + ghal*rv7
-                  tau = (dhal+1.0d0) / (r+dhal*rv)
-                  tau7 = tau**7
+                  e = ehalpr (r,rv,rv7,eps)
+c                 rho = r7 + ghal*rv7
+c                 tau = (dhal+1.0d0) / (r+dhal*rv)
+c                 tau7 = tau**7
 c                 dtau = tau / (dhal+1.0d0)
 c                 gtau = eps*tau7*r6*(ghal+1.0d0)*(rv7/rho)**2
-                  e = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
 c                 de = -7.0d0 * (dtau*e+gtau)
                else if (vdwtyp.eq.'BUCKINGHAM' .or.
      &                  vdwtyp.eq.'MM3-HBOND') then
@@ -497,5 +493,40 @@ c
       deallocate (jvt)
       deallocate (avt)
       deallocate (bvt)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  function ehalpr  --  buffered 14-7 energy of a hal pair  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ehalpr" returns the unscaled buffered 14-7 interaction energy
+c     at distance r for a pair with minimum energy distance rv, its
+c     seventh power rv7 and well depth eps
+c
+c
+      function ehalpr (r,rv,rv7,eps)
+      use vdwpot
+      implicit none
+      real*8 ehalpr
+      real*8 r,rv,rv7,eps
+      real*8 r2,r3,r6,r7
+      real*8 rho,tau,tau7
+c
+c
+c     compute the buffered 14-7 energy for the pair
+c
+      r2 = r * r
+      r3 = r2 * r
+      r6 = r3 * r3
+      r7 = r6 * r
+      rho = r7 + ghal*rv7
+      tau = (dhal+1.0d0) / (r+dhal*rv)
+      tau7 = tau**7
+      ehalpr = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
       return
       end

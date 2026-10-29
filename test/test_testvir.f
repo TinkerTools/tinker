@@ -39,6 +39,12 @@ c     case 12 adds the long range dispersion correction with a wide
 c     taper window, whose virial must be minus its energy, as the
 c     lattice derivative of a constant over the volume finds it
 c
+c     case 13 decouples a water whose hal tail is handed to an undamped
+c     Ewald dispersion sum, in a box small enough for replicate cells
+c
+c     case 14 repeats case 13 with explicit damped dispersion values
+c     on every site, which the handoff weight multiplies
+c
 c
       subroutine test_testvir
       implicit none
@@ -57,6 +63,10 @@ c
      &                        '../ephippo/dmso')
       call test_testvir_case ('11_ct_lambda_l04','../testlmda/hipwat')
       call test_testvir_case ('12_disp_corr','../testlmda/hipmix')
+      call test_testvir_case ('13_water_dhal_replica_l05',
+     &                        '../testlmda/water2')
+      call test_testvir_case ('14_water_dhal_damp_l05',
+     &                        '../testlmda/water2')
       return
       end
 c

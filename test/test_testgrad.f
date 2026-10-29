@@ -43,6 +43,19 @@ c     images of bonded partners, which must not carry the exclusion
 c     scale, and case 21 weights a DMSO by atom group under Ewald
 c     dispersion, which must scale the damping derivative as well
 c
+c     cases 22 and 23 hand the AMOEBA water hal tail to an undamped
+c     Ewald dispersion sum across a wide vdw switch, by neighbor list
+c     beside the vdw list and in a box small enough for replicates
+c
+c     case 24 repeats case 23 with explicit damped dispersion values
+c     on every site, so the handoff weight multiplies the squared
+c     damping factor in the real space Ewald dispersion pair term
+c
+c     case 25 repeats case 22 without the neighbor list, giving the
+c     oxygen class an explicit undamped value far from its mapped one
+c     and zeroing one oxygen by atom, so only the hydrogens are mapped
+c     from hal and the zeroed site drops out of the dispersion sum
+c
 c
       subroutine test_testgrad
       implicit none
@@ -70,6 +83,10 @@ c
       call test_testgrad_case ('19_hippo_disp_sc_l04','dmso')
       call test_testgrad_case ('20_hippo_dewald_replica_l04','dmso2')
       call test_testgrad_case ('21_hippo_dewald_group_l04','dmso')
+      call test_testgrad_case ('22_water_dhal_nlist','water2')
+      call test_testgrad_case ('23_water_dhal_replica','water2')
+      call test_testgrad_case ('24_water_dhal_damp','water2')
+      call test_testgrad_case ('25_water_dhal_override','water2')
       return
       end
 c

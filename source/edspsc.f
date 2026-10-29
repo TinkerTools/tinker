@@ -151,3 +151,45 @@ c
       end if
       return
       end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine dhalwt  --  Ewald dispersion weight under hal  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "dhalwt" finds the weight "w" of the real space Ewald dispersion
+c     pair term when a dispersion tail takes over from a
+c     buffered 14-7 vdw across its switching window, as one minus the
+c     vdw switch, along with its derivative with respect to distance
+c
+c
+      subroutine dhalwt (r,w,dw)
+      use dsppot
+      implicit none
+      real*8 r,r2,r3,r4,r5
+      real*8 w,dw
+c
+c
+c     the tail is absent inside the switch and whole beyond it
+c
+      if (r .le. dhcut) then
+         w = 0.0d0
+         dw = 0.0d0
+      else if (r .ge. dhoff) then
+         w = 1.0d0
+         dw = 0.0d0
+      else
+         r2 = r * r
+         r3 = r2 * r
+         r4 = r2 * r2
+         r5 = r2 * r3
+         w = 1.0d0 - (dhc5*r5 + dhc4*r4 + dhc3*r3
+     &                   + dhc2*r2 + dhc1*r + dhc0)
+         dw = -(5.0d0*dhc5*r4 + 4.0d0*dhc4*r3 + 3.0d0*dhc3*r2
+     &             + 2.0d0*dhc2*r + dhc1)
+      end if
+      return
+      end

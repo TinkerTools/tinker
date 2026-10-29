@@ -83,12 +83,6 @@ c
 c
 c     set switching coefficients to zero for truncation cutoffs
 c
-      c0 = 0.0d0
-      c1 = 0.0d0
-      c2 = 0.0d0
-      c3 = 0.0d0
-      c4 = 0.0d0
-      c5 = 0.0d0
       f0 = 0.0d0
       f1 = 0.0d0
       f2 = 0.0d0
@@ -115,15 +109,7 @@ c
 c
 c     get 5th degree multiplicative switching function coefficients
 c
-      if (cut .lt. off) then
-         denom = (off-cut)**5
-         c0 = off*off2 * (off2-5.0d0*off*cut+10.0d0*cut2) / denom
-         c1 = -30.0d0 * off2*cut2 / denom
-         c2 = 30.0d0 * (off2*cut+off*cut2) / denom
-         c3 = -10.0d0 * (off2+4.0d0*off*cut+cut2) / denom
-         c4 = 15.0d0 * (off+cut) / denom
-         c5 = -6.0d0 / denom
-      end if
+      call switchc (cut,off,c0,c1,c2,c3,c4,c5)
 c
 c     get 7th degree additive switching function coefficients
 c
@@ -145,6 +131,53 @@ c
          f5 = (42.0d0*cut2-300.0d0*cut*off-267.0d0*off2) / denom
          f6 = (36.0d0*cut+139.0d0*off) / denom
          f7 = -25.0d0 / denom
+      end if
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine switchc  --  quintic switch coefficients only  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "switchc" finds the coefficients of the 5th degree polynomial
+c     that switches an interaction smoothly to zero between the
+c     taper and cutoff distances, without changing any global state
+c
+c
+      subroutine switchc (cut,off,c0,c1,c2,c3,c4,c5)
+      implicit none
+      real*8 cut,off
+      real*8 c0,c1,c2
+      real*8 c3,c4,c5
+      real*8 cut2,off2
+      real*8 denom
+c
+c
+c     set the coefficients to zero for a truncation cutoff
+c
+      c0 = 0.0d0
+      c1 = 0.0d0
+      c2 = 0.0d0
+      c3 = 0.0d0
+      c4 = 0.0d0
+      c5 = 0.0d0
+c
+c     get 5th degree multiplicative switching function coefficients
+c
+      if (cut .lt. off) then
+         cut2 = cut * cut
+         off2 = off * off
+         denom = (off-cut)**5
+         c0 = off*off2 * (off2-5.0d0*off*cut+10.0d0*cut2) / denom
+         c1 = -30.0d0 * off2*cut2 / denom
+         c2 = 30.0d0 * (off2*cut+off*cut2) / denom
+         c3 = -10.0d0 * (off2+4.0d0*off*cut+cut2) / denom
+         c4 = 15.0d0 * (off+cut) / denom
+         c5 = -6.0d0 / denom
       end if
       return
       end

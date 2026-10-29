@@ -284,6 +284,8 @@ void damprep_(double* r, double* r2, double* rr1, double* rr3, double* rr5, doub
 #define tinker_f_damprep damprep_
 void dampexpl_(double* r, double* preik, double* alphai, double* alphak, double* s2, double* ds2);
 #define tinker_f_dampexpl dampexpl_
+void dampdisp_(double* r, double* alphai, double* alphak, double* damp, double* ddamp);
+#define tinker_f_dampdisp dampdisp_
 
 // dcflux.f
 void dcflux_(double* pot, double* dcfx, double* dcfy, double* dcfz);
@@ -790,6 +792,8 @@ void edspsc_(double* r, double* dlsc, double* dlsq, double* soft, double* dsoft)
 #define tinker_f_edspsc edspsc_
 void edspsc4_(double* r, double* dlsc, double* dlsq, double* dlsc1, double* dlsq1, double* dlsc2, double* dlsq2, double* soft, double* dsoft, double* dsdl, double* d2sdl2, double* d2sdldr);
 #define tinker_f_edspsc4 edspsc4_
+void dhalwt_(double* r, double* w, double* dw);
+#define tinker_f_dhalwt dhalwt_
 
 // efep.f
 void efeptrial_(int* ntrial, double* ltrial, double* etrial, double* enative);
@@ -1718,6 +1722,8 @@ void evcorr1_(char* mode, double* elrc, double* vlrc, double* delrc, double* dvl
 inline void tinker_f_evcorr1(tinker_fchars mode, double* elrc, double* vlrc, double* delrc, double* dvlrc, double* d2elrc) {
     return evcorr1_(mode.string, elrc, vlrc, delrc, dvlrc, d2elrc, mode.capacity);
 }
+double ehalpr_(double* r, double* rv, double* rv7, double* eps);
+#define tinker_f_ehalpr ehalpr_
 
 // exfield.f
 void exfield_(char* mode, double* exf, tinker_fchar_len_t mode_cap);
@@ -2138,6 +2144,8 @@ void kdipole_();
 // kdisp.f
 void kdisp_();
 #define tinker_f_kdisp kdisp_
+void kdsphal_(int* dspset);
+#define tinker_f_kdsphal kdsphal_
 
 // kewald.f
 void kewald_();
@@ -3048,6 +3056,8 @@ void switch_(char* mode, tinker_fchar_len_t mode_cap);
 inline void tinker_f_switch(tinker_fchars mode) {
     return switch_(mode.string, mode.capacity);
 }
+void switchc_(double* cut, double* off, double* c0, double* c1, double* c2, double* c3, double* c4, double* c5);
+#define tinker_f_switchc switchc_
 
 // tcgstuf.f
 void induce0b_();

@@ -6,10 +6,13 @@
 extern "C" {
 #endif
 extern int TINKER_MOD(neigh, maxvlst);
+extern int TINKER_MOD(neigh, maxdlst);
 extern int TINKER_MOD(neigh, maxelst);
 extern int TINKER_MOD(neigh, maxulst);
 extern int* TINKER_MOD(neigh, nvlst);
 extern int* TINKER_MOD(neigh, vlst);
+extern int* TINKER_MOD(neigh, ndlst);
+extern int* TINKER_MOD(neigh, dlst);
 extern int* TINKER_MOD(neigh, nelst);
 extern int* TINKER_MOD(neigh, elst);
 extern int* TINKER_MOD(neigh, nulst);
@@ -31,6 +34,9 @@ extern double TINKER_MOD(neigh, ubufx);
 extern double* TINKER_MOD(neigh, xvold);
 extern double* TINKER_MOD(neigh, yvold);
 extern double* TINKER_MOD(neigh, zvold);
+extern double* TINKER_MOD(neigh, xdold);
+extern double* TINKER_MOD(neigh, ydold);
+extern double* TINKER_MOD(neigh, zdold);
 extern double* TINKER_MOD(neigh, xeold);
 extern double* TINKER_MOD(neigh, yeold);
 extern double* TINKER_MOD(neigh, zeold);

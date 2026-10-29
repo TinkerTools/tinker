@@ -13,10 +13,13 @@ c     ##################################################################
 c
 c
 c     maxvlst     maximum size of van der Waals pair neighbor lists
+c     maxdlst     maximum size of dispersion pair neighbor lists
 c     maxelst     maximum size of electrostatic pair neighbor lists
 c     maxulst     maximum size of dipole preconditioner pair lists
 c     nvlst       number of sites in list for each vdw site
 c     vlst        site numbers in neighbor list of each vdw site
+c     ndlst       number of sites in list for each dispersion site
+c     dlst        site numbers in list of each dispersion site
 c     nelst       number of sites in list for each electrostatic site
 c     elst        site numbers in list of each electrostatic site
 c     nulst       number of sites in list for each preconditioner site
@@ -35,9 +38,12 @@ c     mbuf2       square of multipole cutoff plus the list buffer
 c     mbufx       square of multipole cutoff plus 2X list buffer
 c     ubuf2       square of preconditioner cutoff plus the list buffer
 c     ubufx       square of preconditioner cutoff plus 2X list buffer
-c     xvold       x-coordinate at last vdw/dispersion list update
-c     yvold       y-coordinate at last vdw/dispersion list update
-c     zvold       z-coordinate at last vdw/dispersion list update
+c     xvold       x-coordinate at last vdw list update
+c     yvold       y-coordinate at last vdw list update
+c     zvold       z-coordinate at last vdw list update
+c     xdold       x-coordinate at last dispersion list update
+c     ydold       y-coordinate at last dispersion list update
+c     zdold       z-coordinate at last dispersion list update
 c     xeold       x-coordinate at last electrostatic list update
 c     yeold       y-coordinate at last electrostatic list update
 c     zeold       z-coordinate at last electrostatic list update
@@ -54,10 +60,13 @@ c
       module neigh
       implicit none
       integer maxvlst
+      integer maxdlst
       integer maxelst
       integer maxulst
       integer, allocatable :: nvlst(:)
       integer, allocatable :: vlst(:,:)
+      integer, allocatable :: ndlst(:)
+      integer, allocatable :: dlst(:,:)
       integer, allocatable :: nelst(:)
       integer, allocatable :: elst(:,:)
       integer, allocatable :: nulst(:)
@@ -72,6 +81,9 @@ c
       real*8, allocatable :: xvold(:)
       real*8, allocatable :: yvold(:)
       real*8, allocatable :: zvold(:)
+      real*8, allocatable :: xdold(:)
+      real*8, allocatable :: ydold(:)
+      real*8, allocatable :: zdold(:)
       real*8, allocatable :: xeold(:)
       real*8, allocatable :: yeold(:)
       real*8, allocatable :: zeold(:)

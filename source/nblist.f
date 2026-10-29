@@ -23,13 +23,6 @@ c
       implicit none
 c
 c
-c     rebuild list if using both vdw and dispersion terms
-c
-      if (use_vdw .and. use_disp) then
-         dovlst = .true.
-         dodlst = .true.
-      end if
-c
 c     rebuild list if using both charge and multipole terms
 c
       if (use_charge .and. use_mpole) then
@@ -505,17 +498,17 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         xr = xi - xvold(i)
-         yr = yi - yvold(i)
-         zr = zi - zvold(i)
+         xr = xi - xdold(i)
+         yr = yi - ydold(i)
+         zr = zi - zdold(i)
          call imagen (xr,yr,zr)
          r2 = xr*xr + yr*yr + zr*zr
          update(i) = .false.
          if (r2 .ge. lbuf2) then
             update(i) = .true.
-            xvold(i) = xi
-            yvold(i) = yi
-            zvold(i) = zi
+            xdold(i) = xi
+            ydold(i) = yi
+            zdold(i) = zi
          end if
       end do
 !$OMP END DO
@@ -526,20 +519,20 @@ c
       do ii = 1, ndisp
          i = idisp(ii)
          if (update(i)) then
-            xi = xvold(i)
-            yi = yvold(i)
-            zi = zvold(i)
-            nvlst(i) = 0
+            xi = xdold(i)
+            yi = ydold(i)
+            zi = zdold(i)
+            ndlst(i) = 0
             do kk = ii+1, ndisp
                k = idisp(kk)
-               xr = xi - xvold(k)
-               yr = yi - yvold(k)
-               zr = zi - zvold(k)
+               xr = xi - xdold(k)
+               yr = yi - ydold(k)
+               zr = zi - zdold(k)
                call imagen (xr,yr,zr)
                r2 = xr*xr + yr*yr + zr*zr
                if (r2 .le. dbuf2) then
-                  nvlst(i) = nvlst(i) + 1
-                  vlst(nvlst(i),i) = k
+                  ndlst(i) = ndlst(i) + 1
+                  dlst(ndlst(i),i) = k
                end if
             end do
          end if
@@ -552,31 +545,31 @@ c
       do ii = 1, ndisp
          i = idisp(ii)
          if (update(i)) then
-            xi = xvold(i)
-            yi = yvold(i)
-            zi = zvold(i)
+            xi = xdold(i)
+            yi = ydold(i)
+            zi = zdold(i)
             do k = 1, i-1
                if (.not. update(k)) then
-                  xr = xi - xvold(k)
-                  yr = yi - yvold(k)
-                  zr = zi - zvold(k)
+                  xr = xi - xdold(k)
+                  yr = yi - ydold(k)
+                  zr = zi - zdold(k)
                   call imagen (xr,yr,zr)
                   r2 = xr*xr + yr*yr + zr*zr
                   if (r2 .le. dbuf2) then
 !$OMP CRITICAL
-                     do j = 1, nvlst(k)
-                        if (vlst(j,k) .eq. i)  goto 20
+                     do j = 1, ndlst(k)
+                        if (dlst(j,k) .eq. i)  goto 20
                      end do
-                     nvlst(k) = nvlst(k) + 1
-                     vlst(nvlst(k),k) = i
+                     ndlst(k) = ndlst(k) + 1
+                     dlst(ndlst(k),k) = i
    20                continue
 !$OMP END CRITICAL
                   else if (r2 .le. dbufx) then
 !$OMP CRITICAL
-                     do j = 1, nvlst(k)
-                        if (vlst(j,k) .eq. i) then
-                           vlst(j,k) = vlst(nvlst(k),k)
-                           nvlst(k) = nvlst(k) - 1
+                     do j = 1, ndlst(k)
+                        if (dlst(j,k) .eq. i) then
+                           dlst(j,k) = dlst(ndlst(k),k)
+                           ndlst(k) = ndlst(k) - 1
                            goto 30
                         end if
                      end do
@@ -594,10 +587,10 @@ c
 !$OMP DO
       do ii = 1, ndisp
          i = idisp(ii)
-         if (nvlst(i) .ge. maxvlst) then
+         if (ndlst(i) .ge. maxdlst) then
             write (iout,40)
    40       format (/,' DLIST  --  Too many Neighbors;',
-     &                 ' Increase MAXVLST')
+     &                 ' Increase MAXDLST')
             call fatal
          end if
       end do
@@ -646,13 +639,13 @@ c
          xi = x(i)
          yi = y(i)
          zi = z(i)
-         xvold(i) = xi
-         yvold(i) = yi
-         zvold(i) = zi
+         xdold(i) = xi
+         ydold(i) = yi
+         zdold(i) = zi
 c
 c     generate all neighbors for the site being rebuilt
 c
-         nvlst(i) = 0
+         ndlst(i) = 0
          do kk = ii+1, ndisp
             k = idisp(kk)
             xr = xi - x(k)
@@ -661,17 +654,17 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. dbuf2) then
-               nvlst(i) = nvlst(i) + 1
-               vlst(nvlst(i),i) = k
+               ndlst(i) = ndlst(i) + 1
+               dlst(ndlst(i),i) = k
             end if
          end do
 c
 c     check to see if the neighbor list is too long
 c
-         if (nvlst(i) .ge. maxvlst) then
+         if (ndlst(i) .ge. maxdlst) then
             write (iout,10)
    10       format (/,' DBUILD  --  Too many Neighbors;',
-     &                 ' Increase MAXVLST')
+     &                 ' Increase MAXDLST')
             call fatal
          end if
       end do
@@ -727,10 +720,10 @@ c     transfer interaction site coordinates to sorting arrays
 c
       do ii = 1, ndisp
          i = idisp(ii)
-         nvlst(i) = 0
-         xvold(i) = x(i)
-         yvold(i) = y(i)
-         zvold(i) = z(i)
+         ndlst(i) = 0
+         xdold(i) = x(i)
+         ydold(i) = y(i)
+         zdold(i) = z(i)
          xsort(ii) = x(i)
          ysort(ii) = y(i)
          zsort(ii) = z(i)
@@ -793,8 +786,8 @@ c
             call imagen (xr,yr,zr)
             r2 = xr*xr + yr*yr + zr*zr
             if (r2 .le. dbuf2) then
-               nvlst(i) = nvlst(i) + 1
-               vlst(nvlst(i),i) = k
+               ndlst(i) = ndlst(i) + 1
+               dlst(ndlst(i),i) = k
             end if
    20       continue
          end do
@@ -807,10 +800,10 @@ c
 c
 c     check to see if the neighbor list is too long
 c
-         if (nvlst(i) .ge. maxvlst) then
+         if (ndlst(i) .ge. maxdlst) then
             write (iout,30)
    30       format (/,' DLIGHT  --  Too many Neighbors;',
-     &                 ' Increase MAXVLST')
+     &                 ' Increase MAXDLST')
             call fatal
          end if
       end do

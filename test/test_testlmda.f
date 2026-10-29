@@ -109,6 +109,10 @@ c     dispersion correction of case 113 through the same taper, and 125
 c     the Ewald dispersion of case 120 through an inverse power map with
 c     n of 2, so the curvature of each map enters with its own sign
 c
+c     case 126 decouples a water whose hal tail is handed to an
+c     undamped Ewald dispersion sum, which follows the hal soft core
+c     lambda power in place of the long range correction
+c
 c
       subroutine test_testlmda
       implicit none
@@ -318,6 +322,7 @@ c
      &                        '1e-4')
       call test_testlmda_xyz ('125_hipmix_dsp_ewald_inv_l04','hipmix',
      &                        '1e-4')
+      call test_testlmda_case ('126_water_dhal_l05','1e-4')
       return
       end
 c

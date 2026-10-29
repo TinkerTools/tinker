@@ -899,6 +899,8 @@ c     deallocation of global arrays from module neigh
 c
       if (allocated(nvlst))  deallocate (nvlst)
       if (allocated(vlst))  deallocate (vlst)
+      if (allocated(ndlst))  deallocate (ndlst)
+      if (allocated(dlst))  deallocate (dlst)
       if (allocated(nelst))  deallocate (nelst)
       if (allocated(elst))  deallocate (elst)
       if (allocated(nulst))  deallocate (nulst)
@@ -906,6 +908,9 @@ c
       if (allocated(xvold))  deallocate (xvold)
       if (allocated(yvold))  deallocate (yvold)
       if (allocated(zvold))  deallocate (zvold)
+      if (allocated(xdold))  deallocate (xdold)
+      if (allocated(ydold))  deallocate (ydold)
+      if (allocated(zdold))  deallocate (zdold)
       if (allocated(xeold))  deallocate (xeold)
       if (allocated(yeold))  deallocate (yeold)
       if (allocated(zeold))  deallocate (zeold)

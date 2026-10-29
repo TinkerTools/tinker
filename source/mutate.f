@@ -1624,6 +1624,17 @@ c
      &   scexpd = 4.0d0
       if (use_d2lmda .and. scexpd+scexpdq.lt.2.0d0)  scexpdq = 1.0d0
 c
+c     an Ewald dispersion tail mapped from the buffered 14-7 vdw
+c     follows the lambda power of the hal pairs, as the long range
+c     correction it replaces does, and needs no soft core since the
+c     tail is absent inside the vdw switch, so any dispersion soft
+c     core is turned off
+c
+      if (use_dhal) then
+         scrdsp = 0.0d0
+         scexpd = scexp
+      end if
+c
 c     the implicit solvation parameters are scaled once at setup and
 c     carry no lambda derivative, so they cannot follow a lambda that
 c     moves by its derivative or by Monte Carlo
@@ -1861,6 +1872,17 @@ c
   111    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
      &              ' Available for Partial Charge or Bond Dipole',
      &              ' Electrostatics')
+         call fatal
+      end if
+c
+c     an Ewald dispersion tail mapped from the buffered 14-7 vdw
+c     splits reciprocal space for a single ligand only
+c
+      if (use_rel .and. use_dhal) then
+         write (iout,114)
+  114    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
+     &              ' Available with a Buffered 14-7 Ewald',
+     &              ' Dispersion Tail')
          call fatal
       end if
 c

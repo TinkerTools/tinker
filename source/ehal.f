@@ -16,6 +16,7 @@ c     "ehal" calculates the buffered 14-7 van der Waals energy
 c
 c
       subroutine ehal
+      use dsppot
       use energi
       use limits
       use vdwpot
@@ -34,9 +35,10 @@ c
          call ehal0a
       end if
 c
-c     apply the long range van der Waals correction if used
+c     apply the long range van der Waals correction if used,
+c     unless an Ewald dispersion sum carries the hal tail
 c
-      if (use_vcorr) then
+      if (use_vcorr .and. .not.use_dhal) then
          mode = 'VDW'
          call evcorr (mode,elrc)
          ev = ev + elrc

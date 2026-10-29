@@ -31,6 +31,7 @@ c
       use dsppot
       use group
       use hessn
+      use iounit
       use shunt
       use usage
       implicit none
@@ -66,6 +67,17 @@ c
       logical proceed,usei
       character*6 mode
 c
+c
+c     an Ewald dispersion tail mapped from hal depends on the atom
+c     positions, unlike the long range correction it replaces, and
+c     its Hessian is not available
+c
+      if (use_dhal) then
+         write (iout,20)
+   20    format (/,' EDISP2  --  Dispersion Hessian is not Available',
+     &              ' with a Buffered 14-7 Ewald Dispersion Tail')
+         call fatal
+      end if
 c
 c     perform dynamic allocation of some local arrays
 c

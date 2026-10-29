@@ -124,17 +124,8 @@ c
       real*8 ci,ck
       real*8 r,r2,r3
       real*8 r4,r5,r6
-      real*8 ai,ai2,ai3
-      real*8 ak,ak2,ak3
-      real*8 di,di2,di3
-      real*8 di4,di5
-      real*8 dk,dk2,dk3
-      real*8 ti,ti2
-      real*8 tk,tk2
-      real*8 expi,expk
-      real*8 damp3,damp5
+      real*8 ai,ak
       real*8 damp,ddamp
-      real*8 eps
       real*8 dlsc,dlsq
       real*8 dlsc1,dlsq1
       real*8 dlsc2,dlsq2
@@ -193,9 +184,8 @@ c
       end if
       rs2 = scrdsp * scrdsp
 c
-c     set damping tolerance, cutoff and switching coefficients
+c     set cutoff and switching coefficients
 c
-      eps = 0.0001d0
       mode = 'DISP'
       call switch (mode)
 c
@@ -253,48 +243,7 @@ c
 c
 c     find the damping factor for the dispersion interaction
 c
-                  di = ai * r
-                  di2 = di * di
-                  di3 = di * di2
-                  dk = ak * r
-                  expi = exp(-di)
-                  expk = exp(-dk)
-                  if (abs(ai-ak) .lt. eps) then
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                          / 96.0d0
-                  else
-                     ai2 = ai * ai
-                     ai3 = ai * ai2
-                     ak2 = ak * ak
-                     ak3 = ak * ak2
-                     dk2 = dk * dk
-                     dk3 = dk * dk2
-                     ti = ak2 / (ak2-ai2)
-                     tk = ai2 / (ai2-ak2)
-                     ti2 = ti * ti
-                     tk2 = tk * tk
-                     damp3 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2)*expi
-     &                          - tk2*(1.0d0+dk+0.5d0*dk2)*expk
-     &                          - 2.0d0*ti2*tk*(1.0d0+di)*expi
-     &                          - 2.0d0*tk2*ti*(1.0d0+dk)*expk
-                     damp5 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2
-     &                                       +di3/6.0d0)*expi
-     &                          - tk2*(1.0d0+dk+0.5d0*dk2
-     &                                    +dk3/6.0d0)*expk
-     &                          - 2.0d0*ti2*tk*(1.0+di+di2/3.0d0)*expi
-     &                          - 2.0d0*tk2*ti*(1.0+dk+dk2/3.0d0)*expk
-                     ddamp = 0.25d0 * di2 * ti2 * ai * expi
-     &                          * (r*ai+4.0d0*tk-1.0d0)
-     &                       + 0.25d0 * dk2 * tk2 * ak * expk
-     &                            * (r*ak+4.0d0*ti-1.0d0)
-                  end if
-                  damp = 1.5d0*damp5 - 0.5d0*damp3
+                  call dampdisp (r,ai,ak,damp,ddamp)
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -490,48 +439,7 @@ c
 c
 c     find the damping factor for the dispersion interaction
 c
-                     di = ai * r
-                     di2 = di * di
-                     di3 = di * di2
-                     dk = ak * r
-                     expi = exp(-di)
-                     expk = exp(-dk)
-                     if (abs(ai-ak) .lt. eps) then
-                        di4 = di2 * di2
-                        di5 = di2 * di3
-                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                        ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                             / 96.0d0
-                     else
-                        ai2 = ai * ai
-                        ai3 = ai * ai2
-                        ak2 = ak * ak
-                        ak3 = ak * ak2
-                        dk2 = dk * dk
-                        dk3 = dk * dk2
-                        ti = ak2 / (ak2-ai2)
-                        tk = ai2 / (ai2-ak2)
-                        ti2 = ti * ti
-                        tk2 = tk * tk
-                        damp3 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2)*expi
-     &                             - tk2*(1.0d0+dk+0.5d0*dk2)*expk
-     &                             - 2.0d0*ti2*tk*(1.0d0+di)*expi
-     &                             - 2.0d0*tk2*ti*(1.0d0+dk)*expk
-                        damp5 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2
-     &                                          +di3/6.0d0)*expi
-     &                             - tk2*(1.0d0+dk+0.5d0*dk2
-     &                                       +dk3/6.0d0)*expk
-     &                            - 2.0d0*ti2*tk*(1.0+di+di2/3.0d0)*expi
-     &                            - 2.0d0*tk2*ti*(1.0+dk+dk2/3.0d0)*expk
-                        ddamp = 0.25d0 * di2 * ti2 * ai * expi
-     &                             * (r*ai+4.0d0*tk-1.0d0)
-     &                          + 0.25d0 * dk2 * tk2 * ak * expk
-     &                               * (r*ak+4.0d0*ti-1.0d0)
-                     end if
-                     damp = 1.5d0*damp5 - 0.5d0*damp3
+                     call dampdisp (r,ai,ak,damp,ddamp)
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -720,17 +628,8 @@ c
       real*8 ci,ck
       real*8 r,r2,r3
       real*8 r4,r5,r6
-      real*8 ai,ai2,ai3
-      real*8 ak,ak2,ak3
-      real*8 di,di2,di3
-      real*8 di4,di5
-      real*8 dk,dk2,dk3
-      real*8 ti,ti2
-      real*8 tk,tk2
-      real*8 expi,expk
-      real*8 damp3,damp5
+      real*8 ai,ak
       real*8 damp,ddamp
-      real*8 eps
       real*8 dlsc,dlsq
       real*8 dlsc1,dlsq1
       real*8 dlsc2,dlsq2
@@ -800,19 +699,18 @@ c
       end if
       rs2 = scrdsp * scrdsp
 c
-c     set damping tolerance, cutoff and switching coefficients
+c     set cutoff and switching coefficients
 c
-      eps = 0.0001d0
       mode = 'DISP'
       call switch (mode)
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
-!$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
+!$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,ndlst,dlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,cut2,
 !$OMP& c0,c1,c2,c3,c4,c5,vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,
-!$OMP& dodl,dod2,eps)
+!$OMP& dodl,dod2)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,edspvir,devdl,
 !$OMP& d2evdl2,dfl,devvirdl)
 !$OMP DO reduction(+:edsp,dedsp,edspvir,devdl,d2evdl2,dfl,devvirdl)
@@ -846,8 +744,8 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kk = 1, nvlst(i)
-            k = vlst(kk,i)
+         do kk = 1, ndlst(i)
+            k = dlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
             mutk = (mutg(k) .ne. 0)
@@ -871,48 +769,7 @@ c
 c
 c     find the damping factor for the dispersion interaction
 c
-                  di = ai * r
-                  di2 = di * di
-                  di3 = di * di2
-                  dk = ak * r
-                  expi = exp(-di)
-                  expk = exp(-dk)
-                  if (abs(ai-ak) .lt. eps) then
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                          / 96.0d0
-                  else
-                     ai2 = ai * ai
-                     ai3 = ai * ai2
-                     ak2 = ak * ak
-                     ak3 = ak * ak2
-                     dk2 = dk * dk
-                     dk3 = dk * dk2
-                     ti = ak2 / (ak2-ai2)
-                     tk = ai2 / (ai2-ak2)
-                     ti2 = ti * ti
-                     tk2 = tk * tk
-                     damp3 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2)*expi
-     &                          - tk2*(1.0d0+dk+0.5d0*dk2)*expk
-     &                          - 2.0d0*ti2*tk*(1.0d0+di)*expi
-     &                          - 2.0d0*tk2*ti*(1.0d0+dk)*expk
-                     damp5 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2
-     &                                       +di3/6.0d0)*expi
-     &                          - tk2*(1.0d0+dk+0.5d0*dk2
-     &                                    +dk3/6.0d0)*expk
-     &                          - 2.0d0*ti2*tk*(1.0+di+di2/3.0d0)*expi
-     &                          - 2.0d0*tk2*ti*(1.0+dk+dk2/3.0d0)*expk
-                     ddamp = 0.25d0 * di2 * ti2 * ai * expi
-     &                          * (r*ai+4.0d0*tk-1.0d0)
-     &                       + 0.25d0 * dk2 * tk2 * ak * expk
-     &                            * (r*ak+4.0d0*ti-1.0d0)
-                  end if
-                  damp = 1.5d0*damp5 - 0.5d0*damp3
+                  call dampdisp (r,ai,ak,damp,ddamp)
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -1166,17 +1023,11 @@ c
       real*8 e,de,fgrp
       real*8 ci,ck
       real*8 r,r2,r6,r7
-      real*8 ai,ai2
-      real*8 ak,ak2
-      real*8 di,di2,di3
-      real*8 di4,di5
-      real*8 dk,dk2,dk3
-      real*8 ti,ti2
-      real*8 tk,tk2
-      real*8 expi,expk
-      real*8 damp3,damp5
+      real*8 ai,ak
       real*8 damp,ddamp
-      real*8 wsc,eps
+      real*8 dmp2,dmpd
+      real*8 dhw,dhdw
+      real*8 wsc
       real*8 dlsc,dlsq
       real*8 dlsc1,dlsq1
       real*8 dlsc2,dlsq2
@@ -1228,9 +1079,8 @@ c
       end if
       rs2 = scrdsp * scrdsp
 c
-c     set damping tolerance, cutoff and switching coefficients
+c     set cutoff and switching coefficients
 c
-      eps = 0.0001d0
       mode = 'DEWALD'
       call switch (mode)
 c
@@ -1288,56 +1138,31 @@ c
                   expterm = exp(-ralpha2)
                   expa = expterm * term
 c
-c     find the damping factor for the dispersion interaction
+c     find the damping factor, which an undamped hal tail skips
 c
                   r = sqrt(r2)
                   r7 = r6 * r
-                  di = ai * r
-                  di2 = di * di
-                  di3 = di * di2
-                  dk = ak * r
-                  expi = exp(-di)
-                  expk = exp(-dk)
-                  if (abs(ai-ak) .lt. eps) then
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                          / 96.0d0
-                  else
-                     ai2 = ai * ai
-                     ak2 = ak * ak
-                     dk2 = dk * dk
-                     dk3 = dk * dk2
-                     ti = ak2 / (ak2-ai2)
-                     ti2 = ti * ti
-                     tk = ai2 / (ai2-ak2)
-                     tk2 = tk * tk
-                     damp3 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2)*expi
-     &                          - tk2*(1.0d0+dk+0.5d0*dk2)*expk
-     &                          - 2.0d0*ti2*tk*(1.0d0+di)*expi
-     &                          - 2.0d0*tk2*ti*(1.0d0+dk)*expk
-                     damp5 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2
-     &                                       +di3/6.0d0)*expi
-     &                          - tk2*(1.0d0+dk+0.5d0*dk2
-     &                                    +dk3/6.0d0)*expk
-     &                          - 2.0d0*ti2*tk*(1.0+di+di2/3.0d0)*expi
-     &                          - 2.0d0*tk2*ti*(1.0+dk+dk2/3.0d0)*expk
-                     ddamp = 0.25d0 * di2 * ti2 * ai * expi
-     &                          * (r*ai+4.0d0*tk-1.0d0)
-     &                       + 0.25d0 * dk2 * tk2 * ak * expk
-     &                            * (r*ak+4.0d0*ti-1.0d0)
+                  damp = 1.0d0
+                  ddamp = 0.0d0
+                  if (dhdamp .or. .not.use_dhal) then
+                     call dampdisp (r,ai,ak,damp,ddamp)
                   end if
-                  damp = 1.5d0*damp5 - 0.5d0*damp3
+                  dmp2 = damp * damp
+                  dmpd = damp * ddamp
+c
+c     an Ewald tail mapped from hal takes over across the vdw switch
+c
+                  if (use_dhal) then
+                     call dhalwt (r,dhw,dhdw)
+                     dmpd = dhw*dmpd + 0.5d0*dhdw*dmp2
+                     dmp2 = dhw * dmp2
+                  end if
 c
 c     apply damping and scaling factors for this interaction
 c
                   sc = dspscale(k)
                   if (use_group)  sc = sc * fgrp
-                  scale = sc * damp**2
+                  scale = sc * dmp2
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
@@ -1375,7 +1200,7 @@ c
                      if (mutd2) then
                         dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
                         dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
-     &                      - 2.0d0*ci*ck*sc*damp*ddamp*dsdl/r7
+     &                      - 2.0d0*ci*ck*sc*dmpd*dsdl/r7
      &                      - ci*ck*scale*d2sdldr/r7
                      end if
                   end if
@@ -1391,7 +1216,7 @@ c
 c     increment the damped dispersion derivative components
 c
                   de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
-     &                    - 2.0d0*ci*ck*sc*damp*ddamp*soft/r7
+     &                    - 2.0d0*ci*ck*sc*dmpd*soft/r7
      &                    - ci*ck*dscale/r7
                   dedx = de * xr
                   dedy = de * yr
@@ -1513,50 +1338,25 @@ c
                      expterm = exp(-ralpha2)
                      expa = expterm * term
 c
-c     find the damping factor for the dispersion interaction
+c     find the damping factor, which an undamped hal tail skips
 c
                      r = sqrt(r2)
                      r7 = r6 * r
-                     di = ai * r
-                     di2 = di * di
-                     di3 = di * di2
-                     dk = ak * r
-                     expi = exp(-di)
-                     expk = exp(-dk)
-                     if (abs(ai-ak) .lt. eps) then
-                        di4 = di2 * di2
-                        di5 = di2 * di3
-                        damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                             +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                        damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                           +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                        ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                             / 96.0d0
-                     else
-                        ai2 = ai * ai
-                        ak2 = ak * ak
-                        dk2 = dk * dk
-                        dk3 = dk * dk2
-                        ti = ak2 / (ak2-ai2)
-                        ti2 = ti * ti
-                        tk = ai2 / (ai2-ak2)
-                        tk2 = tk * tk
-                        damp3 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2)*expi
-     &                             - tk2*(1.0d0+dk+0.5d0*dk2)*expk
-     &                             - 2.0d0*ti2*tk*(1.0d0+di)*expi
-     &                             - 2.0d0*tk2*ti*(1.0d0+dk)*expk
-                        damp5 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2
-     &                                          +di3/6.0d0)*expi
-     &                             - tk2*(1.0d0+dk+0.5d0*dk2
-     &                                       +dk3/6.0d0)*expk
-     &                            - 2.0d0*ti2*tk*(1.0+di+di2/3.0d0)*expi
-     &                            - 2.0d0*tk2*ti*(1.0+dk+dk2/3.0d0)*expk
-                        ddamp = 0.25d0 * di2 * ti2 * ai * expi
-     &                             * (r*ai+4.0d0*tk-1.0d0)
-     &                          + 0.25d0 * dk2 * tk2 * ak * expk
-     &                               * (r*ak+4.0d0*ti-1.0d0)
+                     damp = 1.0d0
+                     ddamp = 0.0d0
+                     if (dhdamp .or. .not.use_dhal) then
+                        call dampdisp (r,ai,ak,damp,ddamp)
                      end if
-                     damp = 1.5d0*damp5 - 0.5d0*damp3
+                     dmp2 = damp * damp
+                     dmpd = damp * ddamp
+c
+c     an Ewald tail mapped from hal takes over across the vdw switch
+c
+                     if (use_dhal) then
+                        call dhalwt (r,dhw,dhdw)
+                        dmpd = dhw*dmpd + 0.5d0*dhdw*dmp2
+                        dmp2 = dhw * dmp2
+                     end if
 c
 c     apply damping and scaling factors for this interaction
 c
@@ -1565,7 +1365,7 @@ c
                      if (use_polymer) then
                         if (r2 .le. polycut2)  sc = sc * dspscale(k)
                      end if
-                     scale = sc * damp**2
+                     scale = sc * dmp2
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
@@ -1603,7 +1403,7 @@ c
                         if (mutd2) then
                            dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
                            dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
-     &                      - 2.0d0*ci*ck*sc*damp*ddamp*dsdl/r7
+     &                      - 2.0d0*ci*ck*sc*dmpd*dsdl/r7
      &                      - ci*ck*scale*d2sdldr/r7
                         end if
                      end if
@@ -1615,7 +1415,7 @@ c
                      scale = soft*scale - wsc
                      e = e * (wsc*expa+scale)
                      de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
-     &                      - 2.0d0*ci*ck*sc*damp*ddamp*soft/r7
+     &                      - 2.0d0*ci*ck*sc*dmpd*soft/r7
      &                      - ci*ck*dscale/r7
                      if (ii .eq. kk) then
                         e = 0.5d0 * e
@@ -1793,17 +1593,11 @@ c
       real*8 e,de,fgrp
       real*8 ci,ck
       real*8 r,r2,r6,r7
-      real*8 ai,ai2
-      real*8 ak,ak2
-      real*8 di,di2,di3
-      real*8 di4,di5
-      real*8 dk,dk2,dk3
-      real*8 ti,ti2
-      real*8 tk,tk2
-      real*8 expi,expk
-      real*8 damp3,damp5
+      real*8 ai,ak
       real*8 damp,ddamp
-      real*8 wsc,eps
+      real*8 dmp2,dmpd
+      real*8 dhw,dhdw
+      real*8 wsc
       real*8 dlsc,dlsq
       real*8 dlsc1,dlsq1
       real*8 dlsc2,dlsq2
@@ -1866,18 +1660,18 @@ c
       end if
       rs2 = scrdsp * scrdsp
 c
-c     set damping tolerance, cutoff and switching coefficients
+c     set cutoff and switching coefficients
 c
-      eps = 0.0001d0
       mode = 'DEWALD'
       call switch (mode)
 c
 c     OpenMP directives for the major loop structure
 c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
-!$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,nvlst,vlst,use_group,
+!$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,ndlst,dlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,aewald,
-!$OMP& vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,dodl,dod2,eps)
+!$OMP& vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,dodl,dod2)
+!$OMP& shared(use_dhal,dhdamp)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,edspvir,devdl,
 !$OMP& d2evdl2,dfl,devvirdl)
 !$OMP DO reduction(+:edsp,dedsp,edspvir,devdl,d2evdl2,dfl,devvirdl)
@@ -1911,8 +1705,8 @@ c
 c
 c     decide whether to compute the current interaction
 c
-         do kk = 1, nvlst(i)
-            k = vlst(kk,i)
+         do kk = 1, ndlst(i)
+            k = dlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
             mutk = (mutg(k) .ne. 0)
@@ -1936,56 +1730,31 @@ c
                   expterm = exp(-ralpha2)
                   expa = expterm * term
 c
-c     find the damping factor for the dispersion interaction
+c     find the damping factor, which an undamped hal tail skips
 c
                   r = sqrt(r2)
                   r7 = r6 * r
-                  di = ai * r
-                  di2 = di * di
-                  di3 = di * di2
-                  dk = ak * r
-                  expi = exp(-di)
-                  expk = exp(-dk)
-                  if (abs(ai-ak) .lt. eps) then
-                     di4 = di2 * di2
-                     di5 = di2 * di3
-                     damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +7.0d0*di3/48.0d0+di4/48.0d0)*expi
-                     damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
-     &                          +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
-                     ddamp = ai * expi * (di5-3.0d0*di3-3.0d0*di2)
-     &                          / 96.0d0
-                  else
-                     ai2 = ai * ai
-                     ak2 = ak * ak
-                     dk2 = dk * dk
-                     dk3 = dk * dk2
-                     ti = ak2 / (ak2-ai2)
-                     ti2 = ti * ti
-                     tk = ai2 / (ai2-ak2)
-                     tk2 = tk * tk
-                     damp3 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2)*expi
-     &                          - tk2*(1.0d0+dk+0.5d0*dk2)*expk
-     &                          - 2.0d0*ti2*tk*(1.0d0+di)*expi
-     &                          - 2.0d0*tk2*ti*(1.0d0+dk)*expk
-                     damp5 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2
-     &                                       +di3/6.0d0)*expi
-     &                          - tk2*(1.0d0+dk+0.5d0*dk2
-     &                                    +dk3/6.0d0)*expk
-     &                          - 2.0d0*ti2*tk*(1.0+di+di2/3.0d0)*expi
-     &                          - 2.0d0*tk2*ti*(1.0+dk+dk2/3.0d0)*expk
-                     ddamp = 0.25d0 * di2 * ti2 * ai * expi
-     &                          * (r*ai+4.0d0*tk-1.0d0)
-     &                       + 0.25d0 * dk2 * tk2 * ak * expk
-     &                            * (r*ak+4.0d0*ti-1.0d0)
+                  damp = 1.0d0
+                  ddamp = 0.0d0
+                  if (dhdamp .or. .not.use_dhal) then
+                     call dampdisp (r,ai,ak,damp,ddamp)
                   end if
-                  damp = 1.5d0*damp5 - 0.5d0*damp3
+                  dmp2 = damp * damp
+                  dmpd = damp * ddamp
+c
+c     an Ewald tail mapped from hal takes over across the vdw switch
+c
+                  if (use_dhal) then
+                     call dhalwt (r,dhw,dhdw)
+                     dmpd = dhw*dmpd + 0.5d0*dhdw*dmp2
+                     dmp2 = dhw * dmp2
+                  end if
 c
 c     apply damping and scaling factors for this interaction
 c
                   sc = dspscale(k)
                   if (use_group)  sc = sc * fgrp
-                  scale = sc * damp**2
+                  scale = sc * dmp2
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
@@ -2023,7 +1792,7 @@ c
                      if (mutd2) then
                         dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
                         dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
-     &                      - 2.0d0*ci*ck*sc*damp*ddamp*dsdl/r7
+     &                      - 2.0d0*ci*ck*sc*dmpd*dsdl/r7
      &                      - ci*ck*scale*d2sdldr/r7
                      end if
                   end if
@@ -2039,7 +1808,7 @@ c
 c     increment the damped dispersion derivative components
 c
                   de = -6.0d0*e/r2 - wsc*ci*ck*rterm/r7
-     &                    - 2.0d0*ci*ck*sc*damp*ddamp*soft/r7
+     &                    - 2.0d0*ci*ck*sc*dmpd*soft/r7
      &                    - ci*ck*dscale/r7
                   dedx = de * xr
                   dedy = de * yr

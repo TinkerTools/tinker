@@ -20,6 +20,7 @@ c
 c
       subroutine ehal1
       use dlmda
+      use dsppot
       use energi
       use limits
       use vdwpot
@@ -49,9 +50,10 @@ c
       end if
 c
 c     apply the long range van der Waals correction if used,
-c     along with its lambda derivative
+c     along with its lambda derivative, unless an Ewald
+c     dispersion sum carries the hal tail
 c
-      if (use_vcorr) then
+      if (use_vcorr .and. .not.use_dhal) then
          mode = 'VDW'
          call evcorr1 (mode,elrc,vlrc,delrc,dvlrc,d2elrc)
          ev = ev + elrc

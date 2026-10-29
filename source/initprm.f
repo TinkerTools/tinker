@@ -366,6 +366,8 @@ c
       dsp4scale = 1.0d0
       dsp5scale = 1.0d0
       use_dcorr = .false.
+      use_dhal = .false.
+      dhdamp = .false.
 c
 c     set default control parameters for charge-charge terms
 c

@@ -998,3 +998,79 @@ c
       ds2 = preik*ds2
       return
       end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine dampdisp  --  damped dispersion damping value  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "dampdisp" finds the damping factor of the damped dispersion
+c     interaction between two sites and its first derivative with
+c     respect to distance
+c
+c
+      subroutine dampdisp (r,alphai,alphak,damp,ddamp)
+      implicit none
+      real*8 r,eps
+      real*8 alphai,alphak
+      real*8 ai2,ak2
+      real*8 di,di2,di3
+      real*8 di4,di5
+      real*8 dk,dk2,dk3
+      real*8 ti,ti2
+      real*8 tk,tk2
+      real*8 expi,expk
+      real*8 damp3,damp5
+      real*8 damp,ddamp
+c
+c
+c     compute tolerance and exponential damping factors
+c
+      eps = 0.0001d0
+      di = alphai * r
+      di2 = di * di
+      di3 = di * di2
+      dk = alphak * r
+      expi = exp(-di)
+      expk = exp(-dk)
+c
+c     find the damping factor and its derivative for equal or
+c     unequal damping coefficients
+c
+      if (abs(alphai-alphak) .lt. eps) then
+         di4 = di2 * di2
+         di5 = di2 * di3
+         damp3 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &              +7.0d0*di3/48.0d0+di4/48.0d0)*expi
+         damp5 = 1.0d0 - (1.0d0+di+0.5d0*di2
+     &              +di3/6.0d0+di4/24.0d0+di5/144.0d0)*expi
+         ddamp = alphai * expi * (di5-3.0d0*di3-3.0d0*di2)
+     &              / 96.0d0
+      else
+         ai2 = alphai * alphai
+         ak2 = alphak * alphak
+         dk2 = dk * dk
+         dk3 = dk * dk2
+         ti = ak2 / (ak2-ai2)
+         ti2 = ti * ti
+         tk = ai2 / (ai2-ak2)
+         tk2 = tk * tk
+         damp3 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2)*expi
+     &              - tk2*(1.0d0+dk+0.5d0*dk2)*expk
+     &              - 2.0d0*ti2*tk*(1.0d0+di)*expi
+     &              - 2.0d0*tk2*ti*(1.0d0+dk)*expk
+         damp5 = 1.0d0 - ti2*(1.0d0+di+0.5d0*di2+di3/6.0d0)*expi
+     &              - tk2*(1.0d0+dk+0.5d0*dk2+dk3/6.0d0)*expk
+     &              - 2.0d0*ti2*tk*(1.0+di+di2/3.0d0)*expi
+     &              - 2.0d0*tk2*ti*(1.0+dk+dk2/3.0d0)*expk
+         ddamp = 0.25d0 * di2 * ti2 * alphai * expi
+     &              * (r*alphai+4.0d0*tk-1.0d0)
+     &           + 0.25d0 * dk2 * tk2 * alphak * expk
+     &                * (r*alphak+4.0d0*ti-1.0d0)
+      end if
+      damp = 1.5d0*damp5 - 0.5d0*damp3
+      return
+      end
