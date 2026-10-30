@@ -99,6 +99,7 @@ c
       call test_truncated8
       call test_urey
       call test_vdw14
+      call test_water4
 c
 c     run program tests
 c

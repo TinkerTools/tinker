@@ -22,6 +22,7 @@ c
 c
       call test_chglj_nopbc
       call test_chglj_cutoff
+      call test_chglj_rules
       return
       end
 c
@@ -38,7 +39,8 @@ c
 c
 c
       call test_chglj_case ('chglj.1','chglj.1.txt',
-     &                      'chglj_nopbc',.false.)
+     &                      'chglj_nopbc',.false.,
+     &                      'ARITHMETIC','GEOMETRIC')
       return
       end
 c
@@ -55,9 +57,37 @@ c
 c
 c
       call test_chglj_case ('chglj.2','chglj.2.txt',
-     &                      'chglj_cutoff_list',.true.)
+     &                      'chglj_cutoff_list',.true.,
+     &                      'ARITHMETIC','GEOMETRIC')
       call test_chglj_case ('chglj.2','chglj.2.txt',
-     &                      'chglj_cutoff_nolist',.false.)
+     &                      'chglj_cutoff_nolist',.false.,
+     &                      'ARITHMETIC','GEOMETRIC')
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine test_chglj_rules  --  other mixing rules  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "test_chglj_rules" repeats the pbc cutoff case with a geometric
+c     radius rule and with an arithmetic epsilon rule in place of the
+c     rules of the CHARMM parameter file
+c
+c
+      subroutine test_chglj_rules
+      implicit none
+c
+c
+      call test_chglj_case ('chglj.3','chglj.3.txt',
+     &                      'chglj_georad_list',.true.,
+     &                      'GEOMETRIC','GEOMETRIC')
+      call test_chglj_case ('chglj.4','chglj.4.txt',
+     &                      'chglj_arieps_list',.true.,
+     &                      'ARITHMETIC','ARITHMETIC')
       return
       end
 c
@@ -69,10 +99,12 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-      subroutine test_chglj_case (key,reffile,tname,uselist)
+      subroutine test_chglj_case (key,reffile,tname,uselist,
+     &                            radref,epsref)
       use action
       use atoms
       use energi
+      use vdwpot
       use virial
       implicit none
       integer nat
@@ -83,6 +115,7 @@ c
       real*8, allocatable :: refg(:,:)
       logical skiptest,uselist
       character*(*) key,reffile,tname
+      character*(*) radref,epsref
       character*240 rpath
       character*(*) tpre
       parameter (tpre='test_')
@@ -103,6 +136,13 @@ c
       eps_e = 1.0d-4
       eps_g = 5.0d-4
       eps_v = 1.0d-3
+c
+c     combining rules in effect after the keyfile is read
+c
+      call assert_logical (radrule.eq.radref,.true.,
+     &                     tpre//tname//' radius rule')
+      call assert_logical (epsrule.eq.epsref,.true.,
+     &                     tpre//tname//' epsilon rule')
 c
 c     level 0  --  total charge plus Lennard-Jones energy
 c
