@@ -114,6 +114,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       integer jcell
       real*8 xi,yi,zi
@@ -124,13 +125,12 @@ c
       real*8 r4,r5,r6
       real*8 ai,ak
       real*8 damp,ddamp,taper
-      real*8 dlsc,dlsq
+      real*8 dlsc(2),dlsq(2)
       real*8 soft,dsoft
       real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical header,huge
-      logical muti,mutk
       logical mutik
       character*6 mode
 c
@@ -185,7 +185,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -208,9 +208,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -237,12 +241,11 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      if (r2 .lt. rs2) then
-                        call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                      end if
                      e = e * soft
                   end if
@@ -325,7 +328,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -348,9 +351,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -382,12 +389,11 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = (muti.or.mutk) .and.
-     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutik = (ig .gt. 0)
                      if (mutik) then
-                        soft = dlsc
+                        soft = dlsc(ig)
                         if (r2 .lt. rs2) then
-                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                         end if
                         e = e * soft
                      end if
@@ -498,6 +504,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -507,13 +514,12 @@ c
       real*8 r4,r5,r6
       real*8 ai,ak
       real*8 damp,ddamp,taper
-      real*8 dlsc,dlsq
+      real*8 dlsc(2),dlsq(2)
       real*8 soft,dsoft
       real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
       logical header,huge
-      logical muti,mutk
       logical mutik
       character*6 mode
 c
@@ -563,7 +569,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,ndlst,dlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,cut2,c0,c1,
-!$OMP& c2,c3,c4,c5,vcouple,dlsc,dlsq,rs2,molcule,name,verbose,debug,
+!$OMP& c2,c3,c4,c5,mutcls,dlsc,dlsq,rs2,molcule,name,verbose,debug,
 !$OMP& header,iout)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter)
@@ -578,7 +584,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -601,9 +607,13 @@ c
             k = dlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = xi - x(k)
@@ -627,12 +637,11 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      if (r2 .lt. rs2) then
-                        call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                      end if
                      e = e * soft
                   end if
@@ -802,6 +811,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       integer jcell
       real*8 xi,yi,zi
@@ -814,12 +824,11 @@ c
       real*8 expa,term
       real*8 damp,ddamp,scale
       real*8 dmp2,dhw,dhdw
-      real*8 dlsc,dlsq,wsc
+      real*8 dlsc(2),dlsq(2),wsc
       real*8 soft,dsoft
       real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik
       logical header,huge
       character*6 mode
@@ -866,7 +875,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -889,9 +898,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -932,15 +945,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   wsc = 1.0d0
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      if (r2 .lt. rs2) then
-                        call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                      end if
-                     wsc = dlsc
+                     wsc = dlsc(ig)
                      scale = scale * soft
                   end if
 c     
@@ -1015,7 +1027,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1038,9 +1050,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -1087,15 +1103,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = (muti.or.mutk) .and.
-     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutik = (ig .gt. 0)
                      wsc = 1.0d0
                      if (mutik) then
-                        soft = dlsc
+                        soft = dlsc(ig)
                         if (r2 .lt. rs2) then
-                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                         end if
-                        wsc = dlsc
+                        wsc = dlsc(ig)
                         scale = scale * soft
                      end if
 c     
@@ -1255,6 +1270,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -1266,12 +1282,11 @@ c
       real*8 expa,term
       real*8 damp,ddamp,scale
       real*8 dmp2,dhw,dhdw
-      real*8 dlsc,dlsq,wsc
+      real*8 dlsc(2),dlsq(2),wsc
       real*8 soft,dsoft
       real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik
       logical header,huge
       character*6 mode
@@ -1313,7 +1328,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,ndlst,dlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,aewald,
-!$OMP& molcule,vcouple,dlsc,dlsq,rs2,name,verbose,debug,header,iout)
+!$OMP& molcule,mutcls,dlsc,dlsq,rs2,name,verbose,debug,header,iout)
 !$OMP& shared(use_dhal,dhdamp)
 !$OMP& firstprivate(dspscale),shared(edsp,nedsp,aedsp,einter)
 !$OMP DO reduction(+:edsp,nedsp,aedsp,einter)
@@ -1328,7 +1343,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1351,9 +1366,13 @@ c
             k = dlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -1394,15 +1413,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   wsc = 1.0d0
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      if (r2 .lt. rs2) then
-                        call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                      end if
-                     wsc = dlsc
+                     wsc = dlsc(ig)
                      scale = scale * soft
                   end if
 c     

@@ -20,6 +20,9 @@ c     class1      atom class of each atom in the final state system
 c     imut        atom sites differing in initial and final state
 c     mutg        alchemical group of each atom (0=not mutated, 1=ligand
 c                   or ligand A, 2=ligand B of a relative dual topology)
+c     mutcls      class of van der Waals type pairs between two groups
+c                   (-1=skipped, 0=full weight, 1 or 2=soft core of that
+c                   ligand group)
 c     fluxsc      lambda scale applied to the charge flux of each atom
 c     pdltflx     unscaled charge flux change in charge of each atom
 c     type0       atom type of each atom in the initial state system
@@ -54,6 +57,7 @@ c
       integer nmut
       integer nmutb
       integer vcouple
+      integer mutcls(0:2,0:2)
       integer, allocatable :: class0(:)
       integer, allocatable :: class1(:)
       integer, allocatable :: imut(:)

@@ -64,6 +64,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       integer jcell
       real*8 e,eterm
@@ -86,14 +87,14 @@ c
       real*8 diqk,dkqi,qiqk
       real*8 term1,term2,term3
       real*8 term4,term5
-      real*8 rlsc,rshf
+      real*8 rlsc(2),rshf(2)
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
       real*8 dmpik(9)
       real*8, allocatable :: rscale(:)
       logical proceed,usei
-      logical muti,mutk,mutik
+      logical mutik
       character*6 mode
 c
 c
@@ -123,7 +124,7 @@ c
 c     set lambda scaling values for mutated interactions
 c
       if (nmut .ne. 0) then
-         call repsc (rlsc,rshf)
+         call grpsoft (scexpr,scalphar,scexprm,scexprp,rlsc,rshf)
       end if
 c
 c     set cutoff distances and switching coefficients
@@ -152,7 +153,7 @@ c
          qiyz = rrepole(10,i)
          qizz = rrepole(13,i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -173,10 +174,15 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, nrep
             k = irep(kk)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = x(k) - xi
@@ -247,14 +253,13 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   e = sizik * eterm * rr1
                   if (mutik) then
-                     call erepsc (r,rlsc,rshf,soft,dsoft)
+                     call erepsc (r,ig,rlsc,rshf,soft,dsoft)
                      e = soft * e
                   end if
 c
@@ -322,7 +327,7 @@ c
             qiyz = rrepole(10,i)
             qizz = rrepole(13,i)
             usei = use(i)
-            muti = (mutg(i) .ne. 0)
+            mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -343,10 +348,15 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, nrep
                k = irep(kk)
-               mutk = (mutg(k) .ne. 0)
-               proceed = .true.
-               if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-               if (.not. use_intra)  proceed = .true.
+               ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+               proceed = (ig .ge. 0)
+               if (proceed .and. use_group) then
+                  call groups (proceed,fgrp,i,k,0,0,0,0)
+                  if (.not. use_intra)  proceed = .true.
+               end if
                if (proceed)  proceed = (usei .or. use(k))
                if (proceed) then
                   do jcell = 2, ncell
@@ -418,14 +428,13 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                        mutik = (muti.or.mutk) .and.
-     &                          (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                        mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                         e = sizik * eterm * rr1
                         if (mutik) then
-                           call erepsc (r,rlsc,rshf,soft,dsoft)
+                           call erepsc (r,ig,rlsc,rshf,soft,dsoft)
                            e = soft * e
                         end if
 c
@@ -507,7 +516,8 @@ c
       use usage
       implicit none
       integer i,j,k
-      integer ii,kk,kkk
+      integer mutgi,ig
+      integer ii,kkk
       real*8 e,eterm
       real*8 soft,dsoft
       real*8 fgrp,taper
@@ -526,7 +536,7 @@ c
       real*8 qix,qiy,qiz,qir
       real*8 qkx,qky,qkz,qkr
       real*8 diqk,dkqi,qiqk
-      real*8 rlsc,rshf
+      real*8 rlsc(2),rshf(2)
       real*8 term1,term2,term3
       real*8 term4,term5
       real*8 sizi,sizk,sizik
@@ -535,7 +545,7 @@ c
       real*8 dmpik(9)
       real*8, allocatable :: rscale(:)
       logical proceed,usei
-      logical muti,mutk,mutik
+      logical mutik
       character*6 mode
 c
 c
@@ -559,7 +569,7 @@ c
 c     set lambda scaling values for mutated interactions
 c
       if (nmut .ne. 0) then
-         call repsc (rlsc,rshf)
+         call grpsoft (scexpr,scalphar,scexprm,scexprp,rlsc,rshf)
       end if
 c
 c     initialize connected atom exclusion coefficients
@@ -578,7 +588,7 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(nrep,irep,x,y,z,sizpr,dmppr,elepr,rrepole,uind,n12,
 !$OMP& i12,n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,rlsc,
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,mutcls,rlsc,
 !$OMP& rshf,mutg,cut2,off2,c0,c1,c2,c3,c4,c5)
 !$OMP& firstprivate(rscale)
 !$OMP& shared (er)
@@ -605,7 +615,7 @@ c
          qiyz = rrepole(10,i)
          qizz = rrepole(13,i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -626,10 +636,15 @@ c     evaluate all sites within the cutoff distance
 c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed)  proceed = (sizpr(k) .ne. 0.0d0)
             if (proceed) then
@@ -701,14 +716,13 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   e = sizik * eterm * rr1
                   if (mutik) then
-                     call erepsc (r,rlsc,rshf,soft,dsoft)
+                     call erepsc (r,ig,rlsc,rshf,soft,dsoft)
                      e = soft * e
                   end if
 c

@@ -113,7 +113,6 @@ extern double* TINKER_MOD(dlmda, lcphi);
 extern double* TINKER_MOD(dlmda, lfmp);
 extern double* TINKER_MOD(dlmda, lfphi);
 extern double* TINKER_MOD(dlmda, poleorig);
-extern double* TINKER_MOD(dlmda, lqgrid);
 extern int TINKER_MOD(dlmda, use_abf);
 extern int TINKER_MOD(dlmda, use_abfdyn);
 extern int TINKER_MOD(dlmda, use_d2lmda);

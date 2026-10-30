@@ -84,6 +84,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       integer jcell
       real*8 xi,yi,zi
@@ -94,12 +95,11 @@ c
       real*8 r4,r5,r6
       real*8 ai,ak
       real*8 damp,ddamp,taper
-      real*8 dlsc,dlsq
+      real*8 dlsc(2),dlsq(2)
       real*8 soft,dsoft
       real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik
       character*6 mode
 c
@@ -139,7 +139,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -162,9 +162,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -191,12 +195,11 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      if (r2 .lt. rs2) then
-                        call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                      end if
                      e = e * soft
                   end if
@@ -250,7 +253,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -273,9 +276,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -307,12 +314,11 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = (muti.or.mutk) .and.
-     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutik = (ig .gt. 0)
                      if (mutik) then
-                        soft = dlsc
+                        soft = dlsc(ig)
                         if (r2 .lt. rs2) then
-                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                         end if
                         e = e * soft
                      end if
@@ -386,6 +392,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -395,12 +402,11 @@ c
       real*8 r4,r5,r6
       real*8 ai,ak
       real*8 damp,ddamp,taper
-      real*8 dlsc,dlsq
+      real*8 dlsc(2),dlsq(2)
       real*8 soft,dsoft
       real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik
       character*6 mode
 c
@@ -435,7 +441,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,ndlst,dlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,cut2,
-!$OMP& c0,c1,c2,c3,c4,c5,vcouple,dlsc,dlsq,rs2)
+!$OMP& c0,c1,c2,c3,c4,c5,mutcls,dlsc,dlsq,rs2)
 !$OMP& firstprivate(dspscale) shared(edsp)
 !$OMP DO reduction(+:edsp)
 c
@@ -449,7 +455,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -472,9 +478,13 @@ c
             k = dlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = xi - x(k)
@@ -498,12 +508,11 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      if (r2 .lt. rs2) then
-                        call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                      end if
                      e = e * soft
                   end if
@@ -628,6 +637,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       integer jcell
       real*8 xi,yi,zi
@@ -640,12 +650,11 @@ c
       real*8 expa,term
       real*8 damp,ddamp,scale
       real*8 dmp2,dhw,dhdw
-      real*8 dlsc,dlsq,wsc
+      real*8 dlsc(2),dlsq(2),wsc
       real*8 soft,dsoft
       real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik
       character*6 mode
 c
@@ -680,7 +689,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -703,9 +712,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -746,15 +759,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   wsc = 1.0d0
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      if (r2 .lt. rs2) then
-                        call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                      end if
-                     wsc = dlsc
+                     wsc = dlsc(ig)
                      scale = scale * soft
                   end if
 c
@@ -799,7 +811,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -822,9 +834,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -871,15 +887,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = (muti.or.mutk) .and.
-     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutik = (ig .gt. 0)
                      wsc = 1.0d0
                      if (mutik) then
-                        soft = dlsc
+                        soft = dlsc(ig)
                         if (r2 .lt. rs2) then
-                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                         end if
-                        wsc = dlsc
+                        wsc = dlsc(ig)
                         scale = scale * soft
                      end if
 c
@@ -993,6 +1008,7 @@ c
       use usage
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -1004,12 +1020,11 @@ c
       real*8 expa,term
       real*8 damp,ddamp,scale
       real*8 dmp2,dhw,dhdw
-      real*8 dlsc,dlsq,wsc
+      real*8 dlsc(2),dlsq(2),wsc
       real*8 soft,dsoft
       real*8 rs2
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik
       character*6 mode
 c
@@ -1039,7 +1054,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,ndlst,dlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,aewald,
-!$OMP& vcouple,dlsc,dlsq,rs2)
+!$OMP& mutcls,dlsc,dlsq,rs2)
 !$OMP& shared(use_dhal,dhdamp)
 !$OMP& firstprivate(dspscale) shared(edsp)
 !$OMP DO reduction(+:edsp)
@@ -1054,7 +1069,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1077,9 +1092,13 @@ c
             k = dlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -1120,15 +1139,14 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   wsc = 1.0d0
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      if (r2 .lt. rs2) then
-                        call edspsc (r,dlsc,dlsq,soft,dsoft)
+                        call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                      end if
-                     wsc = dlsc
+                     wsc = dlsc(ig)
                      scale = scale * soft
                   end if
 c
@@ -1180,9 +1198,11 @@ c
 c     "edrecip" evaluates the reciprocal space portion of the particle
 c     mesh Ewald energy due to damped dispersion
 c
-c     for a mutated system the environment and ligand sites fill the
-c     real and imaginary parts of one grid, and their transforms are
-c     separated by symmetry to weight each pair type by lambda
+c     for a mutated system the environment and ligand groups fill
+c     the density slots set by "dspslot", the first two as the real
+c     and imaginary parts of one grid and a third on a second grid,
+c     and their transforms are separated by symmetry to weight each
+c     pair type by lambda
 c
 c
       subroutine edrecip
@@ -1196,9 +1216,13 @@ c
       implicit none
       integer i,j
       integer k1,k2,k3
+      integer j1,j2,j3
       integer m1,m2,m3
       integer ntot,nff
       integer nf1,nf2,nf3
+      integer nslot
+      integer gslot(0:2)
+      integer gpart(0:2)
       real*8 e,denom
       real*8 r1,r2,r3
       real*8 h1,h2,h3
@@ -1208,9 +1232,14 @@ c
       real*8 h,hhh,b,bfac
       real*8 fac1,fac2,fac3
       real*8 erfcterm
-      real*8 wel,wll,cpr
-      real*8 ser,sei,slr,sli
-      logical split
+      real*8 cpr,dcpr,d2cpr
+      real*8 dspstruc
+      real*8 sr(3),si(3)
+      real*8 qa(2,2),qb(2)
+      real*8 ws(3,3)
+      real*8 dws(3,3)
+      real*8 d2ws(3,3)
+      real*8, allocatable :: qgb(:,:,:,:)
 c
 c
 c     return if the Ewald coefficient is zero
@@ -1232,11 +1261,34 @@ c
       call bspline_fill
       call table_fill
 c
-c     assign PME grid and perform 3-D FFT forward transform
+c     assign the environment and ligand groups to density slots
 c
-      call dspmutwt (split,wel,wll,cpr)
-      call grid_disp (split)
+      call dspslot (.false.,.false.,nslot,gslot,ws,dws,d2ws,
+     &              cpr,dcpr,d2cpr)
+c
+c     no group left on the grid leaves no energy, as the pairwise
+c     sum of C6 values is then zero as well
+c
+      if (nslot .eq. 0)  return
+c
+c     assign PME grids and perform 3-D FFT forward transforms, where
+c     a third density slot takes a second grid
+c
+      do i = 0, 2
+         gpart(i) = gslot(i)
+         if (gslot(i) .eq. 3)  gpart(i) = 0
+      end do
+      call grid_disp (qgrid,gpart)
       call fftfront (qgrid)
+      if (nslot .eq. 3) then
+         allocate (qgb(2,nfft1,nfft2,nfft3))
+         do i = 0, 2
+            gpart(i) = 0
+            if (gslot(i) .eq. 3)  gpart(i) = 1
+         end do
+         call grid_disp (qgb,gpart)
+         call fftfront (qgb)
+      end if
 c
 c     use scalar sum to get the reciprocal space energy
 c
@@ -1284,13 +1336,14 @@ c
                if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
             end if
             eterm = (-fac1*erfcterm*hhh-expterm*(fac2+fac3*hsq))/denom
-            if (split) then
-               call dspsplit (qgrid,k1,k2,k3,ser,sei,slr,sli)
-               struc2 = ser*ser + sei*sei + wll*(slr*slr+sli*sli)
-     &                     + 2.0d0*wel*(ser*slr+sei*sli)
-            else
-               struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-            end if
+            call pmeopp (k1,k2,k3,j1,j2,j3)
+            do j = 1, 2
+               qa(j,1) = qgrid(j,k1,k2,k3)
+               qa(j,2) = qgrid(j,j1,j2,j3)
+               if (nslot .eq. 3)  qb(j) = qgb(j,k1,k2,k3)
+            end do
+            call dspsf (nslot,qa(1,1),qa(1,2),qb,sr,si)
+            struc2 = dspstruc (nslot,ws,sr,si)
             e = eterm * struc2
             edsp = edsp + e
          end if
@@ -1300,21 +1353,23 @@ c     account for the total energy correction term
 c
       e = -cpr * aewald**3 / denom0
       edsp = edsp + e
+      if (nslot .eq. 3)  deallocate (qgb)
       return
       end
 c
 c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine dspmutwt  --  mutated dispersion PME weights  ##
-c     ##                                                           ##
-c     ###############################################################
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine dspslot  --  dispersion PME density slots  ##
+c     ##                                                        ##
+c     ############################################################
 c
 c
-c     "dspmutwt" finds the lambda weights of the ligand to environment
-c     and the ligand to ligand dispersion pairs, whether the PME sum
-c     has to carry the environment and ligand separately, and the
-c     weighted pairwise sum of C6 values for the zero wavevector term
+c     "dspslot" assigns the dispersion sites of each group to the
+c     real densities "slots" carried by the PME transforms, and finds
+c     the pair weights between slots, their lambda derivatives when
+c     "dodl" or "dod2" is set, and the weighted pairwise sum of C6
+c     values for the zero wavevector term
 c
 c     the lambda power of the soft core scales every pair with a ligand
 c     atom under annihilation, but only the ligand to environment pairs
@@ -1323,105 +1378,204 @@ c     and a single real density cannot reproduce them; the soft core
 c     switch acts only inside its radius, so reciprocal space carries
 c     the plain lambda power
 c
+c     a group with no sites, or with no weight left to carry, is not
+c     placed on the grid, and a group whose weights match those of an
+c     earlier group shares its slot, so a fully coupled system and the
+c     ligand legs of a relative schedule need a single transform; the
+c     first two slots are the real and imaginary parts of the main PME
+c     grid, and a third slot needs a second grid
 c
-      subroutine dspmutwt (split,wel,wll,cpr)
+c
+      subroutine dspslot (dodl,dod2,nslot,gslot,ws,dws,d2ws,
+     &                    cpr,dcpr,d2cpr)
       use disp
+      use mutant
       implicit none
-      real*8 wel,wll,cpr
-      real*8 dwel,dwll,dcpr
-      real*8 d2wel,d2wll,d2cpr
-      logical split
+      integer i,ii
+      integer g,h,f
+      integer nslot
+      integer gslot(0:2)
+      integer grp(3)
+      real*8 cpr,dcpr,d2cpr
+      real*8 csum(0:2)
+      real*8 wg(0:2,0:2)
+      real*8 dwg(0:2,0:2)
+      real*8 d2wg(0:2,0:2)
+      real*8 ws(3,3)
+      real*8 dws(3,3)
+      real*8 d2ws(3,3)
+      logical dodl,dod2
+      logical same,live
+      logical have(0:2)
 c
 c
-c     get the weights from the routine that also finds their lambda
-c     derivatives, which are not needed here
+c     get the pair weights of the environment and ligand groups
 c
-      call dspmutwt4 (split,wel,wll,cpr,dwel,dwll,dcpr,
-     &                d2wel,d2wll,d2cpr)
+      call grpvwt (scexpd,wg,dwg,d2wg)
 c
-c     a fully coupled system needs no split
+c     find the groups with sites and their sums of C6 values
 c
-      if (wel.eq.1.0d0 .and. wll.eq.1.0d0) then
-         split = .false.
-         cpr = csixpr
+      do g = 0, 2
+         csum(g) = 0.0d0
+         have(g) = .false.
+      end do
+      do ii = 1, ndisp
+         i = idisp(ii)
+         g = mutg(i)
+         csum(g) = csum(g) + csix(i)
+         have(g) = .true.
+      end do
+c
+c     drop a group with no weight to any group on the grid
+c
+      do g = 0, 2
+         if (have(g)) then
+            live = .false.
+            do h = 0, 2
+               if (have(h)) then
+                  if (wg(g,h) .ne. 0.0d0)  live = .true.
+                  if (dodl .and. dwg(g,h).ne.0.0d0)  live = .true.
+                  if (dod2 .and. d2wg(g,h).ne.0.0d0)  live = .true.
+               end if
+            end do
+            have(g) = live
+         end if
+      end do
+c
+c     merge a group into an earlier one with the same weights
+c
+      nslot = 0
+      do g = 0, 2
+         gslot(g) = 0
+         if (have(g)) then
+            do h = 0, g-1
+               if (gslot(h).ne.0 .and. gslot(g).eq.0) then
+                  same = .true.
+                  do f = 0, 2
+                     if (have(f)) then
+                        if (wg(g,f) .ne. wg(h,f))  same = .false.
+                        if (dodl .and. dwg(g,f).ne.dwg(h,f))
+     &                     same = .false.
+                        if (dod2 .and. d2wg(g,f).ne.d2wg(h,f))
+     &                     same = .false.
+                     end if
+                  end do
+                  if (same)  gslot(g) = gslot(h)
+               end if
+            end do
+            if (gslot(g) .eq. 0) then
+               nslot = nslot + 1
+               gslot(g) = nslot
+               grp(nslot) = g
+            end if
+         end if
+      end do
+c
+c     set the pair weights between slots
+c
+      do i = 1, 3
+         do ii = 1, 3
+            ws(ii,i) = 0.0d0
+            dws(ii,i) = 0.0d0
+            d2ws(ii,i) = 0.0d0
+         end do
+      end do
+      do i = 1, nslot
+         do ii = 1, nslot
+            ws(ii,i) = wg(grp(ii),grp(i))
+            dws(ii,i) = dwg(grp(ii),grp(i))
+            d2ws(ii,i) = d2wg(grp(ii),grp(i))
+         end do
+      end do
+c
+c     weight the pairwise sum of C6 values over the groups
+c
+      cpr = 0.0d0
+      dcpr = 0.0d0
+      d2cpr = 0.0d0
+      do g = 0, 2
+         do h = 0, 2
+            if (have(g) .and. have(h)) then
+               cpr = cpr + wg(g,h)*csum(g)*csum(h)
+               dcpr = dcpr + dwg(g,h)*csum(g)*csum(h)
+               d2cpr = d2cpr + d2wg(g,h)*csum(g)*csum(h)
+            end if
+         end do
+      end do
+c
+c     an unmutated system keeps the stored pairwise sum
+c
+      if (nmut .eq. 0)  cpr = csixpr
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine dspsf  --  dispersion slot transforms at k  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "dspsf" gets the transforms "sr" and "si" of each dispersion
+c     density slot at one wavevector, from the value "za" there and
+c     "ya" at the opposite wavevector of the main transform, which
+c     holds the first two slots as its real and imaginary parts, and
+c     from the value "zb" there of the second transform, which holds
+c     the third slot
+c
+c
+      subroutine dspsf (nslot,za,ya,zb,sr,si)
+      implicit none
+      integer nslot
+      real*8 za(2),ya(2),zb(2)
+      real*8 sr(3),si(3)
+c
+c
+c     a single slot is the transform itself, while two slots are
+c     packed and must be separated
+c
+      if (nslot .eq. 1) then
+         sr(1) = za(1)
+         si(1) = za(2)
+      else if (nslot .ge. 2) then
+         call pmesplit (za,ya,sr(1),si(1),sr(2),si(2))
+      end if
+      if (nslot .eq. 3) then
+         sr(3) = zb(1)
+         si(3) = zb(2)
       end if
       return
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine dspmutwt4  --  dispersion PME weight derivs  ##
-c     ##                                                          ##
-c     ##############################################################
+c     ################################################################
+c     ##                                                            ##
+c     ##  function dspstruc  --  weighted dispersion structure sum  ##
+c     ##                                                            ##
+c     ################################################################
 c
 c
-c     "dspmutwt4" finds the lambda weights of the mutated dispersion
-c     PME sum as in "dspmutwt", along with their first and second
-c     derivatives with respect to lambda and those of the weighted
-c     C6 pair sum, and always carries the environment and ligand
-c     separately, since the weight derivatives are not zero at the
-c     fully coupled end
+c     "dspstruc" contracts the slot transforms "sr" and "si" at one
+c     wavevector with the slot pair weights "w"
 c
 c
-      subroutine dspmutwt4 (split,wel,wll,cpr,dwel,dwll,dcpr,
-     &                      d2wel,d2wll,d2cpr)
-      use disp
-      use dlmda
-      use mutant
+      function dspstruc (nslot,w,sr,si)
       implicit none
-      integer i,ii
-      real*8 v,v1,v2
-      real*8 wel,wll,cpr
-      real*8 dwel,dwll,dcpr
-      real*8 d2wel,d2wll,d2cpr
-      real*8 sume,suml
-      logical split
+      integer i,j,nslot
+      real*8 dspstruc
+      real*8 w(3,3)
+      real*8 sr(3),si(3)
 c
 c
-c     an unmutated system needs no split
+c     sum the weighted products of the slot transforms
 c
-      split = .false.
-      wel = 1.0d0
-      wll = 1.0d0
-      cpr = csixpr
-      dwel = 0.0d0
-      dwll = 0.0d0
-      dcpr = 0.0d0
-      d2wel = 0.0d0
-      d2wll = 0.0d0
-      d2cpr = 0.0d0
-      if (nmut .eq. 0)  return
-c
-c     set the weights and their derivatives for annihilation or for
-c     decoupling from the lambda power of the soft core
-c
-      call lmdapwr (vlambda,scexpd,use_d2lmda,v,v1,v2)
-      split = .true.
-      wel = v
-      dwel = v1
-      d2wel = v2
-      if (vcouple .eq. 1) then
-         wll = v
-         dwll = v1
-         d2wll = v2
-      end if
-c
-c     weight the environment and ligand parts of the C6 pair sum
-c
-      sume = 0.0d0
-      suml = 0.0d0
-      do ii = 1, ndisp
-         i = idisp(ii)
-         if (mutg(i) .eq. 0) then
-            sume = sume + csix(i)
-         else
-            suml = suml + csix(i)
-         end if
+      dspstruc = 0.0d0
+      do i = 1, nslot
+         do j = 1, nslot
+            dspstruc = dspstruc + w(j,i)*(sr(i)*sr(j)+si(i)*si(j))
+         end do
       end do
-      cpr = sume*sume + 2.0d0*wel*sume*suml + wll*suml*suml
-      dcpr = 2.0d0*dwel*sume*suml + dwll*suml*suml
-      d2cpr = 2.0d0*d2wel*sume*suml + d2wll*suml*suml
       return
       end
 c
@@ -1434,10 +1588,9 @@ c     ############################################################
 c
 c
 c     "dspself" adds the self-energy portion of the Ewald summation
-c     for damped dispersion, weighting each ligand site as the
-c     reciprocal space sum does, along with its lambda derivatives
-c     when "deriv" is set and its partitioning over atoms when "part"
-c     is set
+c     for damped dispersion, weighting each site by the pair weight
+c     of its own group, along with its lambda derivatives when "deriv"
+c     is set and its partitioning over atoms when "part" is set
 c
 c
       subroutine dspself (deriv,part)
@@ -1449,37 +1602,33 @@ c
       use ewald
       use mutant
       implicit none
-      integer i,ii
-      real*8 e,wel,wll,cpr
-      real*8 dwel,dwll,dcpr
-      real*8 d2wel,d2wll,d2cpr
+      integer i,ii,g
+      real*8 e
+      real*8 wg(0:2,0:2)
+      real*8 dwg(0:2,0:2)
+      real*8 d2wg(0:2,0:2)
       logical deriv,part
-      logical split
       logical dodl,dod2
 c
 c
-c     get the ligand weights, along with their lambda derivatives
+c     get the group weights, along with their lambda derivatives
 c     while the van der Waals lambda map has slope or curvature
 c
       dodl = .false.
       dod2 = .false.
       if (deriv)  call vdlflags (dodl,dod2)
-      if (dodl) then
-         call dspmutwt4 (split,wel,wll,cpr,dwel,dwll,dcpr,
-     &                   d2wel,d2wll,d2cpr)
-      else
-         call dspmutwt (split,wel,wll,cpr)
-      end if
+      call grpvwt (scexpd,wg,dwg,d2wg)
 c
 c     add the weighted self energy of each dispersion site
 c
       do ii = 1, ndisp
          i = idisp(ii)
          e = csix(i)**2 * aewald**6 / 12.0d0
-         if (mutg(i) .ne. 0) then
-            if (dodl)  devdl = devdl + dwll*e
-            if (dod2)  d2evdl2 = d2evdl2 + d2wll*e
-            e = e * wll
+         g = mutg(i)
+         if (g .ne. 0) then
+            if (dodl)  devdl = devdl + dwg(g,g)*e
+            if (dod2)  d2evdl2 = d2evdl2 + d2wg(g,g)*e
+            e = e * wg(g,g)
          end if
          edsp = edsp + e
          if (part) then
@@ -1487,48 +1636,5 @@ c
             aedsp(i) = aedsp(i) + e
          end if
       end do
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine dspsplit  --  separate packed PME transforms  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "dspsplit" recovers the transforms of the environment and the
-c     ligand dispersion densities at one wavevector from a grid that
-c     held them as its real and imaginary parts, using the conjugate
-c     symmetry of the transform of a real density
-c
-c
-      subroutine dspsplit (qg,k1,k2,k3,ser,sei,slr,sli)
-      use pme
-      implicit none
-      integer k1,k2,k3
-      integer j1,j2,j3
-      real*8 zr,zi,yr,yi
-      real*8 ser,sei,slr,sli
-      real*8 qg(2,nfft1,nfft2,nfft3)
-c
-c
-c     find the grid point of the opposite wavevector
-c
-      j1 = mod(nfft1+1-k1,nfft1) + 1
-      j2 = mod(nfft2+1-k2,nfft2) + 1
-      j3 = mod(nfft3+1-k3,nfft3) + 1
-c
-c     split the packed values into the two separate transforms
-c
-      zr = qg(1,k1,k2,k3)
-      zi = qg(2,k1,k2,k3)
-      yr = qg(1,j1,j2,j3)
-      yi = qg(2,j1,j2,j3)
-      ser = 0.5d0 * (zr+yr)
-      sei = 0.5d0 * (zi-yi)
-      slr = 0.5d0 * (zi+yi)
-      sli = 0.5d0 * (yr-zr)
       return
       end

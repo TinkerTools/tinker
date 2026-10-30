@@ -45,9 +45,11 @@ c
       real*8 fi,fk,fik
       real*8 fie,fia,fib
       real*8 fke,fka,fkb
-      real*8 ee,ea,eb,aa,bb
-      real*8 e,eps
-      real*8 vlw,vlb
+      real*8 ee,ea,eb,ab,aa,bb
+      real*8 e,eps,pw
+      real*8 wg(0:2,0:2)
+      real*8 dwg(0:2,0:2)
+      real*8 d2wg(0:2,0:2)
       real*8 offset,taper
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
@@ -84,21 +86,17 @@ c
       rdelta = (range-cut) / dble(ndelta)
       offset = cut - 0.5d0*rdelta
 c
-c     the soft core buffered 14-7 potential scales a mutated pair by
-c     the soft core power of its group lambda, and its softening is
-c     negligible against the buffered distance beyond the cutoff
+c     get the pair weights between the environment and ligand groups
+c     from the lambda power a mutated pair keeps beyond the cutoff,
+c     the soft core power of the buffered 14-7 potential, whose
+c     softening is negligible against the buffered distance there,
+c     and the lambda power of the damped dispersion outside its switch
+c     radius
 c
-      vlw = vlambda
-      vlb = 1.0d0 - vlambda
-      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7') then
-         vlw = vlambda**scexp
-         vlb = (1.0d0-vlambda)**scexp
-      end if
-c
-c     beyond its switch radius the soft core of the damped dispersion
-c     leaves only its lambda power on a mutated pair
-c
-      if (dsp)  vlw = vlambda**scexpd
+      pw = 1.0d0
+      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7')  pw = scexp
+      if (dsp)  pw = scexpd
+      call grpvwt (pw,wg,dwg,d2wg)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -150,19 +148,16 @@ c
             fke = fk - fka - fkb
 c
 c     split the pair count into environment and ligand group
-c     classes, with ligand 2 coupling as the complement of vlambda
-c     and no interaction between the two ligand groups
+c     classes, and weight each class by its group pair weight
 c
             ee = fie * fke
             ea = fie*fka + fia*fke
             eb = fie*fkb + fib*fke
+            ab = fia*fkb + fib*fka
             aa = fia * fka
             bb = fib * fkb
-            if (vcouple .eq. 0) then
-               fik = ee + aa + bb + vlw*ea + vlb*eb
-            else
-               fik = ee + vlw*(ea+aa) + vlb*(eb+bb)
-            end if
+            fik = wg(0,0)*ee + wg(0,1)*ea + wg(0,2)*eb
+     &               + wg(1,2)*ab + wg(1,1)*aa + wg(2,2)*bb
             if (k .eq. i)  fik = 0.5d0 * fik
             if (dsp) then
                cik = dspsix(it) * dspsix(kt)
@@ -265,11 +260,12 @@ c
       real*8 dfik,d2fik
       real*8 fie,fia,fib
       real*8 fke,fka,fkb
-      real*8 ee,ea,eb,aa,bb
-      real*8 e,eps
+      real*8 ee,ea,eb,ab,aa,bb
+      real*8 e,eps,pw
       real*8 offset
-      real*8 vlw,dvlw,vlw2
-      real*8 vlb,dvlb,vlb2
+      real*8 wg(0:2,0:2)
+      real*8 dwg(0:2,0:2)
+      real*8 d2wg(0:2,0:2)
       real*8 taper
       real*8 rv,rv2,rv6,rv7
       real*8 r,r2,r3,r4
@@ -313,26 +309,17 @@ c
       rdelta = (range-cut) / dble(ndelta)
       offset = cut - 0.5d0*rdelta
 c
-c     the soft core buffered 14-7 potential scales a mutated pair by
-c     the soft core power of its group lambda, and its softening is
-c     negligible against the buffered distance beyond the cutoff
+c     get the pair weights between the environment and ligand groups,
+c     and their lambda derivatives, from the lambda power a mutated
+c     pair keeps beyond the cutoff, the soft core power of the buffered
+c     14-7 potential, whose softening is negligible against the
+c     buffered distance there, and the lambda power of the damped
+c     dispersion outside its switch radius
 c
-      vlw = vlambda
-      dvlw = 1.0d0
-      vlw2 = 0.0d0
-      vlb = 1.0d0 - vlambda
-      dvlb = -1.0d0
-      vlb2 = 0.0d0
-      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7') then
-         call lmdapwr (vlambda,scexp,use_d2lmda,vlw,dvlw,vlw2)
-         call lmdapwr (1.0d0-vlambda,scexp,use_d2lmda,vlb,dvlb,vlb2)
-         dvlb = -dvlb
-      end if
-c
-c     beyond its switch radius the soft core of the damped dispersion
-c     leaves only its lambda power on a mutated pair
-c
-      if (dsp)  call lmdapwr (vlambda,scexpd,use_d2lmda,vlw,dvlw,vlw2)
+      pw = 1.0d0
+      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7')  pw = scexp
+      if (dsp)  pw = scexpd
+      call grpvwt (pw,wg,dwg,d2wg)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -384,25 +371,21 @@ c
             fke = fk - fka - fkb
 c
 c     split the pair count into environment and ligand group
-c     classes, with ligand 2 coupling as the complement of vlambda
-c     and no interaction between the two ligand groups, and get the
-c     first and second derivatives of the pair weight with respect
-c     to lambda
+c     classes, and weight each class by its group pair weight and
+c     its first and second derivatives with respect to lambda
 c
             ee = fie * fke
             ea = fie*fka + fia*fke
             eb = fie*fkb + fib*fke
+            ab = fia*fkb + fib*fka
             aa = fia * fka
             bb = fib * fkb
-            if (vcouple .eq. 0) then
-               fik = ee + aa + bb + vlw*ea + vlb*eb
-               dfik = dvlw*ea + dvlb*eb
-               d2fik = vlw2*ea + vlb2*eb
-            else
-               fik = ee + vlw*(ea+aa) + vlb*(eb+bb)
-               dfik = dvlw*(ea+aa) + dvlb*(eb+bb)
-               d2fik = vlw2*(ea+aa) + vlb2*(eb+bb)
-            end if
+            fik = wg(0,0)*ee + wg(0,1)*ea + wg(0,2)*eb
+     &               + wg(1,2)*ab + wg(1,1)*aa + wg(2,2)*bb
+            dfik = dwg(0,1)*ea + dwg(0,2)*eb + dwg(1,2)*ab
+     &                + dwg(1,1)*aa + dwg(2,2)*bb
+            d2fik = d2wg(0,1)*ea + d2wg(0,2)*eb + d2wg(1,2)*ab
+     &                 + d2wg(1,1)*aa + d2wg(2,2)*bb
             if (k .eq. i) then
                fik = 0.5d0 * fik
                dfik = 0.5d0 * dfik

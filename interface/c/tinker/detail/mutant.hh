@@ -8,6 +8,7 @@ extern "C" {
 extern int TINKER_MOD(mutant, nmut);
 extern int TINKER_MOD(mutant, nmutb);
 extern int TINKER_MOD(mutant, vcouple);
+extern int TINKER_MOD(mutant, mutcls)[3][3];
 extern int* TINKER_MOD(mutant, class0);
 extern int* TINKER_MOD(mutant, class1);
 extern int* TINKER_MOD(mutant, imut);

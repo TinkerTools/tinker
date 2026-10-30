@@ -80,6 +80,215 @@ c
       end
 c
 c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine grpvlmda  --  van der Waals lambda of a group  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "grpvlmda" returns the van der Waals lambda "vlmd" seen by the
+c     pairs of ligand group "ig" and the sign "vsgn" of its derivative
+c     with respect to vlambda, where the second ligand of a relative
+c     dual topology couples as the complement of vlambda
+c
+c
+      subroutine grpvlmda (ig,vlmd,vsgn)
+      use mutant
+      implicit none
+      integer ig
+      real*8 vlmd,vsgn
+c
+c
+c     the first ligand group couples as vlambda itself
+c
+      vlmd = vlambda
+      vsgn = 1.0d0
+      if (ig .eq. 2) then
+         vlmd = 1.0d0 - vlambda
+         vsgn = -1.0d0
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine grpsoft  --  soft core lambda terms by group  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "grpsoft" sets the soft core scale "lsc" and shift "shf" of each
+c     ligand group for the form shared by the buffered 14-7 potential
+c     and the Pauli repulsion, with scale lambda^n and shift equal to
+c     alpha*lambda^m*(1-lambda)^p, where "pw" is n, "alpha" is alpha,
+c     "pm" is m and "pp" is p
+c
+c
+      subroutine grpsoft (pw,alpha,pm,pp,lsc,shf)
+      implicit none
+      integer ig
+      real*8 pw,alpha,pm,pp
+      real*8 vlmd,vsgn
+      real*8 shf1,shf2
+      real*8 lsc(2)
+      real*8 shf(2)
+c
+c
+c     set the soft core lambda terms for each ligand group
+c
+      do ig = 1, 2
+         call grpvlmda (ig,vlmd,vsgn)
+         lsc(ig) = vlmd**pw
+         call lmdapow (vlmd,alpha,pm,pp,.false.,shf(ig),shf1,shf2)
+      end do
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine grpsoft4  --  soft core terms and lambda derivs  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "grpsoft4" sets the soft core terms of each ligand group as in
+c     "grpsoft" along with the factors needed for their first and
+c     second derivatives with respect to the group lambda, where
+c     "lsc1" and "lsc2" hold the scale over lambda and lambda squared,
+c     and "shf1" and "shf2" hold lambda and lambda squared times the
+c     shift derivatives, so that no power of lambda goes negative;
+c     "lsc1" also carries the sign of the derivative of the group
+c     lambda with respect to vlambda, which is negative for a second
+c     ligand group, and the second derivative factors are only set
+c     when requested
+c
+c
+      subroutine grpsoft4 (pw,alpha,pm,pp,lsc,shf,lsc1,lsc2,shf1,shf2)
+      use dlmda
+      implicit none
+      integer ig
+      real*8 pw,alpha,pm,pp
+      real*8 vlmd,vsgn
+      real*8 lsc(2),shf(2)
+      real*8 lsc1(2),lsc2(2)
+      real*8 shf1(2),shf2(2)
+c
+c
+c     set the soft core terms and their lambda derivative factors
+c
+      do ig = 1, 2
+         call grpvlmda (ig,vlmd,vsgn)
+         lsc(ig) = vlmd**pw
+         lsc1(ig) = vsgn * vlmd**(pw-1.0d0)
+         lsc2(ig) = 0.0d0
+         if (use_d2lmda)  lsc2(ig) = vlmd**(pw-2.0d0)
+         call lmdapow (vlmd,alpha,pm,pp,use_d2lmda,shf(ig),shf1(ig),
+     &                 shf2(ig))
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine grppcls  --  van der Waals pair class by group  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "grppcls" sets the class "mutcls" of the van der Waals type
+c     pairs between the environment (group 0) and the ligand groups,
+c     where -1 marks a pair that is skipped, 0 a pair at full weight,
+c     and 1 or 2 a pair scaled by the soft core of that ligand group
+c
+c     a ligand to environment pair takes the soft core of its ligand,
+c     the pairs within a ligand keep full weight under decoupling but
+c     take its soft core under annihilation, and the two ligands of a
+c     relative dual topology never interact
+c
+c
+      subroutine grppcls
+      use mutant
+      implicit none
+      integer g
+c
+c
+c     set the class of each pair of atom groups
+c
+      mutcls(0,0) = 0
+      do g = 1, 2
+         mutcls(0,g) = g
+         mutcls(g,0) = g
+         mutcls(g,g) = 0
+         if (vcouple .eq. 1)  mutcls(g,g) = g
+      end do
+      mutcls(1,2) = -1
+      mutcls(2,1) = -1
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine grpvwt  --  van der Waals pair weights by group  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "grpvwt" finds the weights "wg" of the van der Waals type pairs
+c     between the environment (group 0) and the ligand groups for the
+c     soft core lambda power "pw", along with their first and second
+c     derivatives "dwg" and "d2wg" with respect to vlambda
+c
+c     a pair carries full weight, the lambda power of a ligand group
+c     or no weight as its class from "grppcls" sets, which gives the
+c     pair loops their soft core group as well
+c
+c
+      subroutine grpvwt (pw,wg,dwg,d2wg)
+      use dlmda
+      use mutant
+      implicit none
+      integer g,h,c
+      real*8 pw,vlmd,vsgn
+      real*8 v(2),dv(2),d2v(2)
+      real*8 wg(0:2,0:2)
+      real*8 dwg(0:2,0:2)
+      real*8 d2wg(0:2,0:2)
+c
+c
+c     get the lambda power of each ligand group and its derivatives
+c
+      do g = 1, 2
+         call grpvlmda (g,vlmd,vsgn)
+         call lmdapwr (vlmd,pw,use_d2lmda,v(g),dv(g),d2v(g))
+         dv(g) = vsgn * dv(g)
+      end do
+c
+c     weight each pair of groups by its pair class
+c
+      do g = 0, 2
+         do h = 0, 2
+            c = mutcls(h,g)
+            wg(h,g) = 0.0d0
+            dwg(h,g) = 0.0d0
+            d2wg(h,g) = 0.0d0
+            if (c .eq. 0) then
+               wg(h,g) = 1.0d0
+            else if (c .gt. 0) then
+               wg(h,g) = v(c)
+               dwg(h,g) = dv(c)
+               d2wg(h,g) = d2v(c)
+            end if
+         end do
+      end do
+      return
+      end
+c
+c
 c     ##############################################################
 c     ##                                                          ##
 c     ##  function lmdadrv  --  lambda derivative of a term used  ##

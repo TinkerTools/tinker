@@ -844,6 +844,154 @@ c
       end
 c
 c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine grid_mpole2  --  pack two mpole sets on grid  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "grid_mpole2" places two sets of fractional atomic multipoles
+c     onto the particle mesh Ewald grid, the set "fmp" in the real
+c     part and the set "lfmp" in the imaginary part, so that one
+c     transform carries both
+c
+c     note the main loop does not need to be an OpenMP reduction
+c     since a given qgrid element is always part of the same chunk,
+c     and the code runs faster without use of a reduction
+c
+c
+      subroutine grid_mpole2 (fmp,lfmp,qg)
+      use atoms
+      use chunks
+      use mpole
+      use pme
+      implicit none
+      integer i,j,k,m
+      integer ii,jj,kk
+      integer ichk,isite,iatm
+      integer offsetx,offsety
+      integer offsetz
+      integer cid(3)
+      integer nearpt(3)
+      integer abound(6)
+      integer cbound(6)
+      real*8 v0,u0,t0
+      real*8 v1,u1,t1
+      real*8 v2,u2,t2
+      real*8 term01,term11,term21
+      real*8 term02,term12,term22
+      real*8 fmp(10,*)
+      real*8 lfmp(10,*)
+      real*8 qg(2,nfft1,nfft2,nfft3)
+c
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,fmp,lfmp,
+!$OMP& pmetable,nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,
+!$OMP& ngrd2,ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
+!$OMP& shared(qg)
+!$OMP DO
+c
+c     zero out the particle mesh Ewald grid
+c
+      do k = 1, nfft3
+         do j = 1, nfft2
+            do i = 1, nfft1
+               qg(1,i,j,k) = 0.0d0
+               qg(2,i,j,k) = 0.0d0
+            end do
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP DO
+c
+c     put both sets of multipole moments onto the grid
+c
+      do ichk = 1, nchunk
+         cid(1) = mod(ichk-1,nchk1)
+         cid(2) = mod(((ichk-1-cid(1))/nchk1),nchk2)
+         cid(3) = mod((ichk-1)/(nchk1*nchk2),nchk3)
+         cbound(1) = cid(1)*ngrd1 + 1
+         cbound(2) = cbound(1) + ngrd1 - 1
+         cbound(3) = cid(2)*ngrd2 + 1
+         cbound(4) = cbound(3) + ngrd2 - 1
+         cbound(5) = cid(3)*ngrd3 + 1
+         cbound(6) = cbound(5) + ngrd3 - 1
+         do isite = 1, npole
+            iatm = ipole(isite)
+            if (pmetable(iatm,ichk) .eq. 1) then
+               nearpt(1) = igrid(1,iatm) + grdoff
+               nearpt(2) = igrid(2,iatm) + grdoff
+               nearpt(3) = igrid(3,iatm) + grdoff
+               abound(1) = nearpt(1) - nlpts
+               abound(2) = nearpt(1) + nrpts
+               abound(3) = nearpt(2) - nlpts
+               abound(4) = nearpt(2) + nrpts
+               abound(5) = nearpt(3) - nlpts
+               abound(6) = nearpt(3) + nrpts
+               call adjust (offsetx,nfft1,nchk1,abound(1),
+     &                         abound(2),cbound(1),cbound(2))
+               call adjust (offsety,nfft2,nchk2,abound(3),
+     &                         abound(4),cbound(3),cbound(4))
+               call adjust (offsetz,nfft3,nchk3,abound(5),
+     &                         abound(6),cbound(5),cbound(6))
+               do kk = abound(5), abound(6)
+                  k = kk
+                  m = k + offsetz
+                  if (k .lt. 1)  k = k + nfft3
+                  v0 = thetai3(1,m,iatm)
+                  v1 = thetai3(2,m,iatm)
+                  v2 = thetai3(3,m,iatm)
+                  do jj = abound(3), abound(4)
+                     j = jj
+                     m = j + offsety
+                     if (j .lt. 1)  j = j + nfft2
+                     u0 = thetai2(1,m,iatm)
+                     u1 = thetai2(2,m,iatm)
+                     u2 = thetai2(3,m,iatm)
+                     term01 = fmp(1,iatm)*u0*v0 + fmp(3,iatm)*u1*v0
+     &                     + fmp(4,iatm)*u0*v1 + fmp(6,iatm)*u2*v0
+     &                     + fmp(7,iatm)*u0*v2 + fmp(10,iatm)*u1*v1
+                     term11 = fmp(2,iatm)*u0*v0 + fmp(8,iatm)*u1*v0
+     &                          + fmp(9,iatm)*u0*v1
+                     term21 = fmp(5,iatm) * u0 * v0
+                     term02 = lfmp(1,iatm)*u0*v0 + lfmp(3,iatm)*u1*v0
+     &                     + lfmp(4,iatm)*u0*v1 + lfmp(6,iatm)*u2*v0
+     &                     + lfmp(7,iatm)*u0*v2 + lfmp(10,iatm)*u1*v1
+                     term12 = lfmp(2,iatm)*u0*v0 + lfmp(8,iatm)*u1*v0
+     &                          + lfmp(9,iatm)*u0*v1
+                     term22 = lfmp(5,iatm) * u0 * v0
+                     do ii = abound(1), abound(2)
+                        i = ii
+                        m = i + offsetx
+                        if (i .lt. 1)  i = i + nfft1
+                        t0 = thetai1(1,m,iatm)
+                        t1 = thetai1(2,m,iatm)
+                        t2 = thetai1(3,m,iatm)
+                        qg(1,i,j,k) = qg(1,i,j,k) + term01*t0
+     &                                      + term11*t1 + term21*t2
+                        qg(2,i,j,k) = qg(2,i,j,k) + term02*t0
+     &                                      + term12*t1 + term22*t2
+                     end do
+                  end do
+               end do
+            end if
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine grid_uind  --  put induced dipoles on PME grid  ##
@@ -987,16 +1135,17 @@ c     ##################################################################
 c
 c
 c     "grid_disp" places the damped dispersion coefficients onto
-c     the particle mesh Ewald grid; with "split" set, the sites of
-c     mutated atoms go into the imaginary part of the grid, so that
-c     one transform carries the environment and ligand separately
+c     the particle mesh Ewald grid "qg", where "gpart" gives for the
+c     environment and each ligand group the real (1) or imaginary (2)
+c     part of the grid that takes its sites, or zero to leave them
+c     off, so that one transform carries two densities separately
 c
 c     note the main loop does not need to be an OpenMP reduction
-c     since a given qgrid element is always part of the same chunk,
+c     since a given grid element is always part of the same chunk,
 c     and the code runs faster without use of a reduction
 c
 c
-      subroutine grid_disp (split)
+      subroutine grid_disp (qg,gpart)
       use atoms
       use disp
       use chunks
@@ -1010,12 +1159,13 @@ c
       integer offsetx,offsety
       integer offsetz
       integer cid(3)
+      integer gpart(0:2)
       integer nearpt(3)
       integer abound(6)
       integer cbound(6)
       real*8 v0,u0,t0
       real*8 term
-      logical split
+      real*8 qg(2,nfft1,nfft2,nfft3)
 c
 c
 c     OpenMP directives for the major loop structure
@@ -1023,8 +1173,8 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,pmetable,
 !$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
 !$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3,
-!$OMP& split,mutg)
-!$OMP& shared(qgrid)
+!$OMP& gpart,mutg)
+!$OMP& shared(qg)
 !$OMP DO
 c
 c     zero out the particle mesh Ewald grid
@@ -1032,8 +1182,8 @@ c
       do k = 1, nfft3
          do j = 1, nfft2
             do i = 1, nfft1
-               qgrid(1,i,j,k) = 0.0d0
-               qgrid(2,i,j,k) = 0.0d0
+               qg(1,i,j,k) = 0.0d0
+               qg(2,i,j,k) = 0.0d0
             end do
          end do
       end do
@@ -1057,11 +1207,8 @@ c
          cbound(6) = cbound(5) + ngrd3 - 1
          do isite = 1, ndisp
             iatm = idisp(isite)
-            if (pmetable(iatm,ichk) .eq. 1) then
-               ipart = 1
-               if (split) then
-                  if (mutg(iatm) .ne. 0)  ipart = 2
-               end if
+            ipart = gpart(mutg(iatm))
+            if (pmetable(iatm,ichk).eq.1 .and. ipart.ne.0) then
                nearpt(1) = igrid(1,iatm) + grdoff
                nearpt(2) = igrid(2,iatm) + grdoff
                nearpt(3) = igrid(3,iatm) + grdoff
@@ -1093,8 +1240,7 @@ c
                         m = i + offsetx
                         if (i .lt. 1)  i = i + nfft1
                         t0 = thetai1(1,m,iatm)
-                        qgrid(ipart,i,j,k) = qgrid(ipart,i,j,k)
-     &                                    + term*t0
+                        qg(ipart,i,j,k) = qg(ipart,i,j,k) + term*t0
                      end do
                   end do
                end do
@@ -1410,6 +1556,274 @@ c
          fphi(18,iatm) = tuv102
          fphi(19,iatm) = tuv012
          fphi(20,iatm) = tuv111
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine fphi_mpole2  --  two packed mpole potentials  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "fphi_mpole2" extracts two permanent multipole potentials and
+c     fields from the particle mesh Ewald grid, "fphi" from its real
+c     part and "lfphi" from its imaginary part
+c
+c
+      subroutine fphi_mpole2 (fphi,lfphi,qg)
+      use mpole
+      use pme
+      implicit none
+      integer i,j,k
+      integer isite,iatm
+      integer i0,j0,k0
+      integer it1,it2,it3
+      integer igrd0,jgrd0,kgrd0
+      real*8 v0,v1,v2,v3
+      real*8 u0,u1,u2,u3
+      real*8 t0_1,t1_1,t2_1,t3_1,tq_1
+      real*8 t0_2,t1_2,t2_2,t3_2,tq_2
+      real*8 tu00_1,tu10_1,tu01_1,tu20_1,tu11_1
+      real*8 tu00_2,tu10_2,tu01_2,tu20_2,tu11_2
+      real*8 tu02_1,tu21_1,tu12_1,tu30_1,tu03_1
+      real*8 tu02_2,tu21_2,tu12_2,tu30_2,tu03_2
+      real*8 tuv000_1,tuv100_1,tuv010_1,tuv001_1
+      real*8 tuv000_2,tuv100_2,tuv010_2,tuv001_2
+      real*8 tuv200_1,tuv020_1,tuv002_1,tuv110_1
+      real*8 tuv200_2,tuv020_2,tuv002_2,tuv110_2
+      real*8 tuv101_1,tuv011_1,tuv300_1,tuv030_1
+      real*8 tuv101_2,tuv011_2,tuv300_2,tuv030_2
+      real*8 tuv003_1,tuv210_1,tuv201_1,tuv120_1
+      real*8 tuv003_2,tuv210_2,tuv201_2,tuv120_2
+      real*8 tuv021_1,tuv102_1,tuv012_1,tuv111_1
+      real*8 tuv021_2,tuv102_2,tuv012_2,tuv111_2
+      real*8 fphi(20,*)
+      real*8 lfphi(20,*)
+      real*8 qg(2,nfft1,nfft2,nfft3)
+c
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(npole,ipole,igrid,bsorder,
+!$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qg,fphi,lfphi)
+!$OMP DO
+c
+c     get both multipole potentials and fields at each site
+c
+      do isite = 1, npole
+         iatm = ipole(isite)
+         igrd0 = igrid(1,iatm)
+         jgrd0 = igrid(2,iatm)
+         kgrd0 = igrid(3,iatm)
+         tuv000_1 = 0.0d0
+         tuv000_2 = 0.0d0
+         tuv001_1 = 0.0d0
+         tuv001_2 = 0.0d0
+         tuv010_1 = 0.0d0
+         tuv010_2 = 0.0d0
+         tuv100_1 = 0.0d0
+         tuv100_2 = 0.0d0
+         tuv200_1 = 0.0d0
+         tuv200_2 = 0.0d0
+         tuv020_1 = 0.0d0
+         tuv020_2 = 0.0d0
+         tuv002_1 = 0.0d0
+         tuv002_2 = 0.0d0
+         tuv110_1 = 0.0d0
+         tuv110_2 = 0.0d0
+         tuv101_1 = 0.0d0
+         tuv101_2 = 0.0d0
+         tuv011_1 = 0.0d0
+         tuv011_2 = 0.0d0
+         tuv300_1 = 0.0d0
+         tuv300_2 = 0.0d0
+         tuv030_1 = 0.0d0
+         tuv030_2 = 0.0d0
+         tuv003_1 = 0.0d0
+         tuv003_2 = 0.0d0
+         tuv210_1 = 0.0d0
+         tuv210_2 = 0.0d0
+         tuv201_1 = 0.0d0
+         tuv201_2 = 0.0d0
+         tuv120_1 = 0.0d0
+         tuv120_2 = 0.0d0
+         tuv021_1 = 0.0d0
+         tuv021_2 = 0.0d0
+         tuv102_1 = 0.0d0
+         tuv102_2 = 0.0d0
+         tuv012_1 = 0.0d0
+         tuv012_2 = 0.0d0
+         tuv111_1 = 0.0d0
+         tuv111_2 = 0.0d0
+         k0 = kgrd0
+         do it3 = 1, bsorder
+            k0 = k0 + 1
+            k = k0 + 1 + (nfft3-isign(nfft3,k0))/2
+            v0 = thetai3(1,it3,iatm)
+            v1 = thetai3(2,it3,iatm)
+            v2 = thetai3(3,it3,iatm)
+            v3 = thetai3(4,it3,iatm)
+            tu00_1 = 0.0d0
+            tu00_2 = 0.0d0
+            tu10_1 = 0.0d0
+            tu10_2 = 0.0d0
+            tu01_1 = 0.0d0
+            tu01_2 = 0.0d0
+            tu20_1 = 0.0d0
+            tu20_2 = 0.0d0
+            tu11_1 = 0.0d0
+            tu11_2 = 0.0d0
+            tu02_1 = 0.0d0
+            tu02_2 = 0.0d0
+            tu30_1 = 0.0d0
+            tu30_2 = 0.0d0
+            tu21_1 = 0.0d0
+            tu21_2 = 0.0d0
+            tu12_1 = 0.0d0
+            tu12_2 = 0.0d0
+            tu03_1 = 0.0d0
+            tu03_2 = 0.0d0
+            j0 = jgrd0
+            do it2 = 1, bsorder
+               j0 = j0 + 1
+               j = j0 + 1 + (nfft2-isign(nfft2,j0))/2
+               u0 = thetai2(1,it2,iatm)
+               u1 = thetai2(2,it2,iatm)
+               u2 = thetai2(3,it2,iatm)
+               u3 = thetai2(4,it2,iatm)
+               t0_1 = 0.0d0
+               t0_2 = 0.0d0
+               t1_1 = 0.0d0
+               t1_2 = 0.0d0
+               t2_1 = 0.0d0
+               t2_2 = 0.0d0
+               t3_1 = 0.0d0
+               t3_2 = 0.0d0
+               i0 = igrd0
+               do it1 = 1, bsorder
+                  i0 = i0 + 1
+                  i = i0 + 1 + (nfft1-isign(nfft1,i0))/2
+                  tq_1 = qg(1,i,j,k)
+                  tq_2 = qg(2,i,j,k)
+                  t0_1 = t0_1 + tq_1*thetai1(1,it1,iatm)
+                  t0_2 = t0_2 + tq_2*thetai1(1,it1,iatm)
+                  t1_1 = t1_1 + tq_1*thetai1(2,it1,iatm)
+                  t1_2 = t1_2 + tq_2*thetai1(2,it1,iatm)
+                  t2_1 = t2_1 + tq_1*thetai1(3,it1,iatm)
+                  t2_2 = t2_2 + tq_2*thetai1(3,it1,iatm)
+                  t3_1 = t3_1 + tq_1*thetai1(4,it1,iatm)
+                  t3_2 = t3_2 + tq_2*thetai1(4,it1,iatm)
+               end do
+               tu00_1 = tu00_1 + t0_1*u0
+               tu00_2 = tu00_2 + t0_2*u0
+               tu10_1 = tu10_1 + t1_1*u0
+               tu10_2 = tu10_2 + t1_2*u0
+               tu01_1 = tu01_1 + t0_1*u1
+               tu01_2 = tu01_2 + t0_2*u1
+               tu20_1 = tu20_1 + t2_1*u0
+               tu20_2 = tu20_2 + t2_2*u0
+               tu11_1 = tu11_1 + t1_1*u1
+               tu11_2 = tu11_2 + t1_2*u1
+               tu02_1 = tu02_1 + t0_1*u2
+               tu02_2 = tu02_2 + t0_2*u2
+               tu30_1 = tu30_1 + t3_1*u0
+               tu30_2 = tu30_2 + t3_2*u0
+               tu21_1 = tu21_1 + t2_1*u1
+               tu21_2 = tu21_2 + t2_2*u1
+               tu12_1 = tu12_1 + t1_1*u2
+               tu12_2 = tu12_2 + t1_2*u2
+               tu03_1 = tu03_1 + t0_1*u3
+               tu03_2 = tu03_2 + t0_2*u3
+            end do
+            tuv000_1 = tuv000_1 + tu00_1*v0
+            tuv000_2 = tuv000_2 + tu00_2*v0
+            tuv100_1 = tuv100_1 + tu10_1*v0
+            tuv100_2 = tuv100_2 + tu10_2*v0
+            tuv010_1 = tuv010_1 + tu01_1*v0
+            tuv010_2 = tuv010_2 + tu01_2*v0
+            tuv001_1 = tuv001_1 + tu00_1*v1
+            tuv001_2 = tuv001_2 + tu00_2*v1
+            tuv200_1 = tuv200_1 + tu20_1*v0
+            tuv200_2 = tuv200_2 + tu20_2*v0
+            tuv020_1 = tuv020_1 + tu02_1*v0
+            tuv020_2 = tuv020_2 + tu02_2*v0
+            tuv002_1 = tuv002_1 + tu00_1*v2
+            tuv002_2 = tuv002_2 + tu00_2*v2
+            tuv110_1 = tuv110_1 + tu11_1*v0
+            tuv110_2 = tuv110_2 + tu11_2*v0
+            tuv101_1 = tuv101_1 + tu10_1*v1
+            tuv101_2 = tuv101_2 + tu10_2*v1
+            tuv011_1 = tuv011_1 + tu01_1*v1
+            tuv011_2 = tuv011_2 + tu01_2*v1
+            tuv300_1 = tuv300_1 + tu30_1*v0
+            tuv300_2 = tuv300_2 + tu30_2*v0
+            tuv030_1 = tuv030_1 + tu03_1*v0
+            tuv030_2 = tuv030_2 + tu03_2*v0
+            tuv003_1 = tuv003_1 + tu00_1*v3
+            tuv003_2 = tuv003_2 + tu00_2*v3
+            tuv210_1 = tuv210_1 + tu21_1*v0
+            tuv210_2 = tuv210_2 + tu21_2*v0
+            tuv201_1 = tuv201_1 + tu20_1*v1
+            tuv201_2 = tuv201_2 + tu20_2*v1
+            tuv120_1 = tuv120_1 + tu12_1*v0
+            tuv120_2 = tuv120_2 + tu12_2*v0
+            tuv021_1 = tuv021_1 + tu02_1*v1
+            tuv021_2 = tuv021_2 + tu02_2*v1
+            tuv102_1 = tuv102_1 + tu10_1*v2
+            tuv102_2 = tuv102_2 + tu10_2*v2
+            tuv012_1 = tuv012_1 + tu01_1*v2
+            tuv012_2 = tuv012_2 + tu01_2*v2
+            tuv111_1 = tuv111_1 + tu11_1*v1
+            tuv111_2 = tuv111_2 + tu11_2*v1
+         end do
+         fphi(1,iatm) = tuv000_1
+         lfphi(1,iatm) = tuv000_2
+         fphi(2,iatm) = tuv100_1
+         lfphi(2,iatm) = tuv100_2
+         fphi(3,iatm) = tuv010_1
+         lfphi(3,iatm) = tuv010_2
+         fphi(4,iatm) = tuv001_1
+         lfphi(4,iatm) = tuv001_2
+         fphi(5,iatm) = tuv200_1
+         lfphi(5,iatm) = tuv200_2
+         fphi(6,iatm) = tuv020_1
+         lfphi(6,iatm) = tuv020_2
+         fphi(7,iatm) = tuv002_1
+         lfphi(7,iatm) = tuv002_2
+         fphi(8,iatm) = tuv110_1
+         lfphi(8,iatm) = tuv110_2
+         fphi(9,iatm) = tuv101_1
+         lfphi(9,iatm) = tuv101_2
+         fphi(10,iatm) = tuv011_1
+         lfphi(10,iatm) = tuv011_2
+         fphi(11,iatm) = tuv300_1
+         lfphi(11,iatm) = tuv300_2
+         fphi(12,iatm) = tuv030_1
+         lfphi(12,iatm) = tuv030_2
+         fphi(13,iatm) = tuv003_1
+         lfphi(13,iatm) = tuv003_2
+         fphi(14,iatm) = tuv210_1
+         lfphi(14,iatm) = tuv210_2
+         fphi(15,iatm) = tuv201_1
+         lfphi(15,iatm) = tuv201_2
+         fphi(16,iatm) = tuv120_1
+         lfphi(16,iatm) = tuv120_2
+         fphi(17,iatm) = tuv021_1
+         lfphi(17,iatm) = tuv021_2
+         fphi(18,iatm) = tuv102_1
+         lfphi(18,iatm) = tuv102_2
+         fphi(19,iatm) = tuv012_1
+         lfphi(19,iatm) = tuv012_2
+         fphi(20,iatm) = tuv111_1
+         lfphi(20,iatm) = tuv111_2
       end do
 c
 c     OpenMP directives for the major loop structure
@@ -1929,5 +2343,63 @@ c
             ftc(i1+4,i2+4) = a(k,i)*a(m,j) + a(m,i)*a(k,j)
          end do
       end do
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine pmeopp  --  opposite PME grid wavevector  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "pmeopp" finds the grid point "j1", "j2", "j3" that holds the
+c     wavevector opposite to that at grid point "k1", "k2", "k3"
+c
+c
+      subroutine pmeopp (k1,k2,k3,j1,j2,j3)
+      use pme
+      implicit none
+      integer k1,k2,k3
+      integer j1,j2,j3
+c
+c
+c     reflect each grid index through the origin of the grid
+c
+      j1 = mod(nfft1+1-k1,nfft1) + 1
+      j2 = mod(nfft2+1-k2,nfft2) + 1
+      j3 = mod(nfft3+1-k3,nfft3) + 1
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine pmesplit  --  separate packed PME transforms  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "pmesplit" recovers the transforms "s1" and "s2" of two real
+c     densities at one wavevector from the values "z" there and "y"
+c     at the opposite wavevector of a transform that held them as its
+c     real and imaginary parts, using the conjugate symmetry of the
+c     transform of a real density
+c
+c
+      subroutine pmesplit (z,y,s1r,s1i,s2r,s2i)
+      implicit none
+      real*8 s1r,s1i
+      real*8 s2r,s2i
+      real*8 z(2),y(2)
+c
+c
+c     split the packed values into the two separate transforms
+c
+      s1r = 0.5d0 * (z(1)+y(1))
+      s1i = 0.5d0 * (z(2)-y(2))
+      s2r = 0.5d0 * (z(2)+y(2))
+      s2i = 0.5d0 * (y(1)-z(1))
       return
       end

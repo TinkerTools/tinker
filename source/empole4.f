@@ -1215,7 +1215,7 @@ c
       use virial
       implicit none
       integer i,j,k,nd
-      integer ii,kk,kkk
+      integer ii,kkk
       integer ix,iy,iz
       integer kx,ky,kz
       real*8 e,de,f,fgrp
@@ -3658,7 +3658,7 @@ c
       use virial
       implicit none
       integer i,j,k,nd
-      integer ii,kk,kkk
+      integer ii,kkk
       real*8 e,de,f
       real*8 scalek
       real*8 xi,yi,zi
@@ -4314,7 +4314,10 @@ c
       implicit none
       integer i,j,k,ii
       integer k1,k2,k3
+      integer j1,j2,j3
       integer m1,m2,m3
+      integer ip,ipt,jpt,npt
+      integer kp(3,2)
       integer ntot,nff
       integer nf1,nf2,nf3
       integer deriv1(10)
@@ -4335,6 +4338,7 @@ c
       real*8 term,pterm
       real*8 vterm,struc2
       real*8 q1,q2,lq1,lq2
+      real*8 qa(2,2)
       real*8 dldeterm,dldvterm
       real*8 dstruc2dl
       real*8 dlambda,dlambda2
@@ -4398,9 +4402,6 @@ c
       if (allocated(qgrid)) then
          if (size(qgrid) .ne. 2*ntot)  call fftclose
       end if
-      if (allocated(lqgrid)) then
-         if (size(lqgrid) .ne. 2*ntot)  deallocate (lqgrid)
-      end if
       if (.not. allocated(qgrid))  call fftsetup
 c
 c     the lambda derivative potential is only needed for the
@@ -4409,9 +4410,6 @@ c
       if (use_d2lmda) then
          if (.not. allocated(lcphi))  allocate (lcphi(10,n))
          if (.not. allocated(lfphi))  allocate (lfphi(20,n))
-         if (.not. allocated(lqgrid)) then
-            allocate (lqgrid(2,nfft1,nfft2,nfft3))
-         end if
       end if
 c
 c     setup spatial decomposition and B-spline coefficients
@@ -4455,14 +4453,16 @@ c
       call cmp_to_fmp (cmp,fmp)
       call cmp_to_fmp (lcmp,lfmp)
 c
-c     assign PME grid and perform 3-D FFT forward transform
+c     assign PME grid and perform 3-D FFT forward transform, where
+c     the lambda derivative multipoles fill the imaginary part of
+c     the grid, so that one transform carries both sets
 c
-      call grid_mpole (fmp,qgrid)
-      call fftfront (qgrid)
       if (use_d2lmda) then
-         call grid_mpole (lfmp,lqgrid)
-         call fftfront (lqgrid)
+         call grid_mpole2 (fmp,lfmp,qgrid)
+      else
+         call grid_mpole (fmp,qgrid)
       end if
+      call fftfront (qgrid)
 c
 c     zero out the temporary virial accumulation variables
 c
@@ -4493,60 +4493,85 @@ c
          j = i - (k3-1)*nff
          k2 = j/nfft1 + 1
          k1 = j - (k2-1)*nfft1 + 1
-         m1 = k1 - 1
-         m2 = k2 - 1
-         m3 = k3 - 1
-         if (k1 .gt. nf1)  m1 = m1 - nfft1
-         if (k2 .gt. nf2)  m2 = m2 - nfft2
-         if (k3 .gt. nf3)  m3 = m3 - nfft3
-         r1 = dble(m1)
-         r2 = dble(m2)
-         r3 = dble(m3)
-         h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
-         h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
-         h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
-         hsq = h1*h1 + h2*h2 + h3*h3
-         term = -pterm * hsq
-         expterm = 0.0d0
-         if (term .gt. -50.0d0) then
-            denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
-            expterm = exp(term) / denom
-            if (.not. use_bounds) then
-               expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (nonprism) then
-               if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+c
+c     visit each wavevector together with its opposite, keeping the
+c     values at both before either is scaled in place, since the
+c     packed multipole sets at one are separated using the other
+c
+         call pmeopp (k1,k2,k3,j1,j2,j3)
+         ip = (j3-1)*nff + (j2-1)*nfft1 + j1 - 1
+         if (ip .lt. i)  goto 10
+         kp(1,1) = k1
+         kp(2,1) = k2
+         kp(3,1) = k3
+         kp(1,2) = j1
+         kp(2,2) = j2
+         kp(3,2) = j3
+         do j = 1, 2
+            qa(j,1) = qgrid(j,k1,k2,k3)
+            qa(j,2) = qgrid(j,j1,j2,j3)
+         end do
+         npt = 2
+         if (ip .eq. i)  npt = 1
+         do ipt = 1, npt
+            jpt = 3 - ipt
+            k1 = kp(1,ipt)
+            k2 = kp(2,ipt)
+            k3 = kp(3,ipt)
+            m1 = k1 - 1
+            m2 = k2 - 1
+            m3 = k3 - 1
+            if (k1 .gt. nf1)  m1 = m1 - nfft1
+            if (k2 .gt. nf2)  m2 = m2 - nfft2
+            if (k3 .gt. nf3)  m3 = m3 - nfft3
+            r1 = dble(m1)
+            r2 = dble(m2)
+            r3 = dble(m3)
+            h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
+            h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
+            h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
+            hsq = h1*h1 + h2*h2 + h3*h3
+            term = -pterm * hsq
+            expterm = 0.0d0
+            if (term .gt. -50.0d0) then
+               denom = volterm*hsq*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+               expterm = exp(term) / denom
+               if (.not. use_bounds) then
+                  expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+               else if (nonprism) then
+                  if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+               end if
+               if (use_d2lmda) then
+                  call pmesplit (qa(1,ipt),qa(1,jpt),q1,q2,lq1,lq2)
+               else
+                  q1 = qa(1,ipt)
+                  q2 = qa(2,ipt)
+               end if
+               struc2 = q1**2 + q2**2
+               eterm = 0.5d0 * f * expterm * struc2
+               vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
+               vxx = vxx + h1*h1*vterm - eterm
+               vxy = vxy + h1*h2*vterm
+               vxz = vxz + h1*h3*vterm
+               vyy = vyy + h2*h2*vterm - eterm
+               vyz = vyz + h2*h3*vterm
+               vzz = vzz + h3*h3*vterm - eterm
+               if (use_d2lmda) then
+                  dstruc2dl = 2.0d0 * (q1*lq1 + q2*lq2)
+                  dldeterm = 0.5d0 * f * expterm * dstruc2dl
+                  dldvterm = (2.0d0/hsq) * (1.0d0-term) * dldeterm
+                  dldvxx = dldvxx + h1*h1*dldvterm - dldeterm
+                  dldvxy = dldvxy + h1*h2*dldvterm
+                  dldvxz = dldvxz + h1*h3*dldvterm
+                  dldvyy = dldvyy + h2*h2*dldvterm - dldeterm
+                  dldvyz = dldvyz + h2*h3*dldvterm
+                  dldvzz = dldvzz + h3*h3*dldvterm - dldeterm
+               end if
             end if
-            q1 = qgrid(1,k1,k2,k3)
-            q2 = qgrid(2,k1,k2,k3)
-            struc2 = q1**2 + q2**2
-            eterm = 0.5d0 * f * expterm * struc2
-            vterm = (2.0d0/hsq) * (1.0d0-term) * eterm
-            vxx = vxx + h1*h1*vterm - eterm
-            vxy = vxy + h1*h2*vterm
-            vxz = vxz + h1*h3*vterm
-            vyy = vyy + h2*h2*vterm - eterm
-            vyz = vyz + h2*h3*vterm
-            vzz = vzz + h3*h3*vterm - eterm
-            if (use_d2lmda) then
-               lq1 = lqgrid(1,k1,k2,k3)
-               lq2 = lqgrid(2,k1,k2,k3)
-               dstruc2dl = 2.0d0 * (q1*lq1 + q2*lq2)
-               dldeterm = 0.5d0 * f * expterm * dstruc2dl
-               dldvterm = (2.0d0/hsq) * (1.0d0-term) * dldeterm
-               dldvxx = dldvxx + h1*h1*dldvterm - dldeterm
-               dldvxy = dldvxy + h1*h2*dldvterm
-               dldvxz = dldvxz + h1*h3*dldvterm
-               dldvyy = dldvyy + h2*h2*dldvterm - dldeterm
-               dldvyz = dldvyz + h2*h3*dldvterm
-               dldvzz = dldvzz + h3*h3*dldvterm - dldeterm
-            end if
-         end if
-         qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
-         qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
-         if (use_d2lmda) then
-            lqgrid(1,k1,k2,k3) = expterm * lqgrid(1,k1,k2,k3)
-            lqgrid(2,k1,k2,k3) = expterm * lqgrid(2,k1,k2,k3)
-         end if
+            qgrid(1,k1,k2,k3) = expterm * qgrid(1,k1,k2,k3)
+            qgrid(2,k1,k2,k3) = expterm * qgrid(2,k1,k2,k3)
+         end do
+   10    continue
       end do
 c
 c     save the partial virial for the polarization computation
@@ -4568,10 +4593,16 @@ c
          qgrid(2,1,1,1) = expterm * qgrid(2,1,1,1)
       end if
 c
-c     perform 3-D FFT backward transform and get potential
+c     perform 3-D FFT backward transform and get potential, along
+c     with that of the lambda derivative multipoles from the
+c     imaginary part of the grid
 c
       call fftback (qgrid)
-      call fphi_mpole (fphi,qgrid)
+      if (use_d2lmda) then
+         call fphi_mpole2 (fphi,lfphi,qgrid)
+      else
+         call fphi_mpole (fphi,qgrid)
+      end if
       do ii = 1, npole
          i = ipole(ii)
          do j = 1, 20
@@ -4580,13 +4611,9 @@ c
       end do
       call fphi_to_cphi (fphi,cphi)
 c
-c     get the potential due to the lambda derivative multipoles
+c     scale the potential due to the lambda derivative multipoles
 c
       if (use_d2lmda) then
-         lqgrid(1,1,1,1) = 0.0d0
-         lqgrid(2,1,1,1) = 0.0d0
-         call fftback (lqgrid)
-         call fphi_mpole (lfphi,lqgrid)
          do ii = 1, npole
             i = ipole(ii)
             do j = 1, 20

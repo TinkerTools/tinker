@@ -338,6 +338,16 @@ void refreshsublmda_();
 #define tinker_f_refreshsublmda refreshsublmda_
 void grpscale_(double* lmda, double* sc, double* dsc);
 #define tinker_f_grpscale grpscale_
+void grpvlmda_(int* ig, double* vlmd, double* vsgn);
+#define tinker_f_grpvlmda grpvlmda_
+void grpsoft_(double* pw, double* alpha, double* pm, double* pp, double* lsc, double* shf);
+#define tinker_f_grpsoft grpsoft_
+void grpsoft4_(double* pw, double* alpha, double* pm, double* pp, double* lsc, double* shf, double* lsc1, double* lsc2, double* shf1, double* shf2);
+#define tinker_f_grpsoft4 grpsoft4_
+void grppcls_();
+#define tinker_f_grppcls grppcls_
+void grpvwt_(double* pw, double* wg, double* dwg, double* d2wg);
+#define tinker_f_grpvwt grpvwt_
 int lmdadrv_(int* use, double* dl, double* d2l);
 #define tinker_f_lmdadrv lmdadrv_
 void vdlflags_(int* dodl, int* dod2);
@@ -736,14 +746,14 @@ void edreal0d_();
 #define tinker_f_edreal0d edreal0d_
 void edrecip_();
 #define tinker_f_edrecip edrecip_
-void dspmutwt_(int* split, double* wel, double* wll, double* cpr);
-#define tinker_f_dspmutwt dspmutwt_
-void dspmutwt4_(int* split, double* wel, double* wll, double* cpr, double* dwel, double* dwll, double* dcpr, double* d2wel, double* d2wll, double* d2cpr);
-#define tinker_f_dspmutwt4 dspmutwt4_
+void dspslot_(int* dodl, int* dod2, int* nslot, int* gslot, double* ws, double* dws, double* d2ws, double* cpr, double* dcpr, double* d2cpr);
+#define tinker_f_dspslot dspslot_
+void dspsf_(int* nslot, double* za, double* ya, double* zb, double* sr, double* si);
+#define tinker_f_dspsf dspsf_
+double dspstruc_(int* nslot, double* w, double* sr, double* si);
+#define tinker_f_dspstruc dspstruc_
 void dspself_(int* deriv, int* part);
 #define tinker_f_dspself dspself_
-void dspsplit_(double* qg, int* k1, int* k2, int* k3, double* ser, double* sei, double* slr, double* sli);
-#define tinker_f_dspsplit dspsplit_
 
 // edisp1.f
 void edisp1_();
@@ -788,9 +798,9 @@ void dspsc_(double* dlsc, double* dlsq);
 #define tinker_f_dspsc dspsc_
 void dspsc4_(double* dlsc, double* dlsq, double* dlsc1, double* dlsq1, double* dlsc2, double* dlsq2);
 #define tinker_f_dspsc4 dspsc4_
-void edspsc_(double* r, double* dlsc, double* dlsq, double* soft, double* dsoft);
+void edspsc_(double* r, int* ig, double* dlsc, double* dlsq, double* soft, double* dsoft);
 #define tinker_f_edspsc edspsc_
-void edspsc4_(double* r, double* dlsc, double* dlsq, double* dlsc1, double* dlsq1, double* dlsc2, double* dlsq2, double* soft, double* dsoft, double* dsdl, double* d2sdl2, double* d2sdldr);
+void edspsc4_(double* r, int* ig, double* dlsc, double* dlsq, double* dlsc1, double* dlsq1, double* dlsc2, double* dlsq2, double* soft, double* dsoft, double* dsdl, double* d2sdl2, double* d2sdldr);
 #define tinker_f_edspsc4 edspsc4_
 void dhalwt_(double* r, double* w, double* dw);
 #define tinker_f_dhalwt dhalwt_
@@ -902,10 +912,6 @@ void ehal3c_();
 #define tinker_f_ehal3c ehal3c_
 
 // ehalsc.f
-void halsc_(double* vlsc, double* vscal);
-#define tinker_f_halsc halsc_
-void halsc4_(double* vlsc, double* vscal, double* vlsc1, double* vlsc2, double* vscal1, double* vscal2);
-#define tinker_f_halsc4 halsc4_
 void ehalsc_(double* rik, double* rv, double* eps, int* ig, double* vlsc, double* vscal, double* e, double* de);
 #define tinker_f_ehalsc ehalsc_
 void ehalsc4_(double* rik, double* rv, double* eps, int* ig, double* vlsc, double* vlsc1, double* vlsc2, double* vscal, double* vscal1, double* vscal2, double* e, double* de, double* dlambda, double* dlambda2, double* dlde);
@@ -1466,13 +1472,9 @@ void erepel3b_();
 #define tinker_f_erepel3b erepel3b_
 
 // erepsc.f
-void repsc_(double* rlsc, double* rshf);
-#define tinker_f_repsc repsc_
-void repsc4_(double* rlsc, double* rshf, double* rlsc1, double* rlsc2, double* rshf1, double* rshf2);
-#define tinker_f_repsc4 repsc4_
-void erepsc_(double* r, double* rlsc, double* rshf, double* soft, double* dsoft);
+void erepsc_(double* r, int* ig, double* rlsc, double* rshf, double* soft, double* dsoft);
 #define tinker_f_erepsc erepsc_
-void erepsc4_(double* r, double* rlsc, double* rshf, double* rlsc1, double* rlsc2, double* rshf1, double* rshf2, double* soft, double* dsoft, double* dsdl, double* d2sdl2, double* d2sdldr);
+void erepsc4_(double* r, int* ig, double* rlsc, double* rshf, double* rlsc1, double* rlsc2, double* rshf1, double* rshf2, double* soft, double* dsoft, double* dsdl, double* d2sdl2, double* d2sdldr);
 #define tinker_f_erepsc4 erepsc4_
 
 // erf.f
@@ -2374,6 +2376,8 @@ void mutate_fep_();
 #define tinker_f_mutate_fep mutate_fep_
 void mutate_check_();
 #define tinker_f_mutate_check mutate_check_
+void softchk_(double* alpha, double* pw, double* pm, double* pp, double* alpha0, double* pw0, double* pm0, double* pp0);
+#define tinker_f_softchk softchk_
 void setligand_(int* j, int* igrp);
 #define tinker_f_setligand setligand_
 void altelec_();
@@ -2566,9 +2570,11 @@ void grid_pchg_();
 #define tinker_f_grid_pchg grid_pchg_
 void grid_mpole_(double* fmp, double* qg);
 #define tinker_f_grid_mpole grid_mpole_
+void grid_mpole2_(double* fmp, double* lfmp, double* qg);
+#define tinker_f_grid_mpole2 grid_mpole2_
 void grid_uind_(double* fuind, double* fuinp);
 #define tinker_f_grid_uind grid_uind_
-void grid_disp_(int* split);
+void grid_disp_(double* qg, int* gpart);
 #define tinker_f_grid_disp grid_disp_
 void adjust_(int* offset, int* nfft, int* nchk, int* amin, int* amax, int* cmin, int* cmax);
 #define tinker_f_adjust adjust_
@@ -2576,6 +2582,8 @@ void fphi_pchg_(double* fphi);
 #define tinker_f_fphi_pchg fphi_pchg_
 void fphi_mpole_(double* fphi, double* qg);
 #define tinker_f_fphi_mpole fphi_mpole_
+void fphi_mpole2_(double* fphi, double* lfphi, double* qg);
+#define tinker_f_fphi_mpole2 fphi_mpole2_
 void fphi_uind_(double* fdip_phi1, double* fdip_phi2, double* fdip_sum_phi);
 #define tinker_f_fphi_uind fphi_uind_
 void cmp_to_fmp_(double* cmp, double* fmp);
@@ -2586,6 +2594,10 @@ void fphi_to_cphi_(double* fphi, double* cphi);
 #define tinker_f_fphi_to_cphi fphi_to_cphi_
 void frac_to_cart_(double* ftc);
 #define tinker_f_frac_to_cart frac_to_cart_
+void pmeopp_(int* k1, int* k2, int* k3, int* j1, int* j2, int* j3);
+#define tinker_f_pmeopp pmeopp_
+void pmesplit_(double* z, double* y, double* s1r, double* s1i, double* s2r, double* s2i);
+#define tinker_f_pmesplit pmesplit_
 
 // pmpb.f
 void apbsinitial_(int* dime, double* grid, double* gcent, double* cgrid, double* cgcent, double* fgrid, double* fgcent, double* pdie, double* sdie, double* srad, double* swin, double* sdens, double* kelvin, int* ionn, double* ionc, int* ionq, double* ionr, char* pbtyp, int* pbtyplen, char* pbsoln, int* pbsolnlen, char* bcfl, int* bcfllen, char* chgm, int* chgmlen, char* srfm, int* srfmlen, tinker_fchar_len_t pbtyp_cap, tinker_fchar_len_t pbsoln_cap, tinker_fchar_len_t bcfl_cap, tinker_fchar_len_t chgm_cap, tinker_fchar_len_t srfm_cap);

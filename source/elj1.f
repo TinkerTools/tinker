@@ -87,6 +87,7 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
+      integer ig
       integer, allocatable :: iv14(:)
       real*8 e,de,p6,p12
       real*8 eps,sc
@@ -104,7 +105,7 @@ c
       real*8 vyx,vzx,vzy
       real*8, allocatable :: vscale(:)
       logical proceed,usei
-      logical muti,mutk,mutik
+      logical mutik
       character*6 mode
 c
 c
@@ -158,7 +159,6 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -182,9 +182,13 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutg(i))
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
 c
 c     compute the energy contribution for this interaction
@@ -210,14 +214,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -370,8 +367,13 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutg(i))
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
 c
 c     compute the energy contribution for this interaction
@@ -402,14 +404,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = .false.
-                     if (muti .or. mutk) then
-                        if (vcouple .eq. 1) then
-                           mutik = .true.
-                        else if (.not.muti .or. .not.mutk) then
-                           mutik = .true.
-                        end if
-                     end if
+                     mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -568,6 +563,7 @@ c
       integer kk,kt,kv
       integer kgy,kgz
       integer start,stop
+      integer ig
       integer, allocatable :: iv14(:)
       real*8 e,de,p6,p12
       real*8 eps,sc
@@ -589,7 +585,7 @@ c
       real*8, allocatable :: zsort(:)
       logical proceed,usei,prime
       logical unique,repeat
-      logical muti,mutk,mutik
+      logical mutik
       character*6 mode
 c
 c
@@ -659,7 +655,6 @@ c
          yi = ysort(rgy(ii))
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -706,13 +701,17 @@ c
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
+            ig = mutcls(mutg(k),mutg(i))
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
 c
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
 c
 c     compute the energy contribution for this interaction
@@ -752,14 +751,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -920,6 +912,7 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
+      integer ig
       integer, allocatable :: iv14(:)
       real*8 e,de,p6,p12
       real*8 eps,sc
@@ -937,7 +930,7 @@ c
       real*8 vyx,vzx,vzy
       real*8, allocatable :: vscale(:)
       logical proceed,usei
-      logical muti,mutk,mutik
+      logical mutik
       character*6 mode
 c
 c
@@ -984,7 +977,7 @@ c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,kred,
 !$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,v2scale,v3scale,v4scale,v5scale,use_group,off2,radmin,
-!$OMP& epsilon,radmin4,epsilon4,vcouple,vlambda,mutg,cut2,c0,c1,
+!$OMP& epsilon,radmin4,epsilon4,mutcls,vlambda,mutg,cut2,c0,c1,
 !$OMP& c2,c3,c4,c5) firstprivate(vscale,iv14)
 !$OMP& shared(ev,dev,vir)
 !$OMP DO reduction(+:ev,dev,vir)
@@ -1001,7 +994,6 @@ c
          yi = yred(i)
          zi = zred(i)
          usei = (use(i) .or. use(iv))
-         muti = (mutg(i) .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1025,9 +1017,13 @@ c
             k = vlst(kk,i)
             kt = jvdw(k)
             kv = ired(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutg(i))
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
 c
 c     compute the energy contribution for this interaction
@@ -1053,14 +1049,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = .false.
-                  if (muti .or. mutk) then
-                     if (vcouple .eq. 1) then
-                        mutik = .true.
-                     else if (.not.muti .or. .not.mutk) then
-                        mutik = .true.
-                     end if
-                  end if
+                  mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c

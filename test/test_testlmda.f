@@ -109,7 +109,25 @@ c     dispersion correction of case 113 through the same taper, and 125
 c     the Ewald dispersion of case 120 through an inverse power map with
 c     n of 2, so the curvature of each map enters with its own sign
 c
-c     case 126 decouples a water whose hal tail is handed to an
+c     cases 126 to 133 put HIPPO repulsion on the staged relative legs
+c     of a water box, where the second ligand couples as one minus the
+c     van der Waals lambda and the two ligands never interact: the van
+c     der Waals leg by double loop and by multipole list, two water
+c     ligands under annihilation, the quintic map, the three legs with
+c     lambda on each one, and replicate cells in a small box; two
+c     ligands at the same site are left to "test_mutate", since the
+c     coordinate check reports them in thread order
+c
+c     cases 134 to 145 put HIPPO damped dispersion on the same relative
+c     legs, where reciprocal space carries the environment and the two
+c     ligands as separate densities: without Ewald by double loop and
+c     by neighbor list, two water ligands under annihilation, and the
+c     long range correction; then under Ewald by double loop and by
+c     neighbor list, under annihilation, the quintic map, the three
+c     legs with lambda on each one, where the ligand legs merge or drop
+c     a ligand density, and replicate cells in a small box
+c
+c     case 147 decouples a water whose hal tail is handed to an
 c     undamped Ewald dispersion sum, which follows the hal soft core
 c     lambda power in place of the long range correction
 c
@@ -322,7 +340,41 @@ c
      &                        '1e-4')
       call test_testlmda_xyz ('125_hipmix_dsp_ewald_inv_l04','hipmix',
      &                        '1e-4')
-      call test_testlmda_case ('126_water_dhal_l05','1e-4')
+      call test_testlmda_case ('126_water_rep_rels_vdwm_l05','1e-4')
+      call test_testlmda_case ('127_water_rep_rels_vdwm_nlist_l05',
+     &                         '1e-4')
+      call test_testlmda_case ('128_water_rep_rels_vdwm_annih_l05',
+     &                         '1e-4')
+      call test_testlmda_case ('129_water_rep_rels_vdwm_qnt_l035',
+     &                         '1e-4')
+      call test_testlmda_case ('130_water_rep_rels3_l050','1e-4')
+      call test_testlmda_case ('131_water_rep_rels3_l085','1e-4')
+      call test_testlmda_case ('132_water_rep_rels3_l015','1e-4')
+      call test_testlmda_case ('133_water_rep_rels_vdwm_replica_l05',
+     &                         '1e-4')
+      call test_testlmda_case ('134_water_dsp_rels_vdwm_l05','1e-4')
+      call test_testlmda_case ('135_water_dsp_rels_vdwm_nlist_l05',
+     &                         '1e-4')
+      call test_testlmda_case ('136_water_dsp_rels_vdwm_annih_l05',
+     &                         '1e-4')
+      call test_testlmda_case ('137_water_dsp_rels_vdwm_corr_l03',
+     &                         '1e-4')
+      call test_testlmda_case ('138_water_dsp_ewald_rels_vdwm_l04',
+     &                         '1e-4')
+      call test_testlmda_case
+     &   ('139_water_dsp_ewald_rels_vdwm_nlist_l04','1e-4')
+      call test_testlmda_case
+     &   ('140_water_dsp_ewald_rels_vdwm_annih_l04','1e-4')
+      call test_testlmda_case ('141_water_dsp_ewald_rels_vdwm_qnt_l035',
+     &                         '1e-4')
+      call test_testlmda_case ('142_water_dsp_ewald_rels3_l050','1e-4')
+      call test_testlmda_case ('143_water_dsp_ewald_rels3_l085','1e-4')
+      call test_testlmda_case ('144_water_dsp_ewald_rels3_l015','1e-4')
+      call test_testlmda_case
+     &   ('145_water_dsp_ewald_rels_vdwm_replica_l04','1e-4')
+      call test_testlmda_case
+     &   ('146_water_dsp_ewald_annih_all_l00','1e-4')
+      call test_testlmda_case ('147_water_dhal_l05','1e-4')
       return
       end
 c

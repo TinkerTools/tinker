@@ -80,6 +80,7 @@ c
       use virial
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk,jcell
       real*8 e,fgrp
       real*8 eterm,de
@@ -115,7 +116,7 @@ c
       real*8 dqikx,dqiky,dqikz
       real*8 term1,term2,term3
       real*8 term4,term5,term6
-      real*8 rlsc,rshf
+      real*8 rlsc(2),rshf(2)
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
@@ -124,8 +125,8 @@ c
       real*8 dsdl,d2sdl2,d2sdldr
       real*8 dle,dle2
       real*8 dldsoft,dldtaper
-      real*8 rlsc1,rlsc2
-      real*8 rshf1,rshf2
+      real*8 rlsc1(2),rlsc2(2)
+      real*8 rshf1(2),rshf2(2)
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlvxx,dlvyy,dlvzz
       real*8 dlvxy,dlvxz,dlvyz
@@ -141,7 +142,7 @@ c
       real*8, allocatable :: ter(:,:)
       real*8, allocatable :: dlter(:,:)
       logical proceed,usei
-      logical muti,mutk,mutik
+      logical mutik
       logical dodl,dod2,mutdl,mutd2
       character*6 mode
 c
@@ -192,9 +193,10 @@ c
       call vdlflags (dodl,dod2)
       if (nmut .ne. 0) then
          if (dodl) then
-            call repsc4 (rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2)
+            call grpsoft4 (scexpr,scalphar,scexprm,scexprp,rlsc,rshf,
+     &                     rlsc1,rlsc2,rshf1,rshf2)
          else
-            call repsc (rlsc,rshf)
+            call grpsoft (scexpr,scalphar,scexprm,scexprp,rlsc,rshf)
          end if
       end if
 c
@@ -224,7 +226,7 @@ c
          qiyz = rrepole(10,i)
          qizz = rrepole(13,i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -245,10 +247,15 @@ c     evaluate all sites within the cutoff distance
 c
          do kk = ii+1, nrep
             k = irep(kk)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed) then
                xr = x(k) - xi
@@ -452,8 +459,7 @@ c
 c
 c     set lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   mutdl = mutik .and. dodl
                   mutd2 = mutik .and. dod2
 c
@@ -461,8 +467,8 @@ c     get energy and force via soft core lambda scaling, along with
 c     their lambda derivatives from the unscaled pair terms
 c
                   if (mutdl) then
-                     call erepsc4 (r,rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2,
-     &                             soft,dsoft,dsdl,d2sdl2,d2sdldr)
+                     call erepsc4 (r,ig,rlsc,rshf,rlsc1,rlsc2,rshf1,
+     &                             rshf2,soft,dsoft,dsdl,d2sdl2,d2sdldr)
                      dle = dsdl * e
                      if (mutd2) then
                         dle2 = d2sdl2 * e
@@ -476,7 +482,7 @@ c
                         end do
                      end if
                   else if (mutik) then
-                     call erepsc (r,rlsc,rshf,soft,dsoft)
+                     call erepsc (r,ig,rlsc,rshf,soft,dsoft)
                   end if
                   if (mutik) then
                      dsoft = dsoft * rr1 * e
@@ -641,7 +647,7 @@ c
             qiyz = rrepole(10,i)
             qizz = rrepole(13,i)
             usei = use(i)
-            muti = (mutg(i) .ne. 0)
+            mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -662,10 +668,15 @@ c     evaluate all sites within the cutoff distance
 c
             do kk = ii, nrep
                k = irep(kk)
-               mutk = (mutg(k) .ne. 0)
-               proceed = .true.
-               if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-               if (.not. use_intra)  proceed = .true.
+               ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+               proceed = (ig .ge. 0)
+               if (proceed .and. use_group) then
+                  call groups (proceed,fgrp,i,k,0,0,0,0)
+                  if (.not. use_intra)  proceed = .true.
+               end if
                if (proceed)  proceed = (usei .or. use(k))
                if (proceed) then
                   do jcell = 2, ncell
@@ -870,8 +881,7 @@ c
 c
 c     set lambda scaling for decoupling or annihilation
 c
-                        mutik = (muti.or.mutk) .and.
-     &                          (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                        mutik = (ig .gt. 0)
                         mutdl = mutik .and. dodl
                         mutd2 = mutik .and. dod2
 c
@@ -879,9 +889,9 @@ c     get energy and force via soft core lambda scaling, along with
 c     their lambda derivatives from the unscaled pair terms
 c
                         if (mutdl) then
-                           call erepsc4 (r,rlsc,rshf,rlsc1,rlsc2,rshf1,
-     &                                   rshf2,soft,dsoft,dsdl,d2sdl2,
-     &                                   d2sdldr)
+                           call erepsc4 (r,ig,rlsc,rshf,rlsc1,rlsc2,
+     &                                   rshf1,rshf2,soft,dsoft,dsdl,
+     &                                   d2sdl2,d2sdldr)
                            dle = dsdl * e
                            if (mutd2) then
                               dle2 = d2sdl2 * e
@@ -895,7 +905,7 @@ c
                               end do
                            end if
                         else if (mutik) then
-                           call erepsc (r,rlsc,rshf,soft,dsoft)
+                           call erepsc (r,ig,rlsc,rshf,soft,dsoft)
                         end if
                         if (mutik) then
                            dsoft = dsoft * rr1 * e
@@ -1109,6 +1119,7 @@ c
       use virial
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kkk
       real*8 e,fgrp
       real*8 eterm,de
@@ -1144,7 +1155,7 @@ c
       real*8 dqikx,dqiky,dqikz
       real*8 term1,term2,term3
       real*8 term4,term5,term6
-      real*8 rlsc,rshf
+      real*8 rlsc(2),rshf(2)
       real*8 sizi,sizk,sizik
       real*8 vali,valk
       real*8 dmpi,dmpk
@@ -1153,8 +1164,8 @@ c
       real*8 dsdl,d2sdl2,d2sdldr
       real*8 dle,dle2
       real*8 dldsoft,dldtaper
-      real*8 rlsc1,rlsc2
-      real*8 rshf1,rshf2
+      real*8 rlsc1(2),rlsc2(2)
+      real*8 rshf1(2),rshf2(2)
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 dlvxx,dlvyy,dlvzz
       real*8 dlvxy,dlvxz,dlvyz
@@ -1171,7 +1182,7 @@ c
       real*8, allocatable :: dlter(:,:)
       real*8, allocatable :: dfl(:,:)
       logical proceed,usei
-      logical muti,mutk,mutik
+      logical mutik
       logical dodl,dod2,mutdl,mutd2
       character*6 mode
 c
@@ -1232,9 +1243,10 @@ c     their lambda derivative factors as needed
 c
       if (nmut .ne. 0) then
          if (dodl) then
-            call repsc4 (rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2)
+            call grpsoft4 (scexpr,scalphar,scexprm,scexprp,rlsc,rshf,
+     &                     rlsc1,rlsc2,rshf1,rshf2)
          else
-            call repsc (rlsc,rshf)
+            call grpsoft (scexpr,scalphar,scexprm,scexprp,rlsc,rshf)
          end if
       end if
 c
@@ -1248,7 +1260,7 @@ c
 !$OMP PARALLEL default(private)
 !$OMP& shared(nrep,irep,x,y,z,sizpr,dmppr,elepr,rrepole,n12,i12,
 !$OMP& n13,i13,n14,i14,n15,i15,r2scale,r3scale,r4scale,r5scale,
-!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,vcouple,
+!$OMP& nelst,elst,use,use_group,use_intra,use_bounds,mutcls,
 !$OMP& rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2,mutg,cut2,off2,xaxis,
 !$OMP& yaxis,zaxis,c0,c1,c2,c3,c4,c5,dodl,dod2)
 !$OMP& firstprivate(rscale) shared (er,der,ter,ervir,dlter,devdl,
@@ -1277,7 +1289,7 @@ c
          qiyz = rrepole(10,i)
          qizz = rrepole(13,i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1298,10 +1310,15 @@ c     evaluate all sites within the cutoff distance
 c
          do kkk = 1, nelst(i)
             k = elst(kkk,i)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
-            if (.not. use_intra)  proceed = .true.
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (proceed .and. use_group) then
+               call groups (proceed,fgrp,i,k,0,0,0,0)
+               if (.not. use_intra)  proceed = .true.
+            end if
             if (proceed)  proceed = (usei .or. use(k))
             if (proceed)  proceed = (sizpr(k) .ne. 0.0d0)
             if (proceed) then
@@ -1506,8 +1523,7 @@ c
 c
 c     set lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   mutdl = mutik .and. dodl
                   mutd2 = mutik .and. dod2
 c
@@ -1515,8 +1531,8 @@ c     get energy and force via soft core lambda scaling, along with
 c     their lambda derivatives from the unscaled pair terms
 c
                   if (mutdl) then
-                     call erepsc4 (r,rlsc,rshf,rlsc1,rlsc2,rshf1,rshf2,
-     &                             soft,dsoft,dsdl,d2sdl2,d2sdldr)
+                     call erepsc4 (r,ig,rlsc,rshf,rlsc1,rlsc2,rshf1,
+     &                             rshf2,soft,dsoft,dsdl,d2sdl2,d2sdldr)
                      dle = dsdl * e
                      if (mutd2) then
                         dle2 = d2sdl2 * e
@@ -1530,7 +1546,7 @@ c
                         end do
                      end if
                   else if (mutik) then
-                     call erepsc (r,rlsc,rshf,soft,dsoft)
+                     call erepsc (r,ig,rlsc,rshf,soft,dsoft)
                   end if
                   if (mutik) then
                      dsoft = dsoft * rr1 * e

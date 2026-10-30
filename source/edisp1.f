@@ -116,6 +116,7 @@ c
       use virial
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       integer jcell
       real*8 xi,yi,zi
@@ -126,9 +127,9 @@ c
       real*8 r4,r5,r6
       real*8 ai,ak
       real*8 damp,ddamp
-      real*8 dlsc,dlsq
-      real*8 dlsc1,dlsq1
-      real*8 dlsc2,dlsq2
+      real*8 dlsc(2),dlsq(2)
+      real*8 dlsc1(2),dlsq1(2)
+      real*8 dlsc2(2),dlsq2(2)
       real*8 soft,dsoft,dsdl
       real*8 rs2
       real*8 d2sdl2,d2sdldr
@@ -140,7 +141,6 @@ c
       real*8 vyx,vzx,vzy
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik,mutdl,mutd2
       logical dodl,dod2
       character*6 mode
@@ -199,7 +199,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -222,9 +222,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -258,8 +262,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   mutdl = mutik .and. dodl
                   mutd2 = mutik .and. dod2
 c
@@ -267,18 +270,18 @@ c     get energy and derivative via soft core lambda scaling, along
 c     with their lambda derivatives from the unscaled pair terms
 c
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      dsoft = 0.0d0
-                     dsdl = dlsc1
-                     d2sdl2 = dlsc2
+                     dsdl = dlsc1(ig)
+                     d2sdl2 = dlsc2(ig)
                      d2sdldr = 0.0d0
                      if (r2 .lt. rs2) then
                         if (mutdl) then
-                           call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+                           call edspsc4 (r,ig,dlsc,dlsq,dlsc1,dlsq1,
      &                                   dlsc2,dlsq2,soft,dsoft,
      &                                   dsdl,d2sdl2,d2sdldr)
                         else
-                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                         end if
                      end if
                   end if
@@ -394,7 +397,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -417,9 +420,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -462,8 +469,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = (muti.or.mutk) .and.
-     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutik = (ig .gt. 0)
                      mutdl = mutik .and. dodl
                      mutd2 = mutik .and. dod2
 c
@@ -471,18 +477,18 @@ c     get energy and derivative via soft core lambda scaling, along
 c     with their lambda derivatives from the unscaled pair terms
 c
                      if (mutik) then
-                        soft = dlsc
+                        soft = dlsc(ig)
                         dsoft = 0.0d0
-                        dsdl = dlsc1
-                        d2sdl2 = dlsc2
+                        dsdl = dlsc1(ig)
+                        d2sdl2 = dlsc2(ig)
                         d2sdldr = 0.0d0
                         if (r2 .lt. rs2) then
                            if (mutdl) then
-                              call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+                              call edspsc4 (r,ig,dlsc,dlsq,dlsc1,dlsq1,
      &                                      dlsc2,dlsq2,soft,dsoft,
      &                                      dsdl,d2sdl2,d2sdldr)
                            else
-                              call edspsc (r,dlsc,dlsq,soft,dsoft)
+                              call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                            end if
                         end if
                      end if
@@ -621,6 +627,7 @@ c
       use virial
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -630,9 +637,9 @@ c
       real*8 r4,r5,r6
       real*8 ai,ak
       real*8 damp,ddamp
-      real*8 dlsc,dlsq
-      real*8 dlsc1,dlsq1
-      real*8 dlsc2,dlsq2
+      real*8 dlsc(2),dlsq(2)
+      real*8 dlsc1(2),dlsq1(2)
+      real*8 dlsc2(2),dlsq2(2)
       real*8 soft,dsoft,dsdl
       real*8 rs2
       real*8 d2sdl2,d2sdldr
@@ -645,7 +652,6 @@ c
       real*8, allocatable :: dspscale(:)
       real*8, allocatable :: dfl(:,:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik,mutdl,mutd2
       logical dodl,dod2
       character*6 mode
@@ -709,7 +715,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,ndlst,dlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,cut2,
-!$OMP& c0,c1,c2,c3,c4,c5,vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,
+!$OMP& c0,c1,c2,c3,c4,c5,mutcls,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,
 !$OMP& dodl,dod2)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,edspvir,devdl,
 !$OMP& d2evdl2,dfl,devvirdl)
@@ -725,7 +731,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -748,9 +754,13 @@ c
             k = dlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -784,8 +794,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   mutdl = mutik .and. dodl
                   mutd2 = mutik .and. dod2
 c
@@ -793,18 +802,18 @@ c     get energy and derivative via soft core lambda scaling, along
 c     with their lambda derivatives from the unscaled pair terms
 c
                   if (mutik) then
-                     soft = dlsc
+                     soft = dlsc(ig)
                      dsoft = 0.0d0
-                     dsdl = dlsc1
-                     d2sdl2 = dlsc2
+                     dsdl = dlsc1(ig)
+                     d2sdl2 = dlsc2(ig)
                      d2sdldr = 0.0d0
                      if (r2 .lt. rs2) then
                         if (mutdl) then
-                           call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+                           call edspsc4 (r,ig,dlsc,dlsq,dlsc1,dlsq1,
      &                                   dlsc2,dlsq2,soft,dsoft,
      &                                   dsdl,d2sdl2,d2sdldr)
                         else
-                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                         end if
                      end if
                   end if
@@ -1016,6 +1025,7 @@ c
       use virial
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       integer jcell
       real*8 xi,yi,zi
@@ -1028,9 +1038,9 @@ c
       real*8 dmp2,dmpd
       real*8 dhw,dhdw
       real*8 wsc
-      real*8 dlsc,dlsq
-      real*8 dlsc1,dlsq1
-      real*8 dlsc2,dlsq2
+      real*8 dlsc(2),dlsq(2)
+      real*8 dlsc1(2),dlsq1(2)
+      real*8 dlsc2(2),dlsq2(2)
       real*8 soft,dsoft,dsdl
       real*8 rs2
       real*8 d2sdl2,d2sdldr
@@ -1045,7 +1055,6 @@ c
       real*8 vyy,vzy,vzz
       real*8, allocatable :: dspscale(:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik,mutdl,mutd2
       logical dodl,dod2
       character*6 mode
@@ -1094,7 +1103,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1117,9 +1126,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -1166,8 +1179,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   mutdl = mutik .and. dodl
                   mutd2 = mutik .and. dod2
 c
@@ -1179,27 +1191,27 @@ c
                   soft = 1.0d0
                   dsoft = 0.0d0
                   if (mutik) then
-                     wsc = dlsc
-                     soft = dlsc
-                     dsdl = dlsc1
-                     d2sdl2 = dlsc2
+                     wsc = dlsc(ig)
+                     soft = dlsc(ig)
+                     dsdl = dlsc1(ig)
+                     d2sdl2 = dlsc2(ig)
                      d2sdldr = 0.0d0
                      if (r2 .lt. rs2) then
                         if (mutdl) then
-                           call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+                           call edspsc4 (r,ig,dlsc,dlsq,dlsc1,dlsq1,
      &                                   dlsc2,dlsq2,soft,dsoft,
      &                                   dsdl,d2sdl2,d2sdldr)
                         else
-                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                         end if
                      end if
                   end if
                   rterm = -(ralpha2**3) * expterm / r
                   if (mutdl) then
-                     dle = e * (dsdl*scale+dlsc1*(expa-1.0d0))
+                     dle = e * (dsdl*scale+dlsc1(ig)*(expa-1.0d0))
                      if (mutd2) then
-                        dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
-                        dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
+                        dle2 = e * (d2sdl2*scale+dlsc2(ig)*(expa-1.0d0))
+                        dlde = -6.0d0*dle/r2 - dlsc1(ig)*ci*ck*rterm/r7
      &                      - 2.0d0*ci*ck*sc*dmpd*dsdl/r7
      &                      - ci*ck*scale*d2sdldr/r7
                      end if
@@ -1293,7 +1305,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1316,9 +1328,13 @@ c
             k = idisp(kk)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -1369,8 +1385,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = (muti.or.mutk) .and.
-     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutik = (ig .gt. 0)
                      mutdl = mutik .and. dodl
                      mutd2 = mutik .and. dod2
 c
@@ -1382,27 +1397,29 @@ c
                      soft = 1.0d0
                      dsoft = 0.0d0
                      if (mutik) then
-                        wsc = dlsc
-                        soft = dlsc
-                        dsdl = dlsc1
-                        d2sdl2 = dlsc2
+                        wsc = dlsc(ig)
+                        soft = dlsc(ig)
+                        dsdl = dlsc1(ig)
+                        d2sdl2 = dlsc2(ig)
                         d2sdldr = 0.0d0
                         if (r2 .lt. rs2) then
                            if (mutdl) then
-                              call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+                              call edspsc4 (r,ig,dlsc,dlsq,dlsc1,dlsq1,
      &                                      dlsc2,dlsq2,soft,dsoft,
      &                                      dsdl,d2sdl2,d2sdldr)
                            else
-                              call edspsc (r,dlsc,dlsq,soft,dsoft)
+                              call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                            end if
                         end if
                      end if
                      rterm = -(ralpha2**3) * expterm / r
                      if (mutdl) then
-                        dle = e * (dsdl*scale+dlsc1*(expa-1.0d0))
+                        dle = e * (dsdl*scale+dlsc1(ig)*(expa-1.0d0))
                         if (mutd2) then
-                           dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
-                           dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
+                           dle2 = e * (d2sdl2*scale
+     &                               +dlsc2(ig)*(expa-1.0d0))
+                           dlde = -6.0d0*dle/r2
+     &                      - dlsc1(ig)*ci*ck*rterm/r7
      &                      - 2.0d0*ci*ck*sc*dmpd*dsdl/r7
      &                      - ci*ck*scale*d2sdldr/r7
                         end if
@@ -1587,6 +1604,7 @@ c
       use virial
       implicit none
       integer i,j,k
+      integer mutgi,ig
       integer ii,kk
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -1598,9 +1616,9 @@ c
       real*8 dmp2,dmpd
       real*8 dhw,dhdw
       real*8 wsc
-      real*8 dlsc,dlsq
-      real*8 dlsc1,dlsq1
-      real*8 dlsc2,dlsq2
+      real*8 dlsc(2),dlsq(2)
+      real*8 dlsc1(2),dlsq1(2)
+      real*8 dlsc2(2),dlsq2(2)
       real*8 soft,dsoft,dsdl
       real*8 rs2
       real*8 d2sdl2,d2sdldr
@@ -1616,7 +1634,6 @@ c
       real*8, allocatable :: dspscale(:)
       real*8, allocatable :: dfl(:,:)
       logical proceed,usei
-      logical muti,mutk
       logical mutik,mutdl,mutd2
       logical dodl,dod2
       character*6 mode
@@ -1670,7 +1687,7 @@ c
 !$OMP PARALLEL default(private) shared(ndisp,idisp,csix,adisp,use,
 !$OMP& x,y,z,n12,n13,n14,n15,i12,i13,i14,i15,ndlst,dlst,use_group,
 !$OMP& dsp2scale,dsp3scale,dsp4scale,dsp5scale,mutg,off2,aewald,
-!$OMP& vcouple,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,dodl,dod2)
+!$OMP& mutcls,dlsc,dlsq,rs2,dlsc1,dlsq1,dlsc2,dlsq2,dodl,dod2)
 !$OMP& shared(use_dhal,dhdamp)
 !$OMP& firstprivate(dspscale) shared(edsp,dedsp,edspvir,devdl,
 !$OMP& d2evdl2,dfl,devvirdl)
@@ -1686,7 +1703,7 @@ c
          yi = y(i)
          zi = z(i)
          usei = use(i)
-         muti = (mutg(i) .ne. 0)
+         mutgi = mutg(i)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1709,9 +1726,13 @@ c
             k = dlst(kk,i)
             ck = csix(k)
             ak = adisp(k)
-            mutk = (mutg(k) .ne. 0)
-            proceed = .true.
-            if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
+            ig = mutcls(mutg(k),mutgi)
+c
+c     the two ligands of a relative dual topology never interact
+c
+            proceed = (ig .ge. 0)
+            if (use_group .and. proceed)
+     &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k))
 c
 c     compute the energy contribution for this interaction
@@ -1758,8 +1779,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
                   mutdl = mutik .and. dodl
                   mutd2 = mutik .and. dod2
 c
@@ -1771,27 +1791,27 @@ c
                   soft = 1.0d0
                   dsoft = 0.0d0
                   if (mutik) then
-                     wsc = dlsc
-                     soft = dlsc
-                     dsdl = dlsc1
-                     d2sdl2 = dlsc2
+                     wsc = dlsc(ig)
+                     soft = dlsc(ig)
+                     dsdl = dlsc1(ig)
+                     d2sdl2 = dlsc2(ig)
                      d2sdldr = 0.0d0
                      if (r2 .lt. rs2) then
                         if (mutdl) then
-                           call edspsc4 (r,dlsc,dlsq,dlsc1,dlsq1,
+                           call edspsc4 (r,ig,dlsc,dlsq,dlsc1,dlsq1,
      &                                   dlsc2,dlsq2,soft,dsoft,
      &                                   dsdl,d2sdl2,d2sdldr)
                         else
-                           call edspsc (r,dlsc,dlsq,soft,dsoft)
+                           call edspsc (r,ig,dlsc,dlsq,soft,dsoft)
                         end if
                      end if
                   end if
                   rterm = -(ralpha2**3) * expterm / r
                   if (mutdl) then
-                     dle = e * (dsdl*scale+dlsc1*(expa-1.0d0))
+                     dle = e * (dsdl*scale+dlsc1(ig)*(expa-1.0d0))
                      if (mutd2) then
-                        dle2 = e * (d2sdl2*scale+dlsc2*(expa-1.0d0))
-                        dlde = -6.0d0*dle/r2 - dlsc1*ci*ck*rterm/r7
+                        dle2 = e * (d2sdl2*scale+dlsc2(ig)*(expa-1.0d0))
+                        dlde = -6.0d0*dle/r2 - dlsc1(ig)*ci*ck*rterm/r7
      &                      - 2.0d0*ci*ck*sc*dmpd*dsdl/r7
      &                      - ci*ck*scale*d2sdldr/r7
                      end if
@@ -1919,11 +1939,16 @@ c
       implicit none
       integer i,j,k,ii
       integer k1,k2,k3
+      integer j1,j2,j3
       integer m1,m2,m3
       integer nf1,nf2,nf3
       integer nff,ntot
       integer i0,iatm,igrd0
-      integer ipart
+      integer nslot,is
+      integer ip,ipt,jpt,npt
+      integer kp(3,2)
+      integer gslot(0:2)
+      integer gpart(0:2)
       integer it1,it2,it3
       integer j0,jgrd0
       integer k0,kgrd0
@@ -1941,16 +1966,19 @@ c
       real*8 dn1,dn2,dn3
       real*8 dt1,dt2,dt3
       real*8 t1,t2,t3
-      real*8 wel,wll,cpr
-      real*8 dwel,dwll,dcpr
-      real*8 d2wel,d2wll,d2cpr
-      real*8 ser,sei,slr,sli
+      real*8 cpr,dcpr,d2cpr
       real*8 strucd,strucd2
+      real*8 dspstruc
+      real*8 pa1,pa2,pb
+      real*8 sr(3),si(3)
+      real*8 qa(2,2),qb(2,2)
+      real*8 cf(3),cd(3)
+      real*8 ws(3,3)
+      real*8 dws(3,3)
+      real*8 d2ws(3,3)
       real*8 edl,vtermd
       real*8 dl1,dl2,dl3
-      real*8, allocatable :: qfwd(:,:,:,:)
-      real*8, allocatable :: qdl(:,:,:,:)
-      logical split
+      real*8, allocatable :: qgb(:,:,:,:)
       logical dodl,dod2
 c
 c
@@ -1973,43 +2001,47 @@ c
       call bspline_fill
       call table_fill
 c
-c     get the mutated pair weights, along with their lambda
-c     derivatives while the van der Waals lambda map has slope or
-c     curvature, as in "edreal1c"
+c     assign the environment and ligand groups to density slots,
+c     along with the lambda derivatives of their pair weights while
+c     the van der Waals lambda map has slope or curvature, as in
+c     "edreal1c"
 c
       call vdlflags (dodl,dod2)
-      if (dodl) then
-         call dspmutwt4 (split,wel,wll,cpr,dwel,dwll,dcpr,
-     &                   d2wel,d2wll,d2cpr)
-      else
-         call dspmutwt (split,wel,wll,cpr)
-      end if
+      call dspslot (dodl,dod2,nslot,gslot,ws,dws,d2ws,
+     &              cpr,dcpr,d2cpr)
 c
-c     assign PME grid and perform 3-D FFT forward transform
+c     no group left on the grid leaves no energy or derivatives, as
+c     the weighted pairwise sums of C6 values are then zero as well
 c
-      call grid_disp (split)
+      if (nslot .eq. 0)  return
+c
+c     assign PME grids and perform 3-D FFT forward transforms, where
+c     a third density slot takes a second grid
+c
+      do i = 0, 2
+         gpart(i) = gslot(i)
+         if (gslot(i) .eq. 3)  gpart(i) = 0
+      end do
+      call grid_disp (qgrid,gpart)
       call fftfront (qgrid)
-c
-c     keep the packed transform, since the grid is overwritten
-c     in place but each point needs its opposite wavevector
-c
-      if (split) then
-         allocate (qfwd(2,nfft1,nfft2,nfft3))
-         qfwd = qgrid
-      end if
-c
-c     the lambda derivative of the potential uses a second grid
-c
-      if (dod2) then
-         allocate (qdl(2,nfft1,nfft2,nfft3))
-         qdl(1,1,1,1) = 0.0d0
-         qdl(2,1,1,1) = 0.0d0
+      if (nslot .eq. 3) then
+         allocate (qgb(2,nfft1,nfft2,nfft3))
+         do i = 0, 2
+            gpart(i) = 0
+            if (gslot(i) .eq. 3)  gpart(i) = 1
+         end do
+         call grid_disp (qgb,gpart)
+         call fftfront (qgb)
       end if
 c
 c     use scalar sum to get the reciprocal space energy
 c
       qgrid(1,1,1,1) = 0.0d0
       qgrid(2,1,1,1) = 0.0d0
+      if (nslot .eq. 3) then
+         qgb(1,1,1,1) = 0.0d0
+         qgb(2,1,1,1) = 0.0d0
+      end if
       bfac = pi / aewald
       fac1 = 2.0d0*pi**(3.5d0)
       fac2 = aewald**3
@@ -2025,108 +2057,124 @@ c
          j = i - (k3-1)*nff
          k2 = j/ndfft1 + 1
          k1 = j - (k2-1)*ndfft1 + 1
-         m1 = k1 - 1
-         m2 = k2 - 1
-         m3 = k3 - 1
-         if (k1 .gt. nf1)  m1 = m1 - ndfft1
-         if (k2 .gt. nf2)  m2 = m2 - ndfft2
-         if (k3 .gt. nf3)  m3 = m3 - ndfft3
-         r1 = dble(m1)
-         r2 = dble(m2)
-         r3 = dble(m3)
-         h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
-         h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
-         h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
-         hsq = h1*h1 + h2*h2 + h3*h3
-         h = sqrt(hsq)
-         b = h*bfac
-         hhh = h*hsq
-         term = -b*b
-         eterm = 0.0d0
-         denom = denom0*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
-         if (split)  call dspsplit (qfwd,k1,k2,k3,ser,sei,slr,sli)
-         if (term .gt. -50.0d0) then
-            expterm = exp(term)
-            erfcterm = erfc(b)
-            if (.not. use_bounds) then
-               expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-               erfcterm = erfcterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
-            else if (nonprism) then
-               if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
-               if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
+c
+c     visit each wavevector together with its opposite, keeping the
+c     values at both before either is scaled in place, since the
+c     packed slots at one are separated using the other
+c
+         call pmeopp (k1,k2,k3,j1,j2,j3)
+         ip = (j3-1)*nff + (j2-1)*ndfft1 + j1 - 1
+         if (ip .lt. i)  goto 20
+         kp(1,1) = k1
+         kp(2,1) = k2
+         kp(3,1) = k3
+         kp(1,2) = j1
+         kp(2,2) = j2
+         kp(3,2) = j3
+         do j = 1, 2
+            qa(j,1) = qgrid(j,k1,k2,k3)
+            qa(j,2) = qgrid(j,j1,j2,j3)
+            if (nslot .eq. 3) then
+               qb(j,1) = qgb(j,k1,k2,k3)
+               qb(j,2) = qgb(j,j1,j2,j3)
             end if
-            eterm = (-fac1*erfcterm*hhh - expterm*(fac2+fac3*hsq))/denom
-            if (split) then
-               struc2 = ser*ser + sei*sei + wll*(slr*slr+sli*sli)
-     &                     + 2.0d0*wel*(ser*slr+sei*sli)
-            else
-               struc2 = qgrid(1,k1,k2,k3)**2 + qgrid(2,k1,k2,k3)**2
-            end if
-            vterm = 3.0d0*(fac1*erfcterm*h + fac3*expterm)*struc2/denom
-            e = eterm * struc2
-            edsp = edsp + e
-            edspvir(1,1) = edspvir(1,1) + h1*h1*vterm - e
-            edspvir(2,1) = edspvir(2,1) + h1*h2*vterm
-            edspvir(3,1) = edspvir(3,1) + h1*h3*vterm
-            edspvir(1,2) = edspvir(1,2) + h2*h1*vterm
-            edspvir(2,2) = edspvir(2,2) + h2*h2*vterm - e
-            edspvir(3,2) = edspvir(3,2) + h2*h3*vterm
-            edspvir(1,3) = edspvir(1,3) + h3*h1*vterm
-            edspvir(2,3) = edspvir(2,3) + h3*h2*vterm
-            edspvir(3,3) = edspvir(3,3) + h3*h3*vterm - e
+         end do
+         npt = 2
+         if (ip .eq. i)  npt = 1
+         do ipt = 1, npt
+            jpt = 3 - ipt
+            k1 = kp(1,ipt)
+            k2 = kp(2,ipt)
+            k3 = kp(3,ipt)
+            m1 = k1 - 1
+            m2 = k2 - 1
+            m3 = k3 - 1
+            if (k1 .gt. nf1)  m1 = m1 - ndfft1
+            if (k2 .gt. nf2)  m2 = m2 - ndfft2
+            if (k3 .gt. nf3)  m3 = m3 - ndfft3
+            r1 = dble(m1)
+            r2 = dble(m2)
+            r3 = dble(m3)
+            h1 = recip(1,1)*r1 + recip(1,2)*r2 + recip(1,3)*r3
+            h2 = recip(2,1)*r1 + recip(2,2)*r2 + recip(2,3)*r3
+            h3 = recip(3,1)*r1 + recip(3,2)*r2 + recip(3,3)*r3
+            hsq = h1*h1 + h2*h2 + h3*h3
+            h = sqrt(hsq)
+            b = h*bfac
+            hhh = h*hsq
+            term = -b*b
+            eterm = 0.0d0
+            denom = denom0*bsmod1(k1)*bsmod2(k2)*bsmod3(k3)
+            call dspsf (nslot,qa(1,ipt),qa(1,jpt),qb(1,ipt),sr,si)
+            if (term .gt. -50.0d0) then
+               expterm = exp(term)
+               erfcterm = erfc(b)
+               if (.not. use_bounds) then
+                  expterm = expterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+                  erfcterm = erfcterm * (1.0d0-cos(pi*xbox*sqrt(hsq)))
+               else if (nonprism) then
+                  if (mod(m1+m2+m3,2) .ne. 0)  expterm = 0.0d0
+                  if (mod(m1+m2+m3,2) .ne. 0)  erfcterm = 0.0d0
+               end if
+               eterm = (-fac1*erfcterm*hhh-expterm*(fac2+fac3*hsq))
+     &                    / denom
+               struc2 = dspstruc (nslot,ws,sr,si)
+               vterm = 3.0d0 * (fac1*erfcterm*h+fac3*expterm)
+     &                    * struc2 / denom
+               e = eterm * struc2
+               edsp = edsp + e
+               edspvir(1,1) = edspvir(1,1) + h1*h1*vterm - e
+               edspvir(2,1) = edspvir(2,1) + h1*h2*vterm
+               edspvir(3,1) = edspvir(3,1) + h1*h3*vterm
+               edspvir(1,2) = edspvir(1,2) + h2*h1*vterm
+               edspvir(2,2) = edspvir(2,2) + h2*h2*vterm - e
+               edspvir(3,2) = edspvir(3,2) + h2*h3*vterm
+               edspvir(1,3) = edspvir(1,3) + h3*h1*vterm
+               edspvir(2,3) = edspvir(2,3) + h3*h2*vterm
+               edspvir(3,3) = edspvir(3,3) + h3*h3*vterm - e
 c
 c     get the lambda derivatives of the energy and virial from the
 c     derivatives of the pair weights
 c
-            if (dodl) then
-               strucd = dwll*(slr*slr+sli*sli)
-     &                     + 2.0d0*dwel*(ser*slr+sei*sli)
-               devdl = devdl + eterm*strucd
+               if (dodl) then
+                  strucd = dspstruc (nslot,dws,sr,si)
+                  devdl = devdl + eterm*strucd
+               end if
+               if (dod2) then
+                  strucd2 = dspstruc (nslot,d2ws,sr,si)
+                  d2evdl2 = d2evdl2 + eterm*strucd2
+                  vtermd = 3.0d0 * (fac1*erfcterm*h+fac3*expterm)
+     &                        * strucd / denom
+                  edl = eterm * strucd
+                  devvirdl(1,1) = devvirdl(1,1) + h1*h1*vtermd - edl
+                  devvirdl(2,1) = devvirdl(2,1) + h1*h2*vtermd
+                  devvirdl(3,1) = devvirdl(3,1) + h1*h3*vtermd
+                  devvirdl(1,2) = devvirdl(1,2) + h2*h1*vtermd
+                  devvirdl(2,2) = devvirdl(2,2) + h2*h2*vtermd - edl
+                  devvirdl(3,2) = devvirdl(3,2) + h2*h3*vtermd
+                  devvirdl(1,3) = devvirdl(1,3) + h3*h1*vtermd
+                  devvirdl(2,3) = devvirdl(2,3) + h3*h2*vtermd
+                  devvirdl(3,3) = devvirdl(3,3) + h3*h3*vtermd - edl
+               end if
             end if
-            if (dod2) then
-               strucd2 = d2wll*(slr*slr+sli*sli)
-     &                      + 2.0d0*d2wel*(ser*slr+sei*sli)
-               d2evdl2 = d2evdl2 + eterm*strucd2
-               vtermd = 3.0d0 * (fac1*erfcterm*h+fac3*expterm)
-     &                     * strucd / denom
-               edl = eterm * strucd
-               devvirdl(1,1) = devvirdl(1,1) + h1*h1*vtermd - edl
-               devvirdl(2,1) = devvirdl(2,1) + h1*h2*vtermd
-               devvirdl(3,1) = devvirdl(3,1) + h1*h3*vtermd
-               devvirdl(1,2) = devvirdl(1,2) + h2*h1*vtermd
-               devvirdl(2,2) = devvirdl(2,2) + h2*h2*vtermd - edl
-               devvirdl(3,2) = devvirdl(3,2) + h2*h3*vtermd
-               devvirdl(1,3) = devvirdl(1,3) + h3*h1*vtermd
-               devvirdl(2,3) = devvirdl(2,3) + h3*h2*vtermd
-               devvirdl(3,3) = devvirdl(3,3) + h3*h3*vtermd - edl
-            end if
-         end if
 c
-c     the environment potential takes the real part of the grid
-c     and the ligand potential the imaginary part
+c     the unweighted potential of each slot keeps its place in the
+c     packed grids, and the pair weights are applied at the sites
 c
-         if (split) then
-            qgrid(1,k1,k2,k3) = eterm * (ser-wel*sei+wel*slr-wll*sli)
-            qgrid(2,k1,k2,k3) = eterm * (sei+wel*ser+wel*sli+wll*slr)
-         else
-            qgrid(1,k1,k2,k3) = eterm * qgrid(1,k1,k2,k3) 
+            qgrid(1,k1,k2,k3) = eterm * qgrid(1,k1,k2,k3)
             qgrid(2,k1,k2,k3) = eterm * qgrid(2,k1,k2,k3)
-         end if
-c
-c     the lambda derivative of the potential packs the environment
-c     and ligand parts with the derivatives of the pair weights
-c
-         if (dod2) then
-            qdl(1,k1,k2,k3) = eterm * (dwel*slr-dwel*sei-dwll*sli)
-            qdl(2,k1,k2,k3) = eterm * (dwel*ser+dwel*sli+dwll*slr)
-         end if
+            if (nslot .eq. 3) then
+               qgb(1,k1,k2,k3) = eterm * qgb(1,k1,k2,k3)
+               qgb(2,k1,k2,k3) = eterm * qgb(2,k1,k2,k3)
+            end if
+         end do
+   20    continue
       end do
-      if (split)  deallocate (qfwd)
 c
-c     perform the 3-D FFT backward transformation
+c     perform the 3-D FFT backward transformations
 c
       call fftback (qgrid)
-      if (dod2)  call fftback (qdl)
+      if (nslot .eq. 3)  call fftback (qgb)
 c
 c     get first derivatives of the reciprocal space energy 
 c
@@ -2139,10 +2187,16 @@ c
          jgrd0 = igrid(2,iatm)
          kgrd0 = igrid(3,iatm)
          fi = csix(iatm)
-         ipart = 1
-         if (split) then
-            if (mutg(iatm) .ne. 0)  ipart = 2
-         end if
+c
+c     weight the slot potentials by the pair weights of the slot
+c     that holds this site, and by their lambda derivatives
+c
+         is = gslot(mutg(iatm))
+         if (is .eq. 0)  goto 10
+         do j = 1, 3
+            cf(j) = ws(is,j)
+            cd(j) = dws(is,j)
+         end do
          de1 = 0.0d0
          de2 = 0.0d0
          de3 = 0.0d0
@@ -2167,12 +2221,16 @@ c
                   i = i0 + 1 + (ndfft1-sign(ndfft1,i0))/2
                   t1 = thetai1(1,it1,iatm)
                   dt1 = dn1 * thetai1(2,it1,iatm)
-                  term = qgrid(ipart,i,j,k)
+                  pa1 = qgrid(1,i,j,k)
+                  pa2 = qgrid(2,i,j,k)
+                  pb = 0.0d0
+                  if (nslot .eq. 3)  pb = qgb(1,i,j,k)
+                  term = cf(1)*pa1 + cf(2)*pa2 + cf(3)*pb
                   de1 = de1 + 2.0d0*term*dt1*t2*t3
                   de2 = de2 + 2.0d0*term*dt2*t1*t3
                   de3 = de3 + 2.0d0*term*dt3*t1*t2
                   if (dod2) then
-                     term = qdl(ipart,i,j,k)
+                     term = cd(1)*pa1 + cd(2)*pa2 + cd(3)*pb
                      dl1 = dl1 + 2.0d0*term*dt1*t2*t3
                      dl2 = dl2 + 2.0d0*term*dt2*t1*t3
                      dl3 = dl3 + 2.0d0*term*dt3*t1*t2
@@ -2194,8 +2252,9 @@ c
             dfvdl(3,iatm) = dfvdl(3,iatm) + fi*(recip(3,1)*dl1
      &                         +recip(3,2)*dl2+recip(3,3)*dl3)
          end if
+   10    continue
       end do
-      if (dod2)  deallocate (qdl)
+      if (nslot .eq. 3)  deallocate (qgb)
 c
 c     account for the energy and virial correction terms
 c

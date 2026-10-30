@@ -356,7 +356,6 @@ c
       if (allocated(lmdawinend))  deallocate (lmdawinend)
       if (allocated(lmdawinfrac))  deallocate (lmdawinfrac)
       if (allocated(lmdawinlist))  deallocate (lmdawinlist)
-      if (allocated(lqgrid))  deallocate (lqgrid)
       if (allocated(pchgorig))  deallocate (pchgorig)
       if (allocated(pcoreorig))  deallocate (pcoreorig)
       if (allocated(polarityorig))  deallocate (polarityorig)

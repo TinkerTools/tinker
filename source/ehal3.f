@@ -104,7 +104,7 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
-      integer mutgi,mutgk,ig
+      integer mutgi,ig
       integer, allocatable :: iv14(:)
       real*8 e,de,rv,rv7
       real*8 vlsc(2),vscal(2)
@@ -116,7 +116,7 @@ c
       real*8 rik4,rik5,rik7
       real*8, allocatable :: vscale(:)
       logical proceed,usei
-      logical muti,mutk,mutik
+      logical mutik
       logical header,huge
       character*6 mode
 c
@@ -149,7 +149,7 @@ c
 c
 c     set the soft core lambda terms for each ligand group
 c
-      call halsc (vlsc,vscal)
+      call grpsoft (scexp,scalphav,scexpm,scexpp,vlsc,vscal)
 c
 c     print header information if debug output was requested
 c
@@ -184,7 +184,6 @@ c
          zi = zred(i)
          usei = (use(i) .or. use(iv))
          mutgi = mutg(i)
-         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -208,12 +207,11 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutgk = mutg(k)
-            mutk = (mutgk .ne. 0)
+            ig = mutcls(mutg(k),mutgi)
 c
 c     the two ligands of a relative dual topology never interact
 c
-            proceed = (mutgi*mutgk .ne. 2)
+            proceed = (ig .ge. 0)
             if (use_group .and. proceed)
      &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -241,8 +239,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -250,7 +247,6 @@ c
 c
 c     take the soft core terms of the ligand group in this pair
 c
-                     ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
                      rv7 = rv**7
@@ -347,7 +343,6 @@ c
          zi = zred(i)
          usei = (use(i) .or. use(iv))
          mutgi = mutg(i)
-         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -371,12 +366,11 @@ c
             k = ivdw(kk)
             kt = jvdw(k)
             kv = ired(k)
-            mutgk = mutg(k)
-            mutk = (mutgk .ne. 0)
+            ig = mutcls(mutg(k),mutgi)
 c
 c     the two ligands of a relative dual topology never interact
 c
-            proceed = (mutgi*mutgk .ne. 2)
+            proceed = (ig .ge. 0)
             if (use_group .and. proceed)
      &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -409,8 +403,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                     mutik = (muti.or.mutk) .and.
-     &                       (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                     mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -418,7 +411,6 @@ c
 c
 c     take the soft core terms of the ligand group in this pair
 c
-                        ig = max(mutgi,mutgk)
                         call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                      else
                         rv7 = rv**7
@@ -548,7 +540,7 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
-      integer mutgi,mutgk,ig
+      integer mutgi,ig
       integer kgy,kgz
       integer start,stop
       integer ikmin,ikmax
@@ -567,7 +559,7 @@ c
       real*8, allocatable :: zsort(:)
       logical proceed,usei,prime
       logical unique,repeat
-      logical muti,mutk,mutik
+      logical mutik
       logical header,huge
       character*6 mode
 c
@@ -603,7 +595,7 @@ c
 c
 c     set the soft core lambda terms for each ligand group
 c
-      call halsc (vlsc,vscal)
+      call grpsoft (scexp,scalphav,scexpm,scexpp,vlsc,vscal)
 c
 c     print header information if debug output was requested
 c
@@ -651,7 +643,6 @@ c
          zi = zsort(rgz(ii))
          usei = (use(i) .or. use(iv))
          mutgi = mutg(i)
-         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -698,8 +689,7 @@ c
             k = ivdw(kk-((kk-1)/nvdw)*nvdw)
             kt = jvdw(k)
             kv = ired(k)
-            mutgk = mutg(k)
-            mutk = (mutgk .ne. 0)
+            ig = mutcls(mutg(k),mutgi)
             prime = (kk .le. nvdw)
 c
 c     decide whether to compute the current interaction
@@ -707,7 +697,7 @@ c
 c
 c     the two ligands of a relative dual topology never interact
 c
-            proceed = (mutgi*mutgk .ne. 2)
+            proceed = (ig .ge. 0)
             if (use_group .and. proceed)
      &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -749,8 +739,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -758,7 +747,6 @@ c
 c
 c     take the soft core terms of the ligand group in this pair
 c
-                     ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
                      rv7 = rv**7
@@ -900,7 +888,7 @@ c
       integer i,j,k
       integer ii,it,iv
       integer kk,kt,kv
-      integer mutgi,mutgk,ig
+      integer mutgi,ig
       integer, allocatable :: iv14(:)
       real*8 e,de,eps,rdn
       real*8 vlsc(2),vscal(2)
@@ -912,7 +900,7 @@ c
       real*8 rik4,rik5,rik7
       real*8, allocatable :: vscale(:)
       logical proceed,usei
-      logical muti,mutk,mutik
+      logical mutik
       logical header,huge
       character*6 mode
 c
@@ -945,7 +933,7 @@ c
 c
 c     set the soft core lambda terms for each ligand group
 c
-      call halsc (vlsc,vscal)
+      call grpsoft (scexp,scalphav,scexpm,scexpp,vlsc,vscal)
 c
 c     print header information if debug output was requested
 c
@@ -975,7 +963,7 @@ c
 !$OMP& ired,xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,
 !$OMP& i12,i13,i14,i15,v2scale,v3scale,v4scale,v5scale,
 !$OMP& use_group,off2,radmin,epsilon,radmin4,epsilon4,ghal,
-!$OMP& dhal,vcouple,vlsc,vscal,mutg,cut2,c0,c1,
+!$OMP& dhal,mutcls,vlsc,vscal,mutg,cut2,c0,c1,
 !$OMP& c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter)
@@ -991,7 +979,6 @@ c
          zi = zred(i)
          usei = (use(i) .or. use(iv))
          mutgi = mutg(i)
-         muti = (mutgi .ne. 0)
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1015,12 +1002,11 @@ c
             k = vlst(kk,i)
             kt = jvdw(k)
             kv = ired(k)
-            mutgk = mutg(k)
-            mutk = (mutgk .ne. 0)
+            ig = mutcls(mutg(k),mutgi)
 c
 c     the two ligands of a relative dual topology never interact
 c
-            proceed = (mutgi*mutgk .ne. 2)
+            proceed = (ig .ge. 0)
             if (use_group .and. proceed)
      &         call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kv))
@@ -1048,8 +1034,7 @@ c
 c
 c     set use of lambda scaling for decoupling or annihilation
 c
-                  mutik = (muti.or.mutk) .and.
-     &                    (vcouple.eq.1 .or. .not.(muti.and.mutk))
+                  mutik = (ig .gt. 0)
 c
 c     get interaction energy, via soft core lambda scaling as needed
 c
@@ -1057,7 +1042,6 @@ c
 c
 c     take the soft core terms of the ligand group in this pair
 c
-                     ig = max(mutgi,mutgk)
                      call ehalsc (rik,rv,eps,ig,vlsc,vscal,e,de)
                   else
                      rv7 = rv**7

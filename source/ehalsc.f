@@ -5,89 +5,6 @@ c     ##  COPYRIGHT (C) 2026 by  Moses Chung, Pengyu Ren, Jay Ponder  ##
 c     ##                     All Rights Reserved                      ##
 c     ##################################################################
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine halsc  --  soft core terms per ligand group  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "halsc" sets the soft core scale "vlsc" and softening "vscal"
-c     of the buffered 14-7 potential for each ligand group, where a
-c     second ligand group couples as the complement of vlambda, and
-c     the softening is alpha*lambda^m*(1-lambda)^p
-c
-c
-      subroutine halsc (vlsc,vscal)
-      use mutant
-      implicit none
-      integer ig
-      real*8 vlmd
-      real*8 vscal1,vscal2
-      real*8 vlsc(2)
-      real*8 vscal(2)
-c
-c
-c     set the soft core lambda terms for each ligand group
-c
-      do ig = 1, 2
-         vlmd = vlambda
-         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc(ig) = vlmd**scexp
-         call lmdapow (vlmd,scalphav,scexpm,scexpp,.false.,
-     &                 vscal(ig),vscal1,vscal2)
-      end do
-      return
-      end
-c
-c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine halsc4  --  soft core terms and lambda derivs  ##
-c     ##                                                            ##
-c     ################################################################
-c
-c
-c     "halsc4" sets the soft core terms of the buffered 14-7 potential
-c     for each ligand group along with the factors needed for their
-c     first and second derivatives with respect to the group lambda,
-c     where "vlsc1" and "vlsc2" hold the scale over lambda and lambda
-c     squared, and "vscal1" and "vscal2" hold lambda and lambda squared
-c     times the softening derivatives, so that no power of lambda goes
-c     negative; the second derivative factors are only set when they
-c     are requested
-c
-c
-      subroutine halsc4 (vlsc,vscal,vlsc1,vlsc2,vscal1,vscal2)
-      use dlmda
-      use mutant
-      implicit none
-      integer ig
-      real*8 vlmd
-      real*8 vlsc(2)
-      real*8 vscal(2)
-      real*8 vlsc1(2)
-      real*8 vlsc2(2)
-      real*8 vscal1(2)
-      real*8 vscal2(2)
-c
-c
-c     set the soft core terms and their lambda derivative factors
-c
-      do ig = 1, 2
-         vlmd = vlambda
-         if (ig .eq. 2)  vlmd = 1.0d0 - vlambda
-         vlsc(ig) = vlmd**scexp
-         vlsc1(ig) = vlmd**(scexp-1.0d0)
-         vlsc2(ig) = 0.0d0
-         if (use_d2lmda)  vlsc2(ig) = vlmd**(scexp-2.0d0)
-         call lmdapow (vlmd,scalphav,scexpm,scexpp,use_d2lmda,
-     &                 vscal(ig),vscal1(ig),vscal2(ig))
-      end do
-      return
-      end
-c
-c
 c     ###########################################################
 c     ##                                                       ##
 c     ##  subroutine ehalsc  --  soft core buffered 14-7 pair  ##
@@ -151,7 +68,7 @@ c
 c     the pair energy is eps * lambda^n * T(scal) with T = t1*(t2-2),
 c     so each lambda derivative is a power of lambda times derivatives
 c     of T with respect to the softening "scal", weighted by the scaled
-c     softening derivatives from "halsc4", and no power of lambda goes
+c     softening derivatives from "grpsoft4", and no power of lambda goes
 c     negative
 c
 c
@@ -165,7 +82,7 @@ c
       real*8 rik,rv,eps
       real*8 e,de,dlambda
       real*8 dlambda2,dlde
-      real*8 vsgn,epsl,scal
+      real*8 epsl,scal
       real*8 sc1,sc2
       real*8 dhal17,ghal1
       real*8 rho,rho6,rho7
@@ -179,12 +96,9 @@ c
       real*8 vscal1(2),vscal2(2)
 c
 c
-c     the second ligand group couples as one minus lambda
-c
-      vsgn = 1.0d0
-      if (ig .eq. 2)  vsgn = -1.0d0
-c
-c     get the soft core energy and its distance derivative
+c     get the soft core energy and its distance derivative, where
+c     the scaled lambda derivative from "grpsoft4" already carries
+c     the sign of the ligand group
 c
       dhal17 = (1.0d0+dhal)**7
       ghal1 = 1.0d0 + ghal
@@ -216,7 +130,6 @@ c
 c     get the first lambda derivative of the energy
 c
       dlambda = eps * vlsc1(ig) * (scexp*tt+sc1*ts)
-      dlambda = vsgn * dlambda
 c
 c     get the second lambda derivative, then the lambda derivative of
 c     the distance derivative from the distance derivative of T and its
@@ -234,7 +147,6 @@ c
          trs = -dt1drho*(2.0d0*s1*t2m2+t2*s2)
      &            - t1*dt2drho*(s1+2.0d0*s2)
          dlde = eps * vlsc1(ig) * (scexp*tr+sc1*trs) / rv
-         dlde = vsgn * dlde
       end if
       return
       end

@@ -227,6 +227,10 @@ c
    30    continue
       end do
 c
+c     set the class of the van der Waals type pairs between groups
+c
+      call grppcls
+c
 c     keep the main lambda and the sublambdas within the physical
 c     lambda range
 c
@@ -1572,34 +1576,20 @@ c
 c
 c
 c     reset any soft core buffered 14-7 parameter outside its allowed
-c     range to the default value, where the second lambda derivative
-c     diverges at an endpoint unless the lambda exponent is at least
-c     two and the one minus lambda shift exponent is one or at least
-c     two; the buffering constants keep the pair energy bounded as the
-c     shift vanishes, so the shift exponents need no further limit
+c     range to the default value; the buffering constants keep the
+c     pair energy bounded as the shift vanishes, so the shift exponents
+c     need no further limit
 c
-      if (scalphav .lt. 0.0d0)  scalphav = 0.7d0
-      if (scexp .lt. 1.0d0)  scexp = 5.0d0
-      if (scexpm .lt. 0.0d0)  scexpm = 0.0d0
-      if (scexpp .lt. 1.0d0)  scexpp = 2.0d0
-      if (use_d2lmda .and. scexp.lt.2.0d0)  scexp = 5.0d0
-      if (use_d2lmda .and. scexpp.ne.1.0d0 .and. scexpp.lt.2.0d0)
-     &   scexpp = 2.0d0
+      call softchk (scalphav,scexp,scexpm,scexpp,
+     &              0.7d0,5.0d0,0.0d0,2.0d0)
 c
 c     reset any soft core Pauli repulsion parameter outside its allowed
-c     range to the default value, where the lambda exponent must outrun
-c     the vanishing shift so the pair energy stays bounded as lambda
-c     goes to zero, and the second lambda derivative diverges at an
-c     endpoint unless the exponent is at least two and the one minus
-c     lambda shift exponent is one or at least two
+c     range to the default value, where the lambda exponent must also
+c     outrun the vanishing shift so the pair energy stays bounded as
+c     lambda goes to zero
 c
-      if (scalphar .lt. 0.0d0)  scalphar = 1.0d0
-      if (scexpr .lt. 1.0d0)  scexpr = 5.0d0
-      if (scexprm .lt. 0.0d0)  scexprm = 3.0d0
-      if (scexprp .lt. 1.0d0)  scexprp = 1.0d0
-      if (use_d2lmda .and. scexpr.lt.2.0d0)  scexpr = 5.0d0
-      if (use_d2lmda .and. scexprp.ne.1.0d0 .and. scexprp.lt.2.0d0)
-     &   scexprp = 1.0d0
+      call softchk (scalphar,scexpr,scexprm,scexprp,
+     &              1.0d0,5.0d0,3.0d0,1.0d0)
       if (scalphar.gt.0.0d0 .and. scexpr.le.0.5d0*scexprm) then
          scexpr = 5.0d0
          scexprm = 3.0d0
@@ -1886,16 +1876,6 @@ c
          call fatal
       end if
 c
-c     the HIPPO repulsion and dispersion terms have no relative free
-c     energy treatment
-c
-      if (use_rel .and. (use_repel .or. use_disp)) then
-         write (iout,112)
-  112    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
-     &              ' Available for HIPPO Repulsion or Dispersion')
-         call fatal
-      end if
-c
 c     implicit solvation parameters are not scaled per ligand group
 c
       if (use_rel .and. use_solv) then
@@ -1956,6 +1936,41 @@ c
      &              ' not Available with Implicit Solvation')
          call fatal
       end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine softchk  --  soft core parameter range check  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "softchk" resets any parameter of a soft core with scale
+c     lambda^n and shift alpha*lambda^m*(1-lambda)^p outside its
+c     allowed range to the given default, where "pw" is n, "alpha" is
+c     alpha, "pm" is m and "pp" is p, and the defaults carry a zero
+c     suffix; the second lambda derivative diverges at an endpoint
+c     unless the lambda exponent is at least two and the one minus
+c     lambda shift exponent is one or at least two
+c
+c
+      subroutine softchk (alpha,pw,pm,pp,alpha0,pw0,pm0,pp0)
+      use dlmda
+      implicit none
+      real*8 alpha,pw,pm,pp
+      real*8 alpha0,pw0,pm0,pp0
+c
+c
+c     reset each parameter outside its allowed range
+c
+      if (alpha .lt. 0.0d0)  alpha = alpha0
+      if (pw .lt. 1.0d0)  pw = pw0
+      if (pm .lt. 0.0d0)  pm = pm0
+      if (pp .lt. 1.0d0)  pp = pp0
+      if (use_d2lmda .and. pw.lt.2.0d0)  pw = pw0
+      if (use_d2lmda .and. pp.ne.1.0d0 .and. pp.lt.2.0d0)  pp = pp0
       return
       end
 c

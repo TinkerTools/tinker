@@ -70,6 +70,8 @@ c
       call test_mutate_crel
       call test_mutate_ctscale
       call test_mutate_ctrel
+      call test_mutate_reprel
+      call test_mutate_dsprel
       return
       end
 c
@@ -3845,5 +3847,120 @@ c
          call popdir
          call final
       end do
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_mutate_reprel  --  relative repulsion  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_mutate_reprel" runs fixtures 240 to 246, HIPPO Pauli
+c     repulsion on the staged relative legs of a water box, where the
+c     second ligand couples as one minus the van der Waals lambda and
+c     the two ligands never interact: repulsion alone on the van der
+c     Waals leg, then two water ligands under annihilation, the ligand
+c     1 leg of fixture 239 with repulsion added for two ligands at the
+c     same site, the van der Waals leg of the three leg schedule with
+c     every other HIPPO term but dispersion under Ewald, and both ends
+c     of the van der Waals leg, where one ligand is fully decoupled;
+c     the "testlmda" central difference steps outside the lambda range
+c     at those ends, so their lambda derivatives were checked against
+c     one-sided differences inside it; fixture 246 puts the van der
+c     Waals leg on two ligands at the same site
+c
+c
+      subroutine test_mutate_reprel
+      implicit none
+c
+c
+      call test_mutate_calc ('water2',
+     &   '240_water2_hip_rep_rels_vdwm_l040.key',
+     &   '240_water2_hip_rep_rels_vdwm_l040.txt',
+     &   '240_water2_hip_rep_rels_vdwm_l040',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '241_water2_hip_rep_rels_vdwm_annih_l030.key',
+     &   '241_water2_hip_rep_rels_vdwm_annih_l030.txt',
+     &   '241_water2_hip_rep_rels_vdwm_annih_l030',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2ovl',
+     &   '242_water2ovl_hip_rep_rels_lig1_ex3_l085.key',
+     &   '242_water2ovl_hip_rep_rels_lig1_ex3_l085.txt',
+     &   '242_water2ovl_hip_rep_rels_lig1_ex3_l085',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '243_water2_hip_rep_rels3_l050.key',
+     &   '243_water2_hip_rep_rels3_l050.txt',
+     &   '243_water2_hip_rep_rels3_l050',
+     &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '244_water2_hip_rep_rels_vdwm_l000.key',
+     &   '244_water2_hip_rep_rels_vdwm_l000.txt',
+     &   '244_water2_hip_rep_rels_vdwm_l000',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '245_water2_hip_rep_rels_vdwm_l100.key',
+     &   '245_water2_hip_rep_rels_vdwm_l100.txt',
+     &   '245_water2_hip_rep_rels_vdwm_l100',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2ovl',
+     &   '246_water2ovl_hip_rep_rels_vdwm_l030.key',
+     &   '246_water2ovl_hip_rep_rels_vdwm_l030.txt',
+     &   '246_water2ovl_hip_rep_rels_vdwm_l030',
+     &   .false., .false., .false., .true.,  .true.)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_mutate_dsprel  --  relative dispersion  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_mutate_dsprel" runs fixtures 247 to 251, HIPPO damped
+c     dispersion under Ewald summation on the staged relative legs of
+c     a water box, where reciprocal space carries the environment and
+c     the two ligands as separate densities: the van der Waals leg,
+c     then two water ligands under annihilation, both ends of the van
+c     der Waals leg, whose lambda derivatives were checked against
+c     one-sided differences, and the three leg schedule with every
+c     HIPPO term under Ewald
+c
+c
+      subroutine test_mutate_dsprel
+      implicit none
+c
+c
+      call test_mutate_calc ('water2',
+     &   '247_water2_hip_dsp_ewald_rels_vdwm_l040.key',
+     &   '247_water2_hip_dsp_ewald_rels_vdwm_l040.txt',
+     &   '247_water2_hip_dsp_ewald_rels_vdwm_l040',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '248_water2_hip_dsp_ewald_rels_vdwm_annih_l040.key',
+     &   '248_water2_hip_dsp_ewald_rels_vdwm_annih_l040.txt',
+     &   '248_water2_hip_dsp_ewald_rels_vdwm_annih_l040',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '249_water2_hip_dsp_ewald_rels_vdwm_l000.key',
+     &   '249_water2_hip_dsp_ewald_rels_vdwm_l000.txt',
+     &   '249_water2_hip_dsp_ewald_rels_vdwm_l000',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '250_water2_hip_dsp_ewald_rels_vdwm_l100.key',
+     &   '250_water2_hip_dsp_ewald_rels_vdwm_l100.txt',
+     &   '250_water2_hip_dsp_ewald_rels_vdwm_l100',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '251_water2_hip_full_rels3_l050.key',
+     &   '251_water2_hip_full_rels3_l050.txt',
+     &   '251_water2_hip_full_rels3_l050',
+     &   .true.,  .true.,  .false., .true.,  .true.)
       return
       end
