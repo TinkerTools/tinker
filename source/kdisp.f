@@ -232,11 +232,10 @@ c
       logical, allocatable :: done(:)
 c
 c
-c     set the vdw switching window and its coefficients
+c     set the vdw switching window
 c
       dhoff = vdwcut
       dhcut = min(vdwtaper,vdwcut)
-      call switchc (dhcut,dhoff,dhc0,dhc1,dhc2,dhc3,dhc4,dhc5)
 c
 c     set number of steps and range for numerical integration
 c

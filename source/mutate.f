@@ -1865,17 +1865,6 @@ c
          call fatal
       end if
 c
-c     an Ewald dispersion tail mapped from the buffered 14-7 vdw
-c     splits reciprocal space for a single ligand only
-c
-      if (use_rel .and. use_dhal) then
-         write (iout,114)
-  114    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
-     &              ' Available with a Buffered 14-7 Ewald',
-     &              ' Dispersion Tail')
-         call fatal
-      end if
-c
 c     implicit solvation parameters are not scaled per ligand group
 c
       if (use_rel .and. use_solv) then

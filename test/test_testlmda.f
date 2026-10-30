@@ -131,6 +131,13 @@ c     case 147 decouples a water whose hal tail is handed to an
 c     undamped Ewald dispersion sum, which follows the hal soft core
 c     lambda power in place of the long range correction
 c
+c     cases 148 to 152 hand the hal tail to the Ewald dispersion sum on
+c     the staged relative legs, where the environment and the two
+c     ligands take separate densities in reciprocal space: the van der
+c     Waals leg, the ligand legs of three stages, which merge or drop
+c     a ligand density, damped dispersion sites, and replicate cells
+c     in a small box
+c
 c
       subroutine test_testlmda
       implicit none
@@ -375,6 +382,13 @@ c
       call test_testlmda_case
      &   ('146_water_dsp_ewald_annih_all_l00','1e-4')
       call test_testlmda_case ('147_water_dhal_l05','1e-4')
+      call test_testlmda_case ('148_water_dhal_rels_vdwm_l04','1e-4')
+      call test_testlmda_case ('149_water_dhal_rels3_l015','1e-4')
+      call test_testlmda_case ('150_water_dhal_rels3_l085','1e-4')
+      call test_testlmda_case
+     &   ('151_water_dhal_rels_vdwm_damp_l04','1e-4')
+      call test_testlmda_case
+     &   ('152_water_dhal_rels_vdwm_replica_l04','1e-4')
       return
       end
 c
