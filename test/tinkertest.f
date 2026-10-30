@@ -67,6 +67,7 @@ c
       call test_chglj
       call test_chgtrn
       call test_disp
+      call test_dodecahedron
       call test_eabf
       call test_eost
       call test_eostmap
@@ -89,6 +90,7 @@ c
       call test_opbend
       call test_partialcharge
       call test_pitors
+      call test_readxyz
       call test_polpair
       call test_rephippo
       call test_strbnd
@@ -112,6 +114,7 @@ c
       call test_testlmda
       call test_testvir
       call test_tinkernist
+      call test_xyzedit
       call test_xyzpdb
 c
 c     report the tally and set the process exit status

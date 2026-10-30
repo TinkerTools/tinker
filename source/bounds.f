@@ -20,12 +20,11 @@ c
       use atomid
       use atoms
       use boxes
-      use math
       use molcul
       implicit none
       integer i,j,k
       integer init,stop
-      real*8 weigh,corr
+      real*8 weigh
       real*8 xmid,ymid,zmid
       real*8 xfrac,yfrac,zfrac
       real*8 xcom,ycom,zcom
@@ -72,12 +71,13 @@ c
          if (dodecadron) then
             xfrac = xfrac - xbox*nint(xfrac/xbox)
             yfrac = yfrac - ybox*nint(yfrac/ybox)
-            zfrac = zfrac - root2*zbox*nint(zfrac/(zbox*root2))
-            corr = xbox2 * int(abs(xfrac/xbox)+abs(yfrac/ybox)
-     &                               +abs(root2*zfrac/zbox))
-            xfrac = xfrac - sign(corr,xfrac)
-            yfrac = yfrac - sign(corr,yfrac)
-            zfrac = zfrac - sign(corr,zfrac)*root2
+            zfrac = zfrac - zbox*nint(zfrac/zbox)
+            if (abs(xfrac/xbox)+abs(yfrac/ybox)+abs(zfrac/zbox2)
+     &             .gt. 1.0d0) then
+               xfrac = xfrac - sign(xbox2,xfrac)
+               yfrac = yfrac - sign(ybox2,yfrac)
+               zfrac = zfrac - sign(zbox2,zfrac)
+            end if
          else if (octahedron) then
             xfrac = xfrac - xbox*nint(xfrac/xbox)
             yfrac = yfrac - ybox*nint(yfrac/ybox)

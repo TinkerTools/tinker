@@ -35,10 +35,8 @@ c
       subroutine image (xr,yr,zr)
       use boxes
       use cell
-      use math
       implicit none
       real*8 xr,yr,zr
-      real*8 corr
 c
 c
 c     for orthogonal lattice, find the desired image directly
@@ -119,12 +117,14 @@ c
          do while (abs(yr) .gt. ybox2)
             yr = yr - sign(ybox,yr)
          end do
-         zr = zr - root2*zbox*nint(zr/(zbox*root2))
-         corr = xbox2 * int(abs(xr/xbox)+abs(yr/ybox)
-     &                        +abs(root2*zr/zbox))
-         xr = xr - sign(corr,xr)
-         yr = yr - sign(corr,yr)
-         zr = zr - sign(corr,zr)*root2
+         do while (abs(zr) .gt. zbox2)
+            zr = zr - sign(zbox,zr)
+         end do
+         if (abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox2) .gt. 1.0d0) then
+            xr = xr - sign(xbox2,xr)
+            yr = yr - sign(ybox2,yr)
+            zr = zr - sign(zbox2,zr)
+         end if
       end if
       return
       end
@@ -145,12 +145,10 @@ c
       subroutine imager (xr,yr,zr,i)
       use boxes
       use cell
-      use math
       implicit none
       integer i
       real*8 xr,yr,zr
       real*8 xmove,ymove,zmove
-      real*8 corr
 c
 c
 c     set the distance to translate along each cell axis
@@ -246,12 +244,14 @@ c
          do while (abs(yr) .gt. ybox2)
             yr = yr - sign(ybox,yr)
          end do
-         zr = zr - root2*zbox*nint(zr/(zbox*root2))
-         corr = xbox2 * int(abs(xr/xbox)+abs(yr/ybox)
-     &                        +abs(root2*zr/zbox))
-         xr = xr - sign(corr,xr)
-         yr = yr - sign(corr,yr)
-         zr = zr - sign(corr,zr)*root2
+         do while (abs(zr) .gt. zbox2)
+            zr = zr - sign(zbox,zr)
+         end do
+         if (abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox2) .gt. 1.0d0) then
+            xr = xr - sign(xbox2,xr)
+            yr = yr - sign(ybox2,yr)
+            zr = zr - sign(zbox2,zr)
+         end if
       end if
       return
       end
@@ -274,10 +274,8 @@ c
 c
       subroutine imagen (xr,yr,zr)
       use boxes
-      use math
       implicit none
       real*8 xr,yr,zr
-      real*8 corr
 c
 c
 c     for orthogonal lattice, find the desired image directly
@@ -330,12 +328,12 @@ c
       else if (dodecadron) then
          xr = xr - xbox*nint(xr/xbox)
          yr = yr - ybox*nint(yr/ybox)
-         zr = zr - root2*zbox*nint(zr/(zbox*root2))
-         corr = xbox2 * int(abs(xr/xbox)+abs(yr/ybox)
-     &                        +abs(root2*zr/zbox))
-         xr = xr - sign(corr,xr)
-         yr = yr - sign(corr,yr)
-         zr = zr - sign(corr,zr)*root2
+         zr = zr - zbox*nint(zr/zbox)
+         if (abs(xr/xbox)+abs(yr/ybox)+abs(zr/zbox2) .gt. 1.0d0) then
+            xr = xr - sign(xbox2,xr)
+            yr = yr - sign(ybox2,yr)
+            zr = zr - sign(zbox2,zr)
+         end if
       end if
       return
       end

@@ -36,10 +36,13 @@ c
       integer, allocatable :: list(:)
       real*8 xtmp,ytmp,ztmp
       real*8 atmp,btmp,gtmp
+      real*8 hx,hy,hz
       logical exist,opened
       logical done,quit
       logical simple,clash
-      logical reorder
+      logical reorder,second
+      logical held,comtitle
+      character*3 hname
       character*240 xyzfile
       character*240 record
       character*240 string
@@ -70,7 +73,7 @@ c
       simple = .false.
       size = 0
       do while (size .eq. 0)
-         read (ixyz,20,err=130,end=130)  record
+         read (ixyz,20,err=190,end=190)  record
    20    format (a240)
          size = trimtext (record)
       end do
@@ -82,7 +85,7 @@ c
       n = 0
       next = 1
       call gettext (record,string,next)
-      read (string,*,err=130,end=130)  n
+      read (string,*,err=190,end=190)  n
 c
 c     extract the title and determine its length
 c
@@ -126,12 +129,18 @@ c
          end do
       end do
 c
-c     read second and following lines until atom lines begin
+c     read second and following lines until atom lines begin; the
+c     line after the atom count is the comment of a simple XYZ file
+c     unless it is a Tinker atom or box line, and a comment that can
+c     be read as a simple atom is held in case the comment is missing
 c
       call unitcell
       done = .false.
+      second = .true.
+      held = .false.
+      comtitle = .false.
       dowhile (.not. done)
-         read (ixyz,50,err=130,end=130)  record
+         read (ixyz,50,err=190,end=120)  record
    50    format (a240)
          size = trimtext (record)
          if (size .ne. 0) then
@@ -144,6 +153,7 @@ c
                call getword (record,name(1),next)
                if (name(1) .eq. '   ')  goto 70
                string = record(next:240)
+               read (string,*,err=70,end=70)  x(1),y(1),z(1)
                read (string,*,err=60,end=60)  x(1),y(1),z(1),type(1),
      &                                        (i12(j,1),j=1,maxval)
    60          continue
@@ -153,7 +163,7 @@ c
 c
 c     check for an initial atom in the simple XYZ format
 c
-            if (.not. done) then
+            if (.not.done .and. .not.second) then
                tag(1) = 1
                next = 1
                call getword (record,name(1),next)
@@ -165,7 +175,15 @@ c
    80          continue
             end if
 c
-c     check for optional dimensions of the periodic box
+c     a held comment followed by a non-atom line is the first atom
+c
+            if (.not.done .and. held) then
+               backspace (unit=ixyz)
+               goto 120
+            end if
+c
+c     check for optional dimensions of the periodic box, which need
+c     three values unless the line ends after fewer of them
 c
             if (.not. done) then
                xtmp = 0.0d0
@@ -174,9 +192,12 @@ c
                atmp = 0.0d0
                btmp = 0.0d0
                gtmp = 0.0d0
-               read (record,*,err=90,end=90)  xtmp,ytmp,ztmp,
+               read (record,*,err=90,end=100)  xtmp,ytmp,ztmp,
      &                                        atmp,btmp,gtmp
+               goto 100
    90          continue
+               if (ztmp .eq. 0.0d0)  xtmp = 0.0d0
+  100          continue
                if (xtmp .ne. 0.0d0) then
                   use_bounds = .true.
                   xbox = xtmp
@@ -193,44 +214,107 @@ c
                   call lattice
                end if
             end if
-         end if
-      end do
 c
-c     read second and following atom lines from input file
+c     otherwise keep the line after the atom count as a comment
+c
+            if (.not. done) then
+               if (second .and. xtmp.eq.0.0d0) then
+                  if (ltitle .eq. 0) then
+                     first = nexttext (record)
+                     last = trimtext (record)
+                     title = record(first:last)
+                     ltitle = trimtext (title)
+                     comtitle = .true.
+                  end if
+                  next = 1
+                  call getword (record,hname,next)
+                  if (next .eq. 1)  goto 110
+                  string = record(next:240)
+                  read (string,*,err=110,end=110)  hx,hy,hz
+                  held = .true.
+  110             continue
+               end if
+            end if
+         end if
+         second = .false.
+      end do
+      goto 130
+c
+c     no atom line follows a held comment, so it was the first atom
+c
+  120 continue
+      if (.not. held)  goto 190
+      tag(1) = 1
+      name(1) = hname
+      x(1) = hx
+      y(1) = hy
+      z(1) = hz
+      if (comtitle) then
+         title = ' '
+         ltitle = 0
+      end if
+      held = .false.
+      simple = .true.
+  130 continue
+c
+c     read second and following atom lines from input file; if the
+c     last line is missing and a comment was held, the file has no
+c     comment line and the held comment holds the first atom
 c
       if (simple) then
          do i = 2, n
-            read (ixyz,100,err=130,end=130)  record
-  100       format (a240)
+            read (ixyz,140,err=190,end=160)  record
+  140       format (a240)
             tag(i) = i
             next = 1
             call getword (record,name(i),next)
             string = record(next:240)
-            read (string,*,err=130,end=130)  x(i),y(i),z(i)
+            read (string,*,err=150,end=150)  x(i),y(i),z(i)
          end do
+         quit = .false.
+         goto 190
+  150    continue
+         backspace (unit=ixyz)
+  160    continue
+         if (.not.held .or. i.ne.n)  goto 190
+         do k = n, 2, -1
+            name(k) = name(k-1)
+            x(k) = x(k-1)
+            y(k) = y(k-1)
+            z(k) = z(k-1)
+         end do
+         tag(n) = n
+         name(1) = hname
+         x(1) = hx
+         y(1) = hy
+         z(1) = hz
+         if (comtitle) then
+            title = ' '
+            ltitle = 0
+         end if
          quit = .false.
       else
          do i = 2, n
-            read (ixyz,110,err=130,end=130)  record
-  110       format (a240)
-            read (record,*,err=130,end=130)  tag(i)
+            read (ixyz,170,err=190,end=190)  record
+  170       format (a240)
+            read (record,*,err=190,end=190)  tag(i)
             next = 1
             call getword (record,name(i),next)
             string = record(next:240)
-            read (string,*,err=120,end=120)  x(i),y(i),z(i),type(i),
+            read (string,*,err=180,end=180)  x(i),y(i),z(i),type(i),
      &                                       (i12(j,i),j=1,maxval)
-  120       continue
+  180       continue
          end do
          quit = .false.
       end if
-  130 continue
+  190 continue
       if (.not. opened)  close (unit=ixyz)
 c
 c     an error occurred in reading the coordinate file
 c
       if (quit) then
-         write (iout,140)  i
-  140    format (/,' READXYZ  --  Error in Coordinate File at Atom',i9)
+         write (iout,200)  i
+  200    format (/,' READXYZ  --  Error in Coordinate File at Atom',i9)
          call fatal
       end if
 c
@@ -241,10 +325,10 @@ c
             do j = maxval, 1, -1
                if (i12(j,i) .ne. 0) then
                   n12(i) = j
-                  goto 150
+                  goto 210
                end if
             end do
-  150       continue
+  210       continue
             call sort (n12(i),i12(1,i))
          end do
 c
@@ -267,8 +351,8 @@ c
             if (tag(i) .ne. i)  reorder = .true.
          end do
          if (reorder) then
-            write (iout,160)
-  160       format (/,' READXYZ  --  Atom Labels not Sequential,',
+            write (iout,220)
+  220       format (/,' READXYZ  --  Atom Labels not Sequential,',
      &                 ' Attempting to Renumber')
             do i = 1, n
                tag(i) = i
@@ -294,13 +378,13 @@ c
             do j = 1, n12(i)
                k = i12(j,i)
                do m = 1, n12(k)
-                  if (i12(m,k) .eq. i)  goto 180
+                  if (i12(m,k) .eq. i)  goto 240
                end do
-               write (iout,170)  k,i
-  170          format (/,' READXYZ  --  Check Connection of Atoms',
+               write (iout,230)  k,i
+  230          format (/,' READXYZ  --  Check Connection of Atoms',
      &                    i9,' and',i9)
                call fatal
-  180          continue
+  240          continue
             end do
          end do
       end if

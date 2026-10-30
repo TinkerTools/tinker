@@ -54,7 +54,7 @@ c
       real*8 phi,theta,psi
       real*8 cphi,ctheta,cpsi
       real*8 sphi,stheta,spsi
-      real*8 dist2,cut2
+      real*8 dist2,cut2,cube
       real*8 random,norm,weigh
       real*8, allocatable :: rad(:)
       real*8 a(3,3)
@@ -420,17 +420,19 @@ c
             nlist = nlist + 1
          end do
          call sort4 (nlist,list)
+c
+c     insert in increasing order, so the input numbers are those of
+c     the new atoms in the output, and "5 6 7 8" matches "-5 8"
+c
          do while (.not. abort)
-            do i = nlist, 1, -1
-               if (i .gt. 1) then
-                  if (list(i-1) .lt. 0) then
-                     do j = abs(list(i-1)), abs(list(i))
-                        call insert (j)
-                     end do
-                  else if (list(i) .gt. 0) then
-                     call insert (list(i))
-                  end if
-               else if (list(i) .gt. 0) then
+            do i = 1, nlist
+               if (list(i) .lt. 0) then
+                  do j = abs(list(i)), abs(list(i+1))
+                     call insert (j)
+                  end do
+               else if (i .eq. 1) then
+                  call insert (list(i))
+               else if (list(i-1) .gt. 0) then
                   call insert (list(i))
                end if
             end do
@@ -467,8 +469,8 @@ c
   240       format (/,' Numbers of the Old and New Atom Types :  ',$)
             read (input,250)  record
   250       format (a240)
+            read (record,*,err=220,end=220)  oldtype,newtype
          end if
-         read (record,*,err=220,end=220)  oldtype,newtype
          do while (.not. abort)
             do i = 1, n
                if (use(i)) then
@@ -654,6 +656,7 @@ c
          end if
          nask = 0
          do while (.not.exist .and. nask.lt.maxask)
+            nask = nask + 1
             write (iout,280)
   280       format (/,' Enter Name of Atom Type Template',
      &                 ' Structure :  ',$)
@@ -663,6 +666,7 @@ c
             call suffix (tmpfile,'xyz','old')
             inquire (file=tmpfile,exist=exist)
          end do
+         if (.not. exist)  call fatal
          itmp = freeunit ()
          open (unit=itmp,file=tmpfile,status='old')
          rewind (unit=itmp)
@@ -837,13 +841,13 @@ c
          call nextarg (string,exist)
          if (exist)  read (string,*,err=340,end=340)  origin
   340    continue
-         if (origin .eq. 0) then
+         do while (origin.lt.1 .or. origin.gt.n)
             write (iout,350)
   350       format (/,' Number of the Atom to Move to the Origin',
      &                 ' :  ',$)
-            read (input,360)  origin
+            read (input,360,err=340)  origin
   360       format (i10)
-         end if
+         end do
          do while (.not. abort)
             xorig = x(origin)
             yorig = y(origin)
@@ -897,6 +901,7 @@ c
          theta = 0.0d0
          call nextarg (string,exist)
          if (exist)  read (string,*,err=370,end=370)  axis
+         call upcase (axis)
          call nextarg (string,exist)
          if (exist)  read (string,*,err=370,end=370)  theta
   370    continue
@@ -921,20 +926,24 @@ c
             end do
             a(i,i) = 1.0d0
          end do
+c
+c     rotate atoms counterclockwise by the right-hand rule, the
+c     same sense as the Euler angles of rigid body placement
+c
          if (axis .eq. 'X') then
             a(2,2) = ctheta
-            a(3,2) = stheta
-            a(2,3) = -stheta
+            a(3,2) = -stheta
+            a(2,3) = stheta
             a(3,3) = ctheta
          else if (axis .eq. 'Y') then
             a(1,1) = ctheta
-            a(3,1) = -stheta
-            a(1,3) = stheta
+            a(3,1) = stheta
+            a(1,3) = -stheta
             a(3,3) = ctheta
          else if (axis .eq. 'Z') then
             a(1,1) = ctheta
-            a(2,1) = stheta
-            a(1,2) = -stheta
+            a(2,1) = -stheta
+            a(1,2) = stheta
             a(2,2) = ctheta
          end if
          do while (.not. abort)
@@ -942,9 +951,9 @@ c
                xorig = x(i)
                yorig = y(i)
                zorig = z(i)
-               x(i) = a(1,1)*xorig + a(2,1)*yorig + a(3,1)*zorig + xcm
-               y(i) = a(1,2)*xorig + a(2,2)*yorig + a(3,2)*zorig + ycm
-               z(i) = a(1,3)*xorig + a(2,3)*yorig + a(3,3)*zorig + zcm
+               x(i) = a(1,1)*xorig + a(2,1)*yorig + a(3,1)*zorig
+               y(i) = a(1,2)*xorig + a(2,2)*yorig + a(3,2)*zorig
+               z(i) = a(1,3)*xorig + a(2,3)*yorig + a(3,3)*zorig
             end do
             call makeref (1)
             call readcart (ixyz,first)
@@ -1168,7 +1177,10 @@ c
          end if
       end if
 c
-c     trim cube to truncated octahedron or rhombic dodecahedron
+c     trim cube to truncated octahedron or rhombic dodecahedron,
+c     each the largest that fits inside the cube; the dodecahedron
+c     edge is the cube edge over sqrt(2), so its z vertices touch
+c     the cube faces
 c
       if (mode.eq.23 .or. mode.eq.24) then
          call unitcell
@@ -1180,21 +1192,27 @@ c
             read (record,*,err=510,end=510)  xbox
   510       continue
          end do
-         ybox = xbox
-         zbox = xbox
-         nonprism = .false.
-         octahedron = .false.
-         dodecadron = .false.
-         call bounds
-         nonprism = .true.
-         if (mode .eq. 20)  octahedron = .true.
-         if (mode .eq. 21)  dodecadron = .true.
-         if (dodecadron)  zbox = xbox * root2
-         call lattice
+         cube = xbox
          call molecule
          allocate (list(n))
          allocate (keep(n))
          do while (.not. abort)
+            xbox = cube
+            ybox = cube
+            zbox = cube
+            nonprism = .false.
+            octahedron = .false.
+            dodecadron = .false.
+            call lattice
+            call bounds
+            if (mode .eq. 23)  octahedron = .true.
+            if (mode .eq. 24) then
+               dodecadron = .true.
+               xbox = cube / root2
+               ybox = xbox
+               zbox = cube
+            end if
+            call lattice
             do i = 1, n
                list(i) = 1
             end do
@@ -1226,10 +1244,9 @@ c
                      end do
                   end if
                else if (dodecadron) then
-                  xcm = xcm - xbox*nint(xcm/xbox)
-                  ycm = ycm - ybox*nint(ycm/ybox)
-                  zcm = zcm - root2*zbox*nint(zcm/(zbox*root2))
-                  if (abs(xcm)+abs(ycm)+abs(root2*zcm) .gt. xbox) then
+                  if (abs(xcm).gt.xbox2 .or. abs(ycm).gt.ybox2 .or.
+     &                abs(xcm/xbox)+abs(ycm/ybox)+abs(zcm/zbox2)
+     &                   .gt. 1.0d0) then
                      do j = init, stop
                         k = kmol(j)
                         list(k) = 0
@@ -2001,6 +2018,7 @@ c
       end if
       nask = 0
       do while (.not.exist .and. nask.lt.maxask)
+         nask = nask + 1
          write (iout,10)
    10    format (/,' Enter Name of Solvent Box Coordinates :  ',$)
          read (input,20)  solvfile
@@ -2013,6 +2031,7 @@ c
          end if
          inquire (file=solvfile,exist=exist)
       end do
+      if (.not. exist)  call fatal
 c
 c     read the coordinate file containing the solvent atoms
 c
@@ -2226,11 +2245,12 @@ c
       use katoms
       use molcul
       implicit none
-      integer i,j,k
+      integer i,j,k,m
       integer nsolute,size
       integer start,stop
       integer icount,iontyp
       integer ncopy,ranatm
+      integer navail
       integer, allocatable :: list(:)
       integer, allocatable :: isolute(:)
       real*8 xi,yi,zi
@@ -2243,6 +2263,7 @@ c
       real*8, allocatable :: zion(:)
       logical exist,header,done
       logical, allocatable :: remove(:)
+      logical, allocatable :: drop(:)
       character*240 record
       character*240 string
       external random
@@ -2260,6 +2281,7 @@ c
          list(i) = 0
       end do
       i = 0
+      exist = .true.
       do while (exist)
          call nextarg (string,exist)
          if (exist) then
@@ -2310,8 +2332,8 @@ c
    70    format (/,' Enter Ion Atom Type Number & Copies to Add :  ',$)
          read (input,80)  record
    80    format (a240)
+         read (record,*,err=50,end=50)  iontyp,ncopy
       end if
-      read (record,*,err=50,end=50)  iontyp,ncopy
 c
 c     set minimum distance cutoff for solute-ion contacts
 c
@@ -2397,41 +2419,63 @@ c
   130    format (' Solvent Atoms Processed',i15)
       end if
 c
-c     randomly replace the solvent molecules with ions
+c     check for enough polyatomic molecules away from the solute
 c
+      navail = 0
+      do i = 1, nmol
+         if (.not.remove(i) .and. imol(2,i).gt.imol(1,i)) then
+            navail = navail + 1
+         end if
+      end do
+      if (navail .lt. ncopy) then
+         write (iout,140)  navail,ncopy
+  140    format (/,' ADDIONS  --  Only',i8,' Solvent Molecules',
+     &              ' Available to Replace with',i8,' Ions')
+         call fatal
+      end if
+c
+c     randomly select polyatomic molecules to replace with ions
+c
+      allocate (drop(n))
+      do i = 1, n
+         drop(i) = .false.
+      end do
       do i = 1, ncopy
          done = .false.
          do while (.not. done)
             rand = random ()
             ranatm = int(rand*dble(n)) + 1
-c
-c     check solute distance, then delete polyatomic molecule
-c
-            if (.not. remove(molcule(ranatm))) then
-               start = imol(1,molcule(ranatm))
-               stop = imol(2,molcule(ranatm))
-               if (start .eq. stop) then
-                  done = .false.
-               else
-                  done = .true.
-                  xmid = 0.0d0
-                  ymid = 0.0d0
-                  zmid = 0.0d0
-                  do k = stop, start, -1
-                     weigh = mass(k)
-                     xmid = xmid + x(k)*weigh
-                     ymid = ymid + y(k)*weigh
-                     zmid = zmid + z(k)*weigh
-                     call delete (k)
-                  end do
-                  weigh = molmass(molcule(ranatm))
-                  xion(i) = xmid / weigh
-                  yion(i) = ymid / weigh
-                  zion(i) = zmid / weigh
-               end if
+            m = molcule(ranatm)
+            start = imol(1,m)
+            stop = imol(2,m)
+            if (.not.remove(m) .and. stop.gt.start) then
+               done = .true.
+               remove(m) = .true.
+               xmid = 0.0d0
+               ymid = 0.0d0
+               zmid = 0.0d0
+               do j = start, stop
+                  k = kmol(j)
+                  weigh = mass(k)
+                  xmid = xmid + x(k)*weigh
+                  ymid = ymid + y(k)*weigh
+                  zmid = zmid + z(k)*weigh
+                  drop(k) = .true.
+               end do
+               weigh = molmass(m)
+               xion(i) = xmid / weigh
+               yion(i) = ymid / weigh
+               zion(i) = zmid / weigh
             end if
          end do
       end do
+c
+c     delete the selected molecules starting from the last atom
+c
+      do i = n, 1, -1
+         if (drop(i))  call delete (i)
+      end do
+      deallocate (drop)
 c
 c     insert new monoatomic ions at saved centers of mass
 c

@@ -851,9 +851,32 @@ c     the test root so it works regardless of the current directory
 c
 c
       subroutine run_prog (name,args,outfile,ist)
-      use assert
       implicit none
       character*(*) name,args,outfile
+      integer ist
+c
+c
+      call run_prog_input (name,args,'/dev/null',outfile,ist)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine run_prog_input  --  run program with stdin  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "run_prog_input" runs a built Tinker program as "run_prog" does,
+c     with its standard input read from the given file, so programs
+c     that prompt for answers can be driven by a fixture file
+c
+c
+      subroutine run_prog_input (name,args,infile,outfile,ist)
+      use assert
+      implicit none
+      character*(*) name,args,infile,outfile
       integer ist
       character*512 exe,cmd
       logical exist
@@ -877,7 +900,7 @@ c
          ist = -1
          return
       end if
-      cmd = trim(exe)//' '//trim(args)//' < /dev/null > '//
+      cmd = trim(exe)//' '//trim(args)//' < '//trim(infile)//' > '//
      &         trim(outfile)//' 2>&1'
       call execute_command_line (cmd,exitstat=ist)
       return

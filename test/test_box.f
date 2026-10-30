@@ -13,7 +13,7 @@ c     ##############################################
 c
 c
 c     "test_box" checks the volume and minimum-image cases exercised
-c     by the tinker-gpu box.cpp tests
+c     by the tinker-gpu box.cpp tests, plus the rhombic dodecahedron
 c
 c
       subroutine test_box
@@ -23,6 +23,7 @@ c
       call test_box_orthogonal
       call test_box_monoclinic
       call test_box_triclinic
+      call test_box_dodecahedron
       return
       end
 c
@@ -157,6 +158,138 @@ c
       call test_box_image (tname,0.91168825d0,10.91168824d0,
      &                     5.0d0,-16.05887450d0,
      &                     -6.05887450d0,5.0d0)
+      call final
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine test_box_dodecahedron  --  rhombic dodec  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "test_box_dodecahedron" checks the rhombic dodecahedron with
+c     edge length a, stored as the a x a x sqrt(2)a parent cell, by
+c     hand-computed images and by a sweep against a brute-force
+c     search over the face-centered cubic lattice vectors
+c
+c
+      subroutine test_box_dodecahedron
+      use boxes
+      use math
+      implicit none
+      integer i,j,k
+      integer n1,n2,n3
+      integer nbad,ngrid
+      parameter (ngrid=10)
+      real*8 a,eps
+      real*8 xr,yr,zr
+      real*8 xn,yn,zn
+      real*8 r2,rmin2
+      real*8 c1,c2,c3
+      real*8 x0,y0,z0
+      real*8 lv(3,3)
+      logical skiptest
+      character*(*) tname
+      parameter (tname='test_box_dodecahedron')
+c
+c
+      if (skiptest(tname,'amoeba'))  return
+      call initial
+      a = 16.0d0
+      xbox = a
+      ybox = a
+      zbox = a * root2
+      alpha = 90.0d0
+      beta = 90.0d0
+      gamma = 90.0d0
+      octahedron = .false.
+      dodecadron = .true.
+      call lattice
+      call assert_real (volbox,2896.3093757400984d0,1.0d-6,
+     &                  tname//' volume')
+c
+c     hand-computed images, the first two missed by a z wrap
+c     with period 2a in place of sqrt(2)a
+c
+      call test_box_image (tname,1.0d0,1.0d0,15.0d0,
+     &                     1.0d0,1.0d0,-7.627416997970d0)
+      call test_box_image (tname,20.0d0,-3.0d0,30.0d0,
+     &                     -4.0d0,5.0d0,-3.941125496954d0)
+      call test_box_image (tname,7.0d0,7.0d0,7.0d0,
+     &                     -1.0d0,-1.0d0,-4.313708498985d0)
+      call test_box_image (tname,7.0d0,-7.0d0,-7.0d0,
+     &                     -1.0d0,1.0d0,4.313708498985d0)
+      call test_box_image (tname,-4.0d0,0.0d0,4.0d0,
+     &                     -4.0d0,0.0d0,4.0d0)
+c
+c     face-centered cubic lattice vectors with nearest-neighbor
+c     distance a, built here rather than taken from "lattice"
+c
+      do i = 1, 3
+         do j = 1, 3
+            lv(j,i) = 0.0d0
+         end do
+      end do
+      lv(1,1) = a
+      lv(2,2) = a
+      lv(1,3) = 0.5d0 * a
+      lv(2,3) = 0.5d0 * a
+      lv(3,3) = 0.5d0 * a * root2
+c
+c     sweep a grid over [-1.5a,1.5a] with irrational offsets; each
+c     image must be a lattice shift of the input, as short as the
+c     brute-force minimum, and agree with "imagen" in magnitude
+c
+      eps = 1.0d-6
+      nbad = 0
+      do i = 1, ngrid
+         do j = 1, ngrid
+            do k = 1, ngrid
+               x0 = 3.0d0*a*(dble(i)-0.381966d0)/dble(ngrid) - 1.5d0*a
+               y0 = 3.0d0*a*(dble(j)-0.732051d0)/dble(ngrid) - 1.5d0*a
+               z0 = 3.0d0*a*(dble(k)-0.414214d0)/dble(ngrid) - 1.5d0*a
+               rmin2 = 1.0d10
+               do n1 = -5, 5
+                  do n2 = -5, 5
+                     do n3 = -5, 5
+                        xr = x0 + n1*lv(1,1) + n2*lv(1,2) + n3*lv(1,3)
+                        yr = y0 + n1*lv(2,1) + n2*lv(2,2) + n3*lv(2,3)
+                        zr = z0 + n1*lv(3,1) + n2*lv(3,2) + n3*lv(3,3)
+                        r2 = xr*xr + yr*yr + zr*zr
+                        rmin2 = min(r2,rmin2)
+                     end do
+                  end do
+               end do
+               xr = x0
+               yr = y0
+               zr = z0
+               call image (xr,yr,zr)
+               r2 = xr*xr + yr*yr + zr*zr
+               c3 = (zr-z0) / lv(3,3)
+               c1 = (xr-x0-c3*lv(1,3)) / a
+               c2 = (yr-y0-c3*lv(2,3)) / a
+               xn = x0
+               yn = y0
+               zn = z0
+               call imagen (xn,yn,zn)
+               if (abs(sqrt(r2)-sqrt(rmin2)) .gt. eps .or.
+     &             abs(c1-dble(nint(c1))) .gt. eps .or.
+     &             abs(c2-dble(nint(c2))) .gt. eps .or.
+     &             abs(c3-dble(nint(c3))) .gt. eps .or.
+     &             abs(abs(xn)-abs(xr)) .gt. eps .or.
+     &             abs(abs(yn)-abs(yr)) .gt. eps .or.
+     &             abs(abs(zn)-abs(zr)) .gt. eps) then
+                  nbad = nbad + 1
+               end if
+            end do
+         end do
+      end do
+      call assert_int (nbad,0,tname//' brute-force images')
+      dodecadron = .false.
+      nonprism = .false.
       call final
       return
       end
