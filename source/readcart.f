@@ -30,5 +30,9 @@ c
       else if (binary) then
          call readdcd (ixyz,first)
       end if
+c
+c     place the extra sites of four-site waters on their frames
+c
+      call watread
       return
       end

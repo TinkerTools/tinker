@@ -735,6 +735,39 @@ c
       end
 c
 c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine watread  --  place 4-site water extra sites  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "watread" places the extra sites of rigid planar four-site water
+c     molecules on their frames after coordinates are read, since they
+c     are not degrees of freedom; it does nothing before "kfreeze" has
+c     found the waters, or for coordinates of a smaller system
+c
+c
+      subroutine watread
+      use atoms
+      use freeze
+      implicit none
+      integer i,j
+c
+c
+      if (.not. use_freeze)  return
+      if (nwat4 .le. 0)  return
+      if (.not. allocated(iwat4))  return
+      do i = 1, nwat4
+         do j = 1, 4
+            if (iwat4(j,i) .gt. n)  return
+         end do
+      end do
+      call watfour (0.0d0)
+      return
+      end
+c
+c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine watfour2  --  distribute 4-site water gradient  ##

@@ -24,6 +24,7 @@ c
 c
 c
       call test_water4_verlet
+      call test_water4_respa
       call test_water4_grad
       call test_water4_minimize
       return
@@ -43,31 +44,19 @@ c     step, then checks that the waters are rigid, with the extra
 c     sites on their frames and at rest
 c
 c     the references hold one step of "dynamic tip4p 1 1.0 0.001 1"
-c     with "integrator verlet", taken from the tinker-gpu water4.cpp
-c     test, which saves positions and velocities as gradient rows
+c     with "integrator verlet" and the extra sites placed on their
+c     frames at load, shared with the tinker-gpu water4.cpp test,
+c     which saves positions and velocities as gradient rows
 c
 c
       subroutine test_water4_verlet
-      use atoms
       use freeze
       use inform
       use iounit
-      use math
-      use moldyn
       implicit none
-      integer i,j,nat
-      integer ia,ib,ic,id
       integer isave,freeunit
-      real*8 dt,eps
-      real*8 roh,rhh
-      real*8 dmax,vmax
-      real*8 rmax,wmax
-      real*8 xr(3)
-      real*8, allocatable :: cur(:,:)
-      real*8, allocatable :: refq(:,:)
-      real*8, allocatable :: refp(:,:)
+      real*8 dt
       logical skiptest
-      character*240 rpath
       character*(*) tname
       parameter (tname='test_water4_verlet')
 c
@@ -90,6 +79,100 @@ c
       call verlet (1,dt)
       close (unit=iout)
       iout = isave
+      call w4check (tname,'water4.q.txt','water4.p.txt')
+      call popdir
+      call sd_final
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_water4_respa  --  RESPA steps from rest  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_water4_respa" takes three VRESPA steps from rest with four
+c     inner steps each, which constrain the waters and place the extra
+c     sites at every inner step, and checks them as for one Verlet step
+c
+c     the references come from "vrespa" with the extra sites placed on
+c     their frames at load, shared with the tinker-gpu water4.cpp test
+c
+c
+      subroutine test_water4_respa
+      use freeze
+      use inform
+      use iounit
+      use mdstuf
+      implicit none
+      integer k,isave,freeunit
+      real*8 dt
+      logical skiptest
+      character*(*) tname
+      parameter (tname='test_water4_respa')
+c
+c
+      if (skiptest(tname,'water4 freeze respa'))  return
+      call pushdir ('file/water4')
+      call loadfix_keyadd ('tip4p','tip4p.key','integrator vrespa')
+      call assert_int (nwat4,1000,tname//' four-site waters')
+c
+c     the integrator must be known to "mdinit", which sets the fast
+c     and slow accelerations; the inner steps only matter to "vrespa"
+c
+      call sd_mdinit (0.0d0)
+      nrespa = 4
+      iwrite = 1000000
+      iprint = 1000000
+      dt = 0.001d0
+      isave = iout
+      iout = freeunit ()
+      open (unit=iout,status='scratch')
+      do k = 1, 3
+         call vrespa (k,dt)
+      end do
+      close (unit=iout)
+      iout = isave
+      call w4check (tname,'water4respa.q.txt','water4respa.p.txt')
+      call popdir
+      call sd_final
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine w4check  --  rigid four-site water checks  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "w4check" compares the positions and velocities with references
+c     saved as gradient rows, then checks that the waters are rigid,
+c     with the extra sites on their frames and at rest
+c
+c
+      subroutine w4check (tname,qname,pname)
+      use atoms
+      use freeze
+      use math
+      use moldyn
+      implicit none
+      integer i,j,nat
+      integer ia,ib,ic,id
+      real*8 eps
+      real*8 roh,rhh
+      real*8 dmax,vmax
+      real*8 rmax,wmax
+      real*8 xr(3)
+      real*8, allocatable :: cur(:,:)
+      real*8, allocatable :: refq(:,:)
+      real*8, allocatable :: refp(:,:)
+      character*240 rpath
+      character*(*) tname,qname,pname
+c
 c
 c     compare positions under the minimum image, in case a molecule
 c     is wrapped into the box at a different time
@@ -97,9 +180,9 @@ c
       allocate (cur(3,n))
       allocate (refq(3,n))
       allocate (refp(3,n))
-      call refpath ('water4','water4.q.txt',rpath)
+      call refpath ('water4',qname,rpath)
       call read_gradient (rpath,n,refq,nat)
-      call refpath ('water4','water4.p.txt',rpath)
+      call refpath ('water4',pname,rpath)
       call read_gradient (rpath,n,refp,nat)
       do i = 1, n
          cur(1,i) = x(i)
@@ -157,8 +240,6 @@ c
       deallocate (cur)
       deallocate (refq)
       deallocate (refp)
-      call popdir
-      call sd_final
       return
       end
 c
@@ -204,17 +285,20 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_water4_grad" checks that "gradient" leaves no gradient on
-c     the extra sites, and that what it gives the O-H-H atoms of a
-c     water is the derivative of the energy when the extra site
-c     moves with them
+c     "test_water4_grad" checks that the extra sites are put on their
+c     frames when the coordinates are read, that "gradient" leaves no
+c     gradient on them, in "derivs" and in "desum", and that what it
+c     gives the O-H-H atoms of a water is the derivative of the energy
+c     when the extra site moves with them
 c
 c
       subroutine test_water4_grad
       use atoms
+      use deriv
       use freeze
       implicit none
       integer i,j,k,ia
+      integer ib,ic,id
       real*8 e,ep,em,h
       real*8 dmax,energy
       real*8 an(3,3),fd(3,3)
@@ -228,9 +312,22 @@ c
       call pushdir ('file/water4')
       call loadfix ('tip4p','tip4p.key')
 c
-c     put the extra sites on their frames, as dynamics would
+c     the extra sites of tip4p.xyz are off their frames in the file
 c
-      call watfour (0.0d0)
+      dmax = 0.0d0
+      do i = 1, nwat4
+         ia = iwat4(1,i)
+         ib = iwat4(2,i)
+         ic = iwat4(3,i)
+         id = iwat4(4,i)
+         dmax = max(dmax,abs(x(id)-kwat4(1,i)*x(ia)
+     &                          -kwat4(2,i)*(x(ib)+x(ic))))
+         dmax = max(dmax,abs(y(id)-kwat4(1,i)*y(ia)
+     &                          -kwat4(2,i)*(y(ib)+y(ic))))
+         dmax = max(dmax,abs(z(id)-kwat4(1,i)*z(ia)
+     &                          -kwat4(2,i)*(z(ib)+z(ic))))
+      end do
+      call assert_real (dmax,0.0d0,1.0d-12,tname//' frames at load')
       allocate (derivs(3,n))
       call gradient (e,derivs)
       dmax = 0.0d0
@@ -241,6 +338,7 @@ c
          end do
       end do
       call assert_real (dmax,0.0d0,0.0d0,tname//' extra site rows')
+      call assert_grad (desum,derivs,n,0.0d0,tname//' desum')
 c
 c     central differences over the O-H-H atoms of the first water,
 c     placing its extra site again after each displacement

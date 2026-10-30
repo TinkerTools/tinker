@@ -371,6 +371,7 @@ c
 c
 c     distribute gradient on four-site water extra centers
 c
+      call watfour2 (desum)
       call watfour2 (derivs)
 c
 c     check for an illegal value for the total energy

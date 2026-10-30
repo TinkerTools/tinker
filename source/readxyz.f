@@ -388,5 +388,9 @@ c
             end do
          end do
       end if
+c
+c     place the extra sites of four-site waters on their frames
+c
+      if (.not. abort)  call watread
       return
       end

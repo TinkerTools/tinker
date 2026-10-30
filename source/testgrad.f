@@ -22,6 +22,7 @@ c
       use deriv
       use energi
       use files
+      use freeze
       use inform
       use inter
       use iounit
@@ -223,6 +224,40 @@ c     compute the energy and analytical gradient components
 c
          if (doanalyt) then
             call gradient (eval,derivs)
+c
+c     distribute the components on four-site water extra centers,
+c     as "gradient" does for the total
+c
+            if (nwat4 .gt. 0) then
+               call watfour2 (deb)
+               call watfour2 (dea)
+               call watfour2 (deba)
+               call watfour2 (deub)
+               call watfour2 (deaa)
+               call watfour2 (deopb)
+               call watfour2 (deopd)
+               call watfour2 (deid)
+               call watfour2 (deit)
+               call watfour2 (det)
+               call watfour2 (dept)
+               call watfour2 (debt)
+               call watfour2 (deat)
+               call watfour2 (dett)
+               call watfour2 (dev)
+               call watfour2 (der)
+               call watfour2 (dedsp)
+               call watfour2 (dec)
+               call watfour2 (decd)
+               call watfour2 (ded)
+               call watfour2 (dem)
+               call watfour2 (dep)
+               call watfour2 (dect)
+               call watfour2 (derxf)
+               call watfour2 (des)
+               call watfour2 (delf)
+               call watfour2 (deg)
+               call watfour2 (dex)
+            end if
          end if
 c
 c     print the total potential energy of the system
@@ -345,7 +380,8 @@ c
             end if
          end if
 c
-c     get the Cartesian component two-sided numerical gradients
+c     get the Cartesian component two-sided numerical gradients,
+c     with the extra sites of four-site waters kept on their frames
 c
          do i = 1, n
             if (donumer .and. use(i)) then
@@ -360,6 +396,7 @@ c
                      old = z(i)
                      z(i) = z(i) - 0.5d0*eps
                   end if
+                  if (nwat4 .gt. 0)  call watfour (0.0d0)
                   f0 = energy ()
                   eb0 = eb
                   ea0 = ea
@@ -396,6 +433,7 @@ c
                   else if (j .eq. 3) then
                      z(i) = z(i) + eps
                   end if
+                  if (nwat4 .gt. 0)  call watfour (0.0d0)
                   f = energy ()
                   if (j .eq. 1) then
                      x(i) = old
@@ -404,6 +442,7 @@ c
                   else if (j .eq. 3) then
                      z(i) = old
                   end if
+                  if (nwat4 .gt. 0)  call watfour (0.0d0)
                   ndesum(j,i) = (f - f0) / eps
                   ndeb(j,i) = (eb - eb0) / eps
                   ndea(j,i) = (ea - ea0) / eps

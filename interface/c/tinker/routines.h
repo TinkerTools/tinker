@@ -2982,6 +2982,8 @@ void solve3_(double* a, double* b, double* p);
 #define tinker_f_solve3 solve3_
 void watfour_(double* dt);
 #define tinker_f_watfour watfour_
+void watread_();
+#define tinker_f_watread watread_
 void watfour2_(double* derivs);
 #define tinker_f_watfour2 watfour2_
 

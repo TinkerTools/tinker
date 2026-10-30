@@ -125,6 +125,10 @@ c     set any holonomic interatomic distance constraints
 c
       call kfreeze
 c
+c     place the extra sites of four-site waters on their frames
+c
+      call watread
+c
 c     set hybrid parameter values for free energy perturbation
 c
       call mutate
