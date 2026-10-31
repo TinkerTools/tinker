@@ -110,7 +110,7 @@ COMMON := assert.o test_amoeba.o test_analyzelmda.o test_angle.o \
  test_eostmap.o test_ephippo.o test_expol.o test_extfield.o test_fep.o \
  test_geom.o test_improp.o test_imptor.o test_kinetic.o test_lmdamc.o \
  test_localframe.o test_localframe2.o test_localframe3.o test_mpolestate.o \
- test_mutate.o test_nacl.o test_opbend.o test_partialcharge.o \
+ test_mutate.o test_nacl.o test_nblist.o test_opbend.o test_partialcharge.o \
  test_pdbxyz.o test_pitors.o test_polpair.o test_potential.o test_readxyz.o \
  test_rephippo.o test_stochastic.o test_strbnd.o test_strtor.o \
  test_testgrad.o test_testlmda.o test_testvir.o test_thermint.o \

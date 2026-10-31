@@ -1200,7 +1200,6 @@ c
             xbox = cube
             ybox = cube
             zbox = cube
-            nonprism = .false.
             octahedron = .false.
             dodecadron = .false.
             call lattice

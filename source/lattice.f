@@ -64,11 +64,11 @@ c
 c
 c     set lattice values for non-prism periodic boundaries
 c
-      if (octahedron .or. dodecadron) then
+      nonprism = (octahedron .or. dodecadron)
+      if (nonprism) then
          orthogonal = .false.
          monoclinic = .false.
          triclinic = .false.
-         nonprism = .true.
       end if
 c
 c     compute and store half box lengths and other lengths

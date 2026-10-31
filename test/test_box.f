@@ -23,6 +23,7 @@ c
       call test_box_orthogonal
       call test_box_monoclinic
       call test_box_triclinic
+      call test_box_octahedron
       call test_box_dodecahedron
       return
       end
@@ -158,6 +159,54 @@ c
       call test_box_image (tname,0.91168825d0,10.91168824d0,
      &                     5.0d0,-16.05887450d0,
      &                     -6.05887450d0,5.0d0)
+      call final
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine test_box_octahedron  --  truncated octa  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "test_box_octahedron" checks the truncated octahedron with
+c     edge a of the parent cube by hand-computed images: one inside,
+c     one across a square face, one across a hexagonal face, one
+c     across a square face and then a hexagonal one, and a far one
+c
+c
+      subroutine test_box_octahedron
+      use boxes
+      implicit none
+      logical skiptest
+      character*(*) tname
+      parameter (tname='test_box_octahedron')
+c
+c
+      if (skiptest(tname,'amoeba'))  return
+      call initial
+      xbox = 16.0d0
+      ybox = 16.0d0
+      zbox = 16.0d0
+      alpha = 90.0d0
+      beta = 90.0d0
+      gamma = 90.0d0
+      octahedron = .true.
+      dodecadron = .false.
+      call lattice
+      call assert_real (volbox,2048.0d0,1.0d-6,tname//' volume')
+      call test_box_image (tname,1.0d0,2.0d0,3.0d0,
+     &                     1.0d0,2.0d0,3.0d0)
+      call test_box_image (tname,10.0d0,0.0d0,0.0d0,
+     &                     -6.0d0,0.0d0,0.0d0)
+      call test_box_image (tname,5.0d0,5.0d0,5.0d0,
+     &                     -3.0d0,-3.0d0,-3.0d0)
+      call test_box_image (tname,12.0d0,4.0d0,-5.0d0,
+     &                     4.0d0,-4.0d0,3.0d0)
+      call test_box_image (tname,35.0d0,-41.0d0,22.0d0,
+     &                     -5.0d0,-1.0d0,-2.0d0)
       call final
       return
       end

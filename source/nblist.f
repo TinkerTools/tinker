@@ -462,10 +462,6 @@ c
       logical, allocatable :: update(:)
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (update(n))
-c
 c     neighbor list cannot be used with the replicates method
 c
       radius = sqrt(dbuf2)
@@ -488,6 +484,10 @@ c
          end if
          return
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
 c
 c     test sites for displacement exceeding half the buffer
 c
@@ -548,7 +548,8 @@ c
             xi = xdold(i)
             yi = ydold(i)
             zi = zdold(i)
-            do k = 1, i-1
+            do kk = 1, ii-1
+               k = idisp(kk)
                if (.not. update(k)) then
                   xr = xi - xdold(k)
                   yr = yi - ydold(k)
@@ -843,10 +844,6 @@ c
       logical, allocatable :: update(:)
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (update(n))
-c
 c     neighbor list cannot be used with the replicates method
 c
       radius = sqrt(cbuf2)
@@ -869,6 +866,10 @@ c
          end if
          return
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
 c
 c     test sites for displacement exceeding half the buffer
 c
@@ -1236,10 +1237,6 @@ c
       logical, allocatable :: update(:)
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (update(n))
-c
 c     neighbor list cannot be used with the replicates method
 c
       radius = sqrt(mbuf2)
@@ -1262,6 +1259,10 @@ c
          end if
          return
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
 c
 c     test sites for displacement exceeding half the buffer
 c
@@ -1618,10 +1619,6 @@ c
       logical, allocatable :: update(:)
 c
 c
-c     perform dynamic allocation of some local arrays
-c
-      allocate (update(n))
-c
 c     neighbor list cannot be used with the replicates method
 c
       radius = sqrt(ubuf2)
@@ -1644,6 +1641,10 @@ c
          end if
          return
       end if
+c
+c     perform dynamic allocation of some local arrays
+c
+      allocate (update(n))
 c
 c     test sites for displacement exceeding half the buffer
 c

@@ -87,6 +87,7 @@ c
       call test_mpolestate
       call test_mutate
       call test_nacl
+      call test_nblist
       call test_opbend
       call test_partialcharge
       call test_pitors
