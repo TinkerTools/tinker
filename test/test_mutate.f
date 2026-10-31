@@ -72,6 +72,8 @@ c
       call test_mutate_ctrel
       call test_mutate_reprel
       call test_mutate_dsprel
+      call test_mutate_fixchg
+      call test_mutate_tip4
       return
       end
 c
@@ -2771,16 +2773,18 @@ c
 c
 c     "test_mutate_unsup" runs "analyze" on keyfiles that mutate atoms
 c     under a van der Waals form with no lambda scaling, that ask for
-c     lambda derivatives of Lennard-Jones van der Waals or partial
-c     charge electrostatics, which have none, that ask for lambda
-c     derivatives or lambda dynamics with implicit solvation, whose
-c     parameters are scaled once at setup, or that ask for a lambda
+c     lambda derivatives or lambda dynamics with implicit solvation,
+c     whose parameters are scaled once at setup, that ask for lambda
+c     derivatives under potential smoothing, or that ask for a lambda
 c     derivative across a quintic map of zero width; each must stop
-c     with its setup error, while lambda keywords given without a
-c     value are skipped, a negative sublambda is taken as zero and one
-c     above one as one, where a non-integer soft core shift exponent
-c     would otherwise find no power of a negative base, leaving the
-c     energy of the keyfile without them
+c     with its setup error, while lambda derivatives of Lennard-Jones
+c     van der Waals and partial charge electrostatics leave the energy
+c     of the keyfile without them, soft core Lennard-Jones exponents
+c     outside their range are reset to the defaults, lambda keywords
+c     given without a value are skipped, a negative sublambda is taken
+c     as zero and one above one as one, where a non-integer soft core
+c     shift exponent would otherwise find no power of a negative base,
+c     leaving the energy of the keyfile without them
 c
 c
       subroutine test_mutate_unsup
@@ -2799,12 +2803,27 @@ c
       call test_mutate_sccase ('mut_solv_deriv_fatal.key','','water2',
      &   'Available with Implicit Solvation',
      &   'test_mutate_unsup solvation deriv')
-      call test_mutate_sccase ('mut_lj_deriv_fatal.key','',
-     &   '../chglj/trp_charmm','Buffered 14-7 van der Waals',
+      call test_mutate_sccase ('mut_lj_deriv.key','mut_lj_noderiv.key',
+     &   '../chglj/trp_charmm','',
      &   'test_mutate_unsup lennard-jones deriv')
-      call test_mutate_sccase ('mut_chg_deriv_fatal.key','',
-     &   '../chglj/trp_charmm','Partial Charge or Bond Dipole',
+      call test_mutate_sccase ('mut_chg_deriv.key',
+     &   'mut_chg_noderiv.key','../chglj/trp_charmm','',
      &   'test_mutate_unsup partial charge deriv')
+      call test_mutate_sccase ('mut_smooth_deriv_fatal.key','',
+     &   '../chglj/trp_charmm','Available with Potential Smoothing',
+     &   'test_mutate_unsup smoothing deriv')
+      call test_mutate_sccase ('mut_smooth_fatal.key','',
+     &   '../chglj/trp_charmm','Available with Potential Smoothing',
+     &   'test_mutate_unsup smoothing')
+      call test_mutate_sccase ('mut_ljsoft_bad.key',
+     &   'mut_lj_noderiv.key','../chglj/trp_charmm','',
+     &   'test_mutate_unsup lj soft core range')
+      call test_mutate_sccase ('mut_ljsoft_d2.key',
+     &   'mut_lj_noderiv.key','../chglj/trp_charmm','',
+     &   'test_mutate_unsup lj soft core deriv2')
+      call test_mutate_sccase ('mut_ljsoft_pw.key',
+     &   'mut_lj_noderiv.key','../chglj/trp_charmm','',
+     &   'test_mutate_unsup lj soft core power')
       call test_mutate_sccase ('mut_bare_kw.key','vsoft_default_d1.key',
      &   'water2','','test_mutate_unsup bare keywords')
       call test_mutate_sccase ('mut_elam_neg.key',
@@ -3689,22 +3708,23 @@ c     ##########################################################
 c
 c
 c     "test_mutate_calc" runs a single mutation fixture three ways,
-c     with the double loop, with a pairwise neighbor list and with
-c     the method of lights, and holds all three to the one reference;
-c     for each variant the force field is built once, then the checks
-c     are repeated twice before teardown, giving six passes per
-c     fixture; the "checkm", "checkp" and "checkv" flags select which
-c     level 3 energy components are verified (Atomic Multipoles,
-c     Polarization and Van der Waals); the "canlist" flag records
+c     with the double loop, with a pairwise neighbor list and with the
+c     method of lights, and holds all three to the one reference; for
+c     each variant the force field is built once, then the checks are
+c     repeated twice before teardown, giving six passes per fixture;
+c     the "checkm", "checkp" and "checkv" flags select which level 3
+c     energy components are verified (Atomic Multipoles, Polarization
+c     and Van der Waals), and the Charge-Charge component is verified
+c     whenever partial charges are used; the "canlist" flag records
 c     whether the full "neighbor-list" keyword is compatible with this
 c     fixture, and when it is not (the no-Ewald cases) the list variant
-c     uses "vdw-list" so only the van der Waals term takes a list;
-c     the method of lights only changes the van der Waals and charge
-c     loops, so it applies to every fixture; when "dolmda" is set, the
-c     level 4 checks also verify the analytical lambda derivatives,
-c     second lambda derivatives, per-atom lambda gradient and dV/dL
-c     tensor against the reference read by "load_lmdaref", reusing the
-c     values already produced by the level 1 gradient call
+c     uses "vdw-list" so only the van der Waals term takes a list; the
+c     method of lights only changes the van der Waals and charge loops,
+c     so it applies to every fixture; when "dolmda" is set, the level 4
+c     checks also verify the analytical lambda derivatives, second
+c     lambda derivatives, per-atom lambda gradient and dV/dL tensor
+c     against the reference read by "load_lmdaref", reusing the values
+c     already produced by the level 1 gradient call
 c
 c
       subroutine test_mutate_calc
@@ -3713,6 +3733,7 @@ c
       use atoms
       use dlmda
       use energi
+      use potent
       use virial
       implicit none
       integer nat,natl,irun,imeth
@@ -3836,6 +3857,10 @@ c
             if (checkv) then
                call check_engcnt (rpath,'Van der Waals',ev,nev,
      &                       eps_e,trim(pre)//' vdw (v3)'//trim(rtag))
+            end if
+            if (use_charge) then
+               call check_engcnt (rpath,'Charge-Charge',ec,nec,
+     &                       eps_e,trim(pre)//' chg (v3)'//trim(rtag))
             end if
          end do
 c
@@ -3962,5 +3987,197 @@ c
      &   '251_water2_hip_full_rels3_l050.txt',
      &   '251_water2_hip_full_rels3_l050',
      &   .true.,  .true.,  .false., .true.,  .true.)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_mutate_fixchg  --  fixed charge fixtures  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_mutate_fixchg" runs fixtures 252 to 257, the soft core
+c     Lennard-Jones and partial charge terms of the fixed charge force
+c     fields with their lambda derivatives: a TIP3P water box under the
+c     AMBER parameters whose two ligand waters sit at the same site on
+c     the staged relative legs, the charge leg and the van der Waals
+c     leg inside each leg and at its ends, where a dead ligand must be
+c     skipped and not give zero times an infinite distance; then the
+c     Trp-cage under CHARMM19 with both terms at both ends of an
+c     absolute decoupling; the lambda derivatives at the ends were
+c     checked against one-sided differences
+c
+c
+      subroutine test_mutate_fixchg
+      implicit none
+c
+c
+      call test_mutate_calc ('tip3ovl',
+     &   '252_tip3ovl_amber_rels_lig1_l050.key',
+     &   '252_tip3ovl_amber_rels_lig1_l050.txt',
+     &   '252_tip3ovl_amber_rels_lig1_l050',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('tip3ovl',
+     &   '253_tip3ovl_amber_rels_vdwm_l040.key',
+     &   '253_tip3ovl_amber_rels_vdwm_l040.txt',
+     &   '253_tip3ovl_amber_rels_vdwm_l040',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('tip3ovl',
+     &   '254_tip3ovl_amber_rels_lig1_l000.key',
+     &   '254_tip3ovl_amber_rels_lig1_l000.txt',
+     &   '254_tip3ovl_amber_rels_lig1_l000',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('tip3ovl',
+     &   '255_tip3ovl_amber_rels_vdwm_l100.key',
+     &   '255_tip3ovl_amber_rels_vdwm_l100.txt',
+     &   '255_tip3ovl_amber_rels_vdwm_l100',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('../chglj/trp_charmm',
+     &   '256_trp_charmm_both_l000.key',
+     &   '256_trp_charmm_both_l000.txt',
+     &   '256_trp_charmm_both_l000',
+     &   .false., .false., .true.,  .true.,  .true.)
+      call test_mutate_calc ('../chglj/trp_charmm',
+     &   '257_trp_charmm_both_l100.key',
+     &   '257_trp_charmm_both_l100.txt',
+     &   '257_trp_charmm_both_l100',
+     &   .false., .false., .true.,  .true.,  .true.)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine test_mutate_tip4  --  four-site water box  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "test_mutate_tip4" runs fixtures 258 to 277, the soft core
+c     Lennard-Jones and partial charge terms with their lambda
+c     derivatives on a minimized box of rigid TIP4P water, whose
+c     charge sits on the extra site and whose gradient and lambda
+c     force derivative on that site are moved onto the H-O-H atoms;
+c     each of the double loop, neighbor list and method of lights
+c     variants is run under Ewald summation and under a plain cutoff
+c     with a taper, with both terms, with the charges or the
+c     Lennard-Jones term alone and its own soft core exponents, under
+c     decoupling and annihilation, at both ends of lambda, and on the
+c     staged relative legs, including two ligand waters at the same
+c     site; the energy, gradient, virial and components of the
+c     absolute fixtures were taken from the code before these lambda
+c     derivatives, which gives the same values, while the relative
+c     legs, which that code did not allow for these terms, and the
+c     soft core exponents it did not read come from the new code; the
+c     lambda derivatives were checked against central differences, and
+c     at the ends of lambda against one-sided differences
+c
+c
+      subroutine test_mutate_tip4
+      implicit none
+c
+c
+      call test_mutate_calc ('tip4box',
+     &   '258_tip4_ew_both_l050.key',
+     &   '258_tip4_ew_both_l050.txt',
+     &   '258_tip4_ew_both_l050',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '259_tip4_ew_both_annih_l030.key',
+     &   '259_tip4_ew_both_annih_l030.txt',
+     &   '259_tip4_ew_both_annih_l030',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '260_tip4_ew_chg_l040.key',
+     &   '260_tip4_ew_chg_l040.txt',
+     &   '260_tip4_ew_chg_l040',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '261_tip4_ew_lj_l060.key',
+     &   '261_tip4_ew_lj_l060.txt',
+     &   '261_tip4_ew_lj_l060',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '262_tip4_ew_both_l000.key',
+     &   '262_tip4_ew_both_l000.txt',
+     &   '262_tip4_ew_both_l000',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '263_tip4_ew_both_l100.key',
+     &   '263_tip4_ew_both_l100.txt',
+     &   '263_tip4_ew_both_l100',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '264_tip4_cut_both_l050.key',
+     &   '264_tip4_cut_both_l050.txt',
+     &   '264_tip4_cut_both_l050',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '265_tip4_cut_both_annih_l030.key',
+     &   '265_tip4_cut_both_annih_l030.txt',
+     &   '265_tip4_cut_both_annih_l030',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '266_tip4_cut_chg_l040.key',
+     &   '266_tip4_cut_chg_l040.txt',
+     &   '266_tip4_cut_chg_l040',
+     &   .false., .false., .false., .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '267_tip4_cut_lj_soft_l060.key',
+     &   '267_tip4_cut_lj_soft_l060.txt',
+     &   '267_tip4_cut_lj_soft_l060',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '268_tip4_cut_both_l000.key',
+     &   '268_tip4_cut_both_l000.txt',
+     &   '268_tip4_cut_both_l000',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '269_tip4_cut_both_l100.key',
+     &   '269_tip4_cut_both_l100.txt',
+     &   '269_tip4_cut_both_l100',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '270_tip4_ew_rels_lig1_l050.key',
+     &   '270_tip4_ew_rels_lig1_l050.txt',
+     &   '270_tip4_ew_rels_lig1_l050',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '271_tip4_ew_rels_lig2_l040.key',
+     &   '271_tip4_ew_rels_lig2_l040.txt',
+     &   '271_tip4_ew_rels_lig2_l040',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '272_tip4_ew_rels_vdwm_l040.key',
+     &   '272_tip4_ew_rels_vdwm_l040.txt',
+     &   '272_tip4_ew_rels_vdwm_l040',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '273_tip4_ew_rels3_l015.key',
+     &   '273_tip4_ew_rels3_l015.txt',
+     &   '273_tip4_ew_rels3_l015',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '274_tip4_cut_rels3_l085.key',
+     &   '274_tip4_cut_rels3_l085.txt',
+     &   '274_tip4_cut_rels3_l085',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4box',
+     &   '275_tip4_cut_rels_vdwm_l060.key',
+     &   '275_tip4_cut_rels_vdwm_l060.txt',
+     &   '275_tip4_cut_rels_vdwm_l060',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4ovl',
+     &   '276_tip4ovl_ew_rels_lig1_l050.key',
+     &   '276_tip4ovl_ew_rels_lig1_l050.txt',
+     &   '276_tip4ovl_ew_rels_lig1_l050',
+     &   .false., .false., .true. , .true.,  .true.)
+      call test_mutate_calc ('tip4ovl',
+     &   '277_tip4ovl_cut_rels_vdwm_l100.key',
+     &   '277_tip4ovl_cut_rels_vdwm_l100.txt',
+     &   '277_tip4ovl_cut_rels_vdwm_l100',
+     &   .false., .false., .true. , .true.,  .true.)
       return
       end

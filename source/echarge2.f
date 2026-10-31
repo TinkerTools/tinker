@@ -775,9 +775,10 @@ c
          end do
       end if
 c
-c     compute reciprocal space Ewald first derivative values
+c     compute reciprocal space Ewald first derivative values,
+c     without lambda derivatives, whose charge array is unused
 c
-      call ecrecip1
+      call ecrecip1 (.false.,.false.,pchg)
       return
       end
 c

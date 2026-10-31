@@ -39,6 +39,15 @@ c     Waals lambda
 c
       call vdlflags (dodl,dod2)
 c
+c     zero out the van der Waals virial, which is kept apart from
+c     the main virial for the lambda derivatives
+c
+      do i = 1, 3
+         do j = 1, 3
+            evvir(j,i) = 0.0d0
+         end do
+      end do
+c
 c     choose the method for summing over pairwise interactions
 c
       if (use_lights) then
@@ -145,11 +154,6 @@ c
          dev(1,i) = 0.0d0
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvir(j,i) = 0.0d0
-         end do
       end do
       if (nvdw .eq. 0)  return
 c
@@ -798,11 +802,6 @@ c
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
       end do
-      do i = 1, 3
-         do j = 1, 3
-            evvir(j,i) = 0.0d0
-         end do
-      end do
       if (nvdw .eq. 0)  return
 c
 c     perform dynamic allocation of some local arrays
@@ -1241,11 +1240,6 @@ c
          dev(1,i) = 0.0d0
          dev(2,i) = 0.0d0
          dev(3,i) = 0.0d0
-      end do
-      do i = 1, 3
-         do j = 1, 3
-            evvir(j,i) = 0.0d0
-         end do
       end do
       if (nvdw .eq. 0)  return
 c

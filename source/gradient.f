@@ -235,6 +235,7 @@ c
          do j = 1, 3
             vir(j,i) = 0.0d0
             epvir(j,i) = 0.0d0
+            ecvir(j,i) = 0.0d0
             emvir(j,i) = 0.0d0
             evvir(j,i) = 0.0d0
             ectvir(j,i) = 0.0d0
@@ -369,10 +370,17 @@ c
          end if
       end if
 c
-c     distribute gradient on four-site water extra centers
+c     distribute gradient on four-site water extra centers, along
+c     with the lambda derivatives of the force
 c
       call watfour2 (desum)
       call watfour2 (derivs)
+      if (use_dlmda .and. use_d2lmda) then
+         call watfour2 (dfsumdl)
+         call watfour2 (dfvdl)
+         call watfour2 (dfmdl)
+         call watfour2 (dfpdl)
+      end if
 c
 c     check for an illegal value for the total energy
 c

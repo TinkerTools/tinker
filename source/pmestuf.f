@@ -708,6 +708,134 @@ c
       end
 c
 c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine grid_pchg2  --  pack charges and derivs on grid  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "grid_pchg2" places the fractional atomic partial charges onto
+c     the real part of the particle mesh Ewald grid, and their lambda
+c     derivatives "dq" onto its imaginary part, so that one transform
+c     carries both densities
+c
+c     note the main loop does not need to be an OpenMP reduction
+c     since a given qgrid element is always part of the same chunk,
+c     and the code runs faster without use of a reduction
+c
+c
+      subroutine grid_pchg2 (dq)
+      use atoms
+      use charge
+      use chunks
+      use pme
+      implicit none
+      integer i,j,k,m
+      integer ii,jj,kk
+      integer ichk,isite,iatm
+      integer offsetx,offsety
+      integer offsetz
+      integer cid(3)
+      integer nearpt(3)
+      integer abound(6)
+      integer cbound(6)
+      real*8 v0,u0,t0
+      real*8 v0l,terml
+      real*8 term
+      real*8 dq(*)
+c
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,pchg,dq,pmetable,
+!$OMP& nfft1,nfft2,nfft3,nchunk,nchk1,nchk2,nchk3,ngrd1,ngrd2,
+!$OMP& ngrd3,nlpts,nrpts,igrid,grdoff,thetai1,thetai2,thetai3)
+!$OMP& shared(qgrid)
+!$OMP DO
+c
+c     zero out the particle mesh Ewald grid
+c
+      do k = 1, nfft3
+         do j = 1, nfft2
+            do i = 1, nfft1
+               qgrid(1,i,j,k) = 0.0d0
+               qgrid(2,i,j,k) = 0.0d0
+            end do
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP DO
+c
+c     put the partial charges onto the real part of the grid and
+c     their lambda derivatives onto the imaginary part
+c
+      do ichk = 1, nchunk
+         cid(1) = mod(ichk-1,nchk1)
+         cid(2) = mod(((ichk-1-cid(1))/nchk1),nchk2)
+         cid(3) = mod((ichk-1)/(nchk1*nchk2),nchk3)
+         cbound(1) = cid(1)*ngrd1 + 1
+         cbound(2) = cbound(1) + ngrd1 - 1
+         cbound(3) = cid(2)*ngrd2 + 1
+         cbound(4) = cbound(3) + ngrd2 - 1
+         cbound(5) = cid(3)*ngrd3 + 1
+         cbound(6) = cbound(5) + ngrd3 - 1
+         do isite = 1, nion
+            iatm = iion(isite)
+            if (pmetable(iatm,ichk) .eq. 1) then
+               nearpt(1) = igrid(1,iatm) + grdoff
+               nearpt(2) = igrid(2,iatm) + grdoff
+               nearpt(3) = igrid(3,iatm) + grdoff
+               abound(1) = nearpt(1) - nlpts
+               abound(2) = nearpt(1) + nrpts
+               abound(3) = nearpt(2) - nlpts
+               abound(4) = nearpt(2) + nrpts
+               abound(5) = nearpt(3) - nlpts
+               abound(6) = nearpt(3) + nrpts
+               call adjust (offsetx,nfft1,nchk1,abound(1),
+     &                         abound(2),cbound(1),cbound(2))
+               call adjust (offsety,nfft2,nchk2,abound(3),
+     &                         abound(4),cbound(3),cbound(4))
+               call adjust (offsetz,nfft3,nchk3,abound(5),
+     &                         abound(6),cbound(5),cbound(6))
+               do kk = abound(5), abound(6)
+                  k = kk
+                  m = k + offsetz
+                  if (k .lt. 1)  k = k + nfft3
+                  v0 = thetai3(1,m,iatm) * pchg(iatm)
+                  v0l = thetai3(1,m,iatm) * dq(iatm)
+                  do jj = abound(3), abound(4)
+                     j = jj
+                     m = j + offsety
+                     if (j .lt. 1)  j = j + nfft2
+                     u0 = thetai2(1,m,iatm)
+                     term = v0 * u0
+                     terml = v0l * u0
+                     do ii = abound(1), abound(2)
+                        i = ii
+                        m = i + offsetx
+                        if (i .lt. 1)  i = i + nfft1
+                        t0 = thetai1(1,m,iatm)
+                        qgrid(1,i,j,k) = qgrid(1,i,j,k) + term*t0
+                        qgrid(2,i,j,k) = qgrid(2,i,j,k) + terml*t0
+                     end do
+                  end do
+               end do
+            end if
+         end do
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
 c     #############################################################
 c     ##                                                         ##
 c     ##  subroutine grid_mpole  --  put multipoles on PME grid  ##
@@ -1387,6 +1515,132 @@ c
          fphi(2,iatm) = tuv100
          fphi(3,iatm) = tuv010
          fphi(4,iatm) = tuv001
+      end do
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP END DO
+!$OMP END PARALLEL
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine fphi_pchg2  --  two packed charge potentials  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "fphi_pchg2" extracts the partial charge potential and field
+c     "fphi" from the real part of the particle mesh Ewald grid, and
+c     those of the lambda derivative charges "lfphi" from its
+c     imaginary part, as packed by "grid_pchg2"
+c
+c
+      subroutine fphi_pchg2 (fphi,lfphi)
+      use charge
+      use pme
+      implicit none
+      integer i,j,k
+      integer isite,iatm
+      integer i0,j0,k0
+      integer it1,it2,it3
+      integer igrd0,jgrd0,kgrd0
+      real*8 v0,v1
+      real*8 u0,u1
+      real*8 t0,t1,tq
+      real*8 tu00,tu10,tu01
+      real*8 tuv000,tuv100
+      real*8 tuv010,tuv001
+      real*8 t0l,t1l,tql
+      real*8 tu00l,tu10l,tu01l
+      real*8 tuv000l,tuv100l
+      real*8 tuv010l,tuv001l
+      real*8 fphi(4,*)
+      real*8 lfphi(4,*)
+c
+c
+c     OpenMP directives for the major loop structure
+c
+!$OMP PARALLEL default(private) shared(nion,iion,igrid,bsorder,
+!$OMP& nfft1,nfft2,nfft3,thetai1,thetai2,thetai3,qgrid,fphi,lfphi)
+!$OMP DO
+c
+c     get the partial charge potential and field at each site from
+c     the real part of the grid, and their lambda derivatives from
+c     the imaginary part
+c
+      do isite = 1, nion
+         iatm = iion(isite)
+         igrd0 = igrid(1,iatm)
+         jgrd0 = igrid(2,iatm)
+         kgrd0 = igrid(3,iatm)
+         tuv000 = 0.0d0
+         tuv001 = 0.0d0
+         tuv010 = 0.0d0
+         tuv100 = 0.0d0
+         tuv000l = 0.0d0
+         tuv001l = 0.0d0
+         tuv010l = 0.0d0
+         tuv100l = 0.0d0
+         k0 = kgrd0
+         do it3 = 1, bsorder
+            k0 = k0 + 1
+            k = k0 + 1 + (nfft3-isign(nfft3,k0))/2
+            v0 = thetai3(1,it3,iatm)
+            v1 = thetai3(2,it3,iatm)
+            tu00 = 0.0d0
+            tu10 = 0.0d0
+            tu01 = 0.0d0
+            tu00l = 0.0d0
+            tu10l = 0.0d0
+            tu01l = 0.0d0
+            j0 = jgrd0
+            do it2 = 1, bsorder
+               j0 = j0 + 1
+               j = j0 + 1 + (nfft2-isign(nfft2,j0))/2
+               u0 = thetai2(1,it2,iatm)
+               u1 = thetai2(2,it2,iatm)
+               t0 = 0.0d0
+               t1 = 0.0d0
+               t0l = 0.0d0
+               t1l = 0.0d0
+               i0 = igrd0
+               do it1 = 1, bsorder
+                  i0 = i0 + 1
+                  i = i0 + 1 + (nfft1-isign(nfft1,i0))/2
+                  tq = qgrid(1,i,j,k)
+                  tql = qgrid(2,i,j,k)
+                  t0 = t0 + tq*thetai1(1,it1,iatm)
+                  t1 = t1 + tq*thetai1(2,it1,iatm)
+                  t0l = t0l + tql*thetai1(1,it1,iatm)
+                  t1l = t1l + tql*thetai1(2,it1,iatm)
+               end do
+               tu00 = tu00 + t0*u0
+               tu10 = tu10 + t1*u0
+               tu01 = tu01 + t0*u1
+               tu00l = tu00l + t0l*u0
+               tu10l = tu10l + t1l*u0
+               tu01l = tu01l + t0l*u1
+            end do
+            tuv000 = tuv000 + tu00*v0
+            tuv100 = tuv100 + tu10*v0
+            tuv010 = tuv010 + tu01*v0
+            tuv001 = tuv001 + tu00*v1
+            tuv000l = tuv000l + tu00l*v0
+            tuv100l = tuv100l + tu10l*v0
+            tuv010l = tuv010l + tu01l*v0
+            tuv001l = tuv001l + tu00l*v1
+         end do
+         fphi(1,iatm) = tuv000
+         fphi(2,iatm) = tuv100
+         fphi(3,iatm) = tuv010
+         fphi(4,iatm) = tuv001
+         lfphi(1,iatm) = tuv000l
+         lfphi(2,iatm) = tuv100l
+         lfphi(3,iatm) = tuv010l
+         lfphi(4,iatm) = tuv001l
       end do
 c
 c     OpenMP directives for the major loop structure

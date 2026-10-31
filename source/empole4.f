@@ -24,6 +24,7 @@ c
       use virial
       implicit none
       integer i,j
+      character*6 mode
 c
 c
 c     choose the method to sum over multipole interactions
@@ -44,7 +45,10 @@ c
 c
 c     get contribution from external electric field if used
 c
-      if (use_exfld)  call exfield4
+      if (use_exfld) then
+         mode = 'MPOLE'
+         call exfield4 (mode)
+      end if
 c
 c     the lambda derivative leaves the unscaled multipoles in the
 c     global frame, so put back the scaled ones when a saved dipole
@@ -170,23 +174,35 @@ c
       character*6 mode
 c
 c
-c     zero out the atomic multipole energy and derivatives
+c     zero out the atomic multipole energy and derivatives, where
+c     the lambda derivatives keep any partial charge terms already
+c     added to them by "echarge1"
 c
       em = 0.0d0
-      demdl = 0.0d0
-      d2emdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
-            dfmdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             emvir(j,i) = 0.0d0
-            demvirdl(j,i) = 0.0d0
          end do
       end do
+      if (.not. use_charge) then
+         demdl = 0.0d0
+         d2emdl2 = 0.0d0
+         do i = 1, n
+            do j = 1, 3
+               dfmdl(j,i) = 0.0d0
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               demvirdl(j,i) = 0.0d0
+            end do
+         end do
+      end if
       if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
@@ -1291,23 +1307,35 @@ c
       character*6 mode
 c
 c
-c     zero out the atomic multipole energy and derivatives
+c     zero out the atomic multipole energy and derivatives, where
+c     the lambda derivatives keep any partial charge terms already
+c     added to them by "echarge1"
 c
       em = 0.0d0
-      demdl = 0.0d0
-      d2emdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
-            dfmdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             emvir(j,i) = 0.0d0
-            demvirdl(j,i) = 0.0d0
          end do
       end do
+      if (.not. use_charge) then
+         demdl = 0.0d0
+         d2emdl2 = 0.0d0
+         do i = 1, n
+            do j = 1, 3
+               dfmdl(j,i) = 0.0d0
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               demvirdl(j,i) = 0.0d0
+            end do
+         end do
+      end if
       if (npole .eq. 0)  return
 c
 c     check the sign of multipole components at chiral sites
@@ -1929,23 +1957,35 @@ c
       real*8 emsc(0:2),demsc(0:2)
 c
 c
-c     zero out the atomic multipole energy and derivatives
+c     zero out the atomic multipole energy and derivatives, where
+c     the lambda derivatives keep any partial charge terms already
+c     added to them by "echarge1"
 c
       em = 0.0d0
-      demdl = 0.0d0
-      d2emdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
-            dfmdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             emvir(j,i) = 0.0d0
-            demvirdl(j,i) = 0.0d0
          end do
       end do
+      if (.not. use_charge) then
+         demdl = 0.0d0
+         d2emdl2 = 0.0d0
+         do i = 1, n
+            do j = 1, 3
+               dfmdl(j,i) = 0.0d0
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               demvirdl(j,i) = 0.0d0
+            end do
+         end do
+      end if
       if (npole .eq. 0)  return
 c
 c     set grid size, spline order and Ewald coefficient
@@ -3337,23 +3377,35 @@ c
       real*8 emsc(0:2),demsc(0:2)
 c
 c
-c     zero out the atomic multipole energy and derivatives
+c     zero out the atomic multipole energy and derivatives, where
+c     the lambda derivatives keep any partial charge terms already
+c     added to them by "echarge1"
 c
       em = 0.0d0
-      demdl = 0.0d0
-      d2emdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dem(j,i) = 0.0d0
-            dfmdl(j,i) = 0.0d0
          end do
       end do
       do i = 1, 3
          do j = 1, 3
             emvir(j,i) = 0.0d0
-            demvirdl(j,i) = 0.0d0
          end do
       end do
+      if (.not. use_charge) then
+         demdl = 0.0d0
+         d2emdl2 = 0.0d0
+         do i = 1, n
+            do j = 1, 3
+               dfmdl(j,i) = 0.0d0
+            end do
+         end do
+         do i = 1, 3
+            do j = 1, 3
+               demvirdl(j,i) = 0.0d0
+            end do
+         end do
+      end if
       if (npole .eq. 0)  return
 c
 c     set grid size, spline order and Ewald coefficient

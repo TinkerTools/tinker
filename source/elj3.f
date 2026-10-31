@@ -109,8 +109,9 @@ c
       integer kk,kt,kv
       integer ig
       integer, allocatable :: iv14(:)
-      real*8 e,p6,p12
-      real*8 eps,sc,term
+      real*8 e,de,p6,p12
+      real*8 eps
+      real*8 vlsc(2),vshf(2)
       real*8 rv,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -148,6 +149,10 @@ c     set the coefficients for the switching function
 c
       mode = 'VDW'
       call switch (mode)
+c
+c     set the soft core lambda terms for each ligand group
+c
+      call grpsoft (scexplj,scalphalj,scexpljm,scexpljp,vlsc,vshf)
 c
 c     print header information if debug output was requested
 c
@@ -240,10 +245,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     p6 = 2.0d0 * rik2**3 / rv**6
-                     sc = p6 + 0.5d0*(1.0d0-vlambda)
-                     term = 4.0d0 * vlambda * eps / (sc*sc)
-                     e = term * (1.0d0-sc)
+                     call eljsc (rik,rik2,rv,eps,ig,vlsc,vshf,
+     &                           .false.,e,de)
                   else
                      p6 = rv**6 / rik2**3
                      p12 = p6 * p6
@@ -399,10 +402,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                      if (mutik) then
-                        p6 = 2.0d0 * rik2**3 / rv**6
-                        sc = p6 + 0.5d0*(1.0d0-vlambda)
-                        term = 4.0d0 * vlambda * eps / (sc*sc)
-                        e = term * (1.0d0-sc)
+                        call eljsc (rik,rik2,rv,eps,ig,vlsc,vshf,
+     &                              .false.,e,de)
                      else
                         p6 = rv**6 / rik2**3
                         p12 = p6 * p6
@@ -533,8 +534,9 @@ c
       integer ikmin,ikmax
       integer ig
       integer, allocatable :: iv14(:)
-      real*8 e,p6,p12
-      real*8 eps,sc,term
+      real*8 e,de,p6,p12
+      real*8 eps
+      real*8 vlsc(2),vshf(2)
       real*8 rv,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -579,6 +581,10 @@ c     set the coefficients for the switching function
 c
       mode = 'VDW'
       call switch (mode)
+c
+c     set the soft core lambda terms for each ligand group
+c
+      call grpsoft (scexplj,scalphalj,scexpljm,scexpljp,vlsc,vshf)
 c
 c     print header information if debug output was requested
 c
@@ -725,10 +731,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     p6 = 2.0d0 * rik2**3 / rv**6
-                     sc = p6 + 0.5d0*(1.0d0-vlambda)
-                     term = 4.0d0 * vlambda * eps / (sc*sc)
-                     e = term * (1.0d0-sc)
+                     call eljsc (rik,rik2,rv,eps,ig,vlsc,vshf,
+     &                           .false.,e,de)
                   else
                      p6 = rv**6 / rik2**3
                      p12 = p6 * p6
@@ -869,8 +873,9 @@ c
       integer kk,kt,kv
       integer ig
       integer, allocatable :: iv14(:)
-      real*8 e,p6,p12
-      real*8 eps,sc,term
+      real*8 e,de,p6,p12
+      real*8 eps
+      real*8 vlsc(2),vshf(2)
       real*8 rv,rdn,fgrp
       real*8 xi,yi,zi
       real*8 xr,yr,zr
@@ -909,6 +914,10 @@ c
       mode = 'VDW'
       call switch (mode)
 c
+c     set the soft core lambda terms for each ligand group
+c
+      call grpsoft (scexplj,scalphalj,scexpljm,scexpljp,vlsc,vshf)
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -936,7 +945,7 @@ c
 !$OMP PARALLEL default(private) shared(nvdw,ivdw,jvdw,ired,
 !$OMP& xred,yred,zred,use,nvlst,vlst,n12,n13,n14,n15,i12,i13,i14,
 !$OMP& i15,v2scale,v3scale,v4scale,v5scale,use_group,off2,radmin,
-!$OMP& epsilon,radmin4,epsilon4,mutcls,vlambda,mutg,cut2,c0,c1,
+!$OMP& epsilon,radmin4,epsilon4,mutcls,vlsc,vshf,mutg,cut2,c0,c1,
 !$OMP& c2,c3,c4,c5,molcule,name,verbose,debug,header,iout)
 !$OMP& firstprivate(vscale,iv14) shared(ev,nev,aev,einter)
 !$OMP DO reduction(+:ev,nev,aev,einter)
@@ -1010,10 +1019,8 @@ c
 c     get interaction energy, via soft core lambda scaling as needed
 c
                   if (mutik) then
-                     p6 = 2.0d0 * rik2**3 / rv**6
-                     sc = p6 + 0.5d0*(1.0d0-vlambda)
-                     term = 4.0d0 * vlambda * eps / (sc*sc)
-                     e = term * (1.0d0-sc)
+                     call eljsc (rik,rik2,rv,eps,ig,vlsc,vshf,
+     &                           .false.,e,de)
                   else
                      p6 = rv**6 / rik2**3
                      p12 = p6 * p6

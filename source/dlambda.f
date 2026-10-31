@@ -192,6 +192,52 @@ c
       end
 c
 c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine grpsoftd  --  soft core terms with raw derivs  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "grpsoftd" sets the soft core scale "lsc" and shift "shf" of each
+c     ligand group as in "grpsoft", along with their first and second
+c     derivatives with respect to vlambda, which are not factored by
+c     powers of the group lambda as in "grpsoft4", so a linear lambda
+c     scale keeps a finite second derivative at zero lambda; the first
+c     derivatives carry the sign of the derivative of the group lambda
+c     with respect to vlambda, and the second derivatives are only set
+c     when requested
+c
+c
+      subroutine grpsoftd (pw,alpha,pm,pp,lsc,dlsc,d2lsc,shf,dshf,d2shf)
+      use dlmda
+      implicit none
+      integer ig
+      real*8 pw,alpha,pm,pp
+      real*8 vlmd,vsgn
+      real*8 a,da,d2a
+      real*8 b,db,d2b
+      real*8 lsc(2),dlsc(2),d2lsc(2)
+      real*8 shf(2),dshf(2),d2shf(2)
+c
+c
+c     the shift is alpha times a power of lambda and of one minus
+c     lambda, so its derivatives follow from the product rule
+c
+      do ig = 1, 2
+         call grpvlmda (ig,vlmd,vsgn)
+         call lmdapwr (vlmd,pw,use_d2lmda,lsc(ig),dlsc(ig),d2lsc(ig))
+         call lmdapwr (vlmd,pm,use_d2lmda,a,da,d2a)
+         call lmdapwr (1.0d0-vlmd,pp,use_d2lmda,b,db,d2b)
+         dlsc(ig) = vsgn * dlsc(ig)
+         shf(ig) = alpha * a * b
+         dshf(ig) = vsgn * alpha * (da*b-a*db)
+         d2shf(ig) = alpha * (d2a*b-2.0d0*da*db+a*d2b)
+      end do
+      return
+      end
+c
+c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine grppcls  --  van der Waals pair class by group  ##
@@ -340,6 +386,117 @@ c     the second derivatives are only needed alongside the first
 c
       dodl = lmdadrv (use_vdlmda,dvldlmda,d2vldlmda2)
       dod2 = (dodl .and. use_d2lmda)
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine chgdlflags  --  partial charge lambda deriv use  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "chgdlflags" sets whether the partial charges take their first
+c     lambda derivatives, as "lmdadrv" decides for the electrostatic
+c     lambda, and whether they also take the second, force and virial
+c     ones
+c
+c
+      subroutine chgdlflags (dodl,dod2)
+      use dlmda
+      implicit none
+      logical dodl,dod2
+      logical lmdadrv
+c
+c
+c     the second derivatives are only needed alongside the first
+c
+      dodl = lmdadrv (use_edlmda,deldlmda,d2eldlmda2)
+      dod2 = (dodl .and. use_d2lmda)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine chgdlmda  --  partial charge lambda derivs  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "chgdlmda" fills "dq" with the derivative of each partial charge
+c     with respect to the electrostatic lambda, which is the original
+c     charge times the slope of the "grpscale" scale of its group and
+c     is zero outside the charging ligand
+c
+c
+      subroutine chgdlmda (dq)
+      use atoms
+      use charge
+      use dlmda
+      use mutant
+      implicit none
+      integer i,k
+      real*8 sc(0:2),dsc(0:2)
+      real*8 dq(*)
+c
+c
+c     each charge is linear in the scale of its own group
+c
+      do i = 1, n
+         dq(i) = 0.0d0
+      end do
+      call grpscale (elambda,sc,dsc)
+      do i = 1, nion
+         k = iion(i)
+         dq(k) = pchgorig(k) * dsc(mutg(k))
+      end do
+      return
+      end
+c
+c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine dlcscale  --  partial charge pair lambda terms  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "dlcscale" takes the energy "e" and the distance derivatives
+c     "de" and "dc" of a partial charge pair found for a unit charge
+c     product, finds the first lambda derivative "dlambda" from the
+c     charges "qi" and "qk" and their lambda derivatives "dqi" and
+c     "dqk", along with, if "mutd2" is set, the second derivative
+c     "dlambda2" and the lambda derivatives "dlde" and "dldc" of the
+c     distance derivatives, then scales the pair terms by the charge
+c     product
+c
+c
+      subroutine dlcscale (qi,qk,dqi,dqk,mutd2,e,de,dc,dlambda,
+     &                     dlambda2,dlde,dldc)
+      implicit none
+      real*8 qi,qk,dqi,dqk
+      real*8 e,de,dc
+      real*8 qik,dqik
+      real*8 dlambda,dlambda2
+      real*8 dlde,dldc
+      logical mutd2
+c
+c
+c     the energy is linear in each charge of the pair
+c
+      qik = qi * qk
+      dqik = dqi*qk + qi*dqk
+      dlambda = dqik * e
+      if (mutd2) then
+         dlambda2 = 2.0d0 * dqi * dqk * e
+         dlde = dqik * de
+         dldc = dqik * dc
+      end if
+      e = qik * e
+      de = qik * de
+      dc = qik * dc
       return
       end
 c

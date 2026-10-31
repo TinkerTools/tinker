@@ -31,6 +31,7 @@ c     elambda     state weighting value for electrostatic potentials
 c     lambda      generic weighting between initial and final states
 c     plambda     state weighting value for polarization potentials
 c     scalphar    shift scale for soft core Pauli repulsion in Ang^2
+c     scalphalj   shift scale for soft core Lennard-Jones potential
 c     scalphav    scale factor for soft core buffered 14-7 potential
 c     scexp       scale factor for soft core buffered 14-7 potential
 c     scexpm      lambda exponent of soft core buffered 14-7 shift
@@ -41,6 +42,9 @@ c     scexprp     one minus lambda exponent of soft core repulsion shift
 c     scrdsp      switch radius for soft core damped dispersion in Ang
 c     scexpd      lambda exponent for soft core damped dispersion
 c     scexpdq     added lambda exponent of soft core dispersion at r=0
+c     scexplj     lambda exponent for soft core Lennard-Jones potential
+c     scexpljm    lambda exponent of soft core Lennard-Jones shift
+c     scexpljp    one minus lambda exponent of soft core LJ shift
 c     tlambda     state weighting value for torsional potential
 c     vlambda     state weighting value for van der Waals potentials
 c     mutfield    flag restricting dfield to the mpoles of mutated atoms
@@ -68,6 +72,7 @@ c
       real*8 lambda
       real*8 plambda
       real*8 scalphar
+      real*8 scalphalj
       real*8 scalphav
       real*8 scexp
       real*8 scexpm
@@ -78,6 +83,9 @@ c
       real*8 scrdsp
       real*8 scexpd
       real*8 scexpdq
+      real*8 scexplj
+      real*8 scexpljm
+      real*8 scexpljp
       real*8 tlambda
       real*8 vlambda
       real*8, allocatable :: fluxsc(:)

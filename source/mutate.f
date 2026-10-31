@@ -117,6 +117,13 @@ c
       scexpd = 4.0d0
       scexpdq = 1.0d0
 c
+c     set defaults for soft core Lennard-Jones
+c
+      scalphalj = 0.5d0
+      scexplj = 1.0d0
+      scexpljm = 0.0d0
+      scexpljp = 1.0d0
+c
 c     zero out number of hybrid atoms and mutated torsions
 c
       nmut = 0
@@ -167,6 +174,10 @@ c
          else if (keyword(1:14) .eq. 'DISP-SOFTCORE ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  scrdsp,scexpd,scexpdq
+         else if (keyword(1:12) .eq. 'LJ-SOFTCORE ') then
+            string = record(next:240)
+            read (string,*,err=30,end=30)  scalphalj,scexplj,
+     &                                     scexpljm,scexpljp
          else if (keyword(1:12) .eq. 'TORS-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  tlambda
@@ -1565,6 +1576,7 @@ c
       use polpot
       use potent
       use vdwpot
+      use warp
       implicit none
       integer i,k,next
       integer nstg
@@ -1594,6 +1606,16 @@ c
          scexpr = 5.0d0
          scexprm = 3.0d0
       end if
+c
+c     reset any soft core Lennard-Jones parameter outside its allowed
+c     range to the default value; the lambda derivatives are taken
+c     without factoring out powers of lambda, so a linear lambda
+c     power is kept, while an exponent between zero and one, or
+c     between one and two with second derivatives, diverges at an
+c     endpoint, and the lambda exponent must outrun twice the shift
+c     exponent so the pair energy stays bounded as lambda goes to zero
+c
+      call ljsoftchk (scalphalj,scexplj,scexpljm,scexpljp)
 c
 c     reset any soft core damped dispersion parameter outside its
 c     allowed range to the default value, where the switch radius must
@@ -1823,45 +1845,37 @@ c
          call fatal
       end if
 c
-c     only the buffered 14-7 van der Waals potential and the atomic
-c     multipole electrostatics carry a lambda derivative
+c     bond dipole electrostatics carry no lambda derivative, nor do
+c     partial charges moved by charge flux, while the van der Waals
+c     forms above, the atomic multipoles and fixed partial charges do
 c
-      if (use_vdlmda .and. use_vdw .and.
-     &    vdwtyp.ne.'BUFFERED-14-7') then
-         write (iout,106)
-  106    format (/,' MUTATE_CHECK  --  Lambda Derivatives are only',
-     &              ' Available for the Buffered 14-7 van der Waals',
-     &              ' Potential')
-         call fatal
-      end if
-      if (use_edlmda .and.
-     &    (use_charge.or.use_dipole.or.use_chgdpl)) then
+      if (use_edlmda .and. (use_dipole .or. use_chgdpl
+     &       .or. (use_charge.and.use_chgflx))) then
          write (iout,107)
   107    format (/,' MUTATE_CHECK  --  Lambda Derivatives are not',
-     &              ' Available for Partial Charge or Bond Dipole',
-     &              ' Electrostatics')
+     &              ' Available for Bond Dipole Electrostatics or',
+     &              ' Partial Charges with Charge Flux')
          call fatal
       end if
 c
-c     relative free energy handles only the buffered 14-7 form of
-c     the van der Waals potential
+c     potential smoothing transforms the Lennard-Jones and partial
+c     charge pairs with no soft core or lambda scaling
 c
-      if (use_rel .and. use_vdw .and. vdwtyp.ne.'BUFFERED-14-7') then
-         write (iout,110)
-  110    format (/,' MUTATE_CHECK  --  Relative Free Energy is only',
-     &              ' Available for the Buffered 14-7 van der Waals',
-     &              ' Potential')
+      if ((use_smooth.or.use_stophat) .and. use_mutate
+     &       .and. (use_vdw.or.use_charge)) then
+         write (iout,108)
+  108    format (/,' MUTATE_CHECK  --  Mutated Atoms are not',
+     &              ' Available with Potential Smoothing')
          call fatal
       end if
 c
-c     partial charge and bond dipole electrostatics have no relative
-c     free energy treatment
+c     bond dipole electrostatics have no relative free energy
+c     treatment
 c
-      if (use_rel .and. (use_charge .or. use_dipole)) then
+      if (use_rel .and. use_dipole) then
          write (iout,111)
   111    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
-     &              ' Available for Partial Charge or Bond Dipole',
-     &              ' Electrostatics')
+     &              ' Available for Bond Dipole Electrostatics')
          call fatal
       end if
 c
@@ -1960,6 +1974,49 @@ c
       if (pp .lt. 1.0d0)  pp = pp0
       if (use_d2lmda .and. pw.lt.2.0d0)  pw = pw0
       if (use_d2lmda .and. pp.ne.1.0d0 .and. pp.lt.2.0d0)  pp = pp0
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine ljsoftchk  --  soft core Lennard-Jones check  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "ljsoftchk" resets each soft core Lennard-Jones parameter with
+c     scale lambda^n and shift alpha*lambda^m*(1-lambda)^p outside its
+c     allowed range to its default, where "pw" is n, "alpha" is alpha,
+c     "pm" is m and "pp" is p; n and p may be one, m may be zero or
+c     one, and any other exponent must be at least one, or at least
+c     two when second lambda derivatives are used, while n must also
+c     exceed twice m for a nonzero shift
+c
+c
+      subroutine ljsoftchk (alpha,pw,pm,pp)
+      use dlmda
+      implicit none
+      real*8 alpha,pw,pm,pp
+      real*8 pmin
+c
+c
+c     set the smallest exponent beyond zero and one that is allowed
+c
+      pmin = 1.0d0
+      if (use_d2lmda)  pmin = 2.0d0
+c
+c     reset each parameter outside its allowed range
+c
+      if (alpha .lt. 0.0d0)  alpha = 0.5d0
+      if (pw.ne.1.0d0 .and. pw.lt.pmin)  pw = 1.0d0
+      if (pm.lt.0.0d0 .or. (pm.ne.0.0d0 .and. pm.ne.1.0d0
+     &       .and. pm.lt.pmin))  pm = 0.0d0
+      if (pp.ne.1.0d0 .and. pp.lt.pmin)  pp = 1.0d0
+      if (alpha.gt.0.0d0 .and. pm.gt.0.0d0 .and. pw.le.2.0d0*pm) then
+         pw = 1.0d0
+         pm = 0.0d0
+      end if
       return
       end
 c

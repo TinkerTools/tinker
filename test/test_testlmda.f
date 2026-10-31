@@ -138,6 +138,21 @@ c     Waals leg, the ligand legs of three stages, which merge or drop
 c     a ligand density, damped dispersion sites, and replicate cells
 c     in a small box
 c
+c     cases 153 to 166 take the Lennard-Jones and partial charge terms
+c     of the fixed charge force fields, on a TIP3P water box under the
+c     AMBER parameters and on the Trp-cage under CHARMM19: the soft
+c     core Lennard-Jones by double loop, by neighbor list with its own
+c     soft core exponents, and by the method of lights under
+c     annihilation; the charges under Ewald alone, and both terms by
+c     neighbor list, by the method of lights with the inverse power
+c     map, and in replicate cells; the Trp-cage with neutral group
+c     cutoffs and a taper, with a net charged ligand under the vacuum
+c     Ewald boundary, and in an external field; and the staged relative
+c     legs, where the charges of the other ligand vanish, by double
+c     loop, by neighbor list and by the method of lights; the energy
+c     is quadratic in the charges, so a larger step keeps the numerical
+c     second derivative clear of roundoff in the box energy
+c
 c
       subroutine test_testlmda
       implicit none
@@ -389,6 +404,34 @@ c
      &   ('151_water_dhal_rels_vdwm_damp_l04','1e-4')
       call test_testlmda_case
      &   ('152_water_dhal_rels_vdwm_replica_l04','1e-4')
+      call test_testlmda_xyz ('153_tip3_lj_l04',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('154_tip3_lj_nlist_soft_l03',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('155_tip3_lj_lights_annih_l03',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('156_tip3_chg_l04',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('157_tip3_both_nlist_l06',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('158_tip3_both_lights_inv_l05',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('159_tip3_both_replica_l04',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('160_trp_both_cut_neutral_l05',
+     &   '../chglj/trp_charmm','1e-3')
+      call test_testlmda_xyz ('161_trp_chg_ewald_vacuum_l05',
+     &   '../chglj/trp_charmm','1e-3')
+      call test_testlmda_xyz ('162_trp_chg_exfield_l05',
+     &   '../chglj/trp_charmm','1e-3')
+      call test_testlmda_xyz ('163_tip3_rels_lig2_l04',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('164_tip3_rels_vdwm_nlist_l04',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('165_tip3_rels3_l015',
+     &   'tip3box','1e-3')
+      call test_testlmda_xyz ('166_tip3_rels3_lights_l085',
+     &   'tip3box','1e-3')
       return
       end
 c

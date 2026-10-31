@@ -738,12 +738,16 @@ FREE ENERGY PERTURBATION KEYWORDS
      - LAMBDA
    * -
      - LIGAND
+     - LJ-SOFTCORE
      - MUTATE
-     - REPEL-SOFTCORE
    * -
+     - REPEL-SOFTCORE
      - VDW-ANNIHILATE
      - VDW-LAMBDA
+   * -
      - VDW-SOFTCORE
+     -
+     -
 
 ADAPTIVE LAMBDA BIAS KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2318,6 +2322,12 @@ LIGHTS
 
 LIST-BUFFER [real]
    Sets the size of the neighbor list buffer in Angstroms for potential energy functions. This value is added to the actual cutoff distance to determine which pairs will be kept on the neighbor list. This buffer value is used for all potential function neighbor lists. The default value in the absence of the LIST-BUFFER keyword is 2.0 Angstroms.
+
+.. index:: LJ-SOFTCORE
+.. _KEY-LJ-SOFTCORE:
+
+LJ-SOFTCORE [2-4 reals]
+   Sets the soft-core scaling of Lennard-Jones van der Waals interactions involving mutated atoms during free energy calculations, where each such pair energy is 4 epsilon lambda^n (1/s^2 - 1/s), with s equal to (r/sigma)^6 plus the softening alpha * lambda^m * (1-lambda)^p, and with lambda the van der Waals lambda. The four real-number modifiers are the alpha softening, the lambda exponent n, and the optional softening exponents m and p. Alpha must be nonnegative, n and p must be at least 1.0, and m must be 0.0 or at least 1.0; when second lambda derivatives are used by orthogonal space tempering or the LAMBDA-DERIV2 keyword, any exponent other than 0.0 or 1.0 must be at least 2.0. With a nonzero softening exponent m, n must also exceed 2m so the pair energy stays finite as lambda goes to zero. Any value outside these limits is reset to its default. With the VDW-CORRECTION keyword, the long range correction weights each mutated pair by lambda^n alone, since the softening is negligible beyond the cutoff. The default values in the absence of the LJ-SOFTCORE keyword are 0.5, 1.0, 0.0 and 1.0, respectively, which give the soft-core form of Beutler et al.
 
 .. index:: MAXITER
 .. _KEY-MAXITER:

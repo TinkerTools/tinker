@@ -292,6 +292,7 @@ add_library (tinkerObjF OBJECT
 ../source/elj1.f
 ../source/elj2.f
 ../source/elj3.f
+../source/eljsc.f
 ../source/embed.f
 ../source/emetal.f
 ../source/emetal1.f

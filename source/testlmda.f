@@ -252,8 +252,9 @@ c
 c
 c     compute the numerical lambda derivatives, where charge transfer
 c     follows the polarization lambda and is counted with polarization,
-c     and Pauli repulsion and damped dispersion follow the van der
-c     Waals lambda and are counted with van der Waals
+c     Pauli repulsion and damped dispersion follow the van der Waals
+c     lambda and are counted with van der Waals, and partial charges
+c     follow the electrostatic lambda and are counted with multipoles
 c
          if (donumer .and. keylmda) then
             use_dlmda = .false.
@@ -262,17 +263,17 @@ c
             call settestlmda (lmda0+eps)
             esum2 = energy ()
             ev2 = ev + er + edsp
-            em2 = em
+            em2 = em + ec
             ep2 = ep + ect
             call settestlmda (lmda0-eps)
             esum0 = energy ()
             ev0 = ev + er + edsp
-            em0 = em
+            em0 = em + ec
             ep0 = ep + ect
             call settestlmda (lmda0)
             esum1 = energy ()
             ev1 = ev + er + edsp
-            em1 = em
+            em1 = em + ec
             ep1 = ep + ect
             ndedl = (esum2 - esum0) / (2.0d0 * eps)
             ndevdl = (ev2 - ev0) / (2.0d0 * eps)
@@ -288,7 +289,7 @@ c
                do j = 1, 3
                   ndfsumdl(j,i) = derivs(j,i)
                   ndfvdl(j,i) = dev(j,i) + der(j,i) + dedsp(j,i)
-                  ndfmdl(j,i) = dem(j,i)
+                  ndfmdl(j,i) = dem(j,i) + dec(j,i)
                   ndfpdl(j,i) = dep(j,i) + dect(j,i)
                end do
             end do
@@ -296,7 +297,7 @@ c
                do j = 1, 3
                   ndvirdl(j,i) = vir(j,i)
                   ndepvirdl(j,i) = epvir(j,i) + ectvir(j,i)
-                  ndemvirdl(j,i) = emvir(j,i)
+                  ndemvirdl(j,i) = emvir(j,i) + ecvir(j,i)
                   ndevvirdl(j,i) = evvir(j,i) + ervir(j,i)
      &                                + edspvir(j,i)
                end do
@@ -310,19 +311,27 @@ c
                   ndfvdl(j,i) = (ndfvdl(j,i)-dev(j,i)-der(j,i)
      &                              -dedsp(j,i))
      &                                                 / (2.0d0 * eps)
-                  ndfmdl(j,i) = (ndfmdl(j,i)-dem(j,i)) / (2.0d0 * eps)
+                  ndfmdl(j,i) = (ndfmdl(j,i)-dem(j,i)-dec(j,i))
+     &                                                 / (2.0d0 * eps)
                   ndfpdl(j,i) = (ndfpdl(j,i)-dep(j,i)-dect(j,i))
      &                                                 / (2.0d0 * eps)
                end do
             end do
+c
+c     the component gradients still hold the four-site water extra
+c     centers, which "gradient" distributes for the total
+c
+            call watfour2 (ndfvdl)
+            call watfour2 (ndfmdl)
+            call watfour2 (ndfpdl)
             do i = 1, 3
                do j = 1, 3
                   ndvirdl(j,i) = (ndvirdl(j,i) - vir(j,i))
      &                         / (2.0d0 * eps)
                   ndepvirdl(j,i) = (ndepvirdl(j,i)-epvir(j,i)
      &                              -ectvir(j,i)) / (2.0d0 * eps)
-                  ndemvirdl(j,i) = (ndemvirdl(j,i)-emvir(j,i))
-     &                           / (2.0d0 * eps)
+                  ndemvirdl(j,i) = (ndemvirdl(j,i)-emvir(j,i)
+     &                              -ecvir(j,i)) / (2.0d0 * eps)
                   ndevvirdl(j,i) = (ndevvirdl(j,i)-evvir(j,i)
      &                              -ervir(j,i)-edspvir(j,i))
      &                                 / (2.0d0 * eps)

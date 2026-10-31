@@ -344,6 +344,8 @@ void grpsoft_(double* pw, double* alpha, double* pm, double* pp, double* lsc, do
 #define tinker_f_grpsoft grpsoft_
 void grpsoft4_(double* pw, double* alpha, double* pm, double* pp, double* lsc, double* shf, double* lsc1, double* lsc2, double* shf1, double* shf2);
 #define tinker_f_grpsoft4 grpsoft4_
+void grpsoftd_(double* pw, double* alpha, double* pm, double* pp, double* lsc, double* dlsc, double* d2lsc, double* shf, double* dshf, double* d2shf);
+#define tinker_f_grpsoftd grpsoftd_
 void grppcls_();
 #define tinker_f_grppcls grppcls_
 void grpvwt_(double* pw, double* wg, double* dwg, double* d2wg);
@@ -352,6 +354,12 @@ int lmdadrv_(int* use, double* dl, double* d2l);
 #define tinker_f_lmdadrv lmdadrv_
 void vdlflags_(int* dodl, int* dod2);
 #define tinker_f_vdlflags vdlflags_
+void chgdlflags_(int* dodl, int* dod2);
+#define tinker_f_chgdlflags chgdlflags_
+void chgdlmda_(double* dq);
+#define tinker_f_chgdlmda chgdlmda_
+void dlcscale_(double* qi, double* qk, double* dqi, double* dqk, int* mutd2, double* e, double* de, double* dc, double* dlambda, double* dlambda2, double* dlde, double* dldc);
+#define tinker_f_dlcscale dlcscale_
 void dlcpair_(int* i, int* k, double* xr, double* yr, double* zr, double* dldx, double* dldy, double* dldz, double* dfl, double* dvir);
 #define tinker_f_dlcpair dlcpair_
 void dlcvir_(double* xr, double* yr, double* zr, double* dldx, double* dldy, double* dldz, double* dvir);
@@ -624,7 +632,9 @@ void echarge1f_();
 #define tinker_f_echarge1f echarge1f_
 void echarge1g_();
 #define tinker_f_echarge1g echarge1g_
-void ecrecip1_();
+void ecself1_(int* dodl, int* dod2, double* dq);
+#define tinker_f_ecself1 ecself1_
+void ecrecip1_(int* dodl, int* dod2, double* dq);
 #define tinker_f_ecrecip1 ecrecip1_
 
 // echarge2.f
@@ -1000,6 +1010,12 @@ void elj3d_();
 #define tinker_f_elj3d elj3d_
 void elj3e_();
 #define tinker_f_elj3e elj3e_
+
+// eljsc.f
+void eljsc_(double* rik, double* rik2, double* rv, double* eps, int* ig, double* lsc, double* shf, int* dograd, double* e, double* de);
+#define tinker_f_eljsc eljsc_
+void eljsc4_(double* rik, double* rik2, double* rv, double* eps, int* ig, double* lsc, double* dlsc, double* d2lsc, double* shf, double* dshf, double* d2shf, double* e, double* de, double* dlambda, double* dlambda2, double* dlde);
+#define tinker_f_eljsc4 eljsc4_
 
 // embed.f
 void embed_();
@@ -1740,8 +1756,10 @@ void exfield3_(char* mode, double* exf, tinker_fchar_len_t mode_cap);
 inline void tinker_f_exfield3(tinker_fchars mode, double* exf) {
     return exfield3_(mode.string, exf, mode.capacity);
 }
-void exfield4_();
-#define tinker_f_exfield4 exfield4_
+void exfield4_(char* mode, tinker_fchar_len_t mode_cap);
+inline void tinker_f_exfield4(tinker_fchars mode) {
+    return exfield4_(mode.string, mode.capacity);
+}
 
 // extra.f
 void extra_();
@@ -2378,6 +2396,8 @@ void mutate_check_();
 #define tinker_f_mutate_check mutate_check_
 void softchk_(double* alpha, double* pw, double* pm, double* pp, double* alpha0, double* pw0, double* pm0, double* pp0);
 #define tinker_f_softchk softchk_
+void ljsoftchk_(double* alpha, double* pw, double* pm, double* pp);
+#define tinker_f_ljsoftchk ljsoftchk_
 void setligand_(int* j, int* igrp);
 #define tinker_f_setligand setligand_
 void altelec_();
@@ -2568,6 +2588,8 @@ void setchunk_(int* i, int* cid, int* off1, int* off2, int* off3);
 #define tinker_f_setchunk setchunk_
 void grid_pchg_();
 #define tinker_f_grid_pchg grid_pchg_
+void grid_pchg2_(double* dq);
+#define tinker_f_grid_pchg2 grid_pchg2_
 void grid_mpole_(double* fmp, double* qg);
 #define tinker_f_grid_mpole grid_mpole_
 void grid_mpole2_(double* fmp, double* lfmp, double* qg);
@@ -2580,6 +2602,8 @@ void adjust_(int* offset, int* nfft, int* nchk, int* amin, int* amax, int* cmin,
 #define tinker_f_adjust adjust_
 void fphi_pchg_(double* fphi);
 #define tinker_f_fphi_pchg fphi_pchg_
+void fphi_pchg2_(double* fphi, double* lfphi);
+#define tinker_f_fphi_pchg2 fphi_pchg2_
 void fphi_mpole_(double* fphi, double* qg);
 #define tinker_f_fphi_mpole fphi_mpole_
 void fphi_mpole2_(double* fphi, double* lfphi, double* qg);

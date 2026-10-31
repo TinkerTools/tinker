@@ -88,13 +88,13 @@ c
 c
 c     get the pair weights between the environment and ligand groups
 c     from the lambda power a mutated pair keeps beyond the cutoff,
-c     the soft core power of the buffered 14-7 potential, whose
-c     softening is negligible against the buffered distance there,
-c     and the lambda power of the damped dispersion outside its switch
-c     radius
+c     the soft core power of the buffered 14-7 or Lennard-Jones
+c     potential, whose softening is negligible there, and the lambda
+c     power of the damped dispersion outside its switch radius
 c
       pw = 1.0d0
       if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7')  pw = scexp
+      if (.not.dsp .and. vdwtyp.eq.'LENNARD-JONES')  pw = scexplj
       if (dsp)  pw = scexpd
       call grpvwt (pw,wg,dwg,d2wg)
 c
@@ -312,12 +312,13 @@ c
 c     get the pair weights between the environment and ligand groups,
 c     and their lambda derivatives, from the lambda power a mutated
 c     pair keeps beyond the cutoff, the soft core power of the buffered
-c     14-7 potential, whose softening is negligible against the
-c     buffered distance there, and the lambda power of the damped
-c     dispersion outside its switch radius
+c     14-7 or Lennard-Jones potential, whose softening is negligible
+c     there, and the lambda power of the damped dispersion outside its
+c     switch radius
 c
       pw = 1.0d0
       if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7')  pw = scexp
+      if (.not.dsp .and. vdwtyp.eq.'LENNARD-JONES')  pw = scexplj
       if (dsp)  pw = scexpd
       call grpvwt (pw,wg,dwg,d2wg)
 c

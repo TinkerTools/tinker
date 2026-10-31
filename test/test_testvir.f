@@ -45,6 +45,11 @@ c
 c     case 14 repeats case 13 with explicit damped dispersion values
 c     on every site, which the handoff weight multiplies
 c
+c     case 15 decouples a TIP3P water from an AMBER box through the soft
+c     core Lennard-Jones and scaled partial charges, whose charge virial
+c     is kept apart from the main virial, under Ewald with a neighbor
+c     list and the long range correction
+c
 c
       subroutine test_testvir
       implicit none
@@ -67,6 +72,8 @@ c
      &                        '../testlmda/water2')
       call test_testvir_case ('14_water_dhal_damp_l05',
      &                        '../testlmda/water2')
+      call test_testvir_case ('15_tip3_ljchg_lambda_nlist_l05',
+     &                        '../testlmda/tip3box')
       return
       end
 c

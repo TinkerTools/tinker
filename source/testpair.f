@@ -232,6 +232,7 @@ c
       allocate (dep(3,n))
       allocate (dect(3,n))
       allocate (dfvdl(3,n))
+      allocate (dfmdl(3,n))
       allocate (dfpdl(3,n))
 c
 c     zero out each of the energy and gradient components
@@ -245,6 +246,12 @@ c
       em = 0.0d0
       ep = 0.0d0
       ect = 0.0d0
+      devdl = 0.0d0
+      demdl = 0.0d0
+      depdl = 0.0d0
+      d2evdl2 = 0.0d0
+      d2emdl2 = 0.0d0
+      d2epdl2 = 0.0d0
       do i = 1, n
          do j = 1, 3
             dev(j,i) = 0.0d0
@@ -256,6 +263,16 @@ c
             dem(j,i) = 0.0d0
             dep(j,i) = 0.0d0
             dect(j,i) = 0.0d0
+            dfvdl(j,i) = 0.0d0
+            dfmdl(j,i) = 0.0d0
+            dfpdl(j,i) = 0.0d0
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            devvirdl(j,i) = 0.0d0
+            demvirdl(j,i) = 0.0d0
+            depvirdl(j,i) = 0.0d0
          end do
       end do
 c

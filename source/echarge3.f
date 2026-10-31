@@ -99,6 +99,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use shunt
       use usage
       implicit none
@@ -117,6 +118,8 @@ c
       real*8 rc5,rc6,rc7
       real*8, allocatable :: cscale(:)
       logical proceed,usei
+      logical livei,doskip
+      logical live(0:2)
       logical header,huge
       character*6 mode
 c
@@ -146,6 +149,10 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
+c     set the atom groups whose pairs carry energy
+c
+      call eleclive (live,doskip)
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -172,6 +179,7 @@ c
          zi = z(i) - zic
          fi = f * pchg(i)
          usei = (use(i) .or. use(ic))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -199,6 +207,8 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
+            if (proceed .and. doskip)
+     &         proceed = (livei .and. live(mutg(k)))
             if (proceed)  proceed = (cscale(kn) .ne. 0.0d0)
 c
 c     compute the energy contribution for this interaction
@@ -307,6 +317,7 @@ c
          zi = z(i) - zic
          fi = f * pchg(i)
          usei = (use(i) .or. use(ic))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -333,6 +344,8 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
+            if (proceed .and. doskip)
+     &         proceed = (livei .and. live(mutg(k)))
 c
 c     compute the energy contribution for this interaction
 c
@@ -464,6 +477,7 @@ c
       use iounit
       use light
       use molcul
+      use mutant
       use shunt
       use usage
       implicit none
@@ -488,6 +502,8 @@ c
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)
       logical proceed,usei,prime
+      logical livei,doskip
+      logical live(0:2)
       logical unique,repeat
       logical header,huge
       character*6 mode
@@ -520,6 +536,10 @@ c
       f = electric / dielec
       mode = 'CHARGE'
       call switch (mode)
+c
+c     set the atom groups whose pairs carry energy
+c
+      call eleclive (live,doskip)
 c
 c     print header information if debug output was requested
 c
@@ -562,6 +582,7 @@ c
          zi = z(i) - z(ic)
          fi = f * pchg(i)
          usei = (use(i) .or. use(ic))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -617,6 +638,8 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
+            if (proceed .and. doskip)
+     &         proceed = (livei .and. live(mutg(k)))
 c
 c     compute the energy contribution for this interaction
 c
@@ -776,6 +799,7 @@ c
       use inter
       use iounit
       use molcul
+      use mutant
       use neigh
       use shunt
       use usage
@@ -795,6 +819,8 @@ c
       real*8 rc5,rc6,rc7
       real*8, allocatable :: cscale(:)
       logical proceed,usei
+      logical livei,doskip
+      logical live(0:2)
       logical header,huge
       character*6 mode
 c
@@ -824,6 +850,10 @@ c
       mode = 'CHARGE'
       call switch (mode)
 c
+c     set the atom groups whose pairs carry energy
+c
+      call eleclive (live,doskip)
+c
 c     print header information if debug output was requested
 c
       header = .true.
@@ -841,7 +871,8 @@ c
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
 !$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,use_bounds,
 !$OMP& off,off2,cut,cut2,c0,c1,c2,c3,c4,c5,f0,f1,f2,f3,f4,f5,f6,f7,
-!$OMP% molcule,ebuffer,name,verbose,debug,header,iout)
+!$OMP% molcule,ebuffer,name,verbose,debug,header,iout,
+!$OMP& mutg,live,doskip)
 !$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
 !$OMP DO reduction(+:ec,nec,aec,einter)
 c
@@ -860,6 +891,7 @@ c
          zi = z(i) - zic
          fi = f * pchg(i)
          usei = (use(i) .or. use(ic))
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -887,6 +919,8 @@ c
             proceed = .true.
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             if (proceed)  proceed = (usei .or. use(k) .or. use(kc))
+            if (proceed .and. doskip)
+     &         proceed = (livei .and. live(mutg(k)))
             if (proceed)  proceed = (cscale(kn) .ne. 0.0d0)
 c
 c     compute the energy contribution for this interaction
@@ -1019,6 +1053,7 @@ c
       use iounit
       use math
       use molcul
+      use mutant
       use pme
       use shunt
       use usage
@@ -1037,6 +1072,8 @@ c
       real*8 sum,scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
+      logical livei,doskip
+      logical live(0:2)
       logical header,huge
       character*6 mode
       external erfc
@@ -1074,6 +1111,10 @@ c
       f = electric / dielec
       mode = 'EWALD'
       call switch (mode)
+c
+c     set the atom groups whose pairs carry energy
+c
+      call eleclive (live,doskip)
 c
 c     print header information if debug output was requested
 c
@@ -1151,6 +1192,7 @@ c
          zi = z(i)
          fi = f * pchg(i)
          usei = use(i)
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1177,6 +1219,8 @@ c
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
+            if (proceed .and. doskip)
+     &         proceed = (livei .and. live(mutg(k)))
 c
 c     compute the energy contribution for this interaction
 c
@@ -1262,6 +1306,7 @@ c
          zi = z(i)
          fi = f * pchg(i)
          usei = use(i)
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1287,6 +1332,8 @@ c
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
+            if (proceed .and. doskip)
+     &         proceed = (livei .and. live(mutg(k)))
 c
 c     compute the energy contribution for this interaction
 c
@@ -1405,6 +1452,7 @@ c
       use light
       use math
       use molcul
+      use mutant
       use pme
       use shunt
       use usage
@@ -1428,6 +1476,8 @@ c
       real*8, allocatable :: ysort(:)
       real*8, allocatable :: zsort(:)
       logical proceed,usei,prime
+      logical livei,doskip
+      logical live(0:2)
       logical unique,repeat
       logical header,huge
       character*6 mode
@@ -1469,6 +1519,10 @@ c
       f = electric / dielec
       mode = 'EWALD'
       call switch (mode)
+c
+c     set the atom groups whose pairs carry energy
+c
+      call eleclive (live,doskip)
 c
 c     print header information if debug output was requested
 c
@@ -1562,6 +1616,7 @@ c
          zi = zsort(rgz(ii))
          fi = f * pchg(i)
          usei = use(i)
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1616,6 +1671,8 @@ c
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
+            if (proceed .and. doskip)
+     &         proceed = (livei .and. live(mutg(k)))
 c
 c     compute the energy contribution for this interaction
 c
@@ -1760,6 +1817,7 @@ c
       use iounit
       use math
       use molcul
+      use mutant
       use neigh
       use pme
       use shunt
@@ -1779,6 +1837,8 @@ c
       real*8 sum,scale
       real*8, allocatable :: cscale(:)
       logical proceed,usei
+      logical livei,doskip
+      logical live(0:2)
       logical header,huge
       character*6 mode
       external erfc
@@ -1816,6 +1876,10 @@ c
       f = electric / dielec
       mode = 'EWALD'
       call switch (mode)
+c
+c     set the atom groups whose pairs carry energy
+c
+      call eleclive (live,doskip)
 c
 c     print header information if debug output was requested
 c
@@ -1887,7 +1951,8 @@ c
 !$OMP PARALLEL default(private) shared(nion,iion,jion,use,
 !$OMP& x,y,z,f,pchg,nelst,elst,n12,n13,n14,n15,i12,i13,i14,i15,
 !$OMP& c1scale,c2scale,c3scale,c4scale,c5scale,use_group,off2,
-!$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout)
+!$OMP& aewald,molcule,ebuffer,name,verbose,debug,header,iout,
+!$OMP& mutg,live,doskip)
 !$OMP& firstprivate(cscale) shared (ec,nec,aec,einter)
 !$OMP DO reduction(+:ec,nec,aec,einter)
 c
@@ -1902,6 +1967,7 @@ c
          zi = z(i)
          fi = f * pchg(i)
          usei = use(i)
+         livei = live(mutg(i))
 c
 c     set exclusion coefficients for connected atoms
 c
@@ -1928,6 +1994,8 @@ c
             if (use_group)  call groups (proceed,fgrp,i,k,0,0,0,0)
             proceed = .true.
             if (proceed)  proceed = (usei .or. use(k))
+            if (proceed .and. doskip)
+     &         proceed = (livei .and. live(mutg(k)))
 c
 c     compute the energy contribution for this interaction
 c
