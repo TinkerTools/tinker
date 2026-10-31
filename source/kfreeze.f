@@ -43,6 +43,7 @@ c
       real*8 cosine,ratio
       real*8 dom,doh
       logical done,proceed
+      logical frzwat
       logical, allocatable :: keep(:)
       character*9 rattyp
       character*20 keyword
@@ -97,8 +98,10 @@ c
    10    continue
       end do
 c
-c     process keywords containing rigid water constraints
+c     process keywords containing rigid water constraints; only
+c     once, since the water arrays hold each molecule just once
 c
+      frzwat = .false.
       do k = 1, nkey
          next = 1
          record = keyline(k)
@@ -106,7 +109,8 @@ c
          call gettext (record,keyword,next)
          if (keyword(1:7) .eq. 'FREEZE ') then
             call getword (record,rattyp,next)
-            if (rattyp(1:5) .eq. 'WATER') then
+            if (rattyp(1:5).eq.'WATER' .and. .not.frzwat) then
+               frzwat = .true.
                do i = 1, n
                   nhyd = 0
                   if (atomic(i) .eq. 8) then

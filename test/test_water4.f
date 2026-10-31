@@ -27,6 +27,7 @@ c
       call test_water4_respa
       call test_water4_grad
       call test_water4_minimize
+      call test_water4_twice
       return
       end
 c
@@ -430,5 +431,36 @@ c
       call assert_real (grms,1.1078d0,1.0d-4,tname//' rms gradient')
       call execute_command_line ('rm -f tip4p.xyz_* out.txt')
       call popdir
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_water4_twice  --  FREEZE WATER repeated  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_water4_twice" reads the TIP4P box with FREEZE WATER given
+c     a second time, which used to store every water again past the
+c     end of the water arrays, and checks the same waters are found
+c
+c
+      subroutine test_water4_twice
+      use freeze
+      implicit none
+      logical skiptest
+      character*(*) tname
+      parameter (tname='test_water4_twice')
+c
+c
+      if (skiptest(tname,'water4 freeze'))  return
+      call pushdir ('file/water4')
+      call loadfix_keyadd ('tip4p','tip4p.key','freeze water')
+      call assert_int (nwat,1000,tname//' three-site frames')
+      call assert_int (nwat4,1000,tname//' four-site waters')
+      call popdir
+      call final
       return
       end
