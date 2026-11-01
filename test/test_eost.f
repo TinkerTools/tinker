@@ -1385,6 +1385,7 @@ c
       integer nsave
       real*8 efreetot
       real*8 wtref(5)
+      real*8 sumref(5)
       logical lmdasampled
 c
 c
@@ -1469,6 +1470,48 @@ c
       do i = 1, nlmda
          call assert_logical (lmdasampled(i),i.ge.4,
      &                        'buildfkernel rows with support')
+      end do
+c
+c     a gaussian of zero height, as a fully tempered deposit gives,
+c     leaves every row without data
+c
+      call resetost (5,5,4)
+      use_ost = .true.
+      nlmdahist = 1
+      call sethist (1,1.0d0,0.0d0,0.0d0,0.3d0,1.0d0)
+      call buildostindex
+      call buildkernels
+      do i = 1, nlmda
+         call assert_logical (lmdasampled(i),.false.,
+     &                        'zero height gaussian rows without data')
+         call assert_real (lmdafsum(i),0.0d0,0.0d0,
+     &                     'zero height gaussian row force sum')
+         call assert_real (lmdafmean(i),0.0d0,0.0d0,
+     &                     'zero height gaussian row mean force')
+      end do
+c
+c     beside a gaussian of positive height, one of zero height that
+c     reaches other cells of the same rows adds no weight, so both
+c     kernel build paths agree on the rows
+c
+      nlmdahist = 2
+      call sethist (1,1.0d0,0.0d0,1.0d0,0.3d0,1.0d0)
+      call sethist (2,1.0d0,1.0d0,0.0d0,0.3d0,1.0d0)
+      call buildostindex
+      call buildkernels
+      do i = 1, nlmda
+         wtref(i) = lmdafwt(i)
+         sumref(i) = lmdafsum(i)
+      end do
+      call buildgkernel
+      call buildfkernel
+      call assert_array1 (lmdafwt,wtref,nlmda,1.0d-12,
+     &                    'zero height gaussian row weights')
+      call assert_array1 (lmdafsum,sumref,nlmda,1.0d-12,
+     &                    'zero height gaussian row force sums')
+      do i = 1, nlmda
+         call assert_logical (lmdasampled(i),i.ge.4,
+     &                        'zero height gaussian rows with data')
       end do
       use_ost = .false.
       n = nsave

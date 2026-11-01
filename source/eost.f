@@ -1420,12 +1420,18 @@ c
          lmdafwt(ilmda) = lmdafwt(ilmda) * scale
          vmax = newg
       end if
+c
+c     a cell with no bias carries no weight, as in "buildfkernel", so
+c     a gaussian of zero height leaves a row without data
+c
       if (oldg .eq. 0.0d0) then
          oldweight = 0.0d0
       else
          oldweight = exp((oldg-vmax)/rt)
       end if
-      if (raised) then
+      if (newg .eq. 0.0d0) then
+         newweight = 0.0d0
+      else if (raised) then
          newweight = 1.0d0
       else
          newweight = exp((newg-vmax)/rt)
