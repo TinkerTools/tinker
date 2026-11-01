@@ -56,6 +56,12 @@ c     oxygen class an explicit undamped value far from its mapped one
 c     and zeroing one oxygen by atom, so only the hydrogens are mapped
 c     from hal and the zeroed site drops out of the dispersion sum
 c
+c     case 26 repeats case 22 with an Ewald dispersion cutoff beyond
+c     the vdw cutoff, where the dispersion tail carries its full weight
+c
+c     case 22 with a vdw long range correction must reproduce case 22,
+c     since the Ewald dispersion tail replaces the correction
+c
 c
       subroutine test_testgrad
       implicit none
@@ -87,6 +93,9 @@ c
       call test_testgrad_case ('23_water_dhal_replica','water2')
       call test_testgrad_case ('24_water_dhal_damp','water2')
       call test_testgrad_case ('25_water_dhal_override','water2')
+      call test_testgrad_case ('26_water_dhal_beyond_vcut','water2')
+      call test_testgrad_ref ('22_water_dhal_nlist_vcorr','water2',
+     &                        '22_water_dhal_nlist')
       return
       end
 c
@@ -107,9 +116,30 @@ c
 c
       subroutine test_testgrad_case (base,xyz)
       implicit none
+      character*(*) base,xyz
+c
+c
+      call test_testgrad_ref (base,xyz,base)
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine test_testgrad_ref  --  case on other ref  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "test_testgrad_ref" runs a testgrad case whose key file must
+c     reproduce the reference of another case
+c
+c
+      subroutine test_testgrad_ref (base,xyz,ref)
+      implicit none
       integer ist
       logical skiptest
-      character*(*) base,xyz
+      character*(*) base,xyz,ref
       character*240 rpath
       character*512 args
 c
@@ -127,7 +157,7 @@ c
          call popdir
          return
       end if
-      call refpath ('testgrad',base//'.txt',rpath)
+      call refpath ('testgrad',ref//'.txt',rpath)
       call assert_files (rpath,'out.txt',1.0d-3,'test_testgrad '//base)
       call execute_command_line ('rm -f out.txt')
       call popdir

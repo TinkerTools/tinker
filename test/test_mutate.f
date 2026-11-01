@@ -74,6 +74,7 @@ c
       call test_mutate_dsprel
       call test_mutate_fixchg
       call test_mutate_tip4
+      call test_mutate_dsprelne
       return
       end
 c
@@ -2118,6 +2119,7 @@ c
 c
       subroutine test_mutate_cflux
       implicit none
+      logical skiptest
 c
 c
       call test_mutate_calc ('hipwat','202_hipwat_flux_ewald_l04.key',
@@ -2134,6 +2136,15 @@ c
      &   '209_apgas_cross_ewald_nold_l04.txt',
      &   '209_apgas_cross_ewald_nold_l04',
      &   .true.,  .false., .false., .true.,  .false.)
+c
+c     the lambda derivatives of 203 take another code path, which must
+c     leave the energy of 209, the same key without them
+c
+      if (.not. skiptest('test_mutate_cflux_paths','mutate')) then
+         call test_mutate_sccase ('203_apgas_cross_ewald_l04.key',
+     &      '209_apgas_cross_ewald_nold_l04.key','apgas','',
+     &      'test_mutate_cflux paths')
+      end if
       return
       end
 c
@@ -2809,6 +2820,9 @@ c
       call test_mutate_sccase ('mut_chg_deriv.key',
      &   'mut_chg_noderiv.key','../chglj/trp_charmm','',
      &   'test_mutate_unsup partial charge deriv')
+      call test_mutate_sccase ('mut_nolig_deriv.key',
+     &   'mut_nolig_noderiv.key','../chglj/trp_charmm','',
+     &   'test_mutate_unsup deriv without ligand')
       call test_mutate_sccase ('mut_smooth_deriv_fatal.key','',
      &   '../chglj/trp_charmm','Available with Potential Smoothing',
      &   'test_mutate_unsup smoothing deriv')
@@ -4179,5 +4193,32 @@ c
      &   '277_tip4ovl_cut_rels_vdwm_l100.txt',
      &   '277_tip4ovl_cut_rels_vdwm_l100',
      &   .false., .false., .true. , .true.,  .true.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_dsprelne  --  relative dispersion  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_dsprelne" runs fixture 278, HIPPO damped dispersion
+c     without Ewald summation on the van der Waals leg of a relative
+c     calculation with two water ligands at the same site, so the
+c     energy holds the pairs between the two ligands, which never
+c     interact, to zero
+c
+c
+      subroutine test_mutate_dsprelne
+      implicit none
+c
+c
+      call test_mutate_calc ('water2ovl',
+     &   '278_water2ovl_hip_dsp_rels_vdwm_l030.key',
+     &   '278_water2ovl_hip_dsp_rels_vdwm_l030.txt',
+     &   '278_water2ovl_hip_dsp_rels_vdwm_l030',
+     &   .false., .false., .false., .true.,  .true.)
       return
       end

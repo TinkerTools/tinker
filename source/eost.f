@@ -47,14 +47,15 @@ c
          return
       end if
 c
-c     evaluate the ost g kernel bias and free energy f term
+c     evaluate the ost g kernel bias and free energy f term, where
+c     the f term uses the mean force with unsampled bins filled
 c
       if (ostinterpol) then
          call egkernelinterpolate (egbias,dgdl,dgdfl)
       else
          call egkernel (egbias,dgdl,dgdfl)
       end if
-      call efreelmda (lambda,eostlmda,dfdl)
+      call efreebias (lambda,eostlmda,dfdl)
       esum = esum + egbias - eostlmda
       lmdavbias = egbias - eostlmda
       ostbdgdl = dgdl
@@ -1453,7 +1454,10 @@ c     #########################################################
 c
 c
 c     "buildfkernel" builds the ost f kernel by computing the
-c     biased ensemble average of dE/dlambda at each lambda bin
+c     biased ensemble average of dE/dlambda at each lambda bin, and
+c     keeps its weighted sum and total weight in the same scaled
+c     form as "addkernelpoint", so a row has data exactly when its
+c     total weight is positive
 c
 c
       subroutine buildfkernel
@@ -1493,8 +1497,11 @@ c
             end if
          end do
 c
-c     set mean force for this lambda bin
+c     keep the accumulators as the fused kernel build does, and set
+c     the mean force for this lambda bin
 c
+         lmdafsum(ilmda) = avgflambda
+         lmdafwt(ilmda) = partfunc
          if (partfunc .eq. 0.0d0) then
             lmdafmean(ilmda) = 0.0d0
          else

@@ -153,7 +153,7 @@ c
       real*8 dldvxy,dldvxz,dldvyz
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 scalelmda
-      real*8 esi,desi,esk,desk,dscal
+      real*8 esi,desi,esk,desk,dscal,d2scal
       real*8 emsc(0:2),demsc(0:2)
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
@@ -583,11 +583,11 @@ c
                mutd2 = (mutik .and. use_d2lmda)
                scalelmda = esi * esk
                if (mutik) then
-                  dscal = desi*esk + esi*desk
+                  call dlprod (esi,esk,desi,desk,mutd2,dscal,d2scal)
                   demdl = demdl + dscal*e
                end if
                if (mutd2) then
-                  d2emdl2 = d2emdl2 + 2.0d0*desi*desk*e
+                  d2emdl2 = d2emdl2 + d2scal*e
                   dlfrcx = dscal * frcx
                   dlfrcy = dscal * frcy
                   dlfrcz = dscal * frcz
@@ -1049,11 +1049,11 @@ c
                mutd2 = (mutik .and. use_d2lmda)
                scalelmda = esi * esk
                if (mutik) then
-                  dscal = desi*esk + esi*desk
+                  call dlprod (esi,esk,desi,desk,mutd2,dscal,d2scal)
                   demdl = demdl + dscal*e
                end if
                if (mutd2) then
-                  d2emdl2 = d2emdl2 + 2.0d0*desi*desk*e
+                  d2emdl2 = d2emdl2 + d2scal*e
                   dlfrcx = dscal * frcx
                   dlfrcy = dscal * frcy
                   dlfrcz = dscal * frcz
@@ -1285,7 +1285,7 @@ c
       real*8 dldvxy,dldvxz,dldvyz
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 scalelmda
-      real*8 esi,desi,esk,desk,dscal
+      real*8 esi,desi,esk,desk,dscal,d2scal
       real*8 emsc(0:2),demsc(0:2)
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
@@ -1732,11 +1732,11 @@ c
                mutd2 = (mutik .and. use_d2lmda)
                scalelmda = esi * esk
                if (mutik) then
-                  dscal = desi*esk + esi*desk
+                  call dlprod (esi,esk,desi,desk,mutd2,dscal,d2scal)
                   demdl = demdl + dscal*e
                end if
                if (mutd2) then
-                  d2emdl2 = d2emdl2 + 2.0d0*desi*desk*e
+                  d2emdl2 = d2emdl2 + d2scal*e
                   dlfrcx = dscal * frcx
                   dlfrcy = dscal * frcy
                   dlfrcz = dscal * frcz
@@ -2343,7 +2343,7 @@ c
       real*8 dldvxy,dldvxz,dldvyz
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 scalelmda
-      real*8 esi,desi,esk,desk,dscal
+      real*8 esi,desi,esk,desk,dscal,d2scal
       real*8 emsc(0:2),demsc(0:2)
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
@@ -2717,11 +2717,11 @@ c
                mutd2 = (mutik .and. use_d2lmda)
                scalelmda = esi * esk
                if (mutik) then
-                  dscal = desi*esk + esi*desk
+                  call dlprod (esi,esk,desi,desk,mutd2,dscal,d2scal)
                   demdl = demdl + dscal*e
                end if
                if (mutd2) then
-                  d2emdl2 = d2emdl2 + 2.0d0*desi*desk*e
+                  d2emdl2 = d2emdl2 + d2scal*e
                   dlfrcx = dscal * frcx
                   dlfrcy = dscal * frcy
                   dlfrcz = dscal * frcz
@@ -3170,11 +3170,11 @@ c
                mutd2 = (mutik .and. use_d2lmda)
                scalelmda = esi * esk
                if (mutik) then
-                  dscal = desi*esk + esi*desk
+                  call dlprod (esi,esk,desi,desk,mutd2,dscal,d2scal)
                   demdl = demdl + dscal*e
                end if
                if (mutd2) then
-                  d2emdl2 = d2emdl2 + 2.0d0*desi*desk*e
+                  d2emdl2 = d2emdl2 + d2scal*e
                   dlfrcx = dscal * frcx
                   dlfrcy = dscal * frcy
                   dlfrcz = dscal * frcz
@@ -3763,7 +3763,7 @@ c
       real*8 dldvxy,dldvxz,dldvyz
       real*8 dlfrcx,dlfrcy,dlfrcz
       real*8 scalelmda
-      real*8 esi,desi,esk,desk,dscal
+      real*8 esi,desi,esk,desk,dscal,d2scal
       real*8 emsc(0:2),demsc(0:2)
       real*8 ttmi(3),ttmk(3)
       real*8 dlttmi(3),dlttmk(3)
@@ -4154,11 +4154,11 @@ c
                mutd2 = (mutik .and. use_d2lmda)
                scalelmda = esi * esk
                if (mutik) then
-                  dscal = desi*esk + esi*desk
+                  call dlprod (esi,esk,desi,desk,mutd2,dscal,d2scal)
                   demdl = demdl + dscal*e
                end if
                if (mutd2) then
-                  d2emdl2 = d2emdl2 + 2.0d0*desi*desk*e
+                  d2emdl2 = d2emdl2 + d2scal*e
                   dlfrcx = dscal * frcx
                   dlfrcy = dscal * frcy
                   dlfrcz = dscal * frcz

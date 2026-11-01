@@ -28,6 +28,8 @@ c
       call initial
       kelvin = 300.0d0
       call test_eabf_bias
+      call test_eabf_fill
+      call test_eabf_fillbias
       call test_eabf_dyn
       call test_eabf_mean
       call test_eabf_gate
@@ -88,6 +90,243 @@ c
       call assert_real (vir(2,1),1.0d0,0.0d0,
      &                  'eabfbias leaves the virial')
       use_abf = .false.
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_eabf_fill  --  unsampled bin fill rule  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_eabf_fill" checks the fill of unsampled mean force bins:
+c     a copy of the nearest sampled bin past either end of the data,
+c     linear interpolation inside a gap, zero with no data, sampled
+c     bins kept exactly, and the sampled values left unchanged
+c
+c
+      subroutine test_eabf_fill
+      implicit none
+      real*8 fsamp(5),fsave(5)
+      real*8 fbias(5),ref(5)
+      logical sampled(5)
+c
+c
+c     bins below the first sampled bin copy its mean force
+c
+      fsamp = (/ 0.0d0, 0.0d0, 0.0d0, -20.0d0, -40.0d0 /)
+      sampled = (/ .false., .false., .false., .true., .true. /)
+      fsave = fsamp
+      call lmdafill (5,fsamp,sampled,fbias)
+      ref = (/ -20.0d0, -20.0d0, -20.0d0, -20.0d0, -40.0d0 /)
+      call assert_array1 (fbias,ref,5,0.0d0,
+     &                    'lmdafill copies the first sampled bin')
+      call assert_array1 (fsamp,fsave,5,0.0d0,
+     &                    'lmdafill leaves the sampled mean force')
+c
+c     bins past the last sampled bin copy its mean force
+c
+      fsamp = (/ -10.0d0, -20.0d0, 0.0d0, 0.0d0, 0.0d0 /)
+      sampled = (/ .true., .true., .false., .false., .false. /)
+      call lmdafill (5,fsamp,sampled,fbias)
+      ref = (/ -10.0d0, -20.0d0, -20.0d0, -20.0d0, -20.0d0 /)
+      call assert_array1 (fbias,ref,5,0.0d0,
+     &                    'lmdafill copies the last sampled bin')
+c
+c     a gap between sampled bins is interpolated linearly
+c
+      fsamp = (/ -10.0d0, 0.0d0, 0.0d0, -40.0d0, -50.0d0 /)
+      sampled = (/ .true., .false., .false., .true., .true. /)
+      call lmdafill (5,fsamp,sampled,fbias)
+      ref = (/ -10.0d0, -20.0d0, -30.0d0, -40.0d0, -50.0d0 /)
+      call assert_array1 (fbias,ref,5,1.0d-12,
+     &                    'lmdafill interpolates a gap')
+c
+c     a bin halfway between two sampled bins takes their average
+c
+      fsamp = (/ -10.0d0, 0.0d0, -30.0d0, 0.0d0, 0.0d0 /)
+      sampled = (/ .true., .false., .true., .false., .false. /)
+      call lmdafill (3,fsamp,sampled,fbias)
+      call assert_real (fbias(2),-20.0d0,0.0d0,
+     &                  'lmdafill averages a halfway bin')
+c
+c     both ends and a gap are filled in the same profile
+c
+      fsamp = (/ 0.0d0, -10.0d0, 0.0d0, 0.0d0, -40.0d0 /)
+      sampled = (/ .false., .true., .false., .false., .true. /)
+      call lmdafill (5,fsamp,sampled,fbias)
+      ref = (/ -10.0d0, -10.0d0, -20.0d0, -30.0d0, -40.0d0 /)
+      call assert_array1 (fbias,ref,5,1.0d-12,
+     &                    'lmdafill fills an end and a gap')
+c
+c     a sampled zero is data, and values in unsampled bins are unused
+c
+      fsamp = (/ 7.0d0, 9.0d0, 0.0d0, -20.0d0, -40.0d0 /)
+      sampled = (/ .false., .false., .true., .true., .true. /)
+      call lmdafill (5,fsamp,sampled,fbias)
+      ref = (/ 0.0d0, 0.0d0, 0.0d0, -20.0d0, -40.0d0 /)
+      call assert_array1 (fbias,ref,5,0.0d0,
+     &                    'lmdafill keeps a sampled zero')
+c
+c     with no sampled bin the profile is zero
+c
+      fsamp = (/ 3.0d0, 1.0d0, 4.0d0, 1.0d0, 5.0d0 /)
+      sampled = (/ .false., .false., .false., .false., .false. /)
+      call lmdafill (5,fsamp,sampled,fbias)
+      ref = (/ 0.0d0, 0.0d0, 0.0d0, 0.0d0, 0.0d0 /)
+      call assert_array1 (fbias,ref,5,0.0d0,
+     &                    'lmdafill gives zero without data')
+c
+c     a fully sampled profile is reproduced exactly
+c
+      fsamp = (/ 1.1d0, -2.3d0, 3.7d0, 0.0d0, -5.9d0 /)
+      sampled = (/ .true., .true., .true., .true., .true. /)
+      call lmdafill (5,fsamp,sampled,fbias)
+      call assert_array1 (fbias,fsamp,5,0.0d0,
+     &                    'lmdafill keeps a fully sampled profile')
+c
+c     a single bin keeps its data, or is zero without it
+c
+      fsamp(1) = 2.5d0
+      sampled(1) = .true.
+      call lmdafill (1,fsamp,sampled,fbias)
+      call assert_real (fbias(1),2.5d0,0.0d0,
+     &                  'lmdafill keeps a single sampled bin')
+      sampled(1) = .false.
+      call lmdafill (1,fsamp,sampled,fbias)
+      call assert_real (fbias(1),0.0d0,0.0d0,
+     &                  'lmdafill zeroes a single unsampled bin')
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_eabf_fillbias  --  filled bias vs estimate  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "test_eabf_fillbias" checks that the abf bias and the slope saved
+c     for the lambda particle and for Monte Carlo trials follow the
+c     filled mean force, while the free energy estimate and the bin
+c     mean force keep the sampled data only; a fully sampled profile
+c     gives the same bias with or without the fill
+c
+c     note "resetabf" frees the ost kernels, so the test also shows
+c     the abf fill never reads an ost array
+c
+c
+      subroutine test_eabf_fillbias
+      use dlmda
+      use energi
+      use mutant
+      implicit none
+      integer i
+      real*8 vbias,slope
+      real*8 vfill,dfill
+      real*8 efreetot
+c
+c
+c     sample the two top bins only, at lambda 0.75 and 1
+c
+      call resetabf (5,8)
+      use_abf = .true.
+      use_abfdyn = .true.
+      nlmdahist = 2
+      lmdalhist(1) = 0.75d0
+      lmdafhist(1) = -20.0d0
+      lmdalhist(2) = 1.0d0
+      lmdafhist(2) = -40.0d0
+      do i = 1, nlmdahist
+         call addabfhist (i)
+      end do
+c
+c     the filled bias holds a mean force of -20 below lambda 0.75
+c
+      use_lmdafill = .true.
+      lambda = 1.0d0
+      esum = 0.0d0
+      call eabfbias
+      call assert_real (lmdavbias,22.5d0,1.0d-12,
+     &                  'eabfbias fill bias energy at lambda 1')
+      call assert_real (esum,22.5d0,1.0d-12,
+     &                  'eabfbias fill energy at lambda 1')
+      call assert_real (lmdadfdl,-40.0d0,0.0d0,
+     &                  'eabfbias fill slope at lambda 1')
+      lambda = 0.3d0
+      esum = 0.0d0
+      call eabfbias
+      call assert_real (lmdavbias,6.0d0,1.0d-12,
+     &                  'eabfbias fill bias energy in a gap')
+      call assert_real (lmdadfdl,-20.0d0,0.0d0,
+     &                  'eabfbias fill slope in a gap')
+c
+c     a Monte Carlo trial sees the same filled bias and slope
+c
+      call elmdabias (vbias,slope)
+      call assert_real (vbias,lmdavbias,0.0d0,
+     &                  'elmdabias matches the filled abf bias')
+      call assert_real (slope,lmdadfdl,0.0d0,
+     &                  'elmdabias matches the filled abf slope')
+c
+c     the estimate keeps zero mean force in the unsampled bins
+c
+      call assert_real (efreetot(),-10.0d0,1.0d-12,
+     &                  'efreetot uses sampled bins only')
+      call assert_real (lmdafmean(1),0.0d0,0.0d0,
+     &                  'fill leaves the empty bin mean force')
+      call assert_real (lmdafmean(4),-20.0d0,0.0d0,
+     &                  'fill leaves the sampled bin mean force')
+c
+c     without the fill the bias is the sampled free energy
+c
+      use_lmdafill = .false.
+      lambda = 0.3d0
+      call eabfbias
+      call assert_real (lmdavbias,0.0d0,0.0d0,
+     &                  'eabfbias nofill bias energy in a gap')
+      call assert_real (lmdadfdl,0.0d0,0.0d0,
+     &                  'eabfbias nofill slope in a gap')
+      lambda = 0.6d0
+      call eabfbias
+      call assert_real (lmdavbias,0.4d0,1.0d-12,
+     &                  'eabfbias nofill bias energy near data')
+      call assert_real (lmdadfdl,-8.0d0,1.0d-12,
+     &                  'eabfbias nofill slope near data')
+      call elmdabias (vbias,slope)
+      call assert_real (vbias,lmdavbias,0.0d0,
+     &                  'elmdabias matches the nofill abf bias')
+      call assert_real (slope,lmdadfdl,0.0d0,
+     &                  'elmdabias matches the nofill abf slope')
+c
+c     once every bin is sampled the fill changes nothing
+c
+      nlmdahist = 5
+      lmdalhist(3) = 0.0d0
+      lmdafhist(3) = 2.0d0
+      lmdalhist(4) = 0.25d0
+      lmdafhist(4) = 3.0d0
+      lmdalhist(5) = 0.5d0
+      lmdafhist(5) = -5.0d0
+      do i = 3, nlmdahist
+         call addabfhist (i)
+      end do
+      lambda = 0.6d0
+      use_lmdafill = .true.
+      call eabfbias
+      vfill = lmdavbias
+      dfill = lmdadfdl
+      use_lmdafill = .false.
+      call eabfbias
+      call assert_real (vfill,lmdavbias,0.0d0,
+     &                  'fully sampled fill bias energy unchanged')
+      call assert_real (dfill,lmdadfdl,0.0d0,
+     &                  'fully sampled fill slope unchanged')
+      use_abf = .false.
+      use_abfdyn = .false.
       return
       end
 c
@@ -395,7 +634,7 @@ c
       integer iline
       integer istep
       integer leng0
-      integer size1,size2,size3
+      integer size0,size1,size2,size3
       integer freeunit
       integer trimtext
       real*8 kelvin0
@@ -467,6 +706,16 @@ c
      &                     'initabffile writes no ost grid state')
       call assert_logical (haslabel,.true.,
      &                     'initabffile writes the sample label')
+c
+c     save before any interval completes; the header-only file is
+c     shorter than one header record buffer
+c
+      inquire (file=abffile,size=size0)
+      call assert_logical (size0.lt.240,.true.,
+     &                     'initabffile header is shorter than 240')
+      call saveabf
+      inquire (file=abffile,size=size1)
+      call assert_int (size1,size0,'saveabf updates a header-only file')
 c
 c     record two intervals, then save twice with no new samples
 c

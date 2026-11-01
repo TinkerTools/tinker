@@ -153,6 +153,10 @@ c     loop, by neighbor list and by the method of lights; the energy
 c     is quadratic in the charges, so a larger step keeps the numerical
 c     second derivative clear of roundoff in the box energy
 c
+c     case 167 puts the Trp-cage with its net charged ligand under the
+c     usual Ewald boundary, so the neutralizing background charge and
+c     its lambda derivatives follow the charge of the ligand
+c
 c
       subroutine test_testlmda
       implicit none
@@ -432,6 +436,8 @@ c
      &   'tip3box','1e-3')
       call test_testlmda_xyz ('166_tip3_rels3_lights_l085',
      &   'tip3box','1e-3')
+      call test_testlmda_xyz ('167_trp_chg_ewald_l05',
+     &   '../chglj/trp_charmm','1e-3')
       return
       end
 c

@@ -2139,13 +2139,14 @@ c
       logical need0,need1
 c
 c
-c     only the endpoint states that carry weight are needed
+c     only the endpoint states that carry weight are needed, so the
+c     weight goes to the live endpoint test with no lambda chain
 c
       plambdaorig = plambda
       call lmdapwr (plambda,dble(epdtexp),.true.,weight1,
      &              dweight1,d2weight1)
-      need0 = (weight1 .ne. 1.0d0)
-      need1 = (weight1 .ne. 0.0d0)
+      call relneed (weight1,dweight1,d2weight1,0.0d0,0.0d0,
+     &                 need0,need1)
 c
 c     compute energy of the lambda = 0 state
 c

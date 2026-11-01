@@ -98,7 +98,9 @@ c     dvirdl        total virial lambda derivative
 c     bdplorig      original bdpl
 c     lmdafhist     dU/dlambda value of each history entry
 c     lmdaflist     dU/dlambda values saved within an interval
-c     lmdafmean     mean force of each lambda bin
+c     lmdafmean     sampled mean force of each lambda bin, zero in a
+c                     bin without data; the bias that drives lambda
+c                     reads a filled copy built in "efreebias"
 c     lmdafsum      weighted dU/dlambda sum of each lambda bin
 c     lmdafwt       total weight of each lambda bin
 c     lmdalhist     lambda value of each history entry
@@ -131,6 +133,7 @@ c     use_elmdamap  flag that elambda follows the main lambda map
 c     use_epdt      flag governing use of polarization dual topology
 c     use_fep       flag to use free energy perturbation over windows
 c     use_lmdacv    flag to gate interval samples by convergence
+c     use_lmdafill  flag to fill unsampled bins of the bias mean force
 c     use_lmdamc    flag to move lambda by Monte Carlo trial moves
 c     use_mainlmda  flag that a main lambda value was specified
 c     use_meta      flag to use metadynamics
@@ -277,6 +280,7 @@ c
       logical use_epdt
       logical use_fep
       logical use_lmdacv
+      logical use_lmdafill
       logical use_lmdamc
       logical use_mainlmda
       logical use_meta

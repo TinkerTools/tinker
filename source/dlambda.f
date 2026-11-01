@@ -418,6 +418,34 @@ c
       end
 c
 c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine pdlflags  --  polarization lambda deriv use  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "pdlflags" sets whether the polarization terms take their first
+c     lambda derivatives, as "lmdadrv" decides for the polarization
+c     lambda, and whether they also take the second, force and virial
+c     ones
+c
+c
+      subroutine pdlflags (dodl,dod2)
+      use dlmda
+      implicit none
+      logical dodl,dod2
+      logical lmdadrv
+c
+c
+c     the second derivatives are only needed alongside the first
+c
+      dodl = lmdadrv (use_pdlmda,dpldlmda,d2pldlmda2)
+      dod2 = (dodl .and. use_d2lmda)
+      return
+      end
+c
+c
 c     #############################################################
 c     ##                                                         ##
 c     ##  subroutine chgdlmda  --  partial charge lambda derivs  ##
@@ -456,6 +484,32 @@ c
       end
 c
 c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine dlprod  --  lambda derivative of a product  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "dlprod" finds the first lambda derivative "d1" of a product of
+c     two group scales "si" and "sk" with lambda derivatives "dsi" and
+c     "dsk", each linear in lambda, along with, if "dod2" is set, its
+c     second derivative "d2"
+c
+c
+      subroutine dlprod (si,sk,dsi,dsk,dod2,d1,d2)
+      implicit none
+      real*8 si,sk,dsi,dsk
+      real*8 d1,d2
+      logical dod2
+c
+c
+      d1 = dsi*sk + si*dsk
+      if (dod2)  d2 = 2.0d0 * dsi * dsk
+      return
+      end
+c
+c
 c     #################################################################
 c     ##                                                             ##
 c     ##  subroutine dlcscale  --  partial charge pair lambda terms  ##
@@ -478,7 +532,7 @@ c
       implicit none
       real*8 qi,qk,dqi,dqk
       real*8 e,de,dc
-      real*8 qik,dqik
+      real*8 qik,dqik,d2qik
       real*8 dlambda,dlambda2
       real*8 dlde,dldc
       logical mutd2
@@ -487,10 +541,10 @@ c
 c     the energy is linear in each charge of the pair
 c
       qik = qi * qk
-      dqik = dqi*qk + qi*dqk
+      call dlprod (qi,qk,dqi,dqk,mutd2,dqik,d2qik)
       dlambda = dqik * e
       if (mutd2) then
-         dlambda2 = 2.0d0 * dqi * dqk * e
+         dlambda2 = d2qik * e
          dlde = dqik * de
          dldc = dqik * dc
       end if
@@ -633,8 +687,8 @@ c
          do i = 0, 2
             do k = 0, 2
                sc(k,i) = g(k) * g(i)
-               dsc(k,i) = dg(k)*g(i) + g(k)*dg(i)
-               d2sc(k,i) = 2.0d0 * dg(k) * dg(i)
+               call dlprod (g(k),g(i),dg(k),dg(i),.true.,dsc(k,i),
+     &                      d2sc(k,i))
             end do
          end do
       end if
@@ -1268,65 +1322,81 @@ c
       integer i,j
 c
 c
-c     apply chain rule for second derivatives, force and virial wrt
-c     global lambda, using the first derivatives before their rescale
+c     apply the chain rule to each term, then sum up to get the total
+c     lambda derivatives
+c
+      call dlchain (dvldlmda,d2vldlmda2,devdl,d2evdl2,dfvdl,devvirdl)
+      call dlchain (deldlmda,d2eldlmda2,demdl,d2emdl2,dfmdl,demvirdl)
+      call dlchain (dpldlmda,d2pldlmda2,depdl,d2epdl2,dfpdl,depvirdl)
+      dedl = devdl + demdl + depdl
+      d2edl2 = d2evdl2 + d2emdl2 + d2epdl2
+      do i = 1, n
+         do j = 1, 3
+            dfsumdl(j,i) = dfvdl(j,i) + dfmdl(j,i) + dfpdl(j,i)
+         end do
+      end do
+      do i = 1, 3
+         do j = 1, 3
+            dvirdl(j,i) = devvirdl(j,i) + demvirdl(j,i)
+     &                       + depvirdl(j,i)
+         end do
+      end do
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine dlchain  --  one term lambda chain rule  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "dlchain" carries the lambda derivatives of one term with
+c     respect to its sublambda, the energy derivatives "de" and "d2e",
+c     the force "df" and the virial "dvir", to the global lambda by the
+c     sublambda derivatives "dl" and "d2l", using the first derivative
+c     before its rescale; the second derivative, force and virial are
+c     zeroed unless second lambda derivatives are requested
+c
+c
+      subroutine dlchain (dl,d2l,de,d2e,df,dvir)
+      use atoms
+      use dlmda
+      implicit none
+      integer i,j
+      real*8 dl,d2l
+      real*8 de,d2e
+      real*8 df(3,*)
+      real*8 dvir(3,3)
+c
 c
       if (use_d2lmda) then
-         d2epdl2 = d2epdl2 * dpldlmda*dpldlmda + depdl * d2pldlmda2
-         d2evdl2 = d2evdl2 * dvldlmda*dvldlmda + devdl * d2vldlmda2
-         d2emdl2 = d2emdl2 * deldlmda*deldlmda + demdl * d2eldlmda2
-         d2edl2 = d2evdl2 + d2emdl2 + d2epdl2
+         d2e = d2e*dl*dl + de*d2l
          do i = 1, n
             do j = 1, 3
-               dfpdl(j,i) = dfpdl(j,i) * dpldlmda
-               dfmdl(j,i) = dfmdl(j,i) * deldlmda
-               dfvdl(j,i) = dfvdl(j,i) * dvldlmda
-               dfsumdl(j,i) = dfvdl(j,i) + dfmdl(j,i) + dfpdl(j,i)
+               df(j,i) = df(j,i) * dl
             end do
          end do
          do i = 1, 3
             do j = 1, 3
-               depvirdl(j,i) = depvirdl(j,i) * dpldlmda
-               demvirdl(j,i) = demvirdl(j,i) * deldlmda
-               devvirdl(j,i) = devvirdl(j,i) * dvldlmda
-               dvirdl(j,i) = devvirdl(j,i) + demvirdl(j,i)
-     &                          + depvirdl(j,i)
+               dvir(j,i) = dvir(j,i) * dl
             end do
          end do
-      end if
-c
-c     apply chain rule for derivative of energy wrt global lambda
-c     and sum up to get the total lambda derivative
-c
-      depdl = depdl * dpldlmda
-      devdl = devdl * dvldlmda
-      demdl = demdl * deldlmda
-      dedl = devdl + demdl + depdl
-c
-c     zero d2edl2 and dfdl unless second lambda derivs are requested
-c
-      if (.not. use_d2lmda) then
-         d2evdl2 = 0.0d0
-         d2emdl2 = 0.0d0
-         d2epdl2 = 0.0d0
-         d2edl2 = 0.0d0
+      else
+         d2e = 0.0d0
          do i = 1, n
             do j = 1, 3
-               dfvdl(j,i) = 0.0d0
-               dfmdl(j,i) = 0.0d0
-               dfpdl(j,i) = 0.0d0
-               dfsumdl(j,i) = 0.0d0
+               df(j,i) = 0.0d0
             end do
          end do
          do i = 1, 3
             do j = 1, 3
-               devvirdl(j,i) = 0.0d0
-               demvirdl(j,i) = 0.0d0
-               depvirdl(j,i) = 0.0d0
-               dvirdl(j,i) = 0.0d0
+               dvir(j,i) = 0.0d0
             end do
          end do
       end if
+      de = de * dl
       return
       end
 c
@@ -2020,8 +2090,9 @@ c     "elmdabias" finds the adaptive bias energy at the current
 c     lambda for the methods whose bias depends on lambda alone,
 c     adaptive biasing force and metadynamics, from the history as
 c     it now stands; "slope" returns the value that each method saves
-c     to drive the lambda particle, the mean force for abf and the
-c     bias derivative for metadynamics; no saved value is changed
+c     to drive the lambda particle, the bias mean force for abf, the
+c     same one "eabfbias" uses, and the bias derivative for
+c     metadynamics; no saved value is changed
 c
 c
       subroutine elmdabias (vbias,slope)
@@ -2032,7 +2103,7 @@ c
 c
 c
       if (use_abfdyn) then
-         call efreelmda (lambda,vbias,slope)
+         call efreebias (lambda,vbias,slope)
          vbias = -vbias
       else
          call emetabias (lambda,vbias,slope)
@@ -2538,12 +2609,41 @@ c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "efreelmda" computes the free energy at lambda "lmda" by
-c     integrating the mean force of the lambda bins with linear
-c     interpolation, and also returns its lambda derivative
+c     "efreelmda" computes the free energy estimate at lambda "lmda"
+c     from the sampled mean force of the lambda bins, and also returns
+c     its lambda derivative
+c
+c     note an unsampled bin counts as zero mean force here, since the
+c     estimate uses sampled data only; the bias that drives lambda
+c     fills those bins instead, via "efreebias"
 c
 c
       subroutine efreelmda (lmda,eflmda,dfdl)
+      use dlmda
+      implicit none
+      real*8 lmda
+      real*8 eflmda,dfdl
+c
+c
+      call efreeprof (lmda,lmdafmean,eflmda,dfdl)
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine efreeprof -- free energy from a profile  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "efreeprof" computes the free energy at lambda "lmda" by
+c     integrating the mean force profile "fprof" given at the lambda
+c     bin centers with linear interpolation, and also returns its
+c     lambda derivative
+c
+c
+      subroutine efreeprof (lmda,fprof,eflmda,dfdl)
       use dlmda
       implicit none
       integer ilmda0,ilmda1
@@ -2553,6 +2653,7 @@ c
       real*8 lmda0,lmda1
       real*8 slope
       real*8 x
+      real*8 fprof(*)
 c
 c
 c     initialize free energy and derivative
@@ -2563,7 +2664,7 @@ c
 c     handle endpoint at lambda = 0
 c
       if (lmda .le. 0.0d0) then
-         dfdl = lmdafmean(1)
+         dfdl = fprof(1)
          return
       end if
 c
@@ -2573,8 +2674,8 @@ c
          ilmda1 = ilmda0 + 1
          lmda0 = dble(ilmda0-1) * wlmda
          lmda1 = dble(ilmda1-1) * wlmda
-         fl0 = lmdafmean(ilmda0)
-         fl1 = lmdafmean(ilmda1)
+         fl0 = fprof(ilmda0)
+         fl1 = fprof(ilmda1)
          slope = (fl1-fl0) / wlmda
 c
 c     integrate only to lambda if it lies inside this interval
@@ -2594,7 +2695,7 @@ c
 c
 c     handle endpoint at lambda = 1
 c
-      dfdl = lmdafmean(nlmda)
+      dfdl = fprof(nlmda)
       return
       end
 c
@@ -2618,6 +2719,143 @@ c
 c
 c
       call efreelmda (1.0d0,efreetot,dfdl)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine efreebias -- free energy for the lambda bias  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "efreebias" computes the free energy at lambda "lmda" that the
+c     adaptive bias removes, and its lambda derivative, from the mean
+c     force profile that drives lambda, in which the unsampled bins
+c     are filled from the sampled ones if "use_lmdafill" is set; it
+c     is the only route by which filled values reach an energy or
+c     force, and no free energy estimate may call it
+c
+c
+      subroutine efreebias (lmda,eflmda,dfdl)
+      use dlmda
+      implicit none
+      integer i
+      real*8 lmda
+      real*8 eflmda,dfdl
+      real*8, allocatable :: fbias(:)
+      logical lmdasampled
+      logical, allocatable :: sampled(:)
+c
+c
+c     without the fill the bias follows the sampled mean force
+c
+      if (.not. use_lmdafill) then
+         call efreeprof (lmda,lmdafmean,eflmda,dfdl)
+         return
+      end if
+c
+c     fill the unsampled bins, then integrate up to lambda
+c
+      allocate (fbias(nlmda))
+      allocate (sampled(nlmda))
+      do i = 1, nlmda
+         sampled(i) = lmdasampled(i)
+      end do
+      call lmdafill (nlmda,lmdafmean,sampled,fbias)
+      call efreeprof (lmda,fbias,eflmda,dfdl)
+      deallocate (fbias)
+      deallocate (sampled)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  function lmdasampled -- test if lambda bin holds data  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "lmdasampled" tests whether the mean force of a lambda bin comes
+c     from data, which is any total weight in the bin: an interval
+c     sample for the adaptive biasing force, or g kernel support along
+c     flambda for orthogonal space tempering, as every gaussian height
+c     is positive and both ost kernel builds keep the weight
+c
+c
+      function lmdasampled (ilmda)
+      use dlmda
+      implicit none
+      integer ilmda
+      logical lmdasampled
+c
+c
+      lmdasampled = (lmdafwt(ilmda) .gt. 0.0d0)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine lmdafill -- fill unsampled mean force bins  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "lmdafill" copies the sampled mean force "fsamp" of "nbin" lambda
+c     bins into "fbias" and fills each unsampled bin, flagged false in
+c     "sampled", by linear interpolation between the nearest sampled
+c     bins on either side, or from the nearest sampled bin if there is
+c     only one side; with no sampled bin the profile is zero
+c
+c     note sampled bins are copied unchanged, so a fully sampled
+c     profile is reproduced exactly, and "fsamp" is not modified
+c
+c
+      subroutine lmdafill (nbin,fsamp,sampled,fbias)
+      implicit none
+      integer i,k
+      integer nbin
+      integer ilo
+      real*8 t
+      real*8 fsamp(*)
+      real*8 fbias(*)
+      logical sampled(*)
+c
+c
+c     at each sampled bin, fill the unsampled bins below it back to
+c     the previous sampled bin, or to the first bin if there is none
+c
+      ilo = 0
+      do i = 1, nbin
+         if (sampled(i)) then
+            if (ilo .eq. 0) then
+               do k = 1, i-1
+                  fbias(k) = fsamp(i)
+               end do
+            else
+               do k = ilo+1, i-1
+                  t = dble(k-ilo) / dble(i-ilo)
+                  fbias(k) = fsamp(ilo) + t*(fsamp(i)-fsamp(ilo))
+               end do
+            end if
+            fbias(i) = fsamp(i)
+            ilo = i
+         end if
+      end do
+c
+c     bins past the last sampled bin take its mean force, and with
+c     no sampled bin the profile is zero
+c
+      do k = ilo+1, nbin
+         if (ilo .eq. 0) then
+            fbias(k) = 0.0d0
+         else
+            fbias(k) = fsamp(ilo)
+         end if
+      end do
       return
       end
 c

@@ -405,6 +405,7 @@ c
       real*8 lo,hi
       character*4 legword
       character*8 propword
+      character*8 fillword
       character*20 keyword
       character*240 record
       character*240 string
@@ -419,6 +420,7 @@ c
       use_elmdamap = .false.
       use_epdt = .false.
       use_fep = .false.
+      use_lmdafill = .true.
       use_lmdamc = .false.
       use_meta = .false.
       use_metadyn = .false.
@@ -567,6 +569,19 @@ c
                write (iout,3)
     3          format (/,' MUTATE_DLMDA  --  LAMBDA-PROPAGATE takes',
      &                    ' either LANGEVIN or MC')
+               call fatal
+            end if
+         else if (keyword(1:16) .eq. 'LAMBDA-BIASFILL ') then
+            call getword (record,fillword,next)
+            call upcase (fillword)
+            if (fillword.eq.'LINEAR' .or. fillword.eq.' ') then
+               use_lmdafill = .true.
+            else if (fillword .eq. 'NONE') then
+               use_lmdafill = .false.
+            else
+               write (iout,4)
+    4          format (/,' MUTATE_DLMDA  --  LAMBDA-BIASFILL takes',
+     &                    ' either LINEAR or NONE')
                call fatal
             end if
          else if (keyword(1:16) .eq. 'LAMBDA-MC-TRIAL ') then
@@ -1593,7 +1608,7 @@ c     pair energy bounded as the shift vanishes, so the shift exponents
 c     need no further limit
 c
       call softchk (scalphav,scexp,scexpm,scexpp,
-     &              0.7d0,5.0d0,0.0d0,2.0d0)
+     &              0.7d0,5.0d0,0.0d0,2.0d0,.false.,0.0d0)
 c
 c     reset any soft core Pauli repulsion parameter outside its allowed
 c     range to the default value, where the lambda exponent must also
@@ -1601,11 +1616,7 @@ c     outrun the vanishing shift so the pair energy stays bounded as
 c     lambda goes to zero
 c
       call softchk (scalphar,scexpr,scexprm,scexprp,
-     &              1.0d0,5.0d0,3.0d0,1.0d0)
-      if (scalphar.gt.0.0d0 .and. scexpr.le.0.5d0*scexprm) then
-         scexpr = 5.0d0
-         scexprm = 3.0d0
-      end if
+     &              1.0d0,5.0d0,3.0d0,1.0d0,.false.,0.5d0)
 c
 c     reset any soft core Lennard-Jones parameter outside its allowed
 c     range to the default value; the lambda derivatives are taken
@@ -1615,7 +1626,8 @@ c     between one and two with second derivatives, diverges at an
 c     endpoint, and the lambda exponent must outrun twice the shift
 c     exponent so the pair energy stays bounded as lambda goes to zero
 c
-      call ljsoftchk (scalphalj,scexplj,scexpljm,scexpljp)
+      call softchk (scalphalj,scexplj,scexpljm,scexpljp,
+     &              0.5d0,1.0d0,0.0d0,1.0d0,.true.,2.0d0)
 c
 c     reset any soft core damped dispersion parameter outside its
 c     allowed range to the default value, where the switch radius must
@@ -1629,12 +1641,7 @@ c
       dspcut = dispcut
       if (use_dcorr)  dspcut = disptaper
       if (use_dewald)  dspcut = dewaldcut
-      if (scrdsp.lt.0.0d0 .or. scrdsp.ge.dspcut)  scrdsp = 2.0d0
-      if (scexpd .lt. 1.0d0)  scexpd = 4.0d0
-      if (scexpdq .le. 0.0d0)  scexpdq = 1.0d0
-      if (use_d2lmda .and. scexpd.ne.1.0d0 .and. scexpd.lt.2.0d0)
-     &   scexpd = 4.0d0
-      if (use_d2lmda .and. scexpd+scexpdq.lt.2.0d0)  scexpdq = 1.0d0
+      call dspsoftchk (scrdsp,scexpd,scexpdq,dspcut)
 c
 c     an Ewald dispersion tail mapped from the buffered 14-7 vdw
 c     follows the lambda power of the hal pairs, as the long range
@@ -1954,51 +1961,22 @@ c     "softchk" resets any parameter of a soft core with scale
 c     lambda^n and shift alpha*lambda^m*(1-lambda)^p outside its
 c     allowed range to the given default, where "pw" is n, "alpha" is
 c     alpha, "pm" is m and "pp" is p, and the defaults carry a zero
-c     suffix; the second lambda derivative diverges at an endpoint
-c     unless the lambda exponent is at least two and the one minus
-c     lambda shift exponent is one or at least two
+c     suffix; an exponent must be at least one, or at least two when
+c     second lambda derivatives are used, except that p may be one,
+c     and with "lin" a soft core whose lambda derivatives are taken
+c     without factoring out powers of lambda also keeps n of one and
+c     m of zero or one; a positive "ratio" requires n to exceed ratio
+c     times m for a nonzero shift, so the pair energy stays bounded as
+c     lambda goes to zero, and resets both exponents otherwise
 c
 c
-      subroutine softchk (alpha,pw,pm,pp,alpha0,pw0,pm0,pp0)
+      subroutine softchk (alpha,pw,pm,pp,alpha0,pw0,pm0,pp0,lin,ratio)
       use dlmda
       implicit none
       real*8 alpha,pw,pm,pp
       real*8 alpha0,pw0,pm0,pp0
-c
-c
-c     reset each parameter outside its allowed range
-c
-      if (alpha .lt. 0.0d0)  alpha = alpha0
-      if (pw .lt. 1.0d0)  pw = pw0
-      if (pm .lt. 0.0d0)  pm = pm0
-      if (pp .lt. 1.0d0)  pp = pp0
-      if (use_d2lmda .and. pw.lt.2.0d0)  pw = pw0
-      if (use_d2lmda .and. pp.ne.1.0d0 .and. pp.lt.2.0d0)  pp = pp0
-      return
-      end
-c
-c
-c     ###############################################################
-c     ##                                                           ##
-c     ##  subroutine ljsoftchk  --  soft core Lennard-Jones check  ##
-c     ##                                                           ##
-c     ###############################################################
-c
-c
-c     "ljsoftchk" resets each soft core Lennard-Jones parameter with
-c     scale lambda^n and shift alpha*lambda^m*(1-lambda)^p outside its
-c     allowed range to its default, where "pw" is n, "alpha" is alpha,
-c     "pm" is m and "pp" is p; n and p may be one, m may be zero or
-c     one, and any other exponent must be at least one, or at least
-c     two when second lambda derivatives are used, while n must also
-c     exceed twice m for a nonzero shift
-c
-c
-      subroutine ljsoftchk (alpha,pw,pm,pp)
-      use dlmda
-      implicit none
-      real*8 alpha,pw,pm,pp
-      real*8 pmin
+      real*8 ratio,pmin
+      logical lin
 c
 c
 c     set the smallest exponent beyond zero and one that is allowed
@@ -2008,15 +1986,56 @@ c
 c
 c     reset each parameter outside its allowed range
 c
-      if (alpha .lt. 0.0d0)  alpha = 0.5d0
-      if (pw.ne.1.0d0 .and. pw.lt.pmin)  pw = 1.0d0
-      if (pm.lt.0.0d0 .or. (pm.ne.0.0d0 .and. pm.ne.1.0d0
-     &       .and. pm.lt.pmin))  pm = 0.0d0
-      if (pp.ne.1.0d0 .and. pp.lt.pmin)  pp = 1.0d0
-      if (alpha.gt.0.0d0 .and. pm.gt.0.0d0 .and. pw.le.2.0d0*pm) then
-         pw = 1.0d0
-         pm = 0.0d0
+      if (alpha .lt. 0.0d0)  alpha = alpha0
+      if (lin) then
+         if (pw.ne.1.0d0 .and. pw.lt.pmin)  pw = pw0
+         if (pm.lt.0.0d0 .or. (pm.ne.0.0d0 .and. pm.ne.1.0d0
+     &          .and. pm.lt.pmin))  pm = pm0
+      else
+         if (pw .lt. pmin)  pw = pw0
+         if (pm .lt. 0.0d0)  pm = pm0
       end if
+      if (pp.ne.1.0d0 .and. pp.lt.pmin)  pp = pp0
+c
+c     keep the lambda exponent ahead of the shift exponent
+c
+      if (ratio.gt.0.0d0 .and. alpha.gt.0.0d0 .and.
+     &       pw.le.ratio*pm) then
+         pw = pw0
+         pm = pm0
+      end if
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine dspsoftchk  --  dispersion soft core check  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "dspsoftchk" resets any parameter of the damped dispersion soft
+c     core outside its allowed range to its default, where "rs" is the
+c     switch radius, which must lie inside "cut", "pw" the lambda
+c     exponent n and "pq" the added exponent q; the second lambda
+c     derivative diverges at zero lambda unless n is one or at least
+c     two and n+q is at least two
+c
+c
+      subroutine dspsoftchk (rs,pw,pq,cut)
+      use dlmda
+      implicit none
+      real*8 rs,pw,pq,cut
+c
+c
+c     reset each parameter outside its allowed range
+c
+      if (rs.lt.0.0d0 .or. rs.ge.cut)  rs = 2.0d0
+      if (pw .lt. 1.0d0)  pw = 4.0d0
+      if (pq .le. 0.0d0)  pq = 1.0d0
+      if (use_d2lmda .and. pw.ne.1.0d0 .and. pw.lt.2.0d0)  pw = 4.0d0
+      if (use_d2lmda .and. pw+pq.lt.2.0d0)  pq = 1.0d0
       return
       end
 c

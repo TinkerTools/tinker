@@ -36,6 +36,8 @@ c
       call test_lmdamc_deposit
       call test_lmdamc_stale ('abf')
       call test_lmdamc_stale ('ost')
+      call test_lmdamc_fill ('abf')
+      call test_lmdamc_fill ('ost')
       call test_lmdamc_stalemeta
       call test_lmdamc_nopol
       call test_lmdamc_run
@@ -73,6 +75,22 @@ c
       call assert_int (lmdanpc,40,'lmdamc default average steps')
       call assert_int (lmdamctrial,10,'lmdamc default trial')
       call assert_real (lmdamcmove,0.02d0,0.0d0,'lmdamc default move')
+      call assert_logical (use_lmdafill,.true.,'lmdamc default fill')
+      call final
+c
+c     the fill of unsampled bins is turned off or on by keyword
+c
+      call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
+     &                     'lambda-biasfill none')
+      call assert_logical (use_lmdafill,.false.,'lmdamc fill none')
+      call final
+      call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
+     &                     'lambda-biasfill linear')
+      call assert_logical (use_lmdafill,.true.,'lmdamc fill linear')
+      call final
+      call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
+     &                     'lambda-biasfill')
+      call assert_logical (use_lmdafill,.true.,'lmdamc fill bare')
       call final
 c
 c     the keywords turn on the moves and set their rate and size
@@ -190,11 +208,13 @@ c
       call sd_mdinit (298.0d0)
       allocate (derivs(3,n))
 c
-c     give the abf mean force a slope, or deposit one gaussian
+c     give the abf mean force a slope in every bin, so no bin needs
+c     to be filled, or deposit one gaussian
 c
       if (mode .eq. 'abf') then
          do i = 1, nlmda
             lmdafmean(i) = 30.0d0 * dble(i-1) * wlmda
+            lmdafwt(i) = 1.0d0
          end do
       else if (mode .eq. 'ost') then
          call gradient (epot,derivs)
@@ -239,7 +259,7 @@ c
 c
 c
       if (mode .eq. 'abf') then
-         call efreelmda (lambda,vbias,dvdl)
+         call efreebias (lambda,vbias,dvdl)
          epot = energy () - vbias
       else if (mode .eq. 'ost') then
          allocate (derivs(3,n))
@@ -733,6 +753,113 @@ c
       deallocate (uind0)
       deallocate (udir0)
       deallocate (desum0)
+      call sd_final
+      call popdir
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_lmdamc_fill  --  filled bias in a trial  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_lmdamc_fill" forces an accepted Monte Carlo lambda move
+c     inside a region without data for abf or ost, and checks that
+c     the energy and the slope it keeps come from the filled bias,
+c     which differs there from the sampled free energy
+c
+c
+      subroutine test_lmdamc_fill (mode)
+      use dlmda
+      use mutant
+      implicit none
+      integer i
+      integer ifirst,ilast
+      real*8 epot,e0,eref,eoff
+      real*8 lstart,fedge
+      real*8 vfill,dfill
+      real*8 vsamp,dsamp
+      logical took
+      logical lmdasampled
+      character*(*) mode
+      character*16 tag
+c
+c
+      tag = 'lmdamc fill '//mode
+      call pushdir ('file/mutate')
+      call mcload (mode,e0)
+      call assert_logical (use_lmdafill,.true.,trim(tag)//' on')
+c
+c     keep abf data at lambda 0.9 and above, and start well below;
+c     the ost gaussian sits at the starting lambda of 0.5, so start
+c     well above it
+c
+      if (mode .eq. 'abf') then
+         do i = 1, nlmda
+            if (dble(i-1)*wlmda .lt. 0.9d0) then
+               lmdafmean(i) = 0.0d0
+               lmdafsum(i) = 0.0d0
+               lmdafwt(i) = 0.0d0
+            end if
+         end do
+         lstart = 0.5d0
+      else
+         lstart = 0.8d0
+      end if
+c
+c     an old energy far above the trial energy accepts the move
+c
+      call mctrial (lstart,1,e0+1.0d6,epot,took)
+      call assert_logical (took,.true.,trim(tag)//' accepted')
+c
+c     the kept slope and energy are those of the filled bias, which
+c     differs from the sampled free energy away from the data
+c
+      call efreebias (lambda,vfill,dfill)
+      call efreelmda (lambda,vsamp,dsamp)
+      call assert_real (lmdadfdl,dfill,0.0d0,
+     &                  trim(tag)//' slope is filled')
+      call assert_logical (abs(dfill-dsamp).gt.1.0d-3,.true.,
+     &                     trim(tag)//' fill changes the slope')
+c
+c     check the fill independently: abf is below its data, so its
+c     mean force is the first sampled value all the way from zero,
+c     while ost is above its data and takes the last sampled value
+c
+      ifirst = 0
+      ilast = 0
+      do i = 1, nlmda
+         if (lmdasampled(i)) then
+            if (ifirst .eq. 0)  ifirst = i
+            ilast = i
+         end if
+      end do
+      if (mode .eq. 'abf') then
+         fedge = lmdafmean(ifirst)
+         call assert_logical (lambda.lt.dble(ifirst-1)*wlmda,.true.,
+     &                        trim(tag)//' trial below the data')
+         call assert_real (dfill,fedge,0.0d0,
+     &                     trim(tag)//' slope is the edge value')
+         call assert_real (vfill,fedge*lambda,1.0d-9,
+     &                     trim(tag)//' bias is the edge value')
+      else
+         fedge = lmdafmean(ilast)
+         call assert_logical (lambda.gt.dble(ilast-1)*wlmda,.true.,
+     &                        trim(tag)//' trial above the data')
+         call assert_real (dfill,fedge,0.0d0,
+     &                     trim(tag)//' slope is the edge value')
+      end if
+      call mcenergy (mode,eref)
+      call assert_real (epot,eref,1.0d-6,
+     &                  trim(tag)//' accepted energy')
+      use_lmdafill = .false.
+      call mcenergy (mode,eoff)
+      call assert_logical (abs(eoff-eref).gt.1.0d-3,.true.,
+     &                     trim(tag)//' fill changes the energy')
+      use_lmdafill = .true.
       call sd_final
       call popdir
       return

@@ -46,7 +46,7 @@ c
       real*8 fie,fia,fib
       real*8 fke,fka,fkb
       real*8 ee,ea,eb,ab,aa,bb
-      real*8 e,eps,pw
+      real*8 e,eps
       real*8 wg(0:2,0:2)
       real*8 dwg(0:2,0:2)
       real*8 d2wg(0:2,0:2)
@@ -86,18 +86,6 @@ c
       rdelta = (range-cut) / dble(ndelta)
       offset = cut - 0.5d0*rdelta
 c
-c     get the pair weights between the environment and ligand groups
-c     from the lambda power a mutated pair keeps beyond the cutoff,
-c     the soft core power of the buffered 14-7 or Lennard-Jones
-c     potential, whose softening is negligible there, and the lambda
-c     power of the damped dispersion outside its switch radius
-c
-      pw = 1.0d0
-      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7')  pw = scexp
-      if (.not.dsp .and. vdwtyp.eq.'LENNARD-JONES')  pw = scexplj
-      if (dsp)  pw = scexpd
-      call grpvwt (pw,wg,dwg,d2wg)
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (ivt(n))
@@ -105,32 +93,10 @@ c
       allocate (avt(n))
       allocate (bvt(n))
 c
-c     count the number of types and their frequencies
+c     get the pair weights between the environment and ligand groups,
+c     and count the types, or classes for dispersion, of each group
 c
-      nvt = 0
-      do i = 1, n
-         if (dsp) then
-            it = class(i)
-         else
-            it = jvdw(i)
-         end if
-         do k = 1, nvt
-            if (ivt(k) .eq. it) then
-               jvt(k) = jvt(k) + 1
-               if (mutg(i) .eq. 1)  avt(k) = avt(k) + 1
-               if (mutg(i) .eq. 2)  bvt(k) = bvt(k) + 1
-               goto 10
-            end if
-         end do
-         nvt = nvt + 1
-         ivt(nvt) = it
-         jvt(nvt) = 1
-         avt(nvt) = 0
-         bvt(nvt) = 0
-         if (mutg(i) .eq. 1)  avt(nvt) = 1
-         if (mutg(i) .eq. 2)  bvt(nvt) = 1
-   10    continue
-      end do
+      call evcorrset (dsp,wg,dwg,d2wg,nvt,ivt,jvt,avt,bvt)
 c
 c     find the correction energy via double loop search
 c
@@ -261,7 +227,7 @@ c
       real*8 fie,fia,fib
       real*8 fke,fka,fkb
       real*8 ee,ea,eb,ab,aa,bb
-      real*8 e,eps,pw
+      real*8 e,eps
       real*8 offset
       real*8 wg(0:2,0:2)
       real*8 dwg(0:2,0:2)
@@ -309,19 +275,6 @@ c
       rdelta = (range-cut) / dble(ndelta)
       offset = cut - 0.5d0*rdelta
 c
-c     get the pair weights between the environment and ligand groups,
-c     and their lambda derivatives, from the lambda power a mutated
-c     pair keeps beyond the cutoff, the soft core power of the buffered
-c     14-7 or Lennard-Jones potential, whose softening is negligible
-c     there, and the lambda power of the damped dispersion outside its
-c     switch radius
-c
-      pw = 1.0d0
-      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7')  pw = scexp
-      if (.not.dsp .and. vdwtyp.eq.'LENNARD-JONES')  pw = scexplj
-      if (dsp)  pw = scexpd
-      call grpvwt (pw,wg,dwg,d2wg)
-c
 c     perform dynamic allocation of some local arrays
 c
       allocate (ivt(n))
@@ -329,32 +282,10 @@ c
       allocate (avt(n))
       allocate (bvt(n))
 c
-c     count the number of vdw types and their frequencies
+c     get the pair weights between the environment and ligand groups,
+c     and count the types, or classes for dispersion, of each group
 c
-      nvt = 0
-      do i = 1, n
-         if (dsp) then
-            it = class(i)
-         else
-            it = jvdw(i)
-         end if
-         do k = 1, nvt
-            if (ivt(k) .eq. it) then
-               jvt(k) = jvt(k) + 1
-               if (mutg(i) .eq. 1)  avt(k) = avt(k) + 1
-               if (mutg(i) .eq. 2)  bvt(k) = bvt(k) + 1
-               goto 10
-            end if
-         end do
-         nvt = nvt + 1
-         ivt(nvt) = it
-         jvt(nvt) = 1
-         avt(nvt) = 0
-         bvt(nvt) = 0
-         if (mutg(i) .eq. 1)  avt(nvt) = 1
-         if (mutg(i) .eq. 2)  bvt(nvt) = 1
-   10    continue
-      end do
+      call evcorrset (dsp,wg,dwg,d2wg,nvt,ivt,jvt,avt,bvt)
 c
 c     find the van der Waals energy via double loop search
 c
@@ -477,6 +408,78 @@ c
       deallocate (jvt)
       deallocate (avt)
       deallocate (bvt)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine evcorrset  --  long range correction setup  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "evcorrset" gets the pair weights "wg", "dwg" and "d2wg" between
+c     the environment and ligand groups from the lambda power a mutated
+c     pair keeps beyond the cutoff, the soft core power of the buffered
+c     14-7 or Lennard-Jones potential, whose softening is negligible
+c     there, and the lambda power of the damped dispersion outside its
+c     switch radius, then counts the "nvt" vdw types, or atom classes
+c     for dispersion, in "ivt" with their frequencies "jvt" over all
+c     atoms and "avt" and "bvt" over the two ligand groups
+c
+c
+      subroutine evcorrset (dsp,wg,dwg,d2wg,nvt,ivt,jvt,avt,bvt)
+      use atomid
+      use atoms
+      use mutant
+      use vdw
+      use vdwpot
+      implicit none
+      integer i,k,it,nvt
+      integer ivt(*),jvt(*)
+      integer avt(*),bvt(*)
+      real*8 pw
+      real*8 wg(0:2,0:2)
+      real*8 dwg(0:2,0:2)
+      real*8 d2wg(0:2,0:2)
+      logical dsp
+c
+c
+c     get the pair weights between the environment and ligand groups
+c
+      pw = 1.0d0
+      if (.not.dsp .and. vdwtyp.eq.'BUFFERED-14-7')  pw = scexp
+      if (.not.dsp .and. vdwtyp.eq.'LENNARD-JONES')  pw = scexplj
+      if (dsp)  pw = scexpd
+      call grpvwt (pw,wg,dwg,d2wg)
+c
+c     count the number of types and their frequencies
+c
+      nvt = 0
+      do i = 1, n
+         if (dsp) then
+            it = class(i)
+         else
+            it = jvdw(i)
+         end if
+         do k = 1, nvt
+            if (ivt(k) .eq. it) then
+               jvt(k) = jvt(k) + 1
+               if (mutg(i) .eq. 1)  avt(k) = avt(k) + 1
+               if (mutg(i) .eq. 2)  bvt(k) = bvt(k) + 1
+               goto 10
+            end if
+         end do
+         nvt = nvt + 1
+         ivt(nvt) = it
+         jvt(nvt) = 1
+         avt(nvt) = 0
+         bvt(nvt) = 0
+         if (mutg(i) .eq. 1)  avt(nvt) = 1
+         if (mutg(i) .eq. 2)  bvt(nvt) = 1
+   10    continue
+      end do
       return
       end
 c

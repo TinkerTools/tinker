@@ -100,8 +100,6 @@ c
       real*8 vxy,vxz,vyz
       real*8 taper,dtaper
       real*8 dlfrcx,dlfrcy,dlfrcz
-      real*8 dldvxx,dldvyy,dldvzz
-      real*8 dldvxy,dldvxz,dldvyz
       real*8 scik,dscik
       real*8 ctsc(0:2,0:2)
       real*8 dctsc(0:2,0:2)
@@ -110,7 +108,6 @@ c
       logical proceed,usei
       logical live(0:2,0:2)
       logical dodl,dod2
-      logical lmdadrv
       character*6 mode
 c
 c
@@ -146,12 +143,11 @@ c
       call switch (mode)
 c
 c     set the polarization lambda scale of each pair of atom groups,
-c     taking lambda derivatives as "lmdadrv" decides for polarization;
+c     taking lambda derivatives as "pdlflags" decides for polarization;
 c     a group pair is skipped once it carries neither energy nor a
 c     needed lambda derivative
 c
-      dodl = lmdadrv (use_pdlmda,dpldlmda,d2pldlmda2)
-      dod2 = (dodl .and. use_d2lmda)
+      call pdlflags (dodl,dod2)
       call ctlmdasc (dodl,ctsc,dctsc,d2ctsc,live)
 c
 c     calculate the charge transfer energy and derivatives
@@ -254,27 +250,8 @@ c
                         dlfrcx = dscik * de * xr * rr1
                         dlfrcy = dscik * de * yr * rr1
                         dlfrcz = dscik * de * zr * rr1
-                        dfpdl(1,i) = dfpdl(1,i) - dlfrcx
-                        dfpdl(2,i) = dfpdl(2,i) - dlfrcy
-                        dfpdl(3,i) = dfpdl(3,i) - dlfrcz
-                        dfpdl(1,k) = dfpdl(1,k) + dlfrcx
-                        dfpdl(2,k) = dfpdl(2,k) + dlfrcy
-                        dfpdl(3,k) = dfpdl(3,k) + dlfrcz
-                        dldvxx = xr * dlfrcx
-                        dldvxy = yr * dlfrcx
-                        dldvxz = zr * dlfrcx
-                        dldvyy = yr * dlfrcy
-                        dldvyz = zr * dlfrcy
-                        dldvzz = zr * dlfrcz
-                        depvirdl(1,1) = depvirdl(1,1) + dldvxx
-                        depvirdl(2,1) = depvirdl(2,1) + dldvxy
-                        depvirdl(3,1) = depvirdl(3,1) + dldvxz
-                        depvirdl(1,2) = depvirdl(1,2) + dldvxy
-                        depvirdl(2,2) = depvirdl(2,2) + dldvyy
-                        depvirdl(3,2) = depvirdl(3,2) + dldvyz
-                        depvirdl(1,3) = depvirdl(1,3) + dldvxz
-                        depvirdl(2,3) = depvirdl(2,3) + dldvyz
-                        depvirdl(3,3) = depvirdl(3,3) + dldvzz
+                        call dlcpair (i,k,-xr,-yr,-zr,-dlfrcx,-dlfrcy,
+     &                                -dlfrcz,dfpdl,depvirdl)
                      end if
                      e = e * scik
                      de = de * scik
@@ -443,27 +420,9 @@ c
                               dlfrcx = dscik * de * xr * rr1
                               dlfrcy = dscik * de * yr * rr1
                               dlfrcz = dscik * de * zr * rr1
-                              dfpdl(1,i) = dfpdl(1,i) - dlfrcx
-                              dfpdl(2,i) = dfpdl(2,i) - dlfrcy
-                              dfpdl(3,i) = dfpdl(3,i) - dlfrcz
-                              dfpdl(1,k) = dfpdl(1,k) + dlfrcx
-                              dfpdl(2,k) = dfpdl(2,k) + dlfrcy
-                              dfpdl(3,k) = dfpdl(3,k) + dlfrcz
-                              dldvxx = xr * dlfrcx
-                              dldvxy = yr * dlfrcx
-                              dldvxz = zr * dlfrcx
-                              dldvyy = yr * dlfrcy
-                              dldvyz = zr * dlfrcy
-                              dldvzz = zr * dlfrcz
-                              depvirdl(1,1) = depvirdl(1,1) + dldvxx
-                              depvirdl(2,1) = depvirdl(2,1) + dldvxy
-                              depvirdl(3,1) = depvirdl(3,1) + dldvxz
-                              depvirdl(1,2) = depvirdl(1,2) + dldvxy
-                              depvirdl(2,2) = depvirdl(2,2) + dldvyy
-                              depvirdl(3,2) = depvirdl(3,2) + dldvyz
-                              depvirdl(1,3) = depvirdl(1,3) + dldvxz
-                              depvirdl(2,3) = depvirdl(2,3) + dldvyz
-                              depvirdl(3,3) = depvirdl(3,3) + dldvzz
+                              call dlcpair (i,k,-xr,-yr,-zr,
+     &                                      -dlfrcx,-dlfrcy,-dlfrcz,
+     &                                      dfpdl,depvirdl)
                            end if
                            e = e * scik
                            de = de * scik
@@ -581,8 +540,6 @@ c
       real*8 vxy,vxz,vyz
       real*8 taper,dtaper
       real*8 dlfrcx,dlfrcy,dlfrcz
-      real*8 dldvxx,dldvyy,dldvzz
-      real*8 dldvxy,dldvxz,dldvyz
       real*8 scik,dscik
       real*8 ctsc(0:2,0:2)
       real*8 dctsc(0:2,0:2)
@@ -591,7 +548,6 @@ c
       logical proceed,usei
       logical live(0:2,0:2)
       logical dodl,dod2
-      logical lmdadrv
       character*6 mode
 c
 c
@@ -627,12 +583,11 @@ c
       call switch (mode)
 c
 c     set the polarization lambda scale of each pair of atom groups,
-c     taking lambda derivatives as "lmdadrv" decides for polarization;
+c     taking lambda derivatives as "pdlflags" decides for polarization;
 c     a group pair is skipped once it carries neither energy nor a
 c     needed lambda derivative
 c
-      dodl = lmdadrv (use_pdlmda,dpldlmda,d2pldlmda2)
-      dod2 = (dodl .and. use_d2lmda)
+      call pdlflags (dodl,dod2)
       call ctlmdasc (dodl,ctsc,dctsc,d2ctsc,live)
 c
 c     OpenMP directives for the major loop structure
@@ -747,27 +702,8 @@ c
                         dlfrcx = dscik * de * xr * rr1
                         dlfrcy = dscik * de * yr * rr1
                         dlfrcz = dscik * de * zr * rr1
-                        dfpdl(1,i) = dfpdl(1,i) - dlfrcx
-                        dfpdl(2,i) = dfpdl(2,i) - dlfrcy
-                        dfpdl(3,i) = dfpdl(3,i) - dlfrcz
-                        dfpdl(1,k) = dfpdl(1,k) + dlfrcx
-                        dfpdl(2,k) = dfpdl(2,k) + dlfrcy
-                        dfpdl(3,k) = dfpdl(3,k) + dlfrcz
-                        dldvxx = xr * dlfrcx
-                        dldvxy = yr * dlfrcx
-                        dldvxz = zr * dlfrcx
-                        dldvyy = yr * dlfrcy
-                        dldvyz = zr * dlfrcy
-                        dldvzz = zr * dlfrcz
-                        depvirdl(1,1) = depvirdl(1,1) + dldvxx
-                        depvirdl(2,1) = depvirdl(2,1) + dldvxy
-                        depvirdl(3,1) = depvirdl(3,1) + dldvxz
-                        depvirdl(1,2) = depvirdl(1,2) + dldvxy
-                        depvirdl(2,2) = depvirdl(2,2) + dldvyy
-                        depvirdl(3,2) = depvirdl(3,2) + dldvyz
-                        depvirdl(1,3) = depvirdl(1,3) + dldvxz
-                        depvirdl(2,3) = depvirdl(2,3) + dldvyz
-                        depvirdl(3,3) = depvirdl(3,3) + dldvzz
+                        call dlcpair (i,k,-xr,-yr,-zr,-dlfrcx,-dlfrcy,
+     &                                -dlfrcz,dfpdl,depvirdl)
                      end if
                      e = e * scik
                      de = de * scik

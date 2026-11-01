@@ -356,8 +356,12 @@ void vdlflags_(int* dodl, int* dod2);
 #define tinker_f_vdlflags vdlflags_
 void chgdlflags_(int* dodl, int* dod2);
 #define tinker_f_chgdlflags chgdlflags_
+void pdlflags_(int* dodl, int* dod2);
+#define tinker_f_pdlflags pdlflags_
 void chgdlmda_(double* dq);
 #define tinker_f_chgdlmda chgdlmda_
+void dlprod_(double* si, double* sk, double* dsi, double* dsk, int* dod2, double* d1, double* d2);
+#define tinker_f_dlprod dlprod_
 void dlcscale_(double* qi, double* qk, double* dqi, double* dqk, int* mutd2, double* e, double* de, double* dc, double* dlambda, double* dlambda2, double* dlde, double* dldc);
 #define tinker_f_dlcscale dlcscale_
 void dlcpair_(int* i, int* k, double* xr, double* yr, double* zr, double* dldx, double* dldy, double* dldz, double* dfl, double* dvir);
@@ -392,6 +396,8 @@ void sublmdaapm_(double* x, int* n, double* rho, double* lmda, double* dlmda, do
 #define tinker_f_sublmdaapm sublmdaapm_
 void lmdachain_();
 #define tinker_f_lmdachain lmdachain_
+void dlchain_(double* dl, double* d2l, double* de, double* d2e, double* df, double* dvir);
+#define tinker_f_dlchain dlchain_
 void avgstd_(double* list, int* begin, int* count, double* avg, double* std);
 #define tinker_f_avgstd avgstd_
 int depcriteria_(double* avg, double* std);
@@ -438,8 +444,16 @@ double lmdathjac_(double* lmda, double* sig, double* cut);
 #define tinker_f_lmdathjac lmdathjac_
 void efreelmda_(double* lmda, double* eflmda, double* dfdl);
 #define tinker_f_efreelmda efreelmda_
+void efreeprof_(double* lmda, double* fprof, double* eflmda, double* dfdl);
+#define tinker_f_efreeprof efreeprof_
 double efreetot_();
 #define tinker_f_efreetot efreetot_
+void efreebias_(double* lmda, double* eflmda, double* dfdl);
+#define tinker_f_efreebias efreebias_
+int lmdasampled_(int* ilmda);
+#define tinker_f_lmdasampled lmdasampled_
+void lmdafill_(int* nbin, double* fsamp, int* sampled, double* fbias);
+#define tinker_f_lmdafill lmdafill_
 void setlmdasched_(int* nwin, int* nwinset);
 #define tinker_f_setlmdasched setlmdasched_
 void initlmdawin_(int* nstep);
@@ -1740,6 +1754,8 @@ void evcorr1_(char* mode, double* elrc, double* vlrc, double* delrc, double* dvl
 inline void tinker_f_evcorr1(tinker_fchars mode, double* elrc, double* vlrc, double* delrc, double* dvlrc, double* d2elrc) {
     return evcorr1_(mode.string, elrc, vlrc, delrc, dvlrc, d2elrc, mode.capacity);
 }
+void evcorrset_(int* dsp, double* wg, double* dwg, double* d2wg, int* nvt, int* ivt, int* jvt, int* avt, int* bvt);
+#define tinker_f_evcorrset evcorrset_
 double ehalpr_(double* r, double* rv, double* rv7, double* eps);
 #define tinker_f_ehalpr ehalpr_
 
@@ -2394,10 +2410,10 @@ void mutate_fep_();
 #define tinker_f_mutate_fep mutate_fep_
 void mutate_check_();
 #define tinker_f_mutate_check mutate_check_
-void softchk_(double* alpha, double* pw, double* pm, double* pp, double* alpha0, double* pw0, double* pm0, double* pp0);
+void softchk_(double* alpha, double* pw, double* pm, double* pp, double* alpha0, double* pw0, double* pm0, double* pp0, int* lin, double* ratio);
 #define tinker_f_softchk softchk_
-void ljsoftchk_(double* alpha, double* pw, double* pm, double* pp);
-#define tinker_f_ljsoftchk ljsoftchk_
+void dspsoftchk_(double* rs, double* pw, double* pq, double* cut);
+#define tinker_f_dspsoftchk dspsoftchk_
 void setligand_(int* j, int* igrp);
 #define tinker_f_setligand setligand_
 void altelec_();

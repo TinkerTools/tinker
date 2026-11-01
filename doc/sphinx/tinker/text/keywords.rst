@@ -781,21 +781,25 @@ LAMBDA PARTICLE KEYWORDS
    :header-rows: 0
 
    * -
+     - LAMBDA-BIASFILL
      - LAMBDA-CONVCRI
      - LAMBDA-DERIV
-     - LAMBDA-DERIV2
    * -
+     - LAMBDA-DERIV2
      - LAMBDA-DT
      - LAMBDA-EQRATIO
-     - LAMBDA-FRICTION
    * -
+     - LAMBDA-FRICTION
      - LAMBDA-MASS
      - LAMBDA-MC-MOVE
-     - LAMBDA-MC-TRIAL
    * -
+     - LAMBDA-MC-TRIAL
      - LAMBDA-PROPAGATE
      - LAMBDA-THETA-ALPHA
+   * -
      - LAMBDA-THETA-MAP
+     -
+     -
 
 LAMBDA WINDOW KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^
@@ -2197,6 +2201,12 @@ ISORATIO [real]
 
 LAMBDA [real]
    Sets the value of the lambda scaling parameters for electrostatic, vdw and torsional interactions during free energy calculations and similar. The real number modifier sets the position along path from the initial state (lambda=0) to the final state (lambda=1). Alternatively, this parameter can set the state of decoupling or annihilation for specified groups from none (lambda=1) to complete (lambda=0). The groups involved in the scaling are given separately via LIGAND or MUTATE keywords. When lambda is sampled by LAMBDA-MODE OST, META or ABF, the value sets the starting lambda, with a default of 1. For TI or FEP, a LAMBDA value of 0 starts the evenly spaced LAMBDA-NWINDOW schedule at lambda equal to 0, while an explicit LAMBDA-WINDOW schedule always starts at its first window.
+
+.. index:: LAMBDA-BIASFILL
+.. _KEY-LAMBDA-BIASFILL:
+
+LAMBDA-BIASFILL [LINEAR / NONE]
+   Selects how the bias of orthogonal space tempering and the adaptive biasing force treats lambda bins that hold no data yet, an ABF bin without an interval sample or an OST row without g kernel support. LINEAR, or the keyword with no modifier, fills the mean force of such a bin from the nearest bins with data, by linear interpolation when there are such bins on both sides and by copying the nearest one when there are only bins on one side; the bias is zero until some bin holds data. NONE uses a zero mean force for these bins, so the bias is flat beyond the region already visited. The filled values only change where lambda is sampled, under Langevin or Monte Carlo propagation, since the bias depends on lambda alone; the free energy estimate, the Estimated Delta G of the dynamics output and the analyzelmda mean force table always use the sampled data only, and the table marks the bins without data. The Current -ddG/dLambda value of the dynamics output is the slope of the bias itself, so in a bin without data it shows the filled value rather than an estimate. Filling can slow OST convergence when the mean force changes sign or grows sharply just past the visited region, as for some soft core van der Waals paths, and NONE can then be the better choice. Any other modifier stops the calculation, and the default in the absence of the LAMBDA-BIASFILL keyword is LINEAR.
 
 .. index:: LAMBDA-CONVCRI
 .. _KEY-LAMBDA-CONVCRI:

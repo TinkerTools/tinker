@@ -13,12 +13,13 @@ c     ###########################################################
 c
 c
 c     "eabfbias" evaluates the adaptive biasing force free energy at
-c     the current lambda and subtracts it from the energy; the bias
-c     depends on lambda alone, so the Cartesian gradient and virial
-c     are unchanged; it has no side effects on the history or the
-c     lambda particle, so it may be called from a Monte Carlo barostat
-c     trial, and it saves the bias derivative for a later "elmdadyn"
-c     call in the same step
+c     the current lambda, from the mean force with unsampled bins
+c     filled, and subtracts it from the energy; the bias depends on
+c     lambda alone, so the Cartesian gradient and virial are
+c     unchanged; it has no side effects on the history or the lambda
+c     particle, so it may be called from a Monte Carlo barostat trial,
+c     and it saves the bias derivative for a later "elmdadyn" call in
+c     the same step
 c
 c
       subroutine eabfbias
@@ -29,9 +30,9 @@ c
       real*8 eabflmda,dfdl
 c
 c
-c     free energy and its lambda derivative from the mean force
+c     free energy and its lambda derivative from the bias mean force
 c
-      call efreelmda (lambda,eabflmda,dfdl)
+      call efreebias (lambda,eabflmda,dfdl)
       esum = esum - eabflmda
       lmdavbias = -eabflmda
       lmdadfdl = dfdl

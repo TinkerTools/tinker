@@ -551,6 +551,8 @@ c
       integer ilmda
       real*8 lambda
       real*8 efreetot
+      logical lmdasampled
+      character*3 sampled
 c
 c
 c     recompute and print the total free energy estimate
@@ -563,15 +565,19 @@ c
      &         /,1x,'Temperature Used',11x,d20.10,' K')
 c
 c     print the f kernel mean force at each lambda bin, whose
-c     trapezoid integral is the free energy estimate
+c     trapezoid integral is the free energy estimate, and whether
+c     the row has g kernel support, where a row without support has
+c     zero mean force
 c
       write (iunit,20)
    20 format (/,' OST Mean Force dU/dL(L) :',
-     &        //,1x,'Lambda',10x,'dU/dLambda',/)
+     &        //,1x,'Lambda',10x,'dU/dLambda',5x,'Sampled',/)
       do ilmda = 1, nlmda
          lambda = dble(ilmda-1) * wlmda
-         write (iunit,30)  lambda,lmdafmean(ilmda)
-   30    format (1x,1p,d10.4,d16.4)
+         sampled = ' No'
+         if (lmdasampled(ilmda))  sampled = 'Yes'
+         write (iunit,30)  lambda,lmdafmean(ilmda),sampled
+   30    format (1x,1p,d10.4,d16.4,9x,a3)
       end do
       return
       end
@@ -1013,16 +1019,18 @@ c
      &        //,1x,'Number of Samples',i18,
      &         /,1x,'Delta G',20x,1p,d20.10)
 c
-c     print the mean force at each lambda bin, whose trapezoid
-c     integral is the free energy estimate
+c     print the sampled mean force at each lambda bin, whose
+c     trapezoid integral is the free energy estimate, and the number
+c     of samples, where a bin without samples has zero mean force
 c
       write (iunit,20)
    20 format (/,' ABF Mean Force dU/dL(L) :',
-     &        //,1x,'Lambda',10x,'dU/dLambda',/)
+     &        //,1x,'Lambda',10x,'dU/dLambda',5x,'Samples',/)
       do ilmda = 1, nlmda
          lambda = dble(ilmda-1) * wlmda
-         write (iunit,30)  lambda,lmdafmean(ilmda)
-   30    format (1x,1p,d10.4,d16.4)
+         write (iunit,30)  lambda,lmdafmean(ilmda),
+     &                     nint(lmdafwt(ilmda))
+   30    format (1x,1p,d10.4,d16.4,i12)
       end do
       return
       end

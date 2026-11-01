@@ -40,6 +40,7 @@ c
       call test_eost_depcriteria
       call test_eost_efkernel
       call test_eost_vkernelmax
+      call test_eost_fill
       call test_eost_tempering
       call test_eost_ostdyn
       call test_eost_ostlocal
@@ -851,6 +852,10 @@ c
       end do
       call assert_array1 (lmdafmean,fmanual,nlmda,1.0d-12,
      &                    'buildfkernel all-row weighted mean')
+      call assert_array1 (lmdafsum,fsumref,nlmda,1.0d-12,
+     &                    'buildfkernel fsum accumulator')
+      call assert_array1 (lmdafwt,pfref,nlmda,1.0d-12,
+     &                    'buildfkernel partfunc accumulator')
 c
 c     buildkernels must produce the same gkernel, lmdafmean and
 c     free energy accumulators as the old full rebuild path
@@ -1351,6 +1356,122 @@ c
      &                     'buildgkernel running maximum')
       end do
       deallocate (gsave)
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_eost_fill  --  ost filled bias f term  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_eost_fill" checks that the f term of the ost bias follows
+c     the mean force with rows lacking g kernel support filled, while
+c     the free energy estimate keeps the sampled rows only, and that
+c     the rows a gaussian reaches count as sampled, with the same row
+c     weights from both kernel build paths
+c
+c
+      subroutine test_eost_fill
+      use atoms
+      use dlmda
+      use energi
+      use mutant
+      use ost
+      implicit none
+      integer i
+      integer nsave
+      real*8 efreetot
+      real*8 wtref(5)
+      logical lmdasampled
+c
+c
+c     with no atoms "eostbias" adds no force, so the unallocated
+c     force arrays are never read
+c
+      nsave = n
+      n = 0
+c
+c     give data and a mean force to the two top rows only, with no
+c     gaussian at the current point so the g term is zero
+c
+      call resetost (5,5,4)
+      use_ost = .true.
+      use_metadyn = .false.
+      lmdafwt(4) = 1.0d0
+      lmdafwt(5) = 1.0d0
+      lmdafmean(4) = -20.0d0
+      lmdafmean(5) = -40.0d0
+      dedl = 0.0d0
+c
+c     the f term holds a mean force of -20 below lambda 0.75
+c
+      use_lmdafill = .true.
+      lambda = 1.0d0
+      esum = 0.0d0
+      call eostbias
+      call assert_real (lmdavbias,22.5d0,1.0d-12,
+     &                  'eostbias fill bias energy at lambda 1')
+      call assert_real (esum,22.5d0,1.0d-12,
+     &                  'eostbias fill energy at lambda 1')
+      call assert_real (lmdadfdl,-40.0d0,0.0d0,
+     &                  'eostbias fill slope at lambda 1')
+      lambda = 0.3d0
+      call eostbias
+      call assert_real (lmdavbias,6.0d0,1.0d-12,
+     &                  'eostbias fill bias energy in a gap')
+      call assert_real (lmdadfdl,-20.0d0,0.0d0,
+     &                  'eostbias fill slope in a gap')
+c
+c     the estimate keeps zero mean force in the unsupported rows
+c
+      call assert_real (efreetot(),-10.0d0,1.0d-12,
+     &                  'ost efreetot uses sampled rows only')
+      call assert_real (lmdafmean(1),0.0d0,0.0d0,
+     &                  'ost fill leaves the empty row mean force')
+c
+c     without the fill the f term is the sampled free energy
+c
+      use_lmdafill = .false.
+      call eostbias
+      call assert_real (lmdavbias,0.0d0,0.0d0,
+     &                  'eostbias nofill bias energy in a gap')
+      call assert_real (lmdadfdl,0.0d0,0.0d0,
+     &                  'eostbias nofill slope in a gap')
+c
+c     a gaussian at lambda 1 reaches only the two top rows
+c
+      call resetost (5,5,4)
+      use_ost = .true.
+      nlmdahist = 1
+      call sethist (1,1.0d0,0.0d0,1.0d0,0.3d0,1.0d0)
+      call buildostindex
+      call buildkernels
+      do i = 1, nlmda
+         call assert_logical (lmdasampled(i),i.ge.4,
+     &                        'buildkernels rows with support')
+      end do
+      call assert_real (lmdafmean(3),0.0d0,0.0d0,
+     &                  'buildkernels empty row mean force')
+c
+c     the g kernel and f kernel path sets the same row weights
+c
+      do i = 1, nlmda
+         wtref(i) = lmdafwt(i)
+         lmdafwt(i) = -123.0d0
+      end do
+      call buildgkernel
+      call buildfkernel
+      call assert_array1 (lmdafwt,wtref,nlmda,1.0d-12,
+     &                    'buildfkernel row weights')
+      do i = 1, nlmda
+         call assert_logical (lmdasampled(i),i.ge.4,
+     &                        'buildfkernel rows with support')
+      end do
+      use_ost = .false.
+      n = nsave
       return
       end
 c
@@ -2581,6 +2702,7 @@ c
       dedlstd = 0.0d0
       deffdl = 0.0d0
       use_lmdacv = .false.
+      use_lmdafill = .false.
       lmdacvstd = 0.0d0
       lmdacvrat = 0.0d0
       use_ost = .false.
