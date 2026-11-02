@@ -402,6 +402,7 @@ c
       integer next
       integer lmdanbin
       real*8 temp
+      real*8 fillr
       real*8 lo,hi
       character*4 legword
       character*8 propword
@@ -516,9 +517,11 @@ c
       nlmdamctry = 0
       nlmdamcacc = 0
 c
-c     set default lambda bins and lambda bias free energy
+c     set default lambda bins and lambda bias free energy, and fill
+c     unsampled bins of the bias within a lambda reach of 0.1
 c
       nlmda = 201
+      lmdafillr = 0.1d0
       lmdaddgdl = 0.0d0
       lmdadeltag = 0.0d0
 c
@@ -572,18 +575,16 @@ c
                call fatal
             end if
          else if (keyword(1:16) .eq. 'LAMBDA-BIASFILL ') then
+            use_lmdafill = .true.
+            string = record(next:240)
+            read (string,*,err=8,end=8)  fillr
+            lmdafillr = fillr
+            goto 9
+    8       continue
             call getword (record,fillword,next)
             call upcase (fillword)
-            if (fillword.eq.'LINEAR' .or. fillword.eq.' ') then
-               use_lmdafill = .true.
-            else if (fillword .eq. 'NONE') then
-               use_lmdafill = .false.
-            else
-               write (iout,4)
-    4          format (/,' MUTATE_DLMDA  --  LAMBDA-BIASFILL takes',
-     &                    ' either LINEAR or NONE')
-               call fatal
-            end if
+            if (fillword .eq. 'NONE')  use_lmdafill = .false.
+    9       continue
          else if (keyword(1:16) .eq. 'LAMBDA-MC-TRIAL ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  lmdamctrial
@@ -698,6 +699,10 @@ c     keep the convergence tolerances nonnegative
 c
       lmdacvstd = abs(lmdacvstd)
       lmdacvrat = abs(lmdacvrat)
+c
+c     keep the reach of the bias fill nonnegative
+c
+      lmdafillr = abs(lmdafillr)
 c
 c     split the sample interval into its propagation, equilibration
 c     and averaging phases

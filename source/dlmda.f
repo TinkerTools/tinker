@@ -66,6 +66,7 @@ c     lmdaddgdl     current dDeltaG/dlambda of the lambda bias
 c     lmdadeltag    current free energy estimate of the lambda bias
 c     lmdadfdl      saved bias free energy derivative for dynamics
 c     lmdadt        time step of the theta lambda coordinate
+c     lmdafillr     lambda reach of the bias fill of unsampled bins
 c     lmdafric      friction coefficient of theta lambda coordinate
 c     lmdamass      fictitious mass of the theta lambda coordinate
 c     lmdamcmove    maximum size of a Monte Carlo lambda move
@@ -217,6 +218,7 @@ c
       real*8 lmdadeltag
       real*8 lmdadfdl
       real*8 lmdadt
+      real*8 lmdafillr
       real*8 lmdafric
       real*8 lmdamass
       real*8 lmdamcmove

@@ -1407,9 +1407,11 @@ c
       lmdafmean(5) = -40.0d0
       dedl = 0.0d0
 c
-c     the f term holds a mean force of -20 below lambda 0.75
+c     the f term holds a mean force of -20 below lambda 0.75 with a
+c     reach that fills every row
 c
       use_lmdafill = .true.
+      lmdafillr = 1.0d0
       lambda = 1.0d0
       esum = 0.0d0
       call eostbias
@@ -1432,6 +1434,15 @@ c
      &                  'ost efreetot uses sampled rows only')
       call assert_real (lmdafmean(1),0.0d0,0.0d0,
      &                  'ost fill leaves the empty row mean force')
+c
+c     a reach of one row fills only the row below lambda 0.75
+c
+      lmdafillr = 0.25d0
+      call eostbias
+      call assert_real (lmdavbias,0.1d0,1.0d-12,
+     &                  'eostbias reach bias energy past the ramp')
+      call assert_real (lmdadfdl,-4.0d0,1.0d-12,
+     &                  'eostbias reach slope past the ramp')
 c
 c     without the fill the f term is the sampled free energy
 c
@@ -2746,6 +2757,7 @@ c
       deffdl = 0.0d0
       use_lmdacv = .false.
       use_lmdafill = .false.
+      lmdafillr = 0.1d0
       lmdacvstd = 0.0d0
       lmdacvrat = 0.0d0
       use_ost = .false.

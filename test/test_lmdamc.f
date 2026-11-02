@@ -76,21 +76,41 @@ c
       call assert_int (lmdamctrial,10,'lmdamc default trial')
       call assert_real (lmdamcmove,0.02d0,0.0d0,'lmdamc default move')
       call assert_logical (use_lmdafill,.true.,'lmdamc default fill')
+      call assert_real (lmdafillr,0.1d0,0.0d0,
+     &                  'lmdamc default fill reach')
       call final
 c
-c     the fill of unsampled bins is turned off or on by keyword
+c     the fill of unsampled bins is turned off, or on with a reach
+c     whose sign is dropped, by keyword; with no reach, or a word
+c     other than NONE, the default reach is kept
 c
       call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
      &                     'lambda-biasfill none')
       call assert_logical (use_lmdafill,.false.,'lmdamc fill none')
       call final
       call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
-     &                     'lambda-biasfill linear')
-      call assert_logical (use_lmdafill,.true.,'lmdamc fill linear')
+     &                     'lambda-biasfill 0.25')
+      call assert_logical (use_lmdafill,.true.,'lmdamc fill reach')
+      call assert_real (lmdafillr,0.25d0,0.0d0,
+     &                  'lmdamc fill reach value')
+      call final
+      call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
+     &                     'lambda-biasfill -0.25')
+      call assert_logical (use_lmdafill,.true.,'lmdamc fill negative')
+      call assert_real (lmdafillr,0.25d0,0.0d0,
+     &                  'lmdamc fill negative flips sign')
       call final
       call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
      &                     'lambda-biasfill')
       call assert_logical (use_lmdafill,.true.,'lmdamc fill bare')
+      call assert_real (lmdafillr,0.1d0,0.0d0,
+     &                  'lmdamc fill bare reach')
+      call final
+      call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
+     &                     'lambda-biasfill linear')
+      call assert_logical (use_lmdafill,.true.,'lmdamc fill word')
+      call assert_real (lmdafillr,0.1d0,0.0d0,
+     &                  'lmdamc fill word keeps default reach')
       call final
 c
 c     the keywords turn on the moves and set their rate and size
@@ -674,6 +694,7 @@ c
       call mcload (mode,e0)
       do i = 1, nlmda
          lmdafmean(i) = -1.0d5
+         lmdafwt(i) = 1.0d0
       end do
       kelvin = 1.0d-6
       allocate (uind0(3,n))
@@ -792,6 +813,7 @@ c
       call pushdir ('file/mutate')
       call mcload (mode,e0)
       call assert_logical (use_lmdafill,.true.,trim(tag)//' on')
+      lmdafillr = 1.0d0
 c
 c     keep abf data at lambda 0.9 and above, and start well below;
 c     the ost gaussian sits at the starting lambda of 0.5, so start
@@ -860,6 +882,7 @@ c
       call assert_logical (abs(eoff-eref).gt.1.0d-3,.true.,
      &                     trim(tag)//' fill changes the energy')
       use_lmdafill = .true.
+      lmdafillr = 0.1d0
       call sd_final
       call popdir
       return

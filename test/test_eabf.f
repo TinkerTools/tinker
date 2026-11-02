@@ -30,6 +30,7 @@ c
       call test_eabf_bias
       call test_eabf_fill
       call test_eabf_fillbias
+      call test_eabf_fillfull
       call test_eabf_dyn
       call test_eabf_mean
       call test_eabf_gate
@@ -104,7 +105,9 @@ c
 c     "test_eabf_fill" checks the fill of unsampled mean force bins:
 c     a copy of the nearest sampled bin past either end of the data,
 c     linear interpolation inside a gap, zero with no data, sampled
-c     bins kept exactly, and the sampled values left unchanged
+c     bins kept exactly, and the sampled values left unchanged, then
+c     the reach: a gap up to twice the reach is interpolated, a wider
+c     gap or an end is copied within reach and zero beyond it
 c
 c
       subroutine test_eabf_fill
@@ -119,7 +122,7 @@ c
       fsamp = (/ 0.0d0, 0.0d0, 0.0d0, -20.0d0, -40.0d0 /)
       sampled = (/ .false., .false., .false., .true., .true. /)
       fsave = fsamp
-      call lmdafill (5,fsamp,sampled,fbias)
+      call lmdafill (5,fsamp,sampled,5,fbias)
       ref = (/ -20.0d0, -20.0d0, -20.0d0, -20.0d0, -40.0d0 /)
       call assert_array1 (fbias,ref,5,0.0d0,
      &                    'lmdafill copies the first sampled bin')
@@ -130,7 +133,7 @@ c     bins past the last sampled bin copy its mean force
 c
       fsamp = (/ -10.0d0, -20.0d0, 0.0d0, 0.0d0, 0.0d0 /)
       sampled = (/ .true., .true., .false., .false., .false. /)
-      call lmdafill (5,fsamp,sampled,fbias)
+      call lmdafill (5,fsamp,sampled,5,fbias)
       ref = (/ -10.0d0, -20.0d0, -20.0d0, -20.0d0, -20.0d0 /)
       call assert_array1 (fbias,ref,5,0.0d0,
      &                    'lmdafill copies the last sampled bin')
@@ -139,7 +142,7 @@ c     a gap between sampled bins is interpolated linearly
 c
       fsamp = (/ -10.0d0, 0.0d0, 0.0d0, -40.0d0, -50.0d0 /)
       sampled = (/ .true., .false., .false., .true., .true. /)
-      call lmdafill (5,fsamp,sampled,fbias)
+      call lmdafill (5,fsamp,sampled,5,fbias)
       ref = (/ -10.0d0, -20.0d0, -30.0d0, -40.0d0, -50.0d0 /)
       call assert_array1 (fbias,ref,5,1.0d-12,
      &                    'lmdafill interpolates a gap')
@@ -148,7 +151,7 @@ c     a bin halfway between two sampled bins takes their average
 c
       fsamp = (/ -10.0d0, 0.0d0, -30.0d0, 0.0d0, 0.0d0 /)
       sampled = (/ .true., .false., .true., .false., .false. /)
-      call lmdafill (3,fsamp,sampled,fbias)
+      call lmdafill (3,fsamp,sampled,3,fbias)
       call assert_real (fbias(2),-20.0d0,0.0d0,
      &                  'lmdafill averages a halfway bin')
 c
@@ -156,7 +159,7 @@ c     both ends and a gap are filled in the same profile
 c
       fsamp = (/ 0.0d0, -10.0d0, 0.0d0, 0.0d0, -40.0d0 /)
       sampled = (/ .false., .true., .false., .false., .true. /)
-      call lmdafill (5,fsamp,sampled,fbias)
+      call lmdafill (5,fsamp,sampled,5,fbias)
       ref = (/ -10.0d0, -10.0d0, -20.0d0, -30.0d0, -40.0d0 /)
       call assert_array1 (fbias,ref,5,1.0d-12,
      &                    'lmdafill fills an end and a gap')
@@ -165,7 +168,7 @@ c     a sampled zero is data, and values in unsampled bins are unused
 c
       fsamp = (/ 7.0d0, 9.0d0, 0.0d0, -20.0d0, -40.0d0 /)
       sampled = (/ .false., .false., .true., .true., .true. /)
-      call lmdafill (5,fsamp,sampled,fbias)
+      call lmdafill (5,fsamp,sampled,5,fbias)
       ref = (/ 0.0d0, 0.0d0, 0.0d0, -20.0d0, -40.0d0 /)
       call assert_array1 (fbias,ref,5,0.0d0,
      &                    'lmdafill keeps a sampled zero')
@@ -174,7 +177,7 @@ c     with no sampled bin the profile is zero
 c
       fsamp = (/ 3.0d0, 1.0d0, 4.0d0, 1.0d0, 5.0d0 /)
       sampled = (/ .false., .false., .false., .false., .false. /)
-      call lmdafill (5,fsamp,sampled,fbias)
+      call lmdafill (5,fsamp,sampled,5,fbias)
       ref = (/ 0.0d0, 0.0d0, 0.0d0, 0.0d0, 0.0d0 /)
       call assert_array1 (fbias,ref,5,0.0d0,
      &                    'lmdafill gives zero without data')
@@ -183,7 +186,7 @@ c     a fully sampled profile is reproduced exactly
 c
       fsamp = (/ 1.1d0, -2.3d0, 3.7d0, 0.0d0, -5.9d0 /)
       sampled = (/ .true., .true., .true., .true., .true. /)
-      call lmdafill (5,fsamp,sampled,fbias)
+      call lmdafill (5,fsamp,sampled,5,fbias)
       call assert_array1 (fbias,fsamp,5,0.0d0,
      &                    'lmdafill keeps a fully sampled profile')
 c
@@ -191,13 +194,62 @@ c     a single bin keeps its data, or is zero without it
 c
       fsamp(1) = 2.5d0
       sampled(1) = .true.
-      call lmdafill (1,fsamp,sampled,fbias)
+      call lmdafill (1,fsamp,sampled,1,fbias)
       call assert_real (fbias(1),2.5d0,0.0d0,
      &                  'lmdafill keeps a single sampled bin')
       sampled(1) = .false.
-      call lmdafill (1,fsamp,sampled,fbias)
+      call lmdafill (1,fsamp,sampled,1,fbias)
       call assert_real (fbias(1),0.0d0,0.0d0,
      &                  'lmdafill zeroes a single unsampled bin')
+c
+c     a gap of twice the reach is interpolated across; unsampled
+c     bins hold junk values here, which must never reach the fill
+c
+      fsamp = (/ -10.0d0, 7.0d0, -30.0d0, 9.0d0, 11.0d0 /)
+      sampled = (/ .true., .false., .true., .false., .false. /)
+      call lmdafill (3,fsamp,sampled,1,fbias)
+      ref(1:3) = (/ -10.0d0, -20.0d0, -30.0d0 /)
+      call assert_array1 (fbias,ref,3,1.0d-12,
+     &                    'lmdafill interpolates a gap of 2 reach 1')
+      fsamp = (/ -10.0d0, 7.0d0, 9.0d0, 11.0d0, -50.0d0 /)
+      sampled = (/ .true., .false., .false., .false., .true. /)
+      call lmdafill (5,fsamp,sampled,2,fbias)
+      ref = (/ -10.0d0, -20.0d0, -30.0d0, -40.0d0, -50.0d0 /)
+      call assert_array1 (fbias,ref,5,1.0d-12,
+     &                    'lmdafill interpolates a gap of 4 reach 2')
+c
+c     a gap wider than twice the reach copies each side within reach
+c
+      fsamp = (/ -10.0d0, 7.0d0, 9.0d0, -40.0d0, 11.0d0 /)
+      sampled = (/ .true., .false., .false., .true., .false. /)
+      call lmdafill (4,fsamp,sampled,1,fbias)
+      ref(1:4) = (/ -10.0d0, -10.0d0, -40.0d0, -40.0d0 /)
+      call assert_array1 (fbias,ref,4,0.0d0,
+     &                    'lmdafill copies both sides of a gap of 3')
+      fsamp = (/ -10.0d0, 7.0d0, 9.0d0, 11.0d0, -50.0d0 /)
+      sampled = (/ .true., .false., .false., .false., .true. /)
+      call lmdafill (5,fsamp,sampled,1,fbias)
+      ref = (/ -10.0d0, -10.0d0, 0.0d0, -50.0d0, -50.0d0 /)
+      call assert_array1 (fbias,ref,5,0.0d0,
+     &                    'lmdafill zeroes the middle of a gap of 4')
+c
+c     past either end of the data a bin within reach copies it
+c
+      fsamp = (/ 7.0d0, 9.0d0, 11.0d0, -40.0d0, 13.0d0 /)
+      sampled = (/ .false., .false., .false., .true., .false. /)
+      call lmdafill (5,fsamp,sampled,1,fbias)
+      ref = (/ 0.0d0, 0.0d0, -40.0d0, -40.0d0, -40.0d0 /)
+      call assert_array1 (fbias,ref,5,0.0d0,
+     &                    'lmdafill copies an end within reach')
+c
+c     a reach of zero fills nothing
+c
+      fsamp = (/ 7.0d0, -10.0d0, 9.0d0, -40.0d0, 11.0d0 /)
+      sampled = (/ .false., .true., .false., .true., .false. /)
+      call lmdafill (5,fsamp,sampled,0,fbias)
+      ref = (/ 0.0d0, -10.0d0, 0.0d0, -40.0d0, 0.0d0 /)
+      call assert_array1 (fbias,ref,5,0.0d0,
+     &                    'lmdafill reach zero fills nothing')
       return
       end
 c
@@ -230,9 +282,11 @@ c
       real*8 efreetot
 c
 c
-c     sample the two top bins only, at lambda 0.75 and 1
+c     sample the two top bins only, at lambda 0.75 and 1, with a
+c     reach that fills every bin
 c
       call resetabf (5,8)
+      lmdafillr = 1.0d0
       use_abf = .true.
       use_abfdyn = .true.
       nlmdahist = 2
@@ -281,6 +335,24 @@ c
       call assert_real (lmdafmean(4),-20.0d0,0.0d0,
      &                  'fill leaves the sampled bin mean force')
 c
+c     a reach of one bin fills only the bin below lambda 0.75, so
+c     the mean force is 0, 0, -20, -20, -40
+c
+      lmdafillr = 0.25d0
+      lambda = 0.3d0
+      call eabfbias
+      call assert_real (lmdavbias,0.1d0,1.0d-12,
+     &                  'eabfbias reach bias energy past the ramp')
+      call assert_real (lmdadfdl,-4.0d0,1.0d-12,
+     &                  'eabfbias reach slope past the ramp')
+      lambda = 0.2d0
+      call eabfbias
+      call assert_real (lmdavbias,0.0d0,0.0d0,
+     &                  'eabfbias reach bias energy beyond reach')
+      call assert_real (lmdadfdl,0.0d0,0.0d0,
+     &                  'eabfbias reach slope beyond reach')
+      lmdafillr = 1.0d0
+c
 c     without the fill the bias is the sampled free energy
 c
       use_lmdafill = .false.
@@ -325,8 +397,126 @@ c
      &                  'fully sampled fill bias energy unchanged')
       call assert_real (dfill,lmdadfdl,0.0d0,
      &                  'fully sampled fill slope unchanged')
+      lmdafillr = 0.1d0
       use_abf = .false.
       use_abfdyn = .false.
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eabf_fillfull  --  unit reach fills all  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eabf_fillfull" checks on the default grid of 201 bins that
+c     a fill reach of one lambda, or more, gives the unlimited fill,
+c     where each end copies the nearest sampled bin and a gap of any
+c     width is interpolated, and that a reach of 0.25 copies each side
+c     of a wider gap and the low end only within reach; each case is
+c     compared with a profile built here by hand
+c
+c
+      subroutine test_eabf_fillfull
+      use dlmda
+      implicit none
+      integer i,j,k
+      integer ilo,ihi,nr
+      real*8 flo,fhi
+      real*8 lmda
+      real*8 eb,db,er,dr
+      real*8 reach(3)
+      real*8, allocatable :: fref(:)
+      character*8 rtag
+c
+c
+c     sample only lambda 0.3 and 0.9, leaving 60 bins below the data,
+c     a gap of 120 bins and 20 bins above the data
+c
+      call resetabf (201,1)
+      use_abf = .true.
+      use_lmdafill = .true.
+      ilo = 61
+      ihi = 181
+      flo = -20.0d0
+      fhi = -80.0d0
+      lmdafmean(ilo) = flo
+      lmdafwt(ilo) = 1.0d0
+      lmdafmean(ihi) = fhi
+      lmdafwt(ihi) = 1.0d0
+      allocate (fref(nlmda))
+c
+c     a reach of one or more matches the unlimited fill; a reach of
+c     0.25 is 50 bins, so the gap is wider than twice the reach
+c
+      reach = (/ 1.0d0, 1.5d0, 0.25d0 /)
+      do j = 1, 3
+         lmdafillr = reach(j)
+         write (rtag,'(f4.2)')  reach(j)
+c
+c     build the expected profile by hand, where a reach of one or
+c     more copies each end and interpolates the gap, and the reach
+c     of 0.25 is "nr" bins, which is less than half of the gap
+c
+         nr = 50
+         do k = 1, nlmda
+            if (reach(j) .ge. 1.0d0) then
+               if (k .le. ilo) then
+                  fref(k) = flo
+               else if (k .ge. ihi) then
+                  fref(k) = fhi
+               else
+                  fref(k) = flo + dble(k-ilo)/dble(ihi-ilo)*(fhi-flo)
+               end if
+            else
+               fref(k) = 0.0d0
+               if (k .le. ilo) then
+                  if (ilo-k .le. nr)  fref(k) = flo
+               else if (k .lt. ihi) then
+                  if (k-ilo .le. nr)  fref(k) = flo
+                  if (ihi-k .le. nr)  fref(k) = fhi
+               else
+                  if (k-ihi .le. nr)  fref(k) = fhi
+               end if
+            end if
+         end do
+c
+c     compare the bias energy and slope over the lambda range
+c
+         do i = 0, 80
+            lmda = dble(i) * 0.0125d0
+            call efreebias (lmda,eb,db)
+            call efreeprof (lmda,fref,er,dr)
+            call assert_real (eb,er,1.0d-10,
+     &         'efreebias reach '//trim(rtag)//' full grid energy')
+            call assert_real (db,dr,1.0d-10,
+     &         'efreebias reach '//trim(rtag)//' full grid slope')
+         end do
+      end do
+c
+c     check a few bins of the 0.25 reach directly, at the edge of the
+c     low end and of each side of the gap
+c
+      call efreebias (0.045d0,eb,db)
+      call assert_real (db,0.0d0,1.0d-9,
+     &                  'efreebias reach 0.25 beyond low end')
+      call efreebias (0.05d0,eb,db)
+      call assert_real (db,flo,1.0d-9,
+     &                  'efreebias reach 0.25 low end edge')
+      call efreebias (0.55d0,eb,db)
+      call assert_real (db,flo,1.0d-9,
+     &                  'efreebias reach 0.25 gap lower edge')
+      call efreebias (0.6d0,eb,db)
+      call assert_real (db,0.0d0,1.0d-9,
+     &                  'efreebias reach 0.25 gap middle')
+      call efreebias (0.65d0,eb,db)
+      call assert_real (db,fhi,1.0d-9,
+     &                  'efreebias reach 0.25 gap upper edge')
+      lmdafillr = 0.1d0
+      deallocate (fref)
+      use_abf = .false.
       return
       end
 c

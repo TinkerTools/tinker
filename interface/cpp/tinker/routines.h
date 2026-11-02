@@ -452,7 +452,7 @@ void efreebias_(double* lmda, double* eflmda, double* dfdl);
 #define tinker_f_efreebias efreebias_
 int lmdasampled_(int* ilmda);
 #define tinker_f_lmdasampled lmdasampled_
-void lmdafill_(int* nbin, double* fsamp, int* sampled, double* fbias);
+void lmdafill_(int* nbin, double* fsamp, int* sampled, int* nreach, double* fbias);
 #define tinker_f_lmdafill lmdafill_
 void setlmdasched_(int* nwin, int* nwinset);
 #define tinker_f_setlmdasched setlmdasched_

@@ -2733,15 +2733,17 @@ c
 c     "efreebias" computes the free energy at lambda "lmda" that the
 c     adaptive bias removes, and its lambda derivative, from the mean
 c     force profile that drives lambda, in which the unsampled bins
-c     are filled from the sampled ones if "use_lmdafill" is set; it
-c     is the only route by which filled values reach an energy or
-c     force, and no free energy estimate may call it
+c     are filled from the sampled ones within the lambda reach given
+c     by "lmdafillr" if "use_lmdafill" is set; it is the only route
+c     by which filled values reach an energy or force, and no free
+c     energy estimate may call it
 c
 c
       subroutine efreebias (lmda,eflmda,dfdl)
       use dlmda
       implicit none
       integer i
+      integer nreach
       real*8 lmda
       real*8 eflmda,dfdl
       real*8, allocatable :: fbias(:)
@@ -2749,9 +2751,15 @@ c
       logical, allocatable :: sampled(:)
 c
 c
-c     without the fill the bias follows the sampled mean force
+c     convert the fill reach to a whole number of bins, where the
+c     cap at the bin count already reaches across every bin
 c
-      if (.not. use_lmdafill) then
+      nreach = int(min(lmdafillr/wlmda+1.0d-6,dble(nlmda)))
+c
+c     without the fill, or with a reach under one bin, the bias
+c     follows the sampled mean force
+c
+      if (.not.use_lmdafill .or. nreach.eq.0) then
          call efreeprof (lmda,lmdafmean,eflmda,dfdl)
          return
       end if
@@ -2763,7 +2771,7 @@ c
       do i = 1, nlmda
          sampled(i) = lmdasampled(i)
       end do
-      call lmdafill (nlmda,lmdafmean,sampled,fbias)
+      call lmdafill (nlmda,lmdafmean,sampled,nreach,fbias)
       call efreeprof (lmda,fbias,eflmda,dfdl)
       deallocate (fbias)
       deallocate (sampled)
@@ -2805,19 +2813,24 @@ c     #############################################################
 c
 c
 c     "lmdafill" copies the sampled mean force "fsamp" of "nbin" lambda
-c     bins into "fbias" and fills each unsampled bin, flagged false in
-c     "sampled", by linear interpolation between the nearest sampled
-c     bins on either side, or from the nearest sampled bin if there is
-c     only one side; with no sampled bin the profile is zero
+c     bins into "fbias" and fills the unsampled bins, flagged false in
+c     "sampled", from sampled bins no more than "nreach" bins away; a
+c     gap between two sampled bins at most 2*nreach bins apart, where
+c     every bin is within reach of data, is interpolated linearly, in
+c     a wider gap or past either end of the data a bin within reach
+c     copies the nearest sampled bin, and any other bin is zero
 c
 c     note sampled bins are copied unchanged, so a fully sampled
-c     profile is reproduced exactly, and "fsamp" is not modified
+c     profile is reproduced exactly, and "fsamp" is not modified; a
+c     reach of at least "nbin" fills every bin, and a reach of zero
+c     fills none
 c
 c
-      subroutine lmdafill (nbin,fsamp,sampled,fbias)
+      subroutine lmdafill (nbin,fsamp,sampled,nreach,fbias)
       implicit none
       integer i,k
       integer nbin
+      integer nreach
       integer ilo
       real*8 t
       real*8 fsamp(*)
@@ -2831,14 +2844,20 @@ c
       ilo = 0
       do i = 1, nbin
          if (sampled(i)) then
-            if (ilo .eq. 0) then
-               do k = 1, i-1
-                  fbias(k) = fsamp(i)
-               end do
-            else
+            if (ilo.ne.0 .and. i-ilo.le.2*nreach) then
                do k = ilo+1, i-1
                   t = dble(k-ilo) / dble(i-ilo)
                   fbias(k) = fsamp(ilo) + t*(fsamp(i)-fsamp(ilo))
+               end do
+            else
+               do k = ilo+1, i-1
+                  if (ilo.ne.0 .and. k-ilo.le.nreach) then
+                     fbias(k) = fsamp(ilo)
+                  else if (i-k .le. nreach) then
+                     fbias(k) = fsamp(i)
+                  else
+                     fbias(k) = 0.0d0
+                  end if
                end do
             end if
             fbias(i) = fsamp(i)
@@ -2846,14 +2865,14 @@ c
          end if
       end do
 c
-c     bins past the last sampled bin take its mean force, and with
-c     no sampled bin the profile is zero
+c     bins past the last sampled bin take its mean force within
+c     reach, and with no sampled bin the profile is zero
 c
       do k = ilo+1, nbin
-         if (ilo .eq. 0) then
-            fbias(k) = 0.0d0
-         else
+         if (ilo.ne.0 .and. k-ilo.le.nreach) then
             fbias(k) = fsamp(ilo)
+         else
+            fbias(k) = 0.0d0
          end if
       end do
       return
