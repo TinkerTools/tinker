@@ -720,7 +720,8 @@ c     "eleclive" flags the atom groups that carry multipoles,
 c     polarizability or a lambda slope in the current evaluation;
 c     the environment is always live, the charging ligand is live
 c     unless it is held uncharged with no lambda derivative left to
-c     take, and in a staged relative leg the other ligand never is;
+c     take, its polarizability counting only with polarization, and
+c     in a staged relative leg the other ligand never is;
 c     a pair with a site outside the live groups contributes nothing,
 c     so the pair loops skip it instead of forming zero times an
 c     inverse distance for two sites that may overlap; "doskip" tells
@@ -731,6 +732,7 @@ c
       use atoms
       use dlmda
       use mutant
+      use potent
       implicit none
       integer i
       real*8 g(0:2),dg(0:2)
@@ -758,8 +760,8 @@ c     the "gradient" routine
 c
       edrv = lmdadrv (use_edlmda,deldlmda,d2eldlmda2)
       pdrv = lmdadrv (use_pdlmda,dpldlmda,d2pldlmda2)
-      dead = (elambda.eq.0.0d0 .and. plambda.eq.0.0d0
-     &           .and. .not.edrv .and. .not.pdrv)
+      dead = (elambda.eq.0.0d0 .and. .not.edrv .and. (.not.use_polar
+     &           .or. (plambda.eq.0.0d0 .and. .not.pdrv)))
 c
 c     the environment is always live, and a ligand group only if it
 c     is the one that charges, as "grpscale" sets it

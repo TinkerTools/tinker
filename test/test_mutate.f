@@ -2435,9 +2435,9 @@ c     ##                                                          ##
 c     ##############################################################
 c
 c
-c     "test_mutate_overlap" runs fixtures 180-188 and 236-239, where
-c     an annihilated ligand sits exactly on other atoms; 180-183 are
-c     two waters with the second a ghost on the first or 1.0d-6 Ang
+c     "test_mutate_overlap" runs fixtures 180-188, 236-239 and 279-280,
+c     where an annihilated ligand sits exactly on other atoms; 180-183
+c     are two waters with the second a ghost on the first or 1.0d-6 Ang
 c     off it, at fixed lambdas and with van der Waals on the main
 c     lambda, and every term is zero so no energy component is listed;
 c     184 repeats 181 under Ewald; 185 and 186 place ligand 2 of the
@@ -2449,7 +2449,11 @@ c     off it; 236-239 repeat the ghost with charge penetration, charge
 c     flux and charge transfer: 236 is the HIPPO water pair at zero
 c     elambda and plambda, 237 the same at lambda zero under dual
 c     topology polarization, 238 the AMOEBA+ Ewald water box with a
-c     ghost water, and 239 the HIPPO ligand 1 leg of 185
+c     ghost water, and 239 the HIPPO ligand 1 leg of 185; 279 and 280
+c     put an uncharged ghost on a water of the TIP3P box, 279 at fixed
+c     lambdas and 280 with van der Waals on the main lambda and a
+c     polarization lambda that no term reads, so the ghost still counts
+c     as dead
 c
 c
       subroutine test_mutate_overlap
@@ -2506,6 +2510,14 @@ c
      &   '239_water2ovl_hip_rels_lig1_ex3_l085.txt',
      &   '239_water2ovl_hip_rels_lig1_ex3_l085',
      &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('tip3ovl','279_tip3ovl_amber_m00v05.key',
+     &   '279_tip3ovl_amber_m00v05.txt','279_tip3ovl_amber_m00v05',
+     &   .false., .false., .true.,  .true.,  .false.)
+      call test_mutate_calc ('tip3ovl',
+     &   '280_tip3ovl_amber_m00p05_d1_l050.key',
+     &   '280_tip3ovl_amber_m00p05_d1_l050.txt',
+     &   '280_tip3ovl_amber_m00p05_d1_l050',
+     &   .false., .false., .true.,  .true.,  .true.)
       return
       end
 c
@@ -3969,7 +3981,9 @@ c     the two ligands as separate densities: the van der Waals leg,
 c     then two water ligands under annihilation, both ends of the van
 c     der Waals leg, whose lambda derivatives were checked against
 c     one-sided differences, and the three leg schedule with every
-c     HIPPO term under Ewald
+c     HIPPO term under Ewald; 281 annihilates the whole box at lambda
+c     zero, where the energy, the reciprocal space and self terms and
+c     the lambda derivatives must all vanish
 c
 c
       subroutine test_mutate_dsprel
@@ -4001,6 +4015,11 @@ c
      &   '251_water2_hip_full_rels3_l050.txt',
      &   '251_water2_hip_full_rels3_l050',
      &   .true.,  .true.,  .false., .true.,  .true.)
+      call test_mutate_calc ('water2',
+     &   '281_water2_hip_dsp_ewald_annih_all_l00.key',
+     &   '281_water2_hip_dsp_ewald_annih_all_l00.txt',
+     &   '281_water2_hip_dsp_ewald_annih_all_l00',
+     &   .false., .false., .false., .true.,  .true.)
       return
       end
 c
