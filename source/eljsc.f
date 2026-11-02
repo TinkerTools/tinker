@@ -111,8 +111,13 @@ c
       dsdr = 0.0d0
       if (rik .ne. 0.0d0)  dsdr = 6.0d0 * p6 / rik
 c
-c     get T and its first two derivatives with respect to s
+c     get T and its first two derivatives with respect to s, with s
+c     held off zero: an unshifted pair at zero lambda, m > 0, has a
+c     zero scale and zero coefficients, but at zero distance its T
+c     would be infinite, and a floor only changes the derivatives
+c     where they vanish
 c
+      sc = max(sc,1.0d-8)
       sc2 = sc * sc
       tt = 4.0d0 * (1.0d0-sc) / sc2
       ts = 4.0d0 * (sc-2.0d0) / (sc2*sc)

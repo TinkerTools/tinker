@@ -19,6 +19,9 @@ c
       subroutine mechanic
       use inform
       use iounit
+      use limits
+      use polpot
+      use potent
       implicit none
 c
 c
@@ -132,6 +135,23 @@ c
 c     set hybrid parameter values for free energy perturbation
 c
       call mutate
+c
+c     repulsion, exchange polarization and charge transfer use the
+c     multipole neighbor list, which holds pairs only out to the
+c     multipole or Ewald cutoff
+c
+      if (use_mlist) then
+         if (((use_repel.or.use_expol) .and. repcut.gt.mpolecut) .or.
+     &       (use_chgtrn .and. ctrncut.gt.mpolecut)) then
+            write (iout,20)
+   20       format (/,' MECHANIC  --  Repulsion or Charge Transfer',
+     &                 ' Cutoff Exceeds the Multipole List',
+     &              /,' Cutoff; Lower REPULS-CUTOFF or',
+     &                 ' CHGTRN-CUTOFF, or Raise EWALD-CUTOFF',
+     &              /,' or MPOLE-CUTOFF')
+            call fatal
+         end if
+      end if
 c
 c     quit if essential parameter information is missing
 c

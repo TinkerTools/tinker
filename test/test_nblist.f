@@ -34,6 +34,7 @@ c
       call test_nblist_key ('test_nblist_hippo','octhippo.key',3)
       call test_nblist_key ('test_nblist_hippoc6','octhippoc6.key',3)
       call test_nblist_key ('test_nblist_tip3p','octtip3p.key',2)
+      call test_nblist_cutoff
       return
       end
 c
@@ -461,5 +462,81 @@ c
       next = mod(16807_8*int(seed,8),2147483647_8)
       seed = int(next)
       test_nblist_rand = dble(seed) / 2147483647.0d0
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_nblist_cutoff  --  list holds too little  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_nblist_cutoff" runs "analyze" on a HIPPO water box whose
+c     repulsion or charge transfer cutoff exceeds the Ewald cutoff;
+c     the multipole neighbor list, which those terms use, would miss
+c     pairs, so setup must stop with the list and run without it
+c
+c
+      subroutine test_nblist_cutoff
+      implicit none
+      logical skiptest
+c
+c
+      if (skiptest('test_nblist_cutoff','hippo'))  return
+      call pushdir ('file/mutate')
+      call test_nblist_cutrun ('mlist_repcut_fatal.key',.true.,
+     &   'test_nblist_cutoff repulsion')
+      call test_nblist_cutrun ('mlist_ctcut_fatal.key',.true.,
+     &   'test_nblist_cutoff charge transfer')
+      call test_nblist_cutrun ('mlist_ctcut_nolist.key',.false.,
+     &   'test_nblist_cutoff without list')
+      call popdir
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_nblist_cutrun  --  one cutoff keyfile  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_nblist_cutrun" runs "analyze" on one keyfile with the
+c     "water2" coordinates and checks that setup stops on the list
+c     cutoff if "stops" is set, or else that the energy is printed
+c
+c
+      subroutine test_nblist_cutrun (key,stops,label)
+      implicit none
+      integer ist,iout
+      logical stops,found,energy
+      character*(*) key,label
+      character*240 line
+      character*512 args
+c
+c
+      found = .false.
+      energy = .false.
+      call execute_command_line ('rm -f out.txt')
+      args = '-k '//key//' water2.xyz E'
+      call run_prog ('analyze',trim(args),'out.txt',ist)
+      if (ist .ne. -1) then
+         open (newunit=iout,file='out.txt',status='old')
+         do while (.true.)
+            read (iout,'(a)',end=10)  line
+            if (index(line,'Exceeds the Multipole List') .ne. 0)
+     &         found = .true.
+            if (index(line,'Total Potential Energy') .ne. 0)
+     &         energy = .true.
+         end do
+   10    continue
+         close (unit=iout)
+      end if
+      call execute_command_line ('rm -f out.txt')
+      call assert_logical (found,stops,label//' stops')
+      call assert_logical (energy,.not.stops,label//' runs')
       return
       end
