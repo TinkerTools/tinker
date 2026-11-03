@@ -2242,7 +2242,7 @@ LAMBDA-EQRATIO [1 or 2 reals]
 .. _KEY-LAMBDA-FRICTION:
 
 LAMBDA-FRICTION [real]
-   Sets the Langevin friction coefficient in inverse picoseconds acting on the lambda particle. A value of zero, or a negative value, gives frictionless motion with no random kicks. The default in the absence of the LAMBDA-FRICTION keyword is 0.01 per picosecond.
+   Sets the Langevin friction coefficient in inverse picoseconds acting on the lambda particle. A value of zero, or a negative value, gives frictionless motion with no random kicks. With friction the particle takes leapfrog middle Langevin steps, whose sampling error does not grow with the friction, so a harmonic well in theta is sampled at the bath temperature for any friction once LAMBDA-DT is small enough for stable frictionless motion. Friction above about 2/LAMBDA-DT barely slows the particle further. The default in the absence of the LAMBDA-FRICTION keyword is 0.01 per picosecond.
 
 .. index:: LAMBDA-INTERVAL
 .. _KEY-LAMBDA-INTERVAL:

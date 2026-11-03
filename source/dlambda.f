@@ -2073,6 +2073,14 @@ c     its random kick; the force on theta is in kcal/mole, so the
 c     mass is in kcal/mole*ps**2 and the size of the kick follows
 c     from the thermal energy in kcal/mole
 c
+c     with friction the step is the leapfrog middle scheme, a full
+c     force kick, a half drift, the exact friction and noise update
+c     and a second half drift, which samples a harmonic well in theta
+c     at the bath temperature for any friction times the time step;
+c     above about two over the time step, larger friction no longer
+c     slows the motion of theta; without friction the step reduces
+c     to plain leapfrog
+c
 c
       subroutine lmdalangstep (gauss)
       use bath
@@ -2095,23 +2103,27 @@ c
       call lmdathetamap (lmdatheta,lambda,dldth)
       force = -deffdl * dldth
 c
-c     propagate theta velocity with Langevin friction and noise
+c     kick the theta velocity with the force over the full step
+c
+      lmdavtheta = lmdavtheta + lmdadt*force/lmdamass
+c
+c     drift theta around the exact friction and noise update of its
+c     velocity, or over the full step without friction
 c
       gamma = max(0.0d0,lmdafric)
       if (gamma .gt. 0.0d0) then
          c = exp(-gamma*lmdadt)
          ktm = gasconst * kelvin / lmdamass
          sigma = sqrt(ktm*(1.0d0-c*c))
-         lmdavtheta = c*lmdavtheta
-     &                 + (1.0d0-c)*force/(gamma*lmdamass)
-     &                 + sigma*gauss
+         lmdatheta = lmdatheta + 0.5d0*lmdadt*lmdavtheta
+         lmdavtheta = c*lmdavtheta + sigma*gauss
+         lmdatheta = lmdatheta + 0.5d0*lmdadt*lmdavtheta
       else
-         lmdavtheta = lmdavtheta + lmdadt*force/lmdamass
+         lmdatheta = lmdatheta + lmdadt*lmdavtheta
       end if
 c
-c     update theta and wrap it into the periodic interval [0,pi)
+c     wrap theta into the periodic interval [0,pi)
 c
-      lmdatheta = lmdatheta + lmdadt*lmdavtheta
       lmdatheta = lmdatheta - pi*floor(lmdatheta/pi)
       if (lmdatheta .ge. pi)  lmdatheta = 0.0d0
       if (lmdatheta .lt. 0.0d0)  lmdatheta = 0.0d0

@@ -32,6 +32,7 @@ c
       call test_eostmap_lmdachain
       call test_eostmap_relstage
       call test_eostmap_theta
+      call test_eostmap_lfmid
       call test_eostmap_thjac
       call final
       return
@@ -1408,6 +1409,7 @@ c
       real*8 lp,lm,dnum,h
       real*8 alpha,asina
       real*8 v0,th0,vref,thref
+      real*8 vkick
       real*8 gauss,decay,sigma
       real*8 kelvin0
       real*8 alist(2),llist(6)
@@ -1553,10 +1555,9 @@ c
       call lmdalangstep (gauss)
       decay = exp(-lmdafric*lmdadt)
       sigma = sqrt(gasconst*kelvin*(1.0d0-decay*decay)/lmdamass)
-      vref = decay*v0
-     &          - (1.0d0-decay)*deffdl*dldth/(lmdafric*lmdamass)
-     &          + sigma*gauss
-      thref = th0 + lmdadt*vref
+      vkick = v0 - lmdadt*deffdl*dldth/lmdamass
+      vref = decay*vkick + sigma*gauss
+      thref = th0 + 0.5d0*lmdadt*vkick + 0.5d0*lmdadt*vref
       call assert_real (lmdavtheta,vref,1.0d-14,
      &                  'lmdalangstep friction theta velocity')
       call assert_real (lmdatheta,thref,1.0d-14,
@@ -1611,6 +1612,163 @@ c     restore the default map for later tests
 c
       lmdathmap = 'TRI'
       lmdathalpha = 0.999999999d0
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eostmap_lfmid  --  lambda step sampling  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eostmap_lfmid" checks that a lambda particle step with
+c     friction samples a harmonic well in theta at the bath
+c     temperature for small and large friction times the time step;
+c     the step is linear in the well, so the stationary covariance
+c     of theta and its velocity follows exactly from the step matrix
+c
+c
+      subroutine test_eostmap_lfmid
+      use bath
+      use dlmda
+      use math
+      use mutant
+      use units
+      implicit none
+      integer i,k
+      real*8 th0,kspr,kt,h
+      real*8 pdd,pdv,pvv
+      real*8 cdd,cdv,cvv
+      real*8 kelvin0,lambda0
+      real*8 fric0,dt0,mass0
+      real*8 dedl0,th00,vth0,alpha0
+      real*8 a(2,2),b(2),q(2)
+      real*8 fric(3)
+      character*3 map0
+      character*12 tag(3)
+c
+c
+c     save the lambda particle state for later tests
+c
+      kelvin0 = kelvin
+      lambda0 = lambda
+      fric0 = lmdafric
+      dt0 = lmdadt
+      mass0 = lmdamass
+      dedl0 = deffdl
+      th00 = lmdatheta
+      vth0 = lmdavtheta
+      map0 = lmdathmap
+      alpha0 = lmdathalpha
+c
+c     a well centered where the sine squared map has unit slope and
+c     as stiff as omega times the time step equal to one
+c
+      kelvin = 300.0d0
+      lmdathmap = 'SIN'
+      lmdadt = 0.01d0
+      lmdamass = 2.0d0
+      kspr = lmdamass / lmdadt**2
+      kt = gasconst * kelvin
+      th0 = 0.25d0 * pi
+      h = 0.01d0
+      fric(1) = 50.0d0
+      fric(2) = 500.0d0
+      fric(3) = 2000.0d0
+      tag(1) = 'gamma*dt 0.5'
+      tag(2) = 'gamma*dt 5'
+      tag(3) = 'gamma*dt 20'
+      do k = 1, 3
+         lmdafric = fric(k)
+c
+c     unit theta offset, velocity and kick give the step matrix and
+c     the kick vector
+c
+         call test_eostmap_lfstep (th0,kspr,h,0.0d0,0.0d0,q)
+         a(1,1) = q(1) / h
+         a(2,1) = q(2) / h
+         call test_eostmap_lfstep (th0,kspr,0.0d0,h,0.0d0,q)
+         a(1,2) = q(1) / h
+         a(2,2) = q(2) / h
+         call test_eostmap_lfstep (th0,kspr,0.0d0,0.0d0,h,q)
+         b(1) = q(1) / h
+         b(2) = q(2) / h
+c
+c     iterate the covariance under unit normal kicks to its
+c     stationary value
+c
+         pdd = 0.0d0
+         pdv = 0.0d0
+         pvv = 0.0d0
+         do i = 1, 2000
+            cdd = a(1,1)*a(1,1)*pdd + 2.0d0*a(1,1)*a(1,2)*pdv
+     &               + a(1,2)*a(1,2)*pvv + b(1)*b(1)
+            cdv = a(1,1)*a(2,1)*pdd
+     &               + (a(1,1)*a(2,2)+a(1,2)*a(2,1))*pdv
+     &               + a(1,2)*a(2,2)*pvv + b(1)*b(2)
+            cvv = a(2,1)*a(2,1)*pdd + 2.0d0*a(2,1)*a(2,2)*pdv
+     &               + a(2,2)*a(2,2)*pvv + b(2)*b(2)
+            pdd = cdd
+            pdv = cdv
+            pvv = cvv
+         end do
+         call assert_real (kspr*pdd/kt,1.0d0,1.0d-8,
+     &                     'lmdalangstep theta at the bath, '
+     &                        //trim(tag(k)))
+         call assert_real (lmdamass*pvv/kt,1.0d0,1.0d-8,
+     &                     'lmdalangstep velocity at the bath, '
+     &                        //trim(tag(k)))
+      end do
+c
+c     restore the lambda particle state for later tests
+c
+      kelvin = kelvin0
+      lambda = lambda0
+      lmdafric = fric0
+      lmdadt = dt0
+      lmdamass = mass0
+      deffdl = dedl0
+      lmdatheta = th00
+      lmdavtheta = vth0
+      lmdathmap = map0
+      lmdathalpha = alpha0
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_eostmap_lfstep  --  step in a harmonic  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_eostmap_lfstep" takes one lambda particle step from the
+c     theta offset "d" and velocity "v" with the kick "g" in a
+c     harmonic well of force constant "kspr" centered at "th0", and
+c     returns the new theta offset and velocity in "q"
+c
+c
+      subroutine test_eostmap_lfstep (th0,kspr,d,v,g,q)
+      use dlmda
+      implicit none
+      real*8 th0,kspr
+      real*8 d,v,g
+      real*8 lmda,dldth
+      real*8 q(2)
+c
+c
+c     the effective lambda derivative gives a force -kspr*d on theta
+c
+      lmdatheta = th0 + d
+      lmdavtheta = v
+      call lmdathetamap (lmdatheta,lmda,dldth)
+      deffdl = kspr * d / dldth
+      call lmdalangstep (g)
+      q(1) = lmdatheta - th0
+      q(2) = lmdavtheta
       return
       end
 c
