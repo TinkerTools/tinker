@@ -20,6 +20,7 @@ c
       implicit none
 c
 c
+      call test_tinkernist_nodyn
       call test_tinkernist_nocoord
       call test_tinkernist_dcd
       call test_tinkernist_save1
@@ -27,6 +28,45 @@ c
       call test_tinkernist_save_only
       call test_tinkernist_save_system
       call test_tinkernist_exc_moment
+      return
+      end
+c
+c
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine test_tinkernist_nodyn  --  no restart  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+      subroutine test_tinkernist_nodyn
+      implicit none
+      integer ist,iend
+      integer freeunit
+      logical skiptest
+c
+c
+      if (skiptest('test_tinkernist_nodyn','amoeba'))  return
+      call tnist_prep ('tinkernist_nodyn','water30',.false.)
+      call pushdir ('file/tinkernist_nodyn')
+      call tnist_append ('water30.key','nodyn')
+c
+c     dynamic still writes the .dyn once when the run ends, so stop
+c     at the first save with a .end file to see that saves write none
+c
+      iend = freeunit ()
+      open (unit=iend,file='water30.end',status='new')
+      close (unit=iend)
+      call run_prog ('dynamic','water30 1 1 0.001 1','out.txt',ist)
+      if (ist .ne. -1) then
+         call assert_int (ist,0,'test_tinkernist_nodyn status')
+         call tnist_assert_file ('water30.arc',.true.,
+     &                           'test_tinkernist_nodyn arc')
+         call tnist_assert_file ('water30.dyn',.false.,
+     &                           'test_tinkernist_nodyn dyn')
+      end if
+      call popdir
+      call tnist_clean ('tinkernist_nodyn')
       return
       end
 c

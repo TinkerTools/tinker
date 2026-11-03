@@ -1656,7 +1656,49 @@ c
       write (iout,20)  histfile(1:trimtext(histfile))
    20 format (/,' RDBIASHEAD  --  Error while Reading Lambda Bias',
      &           ' History Header',
-     &        /,'                File Name :  ',a)
+     &        /,'                File Name :  ',a,
+     &        /,'                Remove or Rename the File to Start',
+     &           ' a New Bias History')
+      call fatal
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine chkbiasset  --  match a stored bias setting  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "chkbiasset" compares one setting of the current run with the
+c     value stored in the header of a lambda bias history that is
+c     being continued, and stops the run if the two differ; integer
+c     settings are passed as real values
+c
+c
+      subroutine chkbiasset (routine,setting,vkey,vfile,histfile)
+      use iounit
+      implicit none
+      integer trimtext
+      real*8 vkey,vfile
+      real*8 eps
+      character*(*) routine
+      character*(*) setting
+      character*(*) histfile
+c
+c
+c     header values are written to full precision, so the tolerance
+c     only absorbs round-off from reading them back
+c
+      eps = 1.0d-10
+      if (abs(vkey-vfile) .le. eps*max(1.0d0,abs(vkey)))  return
+      write (iout,10)  routine,setting,vkey,vfile,
+     &                 histfile(1:trimtext(histfile))
+   10 format (/,1x,a,'  --  Setting Differs from the Bias History',
+     &           ' being Continued',
+     &        /,5x,'Setting :  ',a,
+     &        /,5x,'Current Run :',g24.16,4x,'History File :',g24.16,
+     &        /,5x,'File Name :  ',a)
       call fatal
       end
 c

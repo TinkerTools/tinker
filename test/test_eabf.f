@@ -825,6 +825,7 @@ c
       integer istep
       integer leng0
       integer size0,size1,size2,size3
+      integer nbyte0,nbyte1
       integer freeunit
       integer trimtext
       real*8 kelvin0
@@ -839,6 +840,7 @@ c
       character*240 filename0
       character*240 abffile
       character*240 record
+      character*8000 text0,text1
 c
 c
 c     start an abf history in a temporary file
@@ -955,7 +957,13 @@ c
       lmdadt = 0.002d0
       lmdatheta = 0.0d0
       lmdavtheta = 0.0d0
+      call eostfilebytes (abffile,text0,nbyte0)
       call initabffile
+      call eostfilebytes (abffile,text1,nbyte1)
+      call assert_logical (histtail,.false.,
+     &                     'rdabfhist finds no rows past the count')
+      call assert_logical (nbyte1.eq.nbyte0 .and. text1.eq.text0,
+     &                     .true.,'initabffile leaves a clean file')
       call assert_logical (lmdasavefile.eq.abffile,.true.,
      &                     'initabffile continues the same file')
       call assert_int (nlmdahist,3,'initabffile restores the samples')
@@ -1073,6 +1081,8 @@ c
       lmdaintv = 4
       kelvin = 300.0d0
       call initabffile
+      call assert_logical (histtail,.true.,
+     &                     'rdabfhist finds the stray row')
       call assert_int (nlmdahist,2,'initabffile skips the stray row')
       do istep = 1, lmdaintv
          lambda = 0.75d0

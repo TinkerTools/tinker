@@ -1079,7 +1079,7 @@ c
       call run_prog ('dynamic',args,'out.txt',ist)
       if (ist .ne. -1) then
          if (ext .eq. 'none') then
-            cmd = 'grep -q "Require a Constant Temperature" out.txt'
+            cmd = 'grep -q "a Constant Temperature Ensemble" out.txt'
             call execute_command_line (cmd,exitstat=ist)
             call assert_int (ist,0,trim(tag)//' refused')
          else

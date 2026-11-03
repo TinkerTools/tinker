@@ -74,8 +74,8 @@ c     ###########################################################
 c
 c
 c     "test_chglj_rules" repeats the pbc cutoff case with a geometric
-c     radius rule and with an arithmetic epsilon rule in place of the
-c     rules of the CHARMM parameter file
+c     radius rule and with arithmetic and harmonic epsilon rules in
+c     place of the rules of the CHARMM parameter file
 c
 c
       subroutine test_chglj_rules
@@ -88,6 +88,9 @@ c
       call test_chglj_case ('chglj.4','chglj.4.txt',
      &                      'chglj_arieps_list',.true.,
      &                      'ARITHMETIC','ARITHMETIC')
+      call test_chglj_case ('chglj.5','chglj.5.txt',
+     &                      'chglj_harmeps_list',.true.,
+     &                      'ARITHMETIC','HARMONIC')
       return
       end
 c

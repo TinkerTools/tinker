@@ -232,26 +232,29 @@ c
          end if
       end if
 c
-c     Monte Carlo lambda moves are accepted at a set temperature
+c     the adaptive lambda bias, its lambda particle and Monte Carlo
+c     lambda moves all work at a set temperature, which the ost and
+c     metadynamics histories store
 c
-      if (use_lmdamc .and. .not.isothermal) then
-         if (use_ostdyn .or. use_metadyn .or. use_abfdyn) then
+      if (use_ostdyn .or. use_metadyn .or. use_abfdyn) then
+         if (.not.isothermal .or. kelvin.le.0.0d0) then
             write (iout,335)
-  335       format (/,' DYNAMIC  --  Monte Carlo Lambda Moves Require',
+  335       format (/,' DYNAMIC  --  Lambda Bias Dynamics Requires',
      &                 ' a Constant Temperature Ensemble')
             call fatal
          end if
       end if
 c
-c     perform the setup functions needed to run dynamics
-c
-      call mdinit (dt)
-c
-c     open the file holding the adaptive bias history
+c     open the file holding the adaptive bias history, continuing
+c     an earlier one before the initial forces are computed
 c
       if (use_ostdyn)  call initostfile
       if (use_metadyn)  call initmetafile
-      if (use_abf)  call initabffile
+      if (use_abfdyn)  call initabffile
+c
+c     perform the setup functions needed to run dynamics
+c
+      call mdinit (dt)
 c
 c     lay out the thermodynamic integration lambda windows
 c
@@ -376,13 +379,19 @@ c     save lambda dynamics information
 c
       if (use_ostdyn)  call saveost
       if (use_metadyn)  call savemeta
-      if (use_abf)  call saveabf
+      if (use_abfdyn)  call saveabf
       if (use_ti)  call saveti
       if (use_fep)  call savefep
 c
-c     save dynamic at the end if it was not saved during simulation
+c     save the restart file at the end if it was not saved during
+c     the simulation, or if the last step was not a save step but
+c     the adaptive bias history saved above holds it
 c
-      if (.not. dynsave)  call prtdyn
+      if (.not. dynsave) then
+         call prtdyn
+      else if (use_ostdyn .or. use_metadyn .or. use_abfdyn) then
+         if (mod(nstep,iwrite) .ne. 0)  call prtdyn
+      end if
 c
 c     perform any final tasks before program exit
 c

@@ -193,6 +193,11 @@ c
      &             'dmso_env','dispenv.key','dmso_lig','dispenv.key',
      &             1.0d-6,'disp dec')
 c
+c     HIPPO dispersion with its long range correction
+c
+      call fepcase ('file/testlmda','hipmix',
+     &              '113_hipmix_dsp_corr_l04.key',4,ltrial,'disp corr')
+c
 c     with the soft core switch turned off, every pair with a ligand
 c     atom carries the same lambda power, so the energy is linear in
 c     it at any lambda

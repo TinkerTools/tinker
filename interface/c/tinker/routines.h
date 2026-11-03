@@ -406,6 +406,10 @@ void rdbiashead_(int* ihis, char* histfile, char* title, tinker_fchar_len_t hist
 inline void tinker_f_rdbiashead(int* ihis, tinker_fchars histfile, tinker_fchars title) {
     return rdbiashead_(ihis, histfile.string, title.string, histfile.capacity, title.capacity);
 }
+void chkbiasset_(char* routine, char* setting, double* vkey, double* vfile, char* histfile, tinker_fchar_len_t routine_cap, tinker_fchar_len_t setting_cap, tinker_fchar_len_t histfile_cap);
+inline void tinker_f_chkbiasset(tinker_fchars routine, tinker_fchars setting, double* vkey, double* vfile, tinker_fchars histfile) {
+    return chkbiasset_(routine.string, setting.string, vkey, vfile, histfile.string, routine.capacity, setting.capacity, histfile.capacity);
+}
 void fmtbiashead_(char* title, char* label, int* nrec, char* record, tinker_fchar_len_t title_cap, tinker_fchar_len_t label_cap, tinker_fchar_len_t record_cap);
 inline void tinker_f_fmtbiashead(tinker_fchars title, tinker_fchars label, int* nrec, tinker_fchars record) {
     return fmtbiashead_(title.string, label.string, nrec, record.string, title.capacity, label.capacity, record.capacity);
@@ -1334,6 +1338,8 @@ void prtosthist_(int* ihis, int* ifirst, int* ilast);
 #define tinker_f_prtosthist prtosthist_
 void initmetafile_();
 #define tinker_f_initmetafile initmetafile_
+void rdmeta_();
+#define tinker_f_rdmeta rdmeta_
 void savemeta_();
 #define tinker_f_savemeta savemeta_
 void rdmetahist_(int* ihis, char* metafile, tinker_fchar_len_t metafile_cap);

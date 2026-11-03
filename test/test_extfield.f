@@ -13,8 +13,7 @@ c     ##########################################################
 c
 c
 c     "test_extfield" checks the external field cases exercised by
-c     the tinker-gpu extfield.cpp tests, except the dynamic frequency
-c     molecular dynamics case
+c     the tinker-gpu extfield.cpp tests
 c
 c
       subroutine test_extfield
@@ -25,6 +24,7 @@ c
       call test_extfield_polar
       call test_extfield_mpolar
       call test_extfield_vdwpchg
+      call test_extfield_dynfreq
       return
       end
 c
@@ -107,6 +107,50 @@ c
      &   'extfield_vdwpchg',' ','amber',.true.)
       call test_extfield_case ('amber','amber.key','extfield.4.txt',
      &   'extfield_vdwpchg',' ','amber',.false.)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_extfield_dynfreq  --  oscillating field  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_extfield_dynfreq" runs ten Verlet steps of "dynamic" in an
+c     external field oscillating at EXFLD-FREQ and checks positions and
+c     velocities of the final restart file; the virial is left out, as
+c     "exfield1" has an open analytical virial bug
+c
+c     "dynamic" starts from the accelerations stored in water4.dyn,
+c     so they are those of the full field, as tinker-gpu computes them;
+c     the result matches the tinker-gpu extfield.5 references
+c
+c
+      subroutine test_extfield_dynfreq
+      implicit none
+      integer ist
+      logical skiptest
+      character*240 rpath
+      character*(*) tname
+      parameter (tname='test_extfield_dynfreq')
+c
+c
+      if (skiptest(tname,'amoeba'))  return
+      call mdprep ('extfield','extfield_dynfreq','water4')
+      call pushdir ('file/extfield_dynfreq')
+      call tnist_append ('water4.key','external-field  150  -300  450')
+      call tnist_append ('water4.key','exfld-freq  20.5')
+      call tnist_append ('water4.key','integrator verlet')
+      call run_prog ('dynamic','water4 10 2 0.02 1','out.txt',ist)
+      if (ist .ne. -1) then
+         call assert_int (ist,0,tname//' status')
+         call refpath ('extfield','water4_dynfreq.dyn',rpath)
+         call assert_dynfile (rpath,'water4.dyn',1.0d-6,1.0d-5,tname)
+      end if
+      call popdir
+      call tnist_clean ('extfield_dynfreq')
       return
       end
 c

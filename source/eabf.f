@@ -250,16 +250,18 @@ c     interval are not saved in the history file
 c
          lmdastep = (lmdastep/lmdaintv) * lmdaintv
 c
-c     rewrite the history from the samples just read, so that rows
-c     appended after the last header update are dropped before new
-c     samples are appended
+c     drop the rows an interrupted save appended after the last
+c     header update by rewriting the file from the samples just
+c     read; a clean file is left alone until the first save
+c     updates its header
 c
-         ihis = freeunit ()
-         open (unit=ihis,file=lmdasavefile,status='replace',
-     &         access='stream',form='formatted')
-         call prtabf (ihis)
-         close (unit=ihis)
-         nlmdasave = nlmdahist
+         if (histtail) then
+            ihis = freeunit ()
+            open (unit=ihis,file=lmdasavefile,status='replace',
+     &            access='stream',form='formatted')
+            call prtabf (ihis)
+            close (unit=ihis)
+         end if
          write (iout,20)  lmdasavefile(1:trimtext(lmdasavefile))
    20    format (/,' ABF  --  Bias History Continued From  ',a)
          return
@@ -440,6 +442,14 @@ c
      &      lmdalhist(ihist),lmdafhist(ihist)
       end do
    20 format (a240)
+c
+c     note any rows past the saved count, which an interrupted save
+c     leaves behind
+c
+      histtail = .false.
+      read (ihis,20,err=25,end=25)  record
+      histtail = .true.
+   25 continue
       close (unit=ihis)
 c
 c     rebuild the mean force from the saved interval samples

@@ -16,10 +16,10 @@ c     "test_thermint" checks the lambda window schedule and the
 c     block averaging of the lambda derivative used by the
 c     thermodynamic integration method
 c
-c     these are pure module logic tests with no molecular system;
-c     "etidyn" samples the global "dedl", so the accumulation is
-c     driven by assigning dedl directly instead of by evaluating
-c     any energy
+c     apart from the Monte Carlo barostat case, these are pure module
+c     logic tests with no molecular system; "etidyn" samples the
+c     global "dedl", so the accumulation is driven by assigning dedl
+c     directly instead of by evaluating any energy
 c
 c
       subroutine test_thermint
@@ -30,6 +30,7 @@ c
 c
 c
       if (skiptest(tname,'thermint'))  return
+      call test_thermint_mctrial
       call initial
       call test_thermint_avgstd
       call test_thermint_schedule
@@ -46,6 +47,113 @@ c
       call test_thermint_stop
       call test_thermint_up
       call clearti
+      call final
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_thermint_mctrial  --  dU/dL after MC trial  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "test_thermint_mctrial" checks that a Monte Carlo barostat
+c     trial, rejected or not, leaves the dU/dlambda of the force call
+c     in place for "etidyn" to sample at the end of the step
+c
+c
+      subroutine test_thermint_mctrial
+      use atoms
+      use bath
+      use boxes
+      use dlmda
+      use mdstuf
+      use mutant
+      implicit none
+      real*8 energy
+      real*8 e0,e,eold
+      real*8 dedl0,d2edl20
+      real*8 vol0
+      real*8, allocatable :: derivs(:,:)
+c
+c
+c     a mutated water box with lambda derivatives
+c
+      call pushdir ('file/mutate')
+      call loadfix ('water2','128_water_ast_ye_l05.key')
+      kelvin = 298.0d0
+      atmsph = 1.0d0
+      isothermal = .true.
+      voltrial = 1
+      volmove = 100.0d0
+      volscale = 'MOLECULAR'
+      prestyp = 'ISOTROPIC'
+      isoratio = 0.5d0
+      integrate = 'VERLET'
+c
+c     the force call of the step sets dU/dlambda
+c
+      allocate (derivs(3,n))
+      call gradient (e0,derivs)
+      dedl0 = dedl
+      d2edl20 = d2edl2
+      vol0 = volbox
+      call assert_logical (dedl0.ne.0.0d0,.true.,
+     &                     'ti mctrial dedl nonzero')
+c
+c     an energy call carries no lambda derivative
+c
+      e = energy ()
+      call assert_real (dedl,dedl0,0.0d0,'ti mctrial energy dedl')
+c
+c     an old energy far below any trial energy rejects the move
+c
+      eold = -1.0d30
+      call pmonte (eold,298.0d0)
+      call assert_real (eold,-1.0d30,0.0d0,'ti mctrial reject epot')
+      call assert_real (volbox,vol0,0.0d0,'ti mctrial reject volume')
+      call assert_real (dedl,dedl0,0.0d0,'ti mctrial reject dedl')
+      call assert_real (d2edl2,d2edl20,0.0d0,
+     &                  'ti mctrial reject d2edl2')
+c
+c     a move that is accepted or not as it falls
+c
+      eold = e0
+      call pmonte (eold,298.0d0)
+      call assert_real (dedl,dedl0,0.0d0,'ti mctrial trial dedl')
+      call assert_real (d2edl2,d2edl20,0.0d0,
+     &                  'ti mctrial trial d2edl2')
+      deallocate (derivs)
+      call final
+c
+c     an ost trial takes dU/dlambda from a gradient, so a rejected
+c     move has to put back the one of the force call
+c
+      call loadfix ('water2','vsoft_default_ost.key')
+      use_ostdyn = use_ost
+      kelvin = 298.0d0
+      atmsph = 1.0d0
+      isothermal = .true.
+      voltrial = 1
+      volmove = 100.0d0
+      volscale = 'MOLECULAR'
+      prestyp = 'ISOTROPIC'
+      isoratio = 0.5d0
+      integrate = 'VERLET'
+      allocate (derivs(3,n))
+      call gradient (e0,derivs)
+      dedl0 = dedl
+      d2edl20 = d2edl2
+      call assert_logical (use_ostdyn,.true.,'ost mctrial ost in use')
+      eold = -1.0d30
+      call pmonte (eold,298.0d0)
+      call assert_real (dedl,dedl0,0.0d0,'ost mctrial reject dedl')
+      call assert_real (d2edl2,d2edl20,0.0d0,
+     &                  'ost mctrial reject d2edl2')
+      deallocate (derivs)
+      call popdir
       call final
       return
       end

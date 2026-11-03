@@ -47,12 +47,15 @@ c
       call test_eost_ostphase
       call test_eost_ostgate
       call test_eost_save
+      call test_eost_restart
       call test_eost_meta
       call test_eost_metaimage
       call test_eost_metadyn
       call test_eost_metatemper
       call test_eost_metacut
+      call test_eost_metarestart
       call test_eost_temperkeys
+      call test_eost_restartrun
       call final
       return
       end
@@ -179,6 +182,614 @@ c
       filename = filename0
       leng = leng0
       kelvin = kelvin0
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eost_restart  --  ost continuation test  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eost_restart" checks that a fresh run continues an
+c     existing ost history file in place, restoring the gaussians,
+c     the kernels, the flambda grid and the lambda particle, and
+c     resuming at an interval boundary
+c
+c
+      subroutine test_eost_restart
+      use bath
+      use dlmda
+      use files
+      use mutant
+      use ost
+      implicit none
+      integer i,j,ihis
+      integer ios
+      integer leng0
+      integer nline,nsave
+      integer nbyte0,nbyte1
+      integer freeunit
+      real*8 kelvin0
+      real*8 deltag0
+      real*8 gmax,gdiff
+      real*8 efreetot
+      real*8 fmean0(5)
+      real*8 gkern0(5,5)
+      logical exist
+      logical stray
+      character*240 filename0
+      character*240 ostfile
+      character*240 record
+      character*8000 text0,text1
+c
+c
+c     start an ost history in a temporary file
+c
+      filename0 = filename
+      leng0 = leng
+      kelvin0 = kelvin
+      kelvin = 300.0d0
+      filename = 'tinkertest-ostrestart'
+      leng = len_trim(filename)
+      ostfile = filename(1:leng)//'.ost'
+      inquire (file=ostfile,exist=exist)
+      if (exist) then
+         ihis = freeunit ()
+         open (unit=ihis,file=ostfile,status='old')
+         close (unit=ihis,status='delete')
+      end if
+      call resetost (5,5,8)
+      use_ost = .true.
+      fastkernel = .true.
+      oststdev = 4.0d0
+      lmdamass = 2.0d0
+      lmdafric = 0.5d0
+      lmdadt = 0.002d0
+      call sethist (1,0.1d0,1.0d0,2.0d0,0.1d0,1.0d0)
+      call sethist (2,0.5d0,2.0d0,3.0d0,0.1d0,1.0d0)
+      call sethist (3,0.8d0,-1.0d0,4.0d0,0.1d0,1.0d0)
+      do i = 1, 3
+         lmdaihist(i) = 10 * i
+      end do
+      nlmdahist = 3
+      call buildostindex
+      call buildkernels
+      lmdadeltag = efreetot ()
+      deltag0 = lmdadeltag
+      do i = 1, 5
+         fmean0(i) = lmdafmean(i)
+         do j = 1, 5
+            gkern0(i,j) = gkernel(i,j)
+         end do
+      end do
+c
+c     open the file, then save the lambda particle partway into
+c     the next interval
+c
+      lmdastep = 30
+      call initostfile
+      lmdastep = 37
+      lambda = 0.4d0
+      lmdatheta = 0.6d0
+      lmdavtheta = 0.2d0
+      call saveost
+c
+c     a fresh run with the same settings and another flambda grid
+c     continues the file
+c
+      call resetost (5,9,8)
+      use_ost = .true.
+      fastkernel = .true.
+      oststdev = 4.0d0
+      lmdamass = 2.0d0
+      lmdafric = 0.5d0
+      lmdadt = 0.002d0
+      lambda = 1.0d0
+      lmdatheta = 0.0d0
+      lmdavtheta = 0.0d0
+      lmdastep = 0
+      call eostfilebytes (ostfile,text0,nbyte0)
+      call initostfile
+      call eostfilebytes (ostfile,text1,nbyte1)
+      call assert_logical (histtail,.false.,
+     &                     'rdosthist finds no rows past the count')
+      call assert_logical (nbyte1.eq.nbyte0 .and. text1.eq.text0,
+     &                     .true.,'initostfile leaves a clean file')
+      call assert_logical (lmdasavefile.eq.ostfile,.true.,
+     &                     'initostfile continues the same file')
+      call assert_int (nlmdahist,3,'initostfile restores the gaussians')
+      call assert_int (nlmdasave,3,'initostfile restores the save')
+      call assert_int (lmdastep,30,'initostfile resumes on an interval')
+      call assert_int (nflmda,5,'initostfile restores the flambda bins')
+      call assert_int (fli0,3,'initostfile restores the flambda zero')
+      call assert_real (lambda,0.4d0,1.0d-14,
+     &                  'initostfile restores the lambda')
+      call assert_real (lmdatheta,0.6d0,1.0d-14,
+     &                  'initostfile restores the lambda theta')
+      call assert_real (lmdavtheta,0.2d0,1.0d-14,
+     &                  'initostfile restores the theta velocity')
+      call assert_array1 (lmdafmean,fmean0,5,1.0d-12,
+     &                    'initostfile restores the mean force')
+      gmax = 0.0d0
+      gdiff = 0.0d0
+      do i = 1, 5
+         do j = 1, 5
+            gmax = max(gmax,abs(gkern0(i,j)))
+            gdiff = max(gdiff,abs(gkernel(i,j)-gkern0(i,j)))
+         end do
+      end do
+      call assert_logical (gmax.gt.0.0d0,.true.,
+     &                     'initostfile test g kernel is nonzero')
+      call assert_real (gdiff,0.0d0,1.0d-12,
+     &                  'initostfile restores the g kernel')
+      call assert_real (lmdadeltag,deltag0,1.0d-12,
+     &                  'initostfile restores the free energy')
+c
+c     a new gaussian is appended to the same file
+c
+      call sethist (4,0.3d0,0.0d0,1.0d0,0.1d0,1.0d0)
+      lmdaihist(4) = 40
+      nlmdahist = 4
+      call saveost
+      inquire (file=filename(1:leng)//'.ost_2',exist=exist)
+      call assert_logical (exist,.false.,
+     &                     'initostfile claims no new version')
+      ihis = freeunit ()
+      open (unit=ihis,file=ostfile,status='old')
+      do i = 1, 3
+         read (ihis,'(a)')  record
+      end do
+      read (record,*)  i,i,i,i,i,nsave,i
+      do i = 1, 5
+         read (ihis,'(a)')  record
+      end do
+      nline = 0
+      do
+         read (ihis,'(a)',iostat=ios)  record
+         if (ios .ne. 0)  exit
+         nline = nline + 1
+      end do
+      close (unit=ihis)
+      call assert_int (nsave,4,'continued ost header history count')
+      call assert_int (nline,4,'continued ost history record count')
+c
+c     a row past the header count, as left by a run stopped between
+c     appending gaussians and updating the header, is dropped when
+c     the history is continued
+c
+      ihis = freeunit ()
+      open (unit=ihis,file=ostfile,status='old',position='append')
+      write (ihis,'(a)')  '          50       1  stray row'
+      close (unit=ihis)
+      call resetost (5,9,8)
+      use_ost = .true.
+      fastkernel = .true.
+      oststdev = 4.0d0
+      lmdamass = 2.0d0
+      lmdafric = 0.5d0
+      lmdadt = 0.002d0
+      call initostfile
+      call assert_logical (histtail,.true.,
+     &                     'rdosthist finds the stray row')
+      call assert_int (nlmdahist,4,'initostfile skips the stray row')
+      call sethist (5,0.6d0,0.0d0,1.0d0,0.1d0,1.0d0)
+      lmdaihist(5) = 50
+      nlmdahist = 5
+      call saveost
+      ihis = freeunit ()
+      open (unit=ihis,file=ostfile,status='old')
+      nline = 0
+      stray = .false.
+      do
+         read (ihis,'(a)',iostat=ios)  record
+         if (ios .ne. 0)  exit
+         if (index(record,'stray') .gt. 0)  stray = .true.
+         nline = nline + 1
+      end do
+      close (unit=ihis,status='delete')
+      call assert_logical (stray,.false.,
+     &                     'continued ost history drops the stray row')
+      call assert_int (nline-8,5,'ost history keeps the other rows')
+c
+c     restore the global state
+c
+      filename = filename0
+      leng = leng0
+      kelvin = kelvin0
+      use_ost = .false.
+      fastkernel = .false.
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eost_metarestart  --  meta continuation  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eost_metarestart" checks that a fresh run continues an
+c     existing metadynamics history file in place, restoring the
+c     gaussians, the bias grid and the lambda particle, and resuming
+c     at an interval boundary
+c
+c
+      subroutine test_eost_metarestart
+      use bath
+      use dlmda
+      use files
+      use mutant
+      use ost
+      implicit none
+      integer i,ihis
+      integer ios
+      integer leng0
+      integer nline,nsave
+      integer nbyte0,nbyte1
+      integer freeunit
+      real*8 kelvin0
+      real*8 deltag0
+      real*8 metadeltag
+      real*8 vgrid0(5)
+      real*8 dvgrid0(5)
+      real*8 lam(3)
+      logical exist
+      character*240 filename0
+      character*240 metafile
+      character*240 record
+      character*8000 text0,text1
+      data lam / 0.1d0,0.5d0,0.8d0 /
+c
+c
+c     start a metadynamics history in a temporary file
+c
+      filename0 = filename
+      leng0 = leng
+      kelvin0 = kelvin
+      kelvin = 300.0d0
+      filename = 'tinkertest-metarestart'
+      leng = len_trim(filename)
+      metafile = filename(1:leng)//'.meta'
+      inquire (file=metafile,exist=exist)
+      if (exist) then
+         ihis = freeunit ()
+         open (unit=ihis,file=metafile,status='old')
+         close (unit=ihis,status='delete')
+      end if
+      call resetost (5,5,1)
+      use_meta = .true.
+      call resetmeta (8)
+      oststdev = 4.0d0
+      lmdamass = 2.0d0
+      lmdafric = 0.5d0
+      lmdadt = 0.002d0
+      do i = 1, 3
+         metaihist(i) = 10 * i
+         metalhist(i) = lam(i)
+         metahhist(i) = dble(i+1)
+         metawhist(i) = 0.1d0
+      end do
+      nmetahist = 3
+      maxwlhist = 0.1d0
+      call buildmetaindex
+      do i = 1, nmetahist
+         call addmetagrid (i)
+      end do
+      lmdadeltag = metadeltag ()
+      deltag0 = lmdadeltag
+      do i = 1, 5
+         vgrid0(i) = vmetagrid(i)
+         dvgrid0(i) = dvmetagrid(i)
+      end do
+c
+c     open the file, then save the lambda particle partway into
+c     the next interval
+c
+      lmdastep = 30
+      call initmetafile
+      lmdastep = 37
+      lambda = 0.4d0
+      lmdatheta = 0.6d0
+      lmdavtheta = 0.2d0
+      call savemeta
+c
+c     a fresh run with the same settings continues the file
+c
+      call resetost (5,5,1)
+      use_meta = .true.
+      call resetmeta (2)
+      oststdev = 4.0d0
+      lmdamass = 2.0d0
+      lmdafric = 0.5d0
+      lmdadt = 0.002d0
+      lambda = 1.0d0
+      lmdatheta = 0.0d0
+      lmdavtheta = 0.0d0
+      lmdastep = 0
+      call eostfilebytes (metafile,text0,nbyte0)
+      call initmetafile
+      call eostfilebytes (metafile,text1,nbyte1)
+      call assert_logical (histtail,.false.,
+     &                     'rdmetahist finds no rows past the count')
+      call assert_logical (nbyte1.eq.nbyte0 .and. text1.eq.text0,
+     &                     .true.,'initmetafile leaves a clean file')
+      call assert_logical (metasavefile.eq.metafile,.true.,
+     &                     'initmetafile continues the same file')
+      call assert_int (nmetahist,3,
+     &                 'initmetafile restores the gaussians')
+      call assert_int (nmethistsave,3,'initmetafile restores the save')
+      call assert_int (lmdastep,30,
+     &                 'initmetafile resumes on an interval')
+      call assert_real (lambda,0.4d0,1.0d-14,
+     &                  'initmetafile restores the lambda')
+      call assert_real (lmdatheta,0.6d0,1.0d-14,
+     &                  'initmetafile restores the lambda theta')
+      call assert_real (lmdavtheta,0.2d0,1.0d-14,
+     &                  'initmetafile restores the theta velocity')
+      call assert_array1 (vmetagrid,vgrid0,5,1.0d-12,
+     &                    'initmetafile restores the bias grid')
+      call assert_array1 (dvmetagrid,dvgrid0,5,1.0d-12,
+     &                    'initmetafile restores the slope grid')
+      call assert_real (lmdadeltag,deltag0,1.0d-12,
+     &                  'initmetafile restores the free energy')
+c
+c     a new gaussian is appended to the same file
+c
+      metaihist(4) = 40
+      metalhist(4) = 0.3d0
+      metahhist(4) = 1.0d0
+      metawhist(4) = 0.1d0
+      nmetahist = 4
+      call savemeta
+      inquire (file=filename(1:leng)//'.meta_2',exist=exist)
+      call assert_logical (exist,.false.,
+     &                     'initmetafile claims no new version')
+      ihis = freeunit ()
+      open (unit=ihis,file=metafile,status='old')
+      do i = 1, 3
+         read (ihis,'(a)')  record
+      end do
+      read (record,*)  i,i,nsave,i
+      do i = 1, 5
+         read (ihis,'(a)')  record
+      end do
+      nline = 0
+      do
+         read (ihis,'(a)',iostat=ios)  record
+         if (ios .ne. 0)  exit
+         nline = nline + 1
+      end do
+      close (unit=ihis,status='delete')
+      call assert_int (nsave,4,'continued meta header history count')
+      call assert_int (nline,4,'continued meta history record count')
+c
+c     restore the global state
+c
+      filename = filename0
+      leng = leng0
+      kelvin = kelvin0
+      use_meta = .false.
+      return
+      end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_eost_restartrun  --  dynamic restarts  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_eost_restartrun" runs "dynamic" twice for each adaptive
+c     lambda bias method, the second run continuing the history and
+c     trajectory of the first, and checks the runs that are refused
+c
+c
+      subroutine test_eost_restartrun
+      implicit none
+c
+c
+c     continue each method from the files of a previous run
+c
+      call eostrstrun ('OST','ost')
+      call eostrstrun ('META','meta')
+      call eostrstrun ('ABF','abf')
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine eostrstrun  --  restart one dynamics run  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "eostrstrun" makes two 20 step dynamics runs of one lambda bias
+c     method in a scratch directory, the second continuing the first;
+c     it then checks that a run whose settings differ from the stored
+c     history and a run without a thermostat are refused and leave the
+c     history untouched, and that a run that does not end on a save
+c     step writes its restart file at its last step, as the history
+c
+c
+      subroutine eostrstrun (mode,ext)
+      implicit none
+      integer ist,istep
+      logical exist
+      character*(*) mode,ext
+      character*40 tag
+      character*240 histfile
+      character*512 cmd
+c
+c
+c     copy the fixture, pointing its key at the parameter file
+c
+      tag = 'eost restart '//trim(mode)
+      histfile = 'water2.'//ext
+      call pushdir ('file/mutate')
+      cmd = 'rm -rf ../eost_rstrun ; mkdir -p ../eost_rstrun ; '//
+     &      'cp water2.xyz ../eost_rstrun/ ; '//
+     &      'cp vsoft_default_ost.key ../eost_rstrun/water2.key'
+      call execute_command_line (cmd)
+      call popdir
+      call pushdir ('file/eost_rstrun')
+      call tnist_append ('water2.key','lambda-mode '//mode)
+      call tnist_append ('water2.key','lambda-interval 10')
+      call tnist_append ('water2.key','randomseed 12345')
+c
+c     a first run starts the history, and a second one continues it
+c
+      call run_prog ('dynamic','water2 20 1.0 0.01 2 300','out.txt',ist)
+      if (ist .ne. -1) then
+         call assert_int (ist,0,trim(tag)//' first status')
+         cmd = 'grep -q "Bias History Written To" out.txt'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,trim(tag)//' first starts the history')
+         call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                  'out.txt',ist)
+         call assert_int (ist,0,trim(tag)//' second status')
+         cmd = 'grep -q "Bias History Continued From" out.txt'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,trim(tag)//' second continues')
+         cmd = 'grep -q "Restarting Molecular Dynamics" out.txt'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,trim(tag)//' second reads the dyn')
+         inquire (file=trim(histfile)//'_2',exist=exist)
+         call assert_logical (exist,.false.,
+     &                        trim(tag)//' no new version')
+c
+c     a stored setting that differs stops the run, for abf the
+c     interval and for the others the temperature
+c
+         if (mode .eq. 'ABF') then
+            cmd = 'cp water2.key water2.bak ; '//
+     &            'echo "lambda-interval 5" >> water2.key'
+            call execute_command_line (cmd)
+            call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                     'out.txt',ist)
+            call execute_command_line ('mv water2.bak water2.key')
+            cmd = 'grep -q "must match the ABF" out.txt'
+         else
+            call run_prog ('dynamic','water2 20 1.0 0.01 2 310',
+     &                     'out.txt',ist)
+            cmd = 'grep -q "Setting Differs from the Bias" out.txt'
+         end if
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,trim(tag)//' setting refused')
+c
+c     a run without a thermostat is refused
+c
+         call run_prog ('dynamic','water2 20 1.0 0.01 1',
+     &                  'out.txt',ist)
+         cmd = 'grep -q "a Constant Temperature Ensemble" out.txt'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,trim(tag)//' nve refused')
+c
+c     the refused runs leave the continued history at step 40
+c
+         call eosthiststep (histfile,istep)
+         call assert_int (istep,40,trim(tag)//' history step')
+c
+c     a run shorter than the save interval saves nothing on the
+c     way, so the restart file is written at its last step, along
+c     with the history
+c
+         call execute_command_line ('rm -f water2.dyn')
+         call run_prog ('dynamic','water2 5 1.0 0.01 2 300',
+     &                  'out.txt',ist)
+         call assert_int (ist,0,trim(tag)//' short status')
+         inquire (file='water2.dyn',exist=exist)
+         call assert_logical (exist,.true.,
+     &                        trim(tag)//' short writes the dyn')
+         call eosthiststep (histfile,istep)
+         call assert_int (istep,45,trim(tag)//' short history step')
+c
+c     the next run continues both, the history from its last full
+c     interval
+c
+         call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                  'out.txt',ist)
+         call assert_int (ist,0,trim(tag)//' third status')
+         cmd = 'grep -q "Restarting Molecular Dynamics" out.txt'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,trim(tag)//' third reads the dyn')
+         call eosthiststep (histfile,istep)
+         call assert_int (istep,60,trim(tag)//' third history step')
+      end if
+      call popdir
+      call tnist_clean ('eost_rstrun')
+      return
+      end
+c
+c
+c     #######################################################
+c     ##                                                   ##
+c     ##  subroutine eosthiststep  --  history step count  ##
+c     ##                                                   ##
+c     #######################################################
+c
+c
+c     "eosthiststep" returns the dynamics step count stored in the
+c     header of a lambda bias history file, the first value of its
+c     integer state record
+c
+c
+      subroutine eosthiststep (histfile,istep)
+      implicit none
+      integer ihis,istep
+      integer freeunit
+      character*240 record
+      character*(*) histfile
+c
+c
+c     read the third header record, which holds the integer state
+c
+      ihis = freeunit ()
+      open (unit=ihis,file=histfile,status='old')
+      read (ihis,'(a)')  record
+      read (ihis,'(a)')  record
+      read (ihis,'(a)')  record
+      close (unit=ihis)
+      read (record,*)  istep
+      return
+      end
+c
+c
+c     ########################################################
+c     ##                                                    ##
+c     ##  subroutine eostfilebytes  --  whole file content  ##
+c     ##                                                    ##
+c     ########################################################
+c
+c
+c     "eostfilebytes" reads the whole content of a small history file
+c     into a text buffer, so tests can check a file is left unchanged
+c
+c
+      subroutine eostfilebytes (histfile,text,nbyte)
+      implicit none
+      integer ihis,nbyte
+      integer freeunit
+      character*(*) histfile
+      character*(*) text
+c
+c
+c     read the file as a single unformatted stream
+c
+      inquire (file=histfile,size=nbyte)
+      text = ' '
+      ihis = freeunit ()
+      open (unit=ihis,file=histfile,status='old',access='stream',
+     &      form='unformatted')
+      read (ihis)  text(1:min(nbyte,len(text)))
+      close (unit=ihis)
+      call assert_logical (nbyte.le.len(text),.true.,
+     &                     'eostfilebytes buffer holds the file')
       return
       end
 c

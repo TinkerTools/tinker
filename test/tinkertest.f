@@ -93,6 +93,7 @@ c
       call test_pitors
       call test_readxyz
       call test_polpair
+      call test_rattle
       call test_rephippo
       call test_strbnd
       call test_strtor
@@ -115,6 +116,7 @@ c
       call test_testlmda
       call test_testvir
       call test_tinkernist
+      call test_verlet
       call test_xyzedit
       call test_xyzpdb
 c

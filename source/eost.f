@@ -1526,28 +1526,96 @@ c     ###########################################################
 c
 c
 c     "initostfile" opens the external file that will hold the ost
-c     bias history and writes its initial header; a new version is
-c     claimed so a rerun cannot append onto an earlier history
+c     bias history; an existing history is read back and continued
+c     at an interval boundary, and every setting stored in its header
+c     must match the current run, while otherwise a new file is started
 c
 c
       subroutine initostfile
+      use bath
       use dlmda
       use files
       use iounit
+      use ost
       implicit none
       integer ihis
+      integer nlmda0
+      integer lmdaintv0
       integer freeunit
       integer trimtext
+      real*8 wflmda0
+      real*8 oststdev0,kelvin0
+      real*8 lmdamass0,lmdafric0
+      real*8 lmdadt0
+      logical exist
+      character*11 rname
 c
 c
 c     return if ost has not been initialized
 c
       if (.not. use_ost)  return
 c
-c     open a new file, keeping any output from a previous run
+c     continue from the latest existing ost history file
+c
+      lmdasavefile = filename(1:leng)//'.ost'
+      call version (lmdasavefile,'old')
+      inquire (file=lmdasavefile,exist=exist)
+      if (exist) then
+         nlmda0 = nlmda
+         lmdaintv0 = lmdaintv
+         wflmda0 = wflmda
+         oststdev0 = oststdev
+         kelvin0 = kelvin
+         lmdamass0 = lmdamass
+         lmdafric0 = lmdafric
+         lmdadt0 = lmdadt
+         call rdost
+c
+c     every setting stored in the header must match the current run
+c
+         rname = 'INITOSTFILE'
+         call chkbiasset (rname,'LAMBDA-NBIN',dble(nlmda0),
+     &                    dble(nlmda),lmdasavefile)
+         call chkbiasset (rname,'LAMBDA-INTERVAL',dble(lmdaintv0),
+     &                    dble(lmdaintv),lmdasavefile)
+         call chkbiasset (rname,'FLAMBDA-WIDTH',wflmda0,wflmda,
+     &                    lmdasavefile)
+         call chkbiasset (rname,'OST-STDDEV',oststdev0,oststdev,
+     &                    lmdasavefile)
+         call chkbiasset (rname,'Temperature',kelvin0,kelvin,
+     &                    lmdasavefile)
+         call chkbiasset (rname,'LAMBDA-MASS',lmdamass0,lmdamass,
+     &                    lmdasavefile)
+         call chkbiasset (rname,'LAMBDA-FRICTION',lmdafric0,lmdafric,
+     &                    lmdasavefile)
+         call chkbiasset (rname,'LAMBDA-DT',lmdadt0,lmdadt,
+     &                    lmdasavefile)
+c
+c     resume at an interval boundary, since the samples of a partial
+c     interval are not saved in the history file
+c
+         lmdastep = (lmdastep/lmdaintv) * lmdaintv
+c
+c     drop the rows an interrupted save appended after the last
+c     header update by rewriting the file from the gaussians just
+c     read; a clean file is left alone until the first save
+c     updates its header
+c
+         if (histtail) then
+            ihis = freeunit ()
+            open (unit=ihis,file=lmdasavefile,status='replace',
+     &            access='stream',form='formatted')
+            call prtost (ihis)
+            close (unit=ihis)
+         end if
+         write (iout,10)  lmdasavefile(1:trimtext(lmdasavefile))
+   10    format (/,' OST  --  Bias History Continued From  ',a)
+         return
+      end if
+c
+c     otherwise open a new file holding the current history
 c
       ihis = freeunit ()
-      lmdasavefile = filename(1:leng)//'.ost'
       call version (lmdasavefile,'new')
       open (unit=ihis,file=lmdasavefile,status='new',
      &      access='stream',form='formatted')
@@ -1557,8 +1625,8 @@ c
 c
 c     report the name of the file holding the bias history
 c
-      write (iout,10)  lmdasavefile(1:trimtext(lmdasavefile))
-   10 format (/,' OST  --  Bias History Written To  ',a)
+      write (iout,20)  lmdasavefile(1:trimtext(lmdasavefile))
+   20 format (/,' OST  --  Bias History Written To  ',a)
       return
       end
 c
@@ -1617,7 +1685,7 @@ c
 c
 c     "rdost" reads a saved ost bias history from the external
 c     .ost file, then rebuilds the histogram lookup and bias
-c     kernels; used for analysis, not to restart a simulation
+c     kernels; used to continue an ost simulation
 c
 c
       subroutine rdost
@@ -1776,6 +1844,14 @@ c
          maxwfhist = max(maxwfhist,ostwfhist(ihist))
       end do
    10 format (a240)
+c
+c     note any rows past the saved count, which an interrupted save
+c     leaves behind
+c
+      histtail = .false.
+      read (ihis,10,err=15,end=15)  record
+      histtail = .true.
+   15 continue
       close (unit=ihis)
 c
 c     rebuild lookup table and kernels from the saved gaussians
@@ -1915,29 +1991,93 @@ c     ##############################################################
 c
 c
 c     "initmetafile" opens the external file that will hold the
-c     metadynamics bias history and writes its initial header; a new
-c     version is claimed so a rerun cannot append onto an earlier one
+c     metadynamics bias history; an existing history is read back and
+c     continued at an interval boundary, and every setting stored in
+c     its header must match the current run, while otherwise a new
+c     file is started
 c
 c
       subroutine initmetafile
+      use bath
       use dlmda
       use files
       use iounit
       use ost
       implicit none
       integer ihis
+      integer nlmda0
+      integer lmdaintv0
       integer freeunit
       integer trimtext
+      real*8 oststdev0,kelvin0
+      real*8 lmdamass0,lmdafric0
+      real*8 lmdadt0
+      logical exist
+      character*12 rname
 c
 c
 c     return if metadynamics has not been initialized
 c
       if (.not. use_meta)  return
 c
-c     open a new file, keeping any output from a previous run
+c     continue from the latest existing metadynamics history file
+c
+      metasavefile = filename(1:leng)//'.meta'
+      call version (metasavefile,'old')
+      inquire (file=metasavefile,exist=exist)
+      if (exist) then
+         nlmda0 = nlmda
+         lmdaintv0 = lmdaintv
+         oststdev0 = oststdev
+         kelvin0 = kelvin
+         lmdamass0 = lmdamass
+         lmdafric0 = lmdafric
+         lmdadt0 = lmdadt
+         call rdmeta
+c
+c     every setting stored in the header must match the current run
+c
+         rname = 'INITMETAFILE'
+         call chkbiasset (rname,'LAMBDA-NBIN',dble(nlmda0),
+     &                    dble(nlmda),metasavefile)
+         call chkbiasset (rname,'LAMBDA-INTERVAL',dble(lmdaintv0),
+     &                    dble(lmdaintv),metasavefile)
+         call chkbiasset (rname,'OST-STDDEV',oststdev0,oststdev,
+     &                    metasavefile)
+         call chkbiasset (rname,'Temperature',kelvin0,kelvin,
+     &                    metasavefile)
+         call chkbiasset (rname,'LAMBDA-MASS',lmdamass0,lmdamass,
+     &                    metasavefile)
+         call chkbiasset (rname,'LAMBDA-FRICTION',lmdafric0,lmdafric,
+     &                    metasavefile)
+         call chkbiasset (rname,'LAMBDA-DT',lmdadt0,lmdadt,
+     &                    metasavefile)
+c
+c     resume at an interval boundary, since the samples of a partial
+c     interval are not saved in the history file
+c
+         lmdastep = (lmdastep/lmdaintv) * lmdaintv
+c
+c     drop the rows an interrupted save appended after the last
+c     header update by rewriting the file from the gaussians just
+c     read; a clean file is left alone until the first save
+c     updates its header
+c
+         if (histtail) then
+            ihis = freeunit ()
+            open (unit=ihis,file=metasavefile,status='replace',
+     &            access='stream',form='formatted')
+            call prtmeta (ihis)
+            close (unit=ihis)
+         end if
+         write (iout,10)  metasavefile(1:trimtext(metasavefile))
+   10    format (/,' METADYN  --  Bias History Continued From  ',a)
+         return
+      end if
+c
+c     otherwise open a new file holding the current history
 c
       ihis = freeunit ()
-      metasavefile = filename(1:leng)//'.meta'
       call version (metasavefile,'new')
       open (unit=ihis,file=metasavefile,status='new',
      &      access='stream',form='formatted')
@@ -1947,8 +2087,60 @@ c
 c
 c     report the name of the file holding the bias history
 c
-      write (iout,10)  metasavefile(1:trimtext(metasavefile))
-   10 format (/,' METADYN  --  Bias History Written To  ',a)
+      write (iout,20)  metasavefile(1:trimtext(metasavefile))
+   20 format (/,' METADYN  --  Bias History Written To  ',a)
+      return
+      end
+c
+c
+c     #########################################################
+c     ##                                                     ##
+c     ##  subroutine rdmeta  --  input metadynamics history  ##
+c     ##                                                     ##
+c     #########################################################
+c
+c
+c     "rdmeta" reads a saved metadynamics bias history from the
+c     external .meta file, then rebuilds the bin lookup and the
+c     bias grid; used to continue a metadynamics simulation
+c
+c
+      subroutine rdmeta
+      use iounit
+      use ost
+      implicit none
+      integer ihis
+      integer freeunit
+      integer trimtext
+      logical exist
+      character*240 metafile
+      character*240 title
+c
+c
+c     return unless a metadynamics history file is present
+c
+      metafile = metasavefile
+      inquire (file=metafile,exist=exist)
+      if (.not. exist)  return
+      ihis = freeunit ()
+      open (unit=ihis,file=metafile,status='old')
+      rewind (unit=ihis)
+c
+c     read the header, which must be that of a metadynamics history
+c
+      call rdbiashead (ihis,metafile,title)
+      if (index(title,metatitle(1:trimtext(metatitle))) .eq. 0) then
+         close (unit=ihis)
+         write (iout,10)  metafile(1:trimtext(metafile))
+   10    format (/,' RDMETA  --  File is not a Metadynamics History',
+     &              ' File',
+     &           /,'            File Name :  ',a)
+         call fatal
+      end if
+c
+c     read the gaussian history entries and rebuild the grid
+c
+      call rdmetahist (ihis,metafile)
       return
       end
 c
@@ -2069,6 +2261,14 @@ c
      &      metalhist(ihist),metahhist(ihist),metawhist(ihist)
       end do
    10 format (a240)
+c
+c     note any rows past the saved count, which an interrupted save
+c     leaves behind
+c
+      histtail = .false.
+      read (ihis,10,err=15,end=15)  record
+      histtail = .true.
+   15 continue
       close (unit=ihis)
 c
 c     take the gaussian width maximum from the widths saved with each
