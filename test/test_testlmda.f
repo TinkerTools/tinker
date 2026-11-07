@@ -157,6 +157,17 @@ c     case 167 puts the Trp-cage with its net charged ligand under the
 c     usual Ewald boundary, so the neutralizing background charge and
 c     its lambda derivatives follow the charge of the ligand
 c
+c     cases 168 to 173 put the AMOEBA water box of "test_truncated8"
+c     in its truncated octahedron, where reciprocal space keeps only
+c     the wavevectors with h+k+l even and the volume is half the cube;
+c     the first water lies 3.7 and the second 0.6 Angstroms from a
+c     hexagonal face, so their pairs cross the octahedral images: an
+c     absolute leg in single topology, then every lambda at once with
+c     the long range correction, neighbor list and dual topology, and
+c     the staged relative legs, the lig1 and lig2 legs of three stages,
+c     the van der Waals leg with the long range correction and list,
+c     and the lig1 leg in single topology
+c
 c
       subroutine test_testlmda
       implicit none
@@ -438,6 +449,18 @@ c
      &   'tip3box','1e-3')
       call test_testlmda_xyz ('167_trp_chg_ewald_l05',
      &   '../chglj/trp_charmm','1e-3')
+      call test_testlmda_xyz ('168_octwat_pol_ewald_st_l05',
+     &   '../truncated8/octwater','1e-4')
+      call test_testlmda_xyz ('169_octwat_all_vcorr_nlist_dt_l04',
+     &   '../truncated8/octwater','1e-4')
+      call test_testlmda_xyz ('170_octwat_rels3_l085',
+     &   '../truncated8/octwater','1e-4')
+      call test_testlmda_xyz ('171_octwat_rels3_l015',
+     &   '../truncated8/octwater','1e-4')
+      call test_testlmda_xyz ('172_octwat_rels_vdwm_vcorr_nlist_l05',
+     &   '../truncated8/octwater','1e-4')
+      call test_testlmda_xyz ('173_octwat_rels_lig1_st_l085',
+     &   '../truncated8/octwater','1e-4')
       return
       end
 c
