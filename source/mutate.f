@@ -2109,12 +2109,11 @@ c     note charge transfer electrostatics is not treated by parameter
 c     scaling due to the functional form used; instead the potential
 c     routines scale each pair by the product of the "grpscale" scales
 c     of its two groups at the polarization lambda, as the multipoles
-c     are, or under dual topology by the polarization weight between
-c     the pair scales of the two endpoint states, as given by
-c     "ctlmdasc"; the staged relative legs follow from the group
-c     scales, and the lambda derivative is added to that of the
-c     polarization term; pairs within the ligand are always
-c     annihilated, whatever the van der Waals coupling
+c     are, as given by "ctlmdasc", whatever the polarization topology;
+c     the staged relative legs follow from the group scales, and the
+c     lambda derivative is added to that of the polarization term;
+c     pairs within the ligand are always annihilated, whatever the
+c     van der Waals coupling
 c
 c
       subroutine altelec

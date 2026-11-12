@@ -34,16 +34,16 @@
  Number of Ligand2 Atoms                   9
 
  Analytical Lambda Derivatives :             dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                        -28.425888      0.000000      0.000000    -28.425888
+                                        -28.351880      0.000000      0.000000    -28.351880
 
  Numerical Lambda Derivatives :              dE/dL        dEV/dL        dEM/dL        dEP/dL
-                                        -28.425880      0.000000      0.000000    -28.425880
+                                        -28.351873      0.000000      0.000000    -28.351873
 
  Analytical 2nd Lambda Derivatives :       d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                       -284.258875      0.000000      0.000000   -284.258875
+                                       -284.778504      0.000000      0.000000   -284.778504
 
  Numerical 2nd Lambda Derivatives :        d2E/dL2      d2EV/dL2      d2EM/dL2      d2EP/dL2
-                                       -284.258804      0.000000      0.000000   -284.258804
+                                       -284.778433      0.000000      0.000000   -284.778433
 
  Lambda Gradient Breakdown over Individual Atoms :
 
@@ -53,14 +53,14 @@
  Numer         1        21.965184    -22.326959     39.672453     50.545681
  Anlyt         2        -0.026417     -0.307416      0.426140      0.526116
  Numer         2        -0.026417     -0.307416      0.426140      0.526115
- Anlyt         3        -0.078306     -0.164805      0.254078      0.312807
- Numer         3        -0.078306     -0.164805      0.254078      0.312807
- Anlyt         4        -0.230942     -0.272673      0.185666      0.402687
- Numer         4        -0.230942     -0.272673      0.185666      0.402687
- Anlyt         5        -0.022485     -0.019783      0.040668      0.050506
- Numer         5        -0.022485     -0.019783      0.040668      0.050505
- Anlyt         6       -31.316182      8.082246     37.974295     49.880588
- Numer         6       -31.316175      8.082244     37.974285     49.880576
+ Anlyt         3        -0.035111     -0.070699      0.111287      0.136440
+ Numer         3        -0.035111     -0.070699      0.111287      0.136440
+ Anlyt         4        -0.105690     -0.149682      0.145753      0.234135
+ Numer         4        -0.105690     -0.149682      0.145753      0.234135
+ Anlyt         5        -0.011353     -0.017309      0.031474      0.037671
+ Numer         5        -0.011353     -0.017309      0.031474      0.037671
+ Anlyt         6       -31.495762      7.862676     38.166193     50.104520
+ Numer         6       -31.495754      7.862674     38.166183     50.104508
  Anlyt         7         0.000000      0.000000      0.000000      0.000000
  Numer         7         0.000000      0.000000      0.000000      0.000000
  Anlyt         8         0.000000      0.000000      0.000000      0.000000
@@ -130,16 +130,16 @@
 
  Total Gradient Norm and RMS Gradient per Atom :
 
- Anlyt      Total Gradient Norm Value              100.750298
- Numer      Total Gradient Norm Value              100.750273
+ Anlyt      Total Gradient Norm Value              100.860422
+ Numer      Total Gradient Norm Value              100.860396
 
- Anlyt      RMS Gradient over All Atoms             16.132959
- Numer      RMS Gradient over All Atoms             16.132955
+ Anlyt      RMS Gradient over All Atoms             16.150593
+ Numer      RMS Gradient over All Atoms             16.150589
 
- Analytical dV/dL :               79.308      -38.668      -15.308
-                                 -38.668       29.046      -19.668
-                                 -15.308      -19.668      107.933
+ Analytical dV/dL :               79.054      -38.929      -15.140
+                                 -38.929       28.729      -19.419
+                                 -15.140      -19.419      107.623
 
- Numerical dV/dL :                79.308      -38.668      -15.308
-                                 -38.668       29.046      -19.668
-                                 -15.308      -19.668      107.933
+ Numerical dV/dL :                79.054      -38.929      -15.140
+                                 -38.929       28.729      -19.419
+                                 -15.140      -19.419      107.623

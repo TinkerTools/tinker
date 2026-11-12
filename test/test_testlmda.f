@@ -45,21 +45,24 @@ c     electrostatic lambda map, in single and dual topology
 c
 c     cases 73 to 80 cover charge transfer, which follows the
 c     polarization lambda and is counted in dEP/dL: HIPPO water charge
-c     transfer alone in single and dual topology, with a squared dual
-c     topology weight, the multipole list and a zero lambda endpoint,
-c     then with multipoles and polarization at split lambdas, under
-c     Ewald, and for an AMOEBA+ alcohol tetramer; charge transfer
-c     scales each pair by the product of its two group scales in
-c     single topology and by the polarization weight in dual topology
+c     transfer alone with first derivatives only and with the second
+c     and mixed derivatives that orthogonal space tempering asks for,
+c     with a squared dual topology weight that must leave charge
+c     transfer as in case 74, the multipole list and a zero lambda
+c     endpoint, then with multipoles and polarization at split lambdas,
+c     under Ewald, and for an AMOEBA+ alcohol tetramer; charge transfer
+c     scales each pair by the product of its two group scales whatever
+c     the polarization topology
 c
 c     cases 81 to 83 add replicate cells, group weights and a lambda
 c     range that leaves the ligand pairs off
 c
 c     cases 84 to 90 put charge transfer on the staged relative legs
 c     of an AMOEBA+ alcohol tetramer whose two ligands are in contact,
-c     alone on the ligand 1 and ligand 2 legs in single and dual
-c     topology and on the van der Waals leg, where it carries no
-c     lambda derivative, then with multipoles, polarization and
+c     alone on the ligand 1 and ligand 2 legs with first derivatives
+c     only and with second derivatives, whose ligand pairs go as the
+c     square of lambda, and on the van der Waals leg, where it carries
+c     no lambda derivative, then with multipoles, polarization and
 c     charge flux under Ewald for the tetramer and for HIPPO water
 c
 c     cases 91 to 100 cover HIPPO Pauli repulsion, which follows the

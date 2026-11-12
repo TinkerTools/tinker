@@ -31,9 +31,10 @@ c
 c     case 10 annihilates a neutral ligand with Ewald dispersion,
 c     whose reciprocal space virial combines two rescaled sums
 c
-c     case 11 scales HIPPO water charge transfer by a squared dual
-c     topology weight through "echgtrn1", in a box small enough for
-c     the cutoff to reach replicate cells
+c     case 11 scales HIPPO water charge transfer by the polarization
+c     lambda through "echgtrn1" under orthogonal space tempering, whose
+c     squared dual topology weight charge transfer ignores, in a box
+c     small enough for the cutoff to reach replicate cells
 c
 c     case 12 adds the long range dispersion correction with a wide
 c     taper window, whose virial must be minus its energy, as the

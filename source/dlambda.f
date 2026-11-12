@@ -639,24 +639,21 @@ c     "ctlmdasc" returns the scale applied to charge transfer pairs
 c     for each pair of atom groups, along with its first and second
 c     derivatives with respect to the polarization lambda, and flags
 c     the group pairs that carry energy or, when "dodl" is set, a
-c     lambda derivative; single topology scales a pair by the product
-c     of the two group scales from "grpscale", as for the multipoles,
-c     and dual topology interpolates between the pair scales of the
-c     two endpoint states with the power law weight of polarization,
-c     so in a staged relative leg the other ligand is annihilated and
-c     the two ligands never interact
+c     lambda derivative; a pair is scaled by the product of the two
+c     group scales from "grpscale", as for the multipoles, so in a
+c     staged relative leg the other ligand is annihilated and the
+c     two ligands never interact
+c
+c     charge transfer stays in single topology even when polarization
+c     uses dual topology, since it is pairwise additive and the path
+c     between the shared end states leaves the free energy unchanged
 c
 c
       subroutine ctlmdasc (dodl,sc,dsc,d2sc,live)
-      use dlmda
       use mutant
       implicit none
       integer i,k
-      real*8 w,dw,d2w
-      real*8 s0,s1
       real*8 g(0:2),dg(0:2)
-      real*8 g0(0:2),dg0(0:2)
-      real*8 g1(0:2),dg1(0:2)
       real*8 sc(0:2,0:2)
       real*8 dsc(0:2,0:2)
       real*8 d2sc(0:2,0:2)
@@ -664,34 +661,16 @@ c
       logical live(0:2,0:2)
 c
 c
-c     dual topology interpolates the pair scales of the endpoints
+c     take the product of the two group scales
 c
-      if (use_epdt) then
-         call lmdapwr (plambda,dble(epdtexp),.true.,w,dw,d2w)
-         call grpscale (0.0d0,g0,dg0)
-         call grpscale (1.0d0,g1,dg1)
-         do i = 0, 2
-            do k = 0, 2
-               s0 = g0(k) * g0(i)
-               s1 = g1(k) * g1(i)
-               sc(k,i) = s0 + w*(s1-s0)
-               dsc(k,i) = dw * (s1-s0)
-               d2sc(k,i) = d2w * (s1-s0)
-            end do
+      call grpscale (plambda,g,dg)
+      do i = 0, 2
+         do k = 0, 2
+            sc(k,i) = g(k) * g(i)
+            call dlprod (g(k),g(i),dg(k),dg(i),.true.,dsc(k,i),
+     &                   d2sc(k,i))
          end do
-c
-c     single topology takes the product of the two group scales
-c
-      else
-         call grpscale (plambda,g,dg)
-         do i = 0, 2
-            do k = 0, 2
-               sc(k,i) = g(k) * g(i)
-               call dlprod (g(k),g(i),dg(k),dg(i),.true.,dsc(k,i),
-     &                      d2sc(k,i))
-            end do
-         end do
-      end if
+      end do
 c
 c     a group pair is live while it carries energy or a needed
 c     lambda derivative

@@ -2168,7 +2168,7 @@ c     derivatives, so "epolar1p" rescales the multipoles to the
 c     polarization lambda; fixture 213 adds charge transfer to 212,
 c     which follows the polarization lambda, and fixture 214 takes
 c     charge transfer alone under orthogonal space tempering with a
-c     squared dual topology weight
+c     squared dual topology weight, which charge transfer ignores
 c
 c
       subroutine test_mutate_cpol
@@ -2248,21 +2248,22 @@ c
 c     "test_mutate_ctscale" checks the charge transfer lambda scale;
 c     fixtures 215 to 217 mutate the whole AMOEBA+ water and ethanol
 c     gas dimer, so every pair lies within the ligand, and at a half
-c     polarization lambda single topology must give a quarter of the
-c     coupled charge transfer energy, from the product of the two
-c     group scales, while dual topology must give half of it, from the
-c     linear endpoint weight; fixtures 218 to 221 annihilate the
-c     ethanol of an AMOEBA+ alcohol tetramer, whose environment keeps
-c     its own charge transfer, and hold single and dual topology to
-c     one reference at each end of the main lambda, since the two
-c     paths differ only in between
+c     polarization lambda charge transfer must give a quarter of the
+c     coupled energy, from the product of the two group scales, and
+c     must do so as well under dual topology polarization, which
+c     leaves charge transfer in single topology; fixtures 218 to 221
+c     annihilate the ethanol of an AMOEBA+ alcohol tetramer, whose
+c     environment keeps its own charge transfer, and hold the keys
+c     with second lambda derivatives, which turn on dual topology
+c     polarization, to the references without them at each end of
+c     the main lambda
 c
 c
       subroutine test_mutate_ctscale
       use energi
       implicit none
       real*8 energy
-      real*8 e,e1,e05
+      real*8 e,e1,e05,e05dt
       logical skiptest
 c
 c
@@ -2285,18 +2286,18 @@ c
          call assert_real (e05,0.25d0*e1,1.0d-10,
      &                     'ctscale single topology ligand pair')
 c
-c     dual topology scales a ligand pair by the endpoint weight
+c     dual topology polarization leaves the ligand pair scale alone
 c
          call loadfix ('apgas','217_apgas_ct_all_dt_p05.key')
          e = energy ()
-         e05 = ect
+         e05dt = ect
          call final
-         call assert_real (e05,0.5d0*e1,1.0d-10,
-     &                     'ctscale dual topology ligand pair')
+         call assert_real (e05dt,e05,1.0d-10,
+     &                     'ctscale dual topology key ligand pair')
          call popdir
       end if
 c
-c     single and dual topology share both end states
+c     second lambda derivatives keep both end states
 c
       call test_mutate_calc ('aptetra','218_aptetra_ct_st_l00.key',
      &   '218_aptetra_ct_st_l00.txt','218_aptetra_ct_st_l00',
@@ -2324,18 +2325,19 @@ c
 c     "test_mutate_ctrel" runs charge transfer alone on the staged
 c     relative legs of an AMOEBA+ alcohol tetramer, with a methanol
 c     as ligand 1 and an ethanol as ligand 2 in contact with it;
-c     fixture 222 is the ligand 1 leg in dual topology with its own
-c     reference, and fixtures 223 to 232 hold each end state of the
-c     schedule to an absolute fixture of the same physics, so main
-c     lambda 1.0 matches ligand 2 annihilated, 0.0 matches ligand 1
-c     annihilated, and the van der Waals leg and the four leg
-c     junctions, reached from either side, match both annihilated
+c     fixture 222 is the ligand 1 leg with second lambda derivatives
+c     and its own reference, and fixtures 223 to 232 hold each end
+c     state of the schedule to an absolute fixture of the same
+c     physics, so main lambda 1.0 matches ligand 2 annihilated, 0.0
+c     matches ligand 1 annihilated, and the van der Waals leg and the
+c     four leg junctions, reached from either side, match both
+c     annihilated
 c
 c     inside the ligand 1 leg, ligand 2 must contribute nothing at all,
-c     so the charge transfer energy at main lambda 0.85, in single and
-c     dual topology, must equal that of the tetramer with the ethanol
-c     deleted, mutated as an absolute ligand at the same polarization
-c     lambda
+c     so the charge transfer energy at main lambda 0.85, under single
+c     and dual topology polarization, must equal that of the tetramer
+c     with the ethanol deleted, mutated as an absolute ligand at the
+c     same polarization lambda
 c
 c
       subroutine test_mutate_ctrel
@@ -2364,7 +2366,8 @@ c
          call assert_real (ect,erel,1.0d-10,
      &                     'ctrel single topology without ligand 2')
 c
-c     the ligand 1 leg leaves ligand 2 out in dual topology
+c     the ligand 1 leg leaves ligand 2 out under dual topology
+c     polarization
 c
          call loadfix ('aptetra','222_aptetra_ct_rel_lig1_dt_l085.key')
          e = energy ()
@@ -2376,7 +2379,7 @@ c
          e = energy ()
          call final
          call assert_real (ect,erel,1.0d-10,
-     &                     'ctrel dual topology without ligand 2')
+     &                     'ctrel dual topology key without ligand 2')
          call popdir
       end if
 c
