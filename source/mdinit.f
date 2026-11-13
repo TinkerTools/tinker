@@ -21,6 +21,7 @@ c
       use atoms
       use bath
       use bound
+      use boxes
       use couple
       use extfld
       use files
@@ -306,6 +307,21 @@ c
    40       format (/,' MDINIT  --  No Atom-Based Monte Carlo',
      &                 ' Barostat with Constraints')
             call fatal
+         end if
+      end if
+c
+c     only isotropic scaling keeps a nonprism cell's shape
+c
+      if (isobaric .and. use_bounds .and. nonprism) then
+         if (barostat.eq.'BERENDSEN' .or. barostat.eq.'BUSSI' .or.
+     &       barostat.eq.'MONTECARLO') then
+            if (prestyp .ne. 'ISOTROPIC') then
+               write (iout,45)  prestyp(1:trimtext(prestyp))
+   45          format (/,' MDINIT  --  ',a,' Pressure Control is',
+     &                    ' Not Available for Octahedral or',
+     &                    ' Dodecahedral Boxes')
+               call fatal
+            end if
          end if
       end if
 c

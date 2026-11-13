@@ -323,3 +323,87 @@ c
       call final
       return
       end
+c
+c
+c     #############################################################
+c     ##                                                         ##
+c     ##  subroutine test_barostat_nonprism  --  octahedral NPT  ##
+c     ##                                                         ##
+c     #############################################################
+c
+c
+c     "test_barostat_nonprism" checks that anisotropic and semi-
+c     isotropic pressure control are refused for a truncated
+c     octahedron, whose shape only isotropic scaling keeps, and that
+c     an isotropic Monte Carlo barostat run still ends normally
+c
+c
+      subroutine test_barostat_nonprism
+      implicit none
+      logical skiptest
+      character*(*) tname
+      parameter (tname='test_barostat_nonprism')
+c
+c
+      if (skiptest(tname,'barostat'))  return
+      call octnpt (tname,'montecarlo','aniso',.true.)
+      call octnpt (tname,'montecarlo','semiiso',.true.)
+      call octnpt (tname,'bussi','aniso',.true.)
+      call octnpt (tname,'berendsen','semiiso',.true.)
+      call octnpt (tname,'montecarlo','isotropic',.false.)
+      return
+      end
+c
+c
+c     #####################################################
+c     ##                                                 ##
+c     ##  subroutine octnpt  --  one octahedral NPT run  ##
+c     ##                                                 ##
+c     #####################################################
+c
+c
+c     "octnpt" runs two steps of NPT dynamics on the octahedral water
+c     box with the given barostat and pressure control type, and
+c     checks either that the run is refused or that it ends normally
+c
+c
+      subroutine octnpt (tname,baro,ptyp,refuse)
+      implicit none
+      integer ist,igrep
+      logical refuse
+      character*(*) tname,baro,ptyp
+      character*60 tag
+      character*512 cmd
+c
+c
+      tag = tname//' '//trim(baro)//' '//trim(ptyp)
+      call pushdir ('file/truncated8')
+      cmd = 'rm -rf ../barostat_oct ; mkdir -p ../barostat_oct ; '//
+     &      'cp octwater.xyz octtip3p.key ../barostat_oct/'
+      call execute_command_line (cmd)
+      call popdir
+      call pushdir ('file/barostat_oct')
+      call execute_command_line ('mv octtip3p.key octwater.key')
+      call tnist_append ('octwater.key','barostat '//baro)
+      call tnist_append ('octwater.key','pressure '//ptyp)
+      call tnist_append ('octwater.key','volume-trial 1')
+      call tnist_append ('octwater.key','randomseed 123456789')
+      call run_prog ('dynamic','octwater 2 1.0 0.002 4 298 1.0',
+     &                  'out.txt',ist)
+      if (ist .ne. -1) then
+         cmd = 'grep -q "Not Available for Octahedral" out.txt'
+         call execute_command_line (cmd,exitstat=igrep)
+         if (refuse) then
+            call assert_int (igrep,0,trim(tag)//' refused')
+         else
+            call assert_int (ist,0,trim(tag)//' status')
+            call assert_int (igrep,1,trim(tag)//' allowed')
+            cmd = 'grep -q "Illegal Value" out.txt'
+            call execute_command_line (cmd,exitstat=igrep)
+            call assert_int (igrep,1,trim(tag)//' finite energy')
+         end if
+      end if
+      call popdir
+      call tnist_clean ('barostat_oct')
+      return
+      end
