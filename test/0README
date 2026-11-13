@@ -23,3 +23,10 @@
       detail lines can be printed by setting DETAIL to "-v", for example
       "make test FILTER=amoeba DETAIL=-v".
 
+      The tests use all available OpenMP threads by default. To run them
+      on a single core, set OMP_NUM_THREADS on the command line, which is
+      also inherited by any Tinker programs the tests launch:
+
+          OMP_NUM_THREADS=1 make test
+          OMP_NUM_THREADS=1 make test FILTER=<tag>
+

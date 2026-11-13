@@ -855,17 +855,20 @@ c
      &         /,1x,'Lambda Temperature',9x,d20.10,' K')
 c
 c     smooth the theta map factor with the height weighted mean
-c     width of the deposited gaussians
+c     width of the deposited gaussians, which Monte Carlo trials
+c     have no use for
 c
-      sig = 0.0d0
-      hsum = 0.0d0
-      do ihist = 1, nmetahist
-         sig = sig + metahhist(ihist)*metawhist(ihist)
-         hsum = hsum + metahhist(ihist)
-      end do
-      if (hsum .gt. 0.0d0)  sig = sig / hsum
-      rt = gasconst * lmdatemp()
-      jac0 = lmdathjac (0.0d0,sig,oststdev*sig)
+      if (.not. use_lmdamc) then
+         sig = 0.0d0
+         hsum = 0.0d0
+         do ihist = 1, nmetahist
+            sig = sig + metahhist(ihist)*metawhist(ihist)
+            hsum = hsum + metahhist(ihist)
+         end do
+         if (hsum .gt. 0.0d0)  sig = sig / hsum
+         rt = gasconst * lmdatemp()
+         jac0 = lmdathjac (0.0d0,sig,oststdev*sig)
+      end if
 c
 c     write the free energy at each lambda bin as the negative of
 c     the deposited bias with the theta map factor, shifted to zero
