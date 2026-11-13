@@ -68,7 +68,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'hippo'))  return
+      if (skiptest(tpre//tname,'hippo',1))  return
       call pushdir ('file/chgtrn')
       if (uselist) then
          call loadfix_keyadd ('dmso','chgtrn.key','neighbor-list')

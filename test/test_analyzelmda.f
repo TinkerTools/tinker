@@ -25,7 +25,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_analyzelmda','lambda'))  return
+      if (skiptest('test_analyzelmda','lambda',5))  return
       call test_lmda_ost
       call test_lmda_abf
       call test_lmda_meta

@@ -137,7 +137,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoebaplus'))  return
+      if (skiptest(tpre//tname,'amoebaplus',1))  return
       call pushdir ('file/aplusliquid')
       if (uselist) then
          call loadfix_keyadd ('tetramer',key//'.key','neighbor-list')

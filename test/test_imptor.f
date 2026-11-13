@@ -70,7 +70,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amber'))  return
+      if (skiptest(tpre//tname,'amber',1))  return
       call pushdir ('file/imptor')
       if (uselist) then
          call loadfix_keyadd ('ala','ala.key','neighbor-list')

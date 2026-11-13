@@ -23,7 +23,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_xyzpdb','amber'))  return
+      if (skiptest('test_xyzpdb','amber',5))  return
       call pushdir ('file/scorpion')
       call execute_command_line ('rm -f scorpion.pdb* out.txt')
       call run_prog ('xyzpdb','scorpion PDB','out.txt',ist)

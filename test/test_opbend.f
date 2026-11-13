@@ -37,7 +37,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoeba'))  return
+      if (skiptest(tpre//tname,'amoeba',1))  return
       call pushdir ('file/opbend')
       call loadfix ('trpcage','trpcage.key')
       allocate (derivs(3,n))

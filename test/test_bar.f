@@ -34,29 +34,50 @@ c
 c
       subroutine test_bar
       implicit none
-      logical skiptest
+      logical skiptest,skipgroup
+      character*(*) tname
+      parameter (tname='test_bar')
 c
 c
-      if (skiptest('test_bar','amoeba'))  return
-      call test_bar_case ('water-00-0000-0950','water-00-0000-0900')
-      call test_bar_case ('water-00-0950-1000','water-00-0900-1000')
-      call test_bar_vol
-      call test_bar_overlap
-      call test_bar_fep
-      call test_bar_cross
-      call test_bar_frames
-      call test_bar_pv
-      call test_bar_err
-      call test_bar_input
-      call test_bar_fepvol
-      call test_bar_hbar
-      call test_bar_bennett
-      call test_bar_boot
-      call test_bar_chain
-      call test_bar_ref
-      call test_bar_overflow
-      call test_bar_nonconv
-      call test_bar_logs
+      if (skipgroup(tname,'amoeba'))  return
+      if (.not. skiptest(tname//'_case1','amoeba',5))
+     &   call test_bar_case ('water-00-0000-0950','water-00-0000-0900')
+      if (.not. skiptest(tname//'_case2','amoeba',5))
+     &   call test_bar_case ('water-00-0950-1000','water-00-0900-1000')
+      if (.not. skiptest(tname//'_vol','amoeba',2))
+     &   call test_bar_vol
+      if (.not. skiptest(tname//'_overlap','amoeba',5))
+     &   call test_bar_overlap
+      if (.not. skiptest(tname//'_fep','amoeba',5))
+     &   call test_bar_fep
+      if (.not. skiptest(tname//'_cross','amoeba',5))
+     &   call test_bar_cross
+      if (.not. skiptest(tname//'_frames','amoeba',5))
+     &   call test_bar_frames
+      if (.not. skiptest(tname//'_pv','amoeba',5))
+     &   call test_bar_pv
+      if (.not. skiptest(tname//'_err','amoeba',5))
+     &   call test_bar_err
+      if (.not. skiptest(tname//'_input','amoeba',5))
+     &   call test_bar_input
+      if (.not. skiptest(tname//'_fepvol','amoeba',5))
+     &   call test_bar_fepvol
+      if (.not. skiptest(tname//'_hbar','amoeba',2))
+     &   call test_bar_hbar
+      if (.not. skiptest(tname//'_bennett','amoeba',2))
+     &   call test_bar_bennett
+      if (.not. skiptest(tname//'_boot','amoeba',2))
+     &   call test_bar_boot
+      if (.not. skiptest(tname//'_chain','amoeba',5))
+     &   call test_bar_chain
+      if (.not. skiptest(tname//'_ref','amoeba',5))
+     &   call test_bar_ref
+      if (.not. skiptest(tname//'_overflow','amoeba',2))
+     &   call test_bar_overflow
+      if (.not. skiptest(tname//'_nonconv','amoeba',2))
+     &   call test_bar_nonconv
+      if (.not. skiptest(tname//'_logs','amoeba',5))
+     &   call test_bar_logs
       return
       end
 c

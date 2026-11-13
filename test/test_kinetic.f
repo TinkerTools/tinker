@@ -28,7 +28,7 @@ c
       parameter (tname='test_kinetic_arbox')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',1))  return
       call pushdir ('file/kinetic')
       call loadfix ('arbox','arbox.key')
       if (allocated(v))  deallocate (v)

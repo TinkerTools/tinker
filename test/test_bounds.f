@@ -24,7 +24,7 @@ c
       parameter (tname='test_bounds')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',1))  return
       call pushdir ('file/bounds')
       call loadfix ('bounds','bounds.key')
       call bounds

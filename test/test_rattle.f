@@ -41,7 +41,7 @@ c
       parameter (tname='test_rattle')
 c
 c
-      if (skiptest(tname,'rattle freeze'))  return
+      if (skiptest(tname,'rattle freeze',4))  return
 c
 c     the keyfile asks for one OpenMP thread, so restore the count
 c

@@ -96,7 +96,7 @@ c
      &           90.0d0, 90.0d0, 90.0d0 /
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',2))  return
       call pushdir ('file/truncated8')
       call loadfix ('octwater',key)
       seed = 2026
@@ -484,7 +484,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_nblist_cutoff','hippo'))  return
+      if (skiptest('test_nblist_cutoff','hippo',5))  return
       call pushdir ('file/mutate')
       call test_nblist_cutrun ('mlist_repcut_fatal.key',.true.,
      &   'test_nblist_cutoff repulsion')

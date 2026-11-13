@@ -92,7 +92,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'charmm'))  return
+      if (skiptest(tpre//tname,'charmm',1))  return
       call pushdir ('file/partialcharge')
       if (uselist) then
          call loadfix_keyadd ('trp_charmm',key//'.key',

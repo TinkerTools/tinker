@@ -31,7 +31,8 @@ MAKEFILE_CONFIG = '''##
 ##  $(TINKERSRC)/libtinker.a and $(TINKERSRC)/*.mod exist.
 ##
 ##  make            build the test executables
-##  make test       build and run the tests (pass FILTER=<tag> to select)
+##  make test       build and run the tests (pass LEVEL=1-5 and/or
+##                  FILTER=<tag> to select)
 ##  make clean      remove objects, modules and executables
 
 # test source directory
@@ -55,6 +56,9 @@ FFTW_LIBS := -lfftw3_threads -lfftw3
 
 # optional test selection filter passed through to the binaries
 FILTER :=
+# optional test level, from 1 (base, the default without FILTER) to
+# 5 (everything, the default with FILTER)
+LEVEL :=
 # set DETAIL=-v to also print per-check detail lines
 DETAIL :=
 
@@ -263,7 +267,8 @@ def all_test_clean():
 
     print('test: $(EXEFILES)')
     for prog in PROGRAM_FILES:
-        print('\t./%s.x $(FILTER) $(DETAIL)' % prog)
+        print('\t./%s.x $(FILTER) $(if $(LEVEL),-l $(LEVEL)) $(DETAIL)'
+              % prog)
     print('')
 
     print('clean:')

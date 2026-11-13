@@ -23,7 +23,7 @@ c
       parameter (tname='test_eostmap')
 c
 c
-      if (skiptest(tname,'ost'))  return
+      if (skiptest(tname,'ost',2))  return
       call initial
       call test_eostmap_refresh
       call test_eostmap_mapsub

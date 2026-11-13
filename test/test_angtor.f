@@ -56,7 +56,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoeba'))  return
+      if (skiptest(tpre//tname,'amoeba',1))  return
 c
 c     load the angle-torsion-only fixture and reference values
 c

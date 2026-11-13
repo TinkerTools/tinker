@@ -137,7 +137,7 @@ c
       parameter (tname='test_extfield_dynfreq')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',4))  return
       call mdprep ('extfield','extfield_dynfreq','water4')
       call pushdir ('file/extfield_dynfreq')
       call tnist_append ('water4.key','external-field  150  -300  450')
@@ -190,7 +190,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,fftag))  return
+      if (skiptest(cname,fftag,1))  return
       call pushdir ('file/extfield')
       if (uselist) then
          call loadfix_keyadd (base,key,'neighbor-list')

@@ -24,28 +24,43 @@ c
 c
       subroutine test_thermint
       implicit none
-      logical skiptest
+      logical skiptest,skipgroup
       character*(*) tname
       parameter (tname='test_thermint')
 c
 c
-      if (skiptest(tname,'thermint'))  return
-      call test_thermint_mctrial
+      if (skipgroup(tname,'thermint'))  return
+      if (.not. skiptest(tname//'_mctrial','thermint',2))
+     &   call test_thermint_mctrial
       call initial
-      call test_thermint_avgstd
-      call test_thermint_schedule
-      call test_thermint_phase
-      call test_thermint_setsched
-      call test_thermint_fraction
-      call test_thermint_data
-      call test_thermint_inittidyn
-      call test_thermint_uneven
-      call test_thermint_etidyn
-      call test_thermint_partialblock
-      call test_thermint_trailing
-      call test_thermint_save
-      call test_thermint_stop
-      call test_thermint_up
+      if (.not. skiptest(tname//'_avgstd','thermint',2))
+     &   call test_thermint_avgstd
+      if (.not. skiptest(tname//'_schedule','thermint',2))
+     &   call test_thermint_schedule
+      if (.not. skiptest(tname//'_phase','thermint',2))
+     &   call test_thermint_phase
+      if (.not. skiptest(tname//'_setsched','thermint',2))
+     &   call test_thermint_setsched
+      if (.not. skiptest(tname//'_fraction','thermint',2))
+     &   call test_thermint_fraction
+      if (.not. skiptest(tname//'_data','thermint',2))
+     &   call test_thermint_data
+      if (.not. skiptest(tname//'_inittidyn','thermint',2))
+     &   call test_thermint_inittidyn
+      if (.not. skiptest(tname//'_uneven','thermint',2))
+     &   call test_thermint_uneven
+      if (.not. skiptest(tname//'_etidyn','thermint',2))
+     &   call test_thermint_etidyn
+      if (.not. skiptest(tname//'_partialblock','thermint',2))
+     &   call test_thermint_partialblock
+      if (.not. skiptest(tname//'_trailing','thermint',2))
+     &   call test_thermint_trailing
+      if (.not. skiptest(tname//'_save','thermint',2))
+     &   call test_thermint_save
+      if (.not. skiptest(tname//'_stop','thermint',4))
+     &   call test_thermint_stop
+      if (.not. skiptest(tname//'_up','thermint',5))
+     &   call test_thermint_up
       call clearti
       call final
       return

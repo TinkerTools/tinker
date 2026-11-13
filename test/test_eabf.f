@@ -24,7 +24,7 @@ c
       parameter (tname='test_eabf')
 c
 c
-      if (skiptest(tname,'abf'))  return
+      if (skiptest(tname,'abf',2))  return
       call initial
       kelvin = 300.0d0
       call test_eabf_bias

@@ -20,42 +20,70 @@ c
       use bath
       use units
       implicit none
-      logical skiptest
+      logical skiptest,skipgroup
       character*(*) tname
       parameter (tname='test_eost')
 c
 c
-      if (skiptest(tname,'ost'))  return
+      if (skipgroup(tname,'ost'))  return
       call initial
       kelvin = 300.0d0
-      call test_eost_index
-      call test_eost_resize
-      call test_eost_buildindex
-      call test_eost_ensure
-      call test_eost_gkernels
-      call test_eost_fkernel
-      call test_eost_kernelbuilds
-      call test_eost_eginterpolate
-      call test_eost_avgstd
-      call test_eost_depcriteria
-      call test_eost_efkernel
-      call test_eost_vkernelmax
-      call test_eost_fill
-      call test_eost_tempering
-      call test_eost_ostdyn
-      call test_eost_ostlocal
-      call test_eost_ostphase
-      call test_eost_ostgate
-      call test_eost_save
-      call test_eost_restart
-      call test_eost_meta
-      call test_eost_metaimage
-      call test_eost_metadyn
-      call test_eost_metatemper
-      call test_eost_metacut
-      call test_eost_metarestart
-      call test_eost_temperkeys
-      call test_eost_restartrun
+      if (.not. skiptest(tname//'_index','ost',2))
+     &   call test_eost_index
+      if (.not. skiptest(tname//'_resize','ost',2))
+     &   call test_eost_resize
+      if (.not. skiptest(tname//'_buildindex','ost',2))
+     &   call test_eost_buildindex
+      if (.not. skiptest(tname//'_ensure','ost',2))
+     &   call test_eost_ensure
+      if (.not. skiptest(tname//'_gkernels','ost',2))
+     &   call test_eost_gkernels
+      if (.not. skiptest(tname//'_fkernel','ost',2))
+     &   call test_eost_fkernel
+      if (.not. skiptest(tname//'_kernelbuilds','ost',2))
+     &   call test_eost_kernelbuilds
+      if (.not. skiptest(tname//'_eginterpolate','ost',2))
+     &   call test_eost_eginterpolate
+      if (.not. skiptest(tname//'_avgstd','ost',2))
+     &   call test_eost_avgstd
+      if (.not. skiptest(tname//'_depcriteria','ost',2))
+     &   call test_eost_depcriteria
+      if (.not. skiptest(tname//'_efkernel','ost',2))
+     &   call test_eost_efkernel
+      if (.not. skiptest(tname//'_vkernelmax','ost',2))
+     &   call test_eost_vkernelmax
+      if (.not. skiptest(tname//'_fill','ost',2))
+     &   call test_eost_fill
+      if (.not. skiptest(tname//'_tempering','ost',2))
+     &   call test_eost_tempering
+      if (.not. skiptest(tname//'_ostdyn','ost',2))
+     &   call test_eost_ostdyn
+      if (.not. skiptest(tname//'_ostlocal','ost',2))
+     &   call test_eost_ostlocal
+      if (.not. skiptest(tname//'_ostphase','ost',2))
+     &   call test_eost_ostphase
+      if (.not. skiptest(tname//'_ostgate','ost',2))
+     &   call test_eost_ostgate
+      if (.not. skiptest(tname//'_save','ost',2))
+     &   call test_eost_save
+      if (.not. skiptest(tname//'_restart','ost',2))
+     &   call test_eost_restart
+      if (.not. skiptest(tname//'_meta','ost',2))
+     &   call test_eost_meta
+      if (.not. skiptest(tname//'_metaimage','ost',2))
+     &   call test_eost_metaimage
+      if (.not. skiptest(tname//'_metadyn','ost',2))
+     &   call test_eost_metadyn
+      if (.not. skiptest(tname//'_metatemper','ost',2))
+     &   call test_eost_metatemper
+      if (.not. skiptest(tname//'_metacut','ost',2))
+     &   call test_eost_metacut
+      if (.not. skiptest(tname//'_metarestart','ost',2))
+     &   call test_eost_metarestart
+      if (.not. skiptest(tname//'_temperkeys','ost',2))
+     &   call test_eost_temperkeys
+      if (.not. skiptest(tname//'_restartrun','ost',4))
+     &   call test_eost_restartrun
       call final
       return
       end

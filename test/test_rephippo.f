@@ -96,7 +96,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'hippo'))  return
+      if (skiptest(cname,'hippo',1))  return
       call pushdir ('file/rephippo')
       if (uselist) then
          call loadfix_keyadd (base,key//'.key','neighbor-list')

@@ -19,20 +19,28 @@ c
 c
       subroutine test_fep
       implicit none
-      logical skiptest
+      logical skiptest,skipgroup
       character*(*) tname
       parameter (tname='test_fep')
 c
 c
-      if (skiptest(tname,'fep'))  return
-      call test_fep_trial
-      call test_fep_terms
-      call test_fep_state
-      call test_fep_predict
-      call test_fep_dynamic
-      call test_fep_sample
-      call test_fep_run
-      call test_fep_stop
+      if (skipgroup(tname,'fep'))  return
+      if (.not. skiptest(tname//'_trial','fep',2))
+     &   call test_fep_trial
+      if (.not. skiptest(tname//'_terms','fep',2))
+     &   call test_fep_terms
+      if (.not. skiptest(tname//'_state','fep',2))
+     &   call test_fep_state
+      if (.not. skiptest(tname//'_predict','fep',2))
+     &   call test_fep_predict
+      if (.not. skiptest(tname//'_dynamic','fep',4))
+     &   call test_fep_dynamic
+      if (.not. skiptest(tname//'_sample','fep',2))
+     &   call test_fep_sample
+      if (.not. skiptest(tname//'_run','fep',4))
+     &   call test_fep_run
+      if (.not. skiptest(tname//'_stop','fep',4))
+     &   call test_fep_stop
       return
       end
 c

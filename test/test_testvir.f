@@ -103,7 +103,7 @@ c
       character*512 args
 c
 c
-      if (skiptest('test_testvir_'//base,'testvir'))  return
+      if (skiptest('test_testvir_'//base,'testvir',3))  return
       call pushdir ('file/testvir')
       call execute_command_line ('rm -f out.txt')
       args = '-k '//base//'.key '//xyz

@@ -65,7 +65,7 @@ c
       character*240 rpath
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',2))  return
 c
 c     load the dodecahedral water box and the reference values
 c
@@ -147,7 +147,7 @@ c
       parameter (tname='test_dodecahedron_bounds')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',2))  return
       call pushdir ('file/dodecahedron')
       call loadfix ('waterdodec','vdwnolist.key')
       allocate (refg(3,n))

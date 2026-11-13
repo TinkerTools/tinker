@@ -45,7 +45,7 @@ c
       parameter (tname='test_barostat')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',4))  return
       call pushdir ('file/barostat')
       call loadfix ('water30','water30.key')
       call predict
@@ -345,7 +345,7 @@ c
       parameter (tname='test_barostat_nonprism')
 c
 c
-      if (skiptest(tname,'barostat'))  return
+      if (skiptest(tname,'barostat',4))  return
       call octnpt (tname,'montecarlo','aniso',.true.)
       call octnpt (tname,'montecarlo','semiiso',.true.)
       call octnpt (tname,'bussi','aniso',.true.)

@@ -87,7 +87,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'charmm'))  return
+      if (skiptest(tpre//tname,'charmm',1))  return
       call pushdir ('file/improp')
       call loadfix (base,base//'.key')
       allocate (derivs(3,n))

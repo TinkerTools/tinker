@@ -16,17 +16,39 @@
 
       After the Makefile is present, run "make" from this directory to
       compile the unit test executables. Run "make test" to execute the
-      full test suite.
+      base level of the test suite, or "make test LEVEL=5" to execute
+      the full suite; the test levels are described below.
 
-      A subset of tests can be selected by passing a name or tag with the
-      FILTER variable, for example "make test FILTER=amoeba". Per-check
-      detail lines can be printed by setting DETAIL to "-v", for example
-      "make test FILTER=amoeba DETAIL=-v".
+      Each test case carries a level, and the levels are ordered by cost.
+      A run at level L executes every case at level L or lower:
 
-      The tests use all available OpenMP threads by default. To run them
-      on a single core, set OMP_NUM_THREADS on the command line, which is
-      also inherited by any Tinker programs the tests launch:
+          1   base       core in-process energy, gradient, virial
+          2   analytic   other in-process single-point and unit checks
+          3   numerical  finite-difference checks, mostly via
+                         testgrad, testlmda and testvir
+          4   dynamics   molecular dynamics, sampling and
+                         minimization runs
+          5   output     program runs compared against reference output
+
+      Select the level with the LEVEL variable, for example "make test
+      LEVEL=3". A subset of tests can be selected by passing a name or
+      tag with the FILTER variable, for example "make test FILTER=amoeba".
+      Without FILTER the default level is 1; with FILTER it is 5, so all
+      cases matching the filter are run unless LEVEL is also given. Per-
+      check detail lines can be printed by setting DETAIL to "-v", for
+      example "make test FILTER=amoeba DETAIL=-v".
+
+      The test binary can also be run directly from this directory with
+      the same options:
+
+          ./tinkertest.x [filter] [-l level] [-v]
+
+      The tests use all available OpenMP threads by default, which is
+      slow on the small test systems. To run them on a single core, set
+      OMP_NUM_THREADS on the command line, which is also inherited by any
+      Tinker programs the tests launch:
 
           OMP_NUM_THREADS=1 make test
+          OMP_NUM_THREADS=1 make test LEVEL=5
           OMP_NUM_THREADS=1 make test FILTER=<tag>
 

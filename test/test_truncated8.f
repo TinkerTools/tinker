@@ -64,7 +64,7 @@ c
       parameter (tname='test_truncated8')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',2))  return
 c
 c     load the octahedral argon box and the reference values
 c
@@ -144,7 +144,7 @@ c
       character*240 rpath
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',2))  return
 c
 c     load the octahedral water box and the reference values
 c

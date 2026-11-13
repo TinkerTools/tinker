@@ -44,7 +44,7 @@ c
       parameter (tname='test_box_orthogonal')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',1))  return
       call initial
       xbox = 16.0d0
       ybox = 16.0d0
@@ -82,7 +82,7 @@ c
       parameter (tname='test_box_monoclinic')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',1))  return
       call initial
       xbox = 32.0d0
       ybox = 24.0d0
@@ -134,7 +134,7 @@ c
       parameter (tname='test_box_triclinic')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',1))  return
       call initial
       xbox = 32.0d0
       ybox = 24.0d0
@@ -185,7 +185,7 @@ c
       parameter (tname='test_box_octahedron')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',1))  return
       call initial
       xbox = 16.0d0
       ybox = 16.0d0
@@ -245,7 +245,7 @@ c
       parameter (tname='test_box_dodecahedron')
 c
 c
-      if (skiptest(tname,'amoeba'))  return
+      if (skiptest(tname,'amoeba',1))  return
       call initial
       a = 16.0d0
       xbox = a

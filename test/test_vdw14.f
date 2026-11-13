@@ -116,7 +116,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,tag))  return
+      if (skiptest(tpre//tname,tag,1))  return
       call pushdir ('file/vdw14')
       if (uselist) then
          call loadfix_keyadd (base,key//'.key','neighbor-list')

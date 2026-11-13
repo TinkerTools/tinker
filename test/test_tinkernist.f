@@ -46,7 +46,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_tinkernist_nodyn','amoeba'))  return
+      if (skiptest('test_tinkernist_nodyn','amoeba',4))  return
       call tnist_prep ('tinkernist_nodyn','water30',.false.)
       call pushdir ('file/tinkernist_nodyn')
       call tnist_append ('water30.key','nodyn')
@@ -84,7 +84,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_tinkernist_nocoord','amoeba'))  return
+      if (skiptest('test_tinkernist_nocoord','amoeba',4))  return
       call tnist_prep ('tinkernist_nocoord','water30',.false.)
       call pushdir ('file/tinkernist_nocoord')
       call tnist_append ('water30.key','nocoord')
@@ -115,7 +115,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_tinkernist_dcd','amoeba'))  return
+      if (skiptest('test_tinkernist_dcd','amoeba',4))  return
       call tnist_prep ('tinkernist_dcd','water30',.true.)
       call pushdir ('file/tinkernist_dcd')
       call tnist_append_saves ('water30.key')
@@ -158,7 +158,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_tinkernist_save1','amoeba'))  return
+      if (skiptest('test_tinkernist_save1','amoeba',4))  return
       call tnist_save_case ('tinkernist_save1','water30',
      &                      'water30',20)
       return
@@ -177,7 +177,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_tinkernist_save2','amoeba'))  return
+      if (skiptest('test_tinkernist_save2','amoeba',4))  return
       call tnist_save_case ('tinkernist_save2','water30_2',
      &                      'water30_2',20)
       return
@@ -197,7 +197,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_tinkernist_save_only','amoeba'))  return
+      if (skiptest('test_tinkernist_save_only','amoeba',4))  return
       call tnist_prep ('tinkernist_save_only','water30',.true.)
       call pushdir ('file/tinkernist_save_only')
       call tnist_append ('water30.key','save-only -4 102')
@@ -241,7 +241,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_tinkernist_save_system','amoeba'))  return
+      if (skiptest('test_tinkernist_save_system','amoeba',4))  return
       call tnist_prep ('tinkernist_save_system','water30',.true.)
       call pushdir ('file/tinkernist_save_system')
       call tnist_append ('water30.key','save-usystem')
@@ -271,7 +271,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_tinkernist_exc_moment','amoeba'))  return
+      if (skiptest('test_tinkernist_exc_moment','amoeba',4))  return
       call tnist_prep ('tinkernist_exc_moment','water30',.true.)
       call pushdir ('file/tinkernist_exc_moment')
       call tnist_append ('water30.key','exc-moment -2677 2684')

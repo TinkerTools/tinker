@@ -9,7 +9,8 @@
 ##  $(TINKERSRC)/libtinker.a and $(TINKERSRC)/*.mod exist.
 ##
 ##  make            build the test executables
-##  make test       build and run the tests (pass FILTER=<tag> to select)
+##  make test       build and run the tests (pass LEVEL=1-5 and/or
+##                  FILTER=<tag> to select)
 ##  make clean      remove objects, modules and executables
 
 # test source directory
@@ -33,6 +34,9 @@ FFTW_LIBS := -lfftw3_threads -lfftw3
 
 # optional test selection filter passed through to the binaries
 FILTER :=
+# optional test level, from 1 (base, the default without FILTER) to
+# 5 (everything, the default with FILTER)
+LEVEL :=
 # set DETAIL=-v to also print per-check detail lines
 DETAIL :=
 
@@ -130,7 +134,7 @@ tinkertest.x: $(COMMON) tinkertest.o $(TINKERLIB)
 all: $(EXEFILES)
 
 test: $(EXEFILES)
-	./tinkertest.x $(FILTER) $(DETAIL)
+	./tinkertest.x $(FILTER) $(if $(LEVEL),-l $(LEVEL)) $(DETAIL)
 
 clean:
 	rm -f *.o *.mod *.x

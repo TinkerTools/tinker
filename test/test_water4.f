@@ -62,7 +62,7 @@ c
       parameter (tname='test_water4_verlet')
 c
 c
-      if (skiptest(tname,'water4 freeze'))  return
+      if (skiptest(tname,'water4 freeze',4))  return
       call pushdir ('file/water4')
       call loadfix ('tip4p','tip4p.key')
       call assert_int (nwat4,1000,tname//' four-site waters')
@@ -115,7 +115,7 @@ c
       parameter (tname='test_water4_respa')
 c
 c
-      if (skiptest(tname,'water4 freeze respa'))  return
+      if (skiptest(tname,'water4 freeze respa',4))  return
       call pushdir ('file/water4')
       call loadfix_keyadd ('tip4p','tip4p.key','integrator vrespa')
       call assert_int (nwat4,1000,tname//' four-site waters')
@@ -309,7 +309,7 @@ c
       parameter (tname='test_water4_grad')
 c
 c
-      if (skiptest(tname,'water4 freeze'))  return
+      if (skiptest(tname,'water4 freeze',2))  return
       call pushdir ('file/water4')
       call loadfix ('tip4p','tip4p.key')
 c
@@ -415,7 +415,7 @@ c
       parameter (tname='test_water4_minimize')
 c
 c
-      if (skiptest(tname,'water4 freeze'))  return
+      if (skiptest(tname,'water4 freeze',4))  return
       call pushdir ('file/water4')
       call execute_command_line ('rm -f tip4p.xyz_* out.txt')
       call run_prog ('minimize','tip4p 2.0','out.txt',ist)
@@ -455,7 +455,7 @@ c
       parameter (tname='test_water4_twice')
 c
 c
-      if (skiptest(tname,'water4 freeze'))  return
+      if (skiptest(tname,'water4 freeze',2))  return
       call pushdir ('file/water4')
       call loadfix_keyadd ('tip4p','tip4p.key','freeze water')
       call assert_int (nwat,1000,tname//' three-site frames')

@@ -277,7 +277,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'amoeba'))  return
+      if (skiptest(cname,'amoeba',1))  return
       call pushdir ('file/localframe')
       if (uselist) then
          call loadfix_keyadd ('localframe',key,'neighbor-list')
@@ -352,7 +352,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'amoeba'))  return
+      if (skiptest(cname,'amoeba',1))  return
       call pushdir ('file/localframe')
       if (uselist) then
          call loadfix_keyadd ('localframe',key,'neighbor-list')
@@ -430,7 +430,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'amoeba'))  return
+      if (skiptest(cname,'amoeba',1))  return
       call pushdir ('file/localframe')
       if (uselist) then
          call loadfix_keyadd ('localframe',key,'neighbor-list')
@@ -492,7 +492,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'amoeba'))  return
+      if (skiptest(cname,'amoeba',1))  return
       call pushdir ('file/localframe')
       if (uselist) then
          call loadfix_keyadd ('localframe',key,'neighbor-list')
@@ -564,7 +564,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'amoeba'))  return
+      if (skiptest(cname,'amoeba',1))  return
       call pushdir ('file/localframe')
       if (uselist) then
          call loadfix_keyadd ('localframe',key,'neighbor-list')

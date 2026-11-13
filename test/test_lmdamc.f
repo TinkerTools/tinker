@@ -21,28 +21,44 @@ c
 c
       subroutine test_lmdamc
       implicit none
-      logical skiptest
+      logical skiptest,skipgroup
       character*(*) tname
       parameter (tname='test_lmdamc')
 c
 c
-      if (skiptest(tname,'lmdamc'))  return
-      call test_lmdamc_keys
-      call test_lmdamc_particle
-      call test_lmdamc_move ('abf')
-      call test_lmdamc_move ('ost')
-      call test_lmdamc_move ('meta')
-      call test_lmdamc_trial
-      call test_lmdamc_deposit
-      call test_lmdamc_stale ('abf')
-      call test_lmdamc_stale ('ost')
-      call test_lmdamc_temp ('abf')
-      call test_lmdamc_temp ('ost')
-      call test_lmdamc_fill ('abf')
-      call test_lmdamc_fill ('ost')
-      call test_lmdamc_stalemeta
-      call test_lmdamc_nopol
-      call test_lmdamc_run
+      if (skipgroup(tname,'lmdamc'))  return
+      if (.not. skiptest(tname//'_keys','lmdamc',2))
+     &   call test_lmdamc_keys
+      if (.not. skiptest(tname//'_particle','lmdamc',2))
+     &   call test_lmdamc_particle
+      if (.not. skiptest(tname//'_move_abf','lmdamc',2))
+     &   call test_lmdamc_move ('abf')
+      if (.not. skiptest(tname//'_move_ost','lmdamc',2))
+     &   call test_lmdamc_move ('ost')
+      if (.not. skiptest(tname//'_move_meta','lmdamc',2))
+     &   call test_lmdamc_move ('meta')
+      if (.not. skiptest(tname//'_trial','lmdamc',2))
+     &   call test_lmdamc_trial
+      if (.not. skiptest(tname//'_deposit','lmdamc',2))
+     &   call test_lmdamc_deposit
+      if (.not. skiptest(tname//'_stale_abf','lmdamc',2))
+     &   call test_lmdamc_stale ('abf')
+      if (.not. skiptest(tname//'_stale_ost','lmdamc',2))
+     &   call test_lmdamc_stale ('ost')
+      if (.not. skiptest(tname//'_temp_abf','lmdamc',2))
+     &   call test_lmdamc_temp ('abf')
+      if (.not. skiptest(tname//'_temp_ost','lmdamc',2))
+     &   call test_lmdamc_temp ('ost')
+      if (.not. skiptest(tname//'_fill_abf','lmdamc',2))
+     &   call test_lmdamc_fill ('abf')
+      if (.not. skiptest(tname//'_fill_ost','lmdamc',2))
+     &   call test_lmdamc_fill ('ost')
+      if (.not. skiptest(tname//'_stalemeta','lmdamc',2))
+     &   call test_lmdamc_stalemeta
+      if (.not. skiptest(tname//'_nopol','lmdamc',2))
+     &   call test_lmdamc_nopol
+      if (.not. skiptest(tname//'_run','lmdamc',4))
+     &   call test_lmdamc_run
       return
       end
 c

@@ -93,7 +93,7 @@ c
      &             4.2612263885053d-07, 1.6026951787996d-07 /
 c
 c
-      if (skiptest(tname,'stochastic'))  return
+      if (skiptest(tname,'stochastic',4))  return
       call sd_prep ('stochastic_coef',.false.,.false.)
       call loadfix ('g3','g3.key')
       call sd_mdinit (298.0d0)
@@ -209,7 +209,7 @@ c
       parameter (tname='test_sd_setup')
 c
 c
-      if (skiptest(tname,'stochastic'))  return
+      if (skiptest(tname,'stochastic',4))  return
       do ic = 1, 4
          pbc = (ic .ge. 3)
          rest = (mod(ic,2) .eq. 0)
@@ -277,7 +277,7 @@ c
       parameter (tname='test_sd_mdrest')
 c
 c
-      if (skiptest(tname,'stochastic'))  return
+      if (skiptest(tname,'stochastic',4))  return
       do ib = 1, 2
          pbc = (ib .eq. 2)
          cell = sd_cell (pbc,.true.)
@@ -389,7 +389,7 @@ c
       parameter (args='g3 10 1.0 0.001 1')
 c
 c
-      if (skiptest(tname,'stochastic'))  return
+      if (skiptest(tname,'stochastic',4))  return
       call sd_masses (nat,m)
       do ic = 1, 4
          pbc = (ic .ge. 3)
@@ -512,7 +512,7 @@ c
       parameter (args='g3 10 1.0 0.001 2 298')
 c
 c
-      if (skiptest(tname,'stochastic'))  return
+      if (skiptest(tname,'stochastic',4))  return
       call sd_masses (nat,m)
       call sd_ref_momentum (pref,lref)
       pfric = exp(-20.0d0*0.001d0)
@@ -639,7 +639,7 @@ c
       parameter (args='g3 10 0.1 0.0001 2 298')
 c
 c
-      if (skiptest(tname,'stochastic'))  return
+      if (skiptest(tname,'stochastic',4))  return
       call sd_ref_trajectory (gpot,gkin,gxyz)
       do ic = 1, 4
          pbc = (ic .ge. 3)
@@ -735,7 +735,7 @@ c
       parameter (work='stochastic_fricsign')
 c
 c
-      if (skiptest(tname,'stochastic'))  return
+      if (skiptest(tname,'stochastic',4))  return
       call sd_ref_trajectory (gpot,gkin,gxyz)
       call sd_prep (work,.false.,.false.)
       call sd_addkey ('FRICTION -91.0')

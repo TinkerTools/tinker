@@ -109,7 +109,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_refresh','mutate'))  return
+      if (skiptest('test_mutate_refresh','mutate',2))  return
       call pushdir ('file/mutate')
       call loadfix ('water2','056_water_exp_ast_l05.key')
       allocate (derivs(3,n))
@@ -278,7 +278,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_lmda','mutate'))  return
+      if (skiptest('test_mutate_lmda','mutate',2))  return
       call pushdir ('file/mutate')
 c
 c     a main lambda with no map keyword drives all three sublambdas
@@ -407,7 +407,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_lmdamode','mutate'))  return
+      if (skiptest('test_mutate_lmdamode','mutate',2))  return
       call pushdir ('file/mutate')
 c
 c     an abf mode turns on abf alone and drives the main lambda
@@ -1555,7 +1555,7 @@ c
 c
 c
       pre = 'test_201_water_rels1_lig2_exp_l015'
-      if (skiptest(trim(pre),'mutate'))  return
+      if (skiptest(trim(pre),'mutate',2))  return
 c
 c     set up the compressed leg and read the reference of the full one
 c
@@ -2140,7 +2140,7 @@ c
 c     the lambda derivatives of 203 take another code path, which must
 c     leave the energy of 209, the same key without them
 c
-      if (.not. skiptest('test_mutate_cflux_paths','mutate')) then
+      if (.not. skiptest('test_mutate_cflux_paths','mutate',5)) then
          call test_mutate_sccase ('203_apgas_cross_ewald_l04.key',
      &      '209_apgas_cross_ewald_nold_l04.key','apgas','',
      &      'test_mutate_cflux paths')
@@ -2267,7 +2267,7 @@ c
       logical skiptest
 c
 c
-      if (.not. skiptest('test_mutate_ctscale','mutate')) then
+      if (.not. skiptest('test_mutate_ctscale','mutate',2)) then
          call pushdir ('file/mutate')
 c
 c     the coupled energy of the dimer with every pair in the ligand
@@ -2349,7 +2349,7 @@ c
       logical skiptest
 c
 c
-      if (.not. skiptest('test_mutate_ctrel','mutate')) then
+      if (.not. skiptest('test_mutate_ctrel','mutate',2)) then
          call pushdir ('file/mutate')
 c
 c     the ligand 1 leg leaves ligand 2 out in single topology
@@ -2545,7 +2545,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_scexp','mutate'))  return
+      if (skiptest('test_mutate_scexp','mutate',5))  return
       call pushdir ('file/mutate')
       call test_mutate_sccase ('vsoft_n05_d1.key',
      &   'vsoft_default_d1.key','water2','',
@@ -2610,7 +2610,7 @@ c
       parameter (tname='test_mutate_scexpti')
 c
 c
-      if (skiptest(tname,'mutate'))  return
+      if (skiptest(tname,'mutate',2))  return
       call pushdir ('file/mutate')
       call loadfix_keyadd ('water2','175_water_vsoft_n15_ti_l00.key',
      &                     'lambda-window 0.0')
@@ -2655,7 +2655,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_repsc','mutate'))  return
+      if (skiptest('test_mutate_repsc','mutate',5))  return
       call pushdir ('file/mutate')
       call test_mutate_repsccase ('rsoft_a_neg_d1.key','',
      &   'test_mutate_repsc alpha')
@@ -2759,7 +2759,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_dspsc','mutate'))  return
+      if (skiptest('test_mutate_dspsc','mutate',5))  return
       call pushdir ('file/mutate')
       call test_mutate_sccase ('dsoft_rs_neg_d1.key',
      &   'dsoft_default_d1.key','hipwat','',
@@ -2818,7 +2818,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_unsup','mutate'))  return
+      if (skiptest('test_mutate_unsup','mutate',5))  return
       call pushdir ('file/mutate')
       call test_mutate_sccase ('mut_buck_fatal.key','','water2',
      &   'Buffered 14-7 and Lennard-Jones',
@@ -2897,7 +2897,7 @@ c
       parameter (tname='test_mutate_sampreset')
 c
 c
-      if (skiptest(tname,'mutate'))  return
+      if (skiptest(tname,'mutate',2))  return
       call pushdir ('file/mutate')
       call loadfix ('water2','mut_ti_reset.key')
       call assert_int (tinstepavg,100,tname//' ti block')
@@ -2945,7 +2945,7 @@ c
       parameter (tname='test_mutate_lmdastart')
 c
 c
-      if (skiptest(tname,'mutate'))  return
+      if (skiptest(tname,'mutate',2))  return
       call pushdir ('file/mutate')
 c
 c     a zero LAMBDA climbs over the default number of windows
@@ -3031,7 +3031,7 @@ c
       parameter (tname='test_mutate_rpolesave')
 c
 c
-      if (skiptest(tname,'mutate'))  return
+      if (skiptest(tname,'mutate',2))  return
       call pushdir ('file/mutate')
       call loadfix ('hipwat','mpole_save_dl.key')
       allocate (derivs(3,n))
@@ -3108,7 +3108,7 @@ c
       parameter (tname='test_mutate_cthess')
 c
 c
-      if (skiptest(tname,'mutate'))  return
+      if (skiptest(tname,'mutate',3))  return
       call pushdir ('file/mutate')
       call loadfix ('hipwat','ct_hess_taper.key')
       allocate (g0(3,n))
@@ -3298,7 +3298,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_epdtsave','mutate'))  return
+      if (skiptest('test_mutate_epdtsave','mutate',5))  return
       call pushdir ('file/mutate')
       call test_mutate_epdtcase ('epdtsave_uind.key',.true.,
      &                           'test_mutate_epdtsave uinduce')
@@ -3389,7 +3389,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_chiral','mutate'))  return
+      if (skiptest('test_mutate_chiral','mutate',2))  return
       call pushdir ('file/mutate')
       call loadfix ('../angle/trpcage','145_trpcage_chiral_m05.key')
       do i = 1, n
@@ -3446,7 +3446,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_gate','mutate'))  return
+      if (skiptest('test_mutate_gate','mutate',2))  return
       call pushdir ('file/mutate')
       call loadfix ('water2','083_water_rels_ye_l085.key')
       allocate (derivs(3,n))
@@ -3523,7 +3523,7 @@ c
       logical skiptest
 c
 c
-      if (skiptest('test_mutate_flat','mutate'))  return
+      if (skiptest('test_mutate_flat','mutate',2))  return
       call test_mutate_flatcase ('142_water_rels_st_l085.key',
      &                           'test_mutate_flat single')
       call test_mutate_flatcase ('083_water_rels_ye_l085.key',
@@ -3778,7 +3778,7 @@ c
       character*8 rtag
 c
 c
-      if (skiptest('test_'//trim(cname),'mutate'))  return
+      if (skiptest('test_'//trim(cname),'mutate',2))  return
 c
 c     run each fixture with the double loop, a pairwise neighbor
 c     list and the method of lights against the same reference

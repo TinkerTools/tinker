@@ -515,7 +515,7 @@ c
       character*512 args
 c
 c
-      if (skiptest('test_testlmda_'//base,'testlmda'))  return
+      if (skiptest('test_testlmda_'//base,'testlmda',3))  return
       call pushdir ('file/testlmda')
       call execute_command_line ('rm -f out.txt')
       args = '-k '//base//'.key '//xyz//'.xyz Y Y '//step

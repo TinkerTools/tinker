@@ -69,7 +69,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'hippo'))  return
+      if (skiptest(tpre//tname,'hippo',1))  return
       call pushdir ('file/expol')
       call loadfix (base,key//'.key')
       allocate (derivs(3,n))

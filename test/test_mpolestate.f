@@ -118,7 +118,7 @@ c
       character*(*) tname,tags,lvl
 c
 c
-      if (skiptest(tname,tags))  return
+      if (skiptest(tname,tags,2))  return
       call pushdir ('file/'//dir)
       call loadfix (base,key)
       allocate (derivs(3,n))
@@ -184,7 +184,7 @@ c
       parameter (tname='test_mpolestate_induced_prst')
 c
 c
-      if (skiptest(tname,'mpolestate,mutate'))  return
+      if (skiptest(tname,'mpolestate,mutate',2))  return
       call pushdir ('file/mpolestate')
       call loadfix ('../mutate/water2','abs_prng_dl.key')
       allocate (derivs(3,n))

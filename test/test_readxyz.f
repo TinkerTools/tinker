@@ -32,7 +32,7 @@ c
       parameter (tname='test_readxyz')
 c
 c
-      if (skiptest(tname,'readxyz'))  return
+      if (skiptest(tname,'readxyz',2))  return
       call pushdir ('file/readxyz')
 c
 c     simple XYZ files with a comment line

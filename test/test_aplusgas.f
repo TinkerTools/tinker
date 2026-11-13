@@ -36,7 +36,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoebaplus'))  return
+      if (skiptest(tpre//tname,'amoebaplus',1))  return
       call pushdir ('file/aplusgas')
       call loadfix ('aplusgas','gas.key')
       allocate (derivs(3,n))

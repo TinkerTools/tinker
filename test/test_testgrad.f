@@ -144,7 +144,7 @@ c
       character*512 args
 c
 c
-      if (skiptest('test_testgrad_'//base,'testgrad'))  return
+      if (skiptest('test_testgrad_'//base,'testgrad',3))  return
       call pushdir ('file/testgrad')
       call execute_command_line ('rm -f out.txt')
 c

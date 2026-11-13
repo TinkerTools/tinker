@@ -27,7 +27,7 @@ c
 c
 c
       eps = 1.0d-4
-      if (skiptest('test_pdbxyz','amber'))  return
+      if (skiptest('test_pdbxyz','amber',5))  return
       call pushdir ('file/scorpion')
       call execute_command_line
      &   ('rm -f scorpion.xyz_* scorpion.seq_* out.txt')

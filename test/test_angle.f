@@ -101,7 +101,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,tags))  return
+      if (skiptest(tpre//tname,tags,1))  return
 c
 c     load the angle-only fixture and the reference values
 c

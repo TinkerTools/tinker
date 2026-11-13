@@ -139,7 +139,7 @@ c
       character*240 rpath
 c
 c
-      if (skiptest(tname,'xyzedit'))  return
+      if (skiptest(tname,'xyzedit',5))  return
       call pushdir ('file/xyzedit')
       call execute_command_line ('rm -f '//base//'.xyz_* out.txt')
       call run_prog_input ('xyzedit',args,infile,'out.txt',ist)
@@ -175,7 +175,7 @@ c
       character*(*) tname,args,infile,base
 c
 c
-      if (skiptest(tname,'xyzedit'))  return
+      if (skiptest(tname,'xyzedit',5))  return
       call pushdir ('file/xyzedit')
       call execute_command_line ('rm -f '//base//'.xyz_* out.txt')
       call run_prog_input ('xyzedit',args,infile,'out.txt',ist)

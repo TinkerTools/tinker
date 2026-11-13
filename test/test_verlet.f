@@ -45,7 +45,7 @@ c
       parameter (tname='test_verlet_arbox')
 c
 c
-      if (skiptest(tname,'arbox verlet nve'))  return
+      if (skiptest(tname,'arbox verlet nve',4))  return
       call mdprep ('kinetic','verlet_arbox','arbox')
       call pushdir ('file/verlet_arbox')
       call tnist_append ('arbox.key','integrator verlet')
@@ -77,7 +77,7 @@ c
       parameter (tname='test_verlet_nosehoover')
 c
 c
-      if (skiptest(tname,'arbox nosehoover npt'))  return
+      if (skiptest(tname,'arbox nosehoover npt',4))  return
       call mdprep ('kinetic','verlet_nosehoover','arbox')
       call pushdir ('file/verlet_nosehoover')
       call tnist_append ('arbox.key','integrator nose-hoover')

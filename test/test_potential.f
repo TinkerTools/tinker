@@ -50,7 +50,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'tip3p'))  return
+      if (skiptest(tpre//tname,'tip3p',5))  return
       call pushdir ('file/potential')
       call run_prog ('potential',
      &               '-k water.tip3p 6 water water n 0.001',
@@ -90,7 +90,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'amoeba'))  return
+      if (skiptest(tpre//tname,'amoeba',5))  return
       call pushdir ('file/potential')
       call run_prog ('potential',
      &               '-k water.amoeba 6 water water n 0.001',
@@ -130,7 +130,7 @@ c
       parameter (tpre='test_')
 c
 c
-      if (skiptest(tpre//tname,'hippo'))  return
+      if (skiptest(tpre//tname,'hippo',5))  return
       call pushdir ('file/potential')
       call run_prog ('potential',
      &               '-k water.hippo 6 water water n 0.001',

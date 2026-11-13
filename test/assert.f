@@ -24,18 +24,38 @@ c     ta_root     absolute path of the test directory tree
 c     ta_filter   optional tag/name filter selecting which tests run
 c     ta_saved    working directory saved across a pushdir/popdir pair
 c     ta_detail   flag to also print per-check detail lines (-v option)
+c     maxlevel    highest test level defined
+c     ta_level    highest test level to run (-l option)
+c     nlvskip     count of cases not run because of their level
+c
+c     each test case carries a level, and a run at level L executes
+c     every case with level L or lower; the levels are ordered by cost
+c
+c     1   base: core in-process energy, gradient and virial checks
+c     2   analytic: other in-process single-point and unit checks
+c     3   numerical: finite-difference checks, mostly through the
+c            testgrad, testlmda and testvir programs
+c     4   dynamics: molecular dynamics, sampling and minimization
+c            runs
+c     5   output: program runs compared against reference output
 c
 c
       module assert
       implicit none
       integer npass
       integer nfail
+      integer maxlevel
+      parameter (maxlevel=5)
+      integer ta_level
+      integer nlvskip
       character*240 ta_root
       character*240 ta_filter
       character*240 ta_saved
       logical ta_detail
       data npass / 0 /
       data nfail / 0 /
+      data ta_level / maxlevel /
+      data nlvskip / 0 /
       data ta_detail / .false. /
       save
       end
@@ -48,13 +68,14 @@ c     ##                                                    ##
 c     ########################################################
 c
 c
-c     "ta_init" records the test directory root and the optional test
-c     selection filter passed on the command line
+c     "ta_init" records the test directory root, the optional test
+c     selection filter and the test level passed on the command line
 c
 c
-      subroutine ta_init (root,filter,detail)
+      subroutine ta_init (root,filter,detail,level)
       use assert
       implicit none
+      integer level
       character*(*) root,filter
       logical detail
 c
@@ -62,6 +83,7 @@ c
       ta_root = root
       ta_filter = filter
       ta_detail = detail
+      ta_level = level
       return
       end
 c
@@ -73,22 +95,77 @@ c     ##                                                      ##
 c     ##########################################################
 c
 c
-c     "skiptest" returns true when the active filter, if any, matches
-c     neither the test name nor its space-separated tag string, so the
-c     caller can return early
+c     "skiptest" returns true when the test level is above the level
+c     of the run, or when the active filter, if any, matches neither
+c     the test name nor its space-separated tag string, so the caller
+c     can return early
 c
 c
-      logical function skiptest (name,tags)
+      logical function skiptest (name,tags,level)
+      use assert
+      implicit none
+      integer level
+      character*(*) name,tags
+c
+c
+c     reject a level outside the defined range
+c
+      if (level.lt.1 .or. level.gt.maxlevel) then
+         write (*,10)  level,trim(name)
+   10    format (/,' SKIPTEST  --  Invalid Test Level',i12,
+     &              ' for ',a)
+         call exit (1)
+      end if
+c
+c     skip a case not matched by the name or tag filter
+c
+      skiptest = .true.
+      if (len_trim(ta_filter) .ne. 0) then
+         if (index(name,trim(ta_filter)).eq.0 .and.
+     &       index(tags,trim(ta_filter)).eq.0) then
+            write (*,20)  trim(name)
+   20       format (1x,'skip  ',a)
+            return
+         end if
+      end if
+c
+c     skip quietly a matched case above the level of the run
+c
+      if (level .gt. ta_level) then
+         nlvskip = nlvskip + 1
+         return
+      end if
+      skiptest = .false.
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  function skipgroup  --  filter a group of test cases  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "skipgroup" is the name or tag filter for a driver whose cases
+c     are gated one by one with "skiptest"; it returns true when the
+c     active filter, if any, matches neither the group name nor its
+c     tag string and does not name one of its cases, so the caller
+c     can return early with one skip line rather than one per case
+c
+c
+      logical function skipgroup (name,tags)
       use assert
       implicit none
       character*(*) name,tags
 c
 c
-      skiptest = .false.
+      skipgroup = .false.
       if (len_trim(ta_filter) .eq. 0)  return
       if (index(name,trim(ta_filter)) .gt. 0)  return
       if (index(tags,trim(ta_filter)) .gt. 0)  return
-      skiptest = .true.
+      if (index(ta_filter,trim(name)//'_') .eq. 1)  return
+      skipgroup = .true.
       write (*,10)  trim(name)
    10 format (1x,'skip  ',a)
       return
@@ -1066,6 +1143,8 @@ c
 c
       write (*,10)  npass,npass+nfail
    10 format (/,1x,i0,' of ',i0,' checks passed')
+      if (nlvskip .gt. 0)  write (*,20)  nlvskip,ta_level
+   20 format (1x,i0,' cases above level ',i0,' not run')
       if (nfail .gt. 0)  call exit (1)
       call exit (0)
       end

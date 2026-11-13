@@ -204,7 +204,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'amoeba'))
+      if (skiptest(cname,'amoeba',1))
      &   return
       call pushdir ('file/nacl')
       if (uselist) then
@@ -276,7 +276,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'amoeba'))
+      if (skiptest(cname,'amoeba',1))
      &   return
       call pushdir ('file/nacl')
       if (uselist) then

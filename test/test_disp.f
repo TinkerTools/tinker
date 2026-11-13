@@ -119,7 +119,7 @@ c
 c
 c
       cname = 'test_'//trim(tname)
-      if (skiptest(cname,'hippo'))  return
+      if (skiptest(cname,'hippo',1))  return
       call pushdir ('file/disp')
       call loadfix ('../testgrad/dmso2',key//'.key')
       allocate (derivs(3,n))
@@ -176,7 +176,7 @@ c
       else
          cname = tpre//trim(tname)//'_nolist'
       end if
-      if (skiptest(cname,'hippo'))  return
+      if (skiptest(cname,'hippo',1))  return
       call pushdir ('file/disp')
       if (uselist) then
          call loadfix_keyadd ('c5h12acnh2',key//'.key',
