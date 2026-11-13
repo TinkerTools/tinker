@@ -1504,6 +1504,7 @@ c
       real*8 lmdamass0,lmdafric0,lmdadt0
       real*8 lmdadeltag0,oststdev0
       real*8 kelvin0,lmdakelvin0
+      real*8 state(8)
       logical abfhead
       logical metahdr
       character*240 record
@@ -1557,21 +1558,20 @@ c
       if (abfhead) then
          read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0
       else
+         read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0,
+     &      lmdamass0,lmdafric0,lmdadt0,lmdadeltag0
 c
 c     the lambda particle temperature follows the other settings;
-c     a history written before it was stored has seven values, where
-c     the slash past them ends the read and leaves the temperature
-c     unset, and that history ran at the bath and is rewritten in
-c     full when continued
+c     a history written before it was stored has only seven values,
+c     ran at the bath and is rewritten in full when continued, while
+c     an eighth value that cannot be read is an error
 c
-         lmdakelvin0 = -1.0d0
-         record(239:240) = ' /'
-         read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0,
-     &      lmdamass0,lmdafric0,lmdadt0,lmdadeltag0,lmdakelvin0
-         if (lmdakelvin0 .eq. -1.0d0) then
-            lmdakelvin0 = kelvin0
-            histrewrite = .true.
-         end if
+         lmdakelvin0 = kelvin0
+         histrewrite = .true.
+         read (record,*,err=90,end=5)  state
+         lmdakelvin0 = state(8)
+         histrewrite = .false.
+    5    continue
       end if
       read (ihis,10,err=90,end=90)  record
 c

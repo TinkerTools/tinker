@@ -764,7 +764,30 @@ c     continues at the bath temperature, and its header is widened
 c     by rewriting the whole file rather than over its first rows
 c
          if (mode .ne. 'ABF') then
-            call eostoldhead (histfile)
+c
+c     a lambda state record cut short, as by a save interrupted
+c     while it rewrote the header, is refused and left in place
+c
+            cmd = 'cp '//trim(histfile)//' '//trim(histfile)//'.bak'
+            call execute_command_line (cmd)
+            call eostoldhead (histfile,5)
+            cmd = 'cp '//trim(histfile)//' '//trim(histfile)//'.cut'
+            call execute_command_line (cmd)
+            call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                     'out.txt',ist)
+            cmd = 'grep -q "Error while Reading Lambda Bias" out.txt'
+            call execute_command_line (cmd,exitstat=ist)
+            call assert_int (ist,0,trim(tag)//' short header refused')
+            cmd = 'cmp -s '//trim(histfile)//' '//trim(histfile)//'.cut'
+            call execute_command_line (cmd,exitstat=ist)
+            call assert_int (ist,0,trim(tag)//' short header kept')
+            cmd = 'mv '//trim(histfile)//'.bak '//trim(histfile)//
+     &            ' ; rm -f '//trim(histfile)//'.cut'
+            call execute_command_line (cmd)
+c
+c     with all seven older values the history continues
+c
+            call eostoldhead (histfile,7)
             call eostlmdastate (histfile,nval,tlmda)
             call assert_int (nval,7,trim(tag)//' old header made')
             call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
@@ -887,20 +910,24 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "eostoldhead" rewrites an ost or metadynamics history with the
-c     seven value lambda state record written before the lambda
-c     particle temperature was stored, keeping every other line
+c     "eostoldhead" rewrites an ost or metadynamics history keeping
+c     only the first "nkeep" values of its lambda state record, which
+c     with seven gives the record written before the lambda particle
+c     temperature was stored, and with fewer a truncated record; every
+c     other line is kept
 c
 c
-      subroutine eostoldhead (histfile)
+      subroutine eostoldhead (histfile,nkeep)
       implicit none
       integer i,ihis,nline
+      integer nkeep
       integer freeunit
       character*240 lines(5000)
       character*(*) histfile
 c
 c
-c     read every line, then cut the eighth lambda state value
+c     read every line, then cut the lambda state values past the
+c     ones kept
 c
       ihis = freeunit ()
       open (unit=ihis,file=histfile,status='old')
@@ -913,7 +940,7 @@ c
       close (unit=ihis)
       call assert_logical (nline.lt.5000,.true.,
      &                     'eostoldhead buffer holds the file')
-      lines(7)(7*26+1:240) = ' '
+      lines(7)(nkeep*26+1:240) = ' '
       open (unit=ihis,file=histfile,status='replace')
       do i = 1, nline
          write (ihis,'(a)')  trim(lines(i))
