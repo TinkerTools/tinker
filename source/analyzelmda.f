@@ -202,9 +202,11 @@ c
       character*(*) method
 c
 c
-c     set default temperature
+c     set default temperatures, where the lambda particle follows
+c     the bath unless the history header stores its own
 c
       kelvin = 298.0d0
+      lmdakelvin = 0.0d0
 c
 c     read the history header, check that the chosen method wrote
 c     the file, then read its rows and rebuild its kernels
@@ -649,13 +651,15 @@ c     ###########################################################
 c
 c
 c     "metakey" checks the keyfile for a requested lambda grid, for
-c     interpolation of the bias and for the theta map of the lambda
-c     particle, since this program never runs the setup that reads
-c     these keywords for dynamics, and rebuilds the bias grid when it
-c     differs from the grid of the history file
+c     interpolation of the bias, for the theta map of the lambda
+c     particle and for how lambda moved, since this program never
+c     runs the setup that reads these keywords for dynamics, and
+c     rebuilds the bias grid when it differs from the grid of the
+c     history file
 c
-c     note the theta map is not saved in the history, so the keyfile
-c     has to name the same map and sharpness the dynamics used
+c     note neither the theta map nor the lambda propagation is saved
+c     in the history, so the keyfile has to name the same map,
+c     sharpness and propagation the dynamics used
 c
 c
       subroutine metakey
@@ -670,16 +674,19 @@ c
       real*8 metadeltag
       logical setnlmda
       character*20 keyword
+      character*20 propword
       character*240 record
       character*240 string
 c
 c
 c     get the requested lambda grid, keeping that of the history file
-c     when none is given, and whether to interpolate the bias
+c     when none is given, whether to interpolate the bias, and whether
+c     lambda moved by Monte Carlo trials rather than in theta
 c
       setnlmda = .false.
       nlmda1 = nlmda
       ostinterpol = .false.
+      use_lmdamc = .false.
       do i = 1, nkey
          next = 1
          record = keyline(i)
@@ -691,6 +698,10 @@ c
             setnlmda = .true.
          else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
             ostinterpol = .true.
+         else if (keyword(1:17) .eq. 'LAMBDA-PROPAGATE ') then
+            call getword (record,propword,next)
+            call upcase (propword)
+            use_lmdamc = (propword .eq. 'MC')
          end if
    10    continue
       end do
@@ -804,10 +815,14 @@ c        G(L) = Vbias(0) - Vbias(L) + kT ln(J(L)/J(0))
 c
 c     where J is the factor dtheta/dlambda by which the theta map of
 c     the lambda particle weights its visits to each lambda, smoothed
-c     by the deposited gaussian as found by "lmdathjac"
+c     by the deposited gaussian as found by "lmdathjac", and T is the
+c     lambda particle temperature, at which theta samples the biased
+c     free energy when lambda moves slowly against the atoms
 c
 c     note the factor is the same at both ends for the symmetric
-c     theta maps, so the total free energy needs no correction
+c     theta maps, so the total free energy needs no correction, and
+c     Monte Carlo trials move lambda itself, so their profile has no
+c     theta map factor
 c
 c
       subroutine metafreeenergy (iunit)
@@ -826,16 +841,18 @@ c
       real*8 jac0,jac
       real*8 metadeltag
       real*8 lmdathjac
+      real*8 lmdatemp
 c
 c
 c     recompute and write the total free energy estimate
 c
       lmdadeltag = metadeltag()
-      write (iunit,10)  nmetahist,lmdadeltag,kelvin
+      write (iunit,10)  nmetahist,lmdadeltag,kelvin,lmdatemp()
    10 format (/,' Metadynamics Free Energy Estimate :',
      &        //,1x,'Number of Gaussians',i16,
      &         /,1x,'Delta G',20x,1p,d20.10,
-     &         /,1x,'Temperature Used',11x,d20.10,' K')
+     &         /,1x,'Temperature Used',11x,d20.10,' K',
+     &         /,1x,'Lambda Temperature',9x,d20.10,' K')
 c
 c     smooth the theta map factor with the height weighted mean
 c     width of the deposited gaussians
@@ -847,7 +864,7 @@ c
          hsum = hsum + metahhist(ihist)
       end do
       if (hsum .gt. 0.0d0)  sig = sig / hsum
-      rt = gasconst * kelvin
+      rt = gasconst * lmdatemp()
       jac0 = lmdathjac (0.0d0,sig,oststdev*sig)
 c
 c     write the free energy at each lambda bin as the negative of
@@ -861,9 +878,11 @@ c
       do ilmda = 1, nlmda
          lambda = dble(ilmda-1) * wlmda
          call emetabias (lambda,vbias,dvdl)
-         jac = lmdathjac (lambda,sig,oststdev*sig)
-         if (jac0.gt.0.0d0 .and. jac.gt.0.0d0) then
-            vbias = vbias - rt*log(jac/jac0)
+         if (.not. use_lmdamc) then
+            jac = lmdathjac (lambda,sig,oststdev*sig)
+            if (jac0.gt.0.0d0 .and. jac.gt.0.0d0) then
+               vbias = vbias - rt*log(jac/jac0)
+            end if
          end if
          write (iunit,30)  lambda,vbias0-vbias
    30    format (1x,1p,d10.4,d20.10)

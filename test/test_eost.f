@@ -294,7 +294,7 @@ c
       call eostfilebytes (ostfile,text0,nbyte0)
       call initostfile
       call eostfilebytes (ostfile,text1,nbyte1)
-      call assert_logical (histtail,.false.,
+      call assert_logical (histrewrite,.false.,
      &                     'rdosthist finds no rows past the count')
       call assert_logical (nbyte1.eq.nbyte0 .and. text1.eq.text0,
      &                     .true.,'initostfile leaves a clean file')
@@ -372,7 +372,7 @@ c
       lmdafric = 0.5d0
       lmdadt = 0.002d0
       call initostfile
-      call assert_logical (histtail,.true.,
+      call assert_logical (histrewrite,.true.,
      &                     'rdosthist finds the stray row')
       call assert_int (nlmdahist,4,'initostfile skips the stray row')
       call sethist (5,0.6d0,0.0d0,1.0d0,0.1d0,1.0d0)
@@ -513,7 +513,7 @@ c
       call eostfilebytes (metafile,text0,nbyte0)
       call initmetafile
       call eostfilebytes (metafile,text1,nbyte1)
-      call assert_logical (histtail,.false.,
+      call assert_logical (histrewrite,.false.,
      &                     'rdmetahist finds no rows past the count')
       call assert_logical (nbyte1.eq.nbyte0 .and. text1.eq.text0,
      &                     .true.,'initmetafile leaves a clean file')
@@ -620,6 +620,8 @@ c
       subroutine eostrstrun (mode,ext)
       implicit none
       integer ist,istep
+      integer nval,nrow,nsaved
+      real*8 tlmda
       logical exist
       character*(*) mode,ext
       character*40 tag
@@ -682,6 +684,42 @@ c
          call execute_command_line (cmd,exitstat=ist)
          call assert_int (ist,0,trim(tag)//' setting refused')
 c
+c     an ost or metadynamics history stores the lambda temperature,
+c     which follows the bath without the keyword, and a run with a
+c     different one is refused
+c
+         if (mode .ne. 'ABF') then
+            call eostlmdastate (histfile,nval,tlmda)
+            call assert_int (nval,8,trim(tag)//' stores lambda temp')
+            call assert_real (tlmda,300.0d0,0.0d0,
+     &                        trim(tag)//' lambda temp follows bath')
+            cmd = 'cp water2.key water2.bak ; '//
+     &            'echo "lambda-temperature 600" >> water2.key'
+            call execute_command_line (cmd)
+            call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                     'out.txt',ist)
+            call execute_command_line ('mv water2.bak water2.key')
+            cmd = 'grep -q "LAMBDA-TEMPERATURE" out.txt'
+            call execute_command_line (cmd,exitstat=ist)
+            call assert_int (ist,0,trim(tag)//' lambda temp refused')
+         end if
+c
+c     metadynamics refuses Monte Carlo lambda moves away from the
+c     bath temperature
+c
+         if (mode .eq. 'META') then
+            cmd = 'cp water2.key water2.bak ; '//
+     &            'echo "lambda-propagate mc" >> water2.key ; '//
+     &            'echo "lambda-temperature 600" >> water2.key'
+            call execute_command_line (cmd)
+            call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                     'out.txt',ist)
+            call execute_command_line ('mv water2.bak water2.key')
+            cmd = 'grep -q "Monte Carlo Lambda Moves" out.txt'
+            call execute_command_line (cmd,exitstat=ist)
+            call assert_int (ist,0,trim(tag)//' mc lambda temp refused')
+         end if
+c
 c     a run without a thermostat is refused
 c
          call run_prog ('dynamic','water2 20 1.0 0.01 1',
@@ -720,6 +758,47 @@ c
          call assert_int (ist,0,trim(tag)//' third reads the dyn')
          call eosthiststep (histfile,istep)
          call assert_int (istep,60,trim(tag)//' third history step')
+c
+c     a history written before the lambda temperature was stored
+c     continues at the bath temperature, and its header is widened
+c     by rewriting the whole file rather than over its first rows
+c
+         if (mode .ne. 'ABF') then
+            call eostoldhead (histfile)
+            call eostlmdastate (histfile,nval,tlmda)
+            call assert_int (nval,7,trim(tag)//' old header made')
+            call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                     'out.txt',ist)
+            call assert_int (ist,0,trim(tag)//' old header status')
+            cmd = 'grep -q "Bias History Continued From" out.txt'
+            call execute_command_line (cmd,exitstat=ist)
+            call assert_int (ist,0,trim(tag)//' old header continues')
+            call eostlmdastate (histfile,nval,tlmda)
+            call assert_int (nval,8,trim(tag)//' old header widened')
+            call assert_real (tlmda,300.0d0,0.0d0,
+     &                        trim(tag)//' old header at the bath')
+            call eosthistrows (mode,histfile,nrow,nsaved)
+            call assert_int (nrow,nsaved,trim(tag)//' old header rows')
+            call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                     'out.txt',ist)
+            call assert_int (ist,0,trim(tag)//' widened file reads')
+            call eosthiststep (histfile,istep)
+            call assert_int (istep,100,trim(tag)//' widened file step')
+c
+c     a new history run with its own lambda temperature stores it
+c
+            call execute_command_line ('rm -f water2.dyn '//
+     &                                 trim(histfile)//'*')
+            call tnist_append ('water2.key','lambda-temperature 900')
+            call run_prog ('dynamic','water2 20 1.0 0.01 2 300',
+     &                     'out.txt',ist)
+            call assert_int (ist,0,trim(tag)//' hot lambda status')
+            call eostlmdastate (histfile,nval,tlmda)
+            call assert_real (tlmda,900.0d0,0.0d0,
+     &                        trim(tag)//' hot lambda stored')
+            call eosthiststep (histfile,istep)
+            call assert_int (istep,20,trim(tag)//' hot lambda step')
+         end if
       end if
       call popdir
       call tnist_clean ('eost_rstrun')
@@ -756,6 +835,142 @@ c
       read (ihis,'(a)')  record
       close (unit=ihis)
       read (record,*)  istep
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine eostlmdastate  --  stored lambda temperature  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "eostlmdastate" returns the number of values in the lambda
+c     state record of an ost or metadynamics history header, and the
+c     lambda particle temperature it stores when it holds eight
+c
+c
+      subroutine eostlmdastate (histfile,nval,tlmda)
+      implicit none
+      integer i,ihis,nval
+      integer freeunit
+      real*8 tlmda
+      real*8 state(8)
+      character*240 record
+      character*(*) histfile
+c
+c
+c     the lambda state values follow the lambda state label
+c
+      ihis = freeunit ()
+      open (unit=ihis,file=histfile,status='old')
+      do i = 1, 6
+         read (ihis,'(a)')  record
+      end do
+      read (ihis,'(a)')  record
+      close (unit=ihis)
+      nval = 7
+      tlmda = 0.0d0
+      read (record,*,err=10,end=10)  state
+      nval = 8
+      tlmda = state(8)
+   10 continue
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine eostoldhead  --  drop the stored lambda temp  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "eostoldhead" rewrites an ost or metadynamics history with the
+c     seven value lambda state record written before the lambda
+c     particle temperature was stored, keeping every other line
+c
+c
+      subroutine eostoldhead (histfile)
+      implicit none
+      integer i,ihis,nline
+      integer freeunit
+      character*240 lines(5000)
+      character*(*) histfile
+c
+c
+c     read every line, then cut the eighth lambda state value
+c
+      ihis = freeunit ()
+      open (unit=ihis,file=histfile,status='old')
+      nline = 0
+      do while (nline .lt. 5000)
+         read (ihis,'(a)',end=10)  lines(nline+1)
+         nline = nline + 1
+      end do
+   10 continue
+      close (unit=ihis)
+      call assert_logical (nline.lt.5000,.true.,
+     &                     'eostoldhead buffer holds the file')
+      lines(7)(7*26+1:240) = ' '
+      open (unit=ihis,file=histfile,status='replace')
+      do i = 1, nline
+         write (ihis,'(a)')  trim(lines(i))
+      end do
+      close (unit=ihis)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine eosthistrows  --  saved and present row count  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "eosthistrows" returns the number of rows after the eight
+c     header records of an ost or metadynamics history, and the
+c     count of saved rows its integer state record claims
+c
+c
+      subroutine eosthistrows (mode,histfile,nrow,nsaved)
+      implicit none
+      integer i,ihis
+      integer nrow,nsaved
+      integer freeunit
+      integer ival(7)
+      character*240 record
+      character*(*) mode
+      character*(*) histfile
+c
+c
+c     the saved count is the third integer of a metadynamics header
+c     and the sixth of an ost header
+c
+      ihis = freeunit ()
+      open (unit=ihis,file=histfile,status='old')
+      do i = 1, 3
+         read (ihis,'(a)')  record
+      end do
+      if (mode .eq. 'META') then
+         read (record,*)  (ival(i),i=1,4)
+         nsaved = ival(3)
+      else
+         read (record,*)  (ival(i),i=1,7)
+         nsaved = ival(6)
+      end if
+      do i = 4, 8
+         read (ihis,'(a)')  record
+      end do
+      nrow = 0
+      do while (.true.)
+         read (ihis,'(a)',end=10)  record
+         nrow = nrow + 1
+      end do
+   10 continue
+      close (unit=ihis)
       return
       end
 c
@@ -1286,8 +1501,9 @@ c
       use ost
       use units
       implicit none
-      real*8 rt
+      real*8 rt,rth
       real*8 expected
+      real*8 hotmean
       real*8 height
       real*8 wratio
       real*8 w1,w2,w3,w4,w5
@@ -1342,6 +1558,30 @@ c
      &     /(w1+w2+w3+w4+w5)
       call assert_real (lmdafmean(3),expected,1.0d-12,
      &                  'buildfkernel from updated gkernel')
+c
+c     the weights undo the bias on the atoms at the bath temperature,
+c     so a lambda particle three times hotter leaves the mean force
+c     unchanged, in the separate and in the fused kernel builds, while
+c     weighting at that temperature would give a different one
+c
+      rth = 3.0d0 * rt
+      w1 = exp(gkernel(3,1)/rth)
+      w2 = exp(gkernel(3,2)/rth)
+      w3 = exp(gkernel(3,3)/rth)
+      w4 = exp(gkernel(3,4)/rth)
+      w5 = exp(gkernel(3,5)/rth)
+      hotmean = (-2.0d0*w1 - w2 + w4 + 2.0d0*w5)
+     &             / (w1+w2+w3+w4+w5)
+      call assert_logical (abs(hotmean-expected).gt.1.0d-3,.true.,
+     &                     'buildfkernel hot weights would differ')
+      lmdakelvin = 3.0d0 * kelvin
+      call buildfkernel
+      call assert_real (lmdafmean(3),expected,1.0d-12,
+     &                  'buildfkernel mean force at a hot lambda')
+      call buildkernels
+      call assert_real (lmdafmean(3),expected,1.0d-12,
+     &                  'buildkernels mean force at a hot lambda')
+      lmdakelvin = 0.0d0
 c
 c     a deeply filled bin overflows exp(g/kT) unless the largest bias
 c     in the row is factored out; unshifted this returns a NaN

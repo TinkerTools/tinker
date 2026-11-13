@@ -121,8 +121,11 @@ c     change of Vbias(0) - Vbias(1) = 0.044318484119 and a bias part
 c     of G(0.5) of Vbias(0) - Vbias(0.5) = -0.225636348447 Kcal/mol,
 c     to which the profile adds kT ln(J(0.5)/J(0)) for the theta map,
 c     with the default smoothed triangle map and with the sine squared
-c     map; the profile runs from zero to the free energy change, and
-c     a keyfile bin count below three rebuilds it on three bins
+c     map, where T is the lambda particle temperature stored in the
+c     history or else the bath, and Monte Carlo lambda moves drop the
+c     theta map term; the profile runs from zero to the free energy
+c     change, and a keyfile bin count below three rebuilds it on three
+c     bins
 c
 c
       subroutine test_lmda_meta
@@ -194,6 +197,52 @@ c
      &                     'test_analyzelmda meta sin profile end')
       end if
       call lmdawipe ('meta1sin')
+c
+c     a history that stores a lambda temperature of 894 K, three times
+c     the bath, applies the theta map factor at that temperature while
+c     the free energy change stays the same
+c
+      call lmdawipe ('meta1hot')
+      call run_prog ('analyzelmda','2 meta1hot','out.txt',ist)
+      if (ist .ne. -1) then
+         call assert_int (ist,0,'test_analyzelmda meta hot status')
+         call barfind ('meta1hot.freeenergy','Delta G',found,value,err)
+         call assert_real (value,dg,eps,
+     &                     'test_analyzelmda meta hot delta g')
+         call barfind ('meta1hot.freeenergy','Lambda Temperature',
+     &                 found,value,err)
+         call assert_real (value,894.0d0,eps,
+     &                     'test_analyzelmda meta hot temperature')
+         call lmdaprof ('meta1hot.freeenergy',0.5d0,found,value)
+         lmdathmap = 'SIN'
+         gmid = gbias + 3.0d0*rt*log(lmdathjac(0.5d0,sig,cut)
+     &                               /lmdathjac(0.0d0,sig,cut))
+         call assert_real (value,gmid,eps,
+     &                     'test_analyzelmda meta hot profile middle')
+         call lmdaprof ('meta1hot.freeenergy',1.0d0,found,g1)
+         call assert_real (g1,dg,eps,
+     &                     'test_analyzelmda meta hot profile end')
+      end if
+      call lmdawipe ('meta1hot')
+c
+c     Monte Carlo trials named in the keyfile move lambda itself, so
+c     the profile is the bias part alone whatever the theta map
+c
+      call lmdawipe ('meta1mc')
+      call run_prog ('analyzelmda','2 meta1mc','out.txt',ist)
+      if (ist .ne. -1) then
+         call assert_int (ist,0,'test_analyzelmda meta mc status')
+         call barfind ('meta1mc.freeenergy','Delta G',found,value,err)
+         call assert_real (value,dg,eps,
+     &                     'test_analyzelmda meta mc delta g')
+         call lmdaprof ('meta1mc.freeenergy',0.5d0,found,value)
+         call assert_real (value,gbias,eps,
+     &                     'test_analyzelmda meta mc profile middle')
+         call lmdaprof ('meta1mc.freeenergy',1.0d0,found,g1)
+         call assert_real (g1,dg,eps,
+     &                     'test_analyzelmda meta mc profile end')
+      end if
+      call lmdawipe ('meta1mc')
       lmdathmap = 'TRI'
 c
 c     a bin count below three rebuilds the history on three bins, as

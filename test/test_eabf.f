@@ -960,7 +960,7 @@ c
       call eostfilebytes (abffile,text0,nbyte0)
       call initabffile
       call eostfilebytes (abffile,text1,nbyte1)
-      call assert_logical (histtail,.false.,
+      call assert_logical (histrewrite,.false.,
      &                     'rdabfhist finds no rows past the count')
       call assert_logical (nbyte1.eq.nbyte0 .and. text1.eq.text0,
      &                     .true.,'initabffile leaves a clean file')
@@ -1081,7 +1081,7 @@ c
       lmdaintv = 4
       kelvin = 300.0d0
       call initabffile
-      call assert_logical (histtail,.true.,
+      call assert_logical (histrewrite,.true.,
      &                     'rdabfhist finds the stray row')
       call assert_int (nlmdahist,2,'initabffile skips the stray row')
       do istep = 1, lmdaintv

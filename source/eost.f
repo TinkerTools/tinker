@@ -280,7 +280,8 @@ c
       real*8 rt,expo,excess
 c
 c
-c     an untempered run always deposits at the full height
+c     an untempered run always deposits at the full height; the
+c     tempering scale is the bath temperature, not that of lambda
 c
       temperedheight = hbias
       rt = gasconst * kelvin
@@ -1306,6 +1307,10 @@ c
       sigf2 = sigf * sigf
       pref = osthhist(ihist) / (2.0d0*pi*sigl*sigf)
       sourcefl = lmdafhist(ihist)
+c
+c     the f kernel weights undo the bias on the atoms, so they use
+c     the bath temperature, never the lambda particle temperature
+c
       rt = gasconst * kelvin
 c
 c     include target bins out to the requested gaussian cutoff
@@ -1491,7 +1496,8 @@ c     it cancels exactly, to keep the exponential from overflowing
 c
          vmax = vkernelmax(ilmda)
 c
-c     loop over flambda bins with nonzero g kernel support
+c     loop over flambda bins with nonzero g kernel support; the
+c     weights undo the bias on the atoms at the bath temperature
 c
          do iflmda = 1, nflmda
             if (gkernel(ilmda,iflmda) .ne. 0.0d0) then
@@ -1545,6 +1551,8 @@ c
       integer trimtext
       real*8 wflmda0
       real*8 oststdev0,kelvin0
+      real*8 lmdakelvin0
+      real*8 lmdatemp
       real*8 lmdamass0,lmdafric0
       real*8 lmdadt0
       logical exist
@@ -1566,6 +1574,7 @@ c
          wflmda0 = wflmda
          oststdev0 = oststdev
          kelvin0 = kelvin
+         lmdakelvin0 = lmdatemp ()
          lmdamass0 = lmdamass
          lmdafric0 = lmdafric
          lmdadt0 = lmdadt
@@ -1586,6 +1595,8 @@ c
      &                    lmdasavefile)
          call chkbiasset (rname,'LAMBDA-MASS',lmdamass0,lmdamass,
      &                    lmdasavefile)
+         call chkbiasset (rname,'LAMBDA-TEMPERATURE',lmdakelvin0,
+     &                    lmdakelvin,lmdasavefile)
          call chkbiasset (rname,'LAMBDA-FRICTION',lmdafric0,lmdafric,
      &                    lmdasavefile)
          call chkbiasset (rname,'LAMBDA-DT',lmdadt0,lmdadt,
@@ -1597,11 +1608,12 @@ c
          lmdastep = (lmdastep/lmdaintv) * lmdaintv
 c
 c     drop the rows an interrupted save appended after the last
-c     header update by rewriting the file from the gaussians just
-c     read; a clean file is left alone until the first save
-c     updates its header
+c     header update, or widen a header written before the lambda
+c     particle temperature was stored, by rewriting the file from
+c     the gaussians just read; a clean file is left alone until the
+c     first save updates its header
 c
-         if (histtail) then
+         if (histrewrite) then
             ihis = freeunit ()
             open (unit=ihis,file=lmdasavefile,status='replace',
      &            access='stream',form='formatted')
@@ -1846,11 +1858,10 @@ c
    10 format (a240)
 c
 c     note any rows past the saved count, which an interrupted save
-c     leaves behind
+c     leaves behind, beside an old header that "rdbiashead" noted
 c
-      histtail = .false.
       read (ihis,10,err=15,end=15)  record
-      histtail = .true.
+      histrewrite = .true.
    15 continue
       close (unit=ihis)
 c
@@ -2010,6 +2021,8 @@ c
       integer freeunit
       integer trimtext
       real*8 oststdev0,kelvin0
+      real*8 lmdakelvin0
+      real*8 lmdatemp
       real*8 lmdamass0,lmdafric0
       real*8 lmdadt0
       logical exist
@@ -2019,6 +2032,21 @@ c
 c     return if metadynamics has not been initialized
 c
       if (.not. use_meta)  return
+c
+c     a Monte Carlo trial accepts on the instantaneous energy change,
+c     so a lambda particle hotter or colder than the atoms does not
+c     sample the free energy at its own temperature, however slowly
+c     it moves, and the bias would not converge to the free energy
+c
+      if (use_lmdamc) then
+         if (abs(lmdatemp()-kelvin) .gt. 1.0d-10*max(1.0d0,kelvin)) then
+            write (iout,5)
+    5       format (/,' INITMETAFILE  --  Monte Carlo Lambda Moves',
+     &                 ' in Metadynamics Require',
+     &              /,' LAMBDA-TEMPERATURE at the Bath Temperature')
+            call fatal
+         end if
+      end if
 c
 c     continue from the latest existing metadynamics history file
 c
@@ -2030,6 +2058,7 @@ c
          lmdaintv0 = lmdaintv
          oststdev0 = oststdev
          kelvin0 = kelvin
+         lmdakelvin0 = lmdatemp ()
          lmdamass0 = lmdamass
          lmdafric0 = lmdafric
          lmdadt0 = lmdadt
@@ -2048,6 +2077,8 @@ c
      &                    metasavefile)
          call chkbiasset (rname,'LAMBDA-MASS',lmdamass0,lmdamass,
      &                    metasavefile)
+         call chkbiasset (rname,'LAMBDA-TEMPERATURE',lmdakelvin0,
+     &                    lmdakelvin,metasavefile)
          call chkbiasset (rname,'LAMBDA-FRICTION',lmdafric0,lmdafric,
      &                    metasavefile)
          call chkbiasset (rname,'LAMBDA-DT',lmdadt0,lmdadt,
@@ -2059,11 +2090,12 @@ c
          lmdastep = (lmdastep/lmdaintv) * lmdaintv
 c
 c     drop the rows an interrupted save appended after the last
-c     header update by rewriting the file from the gaussians just
-c     read; a clean file is left alone until the first save
-c     updates its header
+c     header update, or widen a header written before the lambda
+c     particle temperature was stored, by rewriting the file from
+c     the gaussians just read; a clean file is left alone until the
+c     first save updates its header
 c
-         if (histtail) then
+         if (histrewrite) then
             ihis = freeunit ()
             open (unit=ihis,file=metasavefile,status='replace',
      &            access='stream',form='formatted')
@@ -2263,11 +2295,10 @@ c
    10 format (a240)
 c
 c     note any rows past the saved count, which an interrupted save
-c     leaves behind
+c     leaves behind, beside an old header that "rdbiashead" noted
 c
-      histtail = .false.
       read (ihis,10,err=15,end=15)  record
-      histtail = .true.
+      histrewrite = .true.
    15 continue
       close (unit=ihis)
 c

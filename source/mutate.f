@@ -509,6 +509,7 @@ c
       lmdamass = 25.0d0
       lmdafric = 0.01d0
       lmdadt = 0.001d0
+      lmdakelvin = 0.0d0
 c
 c     set defaults for the Monte Carlo lambda trial moves
 c
@@ -561,6 +562,9 @@ c
          else if (keyword(1:16) .eq. 'LAMBDA-FRICTION ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  lmdafric
+         else if (keyword(1:19) .eq. 'LAMBDA-TEMPERATURE ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  lmdakelvin
          else if (keyword(1:17) .eq. 'LAMBDA-PROPAGATE ') then
             call getword (record,propword,next)
             call upcase (propword)
@@ -703,6 +707,11 @@ c
 c     keep the reach of the bias fill nonnegative
 c
       lmdafillr = abs(lmdafillr)
+c
+c     keep the lambda particle temperature nonnegative, where zero
+c     leaves it to follow the bath temperature once that is known
+c
+      lmdakelvin = abs(lmdakelvin)
 c
 c     split the sample interval into its propagation, equilibration
 c     and averaging phases

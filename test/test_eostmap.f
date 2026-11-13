@@ -1411,7 +1411,7 @@ c
       real*8 v0,th0,vref,thref
       real*8 vkick
       real*8 gauss,decay,sigma
-      real*8 kelvin0
+      real*8 kelvin0,lmdakelvin0
       real*8 alist(2),llist(6)
       logical inrange
       character*3 maps(2)
@@ -1547,7 +1547,9 @@ c     a step with friction and a given random kick; the kick is
 c     sized by the thermal energy in kcal/mole, as is the force
 c
       kelvin0 = kelvin
+      lmdakelvin0 = lmdakelvin
       kelvin = 300.0d0
+      lmdakelvin = 0.0d0
       lmdafric = 0.5d0
       gauss = 0.8d0
       lmdatheta = th0
@@ -1573,7 +1575,19 @@ c
       call assert_real (lmdamass*lmdavtheta**2/(1.0d0-decay*decay),
      &                  0.59616127758d0,1.0d-12,
      &                  'lmdalangstep thermal energy in kcal/mole')
+c
+c     LAMBDA-TEMPERATURE sizes the kick by its own thermal energy,
+c     three times the bath value at 900 K
+c
+      lmdakelvin = 900.0d0
+      lmdatheta = th0
+      lmdavtheta = 0.0d0
+      call lmdalangstep (1.0d0)
+      call assert_real (lmdamass*lmdavtheta**2/(1.0d0-decay*decay),
+     &                  3.0d0*0.59616127758d0,1.0d-12,
+     &                  'lmdalangstep thermal energy at 900 K')
       kelvin = kelvin0
+      lmdakelvin = lmdakelvin0
 c
 c     a step past the end of the period wraps theta into [0,pi)
 c
@@ -1637,11 +1651,12 @@ c
       use mutant
       use units
       implicit none
-      integer i,k
+      integer i,j,k
       real*8 th0,kspr,kt,h
       real*8 pdd,pdv,pvv
       real*8 cdd,cdv,cvv
       real*8 kelvin0,lambda0
+      real*8 lmdakelvin0
       real*8 fric0,dt0,mass0
       real*8 dedl0,th00,vth0,alpha0
       real*8 a(2,2),b(2),q(2)
@@ -1653,6 +1668,7 @@ c
 c     save the lambda particle state for later tests
 c
       kelvin0 = kelvin
+      lmdakelvin0 = lmdakelvin
       lambda0 = lambda
       fric0 = lmdafric
       dt0 = lmdadt
@@ -1671,7 +1687,6 @@ c
       lmdadt = 0.01d0
       lmdamass = 2.0d0
       kspr = lmdamass / lmdadt**2
-      kt = gasconst * kelvin
       th0 = 0.25d0 * pi
       h = 0.01d0
       fric(1) = 50.0d0
@@ -1680,6 +1695,18 @@ c
       tag(1) = 'gamma*dt 0.5'
       tag(2) = 'gamma*dt 5'
       tag(3) = 'gamma*dt 20'
+c
+c     the particle samples the bath temperature by default, and its
+c     own temperature once LAMBDA-TEMPERATURE sets one
+c
+      do j = 1, 2
+      if (j .eq. 1) then
+         lmdakelvin = 0.0d0
+         kt = gasconst * kelvin
+      else
+         lmdakelvin = 900.0d0
+         kt = gasconst * lmdakelvin
+      end if
       do k = 1, 3
          lmdafric = fric(k)
 c
@@ -1714,17 +1741,28 @@ c
             pdv = cdv
             pvv = cvv
          end do
-         call assert_real (kspr*pdd/kt,1.0d0,1.0d-8,
-     &                     'lmdalangstep theta at the bath, '
-     &                        //trim(tag(k)))
-         call assert_real (lmdamass*pvv/kt,1.0d0,1.0d-8,
-     &                     'lmdalangstep velocity at the bath, '
-     &                        //trim(tag(k)))
+         if (j .eq. 1) then
+            call assert_real (kspr*pdd/kt,1.0d0,1.0d-8,
+     &                        'lmdalangstep theta at the bath, '
+     &                           //trim(tag(k)))
+            call assert_real (lmdamass*pvv/kt,1.0d0,1.0d-8,
+     &                        'lmdalangstep velocity at the bath, '
+     &                           //trim(tag(k)))
+         else
+            call assert_real (kspr*pdd/kt,1.0d0,1.0d-8,
+     &                        'lmdalangstep theta at its own '
+     &                           //'temperature, '//trim(tag(k)))
+            call assert_real (lmdamass*pvv/kt,1.0d0,1.0d-8,
+     &                        'lmdalangstep velocity at its own '
+     &                           //'temperature, '//trim(tag(k)))
+         end if
+      end do
       end do
 c
 c     restore the lambda particle state for later tests
 c
       kelvin = kelvin0
+      lmdakelvin = lmdakelvin0
       lambda = lambda0
       lmdafric = fric0
       lmdadt = dt0

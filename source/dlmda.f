@@ -68,6 +68,7 @@ c     lmdadfdl      saved bias free energy derivative for dynamics
 c     lmdadt        time step of the theta lambda coordinate
 c     lmdafillr     lambda reach of the bias fill of unsampled bins
 c     lmdafric      friction coefficient of theta lambda coordinate
+c     lmdakelvin    temperature of the lambda particle in Kelvin
 c     lmdamass      fictitious mass of the theta lambda coordinate
 c     lmdamcmove    maximum size of a Monte Carlo lambda move
 c     lmdaparatio   interval fraction propagating the lambda particle
@@ -123,8 +124,10 @@ c     lcphi         cphi for lambda derivative
 c     lfmp          fmp for lambda derivative
 c     lfphi         fphi for lambda derivative
 c     poleorig      original pole
-c     histtail      flag that the history file just read holds rows
-c                     past its saved count, left by an interrupted save
+c     histrewrite   flag that the history file just read is rewritten
+c                     in full when continued, as it holds rows past its
+c                     saved count, left by an interrupted save, or a
+c                     header older than the stored lambda temperature
 c     use_abf       flag to use adaptive biasing force
 c     use_abfdyn    flag to propagate abf lambda particle
 c     use_d2lmda    flag that second, force and virial lambda derivs
@@ -222,6 +225,7 @@ c
       real*8 lmdadt
       real*8 lmdafillr
       real*8 lmdafric
+      real*8 lmdakelvin
       real*8 lmdamass
       real*8 lmdamcmove
       real*8 lmdaparatio
@@ -275,7 +279,7 @@ c
       real*8, allocatable :: lfmp(:,:)
       real*8, allocatable :: lfphi(:,:)
       real*8, allocatable :: poleorig(:,:)
-      logical histtail
+      logical histrewrite
       logical use_abf
       logical use_abfdyn
       logical use_d2lmda

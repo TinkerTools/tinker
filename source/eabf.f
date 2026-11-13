@@ -255,7 +255,7 @@ c     header update by rewriting the file from the samples just
 c     read; a clean file is left alone until the first save
 c     updates its header
 c
-         if (histtail) then
+         if (histrewrite) then
             ihis = freeunit ()
             open (unit=ihis,file=lmdasavefile,status='replace',
      &            access='stream',form='formatted')
@@ -446,9 +446,8 @@ c
 c     note any rows past the saved count, which an interrupted save
 c     leaves behind
 c
-      histtail = .false.
       read (ihis,20,err=25,end=25)  record
-      histtail = .true.
+      histrewrite = .true.
    25 continue
       close (unit=ihis)
 c

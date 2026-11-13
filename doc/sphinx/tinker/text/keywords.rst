@@ -795,10 +795,10 @@ LAMBDA PARTICLE KEYWORDS
    * -
      - LAMBDA-MC-TRIAL
      - LAMBDA-PROPAGATE
-     - LAMBDA-THETA-ALPHA
+     - LAMBDA-TEMPERATURE
    * -
+     - LAMBDA-THETA-ALPHA
      - LAMBDA-THETA-MAP
-     -
      -
 
 LAMBDA WINDOW KEYWORDS
@@ -2242,7 +2242,7 @@ LAMBDA-EQRATIO [1 or 2 reals]
 .. _KEY-LAMBDA-FRICTION:
 
 LAMBDA-FRICTION [real]
-   Sets the Langevin friction coefficient in inverse picoseconds acting on the lambda particle. A value of zero, or a negative value, gives frictionless motion with no random kicks. With friction the particle takes leapfrog middle Langevin steps, whose sampling error does not grow with the friction, so a harmonic well in theta is sampled at the bath temperature for any friction once LAMBDA-DT is small enough for stable frictionless motion. Friction above about 2/LAMBDA-DT barely slows the particle further. The default in the absence of the LAMBDA-FRICTION keyword is 0.01 per picosecond.
+   Sets the Langevin friction coefficient in inverse picoseconds acting on the lambda particle. A value of zero, or a negative value, gives frictionless motion with no random kicks. With friction the particle takes leapfrog middle Langevin steps, whose sampling error does not grow with the friction, so a harmonic well in theta is sampled at the LAMBDA-TEMPERATURE of the particle for any friction once LAMBDA-DT is small enough for stable frictionless motion. Friction above about 2/LAMBDA-DT barely slows the particle further. The default in the absence of the LAMBDA-FRICTION keyword is 0.01 per picosecond.
 
 .. index:: LAMBDA-INTERVAL
 .. _KEY-LAMBDA-INTERVAL:
@@ -2290,7 +2290,13 @@ LAMBDA-NWINDOW [integer]
 .. _KEY-LAMBDA-PROPAGATE:
 
 LAMBDA-PROPAGATE [LANGEVIN / MC]
-   Selects how the lambda particle of orthogonal space tempering, metadynamics or the adaptive biasing force moves. LANGEVIN propagates it by Langevin dynamics along the angle theta, controlled by LAMBDA-MASS, LAMBDA-FRICTION and LAMBDA-DT, while MC moves lambda by Monte Carlo trial moves controlled by LAMBDA-MC-MOVE and LAMBDA-MC-TRIAL. Any other modifier stops the calculation, and the default in the absence of the LAMBDA-PROPAGATE keyword is LANGEVIN.
+   Selects how the lambda particle of orthogonal space tempering, metadynamics or the adaptive biasing force moves. LANGEVIN propagates it by Langevin dynamics along the angle theta, controlled by LAMBDA-MASS, LAMBDA-FRICTION and LAMBDA-DT, while MC moves lambda by Monte Carlo trial moves controlled by LAMBDA-MC-MOVE and LAMBDA-MC-TRIAL. Both move lambda at the temperature set by LAMBDA-TEMPERATURE. Any other modifier stops the calculation, and the default in the absence of the LAMBDA-PROPAGATE keyword is LANGEVIN.
+
+.. index:: LAMBDA-TEMPERATURE
+.. _KEY-LAMBDA-TEMPERATURE:
+
+LAMBDA-TEMPERATURE [real]
+   Sets the temperature in Kelvin at which the lambda particle of orthogonal space tempering, metadynamics or the adaptive biasing force moves, both for its Langevin random kicks and for the acceptance test of Monte Carlo lambda moves, while the atoms stay at the bath temperature. A temperature above the bath lets lambda cross between its states more easily. Orthogonal space tempering and the adaptive biasing force average dU/dlambda with lambda held fixed and the atoms at the bath temperature, so their free energy estimates remain at the bath temperature for any LAMBDA-TEMPERATURE; a hotter particle disturbs the atoms more when it moves, so the equilibration phase set by LAMBDA-EQRATIO may need to grow if fewer intervals pass LAMBDA-CONVCRI. Metadynamics reads its free energy from the bias and is correct at a different temperature only when lambda moves slowly compared to the atoms, as with a large LAMBDA-MASS, and ANALYZELMDA applies the theta map factor of its profile at this temperature. Metadynamics with LAMBDA-PROPAGATE MC stops the calculation unless the lambda particle runs at the bath temperature, since a Monte Carlo trial accepts on the instantaneous energy change, so a hotter or colder particle does not sample the free energy at its own temperature however rarely it moves. A negative value is taken as its magnitude, and in the absence of the keyword, or with a value of zero, the lambda particle runs at the bath temperature. The temperature is saved in OST and metadynamics history files, and continuing a history requires the same value.
 
 .. index:: LAMBDA-THETA-ALPHA
 .. _KEY-LAMBDA-THETA-ALPHA:

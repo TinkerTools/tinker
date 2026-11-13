@@ -430,6 +430,8 @@ void elmdadyn_();
 #define tinker_f_elmdadyn elmdadyn_
 void lmdalangevin_();
 #define tinker_f_lmdalangevin lmdalangevin_
+double lmdatemp_();
+#define tinker_f_lmdatemp lmdatemp_
 void lmdalangstep_(double* gauss);
 #define tinker_f_lmdalangstep lmdalangstep_
 void elmdabias_(double* vbias, double* slope);

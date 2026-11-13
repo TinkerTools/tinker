@@ -1503,7 +1503,7 @@ c
       real*8 lmdatheta0,lmdavtheta0
       real*8 lmdamass0,lmdafric0,lmdadt0
       real*8 lmdadeltag0,oststdev0
-      real*8 kelvin0
+      real*8 kelvin0,lmdakelvin0
       logical abfhead
       logical metahdr
       character*240 record
@@ -1514,6 +1514,7 @@ c
 c     read the title and the integer state label records; an abf
 c     history keeps only the sample and lambda particle state
 c
+      histrewrite = .false.
       read (ihis,10,err=90,end=90)  record
    10 format (a240)
       title = record
@@ -1556,8 +1557,21 @@ c
       if (abfhead) then
          read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0
       else
+c
+c     the lambda particle temperature follows the other settings;
+c     a history written before it was stored has seven values, where
+c     the slash past them ends the read and leaves the temperature
+c     unset, and that history ran at the bath and is rewritten in
+c     full when continued
+c
+         lmdakelvin0 = -1.0d0
+         record(239:240) = ' /'
          read (record,*,err=90,end=90)  lambda0,lmdatheta0,lmdavtheta0,
-     &      lmdamass0,lmdafric0,lmdadt0,lmdadeltag0
+     &      lmdamass0,lmdafric0,lmdadt0,lmdadeltag0,lmdakelvin0
+         if (lmdakelvin0 .eq. -1.0d0) then
+            lmdakelvin0 = kelvin0
+            histrewrite = .true.
+         end if
       end if
       read (ihis,10,err=90,end=90)  record
 c
@@ -1570,6 +1584,7 @@ c
       if (sizelmdahist0 .lt. 1)  sizelmdahist0 = 1
       if (.not. abfhead) then
          if (kelvin0 .le. 0.0d0)  goto 90
+         if (.not. (lmdakelvin0 .gt. 0.0d0))  goto 90
          if (use_ost .and. .not.metahdr) then
             if (nflmda0 .lt. 1)  goto 90
             if (fli00 .lt. 1 .or. fli00 .gt. nflmda0)  goto 90
@@ -1612,6 +1627,7 @@ c
       lmdadt = lmdadt0
       lmdadeltag = lmdadeltag0
       kelvin = kelvin0
+      lmdakelvin = lmdakelvin0
       if (metahdr) then
          oststdev = oststdev0
          return
@@ -1705,6 +1721,7 @@ c
       implicit none
       integer nrec
       integer trimtext
+      real*8 lmdatemp
       logical abfhead
       logical metahdr
       character*240 record(*)
@@ -1748,7 +1765,8 @@ c
          write (record(nrec),90)  lambda,lmdatheta,lmdavtheta
       else
          write (record(nrec),70)  lambda,lmdatheta,lmdavtheta,
-     &                            lmdamass,lmdafric,lmdadt,lmdadeltag
+     &                            lmdamass,lmdafric,lmdadt,lmdadeltag,
+     &                            lmdatemp()
       end if
       nrec = nrec + 1
       write (record(nrec),10)  label
@@ -1758,7 +1776,7 @@ c
    40 format (' Grid State :')
    50 format (4d26.16)
    60 format (' Lambda State :')
-   70 format (7d26.16)
+   70 format (8d26.16)
    80 format (4i12)
    90 format (3d26.16)
   100 format (3d26.16)
@@ -2039,6 +2057,33 @@ c
       end
 c
 c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  function lmdatemp  --  lambda particle temperature  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "lmdatemp" returns the temperature at which the lambda particle
+c     and the Monte Carlo lambda trials move, set by the keyword
+c     LAMBDA-TEMPERATURE or else the bath temperature; the atoms and
+c     every free energy estimate stay at the bath temperature, which
+c     ost and abf use alone since they average at a held lambda
+c
+c
+      function lmdatemp ()
+      use bath
+      use dlmda
+      implicit none
+      real*8 lmdatemp
+c
+c
+      lmdatemp = lmdakelvin
+      if (lmdatemp .le. 0.0d0)  lmdatemp = kelvin
+      return
+      end
+c
+c
 c     ############################################################
 c     ##                                                        ##
 c     ##  subroutine lmdalangstep -- lambda particle time step  ##
@@ -2055,10 +2100,10 @@ c
 c     with friction the step is the leapfrog middle scheme, a full
 c     force kick, a half drift, the exact friction and noise update
 c     and a second half drift, which samples a harmonic well in theta
-c     at the bath temperature for any friction times the time step;
-c     above about two over the time step, larger friction no longer
-c     slows the motion of theta; without friction the step reduces
-c     to plain leapfrog
+c     at the lambda particle temperature for any friction times the
+c     time step; above about two over the time step, larger friction
+c     no longer slows the motion of theta; without friction the step
+c     reduces to plain leapfrog
 c
 c
       subroutine lmdalangstep (gauss)
@@ -2075,6 +2120,7 @@ c
       real*8 sigma
       real*8 dldth
       real*8 ktm
+      real*8 lmdatemp
 c
 c
 c     force on theta from dU/dlambda and the theta map derivative
@@ -2092,7 +2138,7 @@ c
       gamma = max(0.0d0,lmdafric)
       if (gamma .gt. 0.0d0) then
          c = exp(-gamma*lmdadt)
-         ktm = gasconst * kelvin / lmdamass
+         ktm = gasconst * lmdatemp() / lmdamass
          sigma = sqrt(ktm*(1.0d0-c*c))
          lmdatheta = lmdatheta + 0.5d0*lmdadt*lmdavtheta
          lmdavtheta = c*lmdavtheta + sigma*gauss
@@ -2199,6 +2245,7 @@ c
       real*8 lold,ltrial
       real*8 vbias,slope
       real*8 energy,random
+      real*8 lmdatemp
       real*8 dedlold,d2edl2old
       real*8 vbiasold,dfdlold
       real*8 bdgdlold,bdgdflold
@@ -2228,7 +2275,7 @@ c
 c
 c     draw the trial lambda and reflect it into the lambda range
 c
-      kt = gasconst * kelvin
+      kt = gasconst * lmdatemp()
       ltrial = lambda + lmdamcmove*(2.0d0*random()-1.0d0)
       if (ltrial .lt. 0.0d0)  ltrial = -ltrial
       if (ltrial .gt. 1.0d0)  ltrial = 2.0d0 - ltrial

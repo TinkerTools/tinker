@@ -36,6 +36,8 @@ c
       call test_lmdamc_deposit
       call test_lmdamc_stale ('abf')
       call test_lmdamc_stale ('ost')
+      call test_lmdamc_temp ('abf')
+      call test_lmdamc_temp ('ost')
       call test_lmdamc_fill ('abf')
       call test_lmdamc_fill ('ost')
       call test_lmdamc_stalemeta
@@ -78,6 +80,22 @@ c
       call assert_logical (use_lmdafill,.true.,'lmdamc default fill')
       call assert_real (lmdafillr,0.1d0,0.0d0,
      &                  'lmdamc default fill reach')
+      call assert_real (lmdakelvin,0.0d0,0.0d0,
+     &                  'lmdamc default lambda temperature')
+      call final
+c
+c     the lambda particle temperature is set by keyword, and a
+c     negative value is taken as its magnitude
+c
+      call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
+     &                     'lambda-temperature 600.0')
+      call assert_real (lmdakelvin,600.0d0,0.0d0,
+     &                  'lmdamc lambda temperature value')
+      call final
+      call loadfix_keyadd ('ionwat','lmdamc_ionwat.key',
+     &                     'lambda-temperature -600.0')
+      call assert_real (lmdakelvin,600.0d0,0.0d0,
+     &                  'lmdamc lambda temperature negative')
       call final
 c
 c     the fill of unsampled bins is turned off, or on with a reach
@@ -774,6 +792,73 @@ c
       deallocate (uind0)
       deallocate (udir0)
       deallocate (desum0)
+      call sd_final
+      call popdir
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_lmdamc_temp  --  lambda temperature move  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_lmdamc_temp" checks for abf or ost that the Monte Carlo
+c     acceptance test uses the lambda particle temperature; a large
+c     constant mean force makes every move from lambda of zero steeply
+c     uphill, so that a move rejected at a very low bath temperature
+c     is accepted once LAMBDA-TEMPERATURE is far above the energy
+c     change of any move
+c
+c
+      subroutine test_lmdamc_temp (mode)
+      use bath
+      use dlmda
+      use mutant
+      implicit none
+      integer i
+      real*8 epot,e0,eref
+      logical took
+      character*(*) mode
+      character*11 tag
+c
+c
+      tag = 'lmdamc '//mode
+      call pushdir ('file/mutate')
+      call mcload (mode,e0)
+      do i = 1, nlmda
+         lmdafmean(i) = -1.0d5
+         lmdafwt(i) = 1.0d0
+      end do
+      kelvin = 1.0d-6
+c
+c     with no lambda temperature of its own the move follows the bath
+c     and is rejected
+c
+      lmdakelvin = 0.0d0
+      lambda = 0.0d0
+      call mcenergy (mode,eref)
+      call mctrial (0.0d0,1,eref,epot,took)
+      call assert_logical (took,.false.,
+     &                     trim(tag)//' uphill rejected at the bath')
+      call assert_real (lambda,0.0d0,0.0d0,
+     &                  trim(tag)//' bath reject lambda')
+c
+c     at a lambda temperature of 1e12 K, a thermal energy of 2e9
+c     kcal/mole, a move up to the largest bias change of 5000 kcal/mole
+c     is rejected less than once in 1e5 trials
+c
+      lmdakelvin = 1.0d12
+      lambda = 0.0d0
+      call mcenergy (mode,eref)
+      call mctrial (0.0d0,1,eref,epot,took)
+      call assert_logical (took,.true.,
+     &                     trim(tag)//' uphill accepted when hot')
+      call assert_logical (lambda.gt.0.0d0,.true.,
+     &                     trim(tag)//' hot move changes lambda')
+      lmdakelvin = 0.0d0
       call sd_final
       call popdir
       return
