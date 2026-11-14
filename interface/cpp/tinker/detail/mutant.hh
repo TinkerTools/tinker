@@ -41,6 +41,7 @@ extern int& mutpsc;
 extern int& setelambda;
 extern int& setplambda;
 extern int& setvlambda;
+extern int& setcvlambda;
 extern int& use_rel;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -82,6 +83,7 @@ extern "C" int TINKER_MOD(mutant, mutpsc);
 extern "C" int TINKER_MOD(mutant, setelambda);
 extern "C" int TINKER_MOD(mutant, setplambda);
 extern "C" int TINKER_MOD(mutant, setvlambda);
+extern "C" int TINKER_MOD(mutant, setcvlambda);
 extern "C" int TINKER_MOD(mutant, use_rel);
 
 int& nmut = TINKER_MOD(mutant, nmut);
@@ -122,6 +124,7 @@ int& mutpsc = TINKER_MOD(mutant, mutpsc);
 int& setelambda = TINKER_MOD(mutant, setelambda);
 int& setplambda = TINKER_MOD(mutant, setplambda);
 int& setvlambda = TINKER_MOD(mutant, setvlambda);
+int& setcvlambda = TINKER_MOD(mutant, setcvlambda);
 int& use_rel = TINKER_MOD(mutant, use_rel);
 #endif
 } }

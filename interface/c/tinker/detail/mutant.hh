@@ -43,6 +43,7 @@ extern int TINKER_MOD(mutant, mutpsc);
 extern int TINKER_MOD(mutant, setelambda);
 extern int TINKER_MOD(mutant, setplambda);
 extern int TINKER_MOD(mutant, setvlambda);
+extern int TINKER_MOD(mutant, setcvlambda);
 extern int TINKER_MOD(mutant, use_rel);
 #ifdef __cplusplus
 }

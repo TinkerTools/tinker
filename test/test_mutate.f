@@ -452,6 +452,23 @@ c
       call assert_logical (use_colvar,.false.,
      &                  'cvterm vdw only use_colvar')
       call final
+c
+c     the collective variable window is kept in [0,1] and ordered, and
+c     its held value in [0,1], as for the other three sublambdas
+c
+      call loadfix ('water2','mut_cv_range_swap.key')
+      call assert_real (qntcvlmda0,0.2d0,0.0d0,'lmda cv range swap lo')
+      call assert_real (qntcvlmda1,0.8d0,0.0d0,'lmda cv range swap hi')
+      call final
+      call loadfix ('water2','mut_cv_range_clamp.key')
+      call assert_real (qntcvlmda0,0.0d0,0.0d0,
+     &                  'lmda cv range clamp lo')
+      call assert_real (qntcvlmda1,1.0d0,0.0d0,
+     &                  'lmda cv range clamp hi')
+      call final
+      call loadfix ('water2','mut_cv_lam_clamp.key')
+      call assert_real (cvlambda,1.0d0,0.0d0,'lmda cv held clamp')
+      call final
       call popdir
       return
       end
@@ -2938,6 +2955,8 @@ c
      &   'range of nonzero width','test_mutate_unsup qnt step')
       call test_mutate_sccase ('mut_cvqnt_step_fatal.key','','water2',
      &   'range of nonzero width','test_mutate_unsup cv qnt step')
+      call test_mutate_sccase ('mut_cvlam_map_fatal.key','','water2',
+     &   'LAMBDA drives cvlambda','test_mutate_unsup cv lambda map')
       call test_mutate_sccase ('mut_nwin_mid_fatal.key','','water2',
      &   'Evenly spaced lambda windows start',
      &   'test_mutate_unsup nwindow interior start')

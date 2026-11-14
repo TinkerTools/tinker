@@ -96,6 +96,7 @@ c
       setelambda = .false.
       setplambda = .false.
       setvlambda = .false.
+      setcvlambda = .false.
       cvfound = .false.
       plambda = 1.0d0
 c
@@ -157,6 +158,7 @@ c
          else if (keyword(1:10) .eq. 'CV-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  cvlambda
+            setcvlambda = .true.
          else if (keyword(1:10) .eq. 'LAMBDA-CV ') then
             cvfound = .true.
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
@@ -257,6 +259,7 @@ c
       elambda = min(1.0d0,max(0.0d0,elambda))
       plambda = min(1.0d0,max(0.0d0,plambda))
       vlambda = min(1.0d0,max(0.0d0,vlambda))
+      cvlambda = min(1.0d0,max(0.0d0,cvlambda))
 c
 c     set plambda to elambda if no values given
 c
@@ -909,12 +912,16 @@ c
       if (qntplmda1 .lt. 0.0d0)  qntplmda1 = 0.0d0
       if (qntvlmda0 .lt. 0.0d0)  qntvlmda0 = 0.0d0
       if (qntvlmda1 .lt. 0.0d0)  qntvlmda1 = 0.0d0
+      if (qntcvlmda0 .lt. 0.0d0)  qntcvlmda0 = 0.0d0
+      if (qntcvlmda1 .lt. 0.0d0)  qntcvlmda1 = 0.0d0
       if (qntelmda0 .gt. 1.0d0)  qntelmda0 = 1.0d0
       if (qntelmda1 .gt. 1.0d0)  qntelmda1 = 1.0d0
       if (qntplmda0 .gt. 1.0d0)  qntplmda0 = 1.0d0
       if (qntplmda1 .gt. 1.0d0)  qntplmda1 = 1.0d0
       if (qntvlmda0 .gt. 1.0d0)  qntvlmda0 = 1.0d0
       if (qntvlmda1 .gt. 1.0d0)  qntvlmda1 = 1.0d0
+      if (qntcvlmda0 .gt. 1.0d0)  qntcvlmda0 = 1.0d0
+      if (qntcvlmda1 .gt. 1.0d0)  qntcvlmda1 = 1.0d0
       if (qntelmda1 .lt. qntelmda0) then
          temp = qntelmda0
          qntelmda0 = qntelmda1
@@ -929,6 +936,11 @@ c
          temp = qntvlmda0
          qntvlmda0 = qntvlmda1
          qntvlmda1 = temp
+      end if
+      if (qntcvlmda1 .lt. qntcvlmda0) then
+         temp = qntcvlmda0
+         qntcvlmda0 = qntcvlmda1
+         qntcvlmda1 = temp
       end if
 c
 c     single topology evaluates polarization from one parameter state
@@ -1829,6 +1841,13 @@ c
          write (iout,90)
    90    format (/,' MUTATE_CHECK  --  LAMBDA drives vlambda through',
      &              ' a lambda map; remove the VDW-LAMBDA keyword, or',
+     &              ' name a map only for the sublambdas LAMBDA drives')
+         call fatal
+      end if
+      if (use_mainlmda .and. use_cvlmdamap .and. setcvlambda) then
+         write (iout,95)
+   95    format (/,' MUTATE_CHECK  --  LAMBDA drives cvlambda through',
+     &              ' a lambda map; remove the CV-LAMBDA keyword, or',
      &              ' name a map only for the sublambdas LAMBDA drives')
          call fatal
       end if

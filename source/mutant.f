@@ -53,6 +53,7 @@ c     mutpsc      flag to collect the mutated partner overlap in alterpol
 c     setelambda  flag that elambda was set by its own keyword
 c     setplambda  flag that plambda was set by its own keyword
 c     setvlambda  flag that vlambda was set by its own keyword
+c     setcvlambda flag that cvlambda was set by its own keyword
 c     use_rel     flag to use the staged two-ligand relative schedule
 c                   being built for a relative dual topo energy
 c
@@ -97,6 +98,7 @@ c
       logical setelambda
       logical setplambda
       logical setvlambda
+      logical setcvlambda
       logical use_rel
       save
       end
