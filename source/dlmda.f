@@ -139,6 +139,8 @@ c                     saved count, left by an interrupted save, or a
 c                     header older than the stored lambda temperature
 c     use_abf       flag to use adaptive biasing force
 c     use_abfdyn    flag to propagate abf lambda particle
+c     use_cvdlmda   flag that the collective variable restraint has a
+c                     lambda deriv
 c     use_cvlmdamap flag that cvlambda follows the main lambda map
 c     use_d2lmda    flag that second, force and virial lambda derivs
 c                     are needed, beyond the first lambda derivative;
@@ -302,6 +304,7 @@ c
       logical histrewrite
       logical use_abf
       logical use_abfdyn
+      logical use_cvdlmda
       logical use_cvlmdamap
       logical use_d2lmda
       logical use_dlmda

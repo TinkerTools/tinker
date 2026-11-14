@@ -49,6 +49,7 @@ c
       integer ntbnd
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
+      logical cvfound
       character*4 leg(3)
       character*20 keyword
       character*240 record
@@ -95,6 +96,7 @@ c
       setelambda = .false.
       setplambda = .false.
       setvlambda = .false.
+      cvfound = .false.
       plambda = 1.0d0
 c
 c     set defaults for vdw coupling type and soft core vdw
@@ -155,6 +157,8 @@ c
          else if (keyword(1:10) .eq. 'CV-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  cvlambda
+         else if (keyword(1:10) .eq. 'LAMBDA-CV ') then
+            cvfound = .true.
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  elambda
@@ -262,6 +266,11 @@ c     turn off hybrid potentials if no sites are mutated
 c
       use_mutate = .true.
       if (nmut .eq. 0)  use_mutate = .false.
+c
+c     turn off the collective variable restraint if no collective
+c     variable is coupled to lambda; its values are read by Tinker9
+c
+      if (.not. cvfound)  use_colvar = .false.
 c
 c     set the options for each flavor of the lambda calculation
 c
@@ -993,7 +1002,8 @@ c
 c
 c     "setdlmdaterms" decides which of the three terms carries a lambda
 c     derivative, and so which of them has to be routed to its "empole4"
-c     flavored energy routine rather than the plain gradient one
+c     flavored energy routine rather than the plain gradient one; the
+c     collective variable restraint has one where its own map drives it
 c
 c     a term qualifies when the main lambda drives its sublambda through
 c     a map, except on a staged relative schedule, where a term that no
@@ -1016,6 +1026,7 @@ c
       use_edlmda = use_dlmda .and. use_elmdamap .and. use_mutate
       use_pdlmda = use_dlmda .and. use_plmdamap .and. use_mutate
       use_vdlmda = use_dlmda .and. use_vlmdamap .and. use_mutate
+      use_cvdlmda = use_dlmda .and. use_cvlmdamap .and. use_colvar
       if (use_rel) then
          if (.not. (use_relstg(1) .or. use_relstg(3))) then
             use_edlmda = .false.

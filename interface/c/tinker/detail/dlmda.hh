@@ -127,6 +127,7 @@ extern double* TINKER_MOD(dlmda, poleorig);
 extern int TINKER_MOD(dlmda, histrewrite);
 extern int TINKER_MOD(dlmda, use_abf);
 extern int TINKER_MOD(dlmda, use_abfdyn);
+extern int TINKER_MOD(dlmda, use_cvdlmda);
 extern int TINKER_MOD(dlmda, use_cvlmdamap);
 extern int TINKER_MOD(dlmda, use_d2lmda);
 extern int TINKER_MOD(dlmda, use_dlmda);

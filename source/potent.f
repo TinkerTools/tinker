@@ -44,6 +44,8 @@ c     use_extra   logical flag governing use of extra potential term
 c     use_born    logical flag governing use of Born radii values
 c     use_orbit   logical flag governing use of pisystem computation
 c     use_mutate  logical flag governing use of hybrid potential terms
+c     use_colvar  logical flag governing use of collective variable
+c                   restraints
 c
 c
       module potent
@@ -64,5 +66,6 @@ c
       logical use_metal,use_geom
       logical use_extra,use_born
       logical use_orbit,use_mutate
+      logical use_colvar
       save
       end

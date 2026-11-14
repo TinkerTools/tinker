@@ -194,6 +194,11 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_geom = .true.
          if (value .eq. 'NONE')  use_geom = .false.
+      else if (keyword(1:7) .eq. 'CVTERM ') then
+         call getword (record,value,next)
+         if (value .eq. 'ONLY')  call potoff
+         use_colvar = .true.
+         if (value .eq. 'NONE')  use_colvar = .false.
       else if (keyword(1:10) .eq. 'EXTRATERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff
@@ -567,6 +572,7 @@ c
       use_metal = .false.
       use_geom = .false.
       use_extra = .false.
+      use_colvar = .false.
       return
       end
 c

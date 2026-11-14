@@ -272,6 +272,7 @@ c
       use atoms
       use dlmda
       use mutant
+      use potent
       implicit none
       real*8 energy
       real*8 e,eref
@@ -423,6 +424,33 @@ c
      &                  'lmda cv default cvlambda')
       call assert_real (dcvldlmda,1.0d0,1.0d-15,
      &                  'lmda cv default dcvldlmda')
+      call final
+c
+c     the collective variable restraint is on only with a LAMBDA-CV
+c     line, and has a lambda derivative only where its own map drives
+c     it; CVTERM and the potential ONLY keywords switch it off
+c
+      call loadfix ('water2','mut_cv_qnt.key')
+      call assert_logical (use_colvar,.false.,
+     &                  'cvterm no restraint use_colvar')
+      call assert_logical (use_cvdlmda,.false.,
+     &                  'cvterm no restraint use_cvdlmda')
+      call final
+      call loadfix ('water2','mut_cvterm_map.key')
+      call assert_logical (use_colvar,.true.,'cvterm map use_colvar')
+      call assert_logical (use_cvdlmda,.true.,'cvterm map use_cvdlmda')
+      call final
+      call loadfix ('water2','mut_cvterm_held.key')
+      call assert_logical (use_colvar,.true.,'cvterm held use_colvar')
+      call assert_logical (use_cvdlmda,.false.,
+     &                  'cvterm held use_cvdlmda')
+      call final
+      call loadfix ('water2','mut_cvterm_none.key')
+      call assert_logical (use_colvar,.false.,'cvterm none use_colvar')
+      call final
+      call loadfix ('water2','mut_cvterm_vdwonly.key')
+      call assert_logical (use_colvar,.false.,
+     &                  'cvterm vdw only use_colvar')
       call final
       call popdir
       return
