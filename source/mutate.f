@@ -84,6 +84,7 @@ c
 c     set defaults for lambda perturbation scaling values
 c
       lambda = 1.0d0
+      cvlambda = 1.0d0
       elambda = 1.0d0
       vlambda = 1.0d0
       tlambda = 1.0d0
@@ -151,6 +152,9 @@ c
             string = record(next:240)
             read (string,*,err=30,end=30)  lambda
             use_mainlmda = .true.
+         else if (keyword(1:10) .eq. 'CV-LAMBDA ') then
+            string = record(next:240)
+            read (string,*,err=30,end=30)  cvlambda
          else if (keyword(1:11) .eq. 'ELE-LAMBDA ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  elambda
@@ -416,6 +420,7 @@ c     flag for use of lambda derivative
 c
       use_abf = .false.
       use_abfdyn = .false.
+      use_cvlmdamap = .false.
       use_d2lmda = .false.
       use_dlmda = .false.
       use_elmdamap = .false.
@@ -451,36 +456,46 @@ c
 c
 c     set default mapping from main lambda to sublambda
 c
+      qntcvlmda1 = 1.0d0
+      qntcvlmda0 = 0.0d0
       qntelmda1 = 1.0d0
       qntelmda0 = 0.0d0
       qntplmda1 = 1.0d0
       qntplmda0 = 0.0d0
       qntvlmda1 = 1.0d0
       qntvlmda0 = 0.0d0
+      cvlmdamap = 'QNT'
       elmdamap = 'QNT'
       plmdamap = 'QNT'
       vlmdamap = 'QNT'
+      cvlmdaexp = 1
       elmdaexp = 1
       plmdaexp = 1
       vlmdaexp = 1
+      cvlmdainvn = 4
       elmdainvn = 4
       plmdainvn = 4
       vlmdainvn = 4
+      cvlmdainveps = 0.3d0
       elmdainveps = 0.3d0
       plmdainveps = 0.3d0
       vlmdainveps = 0.3d0
+      cvlmdaapmn = 12
       elmdaapmn = 12
       plmdaapmn = 12
       vlmdaapmn = 12
+      cvlmdaapmrho = 4.0d0
       elmdaapmrho = 4.0d0
       plmdaapmrho = 4.0d0
       vlmdaapmrho = 4.0d0
 c
 c     a sublambda not driven by the main lambda has an identity chain
 c
+      dcvldlmda = 1.0d0
       deldlmda = 1.0d0
       dpldlmda = 1.0d0
       dvldlmda = 1.0d0
+      d2cvldlmda2 = 0.0d0
       d2eldlmda2 = 0.0d0
       d2pldlmda2 = 0.0d0
       d2vldlmda2 = 0.0d0
@@ -607,6 +622,22 @@ c
          else if (keyword(1:17) .eq. 'POL-DUALTOPO-EXP ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  epdtexp
+         else if (keyword(1:14) .eq. 'CV-LMDA-RANGE ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  qntcvlmda0, qntcvlmda1
+         else if (keyword(1:12) .eq. 'CV-LMDA-MAP ') then
+            use_cvlmdamap = .true.
+            call getword (record,cvlmdamap,next)
+            call upcase (cvlmdamap)
+         else if (keyword(1:12) .eq. 'CV-LMDA-EXP ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  cvlmdaexp
+         else if (keyword(1:14) .eq. 'CV-LMDA-INV-N ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  cvlmdainvn
+         else if (keyword(1:16) .eq. 'CV-LMDA-INV-EPS ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  cvlmdainveps
          else if (keyword(1:15) .eq. 'ELE-LMDA-RANGE ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  qntelmda0, qntelmda1
@@ -768,13 +799,14 @@ c
          use_vlmdamap = .true.
       else if (use_mainlmda) then
          if (.not. (use_elmdamap .or. use_plmdamap .or.
-     &              use_vlmdamap)) then
+     &              use_vlmdamap .or. use_cvlmdamap)) then
             if (use_dlmda) then
                write (iout,20)
    20          format (/,' MUTATE_DLMDA  --  A Lambda Derivative',
      &                    ' requires an explicit map for each driven',
      &                    ' sublambda; add the ELE-LMDA-MAP,',
-     &                    ' POL-LMDA-MAP or VDW-LMDA-MAP keywords')
+     &                    ' POL-LMDA-MAP, VDW-LMDA-MAP or CV-LMDA-MAP',
+     &                    ' keywords')
                call fatal
             end if
             if (use_fep) then
@@ -782,15 +814,18 @@ c
    25          format (/,' MUTATE_DLMDA  --  Free Energy Perturbation',
      &                    ' requires an explicit map for each driven',
      &                    ' sublambda; add the ELE-LMDA-MAP,',
-     &                    ' POL-LMDA-MAP or VDW-LMDA-MAP keywords')
+     &                    ' POL-LMDA-MAP, VDW-LMDA-MAP or CV-LMDA-MAP',
+     &                    ' keywords')
                call fatal
             end if
             use_elmdamap = .true.
             use_plmdamap = .true.
             use_vlmdamap = .true.
+            use_cvlmdamap = .true.
             elmdamap = 'EXP'
             plmdamap = 'EXP'
             vlmdamap = 'EXP'
+            cvlmdamap = 'EXP'
          end if
 c
 c     a sublambda the main lambda does not drive is held at its value
@@ -799,6 +834,7 @@ c
          if (.not. use_elmdamap)  deldlmda = 0.0d0
          if (.not. use_plmdamap)  dpldlmda = 0.0d0
          if (.not. use_vlmdamap)  dvldlmda = 0.0d0
+         if (.not. use_cvlmdamap)  dcvldlmda = 0.0d0
       end if
 c
 c     set the terms that carry a lambda derivative
@@ -827,6 +863,11 @@ c
      &       .and. vlmdamap.ne.'APM') then
          vlmdamap = 'QNT'
       end if
+      if (cvlmdamap.ne.'QNT' .and. cvlmdamap.ne.'EXP'
+     &       .and. cvlmdamap.ne.'INV'
+     &       .and. cvlmdamap.ne.'APM') then
+         cvlmdamap = 'QNT'
+      end if
       if (epdtexp .lt. 1)  epdtexp = 1
       if (elmdaexp .lt. 1)  elmdaexp = 1
       if (plmdaexp .lt. 1)  plmdaexp = 1
@@ -840,12 +881,15 @@ c
       if (elmdaapmn .lt. 2)  elmdaapmn = 2
       if (plmdaapmn .lt. 2)  plmdaapmn = 2
       if (vlmdaapmn .lt. 2)  vlmdaapmn = 2
+      if (cvlmdaapmn .lt. 2)  cvlmdaapmn = 2
       if (elmdaapmrho .lt. 1.0d0)  elmdaapmrho = 1.0d0
       if (plmdaapmrho .lt. 1.0d0)  plmdaapmrho = 1.0d0
       if (vlmdaapmrho .lt. 1.0d0)  vlmdaapmrho = 1.0d0
+      if (cvlmdaapmrho .lt. 1.0d0)  cvlmdaapmrho = 1.0d0
       elmdaapmrho = min(elmdaapmrho,dble(elmdaapmn)-0.001d0)
       plmdaapmrho = min(plmdaapmrho,dble(plmdaapmn)-0.001d0)
       vlmdaapmrho = min(vlmdaapmrho,dble(vlmdaapmn)-0.001d0)
+      cvlmdaapmrho = min(cvlmdaapmrho,dble(cvlmdaapmn)-0.001d0)
 c
 c     check sublambda intervals are in [0,1] and ordered
 c
@@ -1724,6 +1768,9 @@ c
          if (use_vlmdamap .and. qntvlmda1-qntvlmda0.lt.1.0d-8 .and.
      &       vlmdamap.ne.'EXP' .and. vlmdamap.ne.'INV' .and.
      &       vlmdamap.ne.'APM')  qntstep = .true.
+         if (use_cvlmdamap .and. qntcvlmda1-qntcvlmda0.lt.1.0d-8 .and.
+     &       cvlmdamap.ne.'EXP' .and. cvlmdamap.ne.'INV' .and.
+     &       cvlmdamap.ne.'APM')  qntstep = .true.
          if (qntstep) then
             write (iout,55)
    55       format (/,' MUTATE_CHECK  --  A Lambda Derivative requires',

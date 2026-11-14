@@ -169,6 +169,9 @@ c
       plmdaexp = 2
       elmdaexp = 3
       vlmdaexp = 4
+      use_cvlmdamap = .true.
+      cvlmdamap = 'EXP'
+      cvlmdaexp = 5
       call mapsublmda (lambda)
       call assert_real (plambda,0.0625d0,1.0d-12,
      &                  'mapsublmda exponential plambda')
@@ -188,6 +191,12 @@ c
      &                  'mapsublmda exponential dvldlmda')
       call assert_real (d2vldlmda2,0.75d0,1.0d-12,
      &                  'mapsublmda exponential d2vldlmda2')
+      call assert_real (cvlambda,0.0009765625d0,1.0d-12,
+     &                  'mapsublmda exponential cvlambda')
+      call assert_real (dcvldlmda,0.01953125d0,1.0d-12,
+     &                  'mapsublmda exponential dcvldlmda')
+      call assert_real (d2cvldlmda2,0.3125d0,1.0d-12,
+     &                  'mapsublmda exponential d2cvldlmda2')
 c
 c     test shifted inverse-power sublambda maps and derivatives
 c
@@ -205,6 +214,9 @@ c
       plmdainveps = 0.01d0
       elmdainveps = 0.02d0
       vlmdainveps = 0.03d0
+      cvlmdamap = 'INV'
+      cvlmdainvn = 5
+      cvlmdainveps = 0.04d0
       call mapsublmda (lambda)
       call assert_real (plambda,0.452936557937477d0,1.0d-12,
      &                  'mapsublmda invpower plambda')
@@ -224,6 +236,12 @@ c
      &                  'mapsublmda invpower dvldlmda')
       call assert_real (d2vldlmda2,-2.94247262960432d0,1.0d-12,
      &                  'mapsublmda invpower d2vldlmda2')
+      call assert_real (cvlambda,0.529221686634262d0,1.0d-12,
+     &                  'mapsublmda invpower cvlambda')
+      call assert_real (dcvldlmda,1.11571120037745d0,1.0d-12,
+     &                  'mapsublmda invpower dcvldlmda')
+      call assert_real (d2cvldlmda2,-3.07782400104124d0,1.0d-12,
+     &                  'mapsublmda invpower d2cvldlmda2')
 c
 c     test asymmetric power sublambda maps and derivatives, the three
 c     terms taking different powers and slope ratios so that a crossed
@@ -243,6 +261,9 @@ c
       plmdaapmrho = 1.5d0
       elmdaapmrho = 2.0d0
       vlmdaapmrho = 2.5d0
+      cvlmdamap = 'APM'
+      cvlmdaapmn = 5
+      cvlmdaapmrho = 3.5d0
       call mapsublmda (lambda)
       call assert_real (plambda,0.3203125d0,1.0d-12,
      &                  'mapsublmda asympower plambda')
@@ -262,6 +283,12 @@ c
      &                  'mapsublmda asympower dvldlmda')
       call assert_real (d2vldlmda2,-3.34375d0,1.0d-12,
      &                  'mapsublmda asympower d2vldlmda2')
+      call assert_real (cvlambda,0.52191162109375d0,1.0d-12,
+     &                  'mapsublmda asympower cvlambda')
+      call assert_real (dcvldlmda,1.1171875d0,1.0d-12,
+     &                  'mapsublmda asympower dcvldlmda')
+      call assert_real (d2cvldlmda2,-4.931640625d0,1.0d-12,
+     &                  'mapsublmda asympower d2cvldlmda2')
 c
 c     any map other than EXP, INV or APM falls back to the quintic
 c     taper, where the sublambda is the complement of the taper
@@ -274,12 +301,15 @@ c
       qntelmda1 = 0.7d0
       qntvlmda0 = 0.1d0
       qntvlmda1 = 0.9d0
+      qntcvlmda0 = 0.4d0
+      qntcvlmda1 = 0.6d0
       use_plmdamap = .true.
       use_elmdamap = .true.
       use_vlmdamap = .true.
       plmdamap = 'QNT'
       elmdamap = 'QNT'
       vlmdamap = 'QNT'
+      cvlmdamap = 'QNT'
       lambda = 0.5d0
 c
 c     each sublambda uses its own window, so the midpoint value is
@@ -304,6 +334,12 @@ c
      &                  'mapsublmda taper d2eldlmda2')
       call assert_real (d2vldlmda2,0.0d0,1.0d-12,
      &                  'mapsublmda taper d2vldlmda2')
+      call assert_real (cvlambda,0.5d0,1.0d-12,
+     &                  'mapsublmda taper cvlambda')
+      call assert_real (dcvldlmda,9.375d0,1.0d-12,
+     &                  'mapsublmda taper dcvldlmda')
+      call assert_real (d2cvldlmda2,0.0d0,1.0d-12,
+     &                  'mapsublmda taper d2cvldlmda2')
 c
 c     the taper branch must negate the taper derivatives, checked
 c     off center where the second derivative is nonzero
@@ -530,6 +566,10 @@ c
      &                     'mapsublmda exp pol need1')
       call assert_logical (dvldlmda.gt.0.0d0,.true.,
      &                     'mapsublmda exp vdw slope')
+c
+c     leave the collective variable map off for the cases after
+c
+      use_cvlmdamap = .false.
       return
       end
 c

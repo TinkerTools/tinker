@@ -27,6 +27,7 @@ c     fluxsc      lambda scale applied to the charge flux of each atom
 c     pdltflx     unscaled charge flux change in charge of each atom
 c     type0       atom type of each atom in the initial state system
 c     type1       atom type of each atom in the final state system
+c     cvlambda    state weighting value for collective variable terms
 c     elambda     state weighting value for electrostatic potentials
 c     lambda      generic weighting between initial and final states
 c     plambda     state weighting value for polarization potentials
@@ -68,6 +69,7 @@ c
       integer, allocatable :: mutg(:)
       integer, allocatable :: type0(:)
       integer, allocatable :: type1(:)
+      real*8 cvlambda
       real*8 elambda
       real*8 lambda
       real*8 plambda

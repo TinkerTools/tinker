@@ -12,6 +12,9 @@ c     ##                                                  ##
 c     ######################################################
 c
 c
+c     cvlmdaapmn    power exponent for collective variable asym map
+c     cvlmdaexp     exponent for collective variable exponential map
+c     cvlmdainvn    inverse-power exponent for collective variable map
 c     elmdaapmn     power exponent for electrostatic asymmetric map
 c     elmdaexp      exponent for electrostatic exponential mapping
 c     elmdainvn     inverse-power exponent for electrostatic mapping
@@ -40,6 +43,9 @@ c     vlmdaexp      exponent for van der Waals exponential mapping
 c     vlmdainvn     inverse-power exponent for van der Waals mapping
 c     lmdaihist     step at which each history entry was saved
 c     lmdawinend    last dynamics step belonging to each lambda window
+c     cvlmdaapmrho  endpoint slope ratio for collective variable map
+c     cvlmdainveps  shift for collective variable inverse-power map
+c     d2cvldlmda2   second derivative of cvlambda wrt main lambda
 c     d2edl2        total energy second order lambda derivative
 c     d2eldlmda2    second derivative of elambda wrt main lambda
 c     d2emdl2       multipole second order lambda derivative
@@ -47,6 +53,7 @@ c     d2epdl2       polarization second order lambda derivative
 c     d2evdl2       van der Waals second order lambda derivative
 c     d2pldlmda2    second derivative of plambda wrt main lambda
 c     d2vldlmda2    second derivative of vlambda wrt main lambda
+c     dcvldlmda     derivative of cvlambda wrt main lambda
 c     dedl          total unbiased energy lambda derivative
 c     dedlavg       interval average of dU/dlambda
 c     dedlstd       interval deviation of dU/dlambda
@@ -81,6 +88,8 @@ c     lmdavtheta    velocity of the theta lambda coordinate
 c     lmdawinratio  fraction of each lambda window spent equilibrating
 c     plmdaapmrho   endpoint slope ratio for polarization asym map
 c     plmdainveps   shift for polarization inverse-power mapping
+c     qntcvlmda0    sublambda lower bound for collective variables
+c     qntcvlmda1    sublambda upper bound for collective variables
 c     qntelmda0     sublambda lower bound for electrostatics
 c     qntelmda1     sublambda upper bound for electrostatics
 c     qntplmda0     sublambda lower bound for polarization
@@ -130,6 +139,7 @@ c                     saved count, left by an interrupted save, or a
 c                     header older than the stored lambda temperature
 c     use_abf       flag to use adaptive biasing force
 c     use_abfdyn    flag to propagate abf lambda particle
+c     use_cvlmdamap flag that cvlambda follows the main lambda map
 c     use_d2lmda    flag that second, force and virial lambda derivs
 c                     are needed, beyond the first lambda derivative;
 c                     also selects dual topology polarization
@@ -155,6 +165,7 @@ c     use_vlmdamap  flag that vlambda follows the main lambda map
 c     use_relstg    flag that each staged leg is declared, in the
 c                     order LIG2, VDWM and LIG1 of rising lambda
 c     douindorig    original douind
+c     cvlmdamap     mapping type from main to collective variable lambda
 c     elmdamap      mapping type from main to electrostatic lambda
 c     plmdamap      mapping type from main to polarization lambda
 c     vlmdamap      mapping type from main to van der Waals lambda
@@ -169,6 +180,9 @@ c
 c
       module dlmda
       implicit none
+      integer cvlmdaapmn
+      integer cvlmdaexp
+      integer cvlmdainvn
       integer elmdaapmn
       integer elmdaexp
       integer elmdainvn
@@ -197,6 +211,9 @@ c
       integer vlmdainvn
       integer, allocatable :: lmdaihist(:)
       integer, allocatable :: lmdawinend(:)
+      real*8 cvlmdaapmrho
+      real*8 cvlmdainveps
+      real*8 d2cvldlmda2
       real*8 d2edl2
       real*8 d2eldlmda2
       real*8 d2emdl2
@@ -204,6 +221,7 @@ c
       real*8 d2evdl2
       real*8 d2pldlmda2
       real*8 d2vldlmda2
+      real*8 dcvldlmda
       real*8 dedl
       real*8 dedlavg
       real*8 dedlstd
@@ -238,6 +256,8 @@ c
       real*8 lmdawinratio
       real*8 plmdaapmrho
       real*8 plmdainveps
+      real*8 qntcvlmda0
+      real*8 qntcvlmda1
       real*8 qntelmda0
       real*8 qntelmda1
       real*8 qntplmda0
@@ -282,6 +302,7 @@ c
       logical histrewrite
       logical use_abf
       logical use_abfdyn
+      logical use_cvlmdamap
       logical use_d2lmda
       logical use_dlmda
       logical use_edlmda
@@ -304,6 +325,7 @@ c
       logical use_vlmdamap
       logical use_relstg(3)
       logical, allocatable :: douindorig(:)
+      character*3 cvlmdamap
       character*3 elmdamap
       character*3 plmdamap
       character*3 vlmdamap

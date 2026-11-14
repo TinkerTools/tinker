@@ -769,7 +769,8 @@ c     #############################################################
 c
 c
 c     "mapsublmda" maps from the main lambda value "lmda" to the
-c     electrostatic, polarization and van der Waals sublambdas
+c     collective variable, electrostatic, polarization and van der
+c     Waals sublambdas
 c
 c
       subroutine mapsublmda (lmda)
@@ -778,6 +779,16 @@ c
       implicit none
       real*8 lmda
 c
+c
+c     the collective variable sublambda follows its own map, which no
+c     leg of the staged relative schedule takes over
+c
+      if (use_cvlmdamap) then
+         call sublmdamap (lmda,cvlmdamap,cvlmdaexp,cvlmdainvn,
+     &                    cvlmdainveps,cvlmdaapmn,cvlmdaapmrho,
+     &                    qntcvlmda0,qntcvlmda1,cvlambda,dcvldlmda,
+     &                    d2cvldlmda2)
+      end if
 c
 c     the staged relative schedule maps the sublambdas its own way
 c

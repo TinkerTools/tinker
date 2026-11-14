@@ -201,6 +201,7 @@ c
       use_abfdyn = .false.
       use_d2lmda = .false.
       use_dlmda = .false.
+      use_cvlmdamap = .false.
       use_edlmda = .false.
       use_elmdamap = .false.
       use_epdt = .false.

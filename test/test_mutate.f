@@ -381,6 +381,49 @@ c
       eref = energy ()
       call assert_real (e,eref,1.0d-10,'lmda pair energy')
       call final
+c
+c     a collective variable map alone drives the collective variable
+c     sublambda, and is the map a lambda derivative asks for
+c
+      call loadfix ('water2','mut_cv_qnt.key')
+      call assert_logical (use_cvlmdamap,.true.,
+     &                  'lmda cv only use_cvlmdamap')
+      call assert_logical (use_elmdamap,.false.,
+     &                  'lmda cv only use_elmdamap')
+      call assert_logical (use_vlmdamap,.false.,
+     &                  'lmda cv only use_vlmdamap')
+      call assert_real (cvlambda,0.5d0,1.0d-15,'lmda cv only cvlambda')
+      call assert_real (dcvldlmda,9.375d0,1.0d-12,
+     &                  'lmda cv only dcvldlmda')
+      call assert_real (d2cvldlmda2,0.0d0,1.0d-12,
+     &                  'lmda cv only d2cvldlmda2')
+      call assert_real (elambda,1.0d0,0.0d0,'lmda cv only elambda')
+      call assert_real (deldlmda,0.0d0,0.0d0,'lmda cv only deldlmda')
+      call final
+c
+c     a collective variable sublambda without its map is held at the
+c     value of its own keyword and leaves the chain rule
+c
+      call loadfix ('water2','mut_cv_held.key')
+      call assert_logical (use_cvlmdamap,.false.,
+     &                  'lmda cv held use_cvlmdamap')
+      call assert_real (cvlambda,0.7d0,1.0d-15,'lmda cv held cvlambda')
+      call assert_real (dcvldlmda,0.0d0,0.0d0,'lmda cv held dcvldlmda')
+      call assert_real (vlambda,0.3d0,1.0d-15,'lmda cv held vlambda')
+      call assert_real (dvldlmda,1.0d0,1.0d-15,'lmda cv held dvldlmda')
+      call final
+c
+c     with no map named, the collective variable sublambda follows the
+c     main lambda along with the other three
+c
+      call loadfix ('water2','mut_cv_default.key')
+      call assert_logical (use_cvlmdamap,.true.,
+     &                  'lmda cv default use_cvlmdamap')
+      call assert_real (cvlambda,0.3d0,1.0d-15,
+     &                  'lmda cv default cvlambda')
+      call assert_real (dcvldlmda,1.0d0,1.0d-15,
+     &                  'lmda cv default dcvldlmda')
+      call final
       call popdir
       return
       end
@@ -2865,6 +2908,8 @@ c
      &   'test_mutate_unsup ost sample interval')
       call test_mutate_sccase ('mut_qnt_step_fatal.key','','water2',
      &   'range of nonzero width','test_mutate_unsup qnt step')
+      call test_mutate_sccase ('mut_cvqnt_step_fatal.key','','water2',
+     &   'range of nonzero width','test_mutate_unsup cv qnt step')
       call test_mutate_sccase ('mut_nwin_mid_fatal.key','','water2',
      &   'Evenly spaced lambda windows start',
      &   'test_mutate_unsup nwindow interior start')
