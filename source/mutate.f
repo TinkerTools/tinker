@@ -268,7 +268,8 @@ c
       if (nmut .eq. 0)  use_mutate = .false.
 c
 c     turn off the collective variable restraint if no collective
-c     variable is coupled to lambda; its values are read by Tinker9
+c     variable is coupled to lambda; only Tinker9 evaluates the
+c     restraint, so the flag is set here for it
 c
       if (.not. cvfound)  use_colvar = .false.
 c
@@ -1000,10 +1001,11 @@ c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "setdlmdaterms" decides which of the three terms carries a lambda
-c     derivative, and so which of them has to be routed to its "empole4"
-c     flavored energy routine rather than the plain gradient one; the
-c     collective variable restraint has one where its own map drives it
+c     "setdlmdaterms" decides which terms carry a lambda derivative; for
+c     the electrostatic, polarization and van der Waals terms this picks
+c     the "empole4" flavored energy routine over the plain gradient one,
+c     while the collective variable restraint has one where its own map
+c     drives it
 c
 c     a term qualifies when the main lambda drives its sublambda through
 c     a map, except on a staged relative schedule, where a term that no
