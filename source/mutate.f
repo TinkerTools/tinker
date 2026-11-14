@@ -805,11 +805,14 @@ c     a main lambda drives sublambdas that name a map
 c
       if (use_mainlmda .and. use_rel) then
 c
-c     the staged relative schedule maps every sublambda itself
+c     the staged relative schedule maps every sublambda itself,
+c     but for the collective variable one, which follows its own map
+c     or is held
 c
          use_elmdamap = .true.
          use_plmdamap = .true.
          use_vlmdamap = .true.
+         if (.not. use_cvlmdamap)  dcvldlmda = 0.0d0
       else if (use_mainlmda) then
          if (.not. (use_elmdamap .or. use_plmdamap .or.
      &              use_vlmdamap .or. use_cvlmdamap)) then
@@ -885,12 +888,15 @@ c
       if (elmdaexp .lt. 1)  elmdaexp = 1
       if (plmdaexp .lt. 1)  plmdaexp = 1
       if (vlmdaexp .lt. 1)  vlmdaexp = 1
+      if (cvlmdaexp .lt. 1)  cvlmdaexp = 1
       if (elmdainvn .lt. 1)  elmdainvn = 1
       if (plmdainvn .lt. 1)  plmdainvn = 1
       if (vlmdainvn .lt. 1)  vlmdainvn = 1
+      if (cvlmdainvn .lt. 1)  cvlmdainvn = 1
       if (elmdainveps .lt. 0.0d0)  elmdainveps = -elmdainveps
       if (plmdainveps .lt. 0.0d0)  plmdainveps = -plmdainveps
       if (vlmdainveps .lt. 0.0d0)  vlmdainveps = -vlmdainveps
+      if (cvlmdainveps .lt. 0.0d0)  cvlmdainveps = -cvlmdainveps
       if (elmdaapmn .lt. 2)  elmdaapmn = 2
       if (plmdaapmn .lt. 2)  plmdaapmn = 2
       if (vlmdaapmn .lt. 2)  vlmdaapmn = 2

@@ -469,6 +469,23 @@ c
       call loadfix ('water2','mut_cv_lam_clamp.key')
       call assert_real (cvlambda,1.0d0,0.0d0,'lmda cv held clamp')
       call final
+c
+c     the parameters of the collective variable map are kept in range
+c     as for the other three maps
+c
+      call loadfix ('water2','mut_cv_map_clamp.key')
+      call assert_int (cvlmdaexp,1,'lmda cv exp clamp')
+      call assert_int (cvlmdainvn,1,'lmda cv inv-n clamp')
+      call assert_real (cvlmdainveps,0.2d0,0.0d0,
+     &                  'lmda cv inv-eps clamp')
+      call final
+c
+c     the staged relative schedule holds a collective variable
+c     sublambda that names no map, which leaves the chain rule
+c
+      call loadfix ('water2','085_water_rels_ye_l050.key')
+      call assert_real (dcvldlmda,0.0d0,0.0d0,'lmda cv rel held chain')
+      call final
       call popdir
       return
       end
