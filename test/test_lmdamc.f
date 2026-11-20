@@ -47,6 +47,8 @@ c
      &   call test_lmdamc_ostvbias
       if (.not. skiptest(tname//'_deposit','lmdamc',2))
      &   call test_lmdamc_deposit
+      if (.not. skiptest(tname//'_depositost','lmdamc',2))
+     &   call test_lmdamc_depositost
       if (.not. skiptest(tname//'_stale_abf','lmdamc',2))
      &   call test_lmdamc_stale ('abf')
       if (.not. skiptest(tname//'_stale_ost','lmdamc',2))
@@ -843,7 +845,7 @@ c
       lmdaavg = lambda
       call metadeposit
 c
-c     any move within two widths of the peak is then downhill
+c     a move of up to two lambda bins leaves the peak, so it is downhill
 c
       lmdamcmove = 2.0d0 * wlmda
       lold = lambda
@@ -856,6 +858,61 @@ c
      &                     'lmdamc deposit changes lambda')
       call mcenergy ('meta',eref)
       call assert_real (epot,eref,1.0d-6,'lmdamc deposit energy')
+      call sd_final
+      call popdir
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_lmdamc_depositost  --  ost bias, deposit  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_lmdamc_depositost" checks that a lambda move tried on the
+c     step that deposits an ost gaussian, at the end of an interval
+c     whose lambda moves at every step, takes the bias of its old
+c     energy from the history with that gaussian in place, at the
+c     lambda and dU/dlambda of the step; judged against the bias the
+c     step was found with, it would see the whole of the new gaussian
+c     as an energy barrier
+c
+c
+      subroutine test_lmdamc_depositost
+      use dlmda
+      use mutant
+      use ost
+      implicit none
+      real*8 epot,e0,eref
+      real*8 lold
+      logical took
+c
+c
+c     a tall gaussian lands on the lambda and dU/dlambda of the step
+c     after its forces were found
+c
+      call pushdir ('file/mutate')
+      call mcload ('ost',e0)
+      hbias = 1000.0d0
+      lmdaavg = lambda
+      dedlavg = dedl
+      call ostdeposit
+c
+c     a move of up to two lambda bins leaves the peak, so it is downhill
+c
+      lmdamcmove = 2.0d0 * wlmda
+      lmdanpa = lmdaintv
+      lold = lambda
+      call mctrial (lold,lmdaintv,e0,epot,took)
+      call assert_int (nlmdamctry,1,'lmdamc depositost trial made')
+      call assert_logical (took,.true.,
+     &                     'lmdamc depositost move accepted')
+      call assert_logical (lambda.ne.lold,.true.,
+     &                     'lmdamc depositost changes lambda')
+      call mcenergy ('ost',eref)
+      call assert_real (epot,eref,1.0d-6,'lmdamc depositost energy')
       call sd_final
       call popdir
       return
