@@ -358,6 +358,10 @@ c
             write (iout,120)
   120       format (' Sampling Mode',18x,'Fixed Lambda')
          end if
+         if ((use_ost .or. use_abf) .and. .not.use_lmdahold) then
+            write (iout,140)
+  140       format (' Lambda Sampling',22x,'Moving')
+         end if
          if (use_epdt) then
             write (iout,150)
   150       format (' Polarization Topology',18x,'Dual')
@@ -423,6 +427,7 @@ c
       real*8 lo,hi
       character*4 legword
       character*8 propword
+      character*8 sampword
       character*8 fillword
       character*20 keyword
       character*240 record
@@ -440,6 +445,7 @@ c
       use_epdt = .false.
       use_fep = .false.
       use_lmdafill = .true.
+      use_lmdahold = .true.
       use_lmdamc = .false.
       use_meta = .false.
       use_metadyn = .false.
@@ -606,6 +612,19 @@ c
      &                    ' either LANGEVIN or MC')
                call fatal
             end if
+         else if (keyword(1:14) .eq. 'LAMBDA-SAMPLE ') then
+            call getword (record,sampword,next)
+            call upcase (sampword)
+            if (sampword .eq. 'HELD') then
+               use_lmdahold = .true.
+            else if (sampword .eq. 'MOVING') then
+               use_lmdahold = .false.
+            else
+               write (iout,4)
+    4          format (/,' MUTATE_DLMDA  --  LAMBDA-SAMPLE takes',
+     &                    ' either HELD or MOVING')
+               call fatal
+            end if
          else if (keyword(1:16) .eq. 'LAMBDA-BIASFILL ') then
             use_lmdafill = .true.
             string = record(next:240)
@@ -757,13 +776,12 @@ c     leaves it to follow the bath temperature once that is known
 c
       lmdakelvin = abs(lmdakelvin)
 c
-c     split the sample interval into its propagation, equilibration
-c     and averaging phases
+c     keep the sample interval and its phase ratios in range; the
+c     interval is split into phases once the sampling mode is known
 c
       if (lmdaintv .lt. 1)  lmdaintv = 1
       if (lmdaparatio .lt. 0.0d0)  lmdaparatio = 0.0d0
       if (lmdapbratio .lt. 0.0d0)  lmdapbratio = 0.0d0
-      call setlmdaphase
 c
 c     keep the Monte Carlo lambda move within a single reflection
 c
@@ -790,6 +808,45 @@ c
          use_dlmda = .true.
          use_mainlmda = .true.
       end if
+c
+c     a held ost and abf sample interval must keep a propagation
+c     phase, an equilibration phase and samples to average at the
+c     fixed lambda, so equilibration ratios that leave too few samples
+c     or an interval too short for all three phases are reset to
+c     defaults; a moving interval only needs one step, and averages
+c     every step of it; this is settled before the ost and abf setup
+c     sizes the interval sample arrays
+c
+      if ((use_ost .or. use_abf) .and. use_lmdahold) then
+         if (lmdaparatio+lmdapbratio .ge. 0.9d0) then
+            write (iout,12)  lmdaparatio,lmdapbratio
+   12       format (/,' MUTATE_DLMDA  --  Warning, LAMBDA-EQRATIO',
+     &                 2f8.3,' Leaves Too Few Samples;',
+     &              /,' Reset to the Defaults of 0.3 and 0.3')
+            lmdaparatio = 0.3d0
+            lmdapbratio = 0.3d0
+         end if
+         if (lmdaintv .lt. 3) then
+            write (iout,13)  lmdaintv
+   13       format (/,' MUTATE_DLMDA  --  Warning, LAMBDA-INTERVAL',
+     &                 i6,' is Too Short for LAMBDA-SAMPLE HELD;',
+     &              /,' Reset to the Default of 100 Steps')
+            lmdaintv = 100
+         end if
+      end if
+      if ((use_ost .or. use_abf) .and. .not.use_lmdahold) then
+         if (use_lmdacv .and. lmdaintv.lt.2) then
+            write (iout,14)
+   14       format (/,' MUTATE_DLMDA  --  Warning, LAMBDA-CONVCRI',
+     &                 ' Accepts Every Sample of a One-Step',
+     &              /,' LAMBDA-INTERVAL, Whose Deviation is Zero')
+         end if
+      end if
+c
+c     split the sample interval into its propagation, equilibration
+c     and averaging phases
+c
+      call setlmdaphase
 c
 c     free energy perturbation moves a main lambda from window to
 c     window, but makes no use of the lambda derivative
@@ -1992,20 +2049,6 @@ c
   113    format (/,' MUTATE_CHECK  --  Relative Free Energy is not',
      &              ' Available with Implicit Solvation')
          call fatal
-      end if
-c
-c     the ost and abf sample interval must keep a propagation phase,
-c     an equilibration phase and samples to average at the fixed
-c     lambda, so equilibration ratios that leave too few samples or an
-c     interval too short for all three phases are reset to defaults
-c
-      if (use_ost .or. use_abf) then
-         if (lmdaparatio+lmdapbratio .ge. 0.9d0) then
-            lmdaparatio = 0.3d0
-            lmdapbratio = 0.3d0
-         end if
-         if (lmdaintv .lt. 3)  lmdaintv = 100
-         call setlmdaphase
       end if
 c
 c     dual topology leaves the induced dipoles of the last end state

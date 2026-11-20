@@ -34,6 +34,7 @@ c
       call test_eabf_dyn
       call test_eabf_mean
       call test_eabf_gate
+      call test_eabf_moving
       call test_eabf_resize
       call test_eabf_restart
       call test_eabf_orphan
@@ -742,6 +743,103 @@ c
       call assert_real (lmdafhist(1),1.0d0,1.0d-12,
      &                  'elmdadyn abf sample dU/dlambda on the gate')
       use_abf = .false.
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eabf_moving  --  moving lambda samples   ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eabf_moving" drives elmdadyn with lambda sampled moving
+c     and checks that the lambda particle moves at every step, that a
+c     one-step interval records the dU/dlambda of each step at its own
+c     lambda, and that a longer interval records the average lambda
+c     and dU/dlambda over every one of its steps
+c
+c
+      subroutine test_eabf_moving
+      use dlmda
+      use mutant
+      implicit none
+      integer istep
+      real*8 lam(5)
+      real*8 lsum,fsum
+c
+c
+c     a one-step interval records every step at its own lambda, with
+c     a deterministic frictionless particle that moves at every step
+c
+      call resetabf (5,8)
+      use_abf = .true.
+      use_lmdahold = .false.
+      lmdaintv = 1
+      call setlmdaphase
+      lmdadt = 0.1d0
+      lmdamass = 1.0d0
+      lmdafric = 0.0d0
+      lmdatheta = 0.25d0 * 3.14159265358979323846d0
+      lmdavtheta = 0.0d0
+      lambda = 0.5d0
+      lmdadfdl = 0.0d0
+      lmdastep = 0
+      do istep = 1, 4
+         lam(istep) = lambda
+         dedl = dble(istep)
+         call elmdadyn
+         call assert_int (nlmdahist,istep,
+     &                    'elmdadyn abf moving records every step')
+         call assert_real (lmdalhist(istep),lam(istep),0.0d0,
+     &                     'elmdadyn abf moving sample at its lambda')
+         call assert_real (lmdafhist(istep),dble(istep),0.0d0,
+     &                     'elmdadyn abf moving sample dU/dlambda')
+         call assert_logical (lambda.ne.lam(istep),.true.,
+     &                        'elmdadyn abf moving each step')
+      end do
+c
+c     a longer interval records one average over all of its steps
+c
+      call resetabf (5,8)
+      use_abf = .true.
+      use_lmdahold = .false.
+      lmdaintv = 4
+      call setlmdaphase
+      lmdadt = 0.1d0
+      lmdamass = 1.0d0
+      lmdafric = 0.0d0
+      lmdatheta = 0.25d0 * 3.14159265358979323846d0
+      lmdavtheta = 0.0d0
+      lambda = 0.5d0
+      lmdadfdl = 0.0d0
+      lmdastep = 0
+      lsum = 0.0d0
+      fsum = 0.0d0
+      do istep = 1, lmdaintv
+         lam(istep) = lambda
+         dedl = dble(istep)
+         lsum = lsum + lambda
+         fsum = fsum + dedl
+         call elmdadyn
+         if (istep .lt. lmdaintv) then
+            call assert_int (nlmdahist,0,
+     &                       'elmdadyn abf moving waits for the end')
+         end if
+      end do
+      lam(lmdaintv+1) = lambda
+      do istep = 1, lmdaintv
+         call assert_logical (lam(istep+1).ne.lam(istep),.true.,
+     &                        'elmdadyn abf moving block propagates')
+      end do
+      call assert_int (nlmdahist,1,'elmdadyn abf moving one block')
+      call assert_real (lmdalhist(1),lsum/dble(lmdaintv),1.0d-12,
+     &                  'elmdadyn abf moving block lambda average')
+      call assert_real (lmdafhist(1),fsum/dble(lmdaintv),1.0d-12,
+     &                  'elmdadyn abf moving block dU/dlambda average')
+      use_abf = .false.
+      use_lmdahold = .true.
       return
       end
 c

@@ -152,6 +152,8 @@ c     use_epdt      flag governing use of polarization dual topology
 c     use_fep       flag to use free energy perturbation over windows
 c     use_lmdacv    flag to gate interval samples by convergence
 c     use_lmdafill  flag to fill unsampled bins of the bias mean force
+c     use_lmdahold  flag that ost and abf hold lambda to equilibrate and
+c                     average, else lambda moves at every step
 c     use_lmdamc    flag to move lambda by Monte Carlo trial moves
 c     use_mainlmda  flag that a main lambda value was specified
 c     use_meta      flag to use metadynamics
@@ -314,6 +316,7 @@ c
       logical use_fep
       logical use_lmdacv
       logical use_lmdafill
+      logical use_lmdahold
       logical use_lmdamc
       logical use_mainlmda
       logical use_meta

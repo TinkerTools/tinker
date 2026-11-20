@@ -763,15 +763,15 @@ ADAPTIVE LAMBDA BIAS KEYWORDS
    * -
      - LAMBDA-MODE
      - LAMBDA-NBIN
-     - OST-INTERPOLATE
+     - LAMBDA-SAMPLE
    * -
+     - OST-INTERPOLATE
      - OST-STDDEV
      - OST-TEMPER-GLOBAL
-     - OST-TEMPER-LOCAL
    * -
+     - OST-TEMPER-LOCAL
      - WFHIST
      - WLHIST
-     -
 
 LAMBDA PARTICLE KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2071,7 +2071,7 @@ GROUP-SELECT [2 integers, real]
 .. _KEY-HBIAS:
 
 HBIAS [real]
-   Sets the weight of each gaussian deposited by orthogonal space tempering or metadynamics. The gaussians are normalized, so the peak height is HBIAS/(sigma*sqrt(2*pi)) for metadynamics and HBIAS/(2*pi*sigma_lambda*sigma_dU/dlambda) for orthogonal space tempering, with the widths set by WLHIST and WFHIST; the weight is lowered further when OST-TEMPER-GLOBAL or OST-TEMPER-LOCAL is used. A negative value is replaced by its absolute value. The default in the absence of the HBIAS keyword is 0.00001.
+   Sets the weight of each gaussian deposited by orthogonal space tempering or metadynamics. The gaussians are normalized, so the peak height is HBIAS/(sigma*sqrt(2*pi)) for metadynamics and HBIAS/(2*pi*sigma_lambda*sigma_dU/dlambda) for orthogonal space tempering, with the widths set by WLHIST and WFHIST; the weight is lowered further when OST-TEMPER-GLOBAL or OST-TEMPER-LOCAL is used. One gaussian is deposited per LAMBDA-INTERVAL, so a shorter interval, as with LAMBDA-SAMPLE MOVING, builds the bias faster at the same weight. A negative value is replaced by its absolute value. The default in the absence of the HBIAS keyword is 0.00001.
 
 .. index:: HBOND
 .. _KEY-HBOND:
@@ -2212,7 +2212,7 @@ LAMBDA-BIASFILL [real / NONE]
 .. _KEY-LAMBDA-CONVCRI:
 
 LAMBDA-CONVCRI [2 reals]
-   Turns on a convergence gate for the samples of each sampling interval of orthogonal space tempering and the adaptive biasing force. An interval is accepted only when the standard deviation of dU/dlambda over its averaging phase is smaller than the first modifier plus the second modifier times the absolute value of the average, both in Kcal/mol; a rejected interval deposits nothing. The modifiers default to 50.0 and 0.5, and negative values are replaced by their absolute values. Metadynamics ignores the gate, and without the LAMBDA-CONVCRI keyword every interval is accepted.
+   Turns on a convergence gate for the samples of each sampling interval of orthogonal space tempering and the adaptive biasing force. An interval is accepted only when the standard deviation of dU/dlambda over its averaging phase is smaller than the first modifier plus the second modifier times the absolute value of the average, both in Kcal/mol; a rejected interval deposits nothing. With LAMBDA-SAMPLE MOVING the deviation is taken over the whole interval and includes the motion of lambda within it, and a one-step interval has zero deviation, so the gate accepts every sample. The modifiers default to 50.0 and 0.5, and negative values are replaced by their absolute values. Metadynamics ignores the gate, and without the LAMBDA-CONVCRI keyword every interval is accepted.
 
 .. index:: LAMBDA-DERIV
 .. _KEY-LAMBDA-DERIV:
@@ -2236,7 +2236,7 @@ LAMBDA-DT [real]
 .. _KEY-LAMBDA-EQRATIO:
 
 LAMBDA-EQRATIO [1 or 2 reals]
-   For the adaptive lambda bias methods, the two modifiers set the fractions of each sampling interval given to the propagation phase and to the equilibration phase, with the averaging phase taking the rest; the defaults are 0.3 and 0.3, negative values are reset to zero, and the phases are adjusted to keep at least one propagation step and at least two samples to average. For thermodynamic integration and free energy perturbation over lambda windows, the first modifier sets the fraction of each window discarded as equilibration before its samples are used; the default is 0.5, and a value outside the range from 0 up to 1 is reset to the default.
+   For the adaptive lambda bias methods, the two modifiers set the fractions of each sampling interval given to the propagation phase and to the equilibration phase, with the averaging phase taking the rest; the defaults are 0.3 and 0.3, negative values are reset to zero, and the phases are adjusted to keep at least one propagation step and at least two samples to average. For orthogonal space tempering and the adaptive biasing force, fractions that sum to 0.9 or more are reset to the defaults with a warning, and LAMBDA-SAMPLE MOVING ignores the keyword, since it has no equilibration phase. For thermodynamic integration and free energy perturbation over lambda windows, the first modifier sets the fraction of each window discarded as equilibration before its samples are used; the default is 0.5, and a value outside the range from 0 up to 1 is reset to the default.
 
 .. index:: LAMBDA-FRICTION
 .. _KEY-LAMBDA-FRICTION:
@@ -2248,7 +2248,7 @@ LAMBDA-FRICTION [real]
 .. _KEY-LAMBDA-INTERVAL:
 
 LAMBDA-INTERVAL [integer]
-   Sets the number of dynamics steps in each sampling interval of an adaptive lambda bias method selected by LAMBDA-MODE OST, META or ABF. LAMBDA-EQRATIO divides each interval into a propagation phase in which lambda moves, an equilibration phase whose samples are discarded, and an averaging phase of at least two steps. Orthogonal space tempering and the adaptive biasing force hold lambda fixed after the propagation phase and average dU/dlambda over the averaging phase, then deposit one gaussian (OST) or one mean force sample (ABF) at the end of the interval if LAMBDA-CONVCRI accepts the average. Metadynamics moves lambda at every step, averages lambda over the averaging phase, and always deposits one gaussian at the end of the interval. Values below one are reset to one, and the default in the absence of the LAMBDA-INTERVAL keyword is 100 steps. The interval is saved in the history file, and continuing an existing ABF history requires the same interval. With LAMBDA-MODE FEP, the keyword instead sets the number of dynamics steps between samples of the trial lambda energies, with a default of 1000 steps; thermodynamic integration does not use it, and averages its blocks over TI-NSTEPAVG steps.
+   Sets the number of dynamics steps in each sampling interval of an adaptive lambda bias method selected by LAMBDA-MODE OST, META or ABF. LAMBDA-EQRATIO divides each interval into a propagation phase in which lambda moves, an equilibration phase whose samples are discarded, and an averaging phase of at least two steps. Orthogonal space tempering and the adaptive biasing force hold lambda fixed after the propagation phase and average dU/dlambda over the averaging phase, then deposit one gaussian (OST) or one mean force sample (ABF) at the end of the interval if LAMBDA-CONVCRI accepts the average. This held interval needs at least three steps, and a shorter one is reset to 100 steps with a warning. With LAMBDA-SAMPLE MOVING, lambda instead moves at every step, and the averages of lambda and dU/dlambda over every step of the interval are deposited at its end, so an interval of one step deposits every step. Metadynamics moves lambda at every step, averages lambda over the averaging phase, and always deposits one gaussian at the end of the interval. Values below one are reset to one, and the default in the absence of the LAMBDA-INTERVAL keyword is 100 steps. The interval is saved in the history file, and continuing an existing ABF history requires the same interval. With LAMBDA-MODE FEP, the keyword instead sets the number of dynamics steps between samples of the trial lambda energies, with a default of 1000 steps; thermodynamic integration does not use it, and averages its blocks over TI-NSTEPAVG steps.
 
 .. index:: LAMBDA-MASS
 .. _KEY-LAMBDA-MASS:
@@ -2266,7 +2266,7 @@ LAMBDA-MC-MOVE [real]
 .. _KEY-LAMBDA-MC-TRIAL:
 
 LAMBDA-MC-TRIAL [integer]
-   Sets the average number of dynamics steps between Monte Carlo lambda moves made with LAMBDA-PROPAGATE MC, as a move is attempted at each step with a probability of one over the modifier. Orthogonal space tempering and the adaptive biasing force attempt moves only during the propagation phase of each sampling interval. Values below one are reset to one, and the default in the absence of the LAMBDA-MC-TRIAL keyword is 10.
+   Sets the average number of dynamics steps between Monte Carlo lambda moves made with LAMBDA-PROPAGATE MC, as a move is attempted at each step with a probability of one over the modifier. Orthogonal space tempering and the adaptive biasing force attempt moves only during the propagation phase of each sampling interval, which spans the whole interval with LAMBDA-SAMPLE MOVING. Values below one are reset to one, and the default in the absence of the LAMBDA-MC-TRIAL keyword is 10.
 
 .. index:: LAMBDA-MODE
 .. _KEY-LAMBDA-MODE:
@@ -2292,11 +2292,17 @@ LAMBDA-NWINDOW [integer]
 LAMBDA-PROPAGATE [LANGEVIN / MC]
    Selects how the lambda particle of orthogonal space tempering, metadynamics or the adaptive biasing force moves. LANGEVIN propagates it by Langevin dynamics along the angle theta, controlled by LAMBDA-MASS, LAMBDA-FRICTION and LAMBDA-DT, while MC moves lambda by Monte Carlo trial moves controlled by LAMBDA-MC-MOVE and LAMBDA-MC-TRIAL. Both move lambda at the temperature set by LAMBDA-TEMPERATURE. Any other modifier stops the calculation, and the default in the absence of the LAMBDA-PROPAGATE keyword is LANGEVIN.
 
+.. index:: LAMBDA-SAMPLE
+.. _KEY-LAMBDA-SAMPLE:
+
+LAMBDA-SAMPLE [HELD / MOVING]
+   Selects how orthogonal space tempering and the adaptive biasing force sample dU/dlambda within each sampling interval set by LAMBDA-INTERVAL. HELD divides the interval with LAMBDA-EQRATIO into a propagation phase in which lambda moves, an equilibration phase and an averaging phase, both at a held lambda, and deposits the average of the averaging phase. MOVING propagates lambda at every step with no equilibration phase, and deposits the averages of lambda and dU/dlambda over every step of the interval, so LAMBDA-INTERVAL 1 deposits the dU/dlambda of each step at its own lambda, while a longer interval deposits a block average at the average lambda of the block. MOVING ignores LAMBDA-EQRATIO and stops the calculation unless the lambda particle runs at the bath temperature, since samples taken while lambda moves give the mean force only when lambda and the atoms share one temperature. Each interval adds one record to the history file and, for orthogonal space tempering, one gaussian of weight HBIAS to the bias, so a short interval grows the history and builds the bias faster. Metadynamics, which always moves lambda, is unaffected. Any other modifier stops the calculation, and the default in the absence of the LAMBDA-SAMPLE keyword is HELD.
+
 .. index:: LAMBDA-TEMPERATURE
 .. _KEY-LAMBDA-TEMPERATURE:
 
 LAMBDA-TEMPERATURE [real]
-   Sets the temperature in Kelvin at which the lambda particle of orthogonal space tempering, metadynamics or the adaptive biasing force moves, both for its Langevin random kicks and for the acceptance test of Monte Carlo lambda moves, while the atoms stay at the bath temperature. A temperature above the bath lets lambda cross between its states more easily. Orthogonal space tempering and the adaptive biasing force average dU/dlambda with lambda held fixed and the atoms at the bath temperature, so their free energy estimates remain at the bath temperature for any LAMBDA-TEMPERATURE; a hotter particle disturbs the atoms more when it moves, so the equilibration phase set by LAMBDA-EQRATIO may need to grow if fewer intervals pass LAMBDA-CONVCRI. Metadynamics reads its free energy from the bias and is correct at a different temperature only when lambda moves slowly compared to the atoms, as with a large LAMBDA-MASS, and ANALYZELMDA applies the theta map factor of its profile at this temperature. Metadynamics with LAMBDA-PROPAGATE MC stops the calculation unless the lambda particle runs at the bath temperature, since a Monte Carlo trial accepts on the instantaneous energy change, so a hotter or colder particle does not sample the free energy at its own temperature however rarely it moves. A negative value is taken as its magnitude, and in the absence of the keyword, or with a value of zero, the lambda particle runs at the bath temperature. The temperature is saved in OST and metadynamics history files, and continuing a history requires the same value.
+   Sets the temperature in Kelvin at which the lambda particle of orthogonal space tempering, metadynamics or the adaptive biasing force moves, both for its Langevin random kicks and for the acceptance test of Monte Carlo lambda moves, while the atoms stay at the bath temperature. A temperature above the bath lets lambda cross between its states more easily. Orthogonal space tempering and the adaptive biasing force average dU/dlambda with lambda held fixed and the atoms at the bath temperature, so their free energy estimates remain at the bath temperature for any LAMBDA-TEMPERATURE; a hotter particle disturbs the atoms more when it moves, so the equilibration phase set by LAMBDA-EQRATIO may need to grow if fewer intervals pass LAMBDA-CONVCRI. With LAMBDA-SAMPLE MOVING they average while lambda moves, and the calculation stops unless the lambda particle runs at the bath temperature. Metadynamics reads its free energy from the bias and is correct at a different temperature only when lambda moves slowly compared to the atoms, as with a large LAMBDA-MASS, and ANALYZELMDA applies the theta map factor of its profile at this temperature. Metadynamics with LAMBDA-PROPAGATE MC stops the calculation unless the lambda particle runs at the bath temperature, since a Monte Carlo trial accepts on the instantaneous energy change, so a hotter or colder particle does not sample the free energy at its own temperature however rarely it moves. A negative value is taken as its magnitude, and in the absence of the keyword, or with a value of zero, the lambda particle runs at the bath temperature. The temperature is saved in OST and metadynamics history files, and continuing a history requires the same value.
 
 .. index:: LAMBDA-THETA-ALPHA
 .. _KEY-LAMBDA-THETA-ALPHA:

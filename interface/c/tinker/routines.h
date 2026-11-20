@@ -1272,6 +1272,8 @@ void eopdist3_();
 // eost.f
 void eostbias_();
 #define tinker_f_eostbias eostbias_
+void eostvbias_(double* vbias);
+#define tinker_f_eostvbias eostvbias_
 void ostdeposit_();
 #define tinker_f_ostdeposit ostdeposit_
 void metadeposit_();

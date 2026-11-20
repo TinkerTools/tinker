@@ -39,6 +39,12 @@ c
      &   call test_lmdamc_move ('meta')
       if (.not. skiptest(tname//'_trial','lmdamc',2))
      &   call test_lmdamc_trial
+      if (.not. skiptest(tname//'_sample','lmdamc',2))
+     &   call test_lmdamc_sample
+      if (.not. skiptest(tname//'_movetrial','lmdamc',2))
+     &   call test_lmdamc_movetrial
+      if (.not. skiptest(tname//'_ostvbias','lmdamc',2))
+     &   call test_lmdamc_ostvbias
       if (.not. skiptest(tname//'_deposit','lmdamc',2))
      &   call test_lmdamc_deposit
       if (.not. skiptest(tname//'_stale_abf','lmdamc',2))
@@ -59,6 +65,8 @@ c
      &   call test_lmdamc_nopol
       if (.not. skiptest(tname//'_run','lmdamc',4))
      &   call test_lmdamc_run
+      if (.not. skiptest(tname//'_samplerun','lmdamc',4))
+     &   call test_lmdamc_samplerun
       return
       end
 c
@@ -596,6 +604,213 @@ c
       end
 c
 c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_lmdamc_sample  --  lambda sample scheme  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_lmdamc_sample" checks that LAMBDA-SAMPLE selects a held or
+c     a moving lambda for abf, that a held interval too short for its
+c     phases is reset, that a moving interval propagates and averages
+c     every step down to a single step, and that metadynamics keeps
+c     the held split of the interval
+c
+c
+      subroutine test_lmdamc_sample
+      use dlmda
+      implicit none
+c
+c
+c     abf holds lambda by default and splits the interval by ratio
+c
+      call pushdir ('file/mutate')
+      call loadfix_keyadd ('ionwat','lmdasample_ionwat.key',
+     &                     'lambda-interval 10')
+      call assert_logical (use_lmdahold,.true.,'lmdasample held')
+      call assert_int (lmdaintv,10,'lmdasample held interval')
+      call assert_int (lmdanpa,5,'lmdasample held propagate steps')
+      call assert_int (lmdanpb,2,'lmdasample held hold steps')
+      call assert_int (lmdanpc,3,'lmdasample held average steps')
+      call final
+c
+c     a held interval too short for its three phases is reset
+c
+      call loadfix_keyadd ('ionwat','lmdasample_ionwat.key',
+     &                     'lambda-interval 2')
+      call assert_int (lmdaintv,100,'lmdasample held short interval')
+      call assert_int (lmdanpa,50,'lmdasample held reset propagate')
+      call assert_int (lmdanpc,25,'lmdasample held reset average')
+      call assert_int (size(lmdallist),lmdaintv,
+     &                 'lmdasample held reset lambda list size')
+      call assert_int (size(lmdaflist),lmdaintv,
+     &                 'lmdasample held reset dU/dlambda list size')
+      call final
+c
+c     the keyword selects a moving lambda in either case, which
+c     propagates and averages every step of the interval
+c
+      call loadfix_keyadd ('ionwat','lmdasample_ionwat.key',
+     &                     'lambda-sample moving')
+      call assert_logical (use_lmdahold,.false.,'lmdasample moving')
+      call assert_int (lmdaintv,100,'lmdasample moving interval')
+      call assert_int (lmdanpa,100,'lmdasample moving propagate steps')
+      call assert_int (lmdanpb,0,'lmdasample moving hold steps')
+      call assert_int (lmdanpc,100,'lmdasample moving average steps')
+      call final
+      call loadfix_keyadd ('ionwat','lmdasample_ionwat.key',
+     &                     'Lambda-Sample Moving')
+      call assert_logical (use_lmdahold,.false.,
+     &                     'lmdasample moving mixed case')
+      call final
+c
+c     a later keyword selects a held lambda again
+c
+      call loadfix_keyadd ('ionwat','lmdasample_moving_ionwat.key',
+     &                     'lambda-sample held')
+      call assert_logical (use_lmdahold,.true.,'lmdasample held again')
+      call assert_int (lmdanpb,25,'lmdasample held again hold steps')
+      call final
+c
+c     a moving interval keeps a single step, and a shorter one is
+c     raised to a single step
+c
+      call loadfix_keyadd ('ionwat','lmdasample_moving_ionwat.key',
+     &                     'lambda-interval 1')
+      call assert_int (lmdaintv,1,'lmdasample moving one-step interval')
+      call assert_int (lmdanpa,1,'lmdasample moving one-step propagate')
+      call assert_int (lmdanpb,0,'lmdasample moving one-step hold')
+      call assert_int (lmdanpc,1,'lmdasample moving one-step average')
+      call assert_int (size(lmdallist),1,
+     &                 'lmdasample moving one-step list size')
+      call final
+      call loadfix_keyadd ('ionwat','lmdasample_moving_ionwat.key',
+     &                     'lambda-interval 0')
+      call assert_int (lmdaintv,1,'lmdasample moving zero interval')
+      call final
+c
+c     metadynamics keeps the held split of its interval
+c
+      call loadfix_keyadd ('ionwat','lmdasample_moving_ionwat.key',
+     &                     'lambda-mode meta')
+      call assert_int (lmdanpa,50,'lmdasample meta propagate steps')
+      call assert_int (lmdanpb,25,'lmdasample meta hold steps')
+      call assert_int (lmdanpc,25,'lmdasample meta average steps')
+      call final
+      call popdir
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine test_lmdamc_movetrial  --  moving MC trials  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "test_lmdamc_movetrial" checks that abf with lambda sampled
+c     moving tries a Monte Carlo lambda move at every step of the
+c     interval, where a held lambda would try only while propagating
+c
+c
+      subroutine test_lmdamc_movetrial
+      use atoms
+      use dlmda
+      use mutant
+      implicit none
+      integer i
+      real*8 epot,e0
+      real*8, allocatable :: derivs(:,:)
+c
+c
+c     set up moving abf with a sloped mean force in every bin
+c
+      call pushdir ('file/mutate')
+      call loadfix_keyadd ('ionwat','lmdasample_moving_ionwat.key',
+     &                     'lambda-interval 4')
+      use_abfdyn = use_abf
+      call sd_mdinit (298.0d0)
+      do i = 1, nlmda
+         lmdafmean(i) = 30.0d0 * dble(i-1) * wlmda
+         lmdafwt(i) = 1.0d0
+      end do
+      allocate (derivs(3,n))
+      call gradient (e0,derivs)
+      deallocate (derivs)
+c
+c     a trial is made at the late steps a held lambda would skip
+c
+      do i = 1, 5
+         lmdastep = 3
+         epot = e0 + 1.0d6
+         call lmdamonte (epot)
+         lmdastep = 4
+         epot = e0 + 1.0d6
+         call lmdamonte (epot)
+      end do
+      call assert_int (nlmdamctry,10,'lmdamc abf moving tries any step')
+      call sd_final
+      call popdir
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_lmdamc_ostvbias  --  ost bias from history  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "test_lmdamc_ostvbias" checks that eostvbias gives the ost bias
+c     that a full gradient adds at the same structure, before and after
+c     a new deposit, so that a lambda move on a step that deposits may
+c     take its old energy from the energy of the step and the bias as
+c     the history now stands
+c
+c
+      subroutine test_lmdamc_ostvbias
+      use atoms
+      use dlmda
+      use mutant
+      use ost
+      implicit none
+      real*8 e0,e1,v0,v1
+      real*8, allocatable :: derivs(:,:)
+c
+c
+c     the bias from the history matches that of a full gradient
+c
+      call pushdir ('file/mutate')
+      call mcload ('ost',e0)
+      call eostvbias (v0)
+      call assert_real (v0,lmdavbias,1.0d-8,
+     &                  'lmdamc ostvbias matches the gradient bias')
+c
+c     after one more deposit the step energy less its old bias plus
+c     the new bias from the history is the energy of a full gradient
+c
+      lmdaavg = lambda
+      dedlavg = dedl + 0.5d0
+      call ostdeposit
+      call eostvbias (v1)
+      call assert_logical (abs(v1-v0).gt.1.0d-6,.true.,
+     &                     'lmdamc ostvbias sees the new deposit')
+      allocate (derivs(3,n))
+      call gradient (e1,derivs)
+      deallocate (derivs)
+      call assert_real (v1,lmdavbias,1.0d-8,
+     &                  'lmdamc ostvbias matches after a deposit')
+      call assert_real (e0-v0+v1,e1,1.0d-6,
+     &                  'lmdamc ostvbias corrects the step energy')
+      call sd_final
+      call popdir
+      return
+      end
+c
+c
 c     ##################################################################
 c     ##                                                              ##
 c     ##  subroutine test_lmdamc_deposit  --  bias added before move  ##
@@ -689,9 +904,10 @@ c
 c
 c     "test_lmdamc_stale" checks for abf or ost that the old energy
 c     of a lambda move is found again when the energy of the step no
-c     longer describes the system, after a scaling barostat, a rigid
-c     body step or, for ost, a deposit on the same step, and that the
-c     energy of the step is trusted and nothing is found otherwise
+c     longer describes the system, after a scaling barostat or a rigid
+c     body step, and that the energy of the step is trusted otherwise,
+c     including a step that deposits, where only the bias is taken
+c     from the history as it now stands
 c
 c     a large constant mean force makes the energy with its bias
 c     rise steeply with lambda, so that at a very low temperature
@@ -798,13 +1014,14 @@ c
      &                     trim(tag)//' rigid body energy found again')
       integrate = 'BEEMAN'
 c
-c     on a step that deposits, ost finds its energy again while abf
-c     only has to take its bias from the history as it now stands
+c     on a step that deposits, abf and ost take only their bias from
+c     the history as it now stands, at the lambda and dU/dlambda of
+c     the step, and trust the rest of the energy that it hands over
 c
       lmdanpa = lmdaintv
       call mctrial (1.0d0,lmdaintv,-1.0d30,epot,took)
-      call assert_logical (took,mode.eq.'ost',
-     &                     trim(tag)//' deposit step old energy')
+      call assert_logical (took,.false.,
+     &                     trim(tag)//' deposit step trusts the step')
       deallocate (uind0)
       deallocate (udir0)
       deallocate (desum0)
@@ -1197,5 +1414,107 @@ c
       end if
       call popdir
       call tnist_clean ('lmdamc_run')
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_lmdamc_samplerun  --  moving lambda runs  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_lmdamc_samplerun" runs short abf dynamics with lambda
+c     sampled moving and checks that a one-step interval records
+c     every step at a lambda that changes each step, that a lambda
+c     particle hotter than the bath is refused, and that an unknown
+c     sampling scheme is refused
+c
+c
+      subroutine test_lmdamc_samplerun
+      implicit none
+      integer ist
+      character*512 cmd
+c
+c
+c     a one-step interval records every step as lambda moves
+c
+      call samplesetup
+      call tnist_append ('ionwat.key','lambda-interval 1')
+      call run_prog ('dynamic','ionwat 20 1.0 0.02 2 298','out.txt',ist)
+      if (ist .ne. -1) then
+         call assert_int (ist,0,'lmdasample run status')
+         cmd = 'grep -q "Lambda Sampling  *Moving" out.txt'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,'lmdasample run reports moving')
+         cmd = 'awk ''f {n++; if (n>1 && $2==p) s++; p=$2} '//
+     &         '/Sample History/ {f=1} '//
+     &         'END {exit !(n==20 && s==0)}'' ionwat.abf'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,'lmdasample run records each step')
+      end if
+      call popdir
+      call tnist_clean ('lmdasample_run')
+c
+c     a lambda particle hotter than the bath is refused
+c
+      call samplesetup
+      call tnist_append ('ionwat.key','lambda-temperature 600.0')
+      call run_prog ('dynamic','ionwat 20 1.0 0.02 2 298','out.txt',ist)
+      if (ist .ne. -1) then
+         cmd = 'grep -q "LAMBDA-SAMPLE MOVING Requires" out.txt'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,'lmdasample run refuses a hot lambda')
+      end if
+      call popdir
+      call tnist_clean ('lmdasample_run')
+c
+c     an unknown sampling scheme is refused
+c
+      call samplesetup
+      call tnist_append ('ionwat.key','lambda-sample sometimes')
+      call run_prog ('dynamic','ionwat 20 1.0 0.02 2 298','out.txt',ist)
+      if (ist .ne. -1) then
+         cmd = 'grep -q "LAMBDA-SAMPLE takes" out.txt'
+         call execute_command_line (cmd,exitstat=ist)
+         call assert_int (ist,0,'lmdasample run refuses a bad scheme')
+      end if
+      call popdir
+      call tnist_clean ('lmdasample_run')
+      return
+      end
+c
+c
+c     ###########################################################
+c     ##                                                       ##
+c     ##  subroutine samplesetup  --  moving lambda run folder  ##
+c     ##                                                       ##
+c     ###########################################################
+c
+c
+c     "samplesetup" copies the ion and water fixture with moving abf
+c     into a scratch directory, switches it to the lambda particle,
+c     and leaves the scratch directory as the current directory
+c
+c
+      subroutine samplesetup
+      implicit none
+      character*512 cmd
+c
+c
+      call pushdir ('file/mutate')
+      cmd = 'rm -rf ../lmdasample_run ; mkdir -p ../lmdasample_run ; '//
+     &      'cp ionwat.xyz ../lmdasample_run/ ; '//
+     &      'cp lmdasample_moving_ionwat.key '//
+     &      '../lmdasample_run/ionwat.key'
+      call execute_command_line (cmd)
+      call popdir
+      call pushdir ('file/lmdasample_run')
+      call tnist_append ('ionwat.key','lambda-propagate langevin')
+      call tnist_append ('ionwat.key','lambda-mass 0.06')
+      call tnist_append ('ionwat.key','lambda-friction 1000.0')
+      call tnist_append ('ionwat.key','lambda-dt 0.001')
+      call tnist_append ('ionwat.key','randomseed 123456789')
       return
       end

@@ -1921,7 +1921,10 @@ c     "setlmdaphase" divides the lambda sample interval into the
 c     phase that propagates the lambda particle, the phase that
 c     equilibrates at the frozen lambda and the phase that averages
 c     dU/dlambda at that same fixed lambda, the averaging phase taking
-c     whatever the other two leave
+c     whatever the other two leave; when ost or abf samples a moving
+c     lambda, the lambda particle propagates and every step is
+c     averaged over the whole interval, so the propagation and
+c     averaging phases both span it and there is no equilibration
 c
 c
       subroutine setlmdaphase
@@ -1929,10 +1932,19 @@ c
       implicit none
 c
 c
-c     divide the interval, keeping at least one propagation step and
-c     at least two samples to average
+c     a moving ost or abf interval propagates and averages every step
 c
       if (lmdaintv .lt. 1)  lmdaintv = 1
+      if ((use_ost .or. use_abf) .and. .not.use_lmdahold) then
+         lmdanpa = lmdaintv
+         lmdanpb = 0
+         lmdanpc = lmdaintv
+         return
+      end if
+c
+c     divide a held interval, keeping at least one propagation step
+c     and at least two samples to average
+c
       lmdanpa = int(lmdaparatio*dble(lmdaintv))
       lmdanpb = int(lmdapbratio*dble(lmdaintv))
       lmdanpa = max(1,min(lmdanpa,lmdaintv-1))
@@ -1946,6 +1958,11 @@ c
          lmdanpa = lmdanpa - 1
          lmdanpc = lmdanpc + 1
       end do
+c
+c     a one-step interval, which only metadynamics allows, averages
+c     its single step, which is also its propagation step
+c
+      if (lmdanpc .lt. 1)  lmdanpc = 1
       return
       end
 c
@@ -1997,7 +2014,8 @@ c
 c
 c     save all values in the interval, but average only after the
 c     propagation and equilibration phases; only ost and abf keep
-c     dU/dlambda, which they average at a fixed lambda
+c     dU/dlambda, which they average at a fixed lambda when held, or
+c     over every step of the interval as lambda moves
 c
       isamp = mod(lmdastep-1,lmdaintv) + 1
       lmdallist(isamp) = lambda
@@ -2007,7 +2025,7 @@ c     deposit the interval average every lmdaintv steps; an ost or
 c     abf interval is kept only when its samples are converged
 c
       if (isamp .eq. lmdaintv) then
-         nskip = lmdanpa + lmdanpb
+         nskip = lmdaintv - lmdanpc
          call avgstd (lmdallist,nskip+1,lmdanpc,lmdaavg,lmdastd)
          if (use_ost .or. use_abf) then
             call avgstd (lmdaflist,nskip+1,lmdanpc,dedlavg,dedlstd)
@@ -2021,7 +2039,8 @@ c
       end if
 c
 c     propagate the lambda particle; ost and abf hold lambda fixed
-c     after the propagation phase
+c     after the propagation phase, which spans the whole interval
+c     when lambda is sampled moving
 c
       if (.not. use_lmdamc) then
          if (use_ost .or. use_abf) then
@@ -2079,7 +2098,8 @@ c     "lmdatemp" returns the temperature at which the lambda particle
 c     and the Monte Carlo lambda trials move, set by the keyword
 c     LAMBDA-TEMPERATURE or else the bath temperature; the atoms and
 c     every free energy estimate stay at the bath temperature, which
-c     ost and abf use alone since they average at a held lambda
+c     ost and abf use alone since they average at a held lambda; ost
+c     or abf sampling a moving lambda requires the bath temperature
 c
 c
       function lmdatemp ()
@@ -2267,13 +2287,15 @@ c
       real*8, allocatable :: polold(:,:,:)
       real*8, allocatable :: solvold(:,:,:)
       logical accept,stale
+      logical deposit
       logical savepol,savesolv
       logical savepole
       external random
 c
 c
 c     ost and abf move lambda only in the propagation phase of the
-c     sample interval, while metadynamics moves it at any step
+c     sample interval, which spans the interval when lambda is sampled
+c     moving, while metadynamics moves it at any step
 c
       isamp = mod(lmdastep-1,lmdaintv) + 1
       if (use_ostdyn .or. use_abfdyn) then
@@ -2295,15 +2317,16 @@ c
 c     the energy of the step no longer holds once the coordinates or
 c     the box have changed since its forces were found, as they have
 c     after a scaling barostat or after a rigid body step, which finds
-c     its forces before it moves; nor does the ost energy hold once
-c     this step has added to the history
+c     its forces before it moves; the ost bias part of it no longer
+c     holds once this step has added to the history, which happens at
+c     the end of an interval whose lambda is sampled moving
 c
       stale = (integrate .eq. 'RIGIDBODY')
       if (isobaric .and. use_bounds) then
          if (barostat.eq.'BERENDSEN' .or. barostat.eq.'BUSSI')
      &      stale = .true.
       end if
-      if (use_ostdyn .and. isamp.eq.lmdaintv)  stale = .true.
+      deposit = (use_ostdyn .and. isamp.eq.lmdaintv)
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -2348,11 +2371,18 @@ c
 c     get the old energy at the native lambda, using the energy of
 c     the step unless it is stale; a bias that follows lambda alone
 c     is taken from the history as it now stands, which may hold a
-c     deposit made after the forces of the step were found
+c     deposit made after the forces of the step were found, and so
+c     is the ost bias at the unchanged lambda and dU/dlambda of the
+c     step after such a deposit
 c
       if (use_ostdyn) then
          eold = epot
-         if (stale)  call gradient (eold,dtrial)
+         if (stale) then
+            call gradient (eold,dtrial)
+         else if (deposit) then
+            call eostvbias (vbias)
+            eold = epot - lmdavbias + vbias
+         end if
       else
          if (stale) then
             eold = energy ()

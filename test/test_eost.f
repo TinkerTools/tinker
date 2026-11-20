@@ -2795,6 +2795,30 @@ c
      &                        'elmdadyn meta moves lambda each step')
       end do
       use_lmdacv = .false.
+c
+c     a one-step interval centers each gaussian on the lambda of
+c     its own step, rather than on an empty average
+c
+      call resetost (5,5,1)
+      use_meta = .true.
+      call resetmeta (2)
+      lmdaintv = 1
+      call setlmdaphase
+      hbias = 2.0d0
+      wlmda = 0.25d0
+      wlhist = 0.3d0
+      maxwlhist = wlhist
+      dedl = 0.0d0
+      lmdadt = 0.0d0
+      lmdastep = 0
+      do istep = 1, 2
+         lambda = lam(istep+1)
+         call elmdadyn
+         call assert_int (nmetahist,istep,
+     &                    'elmdadyn meta one-step deposits each step')
+         call assert_real (metalhist(istep),lam(istep+1),1.0d-12,
+     &                     'elmdadyn meta one-step gaussian center')
+      end do
       use_meta = .false.
       return
       end
@@ -3444,7 +3468,9 @@ c
 c     "test_eost_ostphase" checks that setlmdaphase divides the deposit
 c     interval into propagation, equilibration and averaging phases,
 c     and that the clamps keep a propagation step and enough samples
-c     to average without ever losing a sample from the interval
+c     to average without ever losing a sample from the interval; a
+c     moving ost or abf interval propagates and averages every step,
+c     while metadynamics keeps the held split
 c
 c
       subroutine test_eost_ostphase
@@ -3497,6 +3523,50 @@ c
       call assert_int (lmdanpc,2,'setlmdaphase minimum average')
       call assert_int (lmdanpa+lmdanpb+lmdanpc,lmdaintv,
      &                 'setlmdaphase spans the minimum interval')
+c
+c     a moving abf or ost interval propagates and averages every
+c     step, whatever the ratios, down to a single step
+c
+      use_lmdahold = .false.
+      use_abf = .true.
+      lmdaintv = 10
+      lmdaparatio = 0.3d0
+      lmdapbratio = 0.3d0
+      call setlmdaphase
+      call assert_int (lmdanpa,10,'setlmdaphase moving abf propagation')
+      call assert_int (lmdanpb,0,'setlmdaphase moving abf no hold')
+      call assert_int (lmdanpc,10,'setlmdaphase moving abf average')
+      lmdaintv = 1
+      call setlmdaphase
+      call assert_int (lmdanpa,1,'setlmdaphase moving one-step move')
+      call assert_int (lmdanpb,0,'setlmdaphase moving one-step hold')
+      call assert_int (lmdanpc,1,'setlmdaphase moving one-step average')
+      use_abf = .false.
+      use_ost = .true.
+      lmdaintv = 10
+      call setlmdaphase
+      call assert_int (lmdanpa,10,'setlmdaphase moving ost propagation')
+      call assert_int (lmdanpb,0,'setlmdaphase moving ost no hold')
+      call assert_int (lmdanpc,10,'setlmdaphase moving ost average')
+c
+c     metadynamics keeps the held split when the moving flag is set
+c
+      use_ost = .false.
+      use_meta = .true.
+      call setlmdaphase
+      call assert_int (lmdanpa,3,'setlmdaphase meta ignores moving')
+      call assert_int (lmdanpb,3,'setlmdaphase meta keeps the hold')
+      call assert_int (lmdanpc,4,'setlmdaphase meta keeps the average')
+c
+c     a held one-step interval averages its single propagation step
+c
+      use_lmdahold = .true.
+      lmdaintv = 1
+      call setlmdaphase
+      call assert_int (lmdanpa,1,'setlmdaphase one-step propagation')
+      call assert_int (lmdanpb,0,'setlmdaphase one-step no hold')
+      call assert_int (lmdanpc,1,'setlmdaphase one-step average')
+      use_meta = .false.
       return
       end
 c
@@ -3663,6 +3733,7 @@ c
       deffdl = 0.0d0
       use_lmdacv = .false.
       use_lmdafill = .false.
+      use_lmdahold = .true.
       lmdafillr = 0.1d0
       lmdacvstd = 0.0d0
       lmdacvrat = 0.0d0

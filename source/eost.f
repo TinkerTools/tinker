@@ -78,6 +78,43 @@ c
       end
 c
 c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine eostvbias -- ost bias energy from history  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "eostvbias" finds the orthogonal space tempering bias energy
+c     at the current lambda and unbiased dU/dlambda from the history
+c     as it now stands, the same energy that "eostbias" adds, so a
+c     deposit made after the forces of a step were found can be taken
+c     into the energy of that step without a new gradient; no saved
+c     value is changed
+c
+c
+      subroutine eostvbias (vbias)
+      use mutant
+      use ost
+      implicit none
+      real*8 vbias
+      real*8 egbias,dgdl,dgdfl
+      real*8 eostlmda,dfdl
+c
+c
+c     the g kernel bias less the free energy term, as in eostbias
+c
+      if (ostinterpol) then
+         call egkernelinterpolate (egbias,dgdl,dgdfl)
+      else
+         call egkernel (egbias,dgdl,dgdfl)
+      end if
+      call efreebias (lambda,eostlmda,dfdl)
+      vbias = egbias - eostlmda
+      return
+      end
+c
+c
 c     ##########################################################
 c     ##                                                      ##
 c     ##  subroutine ostdeposit -- add one ost bias gaussian  ##
@@ -1562,6 +1599,20 @@ c
 c     return if ost has not been initialized
 c
       if (.not. use_ost)  return
+c
+c     samples taken while lambda moves follow the joint distribution
+c     of lambda and the atoms, which gives the mean force only when
+c     the lambda particle moves at the temperature of the atoms
+c
+      if (.not. use_lmdahold) then
+         if (abs(lmdatemp()-kelvin) .gt. 1.0d-10*max(1.0d0,kelvin)) then
+            write (iout,5)
+    5       format (/,' INITOSTFILE  --  LAMBDA-SAMPLE MOVING',
+     &                 ' Requires LAMBDA-TEMPERATURE',
+     &              /,' at the Bath Temperature')
+            call fatal
+         end if
+      end if
 c
 c     continue from the latest existing ost history file
 c

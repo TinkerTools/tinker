@@ -211,6 +211,7 @@ c     taking precedence, while otherwise a new file is started
 c
 c
       subroutine initabffile
+      use bath
       use dlmda
       use files
       use iounit
@@ -220,12 +221,27 @@ c
       integer lmdaintv0
       integer freeunit
       integer trimtext
+      real*8 lmdatemp
       logical exist
 c
 c
 c     return if abf has not been initialized
 c
       if (.not. use_abf)  return
+c
+c     samples taken while lambda moves follow the joint distribution
+c     of lambda and the atoms, which gives the mean force only when
+c     the lambda particle moves at the temperature of the atoms
+c
+      if (.not. use_lmdahold) then
+         if (abs(lmdatemp()-kelvin) .gt. 1.0d-10*max(1.0d0,kelvin)) then
+            write (iout,5)
+    5       format (/,' INITABFFILE  --  LAMBDA-SAMPLE MOVING',
+     &                 ' Requires LAMBDA-TEMPERATURE',
+     &              /,' at the Bath Temperature')
+            call fatal
+         end if
+      end if
 c
 c     continue from the latest existing abf history file
 c
