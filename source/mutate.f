@@ -1137,6 +1137,7 @@ c
       integer i,k
       integer next
       character*20 keyword
+      character*20 interpword
       character*240 record
       character*240 string
 c
@@ -1164,7 +1165,7 @@ c
       hbias = 0.00001d0
       oststdev = 4.0d0
       fastkernel = .true.
-      ostinterpol = .false.
+      ostinterpol = .true.
 c
 c     search keywords for orthogonal space tempering options
 c
@@ -1186,8 +1187,9 @@ c
             string = record(next:240)
             read (string,*,err=10,end=10)  oststdev
          else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
-            ostinterpol = .true.
-            fastkernel = .true.
+            call getword (record,interpword,next)
+            call upcase (interpword)
+            ostinterpol = (interpword .ne. 'NONE')
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  hbias

@@ -2720,8 +2720,8 @@ OPT-COEFF
 .. index:: OST-INTERPOLATE
 .. _KEY-OST-INTERPOLATE:
 
-OST-INTERPOLATE
-   Evaluates the orthogonal space tempering or metadynamics bias by cubic Hermite interpolation of the values stored at the bin centers, over lambda and dU/dlambda for orthogonal space tempering and over lambda for metadynamics, instead of summing the deposited gaussians directly. Interpolation is faster for long histories, while its accuracy depends on the bin width relative to the gaussian widths. ANALYZELMDA also reads this keyword when analyzing a metadynamics history.
+OST-INTERPOLATE [NONE]
+   Selects how the orthogonal space tempering or metadynamics bias is evaluated. By default, and with no modifier, the bias is found by cubic Hermite interpolation of the values and slopes stored at the bin centers, over lambda and dU/dlambda for orthogonal space tempering and over lambda for metadynamics, so each evaluation takes the same time however long the history grows. The NONE modifier sums the deposited gaussians within the OST-STDDEV cutoff directly instead, which is exact between bin centers but slows in proportion to the number of gaussians near the current point, and so grows with the length of the run, most of all with a short LAMBDA-INTERVAL. The accuracy of interpolation depends on the bin width relative to the gaussian widths. ANALYZELMDA also reads this keyword when analyzing a metadynamics history.
 
 .. index:: OST-STDDEV
 .. _KEY-OST-STDDEV:

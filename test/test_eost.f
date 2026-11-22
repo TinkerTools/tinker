@@ -82,6 +82,8 @@ c
      &   call test_eost_metarestart
       if (.not. skiptest(tname//'_temperkeys','ost',2))
      &   call test_eost_temperkeys
+      if (.not. skiptest(tname//'_interpkeys','ost',2))
+     &   call test_eost_interpkeys
       if (.not. skiptest(tname//'_restartrun','ost',4))
      &   call test_eost_restartrun
       call final
@@ -3356,6 +3358,78 @@ c
       end do
       use_lmdacv = .false.
       use_ost = .false.
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine test_eost_interpkeys  --  interpolation keyword  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "test_eost_interpkeys" checks that the orthogonal space tempering
+c     and metadynamics bias is interpolated by default, and with the
+c     OST-INTERPOLATE keyword alone or with any modifier other than
+c     NONE, while NONE in any case selects the direct gaussian sum
+c
+c
+      subroutine test_eost_interpkeys
+      use dlmda
+      use keys
+      use mutant
+      use ost
+      implicit none
+c
+c
+c     no keyword gives interpolation
+c
+      use_ost = .false.
+      use_meta = .false.
+      lambda = 0.5d0
+      if (allocated(keyline))  deallocate (keyline)
+      allocate (keyline(1))
+      nkey = 0
+      ostinterpol = .false.
+      call mutate_ost
+      call assert_logical (ostinterpol,.true.,
+     &                     'OST-INTERPOLATE default on')
+      call assert_logical (fastkernel,.true.,
+     &                     'OST-INTERPOLATE default fused kernels')
+c
+c     NONE selects the direct sum, in any case
+c
+      nkey = 1
+      keyline(1) = 'OST-INTERPOLATE NONE'
+      call mutate_ost
+      call assert_logical (ostinterpol,.false.,
+     &                     'OST-INTERPOLATE NONE direct sum')
+      call assert_logical (fastkernel,.true.,
+     &                     'OST-INTERPOLATE NONE fused kernels')
+      keyline(1) = 'ost-interpolate none'
+      call mutate_ost
+      call assert_logical (ostinterpol,.false.,
+     &                     'OST-INTERPOLATE none lower case')
+c
+c     the keyword alone, or with another word, keeps interpolation
+c
+      keyline(1) = 'OST-INTERPOLATE'
+      ostinterpol = .false.
+      call mutate_ost
+      call assert_logical (ostinterpol,.true.,
+     &                     'OST-INTERPOLATE bare keyword')
+      keyline(1) = 'OST-INTERPOLATE HERMITE'
+      ostinterpol = .false.
+      call mutate_ost
+      call assert_logical (ostinterpol,.true.,
+     &                     'OST-INTERPOLATE other word')
+c
+c     restore an empty keyword list and a clean OST state
+c
+      nkey = 0
+      deallocate (keyline)
+      call resetost (5,5,1)
       return
       end
 c

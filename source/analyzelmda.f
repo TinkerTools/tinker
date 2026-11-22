@@ -675,17 +675,19 @@ c
       logical setnlmda
       character*20 keyword
       character*20 propword
+      character*20 interpword
       character*240 record
       character*240 string
 c
 c
 c     get the requested lambda grid, keeping that of the history file
-c     when none is given, whether to interpolate the bias, and whether
-c     lambda moved by Monte Carlo trials rather than in theta
+c     when none is given, whether to interpolate the bias, which is
+c     the default as in dynamics, and whether lambda moved by Monte
+c     Carlo trials rather than in theta
 c
       setnlmda = .false.
       nlmda1 = nlmda
-      ostinterpol = .false.
+      ostinterpol = .true.
       use_lmdamc = .false.
       do i = 1, nkey
          next = 1
@@ -697,7 +699,9 @@ c
             read (string,*,err=10,end=10)  nlmda1
             setnlmda = .true.
          else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
-            ostinterpol = .true.
+            call getword (record,interpword,next)
+            call upcase (interpword)
+            ostinterpol = (interpword .ne. 'NONE')
          else if (keyword(1:17) .eq. 'LAMBDA-PROPAGATE ') then
             call getword (record,propword,next)
             call upcase (propword)
