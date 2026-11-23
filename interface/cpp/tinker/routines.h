@@ -1318,8 +1318,6 @@ void updatekernels_();
 #define tinker_f_updatekernels updatekernels_
 void addkernelhist_(int* ihist, int* dofkern);
 #define tinker_f_addkernelhist addkernelhist_
-void addkernelpoint_(int* ilmda, int* iflmda, double* e, double* ldelta, double* fldelta, double* sigl2, double* sigf2, double* rt);
-#define tinker_f_addkernelpoint addkernelpoint_
 void buildfkernel_();
 #define tinker_f_buildfkernel buildfkernel_
 void initostfile_();

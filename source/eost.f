@@ -1321,17 +1321,28 @@ c
       integer img,llog
       integer ilmda1,ilmda2
       integer iflmda1,iflmda2
+      integer iflo,ifhi
       integer nlcut,nfcut
       integer nbincut
       real*8 sigl,sigf
       real*8 sigl2,sigf2
-      real*8 pref,rt
+      real*8 pref,rt,rtinv
+      real*8 fcut,sigf2inv
+      real*8 lfac,ffac
       real*8 sourcel,sourcefl
       real*8 targetl,targetf
       real*8 ldelta,ldelta2
       real*8 fldelta,fldelta2
-      real*8 e,expl,expfl
+      real*8 e,expl
+      real*8 flmda
+      real*8 oldg,newg
+      real*8 oldweight,newweight
+      real*8 delweight
+      real*8 scale,vmax
+      real*8 dgdl,dgdfl,d2gdlfl
+      real*8 fexp(nflmda)
       logical dofkern
+      logical raised
 c
 c
 c     unpack saved source location and get gaussian parameters
@@ -1349,6 +1360,8 @@ c     the f kernel weights undo the bias on the atoms, so they use
 c     the bath temperature, never the lambda particle temperature
 c
       rt = gasconst * kelvin
+      rtinv = 1.0d0 / rt
+      sigf2inv = 1.0d0 / sigf2
 c
 c     include target bins out to the requested gaussian cutoff
 c
@@ -1356,6 +1369,27 @@ c
       nfcut = nbincut(oststdev*sigf,wflmda)
       iflmda1 = max(1,fsrc-nfcut)
       iflmda2 = min(nflmda,fsrc+nfcut)
+c
+c     the gaussian factors along flambda are the same for every
+c     lambda target, so get them once for all lambda bins; since
+c     the flambda distance grows with the bin index, the bins
+c     within the gaussian cutoff form one range
+c
+      fcut = oststdev * sigf
+      iflo = iflmda2 + 1
+      ifhi = iflmda1 - 1
+      do iflmda = iflmda1, iflmda2
+         targetf = dble(iflmda-fli0) * wflmda
+         fldelta = targetf - sourcefl
+         if (abs(fldelta) .le. fcut) then
+            iflo = min(iflo,iflmda)
+            ifhi = iflmda
+            fldelta2 = fldelta*fldelta
+            fexp(iflmda) = exp(-fldelta2 / (2.0d0*sigf2))
+         end if
+      end do
+      iflmda1 = iflo
+      iflmda2 = ifhi
 c
 c     use the physical lambda source plus its two mirror images
 c
@@ -1381,22 +1415,57 @@ c
             if (abs(ldelta) .gt. oststdev*sigl)  goto 10
             ldelta2 = ldelta*ldelta
             expl = exp(-ldelta2 / (2.0d0*sigl2))
+            lfac = -ldelta / sigl2
             do iflmda = iflmda1, iflmda2
-               targetf = dble(iflmda-fli0) * wflmda
-               fldelta = targetf - sourcefl
-               if (abs(fldelta) .gt. oststdev*sigf)  goto 20
-               fldelta2 = fldelta*fldelta
-               expfl = exp(-fldelta2 / (2.0d0*sigf2))
-               e = pref * expl * expfl
+               e = pref * expl * fexp(iflmda)
                if (dofkern) then
-                  call addkernelpoint (ilmda,iflmda,e,ldelta,
-     &                                 fldelta,sigl2,sigf2,rt)
+c
+c     update the g kernel, where the f kernel accumulators carry the
+c     largest bias in the row as a common factor, so they are rescaled
+c     whenever this point raises it, and the new point then has unit
+c     weight; a cell with no bias carries no weight
+c
+                  oldg = gkernel(ilmda,iflmda)
+                  newg = oldg + e
+                  vmax = vkernelmax(ilmda)
+                  raised = (newg .gt. vmax)
+                  if (raised) then
+                     scale = exp((vmax-newg)*rtinv)
+                     lmdafsum(ilmda) = lmdafsum(ilmda) * scale
+                     lmdafwt(ilmda) = lmdafwt(ilmda) * scale
+                     vmax = newg
+                  end if
+                  if (oldg .eq. 0.0d0) then
+                     oldweight = 0.0d0
+                  else
+                     oldweight = exp((oldg-vmax)*rtinv)
+                  end if
+                  if (newg .eq. 0.0d0) then
+                     newweight = 0.0d0
+                  else if (raised) then
+                     newweight = 1.0d0
+                  else
+                     newweight = exp((newg-vmax)*rtinv)
+                  end if
+                  delweight = newweight - oldweight
+                  flmda = dble(iflmda-fli0) * wflmda
+                  ffac = (sourcefl-flmda) * sigf2inv
+                  dgdl = lfac * e
+                  dgdfl = ffac * e
+                  d2gdlfl = lfac * dgdfl
+                  gfkernel(ilmda,iflmda) = gfkernel(ilmda,iflmda)+dgdfl
+                  gkernel(ilmda,iflmda) = newg
+                  vkernelmax(ilmda) = vmax
+                  glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda)
+     &                                         + d2gdlfl
+                  glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
+                  lmdafsum(ilmda) = lmdafsum(ilmda) + flmda*delweight
+                  lmdafwt(ilmda) = lmdafwt(ilmda) + delweight
                else
                   gkernel(ilmda,iflmda) = gkernel(ilmda,iflmda) + e
                   vkernelmax(ilmda) = max(vkernelmax(ilmda),
      &                                    gkernel(ilmda,iflmda))
                end if
-   20          continue
             end do
 c
 c     set the mean force of the row once all its points are added
@@ -1415,85 +1484,6 @@ c
       end
 c
 c
-c     ##############################################################
-c     ##                                                          ##
-c     ##  subroutine addkernelpoint -- add one grid contribution  ##
-c     ##                                                          ##
-c     ##############################################################
-c
-c
-c     "addkernelpoint" updates one g kernel cell and the associated
-c     f kernel numerator and partition-function accumulator, given
-c     the thermal energy "rt"; the caller sets the row mean force
-c
-c
-      subroutine addkernelpoint (ilmda,iflmda,e,ldelta,
-     &                           fldelta,sigl2,sigf2,rt)
-      use dlmda
-      use ost
-      implicit none
-      integer ilmda,iflmda
-      real*8 e,rt
-      real*8 ldelta,fldelta
-      real*8 sigl2,sigf2
-      real*8 flmda
-      real*8 oldg,newg
-      real*8 oldweight,newweight
-      real*8 delweight
-      real*8 scale,vmax
-      real*8 dgdl,dgdfl,d2gdlfl
-      logical raised
-c
-c
-c     update the g kernel and adjust the f kernel accumulators
-c
-      oldg = gkernel(ilmda,iflmda)
-      newg = oldg + e
-c
-c     the accumulators carry the largest bias in the row as a common
-c     factor, so they are rescaled whenever this point raises it, and
-c     the new point then has unit weight
-c
-      vmax = vkernelmax(ilmda)
-      raised = (newg .gt. vmax)
-      if (raised) then
-         scale = exp((vmax-newg)/rt)
-         lmdafsum(ilmda) = lmdafsum(ilmda) * scale
-         lmdafwt(ilmda) = lmdafwt(ilmda) * scale
-         vmax = newg
-      end if
-c
-c     a cell with no bias carries no weight, as in "buildfkernel", so
-c     a gaussian of zero height leaves a row without data
-c
-      if (oldg .eq. 0.0d0) then
-         oldweight = 0.0d0
-      else
-         oldweight = exp((oldg-vmax)/rt)
-      end if
-      if (newg .eq. 0.0d0) then
-         newweight = 0.0d0
-      else if (raised) then
-         newweight = 1.0d0
-      else
-         newweight = exp((newg-vmax)/rt)
-      end if
-      delweight = newweight - oldweight
-      flmda = dble(iflmda-fli0) * wflmda
-      dgdl = -ldelta * e / sigl2
-      dgdfl = -fldelta * e / sigf2
-      d2gdlfl = ldelta * fldelta * e / (sigl2*sigf2)
-      gfkernel(ilmda,iflmda) = gfkernel(ilmda,iflmda) + dgdfl
-      gkernel(ilmda,iflmda) = newg
-      vkernelmax(ilmda) = max(vkernelmax(ilmda),newg)
-      glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda) + d2gdlfl
-      glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
-      lmdafsum(ilmda) = lmdafsum(ilmda) + flmda*delweight
-      lmdafwt(ilmda) = lmdafwt(ilmda) + delweight
-      return
-      end
-c
-c
 c     #########################################################
 c     ##                                                     ##
 c     ##  subroutine buildfkernel -- build the ost f kernel  ##
@@ -1504,7 +1494,7 @@ c
 c     "buildfkernel" builds the ost f kernel by computing the
 c     biased ensemble average of dE/dlambda at each lambda bin, and
 c     keeps its weighted sum and total weight in the same scaled
-c     form as "addkernelpoint", so a row has data exactly when its
+c     form as "addkernelhist", so a row has data exactly when its
 c     total weight is positive
 c
 c
@@ -1759,6 +1749,7 @@ c
       integer ihis
       integer freeunit
       integer trimtext
+      real*8 efreetot
       logical exist
       character*240 ostfile
       character*240 title
@@ -1784,9 +1775,19 @@ c
          call fatal
       end if
 c
-c     read the gaussian history entries and rebuild the kernels
+c     read the gaussian history entries
 c
       call rdosthist (ihis,ostfile)
+c
+c     rebuild the kernels from the saved gaussians
+c
+      if (fastkernel) then
+         call buildkernels
+      else
+         call buildgkernel
+         call buildfkernel
+      end if
+      lmdadeltag = efreetot()
       return
       end
 c
@@ -1800,7 +1801,7 @@ c
 c
 c     "rdosthist" reads the gaussian history entries that follow the
 c     header of an open .ost file, then closes the file and rebuilds
-c     the histogram lookup and bias kernels
+c     the histogram lookup; the caller builds the bias kernels
 c
 c
       subroutine rdosthist (ihis,ostfile)
@@ -1809,11 +1810,11 @@ c
       use iounit
       use ost
       implicit none
-      integer i,ihis
+      integer i,k,ihis
       integer ihist
       integer osthist0
       integer trimtext
-      real*8 efreetot
+      logical fixed
       character*240 record
       character*(*) ostfile
 c
@@ -1895,13 +1896,32 @@ c
       maxwlhist = 0.0d0
       maxwfhist = 0.0d0
 c
-c     read saved gaussian histogram entries
+c     read saved gaussian histogram entries, by the fixed format
+c     of "prtosthist" when a row has its exact layout, which is much
+c     faster than a free-format read; each of the seven fields must
+c     end in its last column, with a blank starting the next field,
+c     since blanks inside a field are ignored by a fixed-format read
 c
       do ihist = 1, nlmdahist
          read (ihis,10,err=90,end=90)  record
+         fixed = (trimtext(record) .eq. 154)
+         do i = 1, 6
+            k = 12 * min(i,2) + 26 * max(i-2,0)
+            if (record(k:k).eq.' ' .or. record(k+1:k+1).ne.' ')
+     &         fixed = .false.
+         end do
+         if (fixed) then
+            read (record,13,err=12,end=12)  lmdaihist(ihist),osthist0,
+     &         lmdalhist(ihist),lmdafhist(ihist),osthhist(ihist),
+     &         ostwlhist(ihist),ostwfhist(ihist)
+   13       format (2i12,5d26.16)
+            goto 14
+         end if
+   12    continue
          read (record,*,err=90,end=90)  lmdaihist(ihist),osthist0,
      &      lmdalhist(ihist),lmdafhist(ihist),osthhist(ihist),
      &      ostwlhist(ihist),ostwfhist(ihist)
+   14    continue
          osthist(ihist) = osthist0
          maxwlhist = max(maxwlhist,ostwlhist(ihist))
          maxwfhist = max(maxwfhist,ostwfhist(ihist))
@@ -1916,16 +1936,10 @@ c
    15 continue
       close (unit=ihis)
 c
-c     rebuild lookup table and kernels from the saved gaussians
+c     rebuild the lookup table from the saved gaussians, where the
+c     caller builds the kernels
 c
       call buildostindex
-      if (fastkernel) then
-         call buildkernels
-      else
-         call buildgkernel
-         call buildfkernel
-      end if
-      lmdadeltag = efreetot()
       nlmdasave = nlmdahist
       if (debug) then
          write (iout,20)  ostfile(1:trimtext(ostfile))

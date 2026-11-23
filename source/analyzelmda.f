@@ -209,7 +209,7 @@ c
       lmdakelvin = 0.0d0
 c
 c     read the history header, check that the chosen method wrote
-c     the file, then read its rows and rebuild its kernels
+c     the file, then read its rows
 c
       ihis = freeunit ()
       open (unit=ihis,file=histfile,status='old')
@@ -225,8 +225,8 @@ c
          call fatal
       end if
 c
-c     an ost history uses the fused kernel updates of dynamics from
-c     the first build made as its rows are read
+c     an ost history uses the fused kernel updates of dynamics, and
+c     its kernels are built once, row by row, by "ostseries"
 c
       if (use_ost) then
          fastkernel = .true.
@@ -287,8 +287,9 @@ c
 c
 c     "ostkey" checks the keyfile for requested analysis grid settings,
 c     since this program never runs the setup that reads these keywords
-c     for dynamics, and rebuilds the ost kernels on the requested grid
-c     when it differs from the grid of the restart
+c     for dynamics, and moves the ost history onto the requested grid
+c     when it differs from the grid of the restart, where "ostseries"
+c     then builds the kernels
 c
 c
       subroutine ostkey
@@ -336,7 +337,7 @@ c
          if (wflmda1 .le. 0.0d0)  wflmda1 = wflmda
       end if
 c
-c     rebuild kernels if the requested grid differs from restart grid
+c     move to the requested grid if it differs from restart grid
 c
       if ((setnlmda .and. nlmda1.ne.nlmda) .or.
      &    (setwflmda .and. wflmda1.ne.wflmda)) then
@@ -348,7 +349,7 @@ c
 c
 c     ###########################################################
 c     ##                                                       ##
-c     ##  subroutine remeshost  --  rebuild ost on a new grid  ##
+c     ##  subroutine remeshost  --  remap ost onto a new grid  ##
 c     ##                                                       ##
 c     ###########################################################
 c
@@ -369,7 +370,6 @@ c
       real*8 wflmda0
       real*8 flmin,flmax
       real*8 flow,fhigh
-      real*8 efreetot
 c
 c
 c     save old flambda grid range before changing the grid spacing
@@ -441,16 +441,10 @@ c
          end do
       end do
 c
-c     rebuild lookup table and kernels from saved gaussian centers
+c     rebuild the lookup table from saved gaussian centers, where
+c     "ostseries" then builds the kernels on the new grid
 c
       call buildostindex
-      if (fastkernel) then
-         call buildkernels
-      else
-         call buildgkernel
-         call buildfkernel
-      end if
-      lmdadeltag = efreetot()
       return
       end
 c

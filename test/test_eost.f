@@ -68,6 +68,8 @@ c
      &   call test_eost_save
       if (.not. skiptest(tname//'_restart','ost',2))
      &   call test_eost_restart
+      if (.not. skiptest(tname//'_histformat','ost',2))
+     &   call test_eost_histformat
       if (.not. skiptest(tname//'_meta','ost',2))
      &   call test_eost_meta
       if (.not. skiptest(tname//'_metaimage','ost',2))
@@ -426,6 +428,144 @@ c
 c
 c     restore the global state
 c
+      filename = filename0
+      leng = leng0
+      kelvin = kelvin0
+      use_ost = .false.
+      fastkernel = .false.
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine test_eost_histformat  --  ost history layout  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "test_eost_histformat" checks that history rows read the same
+c     whether written by "prtosthist", in free format, or in a layout
+c     of the same length whose fields are shifted, which must not go
+c     through the fixed-format read
+c
+c
+      subroutine test_eost_histformat
+      use bath
+      use dlmda
+      use files
+      use ost
+      implicit none
+      integer i,ihis
+      integer ios
+      integer leng0
+      integer nline
+      integer freeunit
+      integer trimtext
+      integer ih0(3),k0(3)
+      real*8 kelvin0
+      real*8 l0(3),f0(3),h0(3)
+      real*8 wl0(3),wf0(3)
+      logical exist
+      character*240 filename0
+      character*240 ostfile
+      character*240 line(20)
+c
+c
+c     write a small history to a temporary file
+c
+      filename0 = filename
+      leng0 = leng
+      kelvin0 = kelvin
+      kelvin = 300.0d0
+      filename = 'tinkertest-osthistfmt'
+      leng = len_trim(filename)
+      ostfile = filename(1:leng)//'.ost'
+      inquire (file=ostfile,exist=exist)
+      if (exist) then
+         ihis = freeunit ()
+         open (unit=ihis,file=ostfile,status='old')
+         close (unit=ihis,status='delete')
+      end if
+      call resetost (3,5,3)
+      use_ost = .true.
+      fastkernel = .true.
+      nlmdasave = 0
+      lmdastep = 10
+      lmdatheta = 0.0d0
+      lmdavtheta = 0.0d0
+      lmdamass = 1.0d0
+      lmdafric = 1.0d0
+      lmdadt = 0.001d0
+      call sethist (1,0.1d0,1.0d0,2.0d0,0.01d0,1.0d0)
+      call sethist (2,0.7d0,-1.75d0,3.0d0,0.02d0,1.5d0)
+      call sethist (3,0.3d0,0.5d0,4.0d0,0.01d0,1.0d0)
+      lmdaihist(1) = 10
+      lmdaihist(2) = 1234567
+      lmdaihist(3) = 30
+      call initostfile
+      nlmdahist = 3
+      call saveost
+      do i = 1, 3
+         ih0(i) = lmdaihist(i)
+         k0(i) = osthist(i)
+         l0(i) = lmdalhist(i)
+         f0(i) = lmdafhist(i)
+         h0(i) = osthhist(i)
+         wl0(i) = ostwlhist(i)
+         wf0(i) = ostwfhist(i)
+      end do
+c
+c     rewrite the first row in free format and shift the integer
+c     fields of the second row by one column at the same length
+c
+      ihis = freeunit ()
+      open (unit=ihis,file=ostfile,status='old')
+      nline = 0
+      do
+         read (ihis,'(a)',iostat=ios)  line(nline+1)
+         if (ios .ne. 0)  exit
+         nline = nline + 1
+      end do
+      close (unit=ihis)
+      write (line(nline-2),10)  ih0(1),k0(1),l0(1),f0(1),h0(1),
+     &                          wl0(1),wf0(1)
+   10 format (2i6,5es25.17)
+      write (line(nline-1),20)  ih0(2),k0(2),l0(2),f0(2),h0(2),
+     &                          wl0(2),wf0(2)
+   20 format (i13,i11,5d26.16)
+      call assert_int (trimtext(line(nline-1)),154,
+     &                 'shifted ost history row has the fixed length')
+      open (unit=ihis,file=ostfile,status='old')
+      do i = 1, nline
+         write (ihis,'(a)')  line(i)(1:trimtext(line(i)))
+      end do
+      close (unit=ihis)
+c
+c     every row must restore its saved values exactly
+c
+      kelvin = 111.0d0
+      call rdost
+      call assert_int (nlmdahist,3,'ost history format row count')
+      do i = 1, 3
+         call assert_int (lmdaihist(i),ih0(i),'ost history format step')
+         call assert_int (osthist(i),k0(i),'ost history format bin')
+         call assert_real (lmdalhist(i),l0(i),0.0d0,
+     &                     'ost history format lambda')
+         call assert_real (lmdafhist(i),f0(i),0.0d0,
+     &                     'ost history format flambda')
+         call assert_real (osthhist(i),h0(i),0.0d0,
+     &                     'ost history format height')
+         call assert_real (ostwlhist(i),wl0(i),0.0d0,
+     &                     'ost history format lambda width')
+         call assert_real (ostwfhist(i),wf0(i),0.0d0,
+     &                     'ost history format flambda width')
+      end do
+c
+c     remove the file and restore the global state
+c
+      open (unit=ihis,file=ostfile,status='old')
+      close (unit=ihis,status='delete')
       filename = filename0
       leng = leng0
       kelvin = kelvin0
