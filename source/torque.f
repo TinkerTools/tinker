@@ -230,9 +230,13 @@ c
             t2(j) = t2(j) / t2siz
          end do
          ut1cos = u(1)*t1(1) + u(2)*t1(2) + u(3)*t1(3)
-         ut1sin = sqrt(1.0d0 - ut1cos*ut1cos)
+         ut1sin = s(1)*(u(2)*t1(3)-u(3)*t1(2))
+     &               + s(2)*(u(3)*t1(1)-u(1)*t1(3))
+     &               + s(3)*(u(1)*t1(2)-u(2)*t1(1))
          ut2cos = u(1)*t2(1) + u(2)*t2(2) + u(3)*t2(3)
-         ut2sin = sqrt(1.0d0 - ut2cos*ut2cos)
+         ut2sin = s(1)*(u(2)*t2(3)-u(3)*t2(2))
+     &               + s(2)*(u(3)*t2(1)-u(1)*t2(3))
+     &               + s(3)*(u(1)*t2(2)-u(2)*t2(1))
       end if
 c
 c     force distribution for Z-Only local coordinate frame
