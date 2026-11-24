@@ -1,0 +1,140 @@
+# triethylamine with a deliberately asymmetric 3-Fold N multipole (in-plane dipole and
+# off-diagonal quadrupole), so the torque about the trisector is large; test fixture only
+
+
+      ##############################
+      ##                          ##
+      ##  Force Field Definition  ##
+      ##                          ##
+      ##############################
+
+
+forcefield              AMOEBA-BIO-2018
+
+bond-cubic              -2.55
+bond-quartic            3.793125
+angle-cubic             -0.014
+angle-quartic           0.000056
+angle-pentic            -0.0000007
+angle-sextic            0.000000022
+opbendtype              ALLINGER
+opbend-cubic            -0.014
+opbend-quartic          0.000056
+opbend-pentic           -0.0000007
+opbend-sextic           0.000000022
+torsionunit             0.5
+vdwtype                 BUFFERED-14-7
+radiusrule              CUBIC-MEAN
+radiustype              R-MIN
+radiussize              DIAMETER
+epsilonrule             HHG
+dielectric              1.0
+polarization            MUTUAL
+vdw-12-scale            0.0
+vdw-13-scale            0.0
+vdw-14-scale            1.0
+vdw-15-scale            1.0
+mpole-12-scale          0.0
+mpole-13-scale          0.0
+mpole-14-scale          0.4
+mpole-15-scale          0.8
+polar-12-scale          0.0
+polar-13-scale          0.0
+polar-14-scale          1.0
+polar-15-scale          1.0
+polar-12-intra          0.0
+polar-13-intra          0.0
+polar-14-intra          0.5
+polar-15-intra          1.0
+direct-11-scale         0.0
+direct-12-scale         1.0
+direct-13-scale         1.0
+direct-14-scale         1.0
+mutual-11-scale         1.0
+mutual-12-scale         1.0
+mutual-13-scale         1.0
+mutual-14-scale         1.0
+
+atom          401    401    C     "triethylamine       "         6    12.011    4
+atom          402    402    C     "triethylamine       "         6    12.011    4
+atom          403    403    N     "triethylamine       "         7    14.007    3
+atom          404    404    H     "triethylamine       "         1     1.008    1
+atom         405   405    H     "triethylamine       "         1     1.008    1
+torsion 402 403 402 401 0.000 0.0 1 0.000 180.0 2 0.299 0.0 3
+torsion 401 402 403 402 0.000 0.0 1 0.000 180.0 2 0.299 0.0 3
+torsion 403 402 401 404 0.000 0.0 1  0.000 180.0 2  0.422 0.0 3
+torsion 405 402 401 404 0.000 0.0 1  0.000 180.0 2  0.190 0.0 3
+torsion 405 402 403 402 0.072 0.0 1  -0.012 180.0 2  0.563 0.0 3
+polarize           401          1.4150     0.3900 404
+polarize           402          1.6200     0.3900 403 405
+polarize           403          1.1850     0.3900 402
+polarize           404          0.4800     0.3900 401
+polarize          405          0.4800     0.3900 402
+multipole   401  402  403              -0.14339
+                                        0.00849    0.00000    0.24245
+                                       -0.29910
+                                        0.00000   -0.18332
+                                        0.02688    0.00000    0.48242
+multipole   402  403  401               0.00178
+                                        0.39336    0.00000    0.31080
+                                       -0.04702
+                                        0.00000   -0.47656
+                                       -0.06375    0.00000    0.52358
+multipole   403 -402 -402 -402         -0.21225
+                                         0.30000    0.15000    0.08466
+                                         0.40000
+                                         0.25000    0.78000
+                                         0.20000   -0.12000   -1.18000
+multipole   404  401  402               0.05918
+                                        0.02203    0.00000   -0.06480
+                                        0.03859
+                                        0.00000   -0.01153
+                                       -0.01080    0.00000   -0.02706
+multipole   405  402  403               0.01741
+                                       -0.08858    0.00000   -0.12492
+                                       -0.08911
+                                        0.00000    0.11218
+                                       -0.14449    0.00000   -0.02307
+chgpen           401          0.0000    0.00000
+chgpen           402          0.0000    0.00000
+chgpen           403          0.0000    0.00000
+chgpen           404          0.0000    0.00000
+chgpen           405          0.0000    0.00000
+bond   401   402   203.3112   1.5020
+bond   401   404   345.9789   1.0931
+bond   402   403   216.4607   1.4089
+bond   402   405   340.5325   1.0997
+angle   402   401   404   50.8848   110.162
+angle   404   401   404   36.4069   108.787
+angle   401   402   403   98.1662   111.101
+angle   401   402   405   47.0688   110.195
+angle   403   402   405   57.2776   108.497
+angle   405   402   405   30.4905   108.260
+angle 402 403 402 90.7177 110.112
+strbnd   402   401   404   5.7126   5.7126
+strbnd   404   401   404   5.7126   5.7126
+strbnd   401   402   403   5.7126   5.7126
+strbnd   401   402   405   5.7126   5.7126
+strbnd   403   402   405   5.7126   5.7126
+strbnd   405   402   405   5.7126   5.7126
+strbnd   402   403   402   22.6877   22.6877
+vdw 401 3.8200  0.1010
+vdw 402 3.8200  0.1010
+vdw 403 3.7100  0.1100
+vdw 404 2.9600  0.0240  0.920
+vdw 405 2.9800  0.0240  0.940
+solute 404 3.143   3.374   4.144   0.1350
+solute 405 3.0352   2.686   3.3152   0.1350
+solute 401 3.5062   3.309   4.536   0.1350
+solute 402 3.3025   2.854   4.9016   0.1350
+solute 403 3.4243   3.491   4.2676   0.1350
+
+# sodium ion from amoebabio18, placed beside the N to give a large field across the trisector
+atom        352   93    Na+   "Sodium Ion Na+"              11    22.990    0
+vdw          93               2.9550     0.2800
+multipole   352    0    0               1.00000
+                                        0.00000    0.00000    0.00000
+                                        0.00000
+                                        0.00000    0.00000
+                                        0.00000    0.00000    0.00000
+polarize    352          0.1200     0.3900

@@ -47,15 +47,12 @@ c
       real*8 uvsiz,uwsiz,vwsiz
       real*8 ursiz,ussiz
       real*8 vssiz,wssiz
-      real*8 delsiz,dphiddel
       real*8 uvcos,uwcos,urcos
       real*8 vwcos,vscos,wscos
-      real*8 upcos,vpcos,wpcos
-      real*8 rwcos,rucos,rvcos
+      real*8 upcos,udot,vdot,wdot
       real*8 ut1cos,ut2cos
       real*8 uvsin,uwsin,ursin
       real*8 vwsin,vssin,wssin
-      real*8 rwsin,rusin,rvsin
       real*8 ut1sin,ut2sin
       real*8 dphidu,dphidv,dphidw
       real*8 dphidr,dphids
@@ -106,7 +103,7 @@ c
          v(3) = 0.0d0
          vsiz = 1.0d0
          dot = u(1) / usiz
-         if (abs(dot) .gt. 0.866d0) then
+         if (abs(dot) .gt. 0.707d0) then
             v(1) = 0.0d0
             v(2) = 1.0d0
          end if
@@ -293,102 +290,52 @@ c
             frcy(j) = frcy(j) + dw
          end do
 c
-c     force distribution for 3-Fold local coordinate frame
+c     force distribution for 3-Fold local coordinate frame, where
+c     the z-axis p is the unit trisector of u, v and w, the x-axis r
+c     is u made perpendicular to p, and s = p x r; the frame rotates
+c     by p x dp + (s.dr) p, so eps = dE/d(u+v+w) and t1 = dE/du
 c
       else if (axetyp .eq. '3-Fold') then
          p(1) = u(1) + v(1) + w(1)
          p(2) = u(2) + v(2) + w(2)
          p(3) = u(3) + v(3) + w(3)
-         psiz = sqrt(p(1)*p(1)+p(2)*p(2)+p(3)*p(3)) 
-         do j = 1, 3 
+         psiz = sqrt(p(1)*p(1)+p(2)*p(2)+p(3)*p(3))
+         do j = 1, 3
             p(j) = p(j) / psiz
          end do
-         wpcos = w(1)*p(1) + w(2)*p(2) + w(3)*p(3)
          upcos = u(1)*p(1) + u(2)*p(2) + u(3)*p(3)
-         vpcos = v(1)*p(1) + v(2)*p(2) + v(3)*p(3)
-         r(1) = u(1) + v(1)
-         r(2) = u(2) + v(2)
-         r(3) = u(3) + v(3)
+         do j = 1, 3
+            r(j) = u(j) - upcos*p(j)
+         end do
          rsiz = sqrt(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
          do j = 1, 3
             r(j) = r(j) / rsiz
          end do
-         rwcos = r(1)*w(1) + r(2)*w(2) + r(3)*w(3)
-         rwsin = sqrt(1.0d0 - rwcos*rwcos)
-         dphidr = -trq(1)*r(1) - trq(2)*r(2) - trq(3)*r(3)
-         del(1) = r(2)*w(3) - r(3)*w(2)
-         del(2) = r(3)*w(1) - r(1)*w(3) 
-         del(3) = r(1)*w(2) - r(2)*w(1)
-         delsiz = sqrt(del(1)*del(1)+del(2)*del(2)+del(3)*del(3))    
+         s(1) = p(2)*r(3) - p(3)*r(2)
+         s(2) = p(3)*r(1) - p(1)*r(3)
+         s(3) = p(1)*r(2) - p(2)*r(1)
+         del(1) = trq(2)*p(3) - trq(3)*p(2)
+         del(2) = trq(3)*p(1) - trq(1)*p(3)
+         del(3) = trq(1)*p(2) - trq(2)*p(1)
+         dot = trq(1)*p(1) + trq(2)*p(2) + trq(3)*p(3)
          do j = 1, 3
-            del(j) = del(j) / delsiz
+            eps(j) = (dot*upcos*s(j)/rsiz-del(j)) / psiz
+            t1(j) = eps(j) - dot*s(j)/rsiz
          end do
-         dphiddel = -trq(1)*del(1) - trq(2)*del(2) - trq(3)*del(3)
-         eps(1) = del(2)*w(3) - del(3)*w(2)
-         eps(2) = del(3)*w(1) - del(1)*w(3)
-         eps(3) = del(1)*w(2) - del(2)*w(1)
+         udot = t1(1)*u(1) + t1(2)*u(2) + t1(3)*u(3)
+         vdot = eps(1)*v(1) + eps(2)*v(2) + eps(3)*v(3)
+         wdot = eps(1)*w(1) + eps(2)*w(2) + eps(3)*w(3)
          do j = 1, 3
-            dw = del(j)*dphidr/(wsiz*rwsin)
-     &              + eps(j)*dphiddel*wpcos/(wsiz*psiz) 
-            de(j,id) = de(j,id) + dw
-            de(j,ib) = de(j,ib) - dw
-            frcy(j) = frcy(j) + dw
-         end do
-         r(1) = v(1) + w(1)
-         r(2) = v(2) + w(2)
-         r(3) = v(3) + w(3)
-         rsiz = sqrt(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
-         do j = 1, 3
-            r(j) = r(j) / rsiz
-         end do
-         rucos = r(1)*u(1) + r(2)*u(2) + r(3)*u(3)
-         rusin = sqrt(1.0d0 - rucos*rucos) 
-         dphidr = -trq(1)*r(1) - trq(2)*r(2) - trq(3)*r(3)
-         del(1) = r(2)*u(3) - r(3)*u(2)
-         del(2) = r(3)*u(1) - r(1)*u(3)
-         del(3) = r(1)*u(2) - r(2)*u(1)
-         delsiz = sqrt(del(1)*del(1)+del(2)*del(2)+del(3)*del(3))
-         do j = 1, 3
-            del(j) = del(j) / delsiz
-         end do
-         dphiddel = -trq(1)*del(1) - trq(2)*del(2) - trq(3)*del(3)
-         eps(1) = del(2)*u(3) - del(3)*u(2)
-         eps(2) = del(3)*u(1) - del(1)*u(3)
-         eps(3) = del(1)*u(2) - del(2)*u(1)
-         do j = 1, 3
-            du = del(j)*dphidr/(usiz*rusin)
-     &              + eps(j)*dphiddel*upcos/(usiz*psiz)
+            du = (t1(j)-udot*u(j)) / usiz
+            dv = (eps(j)-vdot*v(j)) / vsiz
+            dw = (eps(j)-wdot*w(j)) / wsiz
             de(j,ia) = de(j,ia) + du
-            de(j,ib) = de(j,ib) - du
-            frcz(j) = frcz(j) + du
-         end do
-         r(1) = u(1) + w(1)
-         r(2) = u(2) + w(2)
-         r(3) = u(3) + w(3)
-         rsiz = sqrt(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
-         do j = 1, 3
-            r(j) = r(j) / rsiz
-         end do
-         rvcos = r(1)*v(1) + r(2)*v(2) + r(3)*v(3) 
-         rvsin = sqrt(1.0d0 - rvcos*rvcos)
-         dphidr = -trq(1)*r(1) - trq(2)*r(2) - trq(3)*r(3)
-         del(1) = r(2)*v(3) - r(3)*v(2)
-         del(2) = r(3)*v(1) - r(1)*v(3)
-         del(3) = r(1)*v(2) - r(2)*v(1)
-         delsiz = sqrt(del(1)*del(1)+del(2)*del(2)+del(3)*del(3))
-         do j = 1, 3
-            del(j) = del(j) / delsiz
-         end do
-         dphiddel = -trq(1)*del(1) - trq(2)*del(2) - trq(3)*del(3)
-         eps(1) = del(2)*v(3) - del(3)*v(2)
-         eps(2) = del(3)*v(1) - del(1)*v(3)
-         eps(3) = del(1)*v(2) - del(2)*v(1)
-         do j = 1, 3
-            dv = del(j)*dphidr/(vsiz*rvsin)
-     &              + eps(j)*dphiddel*vpcos/(vsiz*psiz)
             de(j,ic) = de(j,ic) + dv
-            de(j,ib) = de(j,ib) - dv
+            de(j,id) = de(j,id) + dw
+            de(j,ib) = de(j,ib) - du - dv - dw
+            frcz(j) = frcz(j) + du
             frcx(j) = frcx(j) + dv
+            frcy(j) = frcy(j) + dw
          end do
       end if
       return

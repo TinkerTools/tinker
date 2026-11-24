@@ -139,6 +139,7 @@ c
       call test_strbnd
       call test_strtor
       call test_thermint
+      call test_threefold
       call test_torsion
       call test_tortor
       call test_truncated8
