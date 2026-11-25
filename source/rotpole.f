@@ -132,6 +132,8 @@ c
       real*8 dx2,dy2,dz2
       real*8 dx3,dy3,dz3
       real*8 dx4,dy4,dz4
+      real*8 dx5,dy5,dz5
+      real*8 dx6,dy6,dz6
       real*8 a(3,3)
       logical planar
       character*8 axetyp
@@ -300,8 +302,10 @@ c        eps = 15.0d0
          a(2,1) = dy / r
          a(3,1) = dz / r
 c
-c     get 3-Fold rotation matrix elements for z- and x-axes;
-c     use alternate z-axis if central atom is close to planar
+c     get 3-Fold rotation matrix elements for z- and x-axes, where
+c     z is the trisector of the three bonds and x is the x-axis bond
+c     made perpendicular to z; use alternate z-axis if the central
+c     atom is close to planar
 c
       else if (axetyp .eq. '3-Fold') then
          dx = x(iz) - xi
@@ -333,15 +337,15 @@ c        eps = 0.15d0
          eps = 0.0d0
          if (r .lt. eps) then
             planar = .true.
-            dx2 = x(ix) - x(iz)
-            dy2 = y(ix) - y(iz)
-            dz2 = z(ix) - z(iz)
-            dx3 = x(iy) - x(iz)
-            dy3 = y(iy) - y(iz)
-            dz3 = z(iy) - z(iz)
-            dx4 = dy2*dz3 - dz2*dy3
-            dy4 = dz2*dx3 - dx2*dz3
-            dz4 = dx2*dy3 - dy2*dx3
+            dx5 = x(ix) - x(iz)
+            dy5 = y(ix) - y(iz)
+            dz5 = z(ix) - z(iz)
+            dx6 = x(iy) - x(iz)
+            dy6 = y(iy) - y(iz)
+            dz6 = z(iy) - z(iz)
+            dx4 = dy5*dz6 - dz5*dy6
+            dy4 = dz5*dx6 - dx5*dz6
+            dz4 = dx5*dy6 - dy5*dx6
             dot = dx4*dx + dy4*dy + dz4*dz
             if (dot .gt. 0.0d0) then
                dx = dx4
@@ -357,10 +361,10 @@ c        eps = 0.15d0
          a(1,3) = dx / r
          a(2,3) = dy / r
          a(3,3) = dz / r
-         dot = dx1*a(1,3) + dy1*a(2,3) + dz1*a(3,3)
-         dx = dx1 - dot*a(1,3)
-         dy = dy1 - dot*a(2,3)
-         dz = dz1 - dot*a(3,3)
+         dot = dx2*a(1,3) + dy2*a(2,3) + dz2*a(3,3)
+         dx = dx2 - dot*a(1,3)
+         dy = dy2 - dot*a(2,3)
+         dz = dz2 - dot*a(3,3)
          r = sqrt(dx*dx + dy*dy + dz*dz)
          a(1,1) = dx / r
          a(2,1) = dy / r

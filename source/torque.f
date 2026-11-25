@@ -49,7 +49,7 @@ c
       real*8 vssiz,wssiz
       real*8 uvcos,uwcos,urcos
       real*8 vwcos,vscos,wscos
-      real*8 upcos,udot,vdot,wdot
+      real*8 vpcos,udot,vdot,wdot
       real*8 ut1cos,ut2cos
       real*8 uvsin,uwsin,ursin
       real*8 vwsin,vssin,wssin
@@ -292,8 +292,8 @@ c
 c
 c     force distribution for 3-Fold local coordinate frame, where
 c     the z-axis p is the unit trisector of u, v and w, the x-axis r
-c     is u made perpendicular to p, and s = p x r; the frame rotates
-c     by p x dp + (s.dr) p, so eps = dE/d(u+v+w) and t1 = dE/du
+c     is v made perpendicular to p, and s = p x r; the frame rotates
+c     by p x dp + (s.dr) p, so eps = dE/d(u+v+w) and t1 = dE/dv
 c
       else if (axetyp .eq. '3-Fold') then
          p(1) = u(1) + v(1) + w(1)
@@ -303,9 +303,9 @@ c
          do j = 1, 3
             p(j) = p(j) / psiz
          end do
-         upcos = u(1)*p(1) + u(2)*p(2) + u(3)*p(3)
+         vpcos = v(1)*p(1) + v(2)*p(2) + v(3)*p(3)
          do j = 1, 3
-            r(j) = u(j) - upcos*p(j)
+            r(j) = v(j) - vpcos*p(j)
          end do
          rsiz = sqrt(r(1)*r(1)+r(2)*r(2)+r(3)*r(3))
          do j = 1, 3
@@ -319,15 +319,15 @@ c
          del(3) = trq(1)*p(2) - trq(2)*p(1)
          dot = trq(1)*p(1) + trq(2)*p(2) + trq(3)*p(3)
          do j = 1, 3
-            eps(j) = (dot*upcos*s(j)/rsiz-del(j)) / psiz
+            eps(j) = (dot*vpcos*s(j)/rsiz-del(j)) / psiz
             t1(j) = eps(j) - dot*s(j)/rsiz
          end do
-         udot = t1(1)*u(1) + t1(2)*u(2) + t1(3)*u(3)
-         vdot = eps(1)*v(1) + eps(2)*v(2) + eps(3)*v(3)
+         udot = eps(1)*u(1) + eps(2)*u(2) + eps(3)*u(3)
+         vdot = t1(1)*v(1) + t1(2)*v(2) + t1(3)*v(3)
          wdot = eps(1)*w(1) + eps(2)*w(2) + eps(3)*w(3)
          do j = 1, 3
-            du = (t1(j)-udot*u(j)) / usiz
-            dv = (eps(j)-vdot*v(j)) / vsiz
+            du = (eps(j)-udot*u(j)) / usiz
+            dv = (t1(j)-vdot*v(j)) / vsiz
             dw = (eps(j)-wdot*w(j)) / wsiz
             de(j,ia) = de(j,ia) + du
             de(j,ic) = de(j,ic) + dv

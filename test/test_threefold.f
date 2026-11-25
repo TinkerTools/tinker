@@ -9,7 +9,7 @@ c
 c
 c     "test_threefold" checks the force distribution of torques on a
 c     3-Fold local frame, whose z-axis is the trisector of the three
-c     bond vectors and whose x-axis comes from the z-axis atom alone
+c     bond vectors and whose x-axis comes from the x-axis atom alone
 c
 c     the fixture is triethylamine with an asymmetric 3-Fold N
 c     multipole (in-plane dipole and off-diagonal quadrupole) and a
