@@ -1766,6 +1766,8 @@ void evcorrset_(int* dsp, double* wg, double* dwg, double* d2wg, int* nvt, int* 
 #define tinker_f_evcorrset evcorrset_
 double ehalpr_(double* r, double* rv, double* rv7, double* eps);
 #define tinker_f_ehalpr ehalpr_
+double evcorre_(int* dsp, double* r, double* cik, double* rv, double* rv2, double* rv6, double* rv7, double* eps);
+#define tinker_f_evcorre evcorre_
 
 // exfield.f
 void exfield_(char* mode, double* exf, tinker_fchar_len_t mode_cap);

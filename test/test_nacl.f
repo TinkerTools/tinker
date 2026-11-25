@@ -25,6 +25,8 @@ c
       call test_nacl_ehal_switch_near_off
       call test_nacl_ehal_evcorr_full
       call test_nacl_ehal_evcorr_lambda
+      call test_nacl_ehal_evcorr_trunc
+      call test_nacl_ehal_evcorr_lambda_trunc
       call test_nacl_empole_nonewald
       call test_nacl_empole_ewald
       return
@@ -132,6 +134,64 @@ c
       call test_nacl_vdw_case ('nacl1','nacl_vdw_lambda.key',
      &   'nacl_ehal_evcorr_lambda',25.8220d0,1,81.9570d0,
      &   -180.865d0,-0.560d0,-0.560d0,.false.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_nacl_ehal_evcorr_trunc  --  sharp evcorr  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_nacl_ehal_evcorr_trunc" repeats the full correction under
+c     a sharp cutoff, whose tail starts at the 2.6 Ang cutoff instead
+c     of the taper distance, and whose virial adds the boundary term
+c     -off^3 E(off) of each pair class over three times the volume;
+c     the references come from an independent quadrature of the hal
+c     tail at the same grid, giving an elrc of 0.203342, and from the
+c     closed form hal pair energy at the cutoff for the boundary term
+c     of -1.092460, giving a vlrc of -1.295802
+c
+c
+      subroutine test_nacl_ehal_evcorr_trunc
+      implicit none
+c
+c
+      call test_nacl_vdw_case ('nacl1','nacl_vdw_corr_trunc.key',
+     &   'nacl_ehal_evcorr_trunc',51.6275d0,1,184.4899d0,
+     &   -407.174d0,-1.2958d0,-1.2958d0,.true.)
+      call test_nacl_vdw_case ('nacl1','nacl_vdw_corr_trunc.key',
+     &   'nacl_ehal_evcorr_trunc',51.6275d0,1,184.4899d0,
+     &   -407.174d0,-1.2958d0,-1.2958d0,.false.)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_nacl_ehal_evcorr_lambda_trunc  --  sharp  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_nacl_ehal_evcorr_lambda_trunc" repeats the lambda scaled
+c     correction under a sharp cutoff, where the sodium and chloride
+c     class pair carries 0.9^5 in both the tail and its boundary term,
+c     giving an elrc of 0.185023 and a vlrc of -1.096243
+c
+c
+      subroutine test_nacl_ehal_evcorr_lambda_trunc
+      implicit none
+c
+c
+      call test_nacl_vdw_case ('nacl1','nacl_vdw_lambda_trunc.key',
+     &   'nacl_ehal_evcorr_lambda_trunc',25.4473d0,1,81.9570d0,
+     &   -181.402d0,-1.0962d0,-1.0962d0,.true.)
+      call test_nacl_vdw_case ('nacl1','nacl_vdw_lambda_trunc.key',
+     &   'nacl_ehal_evcorr_lambda_trunc',25.4473d0,1,81.9570d0,
+     &   -181.402d0,-1.0962d0,-1.0962d0,.false.)
       return
       end
 c

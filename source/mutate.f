@@ -1787,7 +1787,7 @@ c     zero lambda unless the exponent is one or at least two and the
 c     sum of the exponents is at least two
 c
       dspcut = dispcut
-      if (use_dcorr)  dspcut = disptaper
+      if (use_dcorr)  dspcut = min(disptaper,dispcut)
       if (use_dewald)  dspcut = dewaldcut
       call dspsoftchk (scrdsp,scexpd,scexpdq,dspcut)
 c

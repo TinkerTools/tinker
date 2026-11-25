@@ -42,6 +42,7 @@ c
       integer, allocatable :: bvt(:)
       real*8 elrc,etot
       real*8 range,rdelta
+      real*8 rstart
       real*8 fi,fk,fik
       real*8 fie,fia,fib
       real*8 fke,fka,fkb
@@ -52,11 +53,9 @@ c
       real*8 d2wg(0:2,0:2)
       real*8 offset,taper
       real*8 rv,rv2,rv6,rv7
-      real*8 r,r2,r3,r4
-      real*8 r5,r6
-      real*8 cik,p,p6,p12
-      real*8 expterm
-      real*8 ehalpr
+      real*8 r,r2,r3,r4,r5
+      real*8 cik
+      real*8 evcorre
       logical dsp
       character*6 mode
 c
@@ -78,13 +77,16 @@ c     set the coefficients for the switching function
 c
       call switch (mode)
 c
-c     set number of steps and range for numerical integration
+c     set number of steps and range for numerical integration, which
+c     starts at the taper distance, or at the cutoff when truncation
+c     has moved the taper distance beyond the cutoff
 c
       nstep = 2
       range = 100.0d0
-      ndelta = int(dble(nstep)*(range-cut))
-      rdelta = (range-cut) / dble(ndelta)
-      offset = cut - 0.5d0*rdelta
+      rstart = min(cut,off)
+      ndelta = int(dble(nstep)*(range-rstart))
+      rdelta = (range-rstart) / dble(ndelta)
+      offset = rstart - 0.5d0*rdelta
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -139,23 +141,7 @@ c
                r = offset + dble(j)*rdelta
                r2 = r * r
                r3 = r2 * r
-               r6 = r3 * r3
-               e = 0.0d0
-               if (dsp) then
-                  e = -cik / r6
-               else if (vdwtyp .eq. 'LENNARD-JONES') then
-                  p6 = rv6 / r6
-                  p12 = p6 * p6
-                  e = eps * (p12 - 2.0d0*p6)
-               else if (vdwtyp .eq. 'BUFFERED-14-7') then
-                  e = ehalpr (r,rv,rv7,eps)
-               else if (vdwtyp.eq.'BUCKINGHAM' .or.
-     &                  vdwtyp.eq.'MM3-HBOND') then
-                  p = sqrt(rv2/r2)
-                  p6 = rv6 / r6
-                  expterm = abuck * exp(-bbuck/p)
-                  e = eps * (expterm - cbuck*p6)
-               end if
+               e = evcorre (dsp,r,cik,rv,rv2,rv6,rv7,eps)
                if (r .lt. off) then
                   r4 = r2 * r2
                   r5 = r2 * r3
@@ -221,7 +207,10 @@ c
       real*8 delrc,dvlrc
       real*8 d2elrc
       real*8 etot
+      real*8 vbnd,dvbnd
+      real*8 ebnd,off3
       real*8 range,rdelta
+      real*8 rstart
       real*8 fi,fk,fik
       real*8 dfik,d2fik
       real*8 fie,fia,fib
@@ -234,16 +223,11 @@ c
       real*8 d2wg(0:2,0:2)
       real*8 taper
       real*8 rv,rv2,rv6,rv7
-      real*8 r,r2,r3,r4
-      real*8 r5,r6
-      real*8 cik,p,p6,p12
-      real*8 expterm
-      real*8 ehalpr
-      logical dsp
+      real*8 r,r2,r3,r4,r5
+      real*8 cik
+      real*8 evcorre
+      logical dsp,trunc
       character*6 mode
-c     real*8 vtot,de,dtaper
-c     real*8 r7,rho,tau,tau7
-c     real*8 dtau,gtau,rvterm
 c
 c
 c     choose the dispersion correction by mode, since a system may
@@ -267,13 +251,23 @@ c     set the coefficients for the switching function
 c
       call switch (mode)
 c
-c     set number of steps and range for numerical integration
+c     set number of steps and range for numerical integration, which
+c     starts at the taper distance, or at the cutoff when truncation
+c     has moved the taper distance beyond the cutoff
 c
       nstep = 2
       range = 100.0d0
-      ndelta = int(dble(nstep)*(range-cut))
-      rdelta = (range-cut) / dble(ndelta)
-      offset = cut - 0.5d0*rdelta
+      rstart = min(cut,off)
+      ndelta = int(dble(nstep)*(range-rstart))
+      rdelta = (range-rstart) / dble(ndelta)
+      offset = rstart - 0.5d0*rdelta
+c
+c     a sharp cutoff leaves a boundary term in the virial at "off"
+c
+      trunc = (cut .ge. off)
+      off3 = off * off * off
+      vbnd = 0.0d0
+      dvbnd = 0.0d0
 c
 c     perform dynamic allocation of some local arrays
 c
@@ -333,74 +327,51 @@ c
                rv7 = rv6 * rv
             end if
             etot = 0.0d0
-c           vtot = 0.0d0
             do j = 1, ndelta
                r = offset + dble(j)*rdelta
                r2 = r * r
                r3 = r2 * r
-               r6 = r3 * r3
-c              r7 = r6 * r
-               e = 0.0d0
-c              de = 0.0d0
-               if (dsp) then
-                  e = -cik / r6
-c                 de = 6.0d0 * cik / r7
-               else if (vdwtyp .eq. 'LENNARD-JONES') then
-                  p6 = rv6 / r6
-                  p12 = p6 * p6
-                  e = eps * (p12 - 2.0d0*p6)
-c                 de = eps * (p12-p6) * (-12.0d0/r)
-               else if (vdwtyp .eq. 'BUFFERED-14-7') then
-                  e = ehalpr (r,rv,rv7,eps)
-c                 rho = r7 + ghal*rv7
-c                 tau = (dhal+1.0d0) / (r+dhal*rv)
-c                 tau7 = tau**7
-c                 dtau = tau / (dhal+1.0d0)
-c                 gtau = eps*tau7*r6*(ghal+1.0d0)*(rv7/rho)**2
-c                 de = -7.0d0 * (dtau*e+gtau)
-               else if (vdwtyp.eq.'BUCKINGHAM' .or.
-     &                  vdwtyp.eq.'MM3-HBOND') then
-                  p = sqrt(rv2/r2)
-                  p6 = rv6 / r6
-c                 rvterm = -bbuck / rv
-                  expterm = abuck * exp(-bbuck/p)
-                  e = eps * (expterm - cbuck*p6)
-c                 de = eps * (rvterm*expterm+6.0d0*cbuck*p6/r)
-               end if
+               e = evcorre (dsp,r,cik,rv,rv2,rv6,rv7,eps)
                if (r .lt. off) then
                   r4 = r2 * r2
                   r5 = r2 * r3
                   taper = c5*r5 + c4*r4 + c3*r3 + c2*r2 + c1*r + c0
-c                 dtaper = 5.0d0*c5*r4 + 4.0d0*c4*r3
-c    &                        + 3.0d0*c3*r2 + 2.0d0*c2*r + c1
-c                 de = de*(1.0d0-taper) - e*dtaper
                   e = e*(1.0d0-taper)
                end if
                etot = etot + e*rdelta*r2
-c              vtot = vtot + de*rdelta*r3
             end do
             elrc = elrc + fik*etot
-c           vlrc = vlrc + fik*vtot
             delrc = delrc + dfik*etot
-c           dvlrc = dvlrc + dfik*vtot
             d2elrc = d2elrc + d2fik*etot
+            if (trunc) then
+               ebnd = off3 * evcorre (dsp,off,cik,rv,rv2,rv6,rv7,eps)
+               vbnd = vbnd + fik*ebnd
+               dvbnd = dvbnd + dfik*ebnd
+            end if
          end do
       end do
       elrc = elrc / volbox
-c     vlrc = vlrc / (3.0d0*volbox)
       delrc = delrc / volbox
-c     dvlrc = dvlrc / (3.0d0*volbox)
       d2elrc = d2elrc / volbox
 c
 c     the correction energy is a constant over the box volume, so
 c     its derivative under a strain of the box, which is its virial,
-c     is minus the energy itself; the separate quadrature of r^3 dE/dr
-c     kept above in comments gives the same value only in the limit
-c     of a fine grid, and broke this by up to tens of percent across
-c     the taper window at the grid spacing used here
+c     is minus the energy itself; a separate quadrature of r^3 dE/dr
+c     gives the same value only in the limit of a fine grid, and broke
+c     this by up to tens of percent across the taper window at the grid
+c     spacing used here
 c
-      vlrc = -elrc
-      dvlrc = -delrc
+c     integrating r^3 dE/dr by parts from the start of the tail leaves
+c     a boundary term r^3 E there, which a taper sends to zero; under
+c     a sharp cutoff it remains as -off^3 E(off), the impulse of pairs
+c     crossing the cutoff, which the truncated forces never carry but
+c     the pressure of the truncated or full potential does, assuming
+c     g(r) is unity at the cutoff; "testvir" differentiates a fixed
+c     configuration with no pair at the cutoff, and so its numerical
+c     virial differs from this one by exactly the boundary term
+c
+      vlrc = -elrc - vbnd/(3.0d0*volbox)
+      dvlrc = -delrc - dvbnd/(3.0d0*volbox)
 c
 c     perform deallocation of some local arrays
 c
@@ -515,5 +486,57 @@ c
       tau = (dhal+1.0d0) / (r+dhal*rv)
       tau7 = tau**7
       ehalpr = eps * rv7 * tau7 * ((ghal+1.0d0)*rv7/rho-2.0d0)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  function evcorre  --  untapered pair energy for the tail  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "evcorre" returns the untapered van der Waals or dispersion
+c     energy at distance r of a type or class pair, as integrated by
+c     the long range correction; "cik" is the dispersion coefficient
+c     product, and "rv", its powers and "eps" the van der Waals size
+c     and well depth, each used only by the matching potential
+c
+c
+      function evcorre (dsp,r,cik,rv,rv2,rv6,rv7,eps)
+      use vdwpot
+      implicit none
+      real*8 evcorre
+      real*8 r,cik,eps
+      real*8 rv,rv2,rv6,rv7
+      real*8 r2,r3,r6
+      real*8 p,p6,p12
+      real*8 expterm
+      real*8 ehalpr
+      logical dsp
+c
+c
+c     compute the pair energy for the chosen potential form
+c
+      r2 = r * r
+      r3 = r2 * r
+      r6 = r3 * r3
+      evcorre = 0.0d0
+      if (dsp) then
+         evcorre = -cik / r6
+      else if (vdwtyp .eq. 'LENNARD-JONES') then
+         p6 = rv6 / r6
+         p12 = p6 * p6
+         evcorre = eps * (p12 - 2.0d0*p6)
+      else if (vdwtyp .eq. 'BUFFERED-14-7') then
+         evcorre = ehalpr (r,rv,rv7,eps)
+      else if (vdwtyp.eq.'BUCKINGHAM' .or.
+     &         vdwtyp.eq.'MM3-HBOND') then
+         p = sqrt(rv2/r2)
+         p6 = rv6 / r6
+         expterm = abuck * exp(-bbuck/p)
+         evcorre = eps * (expterm - cbuck*p6)
+      end if
       return
       end

@@ -1,0 +1,11 @@
+## Lennard-Jones Argon Parameters (Rahman, Phys Rev, 136, A405, 1964)
+
+vdwtype                 LENNARD-JONES
+radiusrule              GEOMETRIC
+radiustype              SIGMA
+radiussize              DIAMETER
+epsilonrule             GEOMETRIC
+
+atom             3    Ar   "Argon Atom Ar"    18     39.948     0
+
+vdw              3                  3.405      0.2381

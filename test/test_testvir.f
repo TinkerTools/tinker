@@ -51,6 +51,17 @@ c     core Lennard-Jones and scaled partial charges, whose charge virial
 c     is kept apart from the main virial, under Ewald with a neighbor
 c     list and the long range correction
 c
+c     case 16 adds the long range hal correction to a liquid argon box
+c     under a sharp cutoff, whose virial carries the boundary term of
+c     pairs crossing the cutoff; the numerical virial of one fixed
+c     configuration cannot see it, so the analytical diagonal must
+c     exceed the numerical one by exactly that term, 11.50128 from the
+c     closed form hal pair energy at the cutoff
+c
+c     case 17 repeats case 16 with a Lennard-Jones argon, whose boundary
+c     term of 18.99825 comes from the closed form pair energy at the
+c     cutoff, sigma 3.405 Ang and epsilon 0.2381 kcal/mol
+c
 c
       subroutine test_testvir
       implicit none
@@ -75,6 +86,10 @@ c
      &                        '../testlmda/water2')
       call test_testvir_case ('15_tip3_ljchg_lambda_nlist_l05',
      &                        '../testlmda/tip3box')
+      call test_testvir_offset ('16_argon_trunc_corr','arbox',
+     &                          11.50128d0)
+      call test_testvir_offset ('17_argon_lj_trunc_corr','arbox',
+     &                          18.99825d0)
       return
       end
 c
@@ -88,15 +103,40 @@ c
 c
 c     "test_testvir_case" runs "testvir" on the given coordinates with
 c     the key file that shares the given base name, and checks that the
-c     analytical and numerical virial tensors in its output agree; the
-c     program prints three decimals, and the tolerance also absorbs the
-c     finite difference noise in the numerical virial
+c     analytical and numerical virial tensors in its output agree
 c
 c
       subroutine test_testvir_case (base,xyz)
+      implicit none
+      character*(*) base,xyz
+c
+c
+      call test_testvir_offset (base,xyz,0.0d0)
+      return
+      end
+c
+c
+c     ##########################################################
+c     ##                                                      ##
+c     ##  subroutine test_testvir_offset  --  offset testvir  ##
+c     ##                                                      ##
+c     ##########################################################
+c
+c
+c     "test_testvir_offset" runs "testvir" on the given coordinates
+c     with the key file that shares the given base name, and checks that
+c     the analytical virial equals the numerical one plus a known offset
+c     on each diagonal element, for a term that a finite difference of
+c     one fixed configuration cannot find; the program prints three
+c     decimals, and the tolerance also absorbs the finite difference
+c     noise in the numerical virial
+c
+c
+      subroutine test_testvir_offset (base,xyz,doff)
       use assert
       implicit none
-      integer ist
+      integer i,ist
+      real*8 doff
       real*8 vira(3,3),virn(3,3)
       logical skiptest,founda,foundn
       character*(*) base,xyz
@@ -123,6 +163,9 @@ c
          call popdir
          return
       end if
+      do i = 1, 3
+         virn(i,i) = virn(i,i) + doff
+      end do
       call assert_grad (vira,virn,3,1.0d-2,'test_testvir '//base)
       call execute_command_line ('rm -f out.txt')
       call popdir

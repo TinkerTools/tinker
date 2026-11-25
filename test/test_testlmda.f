@@ -171,6 +171,12 @@ c     the staged relative legs, the lig1 and lig2 legs of three stages,
 c     the van der Waals leg with the long range correction and list,
 c     and the lig1 leg in single topology
 c
+c     case 174 decouples the first water of that box with the long
+c     range correction under a sharp cutoff, where the virial carries
+c     the boundary term of pairs crossing the cutoff; its lambda
+c     derivative adds about 0.04 to each diagonal of dV/dL beyond
+c     minus the lambda derivative of the correction energy
+c
 c
       subroutine test_testlmda
       implicit none
@@ -463,6 +469,8 @@ c
       call test_testlmda_xyz ('172_octwat_rels_vdwm_vcorr_nlist_l05',
      &   '../truncated8/octwater','1e-4')
       call test_testlmda_xyz ('173_octwat_rels_lig1_st_l085',
+     &   '../truncated8/octwater','1e-4')
+      call test_testlmda_xyz ('174_octwat_ast_vcorr_trunc_nlist_l05',
      &   '../truncated8/octwater','1e-4')
       return
       end
