@@ -1553,7 +1553,7 @@ c
       integer nvar,iconf
       real*8 dterm,qterm
       real*8 xx(*)
-      logical done
+      logical done,axial
 c
 c
 c     translate optimization values back to partial charges
@@ -1603,6 +1603,10 @@ c
          i = ipole(ii)
          it = type(i)
          if (fatm(i))  done = .false.
+c
+c     Z-Only and 3-Fold sites are axial, with Qxx = Qyy = -Qzz/2
+c
+         axial = (polaxe(i).eq.'Z-Only' .or. polaxe(i).eq.'3-Fold')
          if (.not. done) then
             if (fitpol(it)) then
                done = .true.
@@ -1641,7 +1645,7 @@ c
                pole(4,i) = dterm * xx(nvar)
             end if
             if (fit_qpl .and. vpol(5,i,iconf)) then
-               if (polaxe(i) .ne. 'Z-Only') then
+               if (.not. axial) then
                   nvar = nvar + 1
                   pole(5,i) = qterm * xx(nvar)
                end if
@@ -1657,7 +1661,7 @@ c
                pole(11,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. vpol(9,i,iconf)) then
-               if (polaxe(i) .ne. 'Z-Only') then
+               if (.not. axial) then
                   nvar = nvar + 1
                   pole(9,i) = qterm * xx(nvar)
                end if
@@ -1668,7 +1672,7 @@ c
                pole(12,i) = qterm * xx(nvar)
             end if
             if (fit_qpl .and. vpol(13,i,iconf)) then
-               if (polaxe(i) .eq. 'Z-Only') then
+               if (axial) then
                   nvar = nvar + 1
                   pole(13,i) = qterm * xx(nvar)
                   pole(5,i) = -0.5d0 * pole(13,i)
@@ -1760,7 +1764,7 @@ c
       real*8 eps,sum,big
       real*8 ival,kval
       real*8 xx(*)
-      logical done
+      logical done,axial
       character*18 prmtyp
 c
 c
@@ -2018,6 +2022,10 @@ c
          i = ipole(ii)
          it = type(i)
          if (fatm(i))  done = .false.
+c
+c     Z-Only and 3-Fold sites are axial, with Qxx = Qyy = -Qzz/2
+c
+         axial = (polaxe(i).eq.'Z-Only' .or. polaxe(i).eq.'3-Fold')
          if (.not. done) then
             if (fitpol(it))  done = .true.
             fitpol(it) = .true.
@@ -2068,7 +2076,7 @@ c
   170          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. vpol(5,i,iconf)) then
-               if (polaxe(i) .ne. 'Z-Only') then
+               if (.not. axial) then
                   nvar = nvar + 1
                   varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(5,i)
@@ -2103,7 +2111,7 @@ c
   240          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. vpol(9,i,iconf)) then
-               if (polaxe(i) .ne. 'Z-Only') then
+               if (.not. axial) then
                   nvar = nvar + 1
                   varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(9,i)
@@ -2128,7 +2136,7 @@ c
   290          format (4x,'--',7x,i8,' Type',10x,a8,4x,f12.5,10x,'X')
             end if
             if (fit_qpl .and. vpol(13,i,iconf)) then
-               if (polaxe(i) .eq. 'Z-Only') then
+               if (axial) then
                   nvar = nvar + 1
                   varpot(nvar) = 'QUADPL'
                   xx(nvar) = qterm * pole(13,i)

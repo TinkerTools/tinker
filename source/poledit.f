@@ -4361,7 +4361,10 @@ c
       call upcase (answer)
       if (answer .eq. 'N')  symm = .false.
 c
-c     remove multipole components that are zero by symmetry
+c     remove multipole components that are zero by symmetry; a
+c     3-Fold site has three equivalent neighbors, so which one sets
+c     the x-axis is arbitrary and, as for Z-Only, only the parts of
+c     the multipole that are symmetric about the z-axis are kept
 c
       if (symm) then
          do ii = 1, npole
@@ -4378,7 +4381,8 @@ c
                   pole(j,i) = 0.0d0
                end do
             end if
-            if (polaxe(i) .eq. 'Z-Only') then
+            if (polaxe(i).eq.'Z-Only' .or.
+     &          polaxe(i).eq.'3-Fold') then
                pole(2,i) = 0.0d0
                pole(3,i) = 0.0d0
                pole(5,i) = -0.5d0 * pole(13,i)
