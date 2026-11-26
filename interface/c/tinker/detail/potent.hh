@@ -38,6 +38,7 @@ extern int TINKER_MOD(potent, use_born);
 extern int TINKER_MOD(potent, use_orbit);
 extern int TINKER_MOD(potent, use_mutate);
 extern int TINKER_MOD(potent, use_colvar);
+extern int TINKER_MOD(potent, use_nn);
 #ifdef __cplusplus
 }
 #endif

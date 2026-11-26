@@ -22,6 +22,7 @@ c
 c
       call test_mutate_refresh
       call test_mutate_lmda
+      call test_mutate_nnlmda
       call test_mutate_lmdamode
       call test_mutate_mv
       call test_mutate_mp
@@ -485,6 +486,377 @@ c     sublambda that names no map, which leaves the chain rule
 c
       call loadfix ('water2','085_water_rels_ye_l050.key')
       call assert_real (dcvldlmda,0.0d0,0.0d0,'lmda cv rel held chain')
+      call final
+      call popdir
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine test_mutate_nnlmda  --  neural network lambda  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "test_mutate_nnlmda" checks the neural network sublambda, which
+c     only Tinker9 applies to the neural network coupling of mutated
+c     atoms; it follows its own map from the main lambda, carries a
+c     lambda derivative only with mutated atoms and named neural
+c     network terms, joins the default exponential map, is held by its
+c     own keyword, is kept in range like the other sublambdas, and on
+c     the staged relative schedule follows the same rule as the
+c     electrostatic coupling, its LIGNN2 and LIGNN1 legs removing the
+c     coupling of ligand 2 anywhere before the van der Waals morph and
+c     restoring that of ligand 1 anywhere after it, before, after or
+c     across the charge legs
+c
+c
+      subroutine test_mutate_nnlmda
+      use dlmda
+      use mutant
+      use potent
+      implicit none
+      real*8 sub,dsub,d2sub
+      real*8 sc(0:2),dsc(0:2)
+      logical skiptest
+c
+c
+      if (skiptest('test_mutate_nnlmda','mutate',2))  return
+      call pushdir ('file/mutate')
+c
+c     a neural network map alone drives the neural network sublambda,
+c     which has nothing to couple without mutated atoms
+c
+      call loadfix ('water2','mut_nn_qnt.key')
+      call assert_logical (use_nnlmdamap,.true.,
+     &                  'lmda nn only use_nnlmdamap')
+      call assert_logical (use_nndlmda,.false.,
+     &                  'lmda nn only use_nndlmda')
+      call assert_logical (use_mutate,.false.,
+     &                  'lmda nn only use_mutate')
+      call assert_logical (use_elmdamap,.false.,
+     &                  'lmda nn only use_elmdamap')
+      call assert_logical (use_vlmdamap,.false.,
+     &                  'lmda nn only use_vlmdamap')
+      call assert_real (nnlambda,0.5d0,1.0d-15,'lmda nn only nnlambda')
+      call assert_real (dnnldlmda,9.375d0,1.0d-12,
+     &                  'lmda nn only dnnldlmda')
+      call assert_real (d2nnldlmda2,0.0d0,1.0d-12,
+     &                  'lmda nn only d2nnldlmda2')
+      call assert_real (elambda,1.0d0,0.0d0,'lmda nn only elambda')
+      call assert_real (deldlmda,0.0d0,0.0d0,'lmda nn only deldlmda')
+      call final
+c
+c     the lambda derivative needs both a ligand and named neural
+c     network terms
+c
+      call loadfix ('water2','mut_nn_qnt_lig.key')
+      call assert_logical (use_nn,.true.,'lmda nn ligand use_nn')
+      call assert_logical (use_mutate,.true.,
+     &                  'lmda nn ligand use_mutate')
+      call assert_logical (use_nndlmda,.true.,
+     &                  'lmda nn ligand use_nndlmda')
+      call assert_real (dnnldlmda,9.375d0,1.0d-12,
+     &                  'lmda nn ligand dnnldlmda')
+      call final
+      call loadfix ('water2','mut_nn_qnt_noterm.key')
+      call assert_logical (use_nn,.false.,'lmda nn no term use_nn')
+      call assert_logical (use_nndlmda,.false.,
+     &                  'lmda nn no term use_nndlmda')
+      call final
+c
+c     neural network valence terms see only bonded neighbors and are
+c     not coupled to lambda
+c
+      call loadfix ('water2','mut_nn_qnt_val.key')
+      call assert_logical (use_nn,.false.,'lmda nn valence use_nn')
+      call assert_logical (use_nndlmda,.false.,
+     &                  'lmda nn valence use_nndlmda')
+      call final
+c
+c     a neural network sublambda without its map is held at the value
+c     of its own keyword and leaves the chain rule
+c
+      call loadfix ('water2','mut_nn_held.key')
+      call assert_logical (use_nnlmdamap,.false.,
+     &                  'lmda nn held use_nnlmdamap')
+      call assert_logical (use_nndlmda,.false.,
+     &                  'lmda nn held use_nndlmda')
+      call assert_real (nnlambda,0.7d0,1.0d-15,'lmda nn held nnlambda')
+      call assert_real (dnnldlmda,0.0d0,0.0d0,'lmda nn held dnnldlmda')
+      call assert_real (vlambda,0.3d0,1.0d-15,'lmda nn held vlambda')
+      call final
+c
+c     with no map named, the neural network sublambda follows the main
+c     lambda along with the other four when neural network terms are
+c     coupled to lambda, and is held otherwise
+c
+      call loadfix ('water2','mut_nn_default.key')
+      call assert_logical (use_nnlmdamap,.true.,
+     &                  'lmda nn default use_nnlmdamap')
+      call assert_logical (nnlmdamap.eq.'EXP',.true.,
+     &                  'lmda nn default nnlmdamap')
+      call assert_logical (use_nndlmda,.false.,
+     &                  'lmda nn default use_nndlmda')
+      call assert_real (nnlambda,0.3d0,1.0d-15,
+     &                  'lmda nn default nnlambda')
+      call assert_real (dnnldlmda,1.0d0,1.0d-15,
+     &                  'lmda nn default dnnldlmda')
+      call final
+      call loadfix ('water2','mut_cv_default.key')
+      call assert_logical (use_nnlmdamap,.false.,
+     &                  'lmda nn default no term use_nnlmdamap')
+      call assert_real (nnlambda,1.0d0,0.0d0,
+     &                  'lmda nn default no term nnlambda')
+      call final
+      call loadfix ('water2','mut_nn_default_noterm.key')
+      call assert_real (nnlambda,0.6d0,1.0d-15,
+     &                  'lmda nn default no term held')
+      call final
+c
+c     the exponential and inverse power maps take their own neural
+c     network parameters
+c
+      call loadfix ('water2','mut_nn_exp.key')
+      call lmdapwr (0.5d0,2.0d0,.true.,sub,dsub,d2sub)
+      call assert_real (nnlambda,sub,1.0d-15,'lmda nn exp nnlambda')
+      call assert_real (dnnldlmda,dsub,1.0d-15,'lmda nn exp dnnldlmda')
+      call assert_real (d2nnldlmda2,d2sub,1.0d-15,
+     &                  'lmda nn exp d2nnldlmda2')
+      call assert_real (nnlambda,0.25d0,1.0d-15,'lmda nn exp square')
+      call final
+      call loadfix ('water2','mut_nn_inv.key')
+      call sublmdainvpower (0.5d0,3,0.2d0,sub,dsub,d2sub)
+      call assert_real (nnlambda,sub,1.0d-15,'lmda nn inv nnlambda')
+      call assert_real (dnnldlmda,dsub,1.0d-15,'lmda nn inv dnnldlmda')
+      call assert_real (d2nnldlmda2,d2sub,1.0d-15,
+     &                  'lmda nn inv d2nnldlmda2')
+      call final
+c
+c     the neural network window is kept in [0,1] and ordered, its held
+c     value in [0,1], and its map parameters in range
+c
+      call loadfix ('water2','mut_nn_range_swap.key')
+      call assert_real (qntnnlmda0,0.2d0,0.0d0,'lmda nn range swap lo')
+      call assert_real (qntnnlmda1,0.8d0,0.0d0,'lmda nn range swap hi')
+      call final
+      call loadfix ('water2','mut_nn_range_clamp.key')
+      call assert_real (qntnnlmda0,0.0d0,0.0d0,
+     &                  'lmda nn range clamp lo')
+      call assert_real (qntnnlmda1,1.0d0,0.0d0,
+     &                  'lmda nn range clamp hi')
+      call final
+      call loadfix ('water2','mut_nn_lam_clamp.key')
+      call assert_real (nnlambda,1.0d0,0.0d0,'lmda nn held clamp')
+      call final
+      call loadfix ('water2','mut_nn_map_clamp.key')
+      call assert_int (nnlmdaexp,1,'lmda nn exp clamp')
+      call assert_int (nnlmdainvn,1,'lmda nn inv-n clamp')
+      call assert_real (nnlmdainveps,0.2d0,0.0d0,
+     &                  'lmda nn inv-eps clamp')
+      call final
+c
+c     on the staged relative schedule the electrostatic and neural
+c     network terms are couplings of one ligand that follow one rule:
+c     no ligand is coupled within the van der Waals morph, the leg of
+c     the active side walks the map of the term, a side without its
+c     leg is uncoupled when the run has the morph or the other leg of
+c     the term, and the coupling is held at its own value otherwise;
+c     "grpscale" picks the coupled ligand for both
+c
+      call loadfix ('water2','085_water_rels_ye_l050.key')
+      call assert_logical (relstage.eq.'VDWM',.true.,
+     &                  'lmda nn rel morph leg')
+      call assert_logical (use_nnlmdamap,.false.,
+     &                  'lmda nn rel morph no term use_nnlmdamap')
+      call assert_real (nnlambda,0.0d0,0.0d0,'lmda nn rel morph nn')
+      call assert_real (elambda,0.0d0,0.0d0,'lmda nn rel morph ele')
+      call assert_real (dnnldlmda,0.0d0,0.0d0,
+     &                  'lmda nn rel morph nn chain')
+      call grpscale (nnlambda,sc,dsc)
+      call assert_real (sc(1)+sc(2),0.0d0,0.0d0,
+     &                  'lmda nn rel morph scale')
+      call final
+c
+c     a charge leg joined to the morph with no neural network leg
+c     leaves the neural network coupling off, as a neural network leg
+c     joined to the morph with no charge leg leaves the charge off
+c
+      call loadfix ('water2','mut_rel_nn_held_noterm.key')
+      call assert_logical (use_nnlmdamap,.false.,
+     &                  'lmda nn rel held no term use_nnlmdamap')
+      call final
+      call loadfix ('water2','mut_rel_nn_hold_off.key')
+      call assert_logical (use_nnlmdamap,.true.,
+     &                  'lmda nn rel nn off use_nnlmdamap')
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                  'lmda nn rel nn off leg')
+      call assert_real (nnlambda,0.0d0,0.0d0,'lmda nn rel nn off value')
+      call assert_logical (use_nndlmda,.false.,
+     &                  'lmda nn rel nn off use_nndlmda')
+      call final
+c
+c     a run with a charge leg and neither the morph nor a neural
+c     network leg holds the neural network coupling of its ligand, as a
+c     run with a neural network leg and neither the morph nor a charge
+c     leg holds the charge
+c
+      call loadfix ('water2','mut_rel_nn_lig2_on.key')
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                  'lmda nn rel lone lig2 leg')
+      call assert_logical (use_nnlmdamap,.false.,
+     &                  'lmda nn rel lone lig2 use_nnlmdamap')
+      call assert_real (nnlambda,1.0d0,0.0d0,
+     &                  'lmda nn rel lone lig2 value')
+      call grpscale (nnlambda,sc,dsc)
+      call assert_real (sc(2),1.0d0,0.0d0,
+     &                  'lmda nn rel lone lig2 scale lig2')
+      call assert_real (sc(1),0.0d0,0.0d0,
+     &                  'lmda nn rel lone lig2 scale lig1')
+      call final
+      call loadfix ('water2','mut_rel_nn2_only.key')
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                  'lmda nn rel alone leg')
+      call assert_logical (use_elmdamap,.false.,
+     &                  'lmda nn rel alone use_elmdamap')
+      call assert_real (nnlambda,0.5d0,1.0d-12,
+     &                  'lmda nn rel alone value')
+      call assert_real (dnnldlmda,-1.875d0,1.0d-12,
+     &                  'lmda nn rel alone chain')
+      call assert_real (elambda,1.0d0,0.0d0,
+     &                  'lmda nn rel alone elambda')
+      call assert_real (deldlmda,0.0d0,0.0d0,
+     &                  'lmda nn rel alone deldlmda')
+      call assert_real (vlambda,0.0d0,0.0d0,
+     &                  'lmda nn rel alone vlambda')
+      call final
+      call loadfix ('water2','mut_rel_nn2_only_e0.key')
+      call assert_real (elambda,0.0d0,0.0d0,
+     &                  'lmda nn rel alone discharged')
+      call assert_real (plambda,0.0d0,0.0d0,
+     &                  'lmda nn rel alone discharged pol')
+      call final
+c
+c     the full schedule removes the neural network coupling of ligand
+c     2 before its charge leg and restores that of ligand 1 after its
+c     charge leg, each walking the quintic map on its own range
+c
+      call loadfix ('water2','282_water_rels5_nn2_l005.key')
+      call assert_logical (use_nnlmdamap,.true.,
+     &                  'lmda nn rel legs use_nnlmdamap')
+      call assert_logical (use_nndlmda,.true.,
+     &                  'lmda nn rel legs use_nndlmda')
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                  'lmda nn rel nn2 side')
+      call assert_real (nnlambda,0.5d0,1.0d-12,'lmda nn rel nn2 value')
+      call assert_real (dnnldlmda,-18.75d0,1.0d-12,
+     &                  'lmda nn rel nn2 chain')
+      call assert_real (d2nnldlmda2,0.0d0,1.0d-10,
+     &                  'lmda nn rel nn2 curvature')
+      call assert_real (elambda,1.0d0,0.0d0,'lmda nn rel nn2 elambda')
+      call assert_real (plambda,1.0d0,0.0d0,'lmda nn rel nn2 plambda')
+      call assert_real (vlambda,0.0d0,0.0d0,'lmda nn rel nn2 vlambda')
+      call assert_real (deldlmda,0.0d0,0.0d0,
+     &                  'lmda nn rel nn2 deldlmda')
+      call assert_real (dvldlmda,0.0d0,0.0d0,
+     &                  'lmda nn rel nn2 dvldlmda')
+      call grpscale (nnlambda,sc,dsc)
+      call assert_real (sc(0),1.0d0,0.0d0,'lmda nn rel nn2 scale env')
+      call assert_real (sc(1),0.0d0,0.0d0,'lmda nn rel nn2 scale lig1')
+      call assert_real (sc(2),0.5d0,1.0d-12,
+     &                  'lmda nn rel nn2 scale lig2')
+      call mapsublmda (0.0d0)
+      call assert_real (nnlambda,1.0d0,0.0d0,'lmda nn rel start value')
+      call assert_real (elambda,1.0d0,0.0d0,'lmda nn rel start ele')
+      call mapsublmda (0.25d0)
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                  'lmda nn rel lig2 side')
+      call assert_real (nnlambda,0.0d0,0.0d0,'lmda nn rel lig2 value')
+      call assert_real (dnnldlmda,0.0d0,0.0d0,'lmda nn rel lig2 chain')
+      call mapsublmda (0.55d0)
+      call assert_logical (relstage.eq.'VDWM',.true.,
+     &                  'lmda nn rel vdwm side')
+      call assert_real (nnlambda,0.0d0,0.0d0,'lmda nn rel vdwm value')
+      call assert_real (elambda,0.0d0,0.0d0,'lmda nn rel vdwm ele')
+      call mapsublmda (0.95d0)
+      call assert_logical (relstage.eq.'LIG1',.true.,
+     &                  'lmda nn rel nn1 side')
+      call assert_real (nnlambda,0.5d0,1.0d-12,'lmda nn rel nn1 value')
+      call assert_real (dnnldlmda,18.75d0,1.0d-12,
+     &                  'lmda nn rel nn1 chain')
+      call assert_real (elambda,1.0d0,0.0d0,'lmda nn rel nn1 elambda')
+      call assert_real (vlambda,1.0d0,0.0d0,'lmda nn rel nn1 vlambda')
+      call grpscale (nnlambda,sc,dsc)
+      call assert_real (sc(1),0.5d0,1.0d-12,
+     &                  'lmda nn rel nn1 scale lig1')
+      call assert_real (sc(2),0.0d0,0.0d0,'lmda nn rel nn1 scale lig2')
+      call mapsublmda (1.0d0)
+      call assert_real (nnlambda,1.0d0,0.0d0,'lmda nn rel end value')
+      call final
+c
+c     a neural network leg sharing the range of its charge leg scales
+c     both at once, each on its own map
+c
+      call loadfix ('water2','mut_rel_nn_full.key')
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                  'lmda nn rel full side')
+      call assert_real (elambda,0.5d0,1.0d-12,'lmda nn rel full ele')
+      call assert_real (deldlmda,-4.6875d0,1.0d-12,
+     &                  'lmda nn rel full ele chain')
+      call assert_real (nnlambda,0.5d0,1.0d-12,'lmda nn rel full nn')
+      call assert_real (dnnldlmda,-4.6875d0,1.0d-12,
+     &                  'lmda nn rel full nn chain')
+      call final
+c
+c     a neural network leg partly overlapping its charge leg walks its
+c     own range
+c
+      call loadfix ('water2','mut_rel_nn_partial.key')
+      call sublmdamap (1.0d0/3.0d0,'QNT',1,4,0.3d0,12,4.0d0,
+     &                 0.0d0,1.0d0,sub,dsub,d2sub)
+      call assert_real (elambda,1.0d0-sub,1.0d-12,
+     &                  'lmda nn rel partial ele')
+      call assert_real (deldlmda,-dsub/0.3d0,1.0d-10,
+     &                  'lmda nn rel partial ele chain')
+      call sublmdamap (2.0d0/3.0d0,'QNT',1,4,0.3d0,12,4.0d0,
+     &                 0.0d0,1.0d0,sub,dsub,d2sub)
+      call assert_real (nnlambda,1.0d0-sub,1.0d-12,
+     &                  'lmda nn rel partial nn')
+      call assert_real (dnnldlmda,-dsub/0.3d0,1.0d-10,
+     &                  'lmda nn rel partial nn chain')
+      call final
+c
+c     the neural network leg may follow the charge leg, removing the
+c     coupling of an already discharged ligand
+c
+      call loadfix ('water2','mut_rel_nn_eleafter.key')
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                  'lmda nn rel ele first side')
+      call assert_real (elambda,0.0d0,0.0d0,
+     &                  'lmda nn rel ele first ele')
+      call assert_real (deldlmda,0.0d0,0.0d0,
+     &                  'lmda nn rel ele first ele chain')
+      call assert_real (nnlambda,0.5d0,1.0d-12,
+     &                  'lmda nn rel ele first nn')
+      call assert_real (dnnldlmda,-18.75d0,1.0d-10,
+     &                  'lmda nn rel ele first nn chain')
+      call final
+c
+c     a run from LIGNN2 through LIG1 leaves ligand 1 uncoupled at the
+c     end of the run, as a run from LIG2 through LIG1 without LIGNN legs
+c     leaves both uncoupled from the neural network terms
+c
+      call loadfix ('water2','mut_rel_nn_open.key')
+      call assert_real (nnlambda,0.5d0,1.0d-12,
+     &                  'lmda nn rel open value')
+      call mapsublmda (1.0d0)
+      call assert_logical (relstage.eq.'LIG1',.true.,
+     &                  'lmda nn rel open end side')
+      call assert_real (nnlambda,0.0d0,0.0d0,
+     &                  'lmda nn rel open end value')
+      call assert_real (elambda,1.0d0,0.0d0,
+     &                  'lmda nn rel open end ele')
       call final
       call popdir
       return
@@ -1619,6 +1991,18 @@ c
       call test_mutate_calc ('water2','200_water_rels1_flip_l050.key',
      &   '085_water_rels_ye_l050.txt','200_water_rels1_flip_l050',
      &   .true.,  .true.,  .true.,  .true.,  .true.)
+c
+c     the neural network legs hold the ligand 2 and ligand 1 end
+c     states, which only Tinker9 adds neural network terms to, so the
+c     energy, gradient and virial are those of the three leg schedule
+c     at its ends, with no lambda derivative from the ligand terms
+c
+      call test_mutate_calc ('water2','282_water_rels5_nn2_l005.key',
+     &   '088_water_rels_ye_l000.txt','282_water_rels5_nn2_l005',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
+      call test_mutate_calc ('water2','283_water_rels5_nn1_l095.key',
+     &   '082_water_rels_ye_l100.txt','283_water_rels5_nn1_l095',
+     &   .true.,  .true.,  .true.,  .true.,  .false.)
       return
       end
 c
@@ -2974,6 +3358,37 @@ c
      &   'range of nonzero width','test_mutate_unsup cv qnt step')
       call test_mutate_sccase ('mut_cvlam_map_fatal.key','','water2',
      &   'LAMBDA drives cvlambda','test_mutate_unsup cv lambda map')
+      call test_mutate_sccase ('mut_nnqnt_step_fatal.key','','water2',
+     &   'range of nonzero width','test_mutate_unsup nn qnt step')
+      call test_mutate_sccase ('mut_nnlam_map_fatal.key','','water2',
+     &   'LAMBDA drives nnlambda','test_mutate_unsup nn lambda map')
+      call test_mutate_sccase ('mut_rel_nn_gap_fatal.key','','water2',
+     &   'requires the VDWM leg between them',
+     &   'test_mutate_unsup rel nn legs without morph')
+      call test_mutate_sccase ('mut_rel_nn_order_fatal.key','',
+     &   'water2','LIGNN2 must end before',
+     &   'test_mutate_unsup rel nn leg order')
+      call test_mutate_sccase ('mut_rel_nn_held_fatal.key','',
+     &   'water2','keep ELE-LAMBDA or NN-LAMBDA only',
+     &   'test_mutate_unsup rel nn held value with morph')
+      call test_mutate_sccase ('mut_rel_nn2_only_implicit_fatal.key',
+     &   '','water2','give ELE-LAMBDA as 1',
+     &   'test_mutate_unsup rel nn leg alone implicit charge')
+      call test_mutate_sccase ('mut_rel_nn2_only_half_fatal.key',
+     &   '','water2','give ELE-LAMBDA as 1',
+     &   'test_mutate_unsup rel nn leg alone half charge')
+      call test_mutate_sccase ('mut_rel_nn_noterm_fatal.key','',
+     &   'water2','add NNTERM METAL',
+     &   'test_mutate_unsup rel nn leg without terms')
+      call test_mutate_sccase ('mut_rel_nn_implicit_fatal.key','',
+     &   'water2','give NN-LAMBDA as 1',
+     &   'test_mutate_unsup rel nn implicit coupling')
+      call test_mutate_sccase ('mut_nnlam_default_fatal.key','',
+     &   'water2','LAMBDA drives nnlambda',
+     &   'test_mutate_unsup nn lambda default map')
+      call test_mutate_sccase ('mut_rel_nn_map_fatal.key','','water2',
+     &   'requires the QNT lambda map',
+     &   'test_mutate_unsup rel nn map')
       call test_mutate_sccase ('mut_nwin_mid_fatal.key','','water2',
      &   'Evenly spaced lambda windows start',
      &   'test_mutate_unsup nwindow interior start')

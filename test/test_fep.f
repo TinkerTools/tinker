@@ -424,6 +424,8 @@ c
      &               4,ltrial,'rels dt')
       call fepstate (dm,'water2','196_water_rels3_st_l085.key',
      &               4,ltrial,'rels st')
+      call fepstate (dm,'water2','283_water_rels5_nn1_l095.key',
+     &               4,ltrial,'rels nn')
       return
       end
 c
@@ -460,8 +462,8 @@ c
       real*8 enative
       real*8 dmax
       real*8 xboxold
-      real*8 lold(4)
-      real*8 dlold(3)
+      real*8 lold(5)
+      real*8 dlold(4)
       real*8 ltrial(*)
       real*8 etrial(7)
       real*8, allocatable :: xold(:,:)
@@ -492,9 +494,11 @@ c
       lold(2) = elambda
       lold(3) = plambda
       lold(4) = vlambda
+      lold(5) = nnlambda
       dlold(1) = deldlmda
       dlold(2) = dpldlmda
       dlold(3) = dvldlmda
+      dlold(4) = dnnldlmda
       stageold = relstage
       xboxold = xbox
       do i = 1, n
@@ -529,10 +533,12 @@ c
       dmax = max(dmax,abs(elambda-lold(2)))
       dmax = max(dmax,abs(plambda-lold(3)))
       dmax = max(dmax,abs(vlambda-lold(4)))
+      dmax = max(dmax,abs(nnlambda-lold(5)))
       call assert_real (dmax,0.0d0,0.0d0,'fep '//tag//' state lambdas')
       dmax = abs(deldlmda-dlold(1))
       dmax = max(dmax,abs(dpldlmda-dlold(2)))
       dmax = max(dmax,abs(dvldlmda-dlold(3)))
+      dmax = max(dmax,abs(dnnldlmda-dlold(4)))
       call assert_real (dmax,0.0d0,0.0d0,'fep '//tag//' state maps')
       call assert_logical (relstage.eq.stageold,.true.,
      &                     'fep '//tag//' state stage')

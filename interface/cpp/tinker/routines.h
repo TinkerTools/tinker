@@ -380,8 +380,20 @@ inline void tinker_f_sublmdamap(double* lmda, tinker_fchars map, int* nexp, int*
 }
 void maprelstage_(double* lmda);
 #define tinker_f_maprelstage maprelstage_
+void relstgcpl_(double* lmda, int* k2, int* k1, char* map, int* nexp, int* invn, double* inveps, int* apmn, double* apmrho, double* w, double* dw, double* d2w, tinker_fchar_len_t map_cap);
+inline void tinker_f_relstgcpl(double* lmda, int* k2, int* k1, tinker_fchars map, int* nexp, int* invn, double* inveps, int* apmn, double* apmrho, double* w, double* dw, double* d2w) {
+    return relstgcpl_(lmda, k2, k1, map.string, nexp, invn, inveps, apmn, apmrho, w, dw, d2w, map.capacity);
+}
+void relstgside_(double* lmda, double* s, double* ds);
+#define tinker_f_relstgside relstgside_
 void relstgloc_(double* lmda, double* s, double* ds);
 #define tinker_f_relstgloc relstgloc_
+void relstgpos_(int* k, double* lmda, double* s, double* ds);
+#define tinker_f_relstgpos relstgpos_
+void relstgtab_(char* name, tinker_fchar_len_t name_cap);
+inline void tinker_f_relstgtab(tinker_fchars name) {
+    return relstgtab_(name.string, name.capacity);
+}
 void lmdapwr_(double* x, double* a, int* do2, double* f, double* df, double* d2f);
 #define tinker_f_lmdapwr lmdapwr_
 void lmdapow_(double* x, double* c, double* a, double* b, int* do2, double* f, double* f1, double* f2);

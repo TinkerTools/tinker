@@ -34,6 +34,9 @@ c     nlmdamcacc    number of accepted Monte Carlo lambda moves
 c     nlmdamctry    number of attempted Monte Carlo lambda moves
 c     nlmdasave     history entries already written to the file
 c     nlmdawin      number of sequential lambda windows
+c     nnlmdaapmn    power exponent for neural network asymmetric map
+c     nnlmdaexp     exponent for neural network exponential mapping
+c     nnlmdainvn    inverse-power exponent for neural network mapping
 c     plmdaapmn     power exponent for polarization asymmetric map
 c     plmdaexp      exponent for polarization exponential mapping
 c     plmdainvn     inverse-power exponent for polarization mapping
@@ -51,6 +54,7 @@ c     d2eldlmda2    second derivative of elambda wrt main lambda
 c     d2emdl2       multipole second order lambda derivative
 c     d2epdl2       polarization second order lambda derivative
 c     d2evdl2       van der Waals second order lambda derivative
+c     d2nnldlmda2   second derivative of nnlambda wrt main lambda
 c     d2pldlmda2    second derivative of plambda wrt main lambda
 c     d2vldlmda2    second derivative of vlambda wrt main lambda
 c     dcvldlmda     derivative of cvlambda wrt main lambda
@@ -62,6 +66,7 @@ c     deldlmda      derivative of elambda wrt main lambda
 c     demdl         multipole lambda derivative
 c     depdl         polarization lambda derivative
 c     devdl         van der Waals lambda derivative
+c     dnnldlmda     derivative of nnlambda wrt main lambda
 c     dpldlmda      derivative of plambda wrt main lambda
 c     dvldlmda      derivative of vlambda wrt main lambda
 c     elmdaapmrho   endpoint slope ratio for electrostatic asym map
@@ -86,12 +91,16 @@ c     lmdatheta     theta coordinate used to propagate lambda
 c     lmdavbias     saved lambda bias energy shift
 c     lmdavtheta    velocity of the theta lambda coordinate
 c     lmdawinratio  fraction of each lambda window spent equilibrating
+c     nnlmdaapmrho  endpoint slope ratio for neural network asym map
+c     nnlmdainveps  shift for neural network inverse-power mapping
 c     plmdaapmrho   endpoint slope ratio for polarization asym map
 c     plmdainveps   shift for polarization inverse-power mapping
 c     qntcvlmda0    sublambda lower bound for collective variables
 c     qntcvlmda1    sublambda upper bound for collective variables
 c     qntelmda0     sublambda lower bound for electrostatics
 c     qntelmda1     sublambda upper bound for electrostatics
+c     qntnnlmda0    sublambda lower bound for neural network terms
+c     qntnnlmda1    sublambda upper bound for neural network terms
 c     qntplmda0     sublambda lower bound for polarization
 c     qntplmda1     sublambda upper bound for polarization
 c     qntvlmda0     sublambda lower bound for van der Waals
@@ -158,6 +167,9 @@ c     use_lmdamc    flag to move lambda by Monte Carlo trial moves
 c     use_mainlmda  flag that a main lambda value was specified
 c     use_meta      flag to use metadynamics
 c     use_metadyn   flag to propagate metadynamics lambda particle
+c     use_nndlmda   flag that the neural network terms have a lambda
+c                     deriv
+c     use_nnlmdamap flag that nnlambda follows the main lambda map
 c     use_ost       flag to use orthogonal space tempering
 c     use_ostdyn    flag to propagate lambda particle
 c     use_pdlmda    flag that the polarization term has a lambda deriv
@@ -166,11 +178,12 @@ c     use_prst      flag for polarization single topology at plambda
 c     use_ti        flag to use thermodynamic integration
 c     use_vdlmda    flag that the van der Waals term has a lambda deriv
 c     use_vlmdamap  flag that vlambda follows the main lambda map
-c     use_relstg    flag that each staged leg is declared, in the
-c                     order LIG2, VDWM and LIG1 of rising lambda
+c     use_relstg    flag that each staged leg is declared, stored as
+c                     LIG2, VDWM, LIG1, LIGNN2 and LIGNN1
 c     douindorig    original douind
 c     cvlmdamap     mapping type from main to collective variable lambda
 c     elmdamap      mapping type from main to electrostatic lambda
+c     nnlmdamap     mapping type from main to neural network lambda
 c     plmdamap      mapping type from main to polarization lambda
 c     vlmdamap      mapping type from main to van der Waals lambda
 c     lmdathmap     mapping type from theta to main lambda, SIN or TRI
@@ -206,6 +219,9 @@ c
       integer nlmdamctry
       integer nlmdasave
       integer nlmdawin
+      integer nnlmdaapmn
+      integer nnlmdaexp
+      integer nnlmdainvn
       integer plmdaapmn
       integer plmdaexp
       integer plmdainvn
@@ -223,6 +239,7 @@ c
       real*8 d2emdl2
       real*8 d2epdl2
       real*8 d2evdl2
+      real*8 d2nnldlmda2
       real*8 d2pldlmda2
       real*8 d2vldlmda2
       real*8 dcvldlmda
@@ -234,6 +251,7 @@ c
       real*8 demdl
       real*8 depdl
       real*8 devdl
+      real*8 dnnldlmda
       real*8 dpldlmda
       real*8 dvldlmda
       real*8 elmdaapmrho
@@ -258,12 +276,16 @@ c
       real*8 lmdavbias
       real*8 lmdavtheta
       real*8 lmdawinratio
+      real*8 nnlmdaapmrho
+      real*8 nnlmdainveps
       real*8 plmdaapmrho
       real*8 plmdainveps
       real*8 qntcvlmda0
       real*8 qntcvlmda1
       real*8 qntelmda0
       real*8 qntelmda1
+      real*8 qntnnlmda0
+      real*8 qntnnlmda1
       real*8 qntplmda0
       real*8 qntplmda1
       real*8 qntvlmda0
@@ -272,8 +294,8 @@ c
       real*8 vlmdainveps
       real*8 wlmda
       real*8 wlmda2
-      real*8 relstghi(3)
-      real*8 relstglo(3)
+      real*8 relstghi(5)
+      real*8 relstglo(5)
       real*8 demvirdl(3,3)
       real*8 depvirdl(3,3)
       real*8 devvirdl(3,3)
@@ -321,6 +343,8 @@ c
       logical use_mainlmda
       logical use_meta
       logical use_metadyn
+      logical use_nndlmda
+      logical use_nnlmdamap
       logical use_ost
       logical use_ostdyn
       logical use_pdlmda
@@ -329,10 +353,11 @@ c
       logical use_ti
       logical use_vdlmda
       logical use_vlmdamap
-      logical use_relstg(3)
+      logical use_relstg(5)
       logical, allocatable :: douindorig(:)
       character*3 cvlmdamap
       character*3 elmdamap
+      character*3 nnlmdamap
       character*3 plmdamap
       character*3 vlmdamap
       character*3 lmdathmap

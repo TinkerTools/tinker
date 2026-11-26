@@ -36,6 +36,7 @@ extern int& use_born;
 extern int& use_orbit;
 extern int& use_mutate;
 extern int& use_colvar;
+extern int& use_nn;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
 extern "C" int TINKER_MOD(potent, use_bond);
@@ -71,6 +72,7 @@ extern "C" int TINKER_MOD(potent, use_born);
 extern "C" int TINKER_MOD(potent, use_orbit);
 extern "C" int TINKER_MOD(potent, use_mutate);
 extern "C" int TINKER_MOD(potent, use_colvar);
+extern "C" int TINKER_MOD(potent, use_nn);
 
 int& use_bond = TINKER_MOD(potent, use_bond);
 int& use_angle = TINKER_MOD(potent, use_angle);
@@ -105,5 +107,6 @@ int& use_born = TINKER_MOD(potent, use_born);
 int& use_orbit = TINKER_MOD(potent, use_orbit);
 int& use_mutate = TINKER_MOD(potent, use_mutate);
 int& use_colvar = TINKER_MOD(potent, use_colvar);
+int& use_nn = TINKER_MOD(potent, use_nn);
 #endif
 } }

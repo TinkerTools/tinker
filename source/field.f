@@ -64,6 +64,7 @@ c
       use_geom = .true.
       use_extra = .true.
       use_colvar = .true.
+      use_nn = .false.
 c
 c     read the potential energy force field parameter file
 c

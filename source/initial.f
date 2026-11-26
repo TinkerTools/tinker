@@ -213,6 +213,8 @@ c
       use_mainlmda = .false.
       use_meta = .false.
       use_metadyn = .false.
+      use_nndlmda = .false.
+      use_nnlmdamap = .false.
       use_ost = .false.
       use_ostdyn = .false.
       use_pdlmda = .false.
@@ -223,7 +225,7 @@ c
       use_vdlmda = .false.
       use_vlmdamap = .false.
       relstage = 'VDWM'
-      do i = 1, 3
+      do i = 1, 5
          use_relstg(i) = .false.
          relstglo(i) = 0.0d0
          relstghi(i) = 1.0d0

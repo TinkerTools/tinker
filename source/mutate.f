@@ -49,13 +49,18 @@ c
       integer ntbnd
       integer, allocatable :: list(:)
       integer, allocatable :: itbnd(:,:)
+      integer nleg
+      integer legs(5)
       logical cvfound
-      character*4 leg(3)
+      character*6 relstgname(5)
       character*20 keyword
       character*240 record
       character*240 string
-      data leg  / 'LIG2', 'VDWM', 'LIG1' /
 c
+c
+c     get the names of the staged relative legs
+c
+      call relstgtab (relstgname)
 c
 c     perform dynamic allocation of some global arrays
 c
@@ -87,6 +92,7 @@ c
       lambda = 1.0d0
       cvlambda = 1.0d0
       elambda = 1.0d0
+      nnlambda = 1.0d0
       vlambda = 1.0d0
       tlambda = 1.0d0
       use_mainlmda = .false.
@@ -97,6 +103,7 @@ c
       setplambda = .false.
       setvlambda = .false.
       setcvlambda = .false.
+      setnnlambda = .false.
       cvfound = .false.
       plambda = 1.0d0
 c
@@ -173,6 +180,10 @@ c
             string = record(next:240)
             read (string,*,err=30,end=30)  vlambda
             setvlambda = .true.
+         else if (keyword(1:10) .eq. 'NN-LAMBDA ') then
+            string = record(next:240)
+            read (string,*,err=30,end=30)  nnlambda
+            setnnlambda = .true.
          else if (keyword(1:13) .eq. 'VDW-SOFTCORE ') then
             string = record(next:240)
             read (string,*,err=30,end=30)  scalphav,scexp,
@@ -260,6 +271,7 @@ c
       plambda = min(1.0d0,max(0.0d0,plambda))
       vlambda = min(1.0d0,max(0.0d0,vlambda))
       cvlambda = min(1.0d0,max(0.0d0,cvlambda))
+      nnlambda = min(1.0d0,max(0.0d0,nnlambda))
 c
 c     set plambda to elambda if no values given
 c
@@ -324,15 +336,46 @@ c
      &           /,' Polarization Lambda Value',10x,f8.3,
      &           /,' Torsion Angle Lambda Value',9x,f8.3)
 c
+c     the neural network lambda is reported only for a system that
+c     names neural network terms, which only Tinker9 evaluates
+c
+         if (use_nn) then
+            write (iout,55)  nnlambda
+   55       format (' Neural Network Lambda Value',8x,f8.3)
+         end if
+c
 c     report the mode chosen along each axis of the calculation
 c
          if (use_rel) then
             write (iout,60)
    60       format (/,' Free Energy Mode',12x,'Staged Relative')
-            do i = 1, 3
-               if (use_relstg(i)) then
-                  write (iout,70)  leg(i),relstglo(i),relstghi(i)
+c
+c     list the declared legs by their lower bound, a charge leg first
+c     where a neural network leg starts with it
+c
+            nleg = 0
+            do j = 1, 5
+               if (use_relstg(j)) then
+                  nleg = nleg + 1
+                  legs(nleg) = j
+                  do k = nleg, 2, -1
+                     i = legs(k)
+                     if (relstglo(i) .lt. relstglo(legs(k-1))) then
+                        legs(k) = legs(k-1)
+                        legs(k-1) = i
+                     end if
+                  end do
+               end if
+            end do
+            do j = 1, nleg
+               i = legs(j)
+               if (i .le. 3) then
+                  write (iout,70)  relstgname(i)(1:4),relstglo(i),
+     &                             relstghi(i)
    70             format (' Staged Leg ',a4,' Range',6x,2f8.3)
+               else
+                  write (iout,75)  relstgname(i),relstglo(i),relstghi(i)
+   75             format (' Staged Leg ',a6,' Range',4x,2f8.3)
                end if
             end do
          else
@@ -425,7 +468,8 @@ c
       real*8 temp
       real*8 fillr
       real*8 lo,hi
-      character*4 legword
+      character*6 relstgname(5)
+      character*8 legword
       character*8 propword
       character*8 sampword
       character*8 fillword
@@ -433,6 +477,10 @@ c
       character*240 record
       character*240 string
 c
+c
+c     get the names of the staged relative legs
+c
+      call relstgtab (relstgname)
 c
 c     flag for use of lambda derivative
 c
@@ -449,6 +497,7 @@ c
       use_lmdamc = .false.
       use_meta = .false.
       use_metadyn = .false.
+      use_nnlmdamap = .false.
       use_ost = .false.
       use_ostdyn = .false.
       use_prst = .false.
@@ -467,7 +516,7 @@ c
 c     set defaults for the staged relative free energy schedule
 c
       relstage = 'VDWM'
-      do i = 1, 3
+      do i = 1, 5
          use_relstg(i) = .false.
          relstglo(i) = 0.0d0
          relstghi(i) = 1.0d0
@@ -479,32 +528,40 @@ c
       qntcvlmda0 = 0.0d0
       qntelmda1 = 1.0d0
       qntelmda0 = 0.0d0
+      qntnnlmda1 = 1.0d0
+      qntnnlmda0 = 0.0d0
       qntplmda1 = 1.0d0
       qntplmda0 = 0.0d0
       qntvlmda1 = 1.0d0
       qntvlmda0 = 0.0d0
       cvlmdamap = 'QNT'
       elmdamap = 'QNT'
+      nnlmdamap = 'QNT'
       plmdamap = 'QNT'
       vlmdamap = 'QNT'
       cvlmdaexp = 1
       elmdaexp = 1
+      nnlmdaexp = 1
       plmdaexp = 1
       vlmdaexp = 1
       cvlmdainvn = 4
       elmdainvn = 4
+      nnlmdainvn = 4
       plmdainvn = 4
       vlmdainvn = 4
       cvlmdainveps = 0.3d0
       elmdainveps = 0.3d0
+      nnlmdainveps = 0.3d0
       plmdainveps = 0.3d0
       vlmdainveps = 0.3d0
       cvlmdaapmn = 12
       elmdaapmn = 12
+      nnlmdaapmn = 12
       plmdaapmn = 12
       vlmdaapmn = 12
       cvlmdaapmrho = 4.0d0
       elmdaapmrho = 4.0d0
+      nnlmdaapmrho = 4.0d0
       plmdaapmrho = 4.0d0
       vlmdaapmrho = 4.0d0
 c
@@ -512,10 +569,12 @@ c     a sublambda not driven by the main lambda has an identity chain
 c
       dcvldlmda = 1.0d0
       deldlmda = 1.0d0
+      dnnldlmda = 1.0d0
       dpldlmda = 1.0d0
       dvldlmda = 1.0d0
       d2cvldlmda2 = 0.0d0
       d2eldlmda2 = 0.0d0
+      d2nnldlmda2 = 0.0d0
       d2pldlmda2 = 0.0d0
       d2vldlmda2 = 0.0d0
 c
@@ -718,21 +777,39 @@ c
          else if (keyword(1:17) .eq. 'VDW-LMDA-INV-EPS ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  vlmdainveps
+         else if (keyword(1:14) .eq. 'NN-LMDA-RANGE ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  qntnnlmda0, qntnnlmda1
+         else if (keyword(1:12) .eq. 'NN-LMDA-MAP ') then
+            use_nnlmdamap = .true.
+            call getword (record,nnlmdamap,next)
+            call upcase (nnlmdamap)
+         else if (keyword(1:12) .eq. 'NN-LMDA-EXP ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  nnlmdaexp
+         else if (keyword(1:14) .eq. 'NN-LMDA-INV-N ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  nnlmdainvn
+         else if (keyword(1:16) .eq. 'NN-LMDA-INV-EPS ') then
+            string = record(next:240)
+            read (string,*,err=10,end=10)  nnlmdainveps
          else if (keyword(1:10) .eq. 'REL-STAGE ') then
             use_rel = .true.
             use_mainlmda = .true.
             call getword (record,legword,next)
             call upcase (legword)
             k = 0
-            if (legword .eq. 'LIG2')  k = 1
-            if (legword .eq. 'VDWM')  k = 2
-            if (legword .eq. 'LIG1')  k = 3
+            do j = 1, 5
+               if (legword .eq. relstgname(j))  k = j
+            end do
             if (k .eq. 0) then
                write (iout,2)
     2          format (/,' MUTATE_DLMDA  --  REL-STAGE requires the',
      &                    ' leg to be named; use LIG2 to discharge',
-     &                    ' ligand 2, VDWM to morph van der Waals, or',
-     &                    ' LIG1 to charge ligand 1')
+     &                    ' ligand 2, VDWM to morph van der Waals,',
+     &                    ' LIG1 to charge ligand 1, or LIGNN2 and',
+     &                    ' LIGNN1 to remove and restore the neural',
+     &                    ' network coupling of ligand 2 and ligand 1')
                call fatal
             end if
 c
@@ -864,22 +941,36 @@ c
 c
 c     the staged relative schedule maps every sublambda itself,
 c     but for the collective variable one, which follows its own map
-c     or is held
+c     or is held; van der Waals is always set by the schedule, while
+c     the electrostatic and neural network couplings are set by it
+c     when the run has the morph or a leg of the term, and are held at
+c     their own values otherwise, with polarization following the
+c     electrostatic coupling; the morph sets the neural network
+c     coupling only for a system with neural network terms coupled to
+c     lambda, as for the default map
 c
-         use_elmdamap = .true.
-         use_plmdamap = .true.
+         use_elmdamap = (use_relstg(1) .or. use_relstg(2) .or.
+     &                   use_relstg(3))
+         use_plmdamap = use_elmdamap
          use_vlmdamap = .true.
+         use_nnlmdamap = (use_relstg(4) .or. use_relstg(5) .or.
+     &                    (use_relstg(2) .and. use_nn))
+         if (.not. use_elmdamap)  deldlmda = 0.0d0
+         if (.not. use_plmdamap)  dpldlmda = 0.0d0
+         if (.not. use_vlmdamap)  dvldlmda = 0.0d0
          if (.not. use_cvlmdamap)  dcvldlmda = 0.0d0
+         if (.not. use_nnlmdamap)  dnnldlmda = 0.0d0
       else if (use_mainlmda) then
          if (.not. (use_elmdamap .or. use_plmdamap .or.
-     &              use_vlmdamap .or. use_cvlmdamap)) then
+     &              use_vlmdamap .or. use_cvlmdamap .or.
+     &              use_nnlmdamap)) then
             if (use_dlmda) then
                write (iout,20)
    20          format (/,' MUTATE_DLMDA  --  A Lambda Derivative',
      &                    ' requires an explicit map for each driven',
      &                    ' sublambda; add the ELE-LMDA-MAP,',
-     &                    ' POL-LMDA-MAP, VDW-LMDA-MAP or CV-LMDA-MAP',
-     &                    ' keywords')
+     &                    ' POL-LMDA-MAP, VDW-LMDA-MAP, CV-LMDA-MAP or',
+     &                    ' NN-LMDA-MAP keywords')
                call fatal
             end if
             if (use_fep) then
@@ -887,18 +978,20 @@ c
    25          format (/,' MUTATE_DLMDA  --  Free Energy Perturbation',
      &                    ' requires an explicit map for each driven',
      &                    ' sublambda; add the ELE-LMDA-MAP,',
-     &                    ' POL-LMDA-MAP, VDW-LMDA-MAP or CV-LMDA-MAP',
-     &                    ' keywords')
+     &                    ' POL-LMDA-MAP, VDW-LMDA-MAP, CV-LMDA-MAP or',
+     &                    ' NN-LMDA-MAP keywords')
                call fatal
             end if
             use_elmdamap = .true.
             use_plmdamap = .true.
             use_vlmdamap = .true.
             use_cvlmdamap = .true.
+            use_nnlmdamap = use_nn
             elmdamap = 'EXP'
             plmdamap = 'EXP'
             vlmdamap = 'EXP'
             cvlmdamap = 'EXP'
+            if (use_nn)  nnlmdamap = 'EXP'
          end if
 c
 c     a sublambda the main lambda does not drive is held at its value
@@ -908,6 +1001,7 @@ c
          if (.not. use_plmdamap)  dpldlmda = 0.0d0
          if (.not. use_vlmdamap)  dvldlmda = 0.0d0
          if (.not. use_cvlmdamap)  dcvldlmda = 0.0d0
+         if (.not. use_nnlmdamap)  dnnldlmda = 0.0d0
       end if
 c
 c     set the terms that carry a lambda derivative
@@ -941,31 +1035,42 @@ c
      &       .and. cvlmdamap.ne.'APM') then
          cvlmdamap = 'QNT'
       end if
+      if (nnlmdamap.ne.'QNT' .and. nnlmdamap.ne.'EXP'
+     &       .and. nnlmdamap.ne.'INV'
+     &       .and. nnlmdamap.ne.'APM') then
+         nnlmdamap = 'QNT'
+      end if
       if (epdtexp .lt. 1)  epdtexp = 1
       if (elmdaexp .lt. 1)  elmdaexp = 1
       if (plmdaexp .lt. 1)  plmdaexp = 1
       if (vlmdaexp .lt. 1)  vlmdaexp = 1
       if (cvlmdaexp .lt. 1)  cvlmdaexp = 1
+      if (nnlmdaexp .lt. 1)  nnlmdaexp = 1
       if (elmdainvn .lt. 1)  elmdainvn = 1
       if (plmdainvn .lt. 1)  plmdainvn = 1
       if (vlmdainvn .lt. 1)  vlmdainvn = 1
       if (cvlmdainvn .lt. 1)  cvlmdainvn = 1
+      if (nnlmdainvn .lt. 1)  nnlmdainvn = 1
       if (elmdainveps .lt. 0.0d0)  elmdainveps = -elmdainveps
       if (plmdainveps .lt. 0.0d0)  plmdainveps = -plmdainveps
       if (vlmdainveps .lt. 0.0d0)  vlmdainveps = -vlmdainveps
       if (cvlmdainveps .lt. 0.0d0)  cvlmdainveps = -cvlmdainveps
+      if (nnlmdainveps .lt. 0.0d0)  nnlmdainveps = -nnlmdainveps
       if (elmdaapmn .lt. 2)  elmdaapmn = 2
       if (plmdaapmn .lt. 2)  plmdaapmn = 2
       if (vlmdaapmn .lt. 2)  vlmdaapmn = 2
       if (cvlmdaapmn .lt. 2)  cvlmdaapmn = 2
+      if (nnlmdaapmn .lt. 2)  nnlmdaapmn = 2
       if (elmdaapmrho .lt. 1.0d0)  elmdaapmrho = 1.0d0
       if (plmdaapmrho .lt. 1.0d0)  plmdaapmrho = 1.0d0
       if (vlmdaapmrho .lt. 1.0d0)  vlmdaapmrho = 1.0d0
       if (cvlmdaapmrho .lt. 1.0d0)  cvlmdaapmrho = 1.0d0
+      if (nnlmdaapmrho .lt. 1.0d0)  nnlmdaapmrho = 1.0d0
       elmdaapmrho = min(elmdaapmrho,dble(elmdaapmn)-0.001d0)
       plmdaapmrho = min(plmdaapmrho,dble(plmdaapmn)-0.001d0)
       vlmdaapmrho = min(vlmdaapmrho,dble(vlmdaapmn)-0.001d0)
       cvlmdaapmrho = min(cvlmdaapmrho,dble(cvlmdaapmn)-0.001d0)
+      nnlmdaapmrho = min(nnlmdaapmrho,dble(nnlmdaapmn)-0.001d0)
 c
 c     check sublambda intervals are in [0,1] and ordered
 c
@@ -977,6 +1082,8 @@ c
       if (qntvlmda1 .lt. 0.0d0)  qntvlmda1 = 0.0d0
       if (qntcvlmda0 .lt. 0.0d0)  qntcvlmda0 = 0.0d0
       if (qntcvlmda1 .lt. 0.0d0)  qntcvlmda1 = 0.0d0
+      if (qntnnlmda0 .lt. 0.0d0)  qntnnlmda0 = 0.0d0
+      if (qntnnlmda1 .lt. 0.0d0)  qntnnlmda1 = 0.0d0
       if (qntelmda0 .gt. 1.0d0)  qntelmda0 = 1.0d0
       if (qntelmda1 .gt. 1.0d0)  qntelmda1 = 1.0d0
       if (qntplmda0 .gt. 1.0d0)  qntplmda0 = 1.0d0
@@ -985,6 +1092,8 @@ c
       if (qntvlmda1 .gt. 1.0d0)  qntvlmda1 = 1.0d0
       if (qntcvlmda0 .gt. 1.0d0)  qntcvlmda0 = 1.0d0
       if (qntcvlmda1 .gt. 1.0d0)  qntcvlmda1 = 1.0d0
+      if (qntnnlmda0 .gt. 1.0d0)  qntnnlmda0 = 1.0d0
+      if (qntnnlmda1 .gt. 1.0d0)  qntnnlmda1 = 1.0d0
       if (qntelmda1 .lt. qntelmda0) then
          temp = qntelmda0
          qntelmda0 = qntelmda1
@@ -1004,6 +1113,11 @@ c
          temp = qntcvlmda0
          qntcvlmda0 = qntcvlmda1
          qntcvlmda1 = temp
+      end if
+      if (qntnnlmda1 .lt. qntnnlmda0) then
+         temp = qntnnlmda0
+         qntnnlmda0 = qntnnlmda1
+         qntnnlmda1 = temp
       end if
 c
 c     single topology evaluates polarization from one parameter state
@@ -1080,7 +1194,8 @@ c     "setdlmdaterms" decides which terms carry a lambda derivative; for
 c     the electrostatic, polarization and van der Waals terms this picks
 c     the "empole4" flavored energy routine over the plain gradient one,
 c     while the collective variable restraint has one where its own map
-c     drives it
+c     drives it, as do the neural network terms of the mutated atoms,
+c     which only Tinker9 evaluates
 c
 c     a term qualifies when the main lambda drives its sublambda through
 c     a map, except on a staged relative schedule, where a term that no
@@ -1104,12 +1219,16 @@ c
       use_pdlmda = use_dlmda .and. use_plmdamap .and. use_mutate
       use_vdlmda = use_dlmda .and. use_vlmdamap .and. use_mutate
       use_cvdlmda = use_dlmda .and. use_cvlmdamap .and. use_colvar
+      use_nndlmda = use_dlmda .and. use_nnlmdamap .and. use_mutate
+     &                 .and. use_nn
       if (use_rel) then
          if (.not. (use_relstg(1) .or. use_relstg(3))) then
             use_edlmda = .false.
             use_pdlmda = .false.
          end if
          if (.not. use_relstg(2))  use_vdlmda = .false.
+         if (.not. (use_relstg(4) .or. use_relstg(5)))
+     &      use_nndlmda = .false.
       end if
       return
       end
@@ -1861,6 +1980,9 @@ c
          if (use_cvlmdamap .and. qntcvlmda1-qntcvlmda0.lt.1.0d-8 .and.
      &       cvlmdamap.ne.'EXP' .and. cvlmdamap.ne.'INV' .and.
      &       cvlmdamap.ne.'APM')  qntstep = .true.
+         if (use_nnlmdamap .and. qntnnlmda1-qntnnlmda0.lt.1.0d-8 .and.
+     &       nnlmdamap.ne.'EXP' .and. nnlmdamap.ne.'INV' .and.
+     &       nnlmdamap.ne.'APM')  qntstep = .true.
          if (qntstep) then
             write (iout,55)
    55       format (/,' MUTATE_CHECK  --  A Lambda Derivative requires',
@@ -1870,39 +1992,31 @@ c
          end if
       end if
 c
-c     the staged relative schedule maps every sublambda on its own,
-c     so a sublambda set by its own keyword would be overwritten
-c
-      if (use_rel .and.
-     &    (setelambda .or. setplambda .or. setvlambda)) then
-         write (iout,60)
-   60    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
-     &              ' from its own schedule; remove the ELE-LAMBDA,',
-     &              ' POL-LAMBDA and VDW-LAMBDA keywords')
-         call fatal
-      end if
-c
 c     a main lambda maps each sublambda that names a map, so one set by
 c     its own keyword would be overwritten; a sublambda the main lambda
 c     does not drive is free to be pinned by its own keyword, which is
 c     how a leg holds a term at a fixed coupling state while the main
-c     lambda morphs another term
+c     lambda morphs another term; the staged relative schedule checks
+c     its own sublambdas after its legs
 c
-      if (use_mainlmda .and. use_elmdamap .and. setelambda) then
+      if (use_mainlmda .and. .not.use_rel .and.
+     &    use_elmdamap .and. setelambda) then
          write (iout,70)
    70    format (/,' MUTATE_CHECK  --  LAMBDA drives elambda through',
      &              ' a lambda map; remove the ELE-LAMBDA keyword, or',
      &              ' name a map only for the sublambdas LAMBDA drives')
          call fatal
       end if
-      if (use_mainlmda .and. use_plmdamap .and. setplambda) then
+      if (use_mainlmda .and. .not.use_rel .and.
+     &    use_plmdamap .and. setplambda) then
          write (iout,80)
    80    format (/,' MUTATE_CHECK  --  LAMBDA drives plambda through',
      &              ' a lambda map; remove the POL-LAMBDA keyword, or',
      &              ' name a map only for the sublambdas LAMBDA drives')
          call fatal
       end if
-      if (use_mainlmda .and. use_vlmdamap .and. setvlambda) then
+      if (use_mainlmda .and. .not.use_rel .and.
+     &    use_vlmdamap .and. setvlambda) then
          write (iout,90)
    90    format (/,' MUTATE_CHECK  --  LAMBDA drives vlambda through',
      &              ' a lambda map; remove the VDW-LAMBDA keyword, or',
@@ -1916,6 +2030,14 @@ c
      &              ' name a map only for the sublambdas LAMBDA drives')
          call fatal
       end if
+      if (use_mainlmda .and. .not.use_rel .and.
+     &    use_nnlmdamap .and. setnnlambda) then
+         write (iout,96)
+   96    format (/,' MUTATE_CHECK  --  LAMBDA drives nnlambda through',
+     &              ' a lambda map; remove the NN-LAMBDA keyword, or',
+     &              ' name a map only for the sublambdas LAMBDA drives')
+         call fatal
+      end if
 c
 c     the staged relative schedule morphs one ligand into another
 c
@@ -1926,7 +2048,7 @@ c
          call fatal
       end if
 c
-c     the staged legs must follow one another without overlap in the
+c     the ligand legs must follow one another without overlap in the
 c     order LIG2, VDWM and LIG1 of rising main lambda; bounds given in
 c     reverse are swapped, and two legs that meet share one bound
 c
@@ -1966,25 +2088,121 @@ c
          end if
       end do
 c
-c     van der Waals has to morph between the two charging legs
+c     the neural network legs are kept in range like the ligand legs,
+c     and may sit before, after or across the ligand leg of their side
 c
-      if (use_relstg(1) .and. use_relstg(3)
-     &       .and. .not.use_relstg(2)) then
+      do i = 4, 5
+         if (use_relstg(i)) then
+            nstg = nstg + 1
+            relstglo(i) = min(1.0d0,max(0.0d0,relstglo(i)))
+            relstghi(i) = min(1.0d0,max(0.0d0,relstghi(i)))
+            if (relstghi(i) .lt. relstglo(i)) then
+               temp = relstglo(i)
+               relstglo(i) = relstghi(i)
+               relstghi(i) = temp
+            end if
+            if (relstghi(i) .le. relstglo(i)) then
+               write (iout,102)
+               call fatal
+            end if
+         end if
+      end do
+c
+c     the neural network coupling changes only outside the van der
+c     Waals morph, so the LIGNN2 leg ends before any leg of ligand 1
+c     begins, and the LIGNN1 leg begins after any leg of ligand 2 ends
+c
+      if (use_relstg(4)) then
+         do i = 2, 5
+            if (i.ne.4 .and. use_relstg(i)) then
+               if (relstghi(4) .gt. relstglo(i)+eps) then
+                  write (iout,112)
+  112             format (/,' MUTATE_CHECK  --  REL-STAGE LIGNN2 must',
+     &                       ' end before VDWM, LIG1 and LIGNN1 begin,',
+     &                       ' and LIGNN1 must begin after LIGNN2,',
+     &                       ' LIG2 and VDWM end')
+                  call fatal
+               end if
+            end if
+         end do
+      end if
+      if (use_relstg(5)) then
+         do i = 1, 4
+            if (i.ne.3 .and. use_relstg(i)) then
+               if (relstglo(5) .lt. relstghi(i)-eps) then
+                  write (iout,112)
+                  call fatal
+               end if
+            end if
+         end do
+      end if
+c
+c     van der Waals has to morph between the legs of the two ligands
+c
+      if ((use_relstg(1) .or. use_relstg(4)) .and.
+     &    (use_relstg(3) .or. use_relstg(5)) .and.
+     &    .not.use_relstg(2)) then
          write (iout,103)
-  103    format (/,' MUTATE_CHECK  --  REL-STAGE with the LIG2 and',
-     &              ' LIG1 legs requires the VDWM leg between them')
+  103    format (/,' MUTATE_CHECK  --  REL-STAGE with legs of both',
+     &              ' ligands requires the VDWM leg between them')
          call fatal
       end if
+c
+c     a neural network leg needs neural network terms coupled to lambda
+c
+      if ((use_relstg(4) .or. use_relstg(5)) .and. .not.use_nn) then
+         write (iout,110)
+  110    format (/,' MUTATE_CHECK  --  REL-STAGE LIGNN2 and LIGNN1',
+     &              ' require neural network terms coupled to lambda;',
+     &              ' add NNTERM METAL or remove the leg')
+         call fatal
+      end if
+c
+c     the staged relative schedule sets each sublambda from its legs,
+c     so one set by its own keyword would be overwritten; a coupling
+c     term without the morph or a leg of its own in the run is held at
+c     its own value, an end state of the ligand that must be given as
+c     zero or one, since it depends on whether the leg of the term
+c     comes before or after the run
+c
+      if (use_rel .and. (setplambda .or. setvlambda .or.
+     &                   (setelambda .and. use_elmdamap) .or.
+     &                   (setnnlambda .and. use_nnlmdamap))) then
+         write (iout,60)
+   60    format (/,' MUTATE_CHECK  --  REL-STAGE sets each sublambda',
+     &              ' from its legs; remove POL-LAMBDA and VDW-LAMBDA,',
+     &              ' and keep ELE-LAMBDA or NN-LAMBDA only in a run',
+     &              ' without the VDWM leg or a leg of that coupling')
+         call fatal
+      end if
+      if (use_rel .and. .not.use_elmdamap .and.
+     &    (.not.setelambda .or.
+     &     (elambda.ne.0.0d0 .and. elambda.ne.1.0d0))) then
+         write (iout,65)  'ELE-LAMBDA'
+         call fatal
+      end if
+      if (use_rel .and. use_nn .and. .not.use_nnlmdamap .and.
+     &    (.not.setnnlambda .or.
+     &     (nnlambda.ne.0.0d0 .and. nnlambda.ne.1.0d0))) then
+         write (iout,65)  'NN-LAMBDA'
+         call fatal
+      end if
+   65 format (/,' MUTATE_CHECK  --  REL-STAGE run without the VDWM',
+     &           ' leg or a leg of a coupling holds that coupling of',
+     &           ' its ligand; give ',a,' as 1 if it is on during the',
+     &           ' run or 0 if it is off')
 c
 c     legs that share a main lambda meet with a flat slope only on
 c     the quintic map
 c
       if (nstg.gt.1 .and.
-     &    (elmdamap.ne.'QNT' .or. vlmdamap.ne.'QNT')) then
+     &    (elmdamap.ne.'QNT' .or. vlmdamap.ne.'QNT' .or.
+     &     (use_nnlmdamap .and. nnlmdamap.ne.'QNT'))) then
          write (iout,104)
   104    format (/,' MUTATE_CHECK  --  REL-STAGE with more than one',
      &              ' leg requires the QNT lambda map; remove the',
-     &              ' ELE-LMDA-MAP and VDW-LMDA-MAP keywords')
+     &              ' ELE-LMDA-MAP, VDW-LMDA-MAP and NN-LMDA-MAP',
+     &              ' keywords')
          call fatal
       end if
 c

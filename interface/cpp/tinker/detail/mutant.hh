@@ -16,6 +16,7 @@ extern int*& type1;
 extern double& cvlambda;
 extern double& elambda;
 extern double& lambda;
+extern double& nnlambda;
 extern double& plambda;
 extern double& scalphar;
 extern double& scalphalj;
@@ -42,6 +43,7 @@ extern int& setelambda;
 extern int& setplambda;
 extern int& setvlambda;
 extern int& setcvlambda;
+extern int& setnnlambda;
 extern int& use_rel;
 
 #ifdef TINKER_FORTRAN_MODULE_CPP
@@ -58,6 +60,7 @@ extern "C" int* TINKER_MOD(mutant, type1);
 extern "C" double TINKER_MOD(mutant, cvlambda);
 extern "C" double TINKER_MOD(mutant, elambda);
 extern "C" double TINKER_MOD(mutant, lambda);
+extern "C" double TINKER_MOD(mutant, nnlambda);
 extern "C" double TINKER_MOD(mutant, plambda);
 extern "C" double TINKER_MOD(mutant, scalphar);
 extern "C" double TINKER_MOD(mutant, scalphalj);
@@ -84,6 +87,7 @@ extern "C" int TINKER_MOD(mutant, setelambda);
 extern "C" int TINKER_MOD(mutant, setplambda);
 extern "C" int TINKER_MOD(mutant, setvlambda);
 extern "C" int TINKER_MOD(mutant, setcvlambda);
+extern "C" int TINKER_MOD(mutant, setnnlambda);
 extern "C" int TINKER_MOD(mutant, use_rel);
 
 int& nmut = TINKER_MOD(mutant, nmut);
@@ -99,6 +103,7 @@ int*& type1 = TINKER_MOD(mutant, type1);
 double& cvlambda = TINKER_MOD(mutant, cvlambda);
 double& elambda = TINKER_MOD(mutant, elambda);
 double& lambda = TINKER_MOD(mutant, lambda);
+double& nnlambda = TINKER_MOD(mutant, nnlambda);
 double& plambda = TINKER_MOD(mutant, plambda);
 double& scalphar = TINKER_MOD(mutant, scalphar);
 double& scalphalj = TINKER_MOD(mutant, scalphalj);
@@ -125,6 +130,7 @@ int& setelambda = TINKER_MOD(mutant, setelambda);
 int& setplambda = TINKER_MOD(mutant, setplambda);
 int& setvlambda = TINKER_MOD(mutant, setvlambda);
 int& setcvlambda = TINKER_MOD(mutant, setcvlambda);
+int& setnnlambda = TINKER_MOD(mutant, setnnlambda);
 int& use_rel = TINKER_MOD(mutant, use_rel);
 #endif
 } }

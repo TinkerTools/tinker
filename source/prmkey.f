@@ -38,6 +38,7 @@ c
       implicit none
       integer i,next
       character*4 value
+      character*8 nnword
       character*20 keyword
       character*240 text
       character*240 record
@@ -199,6 +200,9 @@ c
          if (value .eq. 'ONLY')  call potoff
          use_colvar = .true.
          if (value .eq. 'NONE')  use_colvar = .false.
+      else if (keyword(1:7) .eq. 'NNTERM ') then
+         call getword (record,nnword,next)
+         if (nnword .eq. 'METAL')  use_nn = .true.
       else if (keyword(1:10) .eq. 'EXTRATERM ') then
          call getword (record,value,next)
          if (value .eq. 'ONLY')  call potoff

@@ -741,12 +741,12 @@ FREE ENERGY PERTURBATION KEYWORDS
      - LJ-SOFTCORE
      - MUTATE
    * -
+     - NN-LAMBDA
      - REPEL-SOFTCORE
      - VDW-ANNIHILATE
-     - VDW-LAMBDA
    * -
+     - VDW-LAMBDA
      - VDW-SOFTCORE
-     -
      -
 
 ADAPTIVE LAMBDA BIAS KEYWORDS
@@ -2562,6 +2562,14 @@ NEWHESS [integer]
 
 NEXTITER [integer]
    Sets the iteration number to be used for the first iteration of the current computation during optimization procedures where its use can effect convergence criteria, timing of restarts, and so forth. The default in the absence of this keyword is to take the initial iteration as iteration 1.
+
+.. index:: NN-LAMBDA
+.. _KEY-NN-LAMBDA:
+
+NN-LAMBDA [real]
+   Sets the value of the lambda scaling parameter for the neural network coupling of the mutated atoms during free energy calculations and similar, on the same footing as ELE-LAMBDA and VDW-LAMBDA. Neural network terms are evaluated only by Tinker9, and those coupled to lambda are named by the NNTERM METAL keyword. Only the ligand is coupled: the neural network energy is the dual topology mix (1-lambda)*U(off) + lambda*U(on), where U(on) is the neural network energy with the ligand coupled and U(off) is the same energy with every pair between a mutated atom and the rest of the system removed in both directions, so that neither side sees the other in the atomic environments of the off state. Pairs within the ligand are kept in the off state, unless the VDW-ANNIHILATE keyword is used, which also removes them. Neural network valence terms, which see only bonded neighbors, do not depend on lambda. The real number modifier lies between 0 (ligand uncoupled) and 1 (fully coupled). When a main LAMBDA is given, the neural network lambda instead follows the main lambda through its own map, named by NN-LMDA-MAP (QNT, EXP, INV or APM, with NN-LMDA-RANGE, NN-LMDA-EXP, NN-LMDA-INV-N and NN-LMDA-INV-EPS as for the other sublambdas), and joins the default exponential map when no map at all is named and NNTERM METAL is given. As with ELE-LAMBDA and VDW-LAMBDA, NN-LAMBDA cannot then be combined with LAMBDA unless the maps name only the sublambdas LAMBDA drives. A lambda derivative includes the neural network coupling only when there are mutated atoms and an NNTERM METAL keyword.
+
+   On the staged relative schedule the electrostatic and neural network terms are both couplings of one ligand at a time and follow the same rule, while van der Waals morphs from ligand 2 onto ligand 1. Both ligands are mutated atoms, pairs between them are always removed, and the coupled ligand is the one on the active side of the morph: ligand 2 below the VDWM leg, none within it, and ligand 1 above it. The REL-STAGE legs LIG2 and LIGNN2 remove the electrostatic and neural network couplings of ligand 2, and LIG1 and LIGNN1 restore those of ligand 1; LIGNN2 and LIGNN1 require NNTERM METAL. Every leg of ligand 2 must end before VDWM and the legs of ligand 1 begin, and every leg of ligand 1 must begin after VDWM and the legs of ligand 2 end, so a full schedule reads LIGNN2/LIG2, VDWM, LIG1/LIGNN1. On each side the neural network and charge legs may come in either order or overlap partly or fully, each walking the map of its term over its own range and holding its end value outside it. As with the other legs a run may hold any subset of them, and legs of both ligands require the VDWM leg between them. A side without the leg of a coupling term is uncoupled for that term when the run has the VDWM leg or the other leg of the term; otherwise the coupling is held at the value of ELE-LAMBDA or NN-LAMBDA, which must then be given as an end state of that ligand, 1 if its coupling is on during the run or 0 if it is off (NN-LAMBDA only for a system with NNTERM METAL), and either keyword is refused in a run where the schedule sets its coupling. The VDWM leg sets the neural network coupling only for a system with NNTERM METAL. Each leg walks its map over its own range, so NN-LMDA-RANGE is not used on the staged schedule, and more than one leg requires the QNT map. The default in the absence of the NN-LAMBDA keyword is 1.0.
 
 .. index:: NOARCHIVE
 .. _KEY-NOARCHIVE:

@@ -45,12 +45,13 @@ c     ##                                                     ##
 c     #########################################################
 c
 c
-c     "grpscale" returns the scale applied to the electrostatic and
-c     polarization parameters of the environment and of each ligand
-c     group at the coupling value "lmda", along with its derivative
-c     with respect to "lmda"; the environment is unscaled, the charging
-c     ligand carries "lmda", and in a staged relative leg the other
-c     ligand is annihilated
+c     "grpscale" returns the scale applied to the environment and to
+c     each ligand group at the coupling value "lmda", along with its
+c     derivative with respect to "lmda", for the electrostatic and
+c     polarization parameters at elambda and for the neural network
+c     coupling at nnlambda; the environment is unscaled, the coupled
+c     ligand carries "lmda", and on the staged relative schedule the
+c     other ligand is uncoupled
 c
 c
       subroutine grpscale (lmda,sc,dsc)
@@ -769,8 +770,8 @@ c     #############################################################
 c
 c
 c     "mapsublmda" maps from the main lambda value "lmda" to the
-c     collective variable, electrostatic, polarization and van der
-c     Waals sublambdas
+c     collective variable, electrostatic, polarization, van der Waals
+c     and neural network sublambdas
 c
 c
       subroutine mapsublmda (lmda)
@@ -813,6 +814,12 @@ c
          call sublmdamap (lmda,vlmdamap,vlmdaexp,vlmdainvn,vlmdainveps,
      &                    vlmdaapmn,vlmdaapmrho,qntvlmda0,qntvlmda1,
      &                    vlambda,dvldlmda,d2vldlmda2)
+      end if
+      if (use_nnlmdamap) then
+         call sublmdamap (lmda,nnlmdamap,nnlmdaexp,nnlmdainvn,
+     &                    nnlmdainveps,nnlmdaapmn,nnlmdaapmrho,
+     &                    qntnnlmda0,qntnnlmda1,nnlambda,dnnldlmda,
+     &                    d2nnldlmda2)
       end if
       return
       end
@@ -870,18 +877,22 @@ c
 c
 c     "maprelstage" maps the main lambda "lmda" onto the sublambdas of
 c     the staged relative schedule, where each declared leg spans its
-c     own range of the main lambda with the following configuration:
+c     own range of the main lambda:
 c
-c        LIG2   charge ligand 2 with ligand 1 annihilated, its
-c                 weight falling as the main lambda rises
-c        VDWM   both ligands electrostatically annihilated while van
-c                 der Waals morphs from ligand 2 onto ligand 1
-c        LIG1   charge ligand 1 with ligand 2 annihilated, its
-c                 weight rising with the main lambda
+c        LIG2    remove the electrostatic coupling of ligand 2
+c        LIGNN2  remove the neural network coupling of ligand 2
+c        VDWM    morph van der Waals from ligand 2 onto ligand 1
+c        LIG1    restore the electrostatic coupling of ligand 1
+c        LIGNN1  restore the neural network coupling of ligand 1
 c
-c     the leg holding "lmda" is walked on its local coordinate, the
-c     term it drives following its own map across the whole leg, and
-c     polarization always carries the electrostatic weight
+c     van der Waals is a morph between the ligands, while the
+c     electrostatic and neural network terms are couplings of one
+c     ligand at a time that follow the same rule in "relstgcpl"; the
+c     main lambda lies on the ligand 2 side of the morph, within it,
+c     or on the ligand 1 side, which "relstage" records and which
+c     selects the coupled ligand in "grpscale"; each leg walks the map
+c     of its term on its own local coordinate, and polarization always
+c     carries the electrostatic weight
 c
 c
       subroutine maprelstage (lmda)
@@ -892,62 +903,38 @@ c
       real*8 s,ds
 c
 c
-c     find the active leg and the local coordinate along it
+c     find the side of the morph holding the main lambda
 c
-      call relstgloc (lmda,s,ds)
+      call relstgside (lmda,s,ds)
 c
-c     the middle leg holds both ligands uncharged, so electrostatics
-c     sits at the reference state and leaves the chain rule while
-c     van der Waals morphs across its map
+c     van der Waals follows its map across the morph and sits at the
+c     end of the morph on either side of it
 c
       if (relstage .eq. 'VDWM') then
-         elambda = 0.0d0
-         deldlmda = 0.0d0
-         d2eldlmda2 = 0.0d0
          call sublmdamap (s,vlmdamap,vlmdaexp,vlmdainvn,vlmdainveps,
      &                    vlmdaapmn,vlmdaapmrho,0.0d0,1.0d0,
      &                    vlambda,dvldlmda,d2vldlmda2)
-c
-c     the ligand legs follow the electrostatic map across the leg
-c
+         dvldlmda = dvldlmda * ds
+         d2vldlmda2 = d2vldlmda2 * ds * ds
       else
-         call sublmdamap (s,elmdamap,elmdaexp,elmdainvn,elmdainveps,
-     &                    elmdaapmn,elmdaapmrho,0.0d0,1.0d0,
-     &                    elambda,deldlmda,d2eldlmda2)
-c
-c     the ligand 1 leg charges ligand 1 with ligand 2 annihilated and
-c     van der Waals already morphed onto ligand 1
-c
-         if (relstage .eq. 'LIG1') then
-            vlambda = 1.0d0
-            dvldlmda = 0.0d0
-            d2vldlmda2 = 0.0d0
-c
-c     the ligand 2 leg discharges ligand 2 as the main lambda rises, so
-c     its weight is the complement of the map, with van der Waals still
-c     on it
-c
-         else
-            elambda = 1.0d0 - elambda
-            deldlmda = -deldlmda
-            d2eldlmda2 = -d2eldlmda2
-            vlambda = 0.0d0
-            dvldlmda = 0.0d0
-            d2vldlmda2 = 0.0d0
-         end if
+         vlambda = 0.0d0
+         if (relstage .eq. 'LIG1')  vlambda = 1.0d0
+         dvldlmda = 0.0d0
+         d2vldlmda2 = 0.0d0
       end if
+c
+c     the electrostatic and neural network couplings follow one rule
+c
+      call relstgcpl (lmda,1,3,elmdamap,elmdaexp,elmdainvn,elmdainveps,
+     &                elmdaapmn,elmdaapmrho,elambda,deldlmda,
+     &                d2eldlmda2)
+      call relstgcpl (lmda,4,5,nnlmdamap,nnlmdaexp,nnlmdainvn,
+     &                nnlmdainveps,nnlmdaapmn,nnlmdaapmrho,nnlambda,
+     &                dnnldlmda,d2nnldlmda2)
 c
 c     numerical guard on the map complement
 c
       elambda = min(1.0d0,max(0.0d0,elambda))
-c
-c     carry the chain rule from the local coordinate of the leg back
-c     to the main lambda
-c
-      deldlmda = deldlmda * ds
-      d2eldlmda2 = d2eldlmda2 * ds * ds
-      dvldlmda = dvldlmda * ds
-      d2vldlmda2 = d2vldlmda2 * ds * ds
 c
 c     polarization stages with the multipoles, same state same weight
 c
@@ -960,12 +947,128 @@ c
 c
 c     ###############################################################
 c     ##                                                           ##
+c     ##  subroutine relstgcpl  --  staged coupling of one ligand  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "relstgcpl" sets the coupling "w" of the ligand on the active
+c     side of the morph for one coupling term of the staged relative
+c     schedule, whose legs are "k2" removing the coupling of ligand 2
+c     and "k1" restoring that of ligand 1, with its first and second
+c     derivatives with respect to the main lambda; no ligand is coupled
+c     within the morph, the leg of the active side walks the map of
+c     the term with ligand 2 taking its complement, a side without its
+c     leg is uncoupled when the term has its other leg or the run has
+c     the morph, and otherwise the coupling is held at its own value
+c
+c
+      subroutine relstgcpl (lmda,k2,k1,map,nexp,invn,inveps,apmn,
+     &                      apmrho,w,dw,d2w)
+      use dlmda
+      implicit none
+      integer k2,k1,k,ko
+      integer nexp,invn,apmn
+      real*8 lmda,inveps,apmrho
+      real*8 w,dw,d2w
+      real*8 s,ds
+      character*3 map
+c
+c
+c     no ligand is coupled while van der Waals morphs
+c
+      dw = 0.0d0
+      d2w = 0.0d0
+      if (relstage .eq. 'VDWM') then
+         w = 0.0d0
+         return
+      end if
+c
+c     pick the leg of the active side and the other leg of the term
+c
+      k = k1
+      ko = k2
+      if (relstage .eq. 'LIG2') then
+         k = k2
+         ko = k1
+      end if
+c
+c     walk the leg of the active side, which removes the coupling of
+c     ligand 2 and restores that of ligand 1 as the main lambda rises
+c
+      if (use_relstg(k)) then
+         call relstgpos (k,lmda,s,ds)
+         call sublmdamap (s,map,nexp,invn,inveps,apmn,apmrho,
+     &                    0.0d0,1.0d0,w,dw,d2w)
+         if (k .eq. k2) then
+            w = 1.0d0 - w
+            dw = -dw
+            d2w = -d2w
+         end if
+         dw = dw * ds
+         d2w = d2w * ds * ds
+c
+c     a side without its leg is uncoupled when the coupling is changed
+c     elsewhere in the run, and is otherwise held at its own value
+c
+      else if (use_relstg(ko) .or. use_relstg(2)) then
+         w = 0.0d0
+      end if
+      return
+      end
+c
+c
+c     ##################################################################
+c     ##                                                              ##
+c     ##  subroutine relstgside  --  side of the van der Waals morph  ##
+c     ##                                                              ##
+c     ##################################################################
+c
+c
+c     "relstgside" sets "relstage" to the side of the van der Waals
+c     morph holding the main lambda "lmda", LIG2 below it, VDWM within
+c     it and LIG1 above it, and returns the local coordinate "s" along
+c     the active ligand leg and its derivative "ds"; a run without the
+c     morph lies on the side of its legs
+c
+c
+      subroutine relstgside (lmda,s,ds)
+      use dlmda
+      implicit none
+      real*8 lmda,s,ds
+c
+c
+c     find the active ligand leg, which holds the end state of the
+c     nearest leg outside every declared range
+c
+      call relstgloc (lmda,s,ds)
+c
+c     a main lambda outside the range of the morph lies on one side
+c
+      if (relstage.eq.'VDWM' .and. use_relstg(2)) then
+         if (lmda .lt. relstglo(2))  relstage = 'LIG2'
+         if (lmda .gt. relstghi(2))  relstage = 'LIG1'
+      end if
+c
+c     a run holding only neural network legs lies on their side
+c
+      if (.not.(use_relstg(1) .or. use_relstg(2) .or. use_relstg(3))
+     &    .and. (use_relstg(4) .or. use_relstg(5))) then
+         relstage = 'LIG1'
+         if (use_relstg(4))  relstage = 'LIG2'
+      end if
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
 c     ##  subroutine relstgloc -- active leg and local coordinate  ##
 c     ##                                                           ##
 c     ###############################################################
 c
 c
-c     "relstgloc" finds the declared leg of the staged relative
+c     "relstgloc" finds the declared ligand leg of the staged relative
 c     schedule that holds the main lambda "lmda" and makes it the
 c     active leg, returning the local coordinate "s" running from zero
 c     to one across that leg and its derivative "ds" with respect to
@@ -978,7 +1081,6 @@ c
       implicit none
       integer i,k
       real*8 lmda,s,ds
-      real*8 lo,hi
       character*4 leg(3)
       data leg  / 'LIG2', 'VDWM', 'LIG1' /
 c
@@ -1003,12 +1105,69 @@ c
 c     set the active leg and the local coordinate along it
 c
       relstage = leg(k)
+      call relstgpos (k,lmda,s,ds)
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine relstgpos  --  local coordinate along one leg  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "relstgpos" returns the local coordinate "s" running from zero to
+c     one across the staged leg "k" at the main lambda "lmda" and its
+c     derivative "ds" with respect to the main lambda, holding an end
+c     of the leg with zero derivative outside its range
+c
+c
+      subroutine relstgpos (k,lmda,s,ds)
+      use dlmda
+      implicit none
+      integer k
+      real*8 lmda,s,ds
+      real*8 lo,hi
+c
+c
+c     scale the main lambda onto the range of the leg
+c
       lo = relstglo(k)
       hi = relstghi(k)
       ds = 1.0d0 / (hi-lo)
       s = min(1.0d0,max(0.0d0,(lmda-lo)*ds))
       if (lmda .ge. hi)  s = 1.0d0
       if (lmda.lt.lo .or. lmda.gt.hi)  ds = 0.0d0
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine relstgtab  --  staged relative leg name table  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "relstgtab" returns the name of each leg of the staged relative
+c     schedule in storage order; the LIGNN2 and LIGNN1 legs are stored
+c     after LIG2, VDWM and LIG1 so those keep the indices Tinker9 reads
+c
+c
+      subroutine relstgtab (name)
+      implicit none
+      integer i
+      character*6 name(5)
+      character*6 name0(5)
+      data name0  / 'LIG2', 'VDWM', 'LIG1', 'LIGNN2', 'LIGNN1' /
+c
+c
+c     copy the leg names
+c
+      do i = 1, 5
+         name(i) = name0(i)
+      end do
       return
       end
 c

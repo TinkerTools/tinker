@@ -30,6 +30,7 @@ c     type1       atom type of each atom in the final state system
 c     cvlambda    state weighting value for collective variable terms
 c     elambda     state weighting value for electrostatic potentials
 c     lambda      generic weighting between initial and final states
+c     nnlambda    state weighting value for neural network terms
 c     plambda     state weighting value for polarization potentials
 c     scalphar    shift scale for soft core Pauli repulsion in Ang^2
 c     scalphalj   shift scale for soft core Lennard-Jones potential
@@ -54,6 +55,7 @@ c     setelambda  flag that elambda was set by its own keyword
 c     setplambda  flag that plambda was set by its own keyword
 c     setvlambda  flag that vlambda was set by its own keyword
 c     setcvlambda flag that cvlambda was set by its own keyword
+c     setnnlambda flag that nnlambda was set by its own keyword
 c     use_rel     flag to use the staged two-ligand relative schedule
 c                   being built for a relative dual topo energy
 c
@@ -73,6 +75,7 @@ c
       real*8 cvlambda
       real*8 elambda
       real*8 lambda
+      real*8 nnlambda
       real*8 plambda
       real*8 scalphar
       real*8 scalphalj
@@ -99,6 +102,7 @@ c
       logical setplambda
       logical setvlambda
       logical setcvlambda
+      logical setnnlambda
       logical use_rel
       save
       end

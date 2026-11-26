@@ -46,6 +46,8 @@ c     use_orbit   logical flag governing use of pisystem computation
 c     use_mutate  logical flag governing use of hybrid potential terms
 c     use_colvar  logical flag governing use of collective variable
 c                   restraints
+c     use_nn      logical flag that neural network terms coupled to
+c                   lambda are named, which only Tinker9 evaluates
 c
 c
       module potent
@@ -67,5 +69,6 @@ c
       logical use_extra,use_born
       logical use_orbit,use_mutate
       logical use_colvar
+      logical use_nn
       save
       end

@@ -1361,8 +1361,10 @@ c     state of the nearest one
 c
       use_relstg(1) = .false.
       call mapsublmda (0.1d0)
-      call assert_logical (relstage.eq.'VDWM',.true.,
-     &                     'maprelstage below legs leg')
+      call assert_logical (relstage.eq.'LIG2',.true.,
+     &                     'maprelstage below legs side')
+      call assert_real (elambda,0.0d0,0.0d0,
+     &                  'maprelstage below legs elambda')
       call assert_real (vlambda,0.0d0,0.0d0,
      &                  'maprelstage below legs vlambda')
       call assert_real (dvldlmda,0.0d0,0.0d0,
@@ -1382,7 +1384,7 @@ c     the ordinary maps must be untouched when staging is off
 c
       use_rel = .false.
       relstage = 'VDWM'
-      do i = 1, 3
+      do i = 1, 5
          use_relstg(i) = .false.
          relstglo(i) = 0.0d0
          relstghi(i) = 1.0d0
@@ -1400,7 +1402,8 @@ c
 c
 c     "test_eostmap_setstg" declares the main lambda ranges of the
 c     LIG2, VDWM and LIG1 legs of the staged relative schedule, where
-c     a leg given a zero width is left undeclared
+c     a leg given a zero width is left undeclared, and leaves the
+c     neural network legs undeclared
 c
 c
       subroutine test_eostmap_setstg (lo2,hi2,lov,hiv,lo1,hi1)
@@ -1419,6 +1422,9 @@ c
       do i = 1, 3
          use_relstg(i) = (relstghi(i) .gt. relstglo(i))
       end do
+      use_relstg(4) = .false.
+      use_relstg(5) = .false.
+      use_nnlmdamap = .false.
       return
       end
 c
