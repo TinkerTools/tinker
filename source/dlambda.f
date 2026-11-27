@@ -932,9 +932,10 @@ c
      &                nnlmdainveps,nnlmdaapmn,nnlmdaapmrho,nnlambda,
      &                dnnldlmda,d2nnldlmda2)
 c
-c     numerical guard on the map complement
+c     numerical guard on the map complement of either coupling
 c
       elambda = min(1.0d0,max(0.0d0,elambda))
+      nnlambda = min(1.0d0,max(0.0d0,nnlambda))
 c
 c     polarization stages with the multipoles, same state same weight
 c
