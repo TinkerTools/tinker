@@ -1312,8 +1312,12 @@ void ensureflambda_(double* dudl);
 #define tinker_f_ensureflambda ensureflambda_
 void egkernel_(double* egbias, double* dgdl, double* dgdfl);
 #define tinker_f_egkernel egkernel_
+void egkernelpt_(double* lmda, double* dudl, int* maxhist, double* egbias, double* dgdl, double* dgdfl);
+#define tinker_f_egkernelpt egkernelpt_
 void egkernelinterpolate_(double* egbias, double* dgdl, double* dgdfl);
 #define tinker_f_egkernelinterpolate egkernelinterpolate_
+void egkernelinterppt_(double* lmda, double* dudl, double* egbias, double* dgdl, double* dgdfl);
+#define tinker_f_egkernelinterppt egkernelinterppt_
 int flambdabin_(double* dudl);
 #define tinker_f_flambdabin flambdabin_
 void resizeosthist_();
@@ -1332,6 +1336,12 @@ void addkernelhist_(int* ihist, int* dofkern);
 #define tinker_f_addkernelhist addkernelhist_
 void buildfkernel_();
 #define tinker_f_buildfkernel buildfkernel_
+double ostgdep_(int* ihist);
+#define tinker_f_ostgdep ostgdep_
+void addflatsample_(int* ihist);
+#define tinker_f_addflatsample addflatsample_
+void clearkernels_();
+#define tinker_f_clearkernels clearkernels_
 void initostfile_();
 #define tinker_f_initostfile initostfile_
 void saveost_();
@@ -2420,6 +2430,10 @@ void setdlmdaterms_();
 #define tinker_f_setdlmdaterms setdlmdaterms_
 void mutate_ost_();
 #define tinker_f_mutate_ost mutate_ost_
+void ostkeys_(char* keyword, char* record, int* next, tinker_fchar_len_t keyword_cap, tinker_fchar_len_t record_cap);
+inline void tinker_f_ostkeys(tinker_fchars keyword, tinker_fchars record, int* next) {
+    return ostkeys_(keyword.string, record.string, next, keyword.capacity, record.capacity);
+}
 void mutate_abf_();
 #define tinker_f_mutate_abf mutate_abf_
 void mutate_meta_();
