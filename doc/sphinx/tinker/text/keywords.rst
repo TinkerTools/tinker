@@ -765,13 +765,17 @@ ADAPTIVE LAMBDA BIAS KEYWORDS
      - LAMBDA-NBIN
      - LAMBDA-SAMPLE
    * -
+     - OST-FLATTEN
      - OST-INTERPOLATE
      - OST-STDDEV
-     - OST-TEMPER-GLOBAL
    * -
+     - OST-TEMPER-GLOBAL
      - OST-TEMPER-LOCAL
      - WFHIST
+   * -
      - WLHIST
+     -
+     -
 
 LAMBDA PARTICLE KEYWORDS
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -2569,7 +2573,7 @@ NEXTITER [integer]
 NN-LAMBDA [real]
    Sets the value of the lambda scaling parameter for the neural network coupling of the mutated atoms during free energy calculations and similar, on the same footing as ELE-LAMBDA and VDW-LAMBDA. Neural network terms are evaluated only by Tinker9, and those coupled to lambda are named by the NNTERM METAL keyword. Only the ligand is coupled: the neural network energy is the dual topology mix (1-lambda)*U(off) + lambda*U(on), where U(on) is the neural network energy with the ligand coupled and U(off) is the same energy with every pair between a mutated atom and the rest of the system removed in both directions, so that neither side sees the other in the atomic environments of the off state. Pairs within the ligand are kept in the off state, unless the VDW-ANNIHILATE keyword is used, which also removes them. Neural network valence terms, which see only bonded neighbors, do not depend on lambda. The real number modifier lies between 0 (ligand uncoupled) and 1 (fully coupled). When a main LAMBDA is given, the neural network lambda instead follows the main lambda through its own map, named by NN-LMDA-MAP (QNT, EXP, INV or APM, with NN-LMDA-RANGE, NN-LMDA-EXP, NN-LMDA-INV-N and NN-LMDA-INV-EPS as for the other sublambdas), and joins the default exponential map when no map at all is named and NNTERM METAL is given. As with ELE-LAMBDA and VDW-LAMBDA, NN-LAMBDA cannot then be combined with LAMBDA unless the maps name only the sublambdas LAMBDA drives. A lambda derivative includes the neural network coupling only when there are mutated atoms and an NNTERM METAL keyword.
 
-   On the staged relative schedule the electrostatic and neural network terms are both couplings of one ligand at a time and follow the same rule, while van der Waals morphs from ligand 2 onto ligand 1. Both ligands are mutated atoms, pairs between them are always removed, and the coupled ligand is the one on the active side of the morph: ligand 2 below the VDWM leg, none within it, and ligand 1 above it. The REL-STAGE legs LIG2 and LIGNN2 remove the electrostatic and neural network couplings of ligand 2, and LIG1 and LIGNN1 restore those of ligand 1; LIGNN2 and LIGNN1 require NNTERM METAL. Every leg of ligand 2 must end before VDWM and the legs of ligand 1 begin, and every leg of ligand 1 must begin after VDWM and the legs of ligand 2 end, so a full schedule reads LIGNN2/LIG2, VDWM, LIG1/LIGNN1. On each side the neural network and charge legs may come in either order or overlap partly or fully, each walking the map of its term over its own range and holding its end value outside it. As with the other legs a run may hold any subset of them, and legs of both ligands require the VDWM leg between them. A side without the leg of a coupling term is uncoupled for that term when the run has the VDWM leg or the other leg of the term; otherwise the coupling is held at the value of ELE-LAMBDA or NN-LAMBDA, which must then be given as an end state of that ligand, 1 if its coupling is on during the run or 0 if it is off (NN-LAMBDA only for a system with NNTERM METAL), and either keyword is refused in a run where the schedule sets its coupling. The VDWM leg sets the neural network coupling only for a system with NNTERM METAL. Each leg walks its map over its own range, so NN-LMDA-RANGE is not used on the staged schedule, and more than one leg requires the QNT map. The default in the absence of the NN-LAMBDA keyword is 1.0.
+   On the staged relative schedule the electrostatic and neural network terms are both couplings of one ligand at a time and follow the same rule, while van der Waals morphs from ligand 2 onto ligand 1. Both ligands are mutated atoms, pairs between them are always removed, and the coupled ligand is the one on the active side of the morph: ligand 2 below the VDWM leg, none within it, and ligand 1 above it. The REL-STAGE legs LIG2 and LIGNN2 remove the electrostatic and neural network couplings of ligand 2, and LIG1 and LIGNN1 restore those of ligand 1; LIGNN2 and LIGNN1 require NNTERM METAL. Every leg of ligand 2 must end before VDWM and the legs of ligand 1 begin, and every leg of ligand 1 must begin after VDWM and the legs of ligand 2 end, so a full schedule reads LIGNN2/LIG2, VDWM, LIG1/LIGNN1. On each side the neural network and charge legs may come in either order or overlap partly or fully, each walking the map of its term over its own range and holding its end value outside it. As with the other legs a run may hold any subset of them, and legs of both ligands require the VDWM leg between them. A schedule of LIG2, VDWM and LIG1 without the LIGNN2 and LIGNN1 legs leaves the neural network coupling off at both end states, as a split protocol needs when those legs run as separate jobs; a single job over the full transformation must declare them. A side without the leg of a coupling term is uncoupled for that term when the run has the VDWM leg or the other leg of the term; otherwise the coupling is held at the value of ELE-LAMBDA or NN-LAMBDA, which must then be given as an end state of that ligand, 1 if its coupling is on during the run or 0 if it is off (NN-LAMBDA only for a system with NNTERM METAL), and either keyword is refused in a run where the schedule sets its coupling. The VDWM leg sets the neural network coupling only for a system with NNTERM METAL. Each leg walks its map over its own range, so NN-LMDA-RANGE is not used on the staged schedule, and more than one leg requires the QNT map. The default in the absence of the NN-LAMBDA keyword is 1.0.
 
 .. index:: NOARCHIVE
 .. _KEY-NOARCHIVE:
@@ -2725,11 +2729,17 @@ OPENMP-THREADS [integer]
 
 OPT-COEFF
 
+.. index:: OST-FLATTEN
+.. _KEY-OST-FLATTEN:
+
+OST-FLATTEN [KERNEL / SAMPLE]
+   Selects the mean force dU/dlambda that orthogonal space tempering integrates over lambda, both for the bias that flattens the free energy along lambda and for the reported free energy: the Estimated Delta G of the dynamics output, the free energy saved in the history file, and the Delta G and time series written by ANALYZELMDA. SAMPLE averages the dU/dlambda of the deposited gaussians in the lambda bin of each, weighting each by exp(g/kT), where g is the bias the dynamics felt at its center before it was added and T is the bath temperature; the weight removes that bias whatever the shape of g. KERNEL instead weights the dU/dlambda bins of the g kernel at each lambda by exp(g/kT), which is valid only once g has flattened dU/dlambda at that lambda, and is smoothed over the WFHIST width. The bias at each gaussian is evaluated as chosen by OST-INTERPOLATE. Only the selected mean force is computed, and ANALYZELMDA, which also reads this keyword, writes only its free energy and mean force; since the mean force is rebuilt from the saved gaussians, the keyword may be changed when a run is continued or analyzed. Any other modifier stops the calculation, and the default in the absence of the OST-FLATTEN keyword is SAMPLE.
+
 .. index:: OST-INTERPOLATE
 .. _KEY-OST-INTERPOLATE:
 
 OST-INTERPOLATE [NONE]
-   Selects how the orthogonal space tempering or metadynamics bias is evaluated. By default, and with no modifier, the bias is found by cubic Hermite interpolation of the values and slopes stored at the bin centers, over lambda and dU/dlambda for orthogonal space tempering and over lambda for metadynamics, so each evaluation takes the same time however long the history grows. The NONE modifier sums the deposited gaussians within the OST-STDDEV cutoff directly instead, which is exact between bin centers but slows in proportion to the number of gaussians near the current point, and so grows with the length of the run, most of all with a short LAMBDA-INTERVAL. The accuracy of interpolation depends on the bin width relative to the gaussian widths. ANALYZELMDA also reads this keyword when analyzing a metadynamics history.
+   Selects how the orthogonal space tempering or metadynamics bias is evaluated. By default, and with no modifier, the bias is found by cubic Hermite interpolation of the values and slopes stored at the bin centers, over lambda and dU/dlambda for orthogonal space tempering and over lambda for metadynamics, so each evaluation takes the same time however long the history grows. The NONE modifier sums the deposited gaussians within the OST-STDDEV cutoff directly instead, which is exact between bin centers but slows in proportion to the number of gaussians near the current point, and so grows with the length of the run, most of all with a short LAMBDA-INTERVAL. The accuracy of interpolation depends on the bin width relative to the gaussian widths. ANALYZELMDA also reads this keyword when analyzing an orthogonal space tempering or metadynamics history.
 
 .. index:: OST-STDDEV
 .. _KEY-OST-STDDEV:

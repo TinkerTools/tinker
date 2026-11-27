@@ -1256,7 +1256,6 @@ c
       integer i,k
       integer next
       character*20 keyword
-      character*20 interpword
       character*240 record
       character*240 string
 c
@@ -1285,6 +1284,7 @@ c
       oststdev = 4.0d0
       fastkernel = .true.
       ostinterpol = .true.
+      ostflatsamp = .true.
 c
 c     search keywords for orthogonal space tempering options
 c
@@ -1305,10 +1305,9 @@ c
          else if (keyword(1:11) .eq. 'OST-STDDEV ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  oststdev
-         else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
-            call getword (record,interpword,next)
-            call upcase (interpword)
-            ostinterpol = (interpword .ne. 'NONE')
+         else if (keyword(1:16) .eq. 'OST-INTERPOLATE ' .or.
+     &            keyword(1:12) .eq. 'OST-FLATTEN ') then
+            call ostkeys (keyword,record,next)
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
             read (string,*,err=10,end=10)  hbias
@@ -1384,6 +1383,7 @@ c
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(lmdafwt))  deallocate (lmdafwt)
       if (allocated(vkernelmax))  deallocate (vkernelmax)
+      if (allocated(ostflatgmax))  deallocate (ostflatgmax)
 c
 c     allocate ost histogram and kernels
 c
@@ -1412,16 +1412,9 @@ c
 c
 c     initialize ost histogram and kernels
 c
+         call clearkernels
          do i = 1, nlmda
-            lmdafmean(i) = 0.0d0
-            lmdafsum(i) = 0.0d0
-            lmdafwt(i) = 0.0d0
-            vkernelmax(i) = 0.0d0
             do k = 1, nflmda
-               gfkernel(i,k) = 0.0d0
-               gkernel(i,k) = 0.0d0
-               glfkernel(i,k) = 0.0d0
-               glkernel(i,k) = 0.0d0
                osthead(i,k) = 0
             end do
          end do
@@ -1439,6 +1432,57 @@ c
             ostwlhist(i) = 0.0d0
             ostwfhist(i) = 0.0d0
          end do
+      end if
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine ostkeys  --  ost bias evaluation keywords  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "ostkeys" applies the OST-INTERPOLATE or OST-FLATTEN keyword
+c     "keyword" found in keyfile line "record", whose modifier starts
+c     at position "next"; it serves both dynamics and the analysis of
+c     a history, which never runs the dynamics setup
+c
+c
+      subroutine ostkeys (keyword,record,next)
+      use iounit
+      use ost
+      implicit none
+      integer next
+      integer trimtext
+      character*20 word
+      character*(*) keyword
+      character*(*) record
+c
+c
+c     interpolate the bias unless the modifier is NONE
+c
+      word = ' '
+      call getword (record,word,next)
+      call upcase (word)
+      if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
+         ostinterpol = (word .ne. 'NONE')
+c
+c     take the sample or the kernel mean force, and stop on any
+c     other modifier
+c
+      else if (keyword(1:12) .eq. 'OST-FLATTEN ') then
+         if (word .eq. 'KERNEL') then
+            ostflatsamp = .false.
+         else if (word .eq. 'SAMPLE') then
+            ostflatsamp = .true.
+         else
+            write (iout,10)  word(1:max(1,trimtext(word)))
+   10       format (/,' OSTKEYS  --  Unknown OST-FLATTEN Mean Force ',
+     &                 a,'; Use KERNEL or SAMPLE')
+            call fatal
+         end if
       end if
       return
       end

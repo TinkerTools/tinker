@@ -286,10 +286,11 @@ c     ##########################################################
 c
 c
 c     "ostkey" checks the keyfile for requested analysis grid settings,
-c     since this program never runs the setup that reads these keywords
-c     for dynamics, and moves the ost history onto the requested grid
-c     when it differs from the grid of the restart, where "ostseries"
-c     then builds the kernels
+c     the mean force that gives the reported free energy and whether
+c     the dynamics interpolated the bias, since this program never runs
+c     the setup that reads these keywords for dynamics, and moves the
+c     ost history onto the requested grid when it differs from the grid
+c     of the restart, where "ostseries" then builds the kernels
 c
 c
       subroutine ostkey
@@ -314,6 +315,8 @@ c
       setwflmda = .false.
       nlmda1 = nlmda
       wflmda1 = wflmda
+      ostflatsamp = .true.
+      ostinterpol = .true.
       do i = 1, nkey
          next = 1
          record = keyline(i)
@@ -326,6 +329,9 @@ c
          else if (keyword(1:14) .eq. 'FLAMBDA-WIDTH ') then
             read (string,*,err=10,end=10)  wflmda1
             setwflmda = .true.
+         else if (keyword(1:16) .eq. 'OST-INTERPOLATE ' .or.
+     &            keyword(1:12) .eq. 'OST-FLATTEN ') then
+            call ostkeys (keyword,record,next)
          end if
    10    continue
       end do
@@ -362,7 +368,7 @@ c
       use dlmda
       use ost
       implicit none
-      integer i,j
+      integer i
       integer lowbin,highbin
       integer nlmda1
       integer nflmda0,fli00
@@ -427,19 +433,7 @@ c
       allocate (glkernel(nlmda,nflmda))
       allocate (lmdafwt(nlmda))
       allocate (vkernelmax(nlmda))
-      do i = 1, nlmda
-         lmdafmean(i) = 0.0d0
-         lmdafsum(i) = 0.0d0
-         lmdafwt(i) = 0.0d0
-         vkernelmax(i) = 0.0d0
-         do j = 1, nflmda
-            gfkernel(i,j) = 0.0d0
-            gkernel(i,j) = 0.0d0
-            glfkernel(i,j) = 0.0d0
-            glkernel(i,j) = 0.0d0
-            osthead(i,j) = 0
-         end do
-      end do
+      call clearkernels
 c
 c     rebuild the lookup table from saved gaussian centers, where
 c     "ostseries" then builds the kernels on the new grid
@@ -457,7 +451,8 @@ c     ############################################################
 c
 c
 c     "ostseries" writes saved OST history entries and recomputes
-c     the cumulative free energy estimate after each deposited bias
+c     the cumulative free energy estimate after each deposited bias,
+c     from the mean force selected by OST-FLATTEN
 c
 c
       subroutine ostseries (iunit)
@@ -466,7 +461,6 @@ c
       use ost
       implicit none
       integer iunit
-      integer i,j
       integer ihist
       integer nsave
       integer step
@@ -489,20 +483,14 @@ c     rebuild the kernels cumulatively over the saved history
 c
       freeeng = 0.0d0
       nlmdahist = 0
-      do i = 1, nlmda
-         lmdafmean(i) = 0.0d0
-         lmdafsum(i) = 0.0d0
-         lmdafwt(i) = 0.0d0
-         vkernelmax(i) = 0.0d0
-         do j = 1, nflmda
-            gfkernel(i,j) = 0.0d0
-            gkernel(i,j) = 0.0d0
-            glfkernel(i,j) = 0.0d0
-            glkernel(i,j) = 0.0d0
-         end do
-      end do
+      call clearkernels
+c
+c     each gaussian joins the sample mean force, weighted by the bias
+c     it was sampled under, before it joins the kernels
+c
       do ihist = 1, nsave
          nlmdahist = ihist
+         call addflatsample (ihist)
          if (fastkernel) then
             call updatekernels
          else
@@ -531,11 +519,11 @@ c     #################################################################
 c
 c
 c     "ostfreeenergy" writes the final free energy estimate from the
-c     f kernel of the full saved OST history, followed by the f kernel
-c     mean force at each lambda bin
+c     mean force selected by OST-FLATTEN, followed by that mean force
+c     at each lambda bin
 c
-c     note the kernels are read as "ostseries" leaves them, built
-c     from the full history
+c     note the mean force is read as "ostseries" leaves it, built from
+c     the full history
 c
 c
       subroutine ostfreeenergy (iunit)
@@ -549,21 +537,26 @@ c
       real*8 efreetot
       logical lmdasampled
       character*3 sampled
+      character*6 fused
 c
 c
 c     recompute and print the total free energy estimate
 c
       lmdadeltag = efreetot()
-      write (iunit,10)  nlmdahist,lmdadeltag,kelvin
+      fused = 'Kernel'
+      if (ostflatsamp)  fused = 'Sample'
+      write (iunit,10)  nlmdahist,fused,lmdadeltag,kelvin
    10 format (/,' OST Free Energy Estimate :',
      &        //,1x,'Number of Gaussians',i16,
+     &         /,1x,'Mean Force Used',a20,
      &         /,1x,'Delta G',20x,1p,d20.10,
      &         /,1x,'Temperature Used',11x,d20.10,' K')
 c
-c     print the f kernel mean force at each lambda bin, whose
-c     trapezoid integral is the free energy estimate, and whether
-c     the row has g kernel support, where a row without support has
-c     zero mean force
+c     print the mean force at each lambda bin, whose trapezoid
+c     integral is the free energy estimate, and whether the bin has
+c     data: a saved gaussian centered in the bin for the sample mean
+c     force, or g kernel support along flambda for the kernel mean
+c     force, where a bin without data has zero mean force
 c
       write (iunit,20)
    20 format (/,' OST Mean Force dU/dL(L) :',
@@ -669,7 +662,6 @@ c
       logical setnlmda
       character*20 keyword
       character*20 propword
-      character*20 interpword
       character*240 record
       character*240 string
 c
@@ -693,9 +685,7 @@ c
             read (string,*,err=10,end=10)  nlmda1
             setnlmda = .true.
          else if (keyword(1:16) .eq. 'OST-INTERPOLATE ') then
-            call getword (record,interpword,next)
-            call upcase (interpword)
-            ostinterpol = (interpword .ne. 'NONE')
+            call ostkeys (keyword,record,next)
          else if (keyword(1:17) .eq. 'LAMBDA-PROPAGATE ') then
             call getword (record,propword,next)
             call upcase (propword)

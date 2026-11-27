@@ -959,6 +959,7 @@ c
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metanext))  deallocate (metanext)
       if (allocated(metawhist))  deallocate (metawhist)
+      if (allocated(ostflatgmax))  deallocate (ostflatgmax)
       if (allocated(osthead))  deallocate (osthead)
       if (allocated(osthhist))  deallocate (osthhist)
       if (allocated(osthist))  deallocate (osthist)

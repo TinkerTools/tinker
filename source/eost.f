@@ -166,6 +166,11 @@ c
       ostwfhist(nlmdahist) = wfhist
       ostnext(nlmdahist) = osthead(ilmda,iflmda)
       osthead(ilmda,iflmda) = nlmdahist
+c
+c     add the new gaussian to the sample mean force, weighted by the
+c     bias it was sampled under, before it joins the kernels
+c
+      call addflatsample (nlmdahist)
       if (fastkernel) then
          call updatekernels
       else
@@ -810,14 +815,41 @@ c
 c
 c     "egkernel" computes the ost biasing g kernel energy and
 c     derivatives at the current lambda and unbiased dU/dlambda values
+c     by direct summation over the whole saved history
 c
 c
       subroutine egkernel (egbias,dgdl,dgdfl)
       use dlmda
-      use math
       use mutant
+      implicit none
+      real*8 egbias,dgdl,dgdfl
+c
+c
+      call egkernelpt (lambda,dedl,nlmdahist,egbias,dgdl,dgdfl)
+      return
+      end
+c
+c
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine egkernelpt -- ost g energy at a given point  ##
+c     ##                                                          ##
+c     ##############################################################
+c
+c
+c     "egkernelpt" computes the ost biasing g kernel energy and
+c     derivatives at lambda "lmda" and dU/dlambda "dudl" by direct
+c     summation over the saved gaussians with history index up to
+c     "maxhist", so the bias as it stood before a later gaussian was
+c     added can be found from a history whose lookup holds them all
+c
+c
+      subroutine egkernelpt (lmda,dudl,maxhist,egbias,dgdl,dgdfl)
+      use dlmda
+      use math
       use ost
       implicit none
+      integer maxhist
       integer ihist
       integer ilmda,iflmda
       integer klmda,kflmda
@@ -827,6 +859,7 @@ c
       integer img,nimg
       integer lmdabin
       integer nbincut
+      real*8 lmda,dudl
       real*8 egbias,dgdl,dgdfl
       real*8 sigl,sigf
       real*8 sigl2,sigf2
@@ -846,10 +879,10 @@ c
       dgdl = 0.0d0
       dgdfl = 0.0d0
 c
-c     get the current lambda and flambda bin indices
+c     get the lambda and flambda bin indices of the point
 c
-      ilmda = lmdabin(lambda)
-      iflmda = nint(dedl / wflmda) + fli0
+      ilmda = lmdabin(lmda)
+      iflmda = nint(dudl / wflmda) + fli0
       if (iflmda .lt. 1 .or. iflmda .gt. nflmda)  return
 c
 c     use max gaussian widths for conservative bin cutoffs
@@ -871,10 +904,11 @@ c
                if (flcenter .ge. 1 .and. flcenter .le. nflmda) then
                   ihist = osthead(lcount,flcenter)
                   do while (ihist .ne. 0)
+                     if (ihist .gt. maxhist)  goto 10
                      sigl = ostwlhist(ihist)
                      sigf = ostwfhist(ihist)
                      sourcefl = lmdafhist(ihist)
-                     fldelta = dedl - sourcefl
+                     fldelta = dudl - sourcefl
                      if (abs(fldelta) .le. oststdev*sigf) then
                         sigl2 = sigl * sigl
                         sigf2 = sigf * sigf
@@ -886,7 +920,7 @@ c
                         do img = 1, nimg
                            sourcel = lmdaimgsrc(lcenter,img,
      &                                          lmdalhist(ihist))
-                           ldelta = lambda - sourcel
+                           ldelta = lmda - sourcel
                            if (abs(ldelta) .le. oststdev*sigl) then
 c
 c     the flambda factor is found once, when an image first counts
@@ -906,6 +940,7 @@ c
                            end if
                         end do
                      end if
+   10                continue
                      ihist = ostnext(ihist)
                   end do
                end if
@@ -924,17 +959,42 @@ c     ##############################################################
 c
 c
 c     "egkernelinterpolate" evaluates the ost g kernel and its first
-c     derivatives using bicubic Hermite interpolation on the grid
+c     derivatives using bicubic Hermite interpolation on the grid at
+c     the current lambda and unbiased dU/dlambda values
 c
 c
       subroutine egkernelinterpolate (egbias,dgdl,dgdfl)
       use dlmda
       use mutant
+      implicit none
+      real*8 egbias,dgdl,dgdfl
+c
+c
+      call egkernelinterppt (lambda,dedl,egbias,dgdl,dgdfl)
+      return
+      end
+c
+c
+c     ###############################################################
+c     ##                                                           ##
+c     ##  subroutine egkernelinterppt -- interpolate g at a point  ##
+c     ##                                                           ##
+c     ###############################################################
+c
+c
+c     "egkernelinterppt" evaluates the ost g kernel and its first
+c     derivatives at lambda "lmda" and dU/dlambda "dudl" using bicubic
+c     Hermite interpolation on the grid as it currently stands
+c
+c
+      subroutine egkernelinterppt (lmda,dudl,egbias,dgdl,dgdfl)
+      use dlmda
       use ost
       implicit none
       integer i,j
       integer ia,ja
       integer il0,if0
+      real*8 lmda,dudl
       real*8 egbias,dgdl,dgdfl
       real*8 flstart,flend
       real*8 l0,f0
@@ -952,28 +1012,28 @@ c
       dgdfl = 0.0d0
       flstart = dble(1-fli0) * wflmda
       flend = dble(nflmda-fli0) * wflmda
-      if (lambda .lt. 0.0d0 .or. lambda .gt. 1.0d0)
+      if (lmda .lt. 0.0d0 .or. lmda .gt. 1.0d0)
      &   return
-      if (dedl .lt. flstart .or. dedl .gt. flend)  return
+      if (dudl .lt. flstart .or. dudl .gt. flend)  return
 c
 c     locate the lower-left grid point of the interpolation cell
 c
-      if (lambda .ge. 1.0d0) then
+      if (lmda .ge. 1.0d0) then
          il0 = nlmda - 1
       else
-         il0 = int(lambda/wlmda) + 1
+         il0 = int(lmda/wlmda) + 1
          il0 = max(1,min(il0,nlmda-1))
       end if
-      if (dedl .ge. flend) then
+      if (dudl .ge. flend) then
          if0 = nflmda - 1
       else
-         if0 = int((dedl-flstart)/wflmda) + 1
+         if0 = int((dudl-flstart)/wflmda) + 1
          if0 = max(1,min(if0,nflmda-1))
       end if
       l0 = dble(il0-1) * wlmda
       f0 = dble(if0-fli0) * wflmda
-      x = (lambda-l0) / wlmda
-      y = (dedl-f0) / wflmda
+      x = (lmda-l0) / wlmda
+      y = (dudl-f0) / wflmda
 c
 c     cubic Hermite basis functions and normalized derivatives
 c
@@ -1173,31 +1233,30 @@ c     ##                                                     ##
 c     #########################################################
 c
 c
-c     "buildgkernel" builds the ost g kernel by looping over
-c     saved histogram sources and spreading their normalized
-c     gaussian contribution to nearby target bins
+c     "buildgkernel" builds the ost g kernel and its derivatives by
+c     looping over saved histogram sources and spreading their
+c     normalized gaussian contribution to nearby target bins, along
+c     with the sample mean force when OST-FLATTEN selects it, while
+c     "buildfkernel" then gives the kernel mean force
 c
 c
       subroutine buildgkernel
       use dlmda
       use ost
       implicit none
-      integer i,j
       integer ihist
 c
 c
-c     zero out g kernel and its running maxima
+c     zero out g kernel, its derivatives and running maxima, and the
+c     mean force of the lambda bins
 c
-      do i = 1, nlmda
-         vkernelmax(i) = 0.0d0
-         do j = 1, nflmda
-            gkernel(i,j) = 0.0d0
-         end do
-      end do
+      call clearkernels
 c
-c     loop over saved histogram sources
+c     loop over saved histogram sources, where each one joins the
+c     sample mean force before it joins the g kernel
 c
       do ihist = 1, nlmdahist
+         call addflatsample (ihist)
          call addkernelhist (ihist,.false.)
       end do
       return
@@ -1211,36 +1270,27 @@ c     ##                                                    ##
 c     ########################################################
 c
 c
-c     "buildkernels" builds both ost kernels by looping over saved
-c     histogram sources and updating the f kernel accumulators
+c     "buildkernels" builds the ost g kernel, its derivatives and the
+c     mean force OST-FLATTEN selects, kernel or sample, by looping over
+c     the saved histogram sources with the fused kernel updates
 c
 c
       subroutine buildkernels
       use dlmda
       use ost
       implicit none
-      integer i,j
       integer ihist
 c
 c
 c     zero out kernels and free energy accumulators
 c
-      do i = 1, nlmda
-         lmdafmean(i) = 0.0d0
-         lmdafsum(i) = 0.0d0
-         lmdafwt(i) = 0.0d0
-         vkernelmax(i) = 0.0d0
-         do j = 1, nflmda
-            gfkernel(i,j) = 0.0d0
-            gkernel(i,j) = 0.0d0
-            glfkernel(i,j) = 0.0d0
-            glkernel(i,j) = 0.0d0
-         end do
-      end do
+      call clearkernels
 c
-c     loop over saved histogram sources
+c     loop over saved histogram sources, where each one joins the
+c     sample mean force before it joins the kernels
 c
       do ihist = 1, nlmdahist
+         call addflatsample (ihist)
          call addkernelhist (ihist,.true.)
       end do
       return
@@ -1301,10 +1351,10 @@ c     ############################################################
 c
 c
 c     "addkernelhist" spreads one saved histogram source to the ost
-c     g kernel using normalized gaussian biasing functions; when
-c     "dofkern" is set it also updates the g kernel derivatives and
-c     the f kernel accumulators, otherwise only the g kernel and its
-c     running maxima
+c     g kernel, its derivatives and running maxima using normalized
+c     gaussian biasing functions; when "dofkern" is set it also
+c     updates the f kernel accumulators, unless OST-FLATTEN selects
+c     the sample mean force
 c
 c
       subroutine addkernelhist (ihist,dofkern)
@@ -1338,12 +1388,18 @@ c
       real*8 oldg,newg
       real*8 oldweight,newweight
       real*8 delweight
-      real*8 scale,vmax
+      real*8 scale,vmax,vtop
       real*8 dgdl,dgdfl,d2gdlfl
       real*8 fexp(nflmda)
       logical dofkern
+      logical dofmean
       logical raised
 c
+c
+c     the f kernel accumulators hold the kernel mean force, so they
+c     are kept only when that mean force is selected
+c
+      dofmean = (dofkern .and. .not.ostflatsamp)
 c
 c     unpack saved source location and get gaussian parameters
 c
@@ -1418,59 +1474,59 @@ c
             lfac = -ldelta / sigl2
             do iflmda = iflmda1, iflmda2
                e = pref * expl * fexp(iflmda)
-               if (dofkern) then
+               oldg = gkernel(ilmda,iflmda)
+               newg = oldg + e
+               vmax = vkernelmax(ilmda)
+               raised = (newg .gt. vmax)
+               vtop = max(vmax,newg)
+               flmda = dble(iflmda-fli0) * wflmda
 c
-c     update the g kernel, where the f kernel accumulators carry the
-c     largest bias in the row as a common factor, so they are rescaled
-c     whenever this point raises it, and the new point then has unit
-c     weight; a cell with no bias carries no weight
+c     update the f kernel accumulators, which carry the largest bias
+c     in the row as a common factor, so they are rescaled whenever
+c     this point raises it, and the new point then has unit weight;
+c     a cell with no bias carries no weight
 c
-                  oldg = gkernel(ilmda,iflmda)
-                  newg = oldg + e
-                  vmax = vkernelmax(ilmda)
-                  raised = (newg .gt. vmax)
+               if (dofmean) then
                   if (raised) then
                      scale = exp((vmax-newg)*rtinv)
                      lmdafsum(ilmda) = lmdafsum(ilmda) * scale
                      lmdafwt(ilmda) = lmdafwt(ilmda) * scale
-                     vmax = newg
                   end if
                   if (oldg .eq. 0.0d0) then
                      oldweight = 0.0d0
                   else
-                     oldweight = exp((oldg-vmax)*rtinv)
+                     oldweight = exp((oldg-vtop)*rtinv)
                   end if
                   if (newg .eq. 0.0d0) then
                      newweight = 0.0d0
                   else if (raised) then
                      newweight = 1.0d0
                   else
-                     newweight = exp((newg-vmax)*rtinv)
+                     newweight = exp((newg-vtop)*rtinv)
                   end if
                   delweight = newweight - oldweight
-                  flmda = dble(iflmda-fli0) * wflmda
-                  ffac = (sourcefl-flmda) * sigf2inv
-                  dgdl = lfac * e
-                  dgdfl = ffac * e
-                  d2gdlfl = lfac * dgdfl
-                  gfkernel(ilmda,iflmda) = gfkernel(ilmda,iflmda)+dgdfl
-                  gkernel(ilmda,iflmda) = newg
-                  vkernelmax(ilmda) = vmax
-                  glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda)
-     &                                         + d2gdlfl
-                  glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
                   lmdafsum(ilmda) = lmdafsum(ilmda) + flmda*delweight
                   lmdafwt(ilmda) = lmdafwt(ilmda) + delweight
-               else
-                  gkernel(ilmda,iflmda) = gkernel(ilmda,iflmda) + e
-                  vkernelmax(ilmda) = max(vkernelmax(ilmda),
-     &                                    gkernel(ilmda,iflmda))
                end if
+c
+c     update the g kernel, its running maximum and the derivatives
+c     that the interpolation reads
+c
+               ffac = (sourcefl-flmda) * sigf2inv
+               dgdl = lfac * e
+               dgdfl = ffac * e
+               d2gdlfl = lfac * dgdfl
+               gkernel(ilmda,iflmda) = newg
+               vkernelmax(ilmda) = vtop
+               gfkernel(ilmda,iflmda) = gfkernel(ilmda,iflmda) + dgdfl
+               glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
+               glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda)
+     &                                      + d2gdlfl
             end do
 c
 c     set the mean force of the row once all its points are added
 c
-            if (dofkern) then
+            if (dofmean) then
                if (lmdafwt(ilmda) .eq. 0.0d0) then
                   lmdafmean(ilmda) = 0.0d0
                else
@@ -1495,7 +1551,8 @@ c     "buildfkernel" builds the ost f kernel by computing the
 c     biased ensemble average of dE/dlambda at each lambda bin, and
 c     keeps its weighted sum and total weight in the same scaled
 c     form as "addkernelhist", so a row has data exactly when its
-c     total weight is positive
+c     total weight is positive; it does nothing when OST-FLATTEN
+c     selects the sample mean force
 c
 c
       subroutine buildfkernel
@@ -1511,6 +1568,10 @@ c
       real*8 vmax
       real*8 weight
 c
+c
+c     the f kernel holds the kernel mean force alone
+c
+      if (ostflatsamp)  return
 c
 c     loop over lambda bins
 c
@@ -1546,6 +1607,165 @@ c
          else
             lmdafmean(ilmda) = avgflambda / partfunc
          end if
+      end do
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  function ostgdep -- ost bias before a saved gaussian  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "ostgdep" finds the ost g bias at the lambda and dU/dlambda
+c     center of saved gaussian "ihist" from the gaussians saved before
+c     it, the bias under which that interval was sampled; it uses the
+c     same evaluation as the dynamics, bicubic interpolation of the
+c     grid, which must not yet hold gaussian "ihist", or the direct
+c     sum over the earlier gaussians
+c
+      function ostgdep (ihist)
+      use dlmda
+      use ost
+      implicit none
+      integer ihist
+      real*8 ostgdep
+      real*8 g,dgdl,dgdfl
+c
+c
+c     interpolate the grid, or sum the earlier gaussians directly
+c
+      if (ostinterpol) then
+         call egkernelinterppt (lmdalhist(ihist),lmdafhist(ihist),
+     &                          g,dgdl,dgdfl)
+      else
+         call egkernelpt (lmdalhist(ihist),lmdafhist(ihist),ihist-1,
+     &                    g,dgdl,dgdfl)
+      end if
+      ostgdep = g
+      return
+      end
+c
+c
+c     ################################################################
+c     ##                                                            ##
+c     ##  subroutine addflatsample -- add one sample to mean force  ##
+c     ##                                                            ##
+c     ################################################################
+c
+c
+c     "addflatsample" adds saved gaussian "ihist" to the sample mean
+c     force, held in the mean force of the lambda bins, when
+c     OST-FLATTEN selects it, and otherwise does nothing; its
+c     dU/dlambda center counts in the lambda bin of
+c     its lambda center with weight exp(g/RT), and g is the bias the
+c     dynamics felt there before this gaussian was added; the weights
+c     undo that bias on the atoms, so they use the bath temperature
+c
+c     note the sums of a bin are kept relative to the largest g they
+c     hold and rescaled when a sample raises it, so no weight exceeds
+c     one and the exponential cannot overflow; the sums are those of
+c     the mean force of the lambda bins, which belong to one choice of
+c     OST-FLATTEN at a time, as explained in "clearkernels"
+c
+c
+      subroutine addflatsample (ihist)
+      use bath
+      use dlmda
+      use ost
+      use units
+      implicit none
+      integer ihist
+      integer ilmda
+      integer lmdabin
+      real*8 g,w,rt
+      real*8 scale
+      real*8 ostgdep
+c
+c
+c     get the lambda bin and the bias at the gaussian center
+c
+      if (.not. ostflatsamp)  return
+      rt = gasconst * kelvin
+      ilmda = lmdabin(lmdalhist(ihist))
+      g = ostgdep(ihist)
+c
+c     the first sample of a bin sets its reference, and a larger g
+c     becomes the reference after the old sums are rescaled
+c
+      w = 1.0d0
+      if (lmdafwt(ilmda) .eq. 0.0d0) then
+         ostflatgmax(ilmda) = g
+      else if (g .gt. ostflatgmax(ilmda)) then
+         scale = exp((ostflatgmax(ilmda)-g)/rt)
+         lmdafsum(ilmda) = lmdafsum(ilmda) * scale
+         lmdafwt(ilmda) = lmdafwt(ilmda) * scale
+         ostflatgmax(ilmda) = g
+      else
+         w = exp((g-ostflatgmax(ilmda))/rt)
+      end if
+c
+c     add the weighted sample and update the mean force of the bin
+c
+      lmdafsum(ilmda) = lmdafsum(ilmda) + w*lmdafhist(ihist)
+      lmdafwt(ilmda) = lmdafwt(ilmda) + w
+      lmdafmean(ilmda) = lmdafsum(ilmda) / lmdafwt(ilmda)
+      return
+      end
+c
+c
+c     ############################################################
+c     ##                                                        ##
+c     ##  subroutine clearkernels -- zero the ost bias kernels  ##
+c     ##                                                        ##
+c     ############################################################
+c
+c
+c     "clearkernels" empties the ost g kernel, its derivative grids
+c     and running maxima, and the mean force of every lambda bin with
+c     the reference bias of the sample mean force, first allocating
+c     that reference if it is missing or no longer matches the number
+c     of lambda bins
+c
+c     note the mean force of the lambda bins holds the kernel or the
+c     sample mean force, whichever OST-FLATTEN selects, and never both,
+c     so a change of the selection must be followed by this routine
+c     and a rebuild of the kernels from the history
+c
+c
+      subroutine clearkernels
+      use dlmda
+      use ost
+      implicit none
+      integer i,j
+      logical resize
+c
+c
+c     allocate the reference bias of the sample mean force if needed
+c
+      resize = (.not. allocated(ostflatgmax))
+      if (.not. resize)  resize = (size(ostflatgmax) .ne. nlmda)
+      if (resize) then
+         if (allocated(ostflatgmax))  deallocate (ostflatgmax)
+         allocate (ostflatgmax(nlmda))
+      end if
+c
+c     empty the kernels, the mean force and the reference bias
+c
+      do i = 1, nlmda
+         ostflatgmax(i) = 0.0d0
+         lmdafmean(i) = 0.0d0
+         lmdafsum(i) = 0.0d0
+         lmdafwt(i) = 0.0d0
+         vkernelmax(i) = 0.0d0
+         do j = 1, nflmda
+            gfkernel(i,j) = 0.0d0
+            gkernel(i,j) = 0.0d0
+            glfkernel(i,j) = 0.0d0
+            glkernel(i,j) = 0.0d0
+         end do
       end do
       return
       end
@@ -1860,21 +2080,10 @@ c
       allocate (lmdafwt(nlmda))
       allocate (vkernelmax(nlmda))
 c
-c     initialize ost arrays
+c     initialize ost arrays, where the lookup table is cleared when
+c     it is rebuilt below
 c
-      do i = 1, nlmda
-         lmdafmean(i) = 0.0d0
-         lmdafsum(i) = 0.0d0
-         lmdafwt(i) = 0.0d0
-         vkernelmax(i) = 0.0d0
-         do ihist = 1, nflmda
-            gfkernel(i,ihist) = 0.0d0
-            gkernel(i,ihist) = 0.0d0
-            glfkernel(i,ihist) = 0.0d0
-            glkernel(i,ihist) = 0.0d0
-            osthead(i,ihist) = 0
-         end do
-      end do
+      call clearkernels
       do i = 1, lmdaintv
          lmdallist(i) = 0.0d0
          lmdaflist(i) = 0.0d0

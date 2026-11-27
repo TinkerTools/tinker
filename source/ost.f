@@ -42,6 +42,7 @@ c     dvmetagrid     d(vmetagrid)/dlambda at each lambda bin
 c     metahhist      height of metadynamics gaussians
 c     metalhist      lambda center of metadynamics gaussians
 c     metawhist      lambda width of metadynamics gaussians
+c     ostflatgmax    largest g of the samples in each lambda bin
 c     osthhist       height of gaussians saved in histogram
 c     ostwfhist      flambda width of gaussians saved in histogram
 c     ostwlhist      lambda width of gaussians saved in histogram
@@ -52,6 +53,7 @@ c     gkernel        ost bias potential on the lambda/flambda grid
 c     glfkernel      mixed derivative of gkernel on grid
 c     glkernel       d(gkernel)/dlambda values on grid
 c     fastkernel     flag to use fused g and f kernel updates
+c     ostflatsamp    flag to use the sample mean force, not the kernel
 c     ostinterpol    flag to interpolate ost g kernel from grid
 c     use_ostgtemp   flag to temper heights by the global bias level
 c     use_ostltemp   flag to temper heights by the lambda bin excess
@@ -94,6 +96,7 @@ c
       real*8, allocatable :: metahhist(:)
       real*8, allocatable :: metalhist(:)
       real*8, allocatable :: metawhist(:)
+      real*8, allocatable :: ostflatgmax(:)
       real*8, allocatable :: osthhist(:)
       real*8, allocatable :: ostwfhist(:)
       real*8, allocatable :: ostwlhist(:)
@@ -104,6 +107,7 @@ c
       real*8, allocatable :: glfkernel(:,:)
       real*8, allocatable :: glkernel(:,:)
       logical fastkernel
+      logical ostflatsamp
       logical ostinterpol
       logical use_ostgtemp
       logical use_ostltemp

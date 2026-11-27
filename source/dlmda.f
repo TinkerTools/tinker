@@ -122,7 +122,11 @@ c     lmdafmean     sampled mean force of each lambda bin, zero in a
 c                     bin without data; the bias that drives lambda
 c                     reads a filled copy built in "efreebias"
 c     lmdafsum      weighted dU/dlambda sum of each lambda bin
-c     lmdafwt       total weight of each lambda bin
+c     lmdafwt       total weight of each lambda bin, a sample count
+c                     for abf; for ost both are scaled by a factor of
+c                     the bin, the vkernelmax or ostflatgmax of the
+c                     mean force OST-FLATTEN selects, so only their
+c                     ratio and a positive weight have a meaning
 c     lmdalhist     lambda value of each history entry
 c     lmdallist     lambda values saved within an interval
 c     lmdawinfrac   fraction of the run spent in each lambda window

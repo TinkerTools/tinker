@@ -3071,9 +3071,11 @@ c
 c
 c     "lmdasampled" tests whether the mean force of a lambda bin comes
 c     from data, which is any total weight in the bin: an interval
-c     sample for the adaptive biasing force, or g kernel support along
-c     flambda for orthogonal space tempering, as every gaussian height
-c     is positive and both ost kernel builds keep the weight
+c     sample for the adaptive biasing force, and for orthogonal space
+c     tempering a saved gaussian centered in the bin for the sample
+c     mean force, or g kernel support along flambda for the kernel
+c     mean force, as every gaussian height is positive and both ost
+c     kernel builds keep the weight
 c
 c
       function lmdasampled (ilmda)

@@ -86,6 +86,8 @@ c
      &   call test_eost_temperkeys
       if (.not. skiptest(tname//'_interpkeys','ost',2))
      &   call test_eost_interpkeys
+      if (.not. skiptest(tname//'_flatten','ost',2))
+     &   call test_eost_flatten
       if (.not. skiptest(tname//'_restartrun','ost',4))
      &   call test_eost_restartrun
       call final
@@ -2017,7 +2019,8 @@ c     ##############################################################
 c
 c
 c     "test_eost_eginterpolate" checks interpolated gaussian
-c     bias values and derivatives
+c     bias values and derivatives, from both the fused and the
+c     separate g and f kernel builds
 c
 c
       subroutine test_eost_eginterpolate
@@ -2026,8 +2029,10 @@ c
       use mutant
       use ost
       implicit none
+      integer i,j
       real*8 egbias0,dgdl0,dgdfl0
       real*8 egbias1,dgdl1,dgdfl1
+      real*8 egbias2,dgdl2,dgdfl2
       real*8 height
       real*8 sigl,sigf
 c
@@ -2083,6 +2088,26 @@ c
      &                  'egkernel interpolate offgrid dgdl')
       call assert_real (dgdfl1,dgdfl0,2.0d-2,
      &                  'egkernel interpolate offgrid dgdfl')
+c
+c     the separate g and f kernel builds keep the same derivatives,
+c     so the interpolated bias matches that of the fused build
+c
+      do i = 1, nlmda
+         do j = 1, nflmda
+            gfkernel(i,j) = -123.0d0
+            glkernel(i,j) = -123.0d0
+            glfkernel(i,j) = -123.0d0
+         end do
+      end do
+      call buildgkernel
+      call buildfkernel
+      call egkernelinterpolate (egbias2,dgdl2,dgdfl2)
+      call assert_real (egbias2,egbias1,1.0d-12,
+     &                  'egkernel interpolate separate build bias')
+      call assert_real (dgdl2,dgdl1,1.0d-12,
+     &                  'egkernel interpolate separate build dgdl')
+      call assert_real (dgdfl2,dgdfl1,1.0d-12,
+     &                  'egkernel interpolate separate build dgdfl')
       return
       end
 c
@@ -3574,6 +3599,185 @@ c
       end
 c
 c
+c     #################################################################
+c     ##                                                             ##
+c     ##  subroutine test_eost_flatten  --  sample mean force tests  ##
+c     ##                                                             ##
+c     #################################################################
+c
+c
+c     "test_eost_flatten" checks the OST-FLATTEN keyword, the sample
+c     mean force of a small history against weights found by hand,
+c     that the sample mean force built one gaussian at a time matches
+c     a rebuild from the history, that the interpolated and the direct
+c     bias give the same weights at grid nodes, that the kernel and the
+c     sample mean force each take the mean force of the lambda bins
+c     alone when selected, and that the free energy, the bias and the
+c     sampled bins read it
+c
+c
+      subroutine test_eost_flatten
+      use bath
+      use dlmda
+      use keys
+      use math
+      use mutant
+      use ost
+      use units
+      implicit none
+      integer i,k
+      integer ilmda
+      integer nhist
+      integer lmdabin
+      real*8 rt,pref,height
+      real*8 g2,g3,w2,w3
+      real*8 fref
+      real*8 eref,dref
+      real*8 vbias,dbias
+      real*8 efreetot
+      real*8 meandir(9),wtdir(9)
+      real*8 kmean(9)
+      logical lmdasampled
+c
+c
+c     no keyword gives the sample mean force, KERNEL and SAMPLE set
+c     it in any case
+c
+      use_ost = .false.
+      use_meta = .false.
+      lambda = 0.5d0
+      if (allocated(keyline))  deallocate (keyline)
+      allocate (keyline(1))
+      nkey = 0
+      ostflatsamp = .false.
+      call mutate_ost
+      call assert_logical (ostflatsamp,.true.,
+     &                     'OST-FLATTEN default sample')
+      nkey = 1
+      keyline(1) = 'OST-FLATTEN KERNEL'
+      call mutate_ost
+      call assert_logical (ostflatsamp,.false.,
+     &                     'OST-FLATTEN KERNEL')
+      keyline(1) = 'ost-flatten sample'
+      call mutate_ost
+      call assert_logical (ostflatsamp,.true.,
+     &                     'OST-FLATTEN sample lower case')
+      nkey = 0
+      deallocate (keyline)
+c
+c     three gaussians at lambda of one half, on grid nodes, whose
+c     peak bias is half of RT, so the weights differ markedly
+c
+      call resetost (9,9,4)
+      rt = gasconst * kelvin
+      pref = 0.5d0 * rt
+      height = pref * 2.0d0 * pi * wlmda * wflmda
+      nhist = 3
+      call sethist (1,0.5d0,0.0d0,height,wlmda,wflmda)
+      call sethist (2,0.5d0,1.0d0,height,wlmda,wflmda)
+      call sethist (3,0.5d0,0.0d0,height,wlmda,wflmda)
+      nlmdahist = nhist
+      call buildostindex
+c
+c     the bias before each gaussian, from the earlier ones alone; the
+c     first sees none, and the lambda offset of the others is zero
+c
+      g2 = pref * exp(-0.5d0)
+      g3 = pref + pref*exp(-0.5d0)
+      w2 = exp(g2/rt)
+      w3 = exp(g3/rt)
+      fref = (0.0d0 + 1.0d0*w2 + 0.0d0*w3) / (1.0d0 + w2 + w3)
+      ilmda = lmdabin(0.5d0)
+c
+c     rebuild from the history with the direct sum of the bias; the
+c     sample mean force fills only the bin of the gaussians, where the
+c     kernel would also fill the neighbors within the lambda cutoff
+c
+      ostflatsamp = .true.
+      ostinterpol = .false.
+      fastkernel = .true.
+      call buildkernels
+      call assert_real (lmdafmean(ilmda),fref,1.0d-12,
+     &                  'flatten rebuild sample mean force')
+      call assert_real (lmdafwt(ilmda)*exp(g3/rt),1.0d0+w2+w3,
+     &                  1.0d-12,'flatten rebuild total weight')
+      do i = 1, nlmda
+         meandir(i) = lmdafmean(i)
+         wtdir(i) = lmdafwt(i)
+         if (i .ne. ilmda) then
+            call assert_real (lmdafwt(i),0.0d0,0.0d0,
+     &                        'flatten sample fills its own bin')
+         end if
+      end do
+c
+c     add the gaussians one at a time, as each deposit does
+c
+      call clearkernels
+      do k = 1, nhist
+         nlmdahist = k
+         call addflatsample (k)
+         call updatekernels
+      end do
+      call assert_array1 (lmdafmean,meandir,nlmda,1.0d-12,
+     &                    'flatten incremental mean force')
+      call assert_array1 (lmdafwt,wtdir,nlmda,1.0d-12,
+     &                    'flatten incremental weight')
+c
+c     the interpolated bias equals the grid at the nodes, so it gives
+c     the same weights as the direct sum
+c
+      ostinterpol = .true.
+      call buildkernels
+      call assert_array1 (lmdafmean,meandir,nlmda,1.0d-12,
+     &                    'flatten interpolated mean force')
+      call assert_array1 (lmdafwt,wtdir,nlmda,1.0d-12,
+     &                    'flatten interpolated weight')
+c
+c     the kernel mean force takes the place of the sample one when it
+c     is selected, matching the separate kernel build with no trace of
+c     the sample, and the sample one then returns unchanged
+c
+      ostflatsamp = .false.
+      call buildkernels
+      do i = 1, nlmda
+         kmean(i) = lmdafmean(i)
+      end do
+      call assert_logical (lmdafwt(ilmda+1).gt.0.0d0,.true.,
+     &                     'flatten kernel fills the neighbors')
+      call buildgkernel
+      call buildfkernel
+      call assert_array1 (lmdafmean,kmean,nlmda,1.0d-12,
+     &                    'flatten kernel matches separate build')
+      ostflatsamp = .true.
+      call buildkernels
+      call assert_array1 (lmdafmean,meandir,nlmda,1.0d-12,
+     &                    'flatten sample after kernel unchanged')
+c
+c     the reported free energy, the bias and the sampled bins all read
+c     the one mean force of the lambda bins
+c
+      use_ost = .true.
+      use_lmdafill = .false.
+      call efreeprof (1.0d0,meandir,eref,dref)
+      call assert_real (efreetot(),eref,1.0d-12,
+     &                  'flatten sample free energy')
+      call efreebias (0.5d0,vbias,dbias)
+      call efreeprof (0.5d0,meandir,eref,dref)
+      call assert_real (vbias,eref,1.0d-12,'flatten sample bias')
+      call assert_real (dbias,dref,1.0d-12,'flatten sample slope')
+      call assert_logical (lmdasampled(ilmda),.true.,
+     &                     'flatten sample bin has data')
+      call assert_logical (lmdasampled(ilmda+1),.false.,
+     &                     'flatten sample neighbor empty')
+c
+c     restore a clean OST state
+c
+      use_ost = .false.
+      call resetost (5,5,1)
+      return
+      end
+c
+c
 c     ###############################################################
 c     ##                                                           ##
 c     ##  subroutine test_eost_temperkeys  --  tempering keywords  ##
@@ -3915,6 +4119,7 @@ c
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
+      if (allocated(ostflatgmax))  deallocate (ostflatgmax)
 c
 c     set scalar state
 c
@@ -3979,6 +4184,7 @@ c
       oststdev = 1.0d0
       ostinterpol = .false.
       fastkernel = .false.
+      ostflatsamp = .false.
 c
 c     allocate arrays
 c

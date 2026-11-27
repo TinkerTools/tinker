@@ -2,7 +2,8 @@
  OST Free Energy Estimate :
 
  Number of Gaussians              30
- Delta G                        0.0000000000D+00
+ Mean Force Used              Sample
+ Delta G                        1.8953084570D-01
  Temperature Used               2.9800000000D+02 K
 
  OST Mean Force dU/dL(L) :
@@ -14,7 +15,7 @@
  2.0000D-01      0.0000D+00          No
  3.0000D-01      0.0000D+00          No
  4.0000D-01      0.0000D+00          No
- 5.0000D-01      0.0000D+00         Yes
+ 5.0000D-01      1.8953D+00         Yes
  6.0000D-01      0.0000D+00          No
  7.0000D-01      0.0000D+00          No
  8.0000D-01      0.0000D+00          No
