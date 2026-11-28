@@ -1251,6 +1251,6 @@ c
       deallocate (gkernel)
       deallocate (glfkernel)
       deallocate (glkernel)
-      deallocate (vkernelmax)
+      deallocate (gkernelmax)
       return
       end

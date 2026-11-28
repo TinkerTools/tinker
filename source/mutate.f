@@ -1284,7 +1284,7 @@ c
       oststdev = 4.0d0
       fastkernel = .true.
       ostinterpol = .true.
-      ostmeansamp = .true.
+      ostsampmean = .true.
 c
 c     search keywords for orthogonal space tempering options
 c
@@ -1382,7 +1382,7 @@ c
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(lmdafwt))  deallocate (lmdafwt)
-      if (allocated(vkernelmax))  deallocate (vkernelmax)
+      if (allocated(gkernelmax))  deallocate (gkernelmax)
       if (allocated(ostsampgmax))  deallocate (ostsampgmax)
 c
 c     allocate ost histogram and kernels
@@ -1408,7 +1408,7 @@ c
          allocate (glfkernel(nlmda,nflmda))
          allocate (glkernel(nlmda,nflmda))
          allocate (lmdafwt(nlmda))
-         allocate (vkernelmax(nlmda))
+         allocate (gkernelmax(nlmda))
 c
 c     initialize ost histogram and kernels
 c
@@ -1474,12 +1474,12 @@ c     other modifier
 c
       else if (keyword(1:14) .eq. 'OST-MEANFORCE ') then
          if (word .eq. 'KERNEL') then
-            ostmeansamp = .false.
+            ostsampmean = .false.
          else if (word .eq. 'SAMPLE') then
-            ostmeansamp = .true.
+            ostsampmean = .true.
          else
             write (iout,10)  word(1:max(1,trimtext(word)))
-   10       format (/,' OSTKEYS  --  Unknown OST-MEANFORCE Mean Force ',
+   10       format (/,' OSTKEYS  --  Unknown OST-MEANFORCE Modifier ',
      &                 a,'; Use KERNEL or SAMPLE')
             call fatal
          end if

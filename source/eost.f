@@ -161,7 +161,7 @@ c
       lmdalhist(nlmdahist) = lmdaavg
       lmdafhist(nlmdahist) = dedlavg
       osthhist(nlmdahist) = temperedheight(ostvminimax(),
-     &                                    vkernelmax(ilmda))
+     &                                    gkernelmax(ilmda))
       ostwlhist(nlmdahist) = wlhist
       ostwfhist(nlmdahist) = wfhist
       ostnext(nlmdahist) = osthead(ilmda,iflmda)
@@ -170,7 +170,7 @@ c
 c     add the new gaussian to the sample mean force, weighted by the
 c     bias it was sampled under, before it joins the kernels
 c
-      call addmeansample (nlmdahist)
+      call addsampmean (nlmdahist)
       if (fastkernel) then
          call updatekernels
       else
@@ -256,10 +256,10 @@ c     reduce the running per lambda bin maxima
 c
       ostvminimax = 0.0d0
       if (nlmda .lt. 1)  return
-      if (.not. allocated(vkernelmax))  return
-      ostvminimax = vkernelmax(1)
+      if (.not. allocated(gkernelmax))  return
+      ostvminimax = gkernelmax(1)
       do i = 2, nlmda
-         ostvminimax = min(ostvminimax,vkernelmax(i))
+         ostvminimax = min(ostvminimax,gkernelmax(i))
       end do
       return
       end
@@ -1256,7 +1256,7 @@ c     loop over saved histogram sources, where each one joins the
 c     sample mean force before it joins the g kernel
 c
       do ihist = 1, nlmdahist
-         call addmeansample (ihist)
+         call addsampmean (ihist)
          call addkernelhist (ihist,.false.)
       end do
       return
@@ -1290,7 +1290,7 @@ c     loop over saved histogram sources, where each one joins the
 c     sample mean force before it joins the kernels
 c
       do ihist = 1, nlmdahist
-         call addmeansample (ihist)
+         call addsampmean (ihist)
          call addkernelhist (ihist,.true.)
       end do
       return
@@ -1399,7 +1399,7 @@ c
 c     the f kernel accumulators hold the kernel mean force, so they
 c     are kept only when that mean force is selected
 c
-      dofmean = (dofkern .and. .not.ostmeansamp)
+      dofmean = (dofkern .and. .not.ostsampmean)
 c
 c     unpack saved source location and get gaussian parameters
 c
@@ -1476,7 +1476,7 @@ c
                e = pref * expl * fexp(iflmda)
                oldg = gkernel(ilmda,iflmda)
                newg = oldg + e
-               vmax = vkernelmax(ilmda)
+               vmax = gkernelmax(ilmda)
                raised = (newg .gt. vmax)
                vtop = max(vmax,newg)
                flmda = dble(iflmda-fli0) * wflmda
@@ -1517,7 +1517,7 @@ c
                dgdfl = ffac * e
                d2gdlfl = lfac * dgdfl
                gkernel(ilmda,iflmda) = newg
-               vkernelmax(ilmda) = vtop
+               gkernelmax(ilmda) = vtop
                gfkernel(ilmda,iflmda) = gfkernel(ilmda,iflmda) + dgdfl
                glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
                glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda)
@@ -1571,7 +1571,7 @@ c
 c
 c     the f kernel holds the kernel mean force alone
 c
-      if (ostmeansamp)  return
+      if (ostsampmean)  return
 c
 c     loop over lambda bins
 c
@@ -1582,7 +1582,7 @@ c
 c     the largest bias in the row is factored out of both sums, where
 c     it cancels exactly, to keep the exponential from overflowing
 c
-         vmax = vkernelmax(ilmda)
+         vmax = gkernelmax(ilmda)
 c
 c     loop over flambda bins with nonzero g kernel support; the
 c     weights undo the bias on the atoms at the bath temperature
@@ -1649,14 +1649,14 @@ c
       end
 c
 c
-c     ################################################################
-c     ##                                                            ##
-c     ##  subroutine addmeansample -- add one sample to mean force  ##
-c     ##                                                            ##
-c     ################################################################
+c     ##############################################################
+c     ##                                                          ##
+c     ##  subroutine addsampmean -- add one sample to mean force  ##
+c     ##                                                          ##
+c     ##############################################################
 c
 c
-c     "addmeansample" adds saved gaussian "ihist" to the sample mean
+c     "addsampmean" adds saved gaussian "ihist" to the sample mean
 c     force, held in the mean force of the lambda bins, when
 c     OST-MEANFORCE selects it, and otherwise does nothing; its
 c     dU/dlambda center counts in the lambda bin of
@@ -1671,7 +1671,7 @@ c     the mean force of the lambda bins, which belong to one choice of
 c     OST-MEANFORCE at a time, as explained in "clearkernels"
 c
 c
-      subroutine addmeansample (ihist)
+      subroutine addsampmean (ihist)
       use bath
       use dlmda
       use ost
@@ -1687,7 +1687,7 @@ c
 c
 c     get the lambda bin and the bias at the gaussian center
 c
-      if (.not. ostmeansamp)  return
+      if (.not. ostsampmean)  return
       rt = gasconst * kelvin
       ilmda = lmdabin(lmdalhist(ihist))
       g = ostgdep(ihist)
@@ -1759,7 +1759,7 @@ c
          lmdafmean(i) = 0.0d0
          lmdafsum(i) = 0.0d0
          lmdafwt(i) = 0.0d0
-         vkernelmax(i) = 0.0d0
+         gkernelmax(i) = 0.0d0
          do j = 1, nflmda
             gfkernel(i,j) = 0.0d0
             gkernel(i,j) = 0.0d0
@@ -2059,7 +2059,7 @@ c
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(lmdafwt))  deallocate (lmdafwt)
-      if (allocated(vkernelmax))  deallocate (vkernelmax)
+      if (allocated(gkernelmax))  deallocate (gkernelmax)
       allocate (osthhist(sizelmdahist))
       allocate (osthist(sizelmdahist))
       allocate (lmdaihist(sizelmdahist))
@@ -2078,7 +2078,7 @@ c
       allocate (glfkernel(nlmda,nflmda))
       allocate (glkernel(nlmda,nflmda))
       allocate (lmdafwt(nlmda))
-      allocate (vkernelmax(nlmda))
+      allocate (gkernelmax(nlmda))
 c
 c     initialize ost arrays, where the lookup table is cleared when
 c     it is rebuilt below

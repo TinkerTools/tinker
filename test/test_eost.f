@@ -50,8 +50,8 @@ c
      &   call test_eost_depcriteria
       if (.not. skiptest(tname//'_efkernel','ost',2))
      &   call test_eost_efkernel
-      if (.not. skiptest(tname//'_vkernelmax','ost',2))
-     &   call test_eost_vkernelmax
+      if (.not. skiptest(tname//'_gkernelmax','ost',2))
+     &   call test_eost_gkernelmax
       if (.not. skiptest(tname//'_fill','ost',2))
      &   call test_eost_fill
       if (.not. skiptest(tname//'_tempering','ost',2))
@@ -119,7 +119,7 @@ c
       integer nsave0
       integer size1,size2,size3
       integer freeunit
-      real*8 brutevkmax
+      real*8 brutegkmax
       real*8 kelvin0
       logical exist
       character*240 filename0
@@ -189,7 +189,7 @@ c
       call assert_real (osthhist(3),4.0d0,1.0d-12,
      &                  'rdost restores height 3')
       do i = 1, nlmda
-         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+         call assert_real (gkernelmax(i),brutegkmax(i),1.0d-12,
      &                     'rdost rebuilds the running maximum')
       end do
 c
@@ -1713,7 +1713,7 @@ c
       rt = gasconst * kelvin
       gkernel(3,2) = log(2.0d0) * rt
       gkernel(3,4) = log(4.0d0) * rt
-      vkernelmax(3) = log(4.0d0) * rt
+      gkernelmax(3) = log(4.0d0) * rt
       call buildfkernel
       expected = 1.0d0 / 3.0d0
       call assert_real (lmdafmean(3),expected,1.0d-12,
@@ -1789,7 +1789,7 @@ c
       rt = gasconst * kelvin
       gkernel(3,2) = 500.0d0
       gkernel(3,4) = 499.0d0
-      vkernelmax(3) = 500.0d0
+      gkernelmax(3) = 500.0d0
       call buildfkernel
       wratio = exp((499.0d0-500.0d0)/rt)
       expected = (-1.0d0 + wratio) / (1.0d0 + wratio)
@@ -1877,7 +1877,7 @@ c
          fsum = 0.0d0
 c
 c     the accumulators factor out the largest bias in the row, so the
-c     reference has to be built with the same vkernelmax shift
+c     reference has to be built with the same gkernelmax shift
 c
          vmaxref = 0.0d0
          do j = 1, nflmda
@@ -2364,24 +2364,24 @@ c
 c
 c     ############################################################
 c     ##                                                        ##
-c     ##  subroutine test_eost_vkernelmax  --  bias level test  ##
+c     ##  subroutine test_eost_gkernelmax  --  bias level test  ##
 c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "test_eost_vkernelmax" checks the running maximum of the g
+c     "test_eost_gkernelmax" checks the running maximum of the g
 c     kernel along flambda and the global path bias level derived
 c     from it, over every path that fills the kernel
 c
 c
-      subroutine test_eost_vkernelmax
+      subroutine test_eost_gkernelmax
       use bath
       use dlmda
       use ost
       implicit none
       integer i
       real*8 vmin
-      real*8 brutevkmax
+      real*8 brutegkmax
       real*8 ostvminimax
       real*8, allocatable :: gsave(:,:)
 c
@@ -2395,11 +2395,11 @@ c
       call sethist (2,0.75d0,1.0d0,2.0d0,0.25d0,1.0d0)
       call buildostindex
       call buildkernels
-      vmin = brutevkmax (1)
+      vmin = brutegkmax (1)
       do i = 1, nlmda
-         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+         call assert_real (gkernelmax(i),brutegkmax(i),1.0d-12,
      &                     'buildkernels running maximum')
-         vmin = min(vmin,brutevkmax(i))
+         vmin = min(vmin,brutegkmax(i))
       end do
       call assert_real (ostvminimax(),vmin,1.0d-12,
      &                  'ostvminimax over lambda')
@@ -2413,7 +2413,7 @@ c
       call buildostindex
       call updatekernels
       do i = 1, nlmda
-         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+         call assert_real (gkernelmax(i),brutegkmax(i),1.0d-12,
      &                     'updatekernels running maximum')
       end do
 c
@@ -2425,7 +2425,7 @@ c
       call assert_array2 (gkernel,gsave,nlmda,nflmda,1.0d-12,
      &                    'buildgkernel reproduces gkernel')
       do i = 1, nlmda
-         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+         call assert_real (gkernelmax(i),brutegkmax(i),1.0d-12,
      &                     'buildgkernel running maximum')
       end do
       deallocate (gsave)
@@ -2605,25 +2605,25 @@ c
 c
 c     #############################################################
 c     ##                                                         ##
-c     ##  function brutevkmax  --  direct kernel column maximum  ##
+c     ##  function brutegkmax  --  direct kernel column maximum  ##
 c     ##                                                         ##
 c     #############################################################
 c
 c
-c     "brutevkmax" scans the g kernel directly for the largest
+c     "brutegkmax" scans the g kernel directly for the largest
 c     value at one lambda bin, ignoring the running maximum
 c
 c
-      function brutevkmax (ilmda)
+      function brutegkmax (ilmda)
       use ost
       implicit none
       integer ilmda,j
-      real*8 brutevkmax
+      real*8 brutegkmax
 c
 c
-      brutevkmax = 0.0d0
+      brutegkmax = 0.0d0
       do j = 1, nflmda
-         brutevkmax = max(brutevkmax,gkernel(ilmda,j))
+         brutegkmax = max(brutegkmax,gkernel(ilmda,j))
       end do
       return
       end
@@ -3429,7 +3429,7 @@ c
       integer imax,imin
       real*8 rt,gmin,gl
       real*8 hglobal
-      real*8 brutevkmax
+      real*8 brutegkmax
       real*8 ostvminimax
       real*8 temperedheight
 c
@@ -3474,10 +3474,10 @@ c     a deposit in the most filled bin is tempered by both factors
 c
       imax = 1
       do i = 2, nlmda
-         if (brutevkmax(i) .gt. brutevkmax(imax))  imax = i
+         if (brutegkmax(i) .gt. brutegkmax(imax))  imax = i
       end do
       gmin = ostvminimax ()
-      gl = vkernelmax(imax)
+      gl = gkernelmax(imax)
       call assert_logical (gmin.gt.ostgthresh,.true.,
      &                     'elmdadyn ost global factor active')
       call assert_logical (gl-gmin.gt.ostlthresh,.true.,
@@ -3500,7 +3500,7 @@ c     a deposit in the least filled bin sees no local excess
 c
       imin = 1
       do i = 2, nlmda
-         if (vkernelmax(i) .lt. vkernelmax(imin))  imin = i
+         if (gkernelmax(i) .lt. gkernelmax(imin))  imin = i
       end do
       gmin = ostvminimax ()
       do istep = 1, lmdaintv
@@ -3518,7 +3518,7 @@ c     growing the flambda grid keeps the running bin maxima
 c
       call ensureflambda (500.0d0)
       do i = 1, nlmda
-         call assert_real (vkernelmax(i),brutevkmax(i),1.0d-12,
+         call assert_real (gkernelmax(i),brutegkmax(i),1.0d-12,
      &                     'ensureflambda keeps bin bias levels')
       end do
       use_lmdacv = .false.
@@ -3649,18 +3649,18 @@ c
       if (allocated(keyline))  deallocate (keyline)
       allocate (keyline(1))
       nkey = 0
-      ostmeansamp = .false.
+      ostsampmean = .false.
       call mutate_ost
-      call assert_logical (ostmeansamp,.true.,
+      call assert_logical (ostsampmean,.true.,
      &                     'OST-MEANFORCE default sample')
       nkey = 1
       keyline(1) = 'OST-MEANFORCE KERNEL'
       call mutate_ost
-      call assert_logical (ostmeansamp,.false.,
+      call assert_logical (ostsampmean,.false.,
      &                     'OST-MEANFORCE KERNEL')
       keyline(1) = 'ost-meanforce sample'
       call mutate_ost
-      call assert_logical (ostmeansamp,.true.,
+      call assert_logical (ostsampmean,.true.,
      &                     'OST-MEANFORCE sample lower case')
       nkey = 0
       deallocate (keyline)
@@ -3693,7 +3693,7 @@ c     rebuild from the history with the direct sum of the bias; the
 c     sample mean force fills only the bin of the gaussians, where the
 c     kernel would also fill the neighbors within the lambda cutoff
 c
-      ostmeansamp = .true.
+      ostsampmean = .true.
       ostinterpol = .false.
       fastkernel = .true.
       call buildkernels
@@ -3715,7 +3715,7 @@ c
       call clearkernels
       do k = 1, nhist
          nlmdahist = k
-         call addmeansample (k)
+         call addsampmean (k)
          call updatekernels
       end do
       call assert_array1 (lmdafmean,meandir,nlmda,1.0d-12,
@@ -3737,7 +3737,7 @@ c     the kernel mean force takes the place of the sample one when it
 c     is selected, matching the separate kernel build with no trace of
 c     the sample, and the sample one then returns unchanged
 c
-      ostmeansamp = .false.
+      ostsampmean = .false.
       call buildkernels
       do i = 1, nlmda
          kmean(i) = lmdafmean(i)
@@ -3748,7 +3748,7 @@ c
       call buildfkernel
       call assert_array1 (lmdafmean,kmean,nlmda,1.0d-12,
      &                    'meanforce kernel matches separate build')
-      ostmeansamp = .true.
+      ostsampmean = .true.
       call buildkernels
       call assert_array1 (lmdafmean,meandir,nlmda,1.0d-12,
      &                    'meanforce sample after kernel unchanged')
@@ -4115,7 +4115,7 @@ c
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(lmdafwt))  deallocate (lmdafwt)
-      if (allocated(vkernelmax))  deallocate (vkernelmax)
+      if (allocated(gkernelmax))  deallocate (gkernelmax)
       if (allocated(metalhist))  deallocate (metalhist)
       if (allocated(metahhist))  deallocate (metahhist)
       if (allocated(metawhist))  deallocate (metawhist)
@@ -4184,7 +4184,7 @@ c
       oststdev = 1.0d0
       ostinterpol = .false.
       fastkernel = .false.
-      ostmeansamp = .false.
+      ostsampmean = .false.
 c
 c     allocate arrays
 c
@@ -4206,7 +4206,7 @@ c
       allocate (glfkernel(nlmda,nflmda))
       allocate (glkernel(nlmda,nflmda))
       allocate (lmdafwt(nlmda))
-      allocate (vkernelmax(nlmda))
+      allocate (gkernelmax(nlmda))
 c
 c     initialize arrays
 c
@@ -4228,7 +4228,7 @@ c
          lmdafmean(i) = 0.0d0
          lmdafsum(i) = 0.0d0
          lmdafwt(i) = 0.0d0
-         vkernelmax(i) = 0.0d0
+         gkernelmax(i) = 0.0d0
          do j = 1, nflmda
             osthead(i,j) = 0
             gfkernel(i,j) = 0.0d0

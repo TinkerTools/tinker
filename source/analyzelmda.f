@@ -315,7 +315,7 @@ c
       setwflmda = .false.
       nlmda1 = nlmda
       wflmda1 = wflmda
-      ostmeansamp = .true.
+      ostsampmean = .true.
       ostinterpol = .true.
       do i = 1, nkey
          next = 1
@@ -423,7 +423,7 @@ c
       if (allocated(glfkernel))  deallocate (glfkernel)
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(lmdafwt))  deallocate (lmdafwt)
-      if (allocated(vkernelmax))  deallocate (vkernelmax)
+      if (allocated(gkernelmax))  deallocate (gkernelmax)
       allocate (osthead(nlmda,nflmda))
       allocate (lmdafmean(nlmda))
       allocate (lmdafsum(nlmda))
@@ -432,7 +432,7 @@ c
       allocate (glfkernel(nlmda,nflmda))
       allocate (glkernel(nlmda,nflmda))
       allocate (lmdafwt(nlmda))
-      allocate (vkernelmax(nlmda))
+      allocate (gkernelmax(nlmda))
       call clearkernels
 c
 c     rebuild the lookup table from saved gaussian centers, where
@@ -490,7 +490,7 @@ c     it was sampled under, before it joins the kernels
 c
       do ihist = 1, nsave
          nlmdahist = ihist
-         call addmeansample (ihist)
+         call addsampmean (ihist)
          if (fastkernel) then
             call updatekernels
          else
@@ -544,7 +544,7 @@ c     recompute and print the total free energy estimate
 c
       lmdadeltag = efreetot()
       fused = 'Kernel'
-      if (ostmeansamp)  fused = 'Sample'
+      if (ostsampmean)  fused = 'Sample'
       write (iunit,10)  nlmdahist,fused,lmdadeltag,kelvin
    10 format (/,' OST Free Energy Estimate :',
      &        //,1x,'Number of Gaussians',i16,

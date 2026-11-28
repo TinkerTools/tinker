@@ -927,8 +927,8 @@ c
      &                     'lmdamode abf allocates no osthhist')
       call assert_logical (allocated(gkernel),.false.,
      &                     'lmdamode abf allocates no gkernel')
-      call assert_logical (allocated(vkernelmax),.false.,
-     &                     'lmdamode abf allocates no vkernelmax')
+      call assert_logical (allocated(gkernelmax),.false.,
+     &                     'lmdamode abf allocates no gkernelmax')
       call final
 c
 c     ost leaves pinned polarization in absolute single topology

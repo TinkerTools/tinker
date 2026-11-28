@@ -966,7 +966,7 @@ c
       if (allocated(ostnext))  deallocate (ostnext)
       if (allocated(ostwfhist))  deallocate (ostwfhist)
       if (allocated(ostwlhist))  deallocate (ostwlhist)
-      if (allocated(vkernelmax))  deallocate (vkernelmax)
+      if (allocated(gkernelmax))  deallocate (gkernelmax)
       if (allocated(vmetagrid))  deallocate (vmetagrid)
 c
 c     deallocation of global arrays from module output
