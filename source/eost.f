@@ -1388,7 +1388,7 @@ c
       real*8 oldg,newg
       real*8 oldweight,newweight
       real*8 delweight
-      real*8 scale,vmax,vtop
+      real*8 scale,gmax,gtop
       real*8 dgdl,dgdfl,d2gdlfl
       real*8 fexp(nflmda)
       logical dofkern
@@ -1476,9 +1476,9 @@ c
                e = pref * expl * fexp(iflmda)
                oldg = gkernel(ilmda,iflmda)
                newg = oldg + e
-               vmax = gkernelmax(ilmda)
-               raised = (newg .gt. vmax)
-               vtop = max(vmax,newg)
+               gmax = gkernelmax(ilmda)
+               raised = (newg .gt. gmax)
+               gtop = max(gmax,newg)
                flmda = dble(iflmda-fli0) * wflmda
 c
 c     update the f kernel accumulators, which carry the largest bias
@@ -1488,21 +1488,21 @@ c     a cell with no bias carries no weight
 c
                if (dofmean) then
                   if (raised) then
-                     scale = exp((vmax-newg)*rtinv)
+                     scale = exp((gmax-newg)*rtinv)
                      lmdafsum(ilmda) = lmdafsum(ilmda) * scale
                      lmdafwt(ilmda) = lmdafwt(ilmda) * scale
                   end if
                   if (oldg .eq. 0.0d0) then
                      oldweight = 0.0d0
                   else
-                     oldweight = exp((oldg-vtop)*rtinv)
+                     oldweight = exp((oldg-gtop)*rtinv)
                   end if
                   if (newg .eq. 0.0d0) then
                      newweight = 0.0d0
                   else if (raised) then
                      newweight = 1.0d0
                   else
-                     newweight = exp((newg-vtop)*rtinv)
+                     newweight = exp((newg-gtop)*rtinv)
                   end if
                   delweight = newweight - oldweight
                   lmdafsum(ilmda) = lmdafsum(ilmda) + flmda*delweight
@@ -1517,7 +1517,7 @@ c
                dgdfl = ffac * e
                d2gdlfl = lfac * dgdfl
                gkernel(ilmda,iflmda) = newg
-               gkernelmax(ilmda) = vtop
+               gkernelmax(ilmda) = gtop
                gfkernel(ilmda,iflmda) = gfkernel(ilmda,iflmda) + dgdfl
                glkernel(ilmda,iflmda) = glkernel(ilmda,iflmda) + dgdl
                glfkernel(ilmda,iflmda) = glfkernel(ilmda,iflmda)
@@ -1565,7 +1565,7 @@ c
       real*8 avgflambda
       real*8 partfunc
       real*8 flmda
-      real*8 vmax
+      real*8 gmax
       real*8 weight
 c
 c
@@ -1582,7 +1582,7 @@ c
 c     the largest bias in the row is factored out of both sums, where
 c     it cancels exactly, to keep the exponential from overflowing
 c
-         vmax = gkernelmax(ilmda)
+         gmax = gkernelmax(ilmda)
 c
 c     loop over flambda bins with nonzero g kernel support; the
 c     weights undo the bias on the atoms at the bath temperature
@@ -1590,7 +1590,7 @@ c
          do iflmda = 1, nflmda
             if (gkernel(ilmda,iflmda) .ne. 0.0d0) then
                flmda = dble(iflmda-fli0) * wflmda
-               weight = exp((gkernel(ilmda,iflmda)-vmax)
+               weight = exp((gkernel(ilmda,iflmda)-gmax)
      &                         /(gasconst*kelvin))
                avgflambda = avgflambda + flmda*weight
                partfunc = partfunc + weight

@@ -1825,7 +1825,7 @@ c
       real*8 partfunc
       real*8 fsum
       real*8 weight
-      real*8 vmaxref
+      real*8 gmaxref
       real*8 height
       real*8 fmanual(9)
       real*8 fref(9)
@@ -1879,15 +1879,15 @@ c
 c     the accumulators factor out the largest bias in the row, so the
 c     reference has to be built with the same gkernelmax shift
 c
-         vmaxref = 0.0d0
+         gmaxref = 0.0d0
          do j = 1, nflmda
             if (gref(i,j) .ne. 0.0d0)
-     &         vmaxref = max(vmaxref,gref(i,j))
+     &         gmaxref = max(gmaxref,gref(i,j))
          end do
          do j = 1, nflmda
             if (gref(i,j) .ne. 0.0d0) then
                flmda = dble(j-fli0) * wflmda
-               weight = exp((gref(i,j)-vmaxref)/rt)
+               weight = exp((gref(i,j)-gmaxref)/rt)
                fsum = fsum + flmda*weight
                partfunc = partfunc + weight
             end if
