@@ -1338,8 +1338,8 @@ void buildfkernel_();
 #define tinker_f_buildfkernel buildfkernel_
 double ostgdep_(int* ihist);
 #define tinker_f_ostgdep ostgdep_
-void addflatsample_(int* ihist);
-#define tinker_f_addflatsample addflatsample_
+void addmeansample_(int* ihist);
+#define tinker_f_addmeansample addmeansample_
 void clearkernels_();
 #define tinker_f_clearkernels clearkernels_
 void initostfile_();

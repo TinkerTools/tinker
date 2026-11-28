@@ -315,7 +315,7 @@ c
       setwflmda = .false.
       nlmda1 = nlmda
       wflmda1 = wflmda
-      ostflatsamp = .true.
+      ostmeansamp = .true.
       ostinterpol = .true.
       do i = 1, nkey
          next = 1
@@ -330,7 +330,7 @@ c
             read (string,*,err=10,end=10)  wflmda1
             setwflmda = .true.
          else if (keyword(1:16) .eq. 'OST-INTERPOLATE ' .or.
-     &            keyword(1:12) .eq. 'OST-FLATTEN ') then
+     &            keyword(1:14) .eq. 'OST-MEANFORCE ') then
             call ostkeys (keyword,record,next)
          end if
    10    continue
@@ -452,7 +452,7 @@ c
 c
 c     "ostseries" writes saved OST history entries and recomputes
 c     the cumulative free energy estimate after each deposited bias,
-c     from the mean force selected by OST-FLATTEN
+c     from the mean force selected by OST-MEANFORCE
 c
 c
       subroutine ostseries (iunit)
@@ -490,7 +490,7 @@ c     it was sampled under, before it joins the kernels
 c
       do ihist = 1, nsave
          nlmdahist = ihist
-         call addflatsample (ihist)
+         call addmeansample (ihist)
          if (fastkernel) then
             call updatekernels
          else
@@ -519,7 +519,7 @@ c     #################################################################
 c
 c
 c     "ostfreeenergy" writes the final free energy estimate from the
-c     mean force selected by OST-FLATTEN, followed by that mean force
+c     mean force selected by OST-MEANFORCE, followed by that mean force
 c     at each lambda bin
 c
 c     note the mean force is read as "ostseries" leaves it, built from
@@ -544,7 +544,7 @@ c     recompute and print the total free energy estimate
 c
       lmdadeltag = efreetot()
       fused = 'Kernel'
-      if (ostflatsamp)  fused = 'Sample'
+      if (ostmeansamp)  fused = 'Sample'
       write (iunit,10)  nlmdahist,fused,lmdadeltag,kelvin
    10 format (/,' OST Free Energy Estimate :',
      &        //,1x,'Number of Gaussians',i16,

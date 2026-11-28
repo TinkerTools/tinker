@@ -170,7 +170,7 @@ c
 c     add the new gaussian to the sample mean force, weighted by the
 c     bias it was sampled under, before it joins the kernels
 c
-      call addflatsample (nlmdahist)
+      call addmeansample (nlmdahist)
       if (fastkernel) then
          call updatekernels
       else
@@ -1236,7 +1236,7 @@ c
 c     "buildgkernel" builds the ost g kernel and its derivatives by
 c     looping over saved histogram sources and spreading their
 c     normalized gaussian contribution to nearby target bins, along
-c     with the sample mean force when OST-FLATTEN selects it, while
+c     with the sample mean force when OST-MEANFORCE selects it, while
 c     "buildfkernel" then gives the kernel mean force
 c
 c
@@ -1256,7 +1256,7 @@ c     loop over saved histogram sources, where each one joins the
 c     sample mean force before it joins the g kernel
 c
       do ihist = 1, nlmdahist
-         call addflatsample (ihist)
+         call addmeansample (ihist)
          call addkernelhist (ihist,.false.)
       end do
       return
@@ -1271,7 +1271,7 @@ c     ########################################################
 c
 c
 c     "buildkernels" builds the ost g kernel, its derivatives and the
-c     mean force OST-FLATTEN selects, kernel or sample, by looping over
+c     mean force OST-MEANFORCE selects, kernel or sample, by looping over
 c     the saved histogram sources with the fused kernel updates
 c
 c
@@ -1290,7 +1290,7 @@ c     loop over saved histogram sources, where each one joins the
 c     sample mean force before it joins the kernels
 c
       do ihist = 1, nlmdahist
-         call addflatsample (ihist)
+         call addmeansample (ihist)
          call addkernelhist (ihist,.true.)
       end do
       return
@@ -1353,7 +1353,7 @@ c
 c     "addkernelhist" spreads one saved histogram source to the ost
 c     g kernel, its derivatives and running maxima using normalized
 c     gaussian biasing functions; when "dofkern" is set it also
-c     updates the f kernel accumulators, unless OST-FLATTEN selects
+c     updates the f kernel accumulators, unless OST-MEANFORCE selects
 c     the sample mean force
 c
 c
@@ -1399,7 +1399,7 @@ c
 c     the f kernel accumulators hold the kernel mean force, so they
 c     are kept only when that mean force is selected
 c
-      dofmean = (dofkern .and. .not.ostflatsamp)
+      dofmean = (dofkern .and. .not.ostmeansamp)
 c
 c     unpack saved source location and get gaussian parameters
 c
@@ -1551,7 +1551,7 @@ c     "buildfkernel" builds the ost f kernel by computing the
 c     biased ensemble average of dE/dlambda at each lambda bin, and
 c     keeps its weighted sum and total weight in the same scaled
 c     form as "addkernelhist", so a row has data exactly when its
-c     total weight is positive; it does nothing when OST-FLATTEN
+c     total weight is positive; it does nothing when OST-MEANFORCE
 c     selects the sample mean force
 c
 c
@@ -1571,7 +1571,7 @@ c
 c
 c     the f kernel holds the kernel mean force alone
 c
-      if (ostflatsamp)  return
+      if (ostmeansamp)  return
 c
 c     loop over lambda bins
 c
@@ -1651,14 +1651,14 @@ c
 c
 c     ################################################################
 c     ##                                                            ##
-c     ##  subroutine addflatsample -- add one sample to mean force  ##
+c     ##  subroutine addmeansample -- add one sample to mean force  ##
 c     ##                                                            ##
 c     ################################################################
 c
 c
-c     "addflatsample" adds saved gaussian "ihist" to the sample mean
+c     "addmeansample" adds saved gaussian "ihist" to the sample mean
 c     force, held in the mean force of the lambda bins, when
-c     OST-FLATTEN selects it, and otherwise does nothing; its
+c     OST-MEANFORCE selects it, and otherwise does nothing; its
 c     dU/dlambda center counts in the lambda bin of
 c     its lambda center with weight exp(g/RT), and g is the bias the
 c     dynamics felt there before this gaussian was added; the weights
@@ -1668,10 +1668,10 @@ c     note the sums of a bin are kept relative to the largest g they
 c     hold and rescaled when a sample raises it, so no weight exceeds
 c     one and the exponential cannot overflow; the sums are those of
 c     the mean force of the lambda bins, which belong to one choice of
-c     OST-FLATTEN at a time, as explained in "clearkernels"
+c     OST-MEANFORCE at a time, as explained in "clearkernels"
 c
 c
-      subroutine addflatsample (ihist)
+      subroutine addmeansample (ihist)
       use bath
       use dlmda
       use ost
@@ -1687,7 +1687,7 @@ c
 c
 c     get the lambda bin and the bias at the gaussian center
 c
-      if (.not. ostflatsamp)  return
+      if (.not. ostmeansamp)  return
       rt = gasconst * kelvin
       ilmda = lmdabin(lmdalhist(ihist))
       g = ostgdep(ihist)
@@ -1697,14 +1697,14 @@ c     becomes the reference after the old sums are rescaled
 c
       w = 1.0d0
       if (lmdafwt(ilmda) .eq. 0.0d0) then
-         ostflatgmax(ilmda) = g
-      else if (g .gt. ostflatgmax(ilmda)) then
-         scale = exp((ostflatgmax(ilmda)-g)/rt)
+         ostsampgmax(ilmda) = g
+      else if (g .gt. ostsampgmax(ilmda)) then
+         scale = exp((ostsampgmax(ilmda)-g)/rt)
          lmdafsum(ilmda) = lmdafsum(ilmda) * scale
          lmdafwt(ilmda) = lmdafwt(ilmda) * scale
-         ostflatgmax(ilmda) = g
+         ostsampgmax(ilmda) = g
       else
-         w = exp((g-ostflatgmax(ilmda))/rt)
+         w = exp((g-ostsampgmax(ilmda))/rt)
       end if
 c
 c     add the weighted sample and update the mean force of the bin
@@ -1730,7 +1730,7 @@ c     that reference if it is missing or no longer matches the number
 c     of lambda bins
 c
 c     note the mean force of the lambda bins holds the kernel or the
-c     sample mean force, whichever OST-FLATTEN selects, and never both,
+c     sample mean force, whichever OST-MEANFORCE selects, and never both,
 c     so a change of the selection must be followed by this routine
 c     and a rebuild of the kernels from the history
 c
@@ -1745,17 +1745,17 @@ c
 c
 c     allocate the reference bias of the sample mean force if needed
 c
-      resize = (.not. allocated(ostflatgmax))
-      if (.not. resize)  resize = (size(ostflatgmax) .ne. nlmda)
+      resize = (.not. allocated(ostsampgmax))
+      if (.not. resize)  resize = (size(ostsampgmax) .ne. nlmda)
       if (resize) then
-         if (allocated(ostflatgmax))  deallocate (ostflatgmax)
-         allocate (ostflatgmax(nlmda))
+         if (allocated(ostsampgmax))  deallocate (ostsampgmax)
+         allocate (ostsampgmax(nlmda))
       end if
 c
 c     empty the kernels, the mean force and the reference bias
 c
       do i = 1, nlmda
-         ostflatgmax(i) = 0.0d0
+         ostsampgmax(i) = 0.0d0
          lmdafmean(i) = 0.0d0
          lmdafsum(i) = 0.0d0
          lmdafwt(i) = 0.0d0

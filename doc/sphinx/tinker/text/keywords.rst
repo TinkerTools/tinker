@@ -765,8 +765,8 @@ ADAPTIVE LAMBDA BIAS KEYWORDS
      - LAMBDA-NBIN
      - LAMBDA-SAMPLE
    * -
-     - OST-FLATTEN
      - OST-INTERPOLATE
+     - OST-MEANFORCE
      - OST-STDDEV
    * -
      - OST-TEMPER-GLOBAL
@@ -2729,17 +2729,17 @@ OPENMP-THREADS [integer]
 
 OPT-COEFF
 
-.. index:: OST-FLATTEN
-.. _KEY-OST-FLATTEN:
-
-OST-FLATTEN [KERNEL / SAMPLE]
-   Selects the mean force dU/dlambda that orthogonal space tempering integrates over lambda, both for the bias that flattens the free energy along lambda and for the reported free energy: the Estimated Delta G of the dynamics output, the free energy saved in the history file, and the Delta G and time series written by ANALYZELMDA. SAMPLE averages the dU/dlambda of the deposited gaussians in the lambda bin of each, weighting each by exp(g/kT), where g is the bias the dynamics felt at its center before it was added and T is the bath temperature; the weight removes that bias whatever the shape of g. KERNEL instead weights the dU/dlambda bins of the g kernel at each lambda by exp(g/kT), which is valid only once g has flattened dU/dlambda at that lambda, and is smoothed over the WFHIST width. The bias at each gaussian is evaluated as chosen by OST-INTERPOLATE. Only the selected mean force is computed, and ANALYZELMDA, which also reads this keyword, writes only its free energy and mean force; since the mean force is rebuilt from the saved gaussians, the keyword may be changed when a run is continued or analyzed. Any other modifier stops the calculation, and the default in the absence of the OST-FLATTEN keyword is SAMPLE.
-
 .. index:: OST-INTERPOLATE
 .. _KEY-OST-INTERPOLATE:
 
 OST-INTERPOLATE [NONE]
    Selects how the orthogonal space tempering or metadynamics bias is evaluated. By default, and with no modifier, the bias is found by cubic Hermite interpolation of the values and slopes stored at the bin centers, over lambda and dU/dlambda for orthogonal space tempering and over lambda for metadynamics, so each evaluation takes the same time however long the history grows. The NONE modifier sums the deposited gaussians within the OST-STDDEV cutoff directly instead, which is exact between bin centers but slows in proportion to the number of gaussians near the current point, and so grows with the length of the run, most of all with a short LAMBDA-INTERVAL. The accuracy of interpolation depends on the bin width relative to the gaussian widths. ANALYZELMDA also reads this keyword when analyzing an orthogonal space tempering or metadynamics history.
+
+.. index:: OST-MEANFORCE
+.. _KEY-OST-MEANFORCE:
+
+OST-MEANFORCE [KERNEL / SAMPLE]
+   Selects the mean force dU/dlambda that orthogonal space tempering integrates over lambda, both for the bias that flattens the free energy along lambda and for the reported free energy: the Estimated Delta G of the dynamics output, the free energy saved in the history file, and the Delta G and time series written by ANALYZELMDA. SAMPLE averages the dU/dlambda of the deposited gaussians in the lambda bin of each, weighting each by exp(g/kT), where g is the bias the dynamics felt at its center before it was added and T is the bath temperature; the weight removes that bias whatever the shape of g. KERNEL instead weights the dU/dlambda bins of the g kernel at each lambda by exp(g/kT), which is valid only once g has flattened dU/dlambda at that lambda, and is smoothed over the WFHIST width. The bias at each gaussian is evaluated as chosen by OST-INTERPOLATE. Only the selected mean force is computed, and ANALYZELMDA, which also reads this keyword, writes only its free energy and mean force; since the mean force is rebuilt from the saved gaussians, the keyword may be changed when a run is continued or analyzed. Any other modifier stops the calculation, and the default in the absence of the OST-MEANFORCE keyword is SAMPLE.
 
 .. index:: OST-STDDEV
 .. _KEY-OST-STDDEV:

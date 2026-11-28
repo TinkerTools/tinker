@@ -1284,7 +1284,7 @@ c
       oststdev = 4.0d0
       fastkernel = .true.
       ostinterpol = .true.
-      ostflatsamp = .true.
+      ostmeansamp = .true.
 c
 c     search keywords for orthogonal space tempering options
 c
@@ -1306,7 +1306,7 @@ c
             string = record(next:240)
             read (string,*,err=10,end=10)  oststdev
          else if (keyword(1:16) .eq. 'OST-INTERPOLATE ' .or.
-     &            keyword(1:12) .eq. 'OST-FLATTEN ') then
+     &            keyword(1:14) .eq. 'OST-MEANFORCE ') then
             call ostkeys (keyword,record,next)
          else if (keyword(1:6) .eq. 'HBIAS ') then
             string = record(next:240)
@@ -1383,7 +1383,7 @@ c
       if (allocated(glkernel))  deallocate (glkernel)
       if (allocated(lmdafwt))  deallocate (lmdafwt)
       if (allocated(vkernelmax))  deallocate (vkernelmax)
-      if (allocated(ostflatgmax))  deallocate (ostflatgmax)
+      if (allocated(ostsampgmax))  deallocate (ostsampgmax)
 c
 c     allocate ost histogram and kernels
 c
@@ -1444,7 +1444,7 @@ c     ##                                                        ##
 c     ############################################################
 c
 c
-c     "ostkeys" applies the OST-INTERPOLATE or OST-FLATTEN keyword
+c     "ostkeys" applies the OST-INTERPOLATE or OST-MEANFORCE keyword
 c     "keyword" found in keyfile line "record", whose modifier starts
 c     at position "next"; it serves both dynamics and the analysis of
 c     a history, which never runs the dynamics setup
@@ -1472,14 +1472,14 @@ c
 c     take the sample or the kernel mean force, and stop on any
 c     other modifier
 c
-      else if (keyword(1:12) .eq. 'OST-FLATTEN ') then
+      else if (keyword(1:14) .eq. 'OST-MEANFORCE ') then
          if (word .eq. 'KERNEL') then
-            ostflatsamp = .false.
+            ostmeansamp = .false.
          else if (word .eq. 'SAMPLE') then
-            ostflatsamp = .true.
+            ostmeansamp = .true.
          else
             write (iout,10)  word(1:max(1,trimtext(word)))
-   10       format (/,' OSTKEYS  --  Unknown OST-FLATTEN Mean Force ',
+   10       format (/,' OSTKEYS  --  Unknown OST-MEANFORCE Mean Force ',
      &                 a,'; Use KERNEL or SAMPLE')
             call fatal
          end if
